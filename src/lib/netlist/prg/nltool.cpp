@@ -52,11 +52,13 @@ public:
 	plib::option_bool   opt_help;
 };
 
-plib::pstdout pout_strm;
-plib::pstderr perr_strm;
+static plib::pstdout pout_strm;
+static plib::pstderr perr_strm;
 
-plib::pstream_fmt_writer_t pout(pout_strm);
-plib::pstream_fmt_writer_t perr(perr_strm);
+static plib::pstream_fmt_writer_t pout(pout_strm);
+static plib::pstream_fmt_writer_t perr(perr_strm);
+
+NETLIST_EXTERNAL(dummy);
 
 NETLIST_START(dummy)
 	/* Standard stuff */
@@ -83,7 +85,7 @@ public:
 	{
 		if (m_setup != nullptr)
 			plib::pfree(m_setup);
-	};
+	}
 
 	void init()
 	{
@@ -135,6 +137,9 @@ private:
 	netlist::setup_t *m_setup;
 };
 
+
+// FIXME: usage should go elsewhere
+void usage(tool_options_t &opts);
 
 void usage(tool_options_t &opts)
 {

@@ -158,7 +158,7 @@ public:
 
 	struct define_t
 	{
-		define_t() { };
+		define_t() { }
 		define_t(const pstring &name, const pstring &replace)
 		: m_name(name), m_replace(replace)
 		{}

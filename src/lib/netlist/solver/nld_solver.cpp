@@ -172,7 +172,8 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 						log().debug("Added input\n");
 					}
 					break;
-				default:
+				case terminal_t::OUTPUT:
+				case terminal_t::PARAM:
 					log().fatal("unhandled element found\n");
 					break;
 			}
@@ -335,7 +336,7 @@ void matrix_solver_t::setup_matrix()
 	}
 	log().verbose("Number of mults/adds for {1}: {2}", name(), ops);
 
-	if (0)
+	if ((0))
 		for (unsigned k = 0; k < iN; k++)
 		{
 			pstring line = plib::pfmt("{1}")(k, "3");

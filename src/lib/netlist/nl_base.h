@@ -273,8 +273,9 @@ namespace netlist
 	class fatalerror_e : public plib::pexception
 	{
 	public:
-		fatalerror_e(const pstring &text) : plib::pexception(text) { }
-		virtual ~fatalerror_e() throw() {}
+		explicit fatalerror_e(const pstring text) : plib::pexception(text) { }
+		fatalerror_e(const fatalerror_e &e) : plib::pexception(e) { }
+		virtual ~fatalerror_e() noexcept {}
 	};
 
 	class logic_output_t;
@@ -711,7 +712,7 @@ namespace netlist
 	public:
 
 		logic_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
-		virtual ~logic_net_t() { };
+		virtual ~logic_net_t() { }
 
 		netlist_sig_t Q() const { return m_cur_Q; }
 		netlist_sig_t new_Q() const     { return m_new_Q; }
@@ -755,7 +756,7 @@ namespace netlist
 
 		analog_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
 
-		virtual ~analog_net_t() { };
+		virtual ~analog_net_t() { }
 
 		nl_double Q_Analog() const { return m_cur_Analog; }
 		nl_double &Q_Analog_state_ptr() { return m_cur_Analog; }
@@ -1160,13 +1161,6 @@ namespace netlist
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 
-	protected:
-
-		// performance
-		nperfcount_t m_perf_out_processed;
-		nperfcount_t m_perf_inp_processed;
-		nperfcount_t m_perf_inp_active;
-
 	private:
 		plib::state_manager_t       m_state;
 		/* mostly rw */
@@ -1185,6 +1179,11 @@ namespace netlist
 		setup_t *m_setup;
 		plib::plog_base<NL_DEBUG> m_log;
 		plib::dynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
+
+		// performance
+		nperfcount_t m_perf_out_processed;
+		nperfcount_t m_perf_inp_processed;
+		nperfcount_t m_perf_inp_active;
 	};
 
 	// -----------------------------------------------------------------------------

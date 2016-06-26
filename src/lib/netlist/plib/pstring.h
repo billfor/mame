@@ -128,7 +128,7 @@ public:
 
 	int find(const pstring_t &search, unsigned start = 0) const;
 	int find(const mem_t *search, unsigned start = 0) const;
-	int find(const code_t search, unsigned start = 0) const { mem_t buf[F::MAXCODELEN+1] = { 0 }; F::encode(search, buf); return find(buf, start); };
+	int find(const code_t search, unsigned start = 0) const { mem_t buf[F::MAXCODELEN+1] = { 0 }; F::encode(search, buf); return find(buf, start); }
 
 	const pstring_t substr(int start, int count = -1) const ;
 
@@ -332,6 +332,8 @@ public:
 	// construction with copy
 	pstringbuffer(const char *string) {init(); if (string != nullptr) pcopy(string); }
 	pstringbuffer(const pstring &string) {init(); pcopy(string); }
+	pstringbuffer(const pstringbuffer &stringb) {init(); pcopy(stringb); }
+	pstringbuffer(pstringbuffer &&b) : m_ptr(b.m_ptr), m_size(b.m_size), m_len(b.m_len) { b.m_ptr = nullptr; b.m_size = 0; b.m_len = 0; }
 
 	// assignment operators
 	pstringbuffer &operator=(const char *string) { pcopy(string); return *this; }

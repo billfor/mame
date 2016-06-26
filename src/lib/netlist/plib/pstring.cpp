@@ -22,30 +22,6 @@ pstr_t pstring_t<putf8_traits>::m_zero = pstr_t(0);
 template<>
 pstr_t pstring_t<pu8_traits>::m_zero = pstr_t(0);
 
-
-/*
- * Uncomment the following to override defaults
- */
-
-#define IMMEDIATE_MODE  (1)
-//#define DEBUG_MODE      (0)
-
-#ifdef MAME_DEBUG
-	#ifndef IMMEDIATE_MODE
-		#define IMMEDIATE_MODE  (1)
-	#endif
-	#ifndef DEBUG_MODE
-		#define DEBUG_MODE      (0)
-	#endif
-#else
-	#ifndef IMMEDIATE_MODE
-		#define IMMEDIATE_MODE  (1)
-	#endif
-	#ifndef DEBUG_MODE
-		#define DEBUG_MODE      (0)
-	#endif
-#endif
-
 template<typename F>
 pstring_t<F>::~pstring_t()
 {
