@@ -664,6 +664,7 @@ namespace netlist
 		bool is_analog() const;
 
 		void toggle_new_Q()             { m_new_Q ^= 1;   }
+		void force_queue_execution()    { m_new_Q = (m_cur_Q ^ 1);   }
 
 		void push_to_queue(const netlist_time delay) NOEXCEPT;
 		void reschedule_in_queue(const netlist_time delay) NOEXCEPT;
@@ -1140,11 +1141,11 @@ namespace netlist
 
 		template<typename O, typename C> void save(O &owner, C &state, const pstring &stname)
 		{
-			this->state().save_item((void *)&owner, state, pstring(owner.name()) + "." + stname);
+			this->state().save_item(static_cast<void *>(&owner), state, pstring(owner.name()) + "." + stname);
 		}
 		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const int count)
 		{
-			this->state().save_state_ptr((void *)&owner, pstring(owner.name()) + "." + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
+			this->state().save_state_ptr(static_cast<void *>(&owner), pstring(owner.name()) + "." + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
 		}
 
 		virtual void reset();

@@ -58,7 +58,7 @@ static plib::pstderr perr_strm;
 static plib::pstream_fmt_writer_t pout(pout_strm);
 static plib::pstream_fmt_writer_t perr(perr_strm);
 
-NETLIST_EXTERNAL(dummy);
+NETLIST_EXTERNAL(dummy)
 
 NETLIST_START(dummy)
 	/* Standard stuff */

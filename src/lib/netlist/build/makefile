@@ -125,11 +125,11 @@ clean:
 
 nltool: $(OBJ)/prg/nltool.o $(OBJS)
 	@echo Linking $@...
-	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
+	@$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
 nlwav: $(OBJ)/prg/nlwav.o $(OBJS)
 	@echo Linking $@...
-	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
+	@$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
 #-------------------------------------------------
 # directories
@@ -161,8 +161,9 @@ depend: .depend
 
 .PHONY: clang
 clang: 
-	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-Weverything -Werror -Wno-old-style-cast -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-c++98-compat -Wno-float-equal -Wno-cast-align -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-format-nonliteral -Wno-weak-template-vtables"
+	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-c++98-compat -Wno-float-equal -Wno-cast-align -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-format-nonliteral -Wno-weak-template-vtables"
 
+# -Wno-old-style-cast
 # FIX:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-old-style-cast -Wno-exit-time-destructors
 
 #-------------------------------------------------
@@ -173,11 +174,11 @@ $(OBJ)/%.o: $(SRC)/%.cpp
 	@echo Compiling $<...
 	@$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 
-$(OBJ)/%.pp: $(SRC)/%.cpp | $(OSPREBUILD)
+$(OBJ)/%.pp: $(SRC)/%.cpp 
 	@echo Compiling $<...
 	@$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
 
-$(OBJ)/%.s: $(SRC)/%.cpp | $(OSPREBUILD)
+$(OBJ)/%.s: $(SRC)/%.cpp |
 	@echo Compiling $<...
 	@$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
 

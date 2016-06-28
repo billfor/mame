@@ -198,6 +198,8 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
 		}
 		if (new_solver_timestep < m_params.m_min_timestep)
 			new_solver_timestep = m_params.m_min_timestep;
+		if (new_solver_timestep > m_params.m_max_timestep)
+			new_solver_timestep = m_params.m_max_timestep;
 	}
 	//if (new_solver_timestep > 10.0 * hn)
 	//    new_solver_timestep = 10.0 * hn;
