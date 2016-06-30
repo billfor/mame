@@ -138,7 +138,7 @@ public:
 
 	void setup(analog_net_t::list_t &nets) { vsetup(nets); }
 
-	const void solve_base();
+	void solve_base();
 
 	const netlist_time solve();
 

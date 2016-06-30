@@ -21,7 +21,8 @@ SRC = ..
 #LDFLAGS = $(LTO) -g -O3 -std=c++98
 
 CFLAGS =  $(CEXTRAFLAGS) $(LTO) -g -O3 -std=c++11 -march=native -I.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter
-LDFLAGS = $(LTO) -g -O3 -std=c++11 -lpthread -ldl
+LDFLAGS = $(LTO) -g -O3 -std=c++11 
+LIBS = -lpthread -ldl
 
 CC = g++-5
 LD = @g++-5
@@ -178,7 +179,7 @@ $(OBJ)/%.pp: $(SRC)/%.cpp
 	@echo Compiling $<...
 	@$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
 
-$(OBJ)/%.s: $(SRC)/%.cpp |
+$(OBJ)/%.s: $(SRC)/%.cpp
 	@echo Compiling $<...
 	@$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
 

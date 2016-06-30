@@ -414,7 +414,7 @@ void matrix_solver_t::step(const netlist_time &delta)
 		m_step_devices[k]->step_time(dd);
 }
 
-const void matrix_solver_t::solve_base()
+void matrix_solver_t::solve_base()
 {
 	m_stat_vsolver_calls++;
 	if (has_dynamic_devices())

@@ -17,6 +17,13 @@ NETLIST_START(perf)
 
 NETLIST_END()
 
+#ifndef P_FREQ
+#define P_FREQ 4800
+#endif
+
+#ifndef P_DTS
+#define P_DTS 1
+#endif
 
 NETLIST_START(cap_delay)
 
@@ -27,9 +34,9 @@ NETLIST_START(cap_delay)
 
     /* Standard stuff */
 
-    SOLVER(Solver, 4800)
+    SOLVER(Solver, P_FREQ)
     PARAM(Solver.ACCURACY, 1e-20)
-	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_TS, P_DTS)
 	PARAM(Solver.MIN_TIMESTEP, 1e-6)
     CLOCK(clk, 5000)
 
