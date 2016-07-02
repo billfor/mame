@@ -131,13 +131,13 @@ static void convert(nlwav_options_t &opts)
 	plib::pofilestream fo(opts.opt_out());
 	if (fo.bad())
 	{
-		throw netlist::fatalerror_e("Error opening output file: " + opts.opt_out());
+		throw netlist::nl_exception("Error opening output file: " + opts.opt_out());
 	}
 	wav_t wo(fo, 48000);
 
 	plib::pifilestream fin(opts.opt_inp());
 	if (fin.bad())
-		throw netlist::fatalerror_e("Error opening input file: " + opts.opt_inp());
+		throw netlist::nl_exception("Error opening input file: " + opts.opt_inp());
 
 	double dt = 1.0 / (double) wo.sample_rate();
 	double ct = dt;

@@ -18,7 +18,6 @@ namespace plib {
 pexception::pexception(const pstring text)
 {
 	m_text = text;
-	fprintf(stderr, "%s\n", m_text.cstr());
 }
 
 mempool::mempool(int min_alloc, int min_align)

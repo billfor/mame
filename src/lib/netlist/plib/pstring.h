@@ -60,6 +60,7 @@ public:
 	// construction with copy
 	pstring_t(const mem_t *string) {init(); if (string != nullptr && *string != 0) pcopy(string); }
 	pstring_t(const pstring_t &string) {init(); pcopy(string); }
+	pstring_t(pstring_t &&string) : m_ptr(string.m_ptr) {string.m_ptr = nullptr; }
 
 	// assignment operators
 	pstring_t &operator=(const mem_t *string) { pcopy(string); return *this; }
@@ -115,7 +116,7 @@ public:
 
 	unsigned len() const
 	{
-		return F::len(m_ptr);
+		return traits::len(m_ptr);
 	}
 
 	pstring_t& operator+=(const code_t c) { mem_t buf[F::MAXCODELEN+1] = { 0 }; F::encode(c, buf); pcat(buf); return *this; }
@@ -294,6 +295,8 @@ struct putf8_traits
 		return p1;
 	}
 };
+
+// FIXME: "using pstring = pstring_t<putf8_traits>" is not understood by eclipse
 
 struct pstring : public pstring_t<putf8_traits>
 {
