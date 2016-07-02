@@ -1038,8 +1038,6 @@ bool source_mem_t::parse(setup_t &setup, const pstring &name)
 bool source_file_t::parse(setup_t &setup, const pstring &name)
 {
 	plib::pifilestream istrm(m_filename);
-	if (istrm.bad())
-		throw plib::pexception(plib::pfmt("File not found: {}")(m_filename));
 	return setup.parse_stream(istrm, name);
 }
 

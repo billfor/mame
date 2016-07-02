@@ -360,6 +360,8 @@ public:
 	void cat(const char *s) { pcat(s); }
 	void cat(const void *m, unsigned l) { pcat(m, l); }
 
+	void clear() { m_len = 0; *m_ptr = 0; }
+
 private:
 
 	void init()
