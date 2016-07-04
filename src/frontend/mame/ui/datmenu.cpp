@@ -81,7 +81,7 @@ menu_dats_view::~menu_dats_view()
 
 void menu_dats_view::handle()
 {
-	const event *menu_event = process(FLAG_UI_DATS);
+	auto menu_event = process(FLAG_UI_DATS);
 	if (menu_event != nullptr)
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT && m_actual > 0)
@@ -110,7 +110,7 @@ void menu_dats_view::populate()
 
 	(m_issoft == true) ? get_data_sw() : get_data();
 
-	item_append(menu_item_type::SEPARATOR);
+	item_append(menu_item_type::SEPARATOR, (FLAG_UI_DATS | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW));
 	customtop = 2.0f * ui().get_line_height() + 4.0f * UI_BOX_TB_BORDER;
 	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 
