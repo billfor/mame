@@ -118,7 +118,7 @@ typename pstring_t<F>::iter_t pstring_t<F>::find_first_not_of(const pstring_t &n
 	for (auto it = begin(); it != end(); ++it)
 	{
 		bool f = true;
-		for (auto const &jt : no)
+		for (auto const jt : no)
 		{
 			if (*it == jt)
 			{
@@ -140,7 +140,7 @@ typename pstring_t<F>::iter_t pstring_t<F>::find_last_not_of(const pstring_t &no
 	for (auto it = begin(); it != end(); ++it)
 	{
 		bool f = true;
-		for (auto const &jt : no)
+		for (auto const jt : no)
 		{
 			if (*it == jt)
 			{
