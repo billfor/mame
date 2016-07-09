@@ -94,24 +94,13 @@ void pstring_t<F>::pcopy(const mem_t *from, int size)
 }
 
 template<typename F>
-const pstring_t<F> pstring_t<F>::substr(unsigned start, unsigned count) const
+const pstring_t<F> pstring_t<F>::substr(const iter_t start, const iter_t end) const
 {
 	pstring_t ret;
-	unsigned alen = len();
-	if (start >= alen || count == 0)
-		return ret;
-	if (start + count > alen)
-		count = alen - start;
-	const mem_t *p = cstr();
-	// find start
-	for (unsigned i=0; i<start; i++)
-		p += F::codelen(p);
-	const char *e = p;
-	for (unsigned i=0; i<count; i++)
-		e += F::codelen(e);
-	ret.pcopy(p, e-p);
+	ret.pcopy(start.p, end.p - start.p);
 	return ret;
 }
+
 
 template<typename F>
 const pstring_t<F> pstring_t<F>::ucase() const
@@ -124,109 +113,108 @@ const pstring_t<F> pstring_t<F>::ucase() const
 }
 
 template<typename F>
-int pstring_t<F>::find_first_not_of(const pstring_t &no) const
+typename pstring_t<F>::iter_t pstring_t<F>::find_first_not_of(const pstring_t &no) const
 {
-	char *t = m_ptr->str();
-	unsigned nolen = no.len();
-	unsigned tlen = len();
-	for (std::size_t  i=0; i < tlen; i++)
+	for (auto it = begin(); it != end(); ++it)
 	{
-		char *n = no.m_ptr->str();
 		bool f = true;
-		for (std::size_t  j=0; j < nolen; j++)
+		for (auto const &jt : no)
 		{
-			if (F::code(t) == F::code(n))
+			if (*it == jt)
+			{
 				f = false;
-			n += F::codelen(t);
+				break;
+			}
 		}
 		if (f)
-			return i;
-		t += F::codelen(t);
+			return it;
 	}
-	return -1;
+	return end();
 }
 
 template<typename F>
-int pstring_t<F>::find_last_not_of(const pstring_t &no) const
+typename pstring_t<F>::iter_t pstring_t<F>::find_last_not_of(const pstring_t &no) const
 {
-	char *t = m_ptr->str();
-	unsigned nolen = no.len();
-	unsigned tlen = len();
-	int last_found = -1;
-	for (std::size_t  i=0; i < tlen; i++)
+	/* FIXME: reverse iterator */
+	iter_t last_found = end();
+	for (auto it = begin(); it != end(); ++it)
 	{
-		char *n = no.m_ptr->str();
 		bool f = true;
-		for (std::size_t  j=0; j < nolen; j++)
+		for (auto const &jt : no)
 		{
-			if (F::code(t) == F::code(n))
+			if (*it == jt)
+			{
 				f = false;
-			n += F::codelen(t);
+				break;
+			}
 		}
 		if (f)
-			last_found = i;
-		t += F::codelen(t);
+			last_found = it;
 	}
 	return last_found;
 }
 
 template<typename F>
+typename pstring_t<F>::iter_t pstring_t<F>::find(const pstring_t &search, iter_t start) const
+{
+	for (; start != end(); ++start)
+	{
+		iter_t itc(start);
+		auto cmp = search.begin();
+		while (itc != end() && cmp != search.end() && *itc == *cmp)
+		{
+			++itc;
+			++cmp;
+		}
+		if (cmp == search.end())
+			return start;
+	}
+	return end();
+}
+
+template<typename F>
 pstring_t<F> pstring_t<F>::replace(const pstring_t &search, const pstring_t &replace) const
 {
-	// FIXME: use this pstringbuffer ret = "";
-	pstring_t ret = "";
-	const int slen = search.blen();
-	const int tlen = blen();
+	pstring_t ret("");
+	const size_type slen = search.len();
 
-	if (slen == 0 || tlen < slen )
-		return *this;
-	int i = 0;
-	while (i < tlen - slen + 1)
+	auto last_s = begin();
+	auto s = find(search, last_s);
+	while (s != end())
 	{
-		if (memcmp(cstr()+i,search.cstr(),slen) == 0)
-		{
-			ret += replace;
-			i += slen;
-		}
-		else
-		{
-			/* avoid adding a code, cat a string ... */
-			mem_t buf[2] = { *(cstr() + i), 0 };
-			ret = ret.cat(buf);
-			i++;
-		}
+		ret += substr(last_s, s);
+		ret += replace;
+		last_s = s + slen;
+		s = find(search, last_s);
 	}
-	ret = ret.cat(cstr() + i);
+	ret += substr(last_s, end());
 	return ret;
 }
 
 template<typename F>
 const pstring_t<F> pstring_t<F>::ltrim(const pstring_t &ws) const
 {
-	int f = find_first_not_of(ws);
-	if (f>=0)
-		return substr(f);
-	else
-		return "";
+	return substr(find_first_not_of(ws), end());
 }
 
 template<typename F>
 const pstring_t<F> pstring_t<F>::rtrim(const pstring_t &ws) const
 {
-	int f = find_last_not_of(ws);
-	if (f>=0)
-		return left(f+1);
+	auto f = find_last_not_of(ws);
+	if (f==end())
+		return pstring_t("");
 	else
-		return "";
+		return substr(begin(), f + 1);
 }
 
 template<typename F>
-const pstring_t<F> pstring_t<F>::rpad(const pstring_t &ws, const unsigned cnt) const
+const pstring_t<F> pstring_t<F>::rpad(const pstring_t &ws, const size_type cnt) const
 {
 	// FIXME: pstringbuffer ret(*this);
 
 	pstring_t ret(*this);
-	while (ret.len() < cnt)
+	size_type wsl = ws.len();
+	for (auto i = ret.len(); i < cnt; i+=wsl)
 		ret += ws;
 	return ret;
 }
@@ -269,6 +257,133 @@ long pstring_t<F>::as_long(bool *error) const
 		if (error != nullptr)
 			*error = true;
 	return ret;
+}
+
+template<typename F>
+typename pstring_t<F>::iter_t pstring_t<F>::find(const mem_t *search, iter_t start) const
+{
+	for (; start != end(); ++start)
+	{
+		iter_t itc(start);
+		iter_t cmp(search);
+		while (itc != end() && *cmp != 0 && *itc == *cmp)
+		{
+			++itc;
+			++cmp;
+		}
+		if (*cmp == 0)
+			return start;
+	}
+	return end();
+}
+
+template<typename F>
+bool pstring_t<F>::startsWith(const pstring_t &arg) const
+{
+	if (arg.blen() > blen())
+		return false;
+	else
+		return (memcmp(arg.cstr(), cstr(), arg.blen()) == 0);
+}
+
+template<typename F>
+bool pstring_t<F>::endsWith(const pstring_t &arg) const
+{
+	if (arg.blen() > blen())
+		return false;
+	else
+		return (memcmp(cstr()+this->blen()-arg.blen(), arg.cstr(), arg.blen()) == 0);
+}
+
+
+template<typename F>
+bool pstring_t<F>::startsWith(const mem_t *arg) const
+{
+	unsigned alen = strlen(arg);
+	if (alen > blen())
+		return false;
+	else
+		return (memcmp(arg, cstr(), alen) == 0);
+}
+
+template<typename F>
+int pstring_t<F>::pcmp(const mem_t *right) const
+{
+	return std::strcmp(m_ptr->str(), right);
+}
+
+// ----------------------------------------------------------------------------------------
+// pstringbuffer
+// ----------------------------------------------------------------------------------------
+
+pstringbuffer::~pstringbuffer()
+{
+	if (m_ptr != nullptr)
+		plib::pfree_array(m_ptr);
+}
+
+void pstringbuffer::resize(const std::size_t size)
+{
+	if (m_ptr == nullptr)
+	{
+		m_size = DEFAULT_SIZE;
+		while (m_size <= size)
+			m_size *= 2;
+		m_ptr = plib::palloc_array<char>(m_size);
+		*m_ptr = 0;
+		m_len = 0;
+	}
+	else if (m_size < size)
+	{
+		while (m_size < size)
+			m_size *= 2;
+		char *new_buf = plib::palloc_array<char>(m_size);
+		std::memcpy(new_buf, m_ptr, m_len + 1);
+		plib::pfree_array(m_ptr);
+		m_ptr = new_buf;
+	}
+}
+
+void pstringbuffer::pcopy(const char *from)
+{
+	std::size_t nl = strlen(from) + 1;
+	resize(nl);
+	std::memcpy(m_ptr, from, nl);
+}
+
+void pstringbuffer::pcopy(const pstring &from)
+{
+	std::size_t nl = from.blen() + 1;
+	resize(nl);
+	std::memcpy(m_ptr, from.cstr(), nl);
+}
+
+void pstringbuffer::pcat(const char *s)
+{
+	const std::size_t slen = std::strlen(s);
+	const std::size_t nl = m_len + slen + 1;
+	resize(nl);
+	std::memcpy(m_ptr + m_len, s, slen + 1);
+	m_len += slen;
+}
+
+void pstringbuffer::pcat(const void *m, unsigned l)
+{
+	const std::size_t nl = m_len + l + 1;
+	resize(nl);
+	std::memcpy(m_ptr + m_len, m, l);
+	m_len += l;
+	*(m_ptr + m_len) = 0;
+}
+
+void pstringbuffer::pcat(const pstring &s)
+{
+	const std::size_t slen = s.blen();
+	const std::size_t nl = m_len + slen + 1;
+	resize(nl);
+	std::memcpy(m_ptr + m_len, s.cstr(), slen);
+	m_len += slen;
+	m_ptr[m_len] = 0;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -384,7 +499,7 @@ void pstring_t<F>::sfree(pstr_t *s)
 	s->m_ref_count--;
 	if (s->m_ref_count == 0 && s != &m_zero)
 	{
-		pfree_array(((char *)s));
+		plib::pfree_array(((char *)s));
 		//_mm_free(((char *)s));
 	}
 }
@@ -393,7 +508,7 @@ template<typename F>
 pstr_t *pstring_t<F>::salloc(int n)
 {
 	int size = sizeof(pstr_t) + n + 1;
-	pstr_t *p = (pstr_t *) palloc_array(char, size);
+	pstr_t *p = (pstr_t *) plib::palloc_array<char>(size);
 	//  str_t *p = (str_t *) mm_malloc(size, 8);
 	p->init(n);
 	return p;
@@ -406,168 +521,9 @@ void pstring_t<F>::resetmem()
 }
 #endif
 
-
 // ----------------------------------------------------------------------------------------
-// pstring ...
+// template stuff ...
 // ----------------------------------------------------------------------------------------
-
-template<typename F>
-int pstring_t<F>::find(const pstring_t &search, unsigned start) const
-{
-	const unsigned tlen = len();
-	const unsigned slen = search.len();
-	const mem_t *s = search.cstr();
-	const unsigned startt = std::min(start, tlen);
-	const mem_t *t = cstr();
-	for (std::size_t  i=0; i<startt; i++)
-		t += F::codelen(t);
-	for (int i=0; i <= (int) tlen - (int) startt - (int) slen; i++)
-	{
-		if (F::code(t) == F::code(s))
-			if (std::memcmp(t,s,search.blen())==0)
-				return i+startt;
-		t += F::codelen(t);
-	}
-	return -1;
-}
-
-template<typename F>
-int pstring_t<F>::find(const mem_t *search, unsigned start) const
-{
-	const unsigned tlen = len();
-	unsigned slen = 0;
-	unsigned sblen = 0;
-	const mem_t *x = search;
-	while (*x != 0)
-	{
-		slen++;
-		const unsigned sl = F::codelen(x);
-		x += sl;
-		sblen += sl;
-	}
-	const char *s = search;
-	const unsigned startt = std::min(start, tlen);
-	const char *t = cstr();
-	for (std::size_t  i=0; i<startt; i++)
-		t += F::codelen(t);
-	for (int i=0; i <= (int) tlen - (int) startt - (int) slen; i++)
-	{
-		if (F::code(t) == F::code(s))
-			if (std::memcmp(t,s,sblen)==0)
-				return i+startt;
-		t += F::codelen(t);
-	}
-	return -1;
-}
-
-template<typename F>
-bool pstring_t<F>::startsWith(const pstring_t &arg) const
-{
-	if (arg.blen() > blen())
-		return false;
-	else
-		return (memcmp(arg.cstr(), cstr(), arg.len()) == 0);
-}
-
-template<typename F>
-bool pstring_t<F>::endsWith(const pstring_t &arg) const
-{
-	if (arg.blen() > blen())
-		return false;
-	else
-		return (memcmp(cstr()+this->len()-arg.len(), arg.cstr(), arg.len()) == 0);
-}
-
-
-template<typename F>
-bool pstring_t<F>::startsWith(const mem_t *arg) const
-{
-	unsigned alen = strlen(arg);
-	if (alen > blen())
-		return false;
-	else
-		return (memcmp(arg, cstr(), alen) == 0);
-}
-
-template<typename F>
-int pstring_t<F>::pcmp(const mem_t *right) const
-{
-	return std::strcmp(m_ptr->str(), right);
-}
-
-// ----------------------------------------------------------------------------------------
-// pstringbuffer
-// ----------------------------------------------------------------------------------------
-
-pstringbuffer::~pstringbuffer()
-{
-	if (m_ptr != nullptr)
-		plib::pfree_array(m_ptr);
-}
-
-void pstringbuffer::resize(const std::size_t size)
-{
-	if (m_ptr == nullptr)
-	{
-		m_size = DEFAULT_SIZE;
-		while (m_size <= size)
-			m_size *= 2;
-		m_ptr = plib::palloc_array<char>(m_size);
-		*m_ptr = 0;
-		m_len = 0;
-	}
-	else if (m_size < size)
-	{
-		while (m_size < size)
-			m_size *= 2;
-		char *new_buf = plib::palloc_array<char>(m_size);
-		std::memcpy(new_buf, m_ptr, m_len + 1);
-		plib::pfree_array(m_ptr);
-		m_ptr = new_buf;
-	}
-}
-
-void pstringbuffer::pcopy(const char *from)
-{
-	std::size_t nl = strlen(from) + 1;
-	resize(nl);
-	std::memcpy(m_ptr, from, nl);
-}
-
-void pstringbuffer::pcopy(const pstring &from)
-{
-	std::size_t nl = from.blen() + 1;
-	resize(nl);
-	std::memcpy(m_ptr, from.cstr(), nl);
-}
-
-void pstringbuffer::pcat(const char *s)
-{
-	const std::size_t slen = std::strlen(s);
-	const std::size_t nl = m_len + slen + 1;
-	resize(nl);
-	std::memcpy(m_ptr + m_len, s, slen + 1);
-	m_len += slen;
-}
-
-void pstringbuffer::pcat(const void *m, unsigned l)
-{
-	const std::size_t nl = m_len + l + 1;
-	resize(nl);
-	std::memcpy(m_ptr + m_len, m, l);
-	m_len += l;
-	*(m_ptr + m_len) = 0;
-}
-
-void pstringbuffer::pcat(const pstring &s)
-{
-	const std::size_t slen = s.blen();
-	const std::size_t nl = m_len + slen + 1;
-	resize(nl);
-	std::memcpy(m_ptr + m_len, s.cstr(), slen);
-	m_len += slen;
-	m_ptr[m_len] = 0;
-}
 
 template struct pstring_t<pu8_traits>;
 template struct pstring_t<putf8_traits>;

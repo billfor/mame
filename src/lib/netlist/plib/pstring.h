@@ -9,6 +9,7 @@
 
 #include <cstdarg>
 #include <cstddef>
+#include <iterator>
 
 #include "pconfig.h"
 
@@ -49,6 +50,7 @@ public:
 
 	typedef typename traits::mem_t mem_t;
 	typedef typename traits::code_t code_t;
+	typedef std::size_t size_type;
 
 	// simple construction/destruction
 	pstring_t()
@@ -65,6 +67,26 @@ public:
 	// assignment operators
 	pstring_t &operator=(const mem_t *string) { pcopy(string); return *this; }
 	pstring_t &operator=(const pstring_t &string) { pcopy(string); return *this; }
+
+	struct iter_t final : public std::iterator<std::forward_iterator_tag, mem_t>
+	{
+		const mem_t * p;
+	public:
+		explicit constexpr iter_t(const mem_t *x) noexcept : p(x) {}
+		iter_t(const iter_t &rhs) noexcept = default;
+		iter_t(iter_t &&rhs) noexcept { p = rhs.p; }
+		iter_t &operator=(const iter_t &it) { p = it.p; return *this; }
+		iter_t& operator++() noexcept {p += F::codelen(p); return *this;}
+		iter_t operator++(int) noexcept {iter_t tmp(*this); operator++(); return tmp;}
+		bool operator==(const iter_t& rhs) noexcept {return p==rhs.p;}
+		bool operator!=(const iter_t& rhs) noexcept {return p!=rhs.p;}
+		const pstring_t::code_t operator*() noexcept {return F::code(p);}
+		iter_t& operator+=(size_type count) { while (count>0) { --count; ++(*this); } return *this; }
+		friend iter_t operator+(iter_t lhs, const size_type &rhs) { return (lhs += rhs); }
+	};
+
+	iter_t begin() const { return iter_t(m_ptr->str()); }
+	iter_t end() const { return iter_t(m_ptr->str() + blen()); }
 
 	// C string conversion helpers
 	const mem_t *cstr() const { return m_ptr->str(); }
@@ -93,8 +115,8 @@ public:
 
 	bool equals(const pstring_t &string) const { return (pcmp(string) == 0); }
 
-	int cmp(const pstring_t &string) const { return pcmp(string); }
-	int cmp(const mem_t *string) const { return pcmp(string); }
+	//int cmp(const pstring_t &string) const { return pcmp(string); }
+	//int cmp(const mem_t *string) const { return pcmp(string); }
 
 	bool startsWith(const pstring_t &arg) const;
 	bool startsWith(const mem_t *arg) const;
@@ -114,40 +136,38 @@ public:
 	double as_double(bool *error = nullptr) const;
 	long as_long(bool *error = nullptr) const;
 
-	unsigned len() const
+	size_type len() const
 	{
 		return traits::len(m_ptr);
 	}
 
-	pstring_t& operator+=(const code_t c) { mem_t buf[F::MAXCODELEN+1] = { 0 }; F::encode(c, buf); pcat(buf); return *this; }
+	pstring_t& operator+=(const code_t c) { mem_t buf[traits::MAXCODELEN+1] = { 0 }; traits::encode(c, buf); pcat(buf); return *this; }
 	friend pstring_t operator+(const pstring_t &lhs, const code_t rhs) { return pstring_t(lhs) += rhs; }
 
-	int find(const pstring_t &search, unsigned start = 0) const;
-	int find(const mem_t *search, unsigned start = 0) const;
-	int find(const code_t search, unsigned start = 0) const { mem_t buf[F::MAXCODELEN+1] = { 0 }; F::encode(search, buf); return find(buf, start); }
+	iter_t find(const pstring_t &search, iter_t start) const;
+	iter_t find(const pstring_t &search) const { return find(search, begin()); }
+	iter_t find(const mem_t *search, iter_t start) const;
+	iter_t find(const mem_t *search) const { return find(search, begin()); }
+	iter_t find(const code_t search, iter_t start) const { mem_t buf[traits::MAXCODELEN+1] = { 0 }; traits::encode(search, buf); return find(buf, start); }
+	iter_t find(const code_t search) const { return find(search, begin()); }
 
-	const pstring_t substr(unsigned start, unsigned count) const ;
-	const pstring_t substr(unsigned start) const { if (start>=len()) return pstring_t(""); else return substr(start, len()-start); }
+	const pstring_t substr(const iter_t start, const iter_t end) const ;
+	const pstring_t substr(const iter_t start) const { return substr(start, end()); }
+	const pstring_t substr(size_type start) const { if (start>=len()) return pstring_t(""); else return substr(begin() + start, end()); }
 
-	const pstring_t left(unsigned count) const { return substr(0, count); }
-	const pstring_t right(unsigned count) const  { if (len()<count) return pstring_t(*this); else return substr(len() - count, count); }
+	const pstring_t left(iter_t leftof) const { return substr(begin(), leftof); }
+	const pstring_t right(iter_t pos) const  { return substr(pos, end()); }
 
-	int find_first_not_of(const pstring_t &no) const;
-	int find_last_not_of(const pstring_t &no) const;
+	iter_t find_first_not_of(const pstring_t &no) const;
+	iter_t find_last_not_of(const pstring_t &no) const;
 
 	const pstring_t ltrim(const pstring_t &ws = " \t\n\r") const;
 	const pstring_t rtrim(const pstring_t &ws = " \t\n\r") const;
 	const pstring_t trim(const pstring_t &ws = " \t\n\r") const { return this->ltrim(ws).rtrim(ws); }
 
-	const pstring_t rpad(const pstring_t &ws, const unsigned cnt) const;
+	const pstring_t rpad(const pstring_t &ws, const size_type cnt) const;
 
-	/*
-	 * everything below MAY not work for utf8.
-	 * Example a=s.find(EUROSIGN); b=s.substr(a,1); will deliver invalid utf8
-	 */
-
-	// FIXME:
-	code_t code_at(const unsigned pos) const { return F::code(F::nthcode(m_ptr->str(),pos)); }
+	code_t code_at(const size_type pos) const { return F::code(F::nthcode(m_ptr->str(),pos)); }
 
 	const pstring_t ucase() const;
 

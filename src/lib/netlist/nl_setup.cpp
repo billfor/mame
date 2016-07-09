@@ -138,8 +138,8 @@ bool setup_t::device_exists(const pstring name) const
 
 void setup_t::register_model(const pstring &model_in)
 {
-	int pos = model_in.find(" ");
-	if (pos < 0)
+	auto pos = model_in.find(" ");
+	if (pos == model_in.end())
 		log().fatal("Unable to parse model: {1}", model_in);
 	pstring model = model_in.left(pos).trim().ucase();
 	pstring def = model_in.substr(pos + 1).trim();
@@ -901,13 +901,13 @@ static pstring model_string(model_map_t &map)
 void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 {
 	pstring model = model_in;
-	int pos = 0;
+	pstring::iter_t pos(nullptr);
 	pstring key;
 
 	while (true)
 	{
 		pos = model.find("(");
-		if (pos >= 0) break;
+		if (pos != model.end()) break;
 
 		key = model.ucase();
 		auto i = m_models.find(key);
@@ -931,13 +931,14 @@ void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 	pstring remainder=model.substr(pos+1).trim();
 	if (!remainder.endsWith(")"))
 		log().fatal("Model error {1}\n", model);
-	remainder = remainder.left(remainder.len() - 1);
+	// FIMXE: Not optimal
+	remainder = remainder.left(remainder.begin() + (remainder.len() - 1));
 
 	plib::pstring_vector_t pairs(remainder," ", true);
 	for (pstring &pe : pairs)
 	{
-		int pose = pe.find("=");
-		if (pose < 0)
+		auto pose = pe.find("=");
+		if (pose == pe.end())
 			log().fatal("Model error on pair {1}\n", model);
 		map[pe.left(pose).ucase()] = pe.substr(pose+1);
 	}
@@ -962,8 +963,8 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 	pstring tmp = model_value_str(map, entity);
 
 	nl_double factor = NL_FCONST(1.0);
-	pstring numfac = tmp.right(1);
-	switch (numfac.code_at(0))
+	auto p = tmp.begin() + (tmp.len() - 1);
+	switch (*p)
 	{
 		case 'M': factor = 1e6; break;
 		case 'k': factor = 1e3; break;
@@ -974,11 +975,11 @@ nl_double setup_t::model_value(model_map_t &map, const pstring &entity)
 		case 'f': factor = 1e-15; break;
 		case 'a': factor = 1e-18; break;
 		default:
-			if (numfac < "0" || numfac > "9")
-				nl_exception(plib::pfmt("Unknown number factor <{1}> in: {2}")(numfac)(entity));
+			if (*p < '0' || *p > '9')
+				nl_exception(plib::pfmt("Unknown number factor in: {1}")(entity));
 	}
 	if (factor != NL_FCONST(1.0))
-		tmp = tmp.left(tmp.len() - 1);
+		tmp = tmp.left(tmp.begin() + (tmp.len() - 1));
 	return tmp.as_double() * factor;
 }
 
@@ -1013,7 +1014,7 @@ bool setup_t::parse_stream(plib::pistream &istrm, const pstring &name)
 void setup_t::register_define(pstring defstr)
 {
 	auto p = defstr.find("=");
-	if (p>0)
+	if (p != defstr.end())
 		register_define(defstr.left(p), defstr.substr(p+1));
 	else
 		register_define(defstr, "1");

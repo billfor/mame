@@ -25,7 +25,7 @@ public:
 	virtual ~ptokenizer() {}
 
 	explicit ptokenizer(pistream &strm)
-	: m_strm(strm), m_lineno(0), m_px(0), m_string('"')
+	: m_strm(strm), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
 	{}
 
 	enum token_type
@@ -126,7 +126,7 @@ private:
 	void skipeol();
 
 	pstring::code_t getc();
-	void ungetc();
+	void ungetc(pstring::code_t c);
 
 	bool eof() { return m_strm.eof(); }
 
@@ -134,7 +134,8 @@ private:
 
 	int m_lineno;
 	pstring m_cur_line;
-	unsigned m_px;
+	pstring::iter_t m_px;
+	pstring::code_t m_unget;
 
 	/* tokenizer stuff follows ... */
 

@@ -335,7 +335,7 @@ static void listdevices(tool_options_t &opts)
 			if (t.second->name().startsWith(d->name()))
 			{
 				pstring tn(t.second->name().substr(d->name().len()+1));
-				if (tn.find(".")<0)
+				if (tn.find(".") == tn.end())
 					terms.push_back(tn);
 			}
 		}
@@ -345,7 +345,7 @@ static void listdevices(tool_options_t &opts)
 			if (t.first.startsWith(d->name()))
 			{
 				pstring tn(t.first.substr(d->name().len()+1));
-				if (tn.find(".")<0)
+				if (tn.find(".") == tn.end())
 				{
 					terms.push_back(tn);
 					pstring resolved = nt.setup().resolve_alias(t.first);

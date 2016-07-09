@@ -162,9 +162,9 @@ depend: .depend
 
 .PHONY: clang
 clang: 
-	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-c++98-compat -Wno-float-equal -Wno-cast-align -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-format-nonliteral -Wno-weak-template-vtables"
+	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-c++98-compat -Wno-float-equal -Wno-cast-align -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-old-style-cast"
 
-# -Wno-old-style-cast
+# 
 # FIX:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-old-style-cast -Wno-exit-time-destructors
 
 #-------------------------------------------------

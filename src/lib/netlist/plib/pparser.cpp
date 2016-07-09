@@ -29,7 +29,7 @@ void ptokenizer::skipeol()
 		{
 			c = getc();
 			if (c != 13)
-				ungetc();
+				ungetc(c);
 			return;
 		}
 		c = getc();
@@ -39,24 +39,28 @@ void ptokenizer::skipeol()
 
 pstring::code_t ptokenizer::getc()
 {
-	if (m_px >= m_cur_line.len())
+	if (m_unget != 0)
+	{
+		pstring::code_t c = m_unget;
+		m_unget = 0;
+		return c;
+	}
+	if (m_px == m_cur_line.end())
 	{
 		m_lineno++;
 		if (m_strm.readline(m_cur_line))
-		{
-			if (m_cur_line.right(1) != "\n")
-				m_cur_line += "\n";
-			m_px = 0;
-		}
+			m_px = m_cur_line.begin();
 		else
 			return 0;
+		return '\n';
 	}
-	return m_cur_line.code_at(m_px++);
+	pstring::code_t c = *(m_px++);
+	return c;
 }
 
-void ptokenizer::ungetc()
+void ptokenizer::ungetc(pstring::code_t c)
 {
-	m_px--;
+	m_unget = c;
 }
 
 void ptokenizer::require_token(const token_id_t &token_num)
@@ -163,7 +167,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 {
 	/* skip ws */
 	pstring::code_t c = getc();
-	while (m_whitespace.find(c)>=0)
+	while (m_whitespace.find(c) != m_whitespace.end())
 	{
 		c = getc();
 		if (eof())
@@ -171,7 +175,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			return token_t(ENDOFFILE);
 		}
 	}
-	if (m_number_chars_start.find(c)>=0)
+	if (m_number_chars_start.find(c) != m_number_chars_start.end())
 	{
 		/* read number while we receive number or identifier chars
 		 * treat it as an identifier when there are identifier chars in it
@@ -180,25 +184,25 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 		token_type ret = NUMBER;
 		pstring tokstr = "";
 		while (true) {
-			if (m_identifier_chars.find(c)>=0 && m_number_chars.find(c)<0)
+			if (m_identifier_chars.find(c) != m_identifier_chars.end() && m_number_chars.find(c) == m_number_chars.end())
 				ret = IDENTIFIER;
-			else if (m_number_chars.find(c)<0)
+			else if (m_number_chars.find(c) == m_number_chars.end())
 				break;
 			tokstr += c;
 			c = getc();
 		}
-		ungetc();
+		ungetc(c);
 		return token_t(ret, tokstr);
 	}
-	else if (m_identifier_chars.find(c)>=0)
+	else if (m_identifier_chars.find(c) != m_identifier_chars.end())
 	{
 		/* read identifier till non identifier char */
 		pstring tokstr = "";
-		while (m_identifier_chars.find(c)>=0) {
+		while (m_identifier_chars.find(c) != m_identifier_chars.end()) {
 			tokstr += c;
 			c = getc();
 		}
-		ungetc();
+		ungetc(c);
 		token_id_t id(plib::container::indexof(m_tokens, tokstr));
 		if (id.id() >= 0)
 			return token_t(id, tokstr);
@@ -222,7 +226,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 	{
 		/* read identifier till first identifier char or ws */
 		pstring tokstr = "";
-		while ((m_identifier_chars.find(c)) < 0 && (m_whitespace.find(c) < 0)) {
+		while ((m_identifier_chars.find(c)) == m_identifier_chars.end() && (m_whitespace.find(c) == m_whitespace.end())) {
 			tokstr += c;
 			/* expensive, check for single char tokens */
 			if (tokstr.len() == 1)
@@ -233,7 +237,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			}
 			c = getc();
 		}
-		ungetc();
+		ungetc(c);
 		token_id_t id(plib::container::indexof(m_tokens, tokstr));
 		if (id.id() >= 0)
 			return token_t(id, tokstr);
@@ -242,7 +246,6 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			return token_t(UNKNOWN, tokstr);
 		}
 	}
-
 }
 
 void ptokenizer::error(const pstring &errs)
