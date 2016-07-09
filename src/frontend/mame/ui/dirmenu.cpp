@@ -392,7 +392,7 @@ void menu_add_change_folder::handle()
 				}
 
 				reset_parent(reset_options::SELECT_FIRST);
-				menu::stack_pop(machine());
+				stack_pop();
 			}
 			else if (menu_event->is_char_printable())
 			{
@@ -444,7 +444,7 @@ void menu_add_change_folder::handle()
 						}
 					}
 				}
-				top_line = selected - (visible_lines / 2);
+				centre_selection();
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_CANCEL)
@@ -614,7 +614,7 @@ void menu_remove_folder::handle()
 		}
 
 		reset_parent(reset_options::REMEMBER_REF);
-		menu::stack_pop(machine());
+		stack_pop();
 	}
 }
 
