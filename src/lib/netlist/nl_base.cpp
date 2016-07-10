@@ -379,7 +379,9 @@ void netlist_t::print_stats() const
 		}
 		overhead.stop();
 
-		uint_least64_t total_overhead = (uint_least64_t) overhead()*(uint_least64_t)total_count/(uint_least64_t)200000;
+		uint_least64_t total_overhead = static_cast<uint_least64_t>(overhead())
+				* static_cast<uint_least64_t>(total_count)
+				/ static_cast<uint_least64_t>(200000);
 
 		log().verbose("Queue Pushes   {1:15}", queue().m_prof_call());
 		log().verbose("Queue Moves    {1:15}", queue().m_prof_sortmove());
@@ -595,7 +597,7 @@ void net_t::inc_active(core_terminal_t &term)
 {
 	m_active++;
 	m_list_active.push_front(&term);
-	nl_assert(m_active <= (int) num_cons());
+	nl_assert(m_active <= static_cast<int>(num_cons()));
 	if (m_active == 1)
 	{
 		railterminal().device().do_inc_active();

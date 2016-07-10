@@ -187,7 +187,7 @@ pstring setup_t::objtype_as_str(device_object_t &in) const
 			return "PARAM";
 	}
 	// FIXME: noreturn
-	log().fatal("Unknown object type {1}\n", (unsigned) in.type());
+	log().fatal("Unknown object type {1}\n", static_cast<unsigned>(in.type()));
 	return "Error";
 }
 
@@ -214,7 +214,7 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 				double vald = 0;
 				if (sscanf(val.cstr(), "%lf", &vald) != 1)
 					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-				static_cast<param_int_t &>(param).initial((int) vald);
+				static_cast<param_int_t &>(param).initial(static_cast<int>(vald));
 			}
 			break;
 			case param_t::STRING:

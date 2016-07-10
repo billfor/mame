@@ -129,7 +129,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 		for (core_terminal_t *p : net->m_core_terms)
 		{
-			log().debug("{1} {2} {3}\n", p->name(), net->name(), (int) net->isRailNet());
+			log().debug("{1} {2} {3}\n", p->name(), net->name(), net->isRailNet());
 			switch (p->type())
 			{
 				case terminal_t::TERMINAL:
@@ -231,7 +231,7 @@ void matrix_solver_t::setup_matrix()
 		for (unsigned k = 0; k < iN - 1; k++)
 			for (unsigned i = k+1; i < iN; i++)
 			{
-				if (((int) m_terms[k]->m_railstart - (int) m_terms[i]->m_railstart) * sort_order < 0)
+				if ((static_cast<int>(m_terms[k]->m_railstart) - static_cast<int>(m_terms[i]->m_railstart)) * sort_order < 0)
 				{
 					std::swap(m_terms[i], m_terms[k]);
 					std::swap(m_nets[i], m_nets[k]);
@@ -291,7 +291,7 @@ void matrix_solver_t::setup_matrix()
 		}
 
 		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!plib::container::contains(t->m_nzrd, other[i]) && other[i] >= (int) (k + 1))
+			if (!plib::container::contains(t->m_nzrd, other[i]) && other[i] >= static_cast<int>(k + 1))
 				t->m_nzrd.push_back(other[i]);
 
 		/* and sort */
@@ -550,27 +550,22 @@ void matrix_solver_t::log_stats()
 		log().verbose("       ==> {1} nets", this->m_nets.size()); //, (*(*groups[i].first())->m_core_terms.first())->name());
 		log().verbose("       has {1} elements", this->has_dynamic_devices() ? "dynamic" : "no dynamic");
 		log().verbose("       has {1} elements", this->has_timestep_devices() ? "timestep" : "no timestep");
-		log().verbose("       {1:6.3} average newton raphson loops", (double) this->m_stat_newton_raphson / (double) this->m_stat_vsolver_calls);
-		log().verbose("       {1:10} invocations ({2:6} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
+		log().verbose("       {1:6.3} average newton raphson loops",
+					static_cast<double>(this->m_stat_newton_raphson) / static_cast<double>(this->m_stat_vsolver_calls));
+		log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
 				this->m_stat_calculations(),
-				this->m_stat_calculations() * 10 / (int) (this->netlist().time().as_double() * 10.0),
+				static_cast<double>(this->m_stat_calculations()) / this->netlist().time().as_double(),
 				this->m_iterative_fail(),
-				100.0 * (double) this->m_iterative_fail() / (double) this->m_stat_calculations(),
-				(double) this->m_iterative_total() / (double) this->m_stat_calculations());
+				100.0 * static_cast<double>(this->m_iterative_fail())
+					/ static_cast<double>(this->m_stat_calculations()),
+				static_cast<double>(this->m_iterative_total()) / static_cast<double>(this->m_stat_calculations()));
 	}
 }
-
-
-
-
-
 
 
 // ----------------------------------------------------------------------------------------
 // solver
 // ----------------------------------------------------------------------------------------
-
-
 
 NETLIB_RESET(solver)
 {
@@ -727,9 +722,9 @@ void NETLIB_NAME(solver)::post_start()
 	// Override log statistics
 	pstring p = plib::util::environment("NL_STATS");
 	if (p != "")
-		m_params.m_log_stats = (bool) p.as_long();
+		m_params.m_log_stats = p.as_long();
 	else
-		m_params.m_log_stats = (bool) m_log_stats.Value();
+		m_params.m_log_stats = m_log_stats.Value();
 
 	netlist().log().verbose("Scanning net groups ...");
 	// determine net groups
@@ -806,7 +801,7 @@ void NETLIB_NAME(solver)::post_start()
 				break;
 #endif
 			default:
-				netlist().log().warning("No specific solver found for netlist of size {1}", (unsigned) net_count);
+				netlist().log().warning("No specific solver found for netlist of size {1}", net_count);
 				if (net_count <= 16)
 				{
 					ms = create_solver<0,16>(net_count, use_specific);

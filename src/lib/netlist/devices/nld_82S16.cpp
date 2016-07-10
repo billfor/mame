@@ -86,7 +86,9 @@ namespace netlist
 
 			if (!INPLOGIC(m_WEQ))
 			{
-				m_ram[adr >> 6] = (m_ram[adr >> 6] & ~((uint_fast64_t) 1 << (adr & 0x3f))) | ((uint_fast64_t) INPLOGIC(m_DIN) << (adr & 0x3f));
+				m_ram[adr >> 6] = (m_ram[adr >> 6]
+					 & ~(static_cast<uint_fast64_t>(1) << (adr & 0x3f)))
+					 | (static_cast<uint_fast64_t>(INPLOGIC(m_DIN)) << (adr & 0x3f));
 			}
 			OUTLOGIC(m_DOUTQ, ((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
 		}

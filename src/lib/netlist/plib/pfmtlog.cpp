@@ -120,7 +120,7 @@ void pfmt::format_element(const char *f, const char *l, const char *fmt_spec,  .
 		unsigned new_size = (p - m_str) + nl + strlen(p) + 1 - sl;
 		if (new_size > m_allocated)
 		{
-			unsigned old_alloc = std::max(m_allocated, (unsigned) sizeof(m_str_buf));
+			std::size_t old_alloc = std::max(m_allocated, sizeof(m_str_buf));
 			if (m_allocated < old_alloc)
 				m_allocated = old_alloc;
 			while (new_size > m_allocated)

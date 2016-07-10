@@ -27,7 +27,7 @@ public:
 
 	using pos_type = std::size_t;
 
-	static constexpr pos_type SEEK_EOF = (pos_type) -1;
+	static constexpr pos_type SEEK_EOF = static_cast<pos_type>(-1);
 
 	explicit pstream(const unsigned flags) : m_flags(flags)
 	{
@@ -314,7 +314,7 @@ protected:
 private:
 	pos_type m_pos;
 	pos_type m_len;
-	char *m_mem;
+	const char *m_mem;
 };
 
 // -----------------------------------------------------------------------------

@@ -63,10 +63,10 @@ namespace netlist
 		{
 			switch (m_size)
 			{
-				case 1: ((uint_least8_t *) m_data)[pos] = val; break;
-				case 2: ((uint_least16_t *) m_data)[pos] = val; break;
-				case 4: ((uint_least32_t *) m_data)[pos] = val; break;
-				case 8: ((uint_least64_t *) m_data)[pos] = val; break;
+				case 1: static_cast<uint_least8_t  *>(m_data)[pos] = val; break;
+				case 2: static_cast<uint_least16_t *>(m_data)[pos] = val; break;
+				case 4: static_cast<uint_least32_t *>(m_data)[pos] = val; break;
+				case 8: static_cast<uint_least64_t *>(m_data)[pos] = val; break;
 				default: { }
 			}
 		}
@@ -75,10 +75,10 @@ namespace netlist
 		{
 			switch (m_size)
 			{
-				case 1: return ((uint_least8_t *) m_data)[pos]; break;
-				case 2: return ((uint_least16_t *) m_data)[pos]; break;
-				case 4: return ((uint_least32_t *) m_data)[pos]; break;
-				case 8: return ((uint_least64_t *) m_data)[pos]; break;
+				case 1: return static_cast<uint_least8_t  *>(m_data)[pos]; break;
+				case 2: return static_cast<uint_least16_t *>(m_data)[pos]; break;
+				case 4: return static_cast<uint_least32_t *>(m_data)[pos]; break;
+				case 8: return static_cast<uint_least64_t *>(m_data)[pos]; break;
 				default:
 					return 0; //should never happen
 			}
@@ -88,10 +88,10 @@ namespace netlist
 		{
 			switch (m_size)
 			{
-				case 1: return ((uint_least8_t) val); break;
-				case 2: return ((uint_least16_t) val); break;
-				case 4: return ((uint_least32_t) val); break;
-				case 8: return ((uint_least64_t) val); break;
+				case 1: return static_cast<uint_least8_t >(val); break;
+				case 2: return static_cast<uint_least16_t>(val); break;
+				case 4: return static_cast<uint_least32_t>(val); break;
+				case 8: return static_cast<uint_least64_t>(val); break;
 				default:
 					return 0; //should never happen
 			}

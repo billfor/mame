@@ -97,7 +97,7 @@ void matrix_solver_GMRES_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 		for (unsigned j=0; j< this->m_terms[k]->m_railstart;j++)
 		{
 			for (unsigned i = mat.ia[k]; i<nz; i++)
-				if (this->m_terms[k]->net_other()[j] == (int) mat.ja[i])
+				if (this->m_terms[k]->net_other()[j] == static_cast<int>(mat.ja[i]))
 				{
 					m_term_cr[k].push_back(i);
 					break;
@@ -170,7 +170,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_
 
 	int mr = iN;
 	if (iN > 3 )
-		mr = (int) sqrt(iN) * 2;
+		mr = static_cast<int>(std::sqrt(iN) * 2.0);
 	int iter = std::max(1, this->m_params.m_gs_loops);
 	int gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy);
 	int failed = mr * iter;
@@ -266,7 +266,7 @@ int matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double * RESTRICT
 		rho_delta = accuracy * rho_to_accuracy;
 	}
 	else
-		rho_delta = accuracy * std::sqrt((double) n) * m_accuracy_mult;
+		rho_delta = accuracy * std::sqrt(n) * m_accuracy_mult;
 
 	for (unsigned itr = 0; itr < restart_max; itr++)
 	{

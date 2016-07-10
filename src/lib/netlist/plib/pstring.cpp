@@ -108,7 +108,7 @@ const pstring_t<F> pstring_t<F>::ucase() const
 	pstring_t ret = *this;
 	ret.pcopy(cstr(), blen());
 	for (std::size_t  i=0; i<ret.len(); i++)
-		ret.m_ptr->str()[i] = toupper((unsigned) ret.m_ptr->str()[i]);
+		ret.m_ptr->str()[i] = toupper(static_cast<unsigned>(ret.m_ptr->str()[i]));
 	return ret;
 }
 
@@ -448,7 +448,7 @@ void pstring_t<F>::sfree(pstr_t *s)
 			stk[sn].push(s);
 		}
 		else
-			plib::pfree_array(((char *)s));
+			plib::pfree_array(reinterpret_cast<char *>(s));
 		//_mm_free(((char *)s));
 	}
 }
@@ -460,9 +460,9 @@ pstr_t *pstring_t<F>::salloc(int n)
 		stk = plib::palloc_array<std::stack<pstr_t *>>(17);
 	pstr_t *p;
 	std::size_t sn= ((32 - countleadbits(n)) + 1) / 2;
-	std::size_t size = sizeof(pstr_t) + ((std::size_t) 1<<(sn * 2)) + 1;
+	std::size_t size = sizeof(pstr_t) + (static_cast<std::size_t>(1)<<(sn * 2)) + 1;
 	if (stk[sn].empty())
-		p = (pstr_t *) plib::palloc_array<char>(size);
+		p = reinterpret_cast<pstr_t *>(plib::palloc_array<char>(size));
 	else
 	{
 		p = stk[sn].top();

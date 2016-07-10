@@ -32,7 +32,7 @@ namespace netlist
 		typename nld_truthtable_t<m_NI, m_NO>::truthtable_t m_ttbl;
 	};
 
-	static const uint_least64_t all_set = ~((uint_least64_t) 0);
+	static const uint_least64_t all_set = ~(static_cast<uint_least64_t>(0));
 
 unsigned truthtable_desc_t::count_bits(uint_least64_t v)
 {

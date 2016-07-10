@@ -152,7 +152,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 		{
 			int other = this->m_terms[k]->net_other()[j];
 			for (unsigned i = mat.ia[k]; i < nz; i++)
-				if (other == (int) mat.ja[i])
+				if (other == static_cast<int>(mat.ja[i]))
 				{
 					m_term_cr[k].push_back(i);
 					break;
@@ -164,7 +164,8 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 	mat.ia[iN] = nz;
 	mat.nz_num = nz;
 
-	this->log().verbose("Ops: {1}  Occupancy ratio: {2}\n", ops, (double) nz / double (iN * iN));
+	this->log().verbose("Ops: {1}  Occupancy ratio: {2}\n", ops,
+			static_cast<double>(nz) / static_cast<double>(iN * iN));
 
 	// FIXME: Move me
 

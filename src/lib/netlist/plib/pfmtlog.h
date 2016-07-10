@@ -21,6 +21,14 @@ struct ptype_treats
 };
 
 template<>
+struct ptype_treats<bool>
+{
+	static unsigned int cast(bool x) { return static_cast<unsigned int>(x); }
+	static const bool is_signed = false;
+	static const char *size_specifier() { return ""; }
+};
+
+template<>
 struct ptype_treats<char>
 {
 	static short cast(char x) { return x; }
@@ -170,7 +178,7 @@ private:
 
 	char *m_str;
 	char m_str_buf[256];
-	unsigned m_allocated;
+	std::size_t m_allocated;
 	unsigned m_arg;
 };
 

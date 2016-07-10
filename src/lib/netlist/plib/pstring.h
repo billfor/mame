@@ -34,6 +34,7 @@
 				m_str[0] = 0;
 		}
 		char *str() { return &m_str[0]; }
+		unsigned char *ustr() { return reinterpret_cast<unsigned char *>(&m_str[0]); }
 		unsigned len() const  { return m_len; }
 		int m_ref_count;
 	private:
@@ -230,7 +231,7 @@ struct putf8_traits
 	static unsigned len(pstr_t *p)
 	{
 		unsigned ret = 0;
-		unsigned char *c = (unsigned char *) p->str();
+		unsigned char *c = p->ustr();
 		while (*c)
 		{
 			if (!((*c & 0xC0) == 0x80))
@@ -241,7 +242,7 @@ struct putf8_traits
 	}
 	static unsigned codelen(const mem_t *p)
 	{
-		unsigned char *p1 = (unsigned char *) p;
+		const unsigned char *p1 = reinterpret_cast<const unsigned char *>(p);
 		if ((*p1 & 0x80) == 0x00)
 			return 1;
 		else if ((*p1 & 0xE0) == 0xC0)
@@ -268,9 +269,9 @@ struct putf8_traits
 	}
 	static code_t code(const mem_t *p)
 	{
-		unsigned char *p1 = (unsigned char *)p;
+		const unsigned char *p1 = reinterpret_cast<const unsigned char *>(p);
 		if ((*p1 & 0x80) == 0x00)
-			return (code_t) *p1;
+			return *p1;
 		else if ((*p1 & 0xE0) == 0xC0)
 			return ((p1[0] & 0x3f) << 6) | ((p1[1] & 0x3f));
 		else if ((*p1 & 0xF0) == 0xE0)
@@ -282,7 +283,7 @@ struct putf8_traits
 	}
 	static void encode(const code_t c, mem_t *p)
 	{
-		unsigned char *m = (unsigned char*)p;
+		unsigned char *m = reinterpret_cast<unsigned char *>(p);
 		if (c < 0x0080)
 		{
 			m[0] = c;

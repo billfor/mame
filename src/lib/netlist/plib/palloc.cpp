@@ -93,9 +93,9 @@ void *mempool::alloc(size_t size)
 		{
 			b.m_free -= rs;
 			b.m_num_alloc++;
-			info *i = (info *) b.cur_ptr;
+			auto i = reinterpret_cast<info *>(b.cur_ptr);
 			i->m_block = bn;
-			void *ret = (void *) (b.cur_ptr + sizeof(info));
+			auto ret = reinterpret_cast<void *>(b.cur_ptr + sizeof(info));
 			b.cur_ptr += rs;
 			return ret;
 		}
@@ -105,9 +105,9 @@ void *mempool::alloc(size_t size)
 		auto &b = m_blocks[bn];
 		b.m_num_alloc = 1;
 		b.m_free = m_min_alloc - rs;
-		info *i = (info *) b.cur_ptr;
+		auto i = reinterpret_cast<info *>(b.cur_ptr);
 		i->m_block = bn;
-		void *ret = (void *) (b.cur_ptr + sizeof(info));
+		auto ret = reinterpret_cast<void *>(b.cur_ptr + sizeof(info));
 		b.cur_ptr += rs;
 		return ret;
 	}
@@ -115,9 +115,9 @@ void *mempool::alloc(size_t size)
 
 void mempool::free(void *ptr)
 {
-	char *p = (char *) ptr;
+	auto p = reinterpret_cast<char *>(ptr);
 
-	info *i = (info *) (p - sizeof(info));
+	auto i = reinterpret_cast<info *>(p - sizeof(info));
 	block *b = &m_blocks[i->m_block];
 	if (b->m_num_alloc == 0)
 		fprintf(stderr, "Argh .. double free\n");
