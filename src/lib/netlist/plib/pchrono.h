@@ -184,7 +184,7 @@ namespace chrono {
 		ctype count() const { return m_count; }
 
 		double as_seconds() const { return static_cast<double>(total())
-				/ static_cast<double> (T::per_second()); }
+				/ static_cast<double>(T::per_second()); }
 
 		constexpr static bool enabled = enabled_;
 	private:

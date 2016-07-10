@@ -72,7 +72,7 @@ void ptokenizer::require_token(const token_t tok, const token_id_t &token_num)
 {
 	if (!tok.is(token_num))
 	{
-		error(pfmt("Expected token <{1}> got <{2}>")(m_tokens[static_cast<size_t>(token_num.id())])(tok.str()) );
+		error(pfmt("Expected token <{1}> got <{2}>")(m_tokens[token_num.id()])(tok.str()) );
 	}
 }
 
@@ -206,12 +206,11 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 		auto idx = plib::container::indexof(m_tokens, tokstr);
 		if (idx != plib::container::npos)
 		{
-			token_id_t id(static_cast<long>(idx));
+			token_id_t id(idx);
 			return token_t(id, tokstr);
 		}
 		else
 		{
-			token_id_t id(-1);
 			return token_t(IDENTIFIER, tokstr);
 		}
 	}
@@ -238,7 +237,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 				auto idx = plib::container::indexof(m_tokens, tokstr);
 				if (idx != plib::container::npos)
 				{
-					token_id_t id(static_cast<long>(idx));
+					token_id_t id(idx);
 					return token_t(id, tokstr);
 				}
 			}
@@ -248,7 +247,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 		auto idx = plib::container::indexof(m_tokens, tokstr);
 		if (idx != plib::container::npos)
 		{
-			token_id_t id(static_cast<long>(idx));
+			token_id_t id(idx);
 			return token_t(id, tokstr);
 		}
 		else

@@ -42,32 +42,29 @@ public:
 	struct token_id_t
 	{
 	public:
-		token_id_t() : m_id(-2) {}
-		token_id_t(const long id) : m_id(id) {}
-		long id() const { return m_id; }
+
+		static const std::size_t npos = static_cast<std::size_t>(-1);
+
+		token_id_t() : m_id(npos) {}
+		token_id_t(const std::size_t id) : m_id(id) {}
+		std::size_t id() const { return m_id; }
 	private:
-		long m_id;
+		std::size_t m_id;
 	};
 
 	struct token_t
 	{
 		token_t(token_type type)
+		: m_type(type), m_id(), m_token("")
 		{
-			m_type = type;
-			m_id = token_id_t(-1);
-			m_token ="";
 		}
 		token_t(token_type type, const pstring &str)
+		: m_type(type), m_id(), m_token(str)
 		{
-			m_type = type;
-			m_id = token_id_t(-1);
-			m_token = str;
 		}
 		token_t(const token_id_t id, const pstring &str)
+		: m_type(TOKEN), m_id(id), m_token(str)
 		{
-			m_type = TOKEN;
-			m_id = id;
-			m_token = str;
 		}
 
 		bool is(const token_id_t &tok_id) const { return m_id.id() == tok_id.id(); }
@@ -102,7 +99,7 @@ public:
 	token_id_t register_token(pstring token)
 	{
 		m_tokens.push_back(token);
-		return token_id_t(static_cast<int>(m_tokens.size()) - 1);
+		return token_id_t(m_tokens.size() - 1);
 	}
 
 	void set_identifier_chars(pstring s) { m_identifier_chars = s; }
