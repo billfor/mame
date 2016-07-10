@@ -63,7 +63,7 @@ public:
 	void write_sample(int sample)
 	{
 		m_data.len += m_fmt.block_align;
-		short ps = sample; /* 16 bit sample, FIXME: Endianess? */
+		short ps = static_cast<short>(sample); /* 16 bit sample, FIXME: Endianess? */
 		m_f.write(&ps, sizeof(ps));
 	}
 
@@ -77,14 +77,14 @@ private:
 
 	struct riff_format_t
 	{
-		char        signature[4];
-		unsigned    fmt_length;
-		short       format_tag;
-		short       channels;
-		unsigned    sample_rate;
-		unsigned    bytes_per_second;
-		short       block_align;
-		short       bits_sample;
+		char        		signature[4];
+		unsigned    		fmt_length;
+		short       		format_tag;
+		unsigned short      channels;
+		unsigned    		sample_rate;
+		unsigned    		bytes_per_second;
+		unsigned short      block_align;
+		unsigned short      bits_sample;
 	};
 
 	struct riff_data_t

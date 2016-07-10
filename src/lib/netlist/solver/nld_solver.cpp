@@ -257,8 +257,8 @@ void matrix_solver_t::setup_matrix()
 		t->m_nz.clear();
 
 		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!plib::container::contains(t->m_nz, other[i]))
-				t->m_nz.push_back(other[i]);
+			if (!plib::container::contains(t->m_nz, static_cast<unsigned>(other[i])))
+				t->m_nz.push_back(static_cast<unsigned>(other[i]));
 
 		t->m_nz.push_back(k);     // add diagonal
 
@@ -291,8 +291,8 @@ void matrix_solver_t::setup_matrix()
 		}
 
 		for (unsigned i = 0; i < t->m_railstart; i++)
-			if (!plib::container::contains(t->m_nzrd, other[i]) && other[i] >= static_cast<int>(k + 1))
-				t->m_nzrd.push_back(other[i]);
+			if (!plib::container::contains(t->m_nzrd, static_cast<unsigned>(other[i])) && other[i] >= static_cast<int>(k + 1))
+				t->m_nzrd.push_back(static_cast<unsigned>(other[i]));
 
 		/* and sort */
 		std::sort(t->m_nzrd.begin(), t->m_nzrd.end());
@@ -419,8 +419,8 @@ void matrix_solver_t::solve_base()
 	m_stat_vsolver_calls++;
 	if (has_dynamic_devices())
 	{
-		int this_resched;
-		int newton_loops = 0;
+		unsigned this_resched;
+		unsigned newton_loops = 0;
 		do
 		{
 			update_dynamic();
@@ -629,7 +629,7 @@ NETLIB_UPDATE(solver)
 }
 
 template <int m_N, int storage_N>
-std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const bool use_specific)
+std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(unsigned size, const bool use_specific)
 {
 	pstring solvername = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 	if (use_specific && m_N == 1)
@@ -698,8 +698,9 @@ void NETLIB_NAME(solver)::post_start()
 
 	m_params.m_pivot = m_pivot.Value();
 	m_params.m_accuracy = m_accuracy.Value();
-	m_params.m_gs_loops = m_gs_loops.Value();
-	m_params.m_nr_loops = m_nr_loops.Value();
+	/* FIXME: Throw when negative */
+	m_params.m_gs_loops = static_cast<unsigned>(m_gs_loops.Value());
+	m_params.m_nr_loops = static_cast<unsigned>(m_nr_loops.Value());
 	m_params.m_nt_sync_delay = netlist_time::from_double(m_sync_delay.Value());
 	m_params.m_lte = m_lte.Value();
 	m_params.m_sor = m_sor.Value();
@@ -749,7 +750,7 @@ void NETLIB_NAME(solver)::post_start()
 	for (auto & grp : groups)
 	{
 		std::unique_ptr<matrix_solver_t> ms;
-		std::size_t net_count = grp.size();
+		unsigned net_count = static_cast<unsigned>(grp.size());
 
 		switch (net_count)
 		{

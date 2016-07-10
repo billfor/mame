@@ -33,7 +33,7 @@ class matrix_solver_GCR_t: public matrix_solver_t
 public:
 
 	matrix_solver_GCR_t(netlist_t &anetlist, const pstring &name,
-			const solver_parameters_t *params, int size)
+			const solver_parameters_t *params, const unsigned size)
 		: matrix_solver_t(anetlist, name, matrix_solver_t::ASCENDING, params)
 		, m_dim(size)
 		, m_proc(nullptr)
@@ -47,7 +47,7 @@ public:
 	inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
 	virtual void vsetup(analog_net_t::list_t &nets) override;
-	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
+	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 	virtual void create_solver_code(plib::postream &strm) override;
 
@@ -67,7 +67,7 @@ private:
 	}
 
 	unsigned m_dim;
-	std::vector<int> m_term_cr[storage_N];
+	std::vector<unsigned> m_term_cr[storage_N];
 	mat_cr_t<storage_N> mat;
 	nl_double m_A[storage_N * storage_N];
 
@@ -239,7 +239,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::create_solver_code(plib::postream &str
 
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	const unsigned iN = this->N();
 
@@ -255,8 +255,8 @@ int matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 		nl_double gtot_t = 0.0;
 		nl_double RHS_t = 0.0;
 
-		const unsigned term_count = t->count();
-		const unsigned railstart = t->m_railstart;
+		const std::size_t term_count = t->count();
+		const std::size_t railstart = t->m_railstart;
 		const nl_double * const RESTRICT gt = t->gt();
 		const nl_double * const RESTRICT go = t->go();
 		const nl_double * const RESTRICT Idr = t->Idr();
@@ -285,7 +285,7 @@ int matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 			RHS_t += Idr[i];
 		}
 #endif
-		for (unsigned i = railstart; i < term_count; i++)
+		for (std::size_t i = railstart; i < term_count; i++)
 			RHS_t += go[i] * *other_cur_analog[i];
 
 		RHS[k] = RHS_t;
@@ -351,7 +351,7 @@ int matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_ra
 	/* row n-1 */
 	new_V[iN - 1] = RHS[iN - 1] / m_A[mat.diag[iN - 1]];
 
-	for (int j = iN - 2; j >= 0; j--)
+	for (unsigned j = iN - 1; j-- > 0;)
 	{
 		//__builtin_prefetch(&new_V[j-1], 1);
 		//if (j>0)__builtin_prefetch(&m_A[mat.diag[j-1]], 0);

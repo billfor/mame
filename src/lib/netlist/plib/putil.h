@@ -42,7 +42,7 @@ namespace plib
 		template <class C>
 		void insert_at(C &con, const std::size_t index, const typename C::value_type &elem)
 		{
-			con.insert(con.begin() + index, elem);
+			con.insert(con.begin() + static_cast<std::ptrdiff_t>(index), elem);
 		}
 
 	}

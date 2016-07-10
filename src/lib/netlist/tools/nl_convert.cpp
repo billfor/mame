@@ -248,7 +248,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				/* check for fourth terminal ... should be numeric net
 				 * including "0" or start with "N" (ltspice)
 				 */
-				ATTR_UNUSED int nval =tt[4].as_long(&cerr);
+				ATTR_UNUSED long nval =tt[4].as_long(&cerr);
 				pstring model;
 				pstring pins ="CBE";
 

@@ -132,8 +132,8 @@ public:
 	virtual void reset() override { matrix_solver_t::reset(); }
 
 protected:
-	virtual int vsolve_non_dynamic(const bool newton_raphson) override;
-	int solve_non_dynamic(const bool newton_raphson);
+	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+	unsigned solve_non_dynamic(const bool newton_raphson);
 
 	inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
@@ -377,7 +377,7 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_back_subst(
 
 
 template <unsigned m_N, unsigned storage_N>
-int matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
+unsigned matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(const bool newton_raphson)
 {
 	nl_double new_V[storage_N]; // = { 0.0 };
 
@@ -400,7 +400,7 @@ int matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(const bool newton_
 }
 
 template <unsigned m_N, unsigned storage_N>
-inline int matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+inline unsigned matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	build_LE_A<matrix_solver_direct_t>();
 	build_LE_RHS<matrix_solver_direct_t>();

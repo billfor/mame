@@ -29,8 +29,8 @@ namespace netlist
 		nl_double m_max_timestep;
 		nl_double m_sor;
 		bool m_dynamic;
-		int m_gs_loops;
-		int m_nr_loops;
+		unsigned m_gs_loops;
+		unsigned m_nr_loops;
 		netlist_time m_nt_sync_delay;
 		bool m_log_stats;
 	};
@@ -174,7 +174,7 @@ protected:
 	void update_dynamic();
 
 	virtual void vsetup(analog_net_t::list_t &nets) = 0;
-	virtual int vsolve_non_dynamic(const bool newton_raphson) = 0;
+	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) = 0;
 
 	netlist_time compute_next_timestep(const double cur_ts);
 	/* virtual */ void  add_term(std::size_t net_idx, terminal_t *term);
