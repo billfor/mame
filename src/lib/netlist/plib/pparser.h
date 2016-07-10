@@ -98,8 +98,9 @@ public:
 
 	token_id_t register_token(pstring token)
 	{
-		m_tokens.push_back(token);
-		return token_id_t(m_tokens.size() - 1);
+		token_id_t ret(m_tokens.size());
+		m_tokens.emplace(token, ret);
+		return ret;
 	}
 
 	void set_identifier_chars(pstring s) { m_identifier_chars = s; }
@@ -139,7 +140,7 @@ private:
 	pstring m_identifier_chars;
 	pstring m_number_chars;
 	pstring m_number_chars_start;
-	std::vector<pstring> m_tokens;
+	std::unordered_map<pstring, token_id_t> m_tokens;
 	pstring m_whitespace;
 	pstring::code_t  m_string;
 

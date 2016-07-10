@@ -72,7 +72,11 @@ void ptokenizer::require_token(const token_t tok, const token_id_t &token_num)
 {
 	if (!tok.is(token_num))
 	{
-		error(pfmt("Expected token <{1}> got <{2}>")(m_tokens[token_num.id()])(tok.str()) );
+		pstring val("");
+		for (auto &i : m_tokens)
+			if (i.second.id() == token_num.id())
+				val = i.first;
+		error(pfmt("Expected token <{1}> got <{2}>")(val)(tok.str()) );
 	}
 }
 
@@ -203,16 +207,11 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			c = getc();
 		}
 		ungetc(c);
-		auto idx = plib::container::indexof(m_tokens, tokstr);
-		if (idx != plib::container::npos)
-		{
-			token_id_t id(idx);
-			return token_t(id, tokstr);
-		}
+		auto id = m_tokens.find(tokstr);
+		if (id != m_tokens.end())
+			return token_t(id->second, tokstr);
 		else
-		{
 			return token_t(IDENTIFIER, tokstr);
-		}
 	}
 	else if (c == m_string)
 	{
@@ -234,26 +233,18 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			/* expensive, check for single char tokens */
 			if (tokstr.len() == 1)
 			{
-				auto idx = plib::container::indexof(m_tokens, tokstr);
-				if (idx != plib::container::npos)
-				{
-					token_id_t id(idx);
-					return token_t(id, tokstr);
-				}
+				auto id = m_tokens.find(tokstr);
+				if (id != m_tokens.end())
+					return token_t(id->second, tokstr);
 			}
 			c = getc();
 		}
 		ungetc(c);
-		auto idx = plib::container::indexof(m_tokens, tokstr);
-		if (idx != plib::container::npos)
-		{
-			token_id_t id(idx);
-			return token_t(id, tokstr);
-		}
+		auto id = m_tokens.find(tokstr);
+		if (id != m_tokens.end())
+			return token_t(id->second, tokstr);
 		else
-		{
 			return token_t(UNKNOWN, tokstr);
-		}
 	}
 }
 
