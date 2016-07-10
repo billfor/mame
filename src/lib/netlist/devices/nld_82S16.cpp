@@ -78,7 +78,7 @@ namespace netlist
 		else
 		{
 			unsigned int adr = 0;
-			for (int i=0; i<8; i++)
+			for (std::size_t i=0; i<8; i++)
 			{
 				//m_A[i].activate();
 				adr |= (INPLOGIC(m_A[i]) << i);
@@ -96,7 +96,7 @@ namespace netlist
 
 	NETLIB_RESET(82S16)
 	{
-		for (int i=0; i<4; i++)
+		for (std::size_t i=0; i<4; i++)
 		{
 			m_ram[i] = 0;
 		}

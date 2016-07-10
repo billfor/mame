@@ -196,10 +196,10 @@ struct input_t
 				static_cast<netlist::param_double_t*>(m_param)->setTo(m_value);
 				break;
 			case netlist::param_t::INTEGER:
-				static_cast<netlist::param_int_t*>(m_param)->setTo(m_value);
+				static_cast<netlist::param_int_t*>(m_param)->setTo(static_cast<int>(m_value));
 				break;
 			case netlist::param_t::LOGIC:
-				static_cast<netlist::param_logic_t*>(m_param)->setTo(m_value);
+				static_cast<netlist::param_logic_t*>(m_param)->setTo(static_cast<bool>(m_value));
 				break;
 		}
 	}

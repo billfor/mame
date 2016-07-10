@@ -105,7 +105,7 @@ namespace netlist
 	{
 		if (m_clrq)
 		{
-			for (int i=0; i<4; i++)
+			for (std::size_t i=0; i<4; i++)
 			{
 				netlist_sig_t d = (m_data >> i) & 1;
 				OUTLOGIC(m_Q[i], d, delay[d]);
@@ -118,14 +118,14 @@ namespace netlist
 	NETLIB_UPDATE(74175)
 	{
 		uint_fast8_t d = 0;
-		for (int i=0; i<4; i++)
+		for (std::size_t i=0; i<4; i++)
 		{
 			d |= (INPLOGIC(m_D[i]) << i);
 		}
 		m_sub.m_clrq = INPLOGIC(m_CLRQ);
 		if (!m_sub.m_clrq)
 		{
-			for (int i=0; i<4; i++)
+			for (std::size_t i=0; i<4; i++)
 			{
 				OUTLOGIC(m_sub.m_Q[i], 0, delay_clear[0]);
 				OUTLOGIC(m_sub.m_QQ[i], 1, delay_clear[1]);

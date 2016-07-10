@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+	// license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
  * nld_7450.c
@@ -67,8 +67,8 @@ namespace netlist
 		m_B.activate();
 		m_C.activate();
 		m_D.activate();
-		uint_fast8_t t1 = INPLOGIC(m_A) & INPLOGIC(m_B);
-		uint_fast8_t t2 = INPLOGIC(m_C) & INPLOGIC(m_D);
+		unsigned t1 = INPLOGIC(m_A) & INPLOGIC(m_B);
+		unsigned t2 = INPLOGIC(m_C) & INPLOGIC(m_D);
 
 		const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
 

@@ -187,12 +187,12 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 void matrix_solver_t::setup_matrix()
 {
-	const unsigned iN = m_nets.size();
+	const std::size_t iN = m_nets.size();
 
-	for (unsigned k = 0; k < iN; k++)
+	for (std::size_t k = 0; k < iN; k++)
 	{
 		m_terms[k]->m_railstart = m_terms[k]->count();
-		for (unsigned i = 0; i < m_rails_temp[k]->count(); i++)
+		for (std::size_t i = 0; i < m_rails_temp[k]->count(); i++)
 			this->m_terms[k]->add(m_rails_temp[k]->terms()[i], m_rails_temp[k]->net_other()[i], false);
 
 		m_rails_temp[k]->clear(); // no longer needed
@@ -469,11 +469,11 @@ int matrix_solver_t::get_net_idx(net_t *net)
 {
 	for (std::size_t k = 0; k < m_nets.size(); k++)
 		if (m_nets[k] == net)
-			return k;
+			return static_cast<int>(k);
 	return -1;
 }
 
-void matrix_solver_t::add_term(int k, terminal_t *term)
+void matrix_solver_t::add_term(std::size_t k, terminal_t *term)
 {
 	if (term->m_otherterm->net().isRailNet())
 	{
@@ -505,7 +505,7 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 		 * FIXME: We should extend the logic to use either all nets or
 		 *        only output nets.
 		 */
-		for (unsigned k = 0, iN=m_terms.size(); k < iN; k++)
+		for (std::size_t k = 0, iN=m_terms.size(); k < iN; k++)
 		{
 			analog_net_t *n = m_nets[k];
 			terms_t *t = m_terms[k];
@@ -629,7 +629,7 @@ NETLIB_UPDATE(solver)
 }
 
 template <int m_N, int storage_N>
-std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(int size, const bool use_specific)
+std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const bool use_specific)
 {
 	pstring solvername = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 	if (use_specific && m_N == 1)
@@ -638,7 +638,7 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(int size, co
 		return plib::make_unique<matrix_solver_direct2_t>(netlist(), solvername, &m_params);
 	else
 	{
-		if (size >= m_gs_threshold)
+		if (static_cast<int>(size) >= m_gs_threshold)
 		{
 			if (pstring("SOR_MAT").equals(m_iterative_solver))
 			{
@@ -706,7 +706,7 @@ void NETLIB_NAME(solver)::post_start()
 
 	m_params.m_min_timestep = m_min_timestep.Value();
 	m_params.m_dynamic = (m_dynamic.Value() == 1 ? true : false);
-	m_params.m_max_timestep = netlist_time::from_hz(m_freq.Value()).as_double();
+	m_params.m_max_timestep = netlist_time::from_double(1.0 / m_freq.Value()).as_double();
 
 	if (m_params.m_dynamic)
 	{

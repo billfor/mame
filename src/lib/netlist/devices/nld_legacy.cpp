@@ -56,7 +56,7 @@ namespace netlist
 		param_int_t m_L_to_H;
 		param_int_t m_H_to_L;
 
-		state_var_u8 m_last;
+		state_var<netlist_sig_t> m_last;
 	};
 
 	NETLIB_RESET(nicRSFF)
@@ -90,12 +90,12 @@ namespace netlist
 		if (nval && !m_last)
 		{
 			// L_to_H
-			OUTLOGIC(m_Q,  1, NLTIME_FROM_NS(m_L_to_H.Value()));
+			OUTLOGIC(m_Q,  1, NLTIME_FROM_NS(static_cast<unsigned>(m_L_to_H.Value())));
 		}
 		else if (!nval && m_last)
 		{
 			// H_to_L
-			OUTLOGIC(m_Q,  0, NLTIME_FROM_NS(m_H_to_L.Value()));
+			OUTLOGIC(m_Q,  0, NLTIME_FROM_NS(static_cast<unsigned>(m_H_to_L.Value())));
 		}
 		m_last = nval;
 	}

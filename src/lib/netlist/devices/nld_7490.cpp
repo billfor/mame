@@ -41,8 +41,8 @@ namespace netlist
 		logic_input_t m_R92;
 
 		state_var_u8 m_cnt;
-		state_var_u8 m_last_A;
-		state_var_u8 m_last_B;
+		state_var<netlist_sig_t> m_last_A;
+		state_var<netlist_sig_t> m_last_B;
 
 		object_array_t<logic_output_t, 4> m_Q;
 	};
@@ -120,7 +120,7 @@ namespace netlist
 
 	NETLIB_FUNC_VOID(7490, update_outputs, (void))
 	{
-		for (int i=0; i<4; i++)
+		for (std::size_t i=0; i<4; i++)
 			OUTLOGIC(m_Q[i], (m_cnt >> i) & 1, delay[i]);
 	}
 

@@ -23,11 +23,11 @@
 	struct pstr_t
 	{
 		//str_t() : m_ref_count(1), m_len(0) { m_str[0] = 0; }
-		pstr_t(const unsigned alen)
+		pstr_t(const std::size_t alen)
 		{
 			init(alen);
 		}
-		void init(const unsigned alen)
+		void init(const std::size_t alen)
 		{
 				m_ref_count = 1;
 				m_len = alen;
@@ -35,10 +35,10 @@
 		}
 		char *str() { return &m_str[0]; }
 		unsigned char *ustr() { return reinterpret_cast<unsigned char *>(&m_str[0]); }
-		unsigned len() const  { return m_len; }
+		std::size_t len() const  { return m_len; }
 		int m_ref_count;
 	private:
-		unsigned m_len;
+		std::size_t m_len;
 		char m_str[1];
 	};
 
@@ -130,7 +130,7 @@ public:
 	const pstring_t cat(const pstring_t &s) const { return *this + s; }
 	const pstring_t cat(const mem_t *s) const { return *this + s; }
 
-	unsigned blen() const { return m_ptr->len(); }
+	size_type blen() const { return m_ptr->len(); }
 
 	// conversions
 
@@ -189,7 +189,7 @@ private:
 
 	int pcmp(const mem_t *right) const;
 
-	void pcopy(const mem_t *from, int size);
+	void pcopy(const mem_t *from, std::size_t size);
 
 	void pcopy(const mem_t *from);
 
@@ -203,7 +203,7 @@ private:
 	void pcat(const mem_t *s);
 	void pcat(const pstring_t &s);
 
-	static pstr_t *salloc(int n);
+	static pstr_t *salloc(std::size_t n);
 	static void sfree(pstr_t *s);
 
 	static pstr_t m_zero;
@@ -214,12 +214,12 @@ struct pu8_traits
 	static const unsigned MAXCODELEN = 1; /* in memory units */
 	typedef char mem_t;
 	typedef char code_t;
-	static unsigned len(const pstr_t *p) { return p->len(); }
+	static std::size_t len(const pstr_t *p) { return p->len(); }
 	static unsigned codelen(const mem_t *p) { return 1; }
 	static unsigned codelen(const code_t c) { return 1; }
 	static code_t code(const mem_t *p) { return *p; }
 	static void encode(const code_t c, mem_t *p) { *p = c; }
-	static const mem_t *nthcode(const mem_t *p, const unsigned n) { return &(p[n]); }
+	static const mem_t *nthcode(const mem_t *p, const std::size_t n) { return &(p[n]); }
 };
 
 /* No checking, this may deliver invalid codes */
@@ -228,9 +228,9 @@ struct putf8_traits
 	static const unsigned MAXCODELEN = 4; /* in memory units,  RFC 3629 */
 	typedef char mem_t;
 	typedef unsigned code_t;
-	static unsigned len(pstr_t *p)
+	static std::size_t len(pstr_t *p)
 	{
-		unsigned ret = 0;
+		std::size_t ret = 0;
 		unsigned char *c = p->ustr();
 		while (*c)
 		{
@@ -273,11 +273,11 @@ struct putf8_traits
 		if ((*p1 & 0x80) == 0x00)
 			return *p1;
 		else if ((*p1 & 0xE0) == 0xC0)
-			return ((p1[0] & 0x3f) << 6) | ((p1[1] & 0x3f));
+			return static_cast<code_t>(((p1[0] & 0x3f) << 6) | (p1[1] & 0x3f));
 		else if ((*p1 & 0xF0) == 0xE0)
-			return ((p1[0] & 0x1f) << 12) | ((p1[1] & 0x3f) << 6) | ((p1[2] & 0x3f) << 0);
+			return static_cast<code_t>(((p1[0] & 0x1f) << 12) | ((p1[1] & 0x3f) << 6) | ((p1[2] & 0x3f) << 0));
 		else if ((*p1 & 0xF8) == 0xF0)
-			return ((p1[0] & 0x0f) << 18) | ((p1[1] & 0x3f) << 12) | ((p1[2] & 0x3f) << 6)  | ((p1[3] & 0x3f) << 0);
+			return static_cast<code_t>(((p1[0] & 0x0f) << 18) | ((p1[1] & 0x3f) << 12) | ((p1[2] & 0x3f) << 6)  | ((p1[3] & 0x3f) << 0));
 		else
 			return *p1; // not correct
 	}
@@ -286,31 +286,31 @@ struct putf8_traits
 		unsigned char *m = reinterpret_cast<unsigned char *>(p);
 		if (c < 0x0080)
 		{
-			m[0] = c;
+			m[0] = static_cast<unsigned char>(c);
 		}
 		else if (c < 0x800)
 		{
-			m[0] = 0xC0 | (c >> 6);
-			m[1] = 0x80 | (c & 0x3f);
+			m[0] = static_cast<unsigned char>(0xC0 | (c >> 6));
+			m[1] = static_cast<unsigned char>(0x80 | (c & 0x3f));
 		}
 		else if (c < 0x10000)
 		{
-			m[0] = 0xE0 | (c >> 12);
-			m[1] = 0x80 | ((c>>6) & 0x3f);
-			m[2] = 0x80 | (c & 0x3f);
+			m[0] = static_cast<unsigned char>(0xE0 | (c >> 12));
+			m[1] = static_cast<unsigned char>(0x80 | ((c>>6) & 0x3f));
+			m[2] = static_cast<unsigned char>(0x80 | (c & 0x3f));
 		}
 		else /* U+10000 U+1FFFFF */
 		{
-			m[0] = 0xF0 | (c >> 18);
-			m[1] = 0x80 | ((c>>12) & 0x3f);
-			m[2] = 0x80 | ((c>>6) & 0x3f);
-			m[3] = 0x80 | (c & 0x3f);
+			m[0] = static_cast<unsigned char>(0xF0 | (c >> 18));
+			m[1] = static_cast<unsigned char>(0x80 | ((c>>12) & 0x3f));
+			m[2] = static_cast<unsigned char>(0x80 | ((c>>6) & 0x3f));
+			m[3] = static_cast<unsigned char>(0x80 | (c & 0x3f));
 		}
 	}
-	static const mem_t *nthcode(const mem_t *p, const unsigned n)
+	static const mem_t *nthcode(const mem_t *p, const std::size_t n)
 	{
 		const mem_t *p1 = p;
-		int i = n;
+		std::size_t i = n;
 		while (i-- > 0)
 			p1 += codelen(p1);
 		return p1;
@@ -379,7 +379,7 @@ public:
 
 	void cat(const pstring &s) { pcat(s); }
 	void cat(const char *s) { pcat(s); }
-	void cat(const void *m, unsigned l) { pcat(m, l); }
+	void cat(const void *m, std::size_t l) { pcat(m, l); }
 
 	void clear() { m_len = 0; *m_ptr = 0; }
 
@@ -398,7 +398,7 @@ private:
 	void pcopy(const pstring &from);
 	void pcat(const char *s);
 	void pcat(const pstring &s);
-	void pcat(const void *m, unsigned l);
+	void pcat(const void *m, std::size_t l);
 
 	char *m_ptr;
 	std::size_t m_size;
@@ -418,7 +418,7 @@ namespace std
 			const pstring::mem_t *string = s.cstr();
 			result_type result = 5381;
 			for (pstring::mem_t c = *string; c != 0; c = *string++)
-				result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ c;
+				result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<result_type>(c);
 			return result;
 		}
 	};

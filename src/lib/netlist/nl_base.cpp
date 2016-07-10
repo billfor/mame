@@ -125,12 +125,12 @@ void queue_t::on_pre_save()
 	netlist().log().debug("on_pre_save\n");
 	m_qsize = this->size();
 	netlist().log().debug("current time {1} qsize {2}\n", netlist().time().as_double(), m_qsize);
-	for (int i = 0; i < m_qsize; i++ )
+	for (std::size_t i = 0; i < m_qsize; i++ )
 	{
 		m_times[i] =  this->listptr()[i].m_exec_time.as_raw();
 		pstring p = this->listptr()[i].m_object->name();
-		int n = p.len();
-		n = std::min(63, n);
+		std::size_t n = p.len();
+		if (n > 63) n = 63;
 		std::strncpy(m_names[i].m_buf, p.cstr(), n);
 		m_names[i].m_buf[n] = 0;
 	}
@@ -141,7 +141,7 @@ void queue_t::on_post_load()
 {
 	this->clear();
 	netlist().log().debug("current time {1} qsize {2}\n", netlist().time().as_double(), m_qsize);
-	for (int i = 0; i < m_qsize; i++ )
+	for (std::size_t i = 0; i < m_qsize; i++ )
 	{
 		net_t *n = netlist().find_net(m_names[i].m_buf);
 		//log().debug("Got {1} ==> {2}\n", qtemp[i].m_name, n));
@@ -291,8 +291,9 @@ void netlist_t::reset()
 	 * It is however not acceptable that this depends on the startup order.
 	 * Best would be, if reset would call update_dev for devices which need it.
 	 */
-	for (int i = m_devices.size() - 1; i >= 0; i--)
-		m_devices[i]->update_dev();
+	std::size_t i = m_devices.size();
+	while (i>0)
+		m_devices[--i]->update_dev();
 #endif
 }
 
@@ -379,9 +380,9 @@ void netlist_t::print_stats() const
 		}
 		overhead.stop();
 
-		uint_least64_t total_overhead = static_cast<uint_least64_t>(overhead())
-				* static_cast<uint_least64_t>(total_count)
-				/ static_cast<uint_least64_t>(200000);
+		nperftime_t::type total_overhead = overhead()
+				* static_cast<nperftime_t::type>(total_count)
+				/ static_cast<nperftime_t::type>(200000);
 
 		log().verbose("Queue Pushes   {1:15}", queue().m_prof_call());
 		log().verbose("Queue Moves    {1:15}", queue().m_prof_sortmove());
@@ -393,7 +394,9 @@ void netlist_t::print_stats() const
 		log().verbose("");
 		log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
 		log().verbose("Total overhead {1:15}", total_overhead);
-		log().verbose("Overhead per pop  {1:11}", (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead ))/queue().m_prof_call());
+		nperftime_t::type overhead_per_pop = (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
+				/ static_cast<nperftime_t::type>(queue().m_prof_call());
+		log().verbose("Overhead per pop  {1:11}", overhead_per_pop );
 		log().verbose("");
 		for (auto &entry : m_devices)
 		{

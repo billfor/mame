@@ -89,7 +89,7 @@ namespace netlist
 			m_sub.m_IP.inactivate();
 			/* static */ const netlist_time reset_time = netlist_time::from_nsec(140);
 			OUTLOGIC(m_sub.m_Q[0], 0, reset_time);
-			for (int i=3; i<14; i++)
+			for (std::size_t i=3; i<14; i++)
 				OUTLOGIC(m_sub.m_Q[i], 0, reset_time);
 		}
 		else
@@ -109,7 +109,7 @@ namespace netlist
 		};
 
 		OUTLOGIC(m_Q[0], cnt & 1, out_delayQn[0]);
-		for (int i=3; i<14; i++)
+		for (std::size_t i=3; i<14; i++)
 			OUTLOGIC(m_Q[i], (cnt >> i) & 1, out_delayQn[i]);
 	}
 

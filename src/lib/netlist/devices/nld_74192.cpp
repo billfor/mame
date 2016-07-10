@@ -32,7 +32,7 @@ namespace netlist
 		logic_input_t m_C;
 		logic_input_t m_D;
 
-		uint_fast8_t read_ABCD() const
+		unsigned read_ABCD() const
 		{
 			//return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
 			return (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
@@ -70,7 +70,7 @@ namespace netlist
 		logic_input_t m_CU;
 		logic_input_t m_CD;
 
-		state_var<int> m_cnt;
+		state_var<unsigned> m_cnt;
 		state_var<unsigned> m_last_CU;
 		state_var<unsigned> m_last_CD;
 
@@ -119,8 +119,8 @@ namespace netlist
 
 	NETLIB_UPDATE(74192)
 	{
-		int tCarry = 1;
-		int tBorrow = 1;
+		netlist_sig_t tCarry = 1;
+		netlist_sig_t tBorrow = 1;
 		if (INPLOGIC(m_CLEAR))
 		{
 			m_cnt = 0;
@@ -155,7 +155,7 @@ namespace netlist
 		m_last_CD = INPLOGIC(m_CD);
 		m_last_CU = INPLOGIC(m_CU);
 
-		for (int i=0; i<4; i++)
+		for (std::size_t i=0; i<4; i++)
 			OUTLOGIC(m_Q[i], (m_cnt >> i) & 1, delay[i]);
 
 		OUTLOGIC(m_BORROWQ, tBorrow, NLTIME_FROM_NS(20)); //FIXME

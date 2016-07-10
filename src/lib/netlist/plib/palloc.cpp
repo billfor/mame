@@ -56,7 +56,7 @@ out_of_mem_e::out_of_mem_e(const pstring &location)
 //  Memory pool
 //============================================================
 
-mempool::mempool(int min_alloc, int min_align)
+mempool::mempool(size_t min_alloc, size_t min_align)
 : m_min_alloc(min_alloc), m_min_align(min_align)
 {
 }
@@ -71,7 +71,7 @@ mempool::~mempool()
 	m_blocks.clear();
 }
 
-int mempool::new_block()
+size_t mempool::new_block()
 {
 	block b;
 	b.data = new char[m_min_alloc];
@@ -101,7 +101,7 @@ void *mempool::alloc(size_t size)
 		}
 	}
 	{
-		int bn = new_block();
+		size_t bn = new_block();
 		auto &b = m_blocks[bn];
 		b.m_num_alloc = 1;
 		b.m_free = m_min_alloc - rs;

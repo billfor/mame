@@ -72,7 +72,7 @@ void ptokenizer::require_token(const token_t tok, const token_id_t &token_num)
 {
 	if (!tok.is(token_num))
 	{
-		error(pfmt("Expected token <{1}> got <{2}>")(m_tokens[token_num.id()])(tok.str()) );
+		error(pfmt("Expected token <{1}> got <{2}>")(m_tokens[static_cast<size_t>(token_num.id())])(tok.str()) );
 	}
 }
 
@@ -203,11 +203,15 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			c = getc();
 		}
 		ungetc(c);
-		token_id_t id(plib::container::indexof(m_tokens, tokstr));
-		if (id.id() >= 0)
+		auto idx = plib::container::indexof(m_tokens, tokstr);
+		if (idx != plib::container::npos)
+		{
+			token_id_t id(static_cast<long>(idx));
 			return token_t(id, tokstr);
+		}
 		else
 		{
+			token_id_t id(-1);
 			return token_t(IDENTIFIER, tokstr);
 		}
 	}
@@ -231,16 +235,22 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 			/* expensive, check for single char tokens */
 			if (tokstr.len() == 1)
 			{
-				token_id_t id(plib::container::indexof(m_tokens, tokstr));
-				if (id.id() >= 0)
+				auto idx = plib::container::indexof(m_tokens, tokstr);
+				if (idx != plib::container::npos)
+				{
+					token_id_t id(static_cast<long>(idx));
 					return token_t(id, tokstr);
+				}
 			}
 			c = getc();
 		}
 		ungetc(c);
-		token_id_t id(plib::container::indexof(m_tokens, tokstr));
-		if (id.id() >= 0)
+		auto idx = plib::container::indexof(m_tokens, tokstr);
+		if (idx != plib::container::npos)
+		{
+			token_id_t id(static_cast<long>(idx));
 			return token_t(id, tokstr);
+		}
 		else
 		{
 			return token_t(UNKNOWN, tokstr);
@@ -409,7 +419,7 @@ pstring  ppreprocessor::process_line(const pstring &line)
 			std::size_t start = 0;
 			lt = replace_macros(lt);
 			pstring_vector_t t(lt.substr(3).replace(" ",""), m_expr_sep);
-			int val = expr(t, start, 0);
+			int val = static_cast<int>(expr(t, start, 0));
 			if (val == 0)
 				m_ifflag |= (1 << m_level);
 		}

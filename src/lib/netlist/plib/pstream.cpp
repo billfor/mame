@@ -47,7 +47,7 @@ bool pistream::readline(pstring &line)
 void postream::write(pistream &strm)
 {
 	char buf[1024];
-	unsigned r;
+	pos_type r;
 	while ((r=strm.read(buf, 1024)) > 0)
 		write(buf, r);
 }
@@ -93,9 +93,9 @@ pifilestream::~pifilestream()
 	}
 }
 
-unsigned pifilestream::vread(void *buf, const unsigned n)
+pifilestream::pos_type pifilestream::vread(void *buf, const pos_type n)
 {
-	std::size_t r = fread(buf, 1, n, static_cast<FILE *>(m_file));
+	pos_type r = fread(buf, 1, n, static_cast<FILE *>(m_file));
 	if (r < n)
 	{
 		if (feof(static_cast<FILE *>(m_file)))
@@ -109,7 +109,7 @@ unsigned pifilestream::vread(void *buf, const unsigned n)
 
 void pifilestream::vseek(const pos_type n)
 {
-	if (fseek(static_cast<FILE *>(m_file), SEEK_SET, n) < 0)
+	if (fseek(static_cast<FILE *>(m_file), static_cast<long>(n), SEEK_SET) < 0)
 		throw file_e("File seek failed: {}", m_filename);
 	else
 		m_pos = n;
@@ -129,7 +129,7 @@ pifilestream::pos_type pifilestream::vtell()
 		return m_pos;
 	}
 	else
-		return ret;
+		return static_cast<pos_type>(ret);
 }
 
 // -----------------------------------------------------------------------------
@@ -175,7 +175,7 @@ pofilestream::~pofilestream()
 		fclose(static_cast<FILE *>(m_file));
 }
 
-void pofilestream::vwrite(const void *buf, const unsigned n)
+void pofilestream::vwrite(const void *buf, const pos_type n)
 {
 	std::size_t r = fwrite(buf, 1, n, static_cast<FILE *>(m_file));
 	if (r < n)
@@ -188,7 +188,7 @@ void pofilestream::vwrite(const void *buf, const unsigned n)
 
 void pofilestream::vseek(const pos_type n)
 {
-	if (fseek(static_cast<FILE *>(m_file), SEEK_SET, n) < 0)
+	if (fseek(static_cast<FILE *>(m_file), static_cast<long>(n), SEEK_SET) < 0)
 		throw file_e("File seek failed: {}", m_filename);
 	else
 	{
@@ -200,13 +200,13 @@ void pofilestream::vseek(const pos_type n)
 
 pstream::pos_type pofilestream::vtell()
 {
-	long ret = ftell(static_cast<FILE *>(m_file));
+	std::ptrdiff_t ret = ftell(static_cast<FILE *>(m_file));
 	if (ret < 0)
 	{
 		return m_pos;
 	}
 	else
-		return ret;
+		return static_cast<pos_type>(ret);
 }
 
 // -----------------------------------------------------------------------------
@@ -245,9 +245,9 @@ pimemstream::~pimemstream()
 {
 }
 
-unsigned pimemstream::vread(void *buf, const unsigned n)
+pimemstream::pos_type pimemstream::vread(void *buf, const pos_type n)
 {
-	unsigned ret = (m_pos + n <= m_len) ? n :  m_len - m_pos;
+	pos_type ret = (m_pos + n <= m_len) ? n :  m_len - m_pos;
 
 	if (ret > 0)
 	{
@@ -288,7 +288,7 @@ pomemstream::~pomemstream()
 	pfree_array(m_mem);
 }
 
-void pomemstream::vwrite(const void *buf, const unsigned n)
+void pomemstream::vwrite(const void *buf, const pos_type n)
 {
 	if (m_pos + n >= m_capacity)
 	{

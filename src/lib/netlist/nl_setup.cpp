@@ -165,8 +165,8 @@ void setup_t::register_dippins_arr(const pstring &terms)
 	plib::pstring_vector_t list(terms,", ");
 	if (list.size() == 0 || (list.size() % 2) == 1)
 		log().fatal("You must pass an equal number of pins to DIPPINS");
-	unsigned n = list.size();
-	for (unsigned i = 0; i < n / 2; i++)
+	std::size_t n = list.size();
+	for (std::size_t i = 0; i < n / 2; i++)
 	{
 		register_alias(plib::pfmt("{1}")(i+1), list[i * 2]);
 		register_alias(plib::pfmt("{1}")(n-i), list[i * 2 + 1]);

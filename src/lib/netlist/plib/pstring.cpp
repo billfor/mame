@@ -32,7 +32,7 @@ pstring_t<F>::~pstring_t()
 template<typename F>
 void pstring_t<F>::pcat(const mem_t *s)
 {
-	int slen = strlen(s);
+	std::size_t slen = strlen(s);
 	pstr_t *n = salloc(m_ptr->len() + slen);
 	if (m_ptr->len() > 0)
 		std::memcpy(n->str(), m_ptr->str(), m_ptr->len());
@@ -46,7 +46,7 @@ void pstring_t<F>::pcat(const mem_t *s)
 template<typename F>
 void pstring_t<F>::pcat(const pstring_t &s)
 {
-	int slen = s.blen();
+	std::size_t slen = s.blen();
 	pstr_t *n = salloc(m_ptr->len() + slen);
 	if (m_ptr->len() > 0)
 		std::memcpy(n->str(), m_ptr->str(), m_ptr->len());
@@ -60,7 +60,7 @@ void pstring_t<F>::pcat(const pstring_t &s)
 template<typename F>
 int pstring_t<F>::pcmp(const pstring_t &right) const
 {
-	long l = std::min(blen(), right.blen());
+	std::size_t l = std::min(blen(), right.blen());
 	if (l == 0)
 	{
 		if (blen() == 0 && right.blen() == 0)
@@ -72,18 +72,18 @@ int pstring_t<F>::pcmp(const pstring_t &right) const
 	}
 	int ret = memcmp(m_ptr->str(), right.cstr(), l);
 	if (ret == 0)
-		ret = this->blen() - right.blen();
-	if (ret < 0)
-		return -1;
-	else if (ret > 0)
-		return 1;
-	else
-		return 0;
+	{
+		if (this->blen() > right.blen())
+			ret = 1;
+		else if (this->blen() < right.blen())
+			ret = -1;
+	}
+	return ret;
 }
 
 
 template<typename F>
-void pstring_t<F>::pcopy(const mem_t *from, int size)
+void pstring_t<F>::pcopy(const mem_t *from, std::size_t size)
 {
 	pstr_t *n = salloc(size);
 	if (size > 0)
@@ -97,7 +97,8 @@ template<typename F>
 const pstring_t<F> pstring_t<F>::substr(const iter_t start, const iter_t end) const
 {
 	pstring_t ret;
-	ret.pcopy(start.p, end.p - start.p);
+	//FIXME: throw ?
+	ret.pcopy(start.p, static_cast<std::size_t>(end.p - start.p));
 	return ret;
 }
 
@@ -108,7 +109,7 @@ const pstring_t<F> pstring_t<F>::ucase() const
 	pstring_t ret = *this;
 	ret.pcopy(cstr(), blen());
 	for (std::size_t  i=0; i<ret.len(); i++)
-		ret.m_ptr->str()[i] = toupper(static_cast<unsigned>(ret.m_ptr->str()[i]));
+		ret.m_ptr->str()[i] = static_cast<char>(toupper(static_cast<int>(ret.m_ptr->str()[i])));
 	return ret;
 }
 
@@ -299,7 +300,7 @@ bool pstring_t<F>::endsWith(const pstring_t &arg) const
 template<typename F>
 bool pstring_t<F>::startsWith(const mem_t *arg) const
 {
-	unsigned alen = strlen(arg);
+	std::size_t alen = strlen(arg);
 	if (alen > blen())
 		return false;
 	else
@@ -367,7 +368,7 @@ void pstringbuffer::pcat(const char *s)
 	m_len += slen;
 }
 
-void pstringbuffer::pcat(const void *m, unsigned l)
+void pstringbuffer::pcat(const void *m, std::size_t l)
 {
 	const std::size_t nl = m_len + l + 1;
 	resize(nl);
@@ -400,11 +401,11 @@ void pstringbuffer::pcat(const pstring &s)
 
 static std::stack<pstr_t *> *stk = nullptr;
 
-static inline unsigned countleadbits(unsigned x)
+static inline std::size_t countleadbits(std::size_t x)
 {
 #ifndef count_leading_zeros
-	unsigned msk;
-	unsigned ret;
+	std::size_t msk;
+	std::size_t ret;
 	if (x < 0x100)
 	{
 		msk = 0x80;
@@ -444,7 +445,7 @@ void pstring_t<F>::sfree(pstr_t *s)
 	{
 		if (stk != nullptr)
 		{
-			unsigned sn= ((32 - countleadbits(s->len())) + 1) / 2;
+			size_type sn= ((32 - countleadbits(s->len())) + 1) / 2;
 			stk[sn].push(s);
 		}
 		else
@@ -454,7 +455,7 @@ void pstring_t<F>::sfree(pstr_t *s)
 }
 
 template<typename F>
-pstr_t *pstring_t<F>::salloc(int n)
+pstr_t *pstring_t<F>::salloc(std::size_t n)
 {
 	if (stk == nullptr)
 		stk = plib::palloc_array<std::stack<pstr_t *>>(17);

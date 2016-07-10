@@ -32,7 +32,7 @@ namespace netlist
 		logic_input_t m_C;
 		logic_input_t m_D;
 
-		uint_fast8_t read_ABCD() const
+		unsigned read_ABCD() const
 		{
 			//return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
 			return (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
@@ -59,7 +59,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void update_outputs_all(const uint_fast8_t cnt, const netlist_time out_delay)
+		void update_outputs_all(const unsigned cnt, const netlist_time out_delay)
 		{
 			OUTLOGIC(m_QA, (cnt >> 0) & 1, out_delay);
 			OUTLOGIC(m_QB, (cnt >> 1) & 1, out_delay);
@@ -69,9 +69,9 @@ namespace netlist
 
 		logic_input_t m_CLK;
 
-		state_var_u8 m_cnt;
-		state_var_u8 m_loadq;
-		state_var_u8 m_ent;
+		state_var<unsigned> m_cnt;
+		state_var<netlist_sig_t> m_loadq;
+		state_var<netlist_sig_t> m_ent;
 
 		logic_output_t m_QA;
 		logic_output_t m_QB;

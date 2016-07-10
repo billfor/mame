@@ -43,10 +43,10 @@ public:
 	{
 	public:
 		token_id_t() : m_id(-2) {}
-		token_id_t(const int id) : m_id(id) {}
-		int id() const { return m_id; }
+		token_id_t(const long id) : m_id(id) {}
+		long id() const { return m_id; }
 	private:
-		int m_id;
+		long m_id;
 	};
 
 	struct token_t
@@ -102,12 +102,12 @@ public:
 	token_id_t register_token(pstring token)
 	{
 		m_tokens.push_back(token);
-		return token_id_t(m_tokens.size() - 1);
+		return token_id_t(static_cast<int>(m_tokens.size()) - 1);
 	}
 
 	void set_identifier_chars(pstring s) { m_identifier_chars = s; }
 	void set_number_chars(pstring st, pstring rem) { m_number_chars_start = st; m_number_chars = rem; }
-	void set_string_char(char c) { m_string = c; }
+	void set_string_char(pstring::code_t c) { m_string = c; }
 	void set_whitespace(pstring s) { m_whitespace = s; }
 	void set_comment(pstring start, pstring end, pstring line)
 	{

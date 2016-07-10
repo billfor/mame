@@ -63,10 +63,10 @@ namespace netlist
 		{
 			switch (m_size)
 			{
-				case 1: static_cast<uint_least8_t  *>(m_data)[pos] = val; break;
-				case 2: static_cast<uint_least16_t *>(m_data)[pos] = val; break;
-				case 4: static_cast<uint_least32_t *>(m_data)[pos] = val; break;
-				case 8: static_cast<uint_least64_t *>(m_data)[pos] = val; break;
+				case 1: static_cast<uint_least8_t  *>(m_data)[pos] = static_cast<uint_least8_t>(val); break;
+				case 2: static_cast<uint_least16_t *>(m_data)[pos] = static_cast<uint_least16_t>(val); break;
+				case 4: static_cast<uint_least32_t *>(m_data)[pos] = static_cast<uint_least32_t>(val); break;
+				case 8: static_cast<uint_least64_t *>(m_data)[pos] = static_cast<uint_least64_t>(val); break;
 				default: { }
 			}
 		}
@@ -103,7 +103,7 @@ namespace netlist
 
 	struct truthtable_desc_t
 	{
-		truthtable_desc_t(int NO, int NI, bool *initialized,
+		truthtable_desc_t(unsigned NO, unsigned NI, bool *initialized,
 				packed_int outs, uint_least8_t *timing, netlist_time *timing_nt)
 		: m_NO(NO), m_NI(NI),  m_initialized(initialized),
 			m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
@@ -217,8 +217,8 @@ namespace netlist
 			for (std::size_t i=0; i < m_NO; i++)
 			{
 				pstring tmp = "_" + out[i];
-				const int idx = plib::container::indexof(inout, tmp);
-				if (idx>=0)
+				const std::size_t idx = plib::container::indexof(inout, tmp);
+				if (idx != plib::container::npos)
 				{
 					connect_late(m_Q[i], m_I[idx]);
 					// disable ignore for this inputs altogether.

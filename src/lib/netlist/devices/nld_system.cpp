@@ -24,7 +24,7 @@ namespace netlist
 
 	NETLIB_UPDATE_PARAM(clock)
 	{
-		m_inc = netlist_time::from_hz(m_freq.Value()*2);
+		m_inc = netlist_time::from_double(1.0 / (m_freq.Value() * 2.0));
 	}
 
 	NETLIB_UPDATE(clock)
@@ -101,7 +101,7 @@ namespace netlist
 
 	NETLIB_UPDATE(d_to_a_proxy)
 	{
-		const int state = INPLOGIC(m_I);
+		const int state = static_cast<int>(INPLOGIC(m_I));
 		if (state != m_last_state)
 		{
 			m_last_state = state;
@@ -126,7 +126,7 @@ namespace netlist
 
 	NETLIB_UPDATE(res_sw)
 	{
-		const int state = INPLOGIC(m_I);
+		const netlist_sig_t state = INPLOGIC(m_I);
 		if (state != m_last_state)
 		{
 			m_last_state = state;
@@ -163,8 +163,8 @@ namespace netlist
 		//OUTANALOG(m_Q, val);
 		nl_double stack[20];
 		unsigned ptr = 0;
-		unsigned e = m_precompiled.size();
-		for (unsigned i = 0; i<e; i++)
+		std::size_t e = m_precompiled.size();
+		for (std::size_t i = 0; i<e; i++)
 		{
 			rpn_inst &rc = m_precompiled[i];
 			switch (rc.m_cmd)
@@ -186,7 +186,7 @@ namespace netlist
 					stack[ptr-1] = stack[ptr-1] / stack[ptr];
 					break;
 				case PUSH_INPUT:
-					stack[ptr++] = INPANALOG(*m_I[static_cast<int>(rc.m_param)]);
+					stack[ptr++] = INPANALOG(*m_I[static_cast<unsigned>(rc.m_param)]);
 					break;
 				case PUSH_CONST:
 					stack[ptr++] = rc.m_param;

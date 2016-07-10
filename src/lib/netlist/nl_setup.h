@@ -120,8 +120,8 @@ namespace netlist
 	{
 		pstring name;
 		pstring classname;
-		unsigned ni;
-		unsigned no;
+		unsigned long ni;
+		unsigned long no;
 		pstring def_param;
 		plib::pstring_vector_t desc;
 		pstring family;

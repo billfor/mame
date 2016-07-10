@@ -1056,7 +1056,7 @@ namespace netlist
 
 	private:
 		struct names_t { char m_buf[64]; };
-		int m_qsize;
+		std::size_t m_qsize;
 		std::vector<netlist_time::internal_type> m_times;
 		std::vector<names_t> m_names;
 	};
@@ -1143,7 +1143,7 @@ namespace netlist
 		{
 			this->state().save_item(static_cast<void *>(&owner), state, pstring(owner.name()) + "." + stname);
 		}
-		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const int count)
+		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const std::size_t count)
 		{
 			this->state().save_state_ptr(static_cast<void *>(&owner), pstring(owner.name()) + "." + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
 		}

@@ -49,7 +49,7 @@ namespace netlist
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5)
 		{
-			m_inc = netlist_time::from_hz(m_freq.Value()*2);
+			m_inc = netlist_time::from_double(1.0 / (m_freq.Value()*2.0));
 		}
 
 		NETLIB_RESETI()
@@ -59,7 +59,7 @@ namespace netlist
 
 		NETLIB_UPDATE_PARAMI()
 		{
-			m_inc = netlist_time::from_hz(m_freq.Value()*2);
+			m_inc = netlist_time::from_double(1.0 / (m_freq.Value()*2.0));
 		}
 
 		NETLIB_UPDATEI()
@@ -90,7 +90,7 @@ namespace netlist
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
 		{
-			m_inc = netlist_time::from_hz(m_freq.Value()*2);
+			m_inc = netlist_time::from_double(1.0 / (m_freq.Value()*2.0));
 
 			connect_late(m_feedback, m_Q);
 		}
@@ -121,20 +121,20 @@ namespace netlist
 		, m_cnt(*this, "m_cnt", 0)
 		, m_off(*this, "m_off", netlist_time::zero())
 		{
-			m_inc[0] = netlist_time::from_hz(m_freq.Value()*2);
+			m_inc[0] = netlist_time::from_double(1.0 / (m_freq.Value()*2.0));
 
 			connect_late(m_feedback, m_Q);
 			{
-				netlist_time base = netlist_time::from_hz(m_freq.Value()*2);
+				netlist_time base = netlist_time::from_double(1.0 / (m_freq.Value()*2.0));
 				plib::pstring_vector_t pat(m_pattern.Value(),",");
 				m_off = netlist_time::from_double(m_offset.Value());
 
-				int pati[256];
+				unsigned long pati[256];
 				m_size = pat.size();
-				int total = 0;
+				unsigned long total = 0;
 				for (unsigned i=0; i<m_size; i++)
 				{
-					pati[i] = pat[i].as_long();
+					pati[i] = static_cast<unsigned long>(pat[i].as_long());
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero();
@@ -160,7 +160,7 @@ namespace netlist
 		netlist_time m_inc[32];
 		state_var<unsigned> m_cnt;
 		state_var<netlist_time> m_off;
-		unsigned m_size;
+		std::size_t m_size;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -410,7 +410,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	private:
-		state_var_u8 m_last_state;
+		state_var<netlist_sig_t> m_last_state;
 	};
 
 	// -----------------------------------------------------------------------------

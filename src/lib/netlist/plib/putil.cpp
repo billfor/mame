@@ -70,7 +70,7 @@ namespace plib
 		unsigned i = 0;
 		while (i<str.blen())
 		{
-			int p = -1;
+			std::size_t p = static_cast<std::size_t>(-1);
 			for (std::size_t j=0; j < onstrl.size(); j++)
 			{
 				if (std::memcmp(onstrl[j].cstr(), &(str.cstr()[i]), onstrl[j].blen())==0)
@@ -79,7 +79,7 @@ namespace plib
 					break;
 				}
 			}
-			if (p>=0)
+			if (p != static_cast<std::size_t>(-1))
 			{
 				if (col != "")
 					this->push_back(col);
@@ -104,13 +104,13 @@ namespace plib
 	{
 		int cnt = 0;
 		const char *cur = str;
-		int lx = strlen(x);
+		std::size_t lx = strlen(x);
 		while (*str)
 		{
 			if (*str == ',')
 			{
-				int l = str-cur;
-				if (l == lx)
+				std::ptrdiff_t l = str-cur;
+				if (static_cast<std::size_t>(l) == lx)
 					if (strncmp(cur, x, lx) == 0)
 						return cnt;
 			}
@@ -121,8 +121,8 @@ namespace plib
 			}
 			str++;
 		}
-		int l = str-cur;
-		if (l == lx)
+		std::ptrdiff_t l = str-cur;
+		if (static_cast<std::size_t>(l) == lx)
 			if (strncmp(cur, x, lx) == 0)
 				return cnt;
 		return -1;
