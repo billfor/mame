@@ -127,7 +127,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 
 		net->set_solver(this);
 
-		for (core_terminal_t *p : net->m_core_terms)
+		for (auto &p : net->m_core_terms)
 		{
 			log().debug("{1} {2} {3}\n", p->name(), net->name(), net->isRailNet());
 			switch (p->type())
@@ -465,7 +465,7 @@ const netlist_time matrix_solver_t::solve()
 	return next_time_step;
 }
 
-int matrix_solver_t::get_net_idx(net_t *net)
+int matrix_solver_t::get_net_idx(detail::net_t *net)
 {
 	for (std::size_t k = 0; k < m_nets.size(); k++)
 		if (m_nets[k] == net)
@@ -837,10 +837,10 @@ void NETLIB_NAME(solver)::post_start()
 		netlist().log().verbose("       ==> {2} nets", grp.size());
 		netlist().log().verbose("       has {1} elements", ms->has_dynamic_devices() ? "dynamic" : "no dynamic");
 		netlist().log().verbose("       has {1} elements", ms->has_timestep_devices() ? "timestep" : "no timestep");
-		for (net_t *n : grp)
+		for (auto &n : grp)
 		{
 			netlist().log().verbose("Net {1}", n->name());
-			for (const core_terminal_t *pcore : n->m_core_terms)
+			for (const auto &pcore : n->m_core_terms)
 			{
 				netlist().log().verbose("   {1}", pcore->name());
 			}

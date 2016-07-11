@@ -157,7 +157,7 @@ public:
 	NETLIB_RESETI();
 
 public:
-	int get_net_idx(net_t *net);
+	int get_net_idx(detail::net_t *net);
 
 	plib::plog_base<NL_DEBUG> &log() { return netlist().log(); }
 

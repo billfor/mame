@@ -420,7 +420,8 @@ namespace netlist
 	NETLIB_OBJECT(base_proxy)
 	{
 	public:
-		nld_base_proxy(netlist_t &anetlist, const pstring &name, logic_t *inout_proxied, core_terminal_t *proxy_inout)
+		nld_base_proxy(netlist_t &anetlist, const pstring &name,
+				logic_t *inout_proxied, detail::core_terminal_t *proxy_inout)
 				: device_t(anetlist, name)
 		{
 			m_logic_family = inout_proxied->logic_family();
@@ -431,7 +432,7 @@ namespace netlist
 		virtual ~nld_base_proxy() {}
 
 		logic_t &term_proxied() const { return *m_term_proxied; }
-		core_terminal_t &proxy_term() const { return *m_proxy_term; }
+		detail::core_terminal_t &proxy_term() const { return *m_proxy_term; }
 
 	protected:
 
@@ -443,7 +444,7 @@ namespace netlist
 	private:
 		const logic_family_desc_t *m_logic_family;
 		logic_t *m_term_proxied;
-		core_terminal_t *m_proxy_term;
+		detail::core_terminal_t *m_proxy_term;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -495,7 +496,8 @@ namespace netlist
 		virtual logic_input_t &in() { return m_I; }
 
 	protected:
-		nld_base_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied, core_terminal_t &proxy_out)
+		nld_base_d_to_a_proxy(netlist_t &anetlist, const pstring &name,
+				logic_output_t *out_proxied, detail::core_terminal_t &proxy_out)
 		: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
 		, m_I(*this, "I")
 		{

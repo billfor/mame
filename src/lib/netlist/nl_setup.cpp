@@ -173,7 +173,7 @@ void setup_t::register_dippins_arr(const pstring &terms)
 	}
 }
 
-pstring setup_t::objtype_as_str(device_object_t &in) const
+pstring setup_t::objtype_as_str(detail::device_object_t &in) const
 {
 	switch (in.type())
 	{
@@ -231,7 +231,7 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 		log().fatal("Error adding parameter {1} to parameter list\n", name);
 }
 
-void setup_t::register_term(core_terminal_t &term)
+void setup_t::register_term(detail::core_terminal_t &term)
 {
 	if (!m_terminals.insert({term.name(), &term}).second)
 		log().fatal("Error adding {1} {2} to terminal list\n", objtype_as_str(term), term.name());
@@ -351,7 +351,7 @@ const pstring setup_t::resolve_alias(const pstring &name) const
 	return ret;
 }
 
-core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool required)
+detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
@@ -362,7 +362,7 @@ core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool require
 		ret = m_terminals.find(tname + ".Q");
 	}
 
-	core_terminal_t *term = (ret == m_terminals.end() ? nullptr : ret->second);
+	detail::core_terminal_t *term = (ret == m_terminals.end() ? nullptr : ret->second);
 
 	if (term == nullptr && required)
 		log().fatal("terminal {1}({2}) not found!\n", terminal_in, tname);
@@ -371,12 +371,13 @@ core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool require
 	return term;
 }
 
-core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, device_object_t::type_t atype, bool required)
+detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in,
+		detail::device_object_t::type_t atype, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
 	/* look for default */
-	if (ret == m_terminals.end() && atype == device_object_t::OUTPUT)
+	if (ret == m_terminals.end() && atype == detail::device_object_t::OUTPUT)
 	{
 		/* look for ".Q" std output */
 		ret = m_terminals.find(tname + ".Q");
@@ -384,7 +385,7 @@ core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, device_objec
 	if (ret == m_terminals.end() && required)
 		log().fatal("terminal {1}({2}) not found!\n", terminal_in, tname);
 
-	core_terminal_t *term = (ret == m_terminals.end() ? nullptr : ret->second);
+	detail::core_terminal_t *term = (ret == m_terminals.end() ? nullptr : ret->second);
 
 	if (term != nullptr && term->type() != atype)
 	{
@@ -413,7 +414,7 @@ param_t *setup_t::find_param(const pstring &param_in, bool required) const
 }
 
 // FIXME avoid dynamic cast here
-devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
+devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 {
 	nl_assert(out.is_logic());
 
@@ -450,7 +451,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(core_terminal_t &out)
 	return proxy;
 }
 
-void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
+void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_terminal_t &out)
 {
 	if (out.is_analog() && in.is_logic())
 	{
@@ -483,7 +484,7 @@ void setup_t::connect_input_output(core_terminal_t &in, core_terminal_t &out)
 }
 
 
-void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
+void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &inp)
 {
 	if (inp.is_analog())
 	{
@@ -514,7 +515,7 @@ void setup_t::connect_terminal_input(terminal_t &term, core_terminal_t &inp)
 	}
 }
 
-void setup_t::connect_terminal_output(terminal_t &in, core_terminal_t &out)
+void setup_t::connect_terminal_output(terminal_t &in, detail::core_terminal_t &out)
 {
 	if (out.is_analog())
 	{
@@ -538,7 +539,7 @@ void setup_t::connect_terminal_output(terminal_t &in, core_terminal_t &out)
 	}
 }
 
-void setup_t::connect_terminals(core_terminal_t &t1, core_terminal_t &t2)
+void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
 {
 	if (t1.has_net() && t2.has_net())
 	{
@@ -566,7 +567,7 @@ void setup_t::connect_terminals(core_terminal_t &t1, core_terminal_t &t2)
 	}
 }
 
-static core_terminal_t &resolve_proxy(core_terminal_t &term)
+static detail::core_terminal_t &resolve_proxy(detail::core_terminal_t &term)
 {
 	if (term.is_logic())
 	{
@@ -577,7 +578,7 @@ static core_terminal_t &resolve_proxy(core_terminal_t &term)
 	return term;
 }
 
-bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
+bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
 {
 	bool ret = false;
 	if (t1.has_net())
@@ -588,7 +589,7 @@ bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 		{
 			for (auto & t : t1.net().m_core_terms)
 			{
-				if (t->is_type(core_terminal_t::TERMINAL))
+				if (t->is_type(detail::core_terminal_t::TERMINAL))
 					ret = connect(t2, *t);
 				if (ret)
 					break;
@@ -603,7 +604,7 @@ bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 		{
 			for (auto & t : t2.net().m_core_terms)
 			{
-				if (t->is_type(core_terminal_t::TERMINAL))
+				if (t->is_type(detail::core_terminal_t::TERMINAL))
 					ret = connect(t1, *t);
 				if (ret)
 					break;
@@ -615,46 +616,46 @@ bool setup_t::connect_input_input(core_terminal_t &t1, core_terminal_t &t2)
 
 
 
-bool setup_t::connect(core_terminal_t &t1_in, core_terminal_t &t2_in)
+bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t2_in)
 {
 	log().debug("Connecting {1} to {2}\n", t1_in.name(), t2_in.name());
-	core_terminal_t &t1 = resolve_proxy(t1_in);
-	core_terminal_t &t2 = resolve_proxy(t2_in);
+	detail::core_terminal_t &t1 = resolve_proxy(t1_in);
+	detail::core_terminal_t &t2 = resolve_proxy(t2_in);
 	bool ret = true;
 
-	if (t1.is_type(core_terminal_t::OUTPUT) && t2.is_type(core_terminal_t::INPUT))
+	if (t1.is_type(detail::core_terminal_t::OUTPUT) && t2.is_type(detail::core_terminal_t::INPUT))
 	{
 		if (t2.has_net() && t2.net().isRailNet())
 			log().fatal("Input {1} already connected\n", t2.name());
 		connect_input_output(t2, t1);
 	}
-	else if (t1.is_type(core_terminal_t::INPUT) && t2.is_type(core_terminal_t::OUTPUT))
+	else if (t1.is_type(detail::core_terminal_t::INPUT) && t2.is_type(detail::core_terminal_t::OUTPUT))
 	{
 		if (t1.has_net()  && t1.net().isRailNet())
 			log().fatal("Input {1} already connected\n", t1.name());
 		connect_input_output(t1, t2);
 	}
-	else if (t1.is_type(core_terminal_t::OUTPUT) && t2.is_type(core_terminal_t::TERMINAL))
+	else if (t1.is_type(detail::core_terminal_t::OUTPUT) && t2.is_type(detail::core_terminal_t::TERMINAL))
 	{
 		connect_terminal_output(dynamic_cast<terminal_t &>(t2), t1);
 	}
-	else if (t1.is_type(core_terminal_t::TERMINAL) && t2.is_type(core_terminal_t::OUTPUT))
+	else if (t1.is_type(detail::core_terminal_t::TERMINAL) && t2.is_type(detail::core_terminal_t::OUTPUT))
 	{
 		connect_terminal_output(dynamic_cast<terminal_t &>(t1), t2);
 	}
-	else if (t1.is_type(core_terminal_t::INPUT) && t2.is_type(core_terminal_t::TERMINAL))
+	else if (t1.is_type(detail::core_terminal_t::INPUT) && t2.is_type(detail::core_terminal_t::TERMINAL))
 	{
 		connect_terminal_input(dynamic_cast<terminal_t &>(t2), t1);
 	}
-	else if (t1.is_type(core_terminal_t::TERMINAL) && t2.is_type(core_terminal_t::INPUT))
+	else if (t1.is_type(detail::core_terminal_t::TERMINAL) && t2.is_type(detail::core_terminal_t::INPUT))
 	{
 		connect_terminal_input(dynamic_cast<terminal_t &>(t1), t2);
 	}
-	else if (t1.is_type(core_terminal_t::TERMINAL) && t2.is_type(core_terminal_t::TERMINAL))
+	else if (t1.is_type(detail::core_terminal_t::TERMINAL) && t2.is_type(detail::core_terminal_t::TERMINAL))
 	{
 		connect_terminals(dynamic_cast<terminal_t &>(t1), dynamic_cast<terminal_t &>(t2));
 	}
-	else if (t1.is_type(core_terminal_t::INPUT) && t2.is_type(core_terminal_t::INPUT))
+	else if (t1.is_type(detail::core_terminal_t::INPUT) && t2.is_type(detail::core_terminal_t::INPUT))
 	{
 		ret = connect_input_input(t1, t2);
 	}
@@ -682,8 +683,8 @@ void setup_t::resolve_inputs()
 		{
 			const pstring t1s = li->first;
 			const pstring t2s = li->second;
-			core_terminal_t *t1 = find_terminal(t1s);
-			core_terminal_t *t2 = find_terminal(t2s);
+			detail::core_terminal_t *t1 = find_terminal(t1s);
+			detail::core_terminal_t *t2 = find_terminal(t2s);
 
 			if (connect(*t1, *t2))
 				li = m_links.erase(li);
@@ -720,7 +721,7 @@ void setup_t::resolve_inputs()
 	log().verbose("looking for terminals not connected ...");
 	for (auto & i : m_terminals)
 	{
-		core_terminal_t *term = i.second;
+		detail::core_terminal_t *term = i.second;
 		if (!term->has_net() && dynamic_cast< devices::NETLIB_NAME(dummy_input) *>(&term->device()) != nullptr)
 			log().warning("Found dummy terminal {1} without connections", term->name());
 		else if (!term->has_net())
@@ -775,59 +776,6 @@ void setup_t::start_devices()
 			log().debug("    dynamic link {1}: <{2}>\n",ll, name);
 			netlist().register_dev(std::move(nc));
 		}
-	}
-
-	/* make sure the solver and parameters are started first! */
-
-	for (auto & e : m_device_factory)
-	{
-		if ( factory().is_class<devices::NETLIB_NAME(mainclock)>(e.second)
-				|| factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
-				|| factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
-				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
-		{
-			auto dev = plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first));
-			netlist().register_dev(std::move(dev));
-		}
-	}
-
-	log().debug("Searching for mainclock and solver ...\n");
-
-	netlist().m_mainclock = netlist().get_single_device<devices::NETLIB_NAME(mainclock)>("mainclock");
-	netlist().m_solver = netlist().get_single_device<devices::NETLIB_NAME(solver)>("solver");
-	netlist().m_gnd = netlist().get_single_device<devices::NETLIB_NAME(gnd)>("gnd");
-	netlist().m_params = netlist().get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
-
-	/* create devices */
-
-	for (auto & e : m_device_factory)
-	{
-		if ( !factory().is_class<devices::NETLIB_NAME(mainclock)>(e.second)
-				&& !factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
-				&& !factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
-				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
-		{
-			auto dev = plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first));
-			netlist().register_dev(std::move(dev));
-		}
-	}
-
-	bool use_deactivate = (netlist().m_params->m_use_deactivate.Value() ? true : false);
-
-	for (auto &d : netlist().m_devices)
-	{
-		if (use_deactivate)
-		{
-			auto p = m_param_values.find(d->name() + ".HINT_NO_DEACTIVATE");
-			if (p != m_param_values.end())
-			{
-				//FIXME: Error checking
-				auto v = p->second.as_long();
-				d->set_hint_deactivate(!v);
-			}
-		}
-		else
-			d->set_hint_deactivate(false);
 	}
 
 	netlist().start();

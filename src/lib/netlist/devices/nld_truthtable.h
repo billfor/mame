@@ -140,7 +140,7 @@ namespace netlist
 	NETLIB_OBJECT(truthtable_t)
 	{
 	private:
-		family_setter_t m_fam;
+		detail::family_setter_t m_fam;
 	public:
 
 		static constexpr int m_num_bits = m_NI;

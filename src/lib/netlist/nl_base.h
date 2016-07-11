@@ -2,6 +2,8 @@
 // copyright-holders:Couriersud
 /*!  \file nl_base.h
  *
+ *  \mainpage
+ *
  *  Netlist
  *  =======
  *
@@ -213,7 +215,7 @@ class NETLIB_NAME(name) : public NETLIB_NAME(pclass)
 class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_CONSTRUCTOR_DERIVED(cname, pclass)                              \
-	private: family_setter_t m_famsetter;                                      \
+	private: detail::family_setter_t m_famsetter;                              \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
 	: NETLIB_NAME(pclass)(owner, name)
 
@@ -222,7 +224,7 @@ class NETLIB_NAME(name) : public device_t
  *  #NETLIB_OBJECT for an example.
  */
 #define NETLIB_CONSTRUCTOR(cname)                                              \
-	private: family_setter_t m_famsetter;                                      \
+	private: detail::family_setter_t m_famsetter;                              \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
 		: device_t(owner, name)
 
@@ -236,7 +238,7 @@ class NETLIB_NAME(name) : public device_t
   *  normally used for sub-devices and system devices only.
   */
 #define NETLIB_CONSTRUCTOR_EX(cname, ...)                                      \
-	private: family_setter_t m_famsetter;                                      \
+	private: detail::family_setter_t m_famsetter;                              \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name, __VA_ARGS__) \
 		: device_t(owner, name)
 
@@ -332,6 +334,20 @@ namespace netlist
 		class NETLIB_NAME(base_d_to_a_proxy);
 	}
 
+	/*! The netlist::detail namespace.
+	 *  This namespace contains all internal support classes not intended
+	 *  to be used outside of the core.
+	 */
+	namespace detail {
+		class object_t;
+		class device_object_t;
+		struct netlist_ref;
+		class core_terminal_t;
+		struct family_setter_t;
+		class queue_t;
+		class net_t;
+	}
+
 	//============================================================
 	//  Exceptions
 	//============================================================
@@ -417,7 +433,15 @@ namespace netlist
 
 	/*! A persistent variable template.
 	 *  Use the state_var template to define a variable whose value is saved.
-	 *  Please refer to the save state documentation.
+	 *  Within a device definition use
+	 *
+	 *  	NETLIB_OBJECT(abc)
+	 *  	{
+	 *  		NETLIB_CONSTRUCTOR(abc)
+	 *  		, m_var(*this, "myvar", 0)
+	 *  		...
+	 *  		state_var<unsigned> m_var;
+	 *  	}
 	 */
 
 	template <typename T>
@@ -486,7 +510,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 
-	class object_t
+	class detail::object_t
 	{
 		P_PREVENT_COPYING(object_t)
 	public:
@@ -496,21 +520,16 @@ namespace netlist
 
 		const pstring &name() const;
 
-		//netlist_t & m_netlist;
-		//netlist_t & netlist() { return m_netlist; }
-		//const netlist_t & netlist() const { return m_netlist; }
-
-	private:
-		pstring m_name;
-
-	public:
 		void * operator new (size_t size, void *ptr) { return ptr; }
 		void operator delete (void *ptr, void *) {  }
 		void * operator new (size_t size);
 		void operator delete (void * mem);
+
+	private:
+		pstring m_name;
 	};
 
-	struct netlist_ref
+	struct detail::netlist_ref
 	{
 		netlist_ref(netlist_t &nl) : m_netlist(nl) { }
 
@@ -526,7 +545,7 @@ namespace netlist
 	// device_object_t
 	// -----------------------------------------------------------------------------
 
-	class device_object_t : public object_t
+	class detail::device_object_t : public detail::object_t
 	{
 		P_PREVENT_COPYING(device_object_t)
 	public:
@@ -555,7 +574,7 @@ namespace netlist
 	// core_terminal_t
 	// -----------------------------------------------------------------------------
 
-	class core_terminal_t : public device_object_t, public plib::linkedlist_t<core_terminal_t>::element_t
+	class detail::core_terminal_t : public device_object_t, public plib::linkedlist_t<core_terminal_t>::element_t
 	{
 		P_PREVENT_COPYING(core_terminal_t)
 	public:
@@ -605,7 +624,7 @@ namespace netlist
 	// analog_t
 	// -----------------------------------------------------------------------------
 
-	class analog_t : public core_terminal_t
+	class analog_t : public detail::core_terminal_t
 	{
 	public:
 
@@ -682,7 +701,7 @@ namespace netlist
 	// logic_t
 	// -----------------------------------------------------------------------------
 
-	class logic_t : public core_terminal_t, public logic_family_t
+	class logic_t : public detail::core_terminal_t, public logic_family_t
 	{
 	public:
 		logic_t(core_device_t &dev, const pstring &aname, const type_t atype)
@@ -739,7 +758,9 @@ namespace netlist
 	// net_t
 	// -----------------------------------------------------------------------------
 
-	class net_t : public object_t, public netlist_ref
+	class detail::net_t :
+			public detail::object_t,
+			public detail::netlist_ref
 	{
 		P_PREVENT_COPYING(net_t)
 	public:
@@ -799,12 +820,12 @@ namespace netlist
 
 	};
 
-	class logic_net_t : public net_t
+	class logic_net_t : public detail::net_t
 	{
 		P_PREVENT_COPYING(logic_net_t)
 	public:
 
-		logic_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
+		logic_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t() { }
 
 		netlist_sig_t Q() const { return m_cur_Q; }
@@ -840,14 +861,14 @@ namespace netlist
 
 	};
 
-	class analog_net_t : public net_t
+	class analog_net_t : public detail::net_t
 	{
 		P_PREVENT_COPYING(analog_net_t)
 	public:
 
 		using list_t =  std::vector<analog_net_t *>;
 
-		analog_net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr = nullptr);
+		analog_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 
 		virtual ~analog_net_t() { }
 
@@ -905,7 +926,7 @@ namespace netlist
 	// param_t
 	// -----------------------------------------------------------------------------
 
-	class param_t : public device_object_t
+	class param_t : public detail::device_object_t
 	{
 		P_PREVENT_COPYING(param_t)
 	public:
@@ -975,7 +996,10 @@ namespace netlist
 	// core_device_t
 	// -----------------------------------------------------------------------------
 
-	class core_device_t : public object_t, public logic_family_t, public netlist_ref
+	class core_device_t :
+			public detail::object_t,
+			public logic_family_t,
+			public detail::netlist_ref
 	{
 		P_PREVENT_COPYING(core_device_t)
 	public:
@@ -1093,12 +1117,12 @@ namespace netlist
 		}
 #endif
 
-		void register_subalias(const pstring &name, core_terminal_t &term);
+		void register_subalias(const pstring &name, detail::core_terminal_t &term);
 		void register_subalias(const pstring &name, const pstring &aliased);
 
 		void connect_late(const pstring &t1, const pstring &t2);
-		void connect_late(core_terminal_t &t1, core_terminal_t &t2);
-		void connect_post_start(core_terminal_t &t1, core_terminal_t &t2);
+		void connect_late(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
+		void connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 	protected:
 
 		NETLIB_UPDATEI() { }
@@ -1111,7 +1135,7 @@ namespace netlist
 	// family_setter_t
 	// -----------------------------------------------------------------------------
 
-	struct family_setter_t
+	struct detail::family_setter_t
 	{
 		family_setter_t() { }
 		family_setter_t(core_device_t &dev, const char *desc);
@@ -1132,10 +1156,11 @@ namespace netlist
 	// queue_t
 	// -----------------------------------------------------------------------------
 
-	class queue_t : public timed_queue<net_t *, netlist_time>,
-					public object_t,
-					public netlist_ref,
-					public plib::state_manager_t::callback_t
+	class detail::queue_t :
+			public timed_queue<net_t *, netlist_time>,
+			public detail::object_t,
+			public detail::netlist_ref,
+			public plib::state_manager_t::callback_t
 	{
 	public:
 		explicit queue_t(netlist_t &nl);
@@ -1160,7 +1185,6 @@ namespace netlist
 
 	class netlist_t : public plib::plog_dispatch_intf
 	{
-		friend class setup_t;
 		P_PREVENT_COPYING(netlist_t)
 	public:
 
@@ -1172,15 +1196,15 @@ namespace netlist
 		void start();
 		void stop();
 
-		const queue_t &queue() const { return m_queue; }
-		queue_t &queue() { return m_queue; }
+		const detail::queue_t &queue() const { return m_queue; }
+		detail::queue_t &queue() { return m_queue; }
 		const netlist_time time() const { return m_time; }
 		devices::NETLIB_NAME(solver) *solver() const { return m_solver; }
 		devices::NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
 		nl_double gmin() const;
 
-		void push_to_queue(net_t &out, const netlist_time attime) NOEXCEPT;
-		void remove_from_queue(net_t &out);
+		void push_to_queue(detail::net_t &out, const netlist_time attime) NOEXCEPT;
+		void remove_from_queue(detail::net_t &out);
 
 		void process_queue(const netlist_time &delta);
 		void abort_current_queue_slice() { m_queue.retime(m_time, nullptr); }
@@ -1190,10 +1214,9 @@ namespace netlist
 		void set_setup(setup_t *asetup) { m_setup = asetup;  }
 		setup_t &setup() { return *m_setup; }
 
-
 		void register_dev(plib::owned_ptr<device_t> dev);
 
-		net_t *find_net(const pstring &name);
+		detail::net_t *find_net(const pstring &name);
 
 		template<class device_class>
 		std::vector<device_class *> get_device_list()
@@ -1246,21 +1269,18 @@ namespace netlist
 
 		void print_stats() const;
 
-		std::vector<plib::owned_ptr<core_device_t>> m_devices;
-
+		std::vector<plib::owned_ptr<core_device_t>> 						  m_devices;
 		/* sole use is to manage lifetime of net objects */
-		std::vector<plib::owned_ptr<net_t>> m_nets;
-
+		std::vector<plib::owned_ptr<detail::net_t>> 						  m_nets;
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 
 	private:
-		plib::state_manager_t       m_state;
+		plib::state_manager_t       		m_state;
 		/* mostly rw */
-		netlist_time                m_time;
-		queue_t                     m_queue;
+		netlist_time                		m_time;
+		detail::queue_t                		m_queue;
 
-		nperftime_t                 m_stat_mainloop;
 		/* mostly ro */
 
 		devices::NETLIB_NAME(mainclock) *    m_mainclock;
@@ -1268,15 +1288,16 @@ namespace netlist
 		devices::NETLIB_NAME(gnd) *          m_gnd;
 		devices::NETLIB_NAME(netlistparams) *m_params;
 
-		pstring m_name;
-		setup_t *m_setup;
-		plib::plog_base<NL_DEBUG> m_log;
-		plib::dynlib *m_lib;                 // external lib needs to be loaded as long as netlist exists
+		pstring 							m_name;
+		setup_t *							m_setup;
+		plib::plog_base<NL_DEBUG> 			m_log;
+		plib::dynlib *						m_lib; // external lib needs to be loaded as long as netlist exists
 
 		// performance
-		nperfcount_t m_perf_out_processed;
-		nperfcount_t m_perf_inp_processed;
-		nperfcount_t m_perf_inp_active;
+		nperftime_t		m_stat_mainloop;
+		nperfcount_t 	m_perf_out_processed;
+		nperfcount_t 	m_perf_inp_processed;
+		nperfcount_t 	m_perf_inp_active;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1315,22 +1336,22 @@ namespace netlist
 		}
 	}
 
-	inline bool core_terminal_t::is_logic() const
+	inline bool detail::core_terminal_t::is_logic() const
 	{
 		return dynamic_cast<const logic_t *>(this) != nullptr;
 	}
 
-	inline bool core_terminal_t::is_analog() const
+	inline bool detail::core_terminal_t::is_analog() const
 	{
 		return dynamic_cast<const analog_t *>(this) != nullptr;
 	}
 
-	inline bool net_t::is_logic() const
+	inline bool detail::net_t::is_logic() const
 	{
 		return dynamic_cast<const logic_net_t *>(this) != nullptr;
 	}
 
-	inline bool net_t::is_analog() const
+	inline bool detail::net_t::is_analog() const
 	{
 		return dynamic_cast<const analog_net_t *>(this) != nullptr;
 	}
@@ -1371,7 +1392,7 @@ namespace netlist
 		}
 	}
 
-	inline void net_t::push_to_queue(const netlist_time delay) NOEXCEPT
+	inline void detail::net_t::push_to_queue(const netlist_time delay) NOEXCEPT
 	{
 		if (!is_queued() && (num_cons() != 0))
 		{
@@ -1384,7 +1405,7 @@ namespace netlist
 		}
 	}
 
-	inline void net_t::reschedule_in_queue(const netlist_time delay) NOEXCEPT
+	inline void detail::net_t::reschedule_in_queue(const netlist_time delay) NOEXCEPT
 	{
 		if (is_queued())
 			netlist().remove_from_queue(*this);
@@ -1437,12 +1458,12 @@ namespace netlist
 		}
 	}
 
-	inline void netlist_t::push_to_queue(net_t &out, const netlist_time attime) NOEXCEPT
+	inline void netlist_t::push_to_queue(detail::net_t &out, const netlist_time attime) NOEXCEPT
 	{
 		m_queue.push(attime, &out);
 	}
 
-	inline void netlist_t::remove_from_queue(net_t &out)
+	inline void netlist_t::remove_from_queue(detail::net_t &out)
 	{
 		m_queue.remove(&out);
 	}
@@ -1468,7 +1489,7 @@ namespace netlist
 			m_value[i] = value;
 	}
 
-	inline netlist_t &device_object_t::netlist()
+	inline netlist_t &detail::device_object_t::netlist()
 	{
 		return m_device.netlist();
 	}
