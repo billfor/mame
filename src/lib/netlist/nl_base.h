@@ -1,24 +1,28 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nlbase.h
+/*!  \file nl_base.h
  *
- *  A mixed signal circuit simulation
+ *  Netlist
+ *  =======
  *
- *  D: Device
- *  O: Rail output (output)
- *  I: Infinite impedance input (input)
- *  T: Terminal (finite impedance)
+ *  A mixed signal circuit simulation.
  *
- *  +---+     +---+     +---+     +---+     +---+
- *  |   |     |   |     |   |     |   |     |   |
- *  | D |     | D |     | D |     | D |     | D |
- *  |   |     |   |     |   |     |   |     |   |
- *  +-O-+     +-I-+     +-I-+     +-T-+     +-T-+
- *    |         |         |         |         |
- *  +-+---------+---------+---------+---------+-+
- *  | rail net                                  |
- *  +-------------------------------------------+
+ *  - D: Device
+ *  - O: Rail output (output)
+ *  - I: Infinite impedance input (input)
+ *  - T: Terminal (finite impedance)
+ *
+ *  The following example shows a typical connection between several devices:
+ *
+ *  	+---+     +---+     +---+     +---+     +---+
+ *  	|   |     |   |     |   |     |   |     |   |
+ *  	| D |     | D |     | D |     | D |     | D |
+ *  	|   |     |   |     |   |     |   |     |   |
+ *  	+-O-+     +-I-+     +-I-+     +-T-+     +-T-+
+ *  	  |         |         |         |         |
+ *  	+-+---------+---------+---------+---------+-+
+ *  	| rail net                                  |
+ *  	+-------------------------------------------+
  *
  *  A rail net is a net which is driven by exactly one output with an
  *  (idealized) internal resistance of zero.
@@ -32,28 +36,29 @@
  *  analog terminals. Analog and logic devices can not be connected to the
  *  same net. Instead, proxy devices are inserted automatically:
  *
- *  +---+     +---+
- *  |   |     |   |
- *  | D1|     | D2|
- *  | A |     | L |
- *  +-O-+     +-I-+
- *    |         |
- *  +-+---------+---+
- *  | rail net      |
- *  +---------------+
+ *  	+---+     +---+
+ *  	|   |     |   |
+ *  	| D1|     | D2|
+ *  	| A |     | L |
+ *  	+-O-+     +-I-+
+ *  	  |         |
+ *  	+-+---------+---+
+ *  	| rail net      |
+ *  	+---------------+
  *
  *  is converted into
- *              +----------+
- *              |          |
- *  +---+     +-+-+        |   +---+
- *  |   |     | L |  A-L   |   |   |
- *  | D1|     | D | Proxy  |   | D2|
- *  | A |     | A |        |   |   |
- *  +-O-+     +-I-+        |   +-I-+
- *    |         |          |     |
- *  +-+---------+--+     +-+-----+-------+
- *  | rail net (A) |     | rail net (L)  |
- *  +--------------|     +---------------+
+ *
+ *  	            +----------+
+ *  	            |          |
+ *  	+---+     +-+-+        |   +---+
+ *  	|   |     | L |  A-L   |   |   |
+ *  	| D1|     | D | Proxy  |   | D2|
+ *  	| A |     | A |        |   |   |
+ *  	+-O-+     +-I-+        |   +-I-+
+ *  	  |         |          |     |
+ *  	+-+---------+--+     +-+-----+-------+
+ *  	| rail net (A) |     | rail net (L)  |
+ *  	+--------------|     +---------------+
  *
  *  This works both analog to logic as well as logic to analog.
  *
@@ -63,65 +68,73 @@
  *  to update them. This would however introduce macro devices for RC, diodes
  *  and transistors again.
  *
- *  ============================================================================
- *
  *  Instead, the following approach in case of a pure terminal/input network
  *  is taken:
  *
- *  +---+     +---+     +---+     +---+     +---+
- *  |   |     |   |     |   |     |   |     |   |
- *  | D |     | D |     | D |     | D |     | D |
- *  |   |     |   |     |   |     |   |     |   |
- *  +-T-+     +-I-+     +-I-+     +-T-+     +-T-+
- *    |         |         |         |         |
- *   '+'        |         |        '-'       '-'
- *  +-+---------+---------+---------+---------+-+
- *  | Calculated net                            |
- *  +-------------------------------------------+
+ *  	+---+     +---+     +---+     +---+     +---+
+ *  	|   |     |   |     |   |     |   |     |   |
+ *  	| D |     | D |     | D |     | D |     | D |
+ *  	|   |     |   |     |   |     |   |     |   |
+ *  	+-T-+     +-I-+     +-I-+     +-T-+     +-T-+
+ *  	  |         |         |         |         |
+ *  	 '+'        |         |        '-'       '-'
+ *  	+-+---------+---------+---------+---------+-+
+ *  	| Calculated net                            |
+ *  	+-------------------------------------------+
  *
- *  SPICE uses the following basic two terminal device:
+ *  Netlist uses the following basic two terminal device:
  *
- *       (k)
- *  +-----T-----+
- *  |     |     |
- *  |  +--+--+  |
- *  |  |     |  |
- *  |  R     |  |
- *  |  R     |  |
- *  |  R     I  |
- *  |  |     I  |  Device n
- *  |  V+    I  |
- *  |  V     |  |
- *  |  V-    |  |
- *  |  |     |  |
- *  |  +--+--+  |
- *  |     |     |
- *  +-----T-----+
- *       (l)
+ *  	     (k)
+ *  	+-----T-----+
+ *  	|     |     |
+ *  	|  +--+--+  |
+ *  	|  |     |  |
+ *  	|  R     |  |
+ *  	|  R     |  |
+ *  	|  R     I  |
+ *  	|  |     I  |  Device n
+ *  	|  V+    I  |
+ *  	|  V     |  |
+ *  	|  V-    |  |
+ *  	|  |     |  |
+ *  	|  +--+--+  |
+ *  	|     |     |
+ *  	+-----T-----+
+ *  	     (l)
  *
  *  This is a resistance in series to a voltage source and paralleled by a
  *  current source. This is suitable to model voltage sources, current sources,
  *  resistors, capacitors, inductances and diodes.
  *
- *  I(n,l) = - I(n,k) = ( V(k) - V - V(l) ) * (1/R(n)) + I(n)
+ *  \f[
+ *  	I_{n,l} = - I_{n,k} = ( V_k - V^N - V_l ) * \frac{1}{R^n} + I^n
+ * 	\f]
  *
  *  Now, the sum of all currents for a given net must be 0:
  *
- *  Sum(n,I(n,l)) = 0 = sum(n, ( V(k) - V(n) - V(l) ) * (1/R(n)) + I(n) )
+ *  \f[
+ *  	\sum_n I_{n,l} = 0 = \sum_{n,k} (V_k - V^n - V_l ) * \frac{1}{R^n} + I^n
+ * 	\f]
  *
- *  With G(n) = 1 / R(n) and sum(n, G(n)) = Gtot and k=k(n)
+ *  With \f$ G^n = \frac{1}{R^n} \f$ and \f$ \sum_n  G^n = G^{tot} \f$ and \f$k=k(n)\f$
  *
- *  0 = - V(l) * Gtot + sum(n, (V(k(n)) - V(n)) * G(n) + I(n))
+ *  \f[
+ *  	0 = - V_l * G^{tot} + \sum_n (V_{k(n)} - V^n) * G^n + I^n)
+ * 	\f]
  *
- *  and with l=l(n) and fixed k
+ *  and with \f$ l=l(n)\f$  and fixed \f$ k\f$
  *
- *  0 =  -V(k) * Gtot + sum(n, ( V(l(n) + V(n) ) * G(n) - I(n))
+ *  \f[
+ *  	0 =  -V_k * G^{tot} + sum_n( V_{l(n)} + V^n ) * G^n - I^n)
+ * 	\f]
  *
  *  These equations represent a linear Matrix equation (with more math).
  *
  *  In the end the solution of the analog subsystem boils down to
  *
- *  (G - D) * V = I
+ *  \f[
+ *	  \mathbf{\it{(G - D) * v = i}}
+ * 	\f]
  *
  *  with G being the conductance matrix, D a diagonal matrix with the total
  *  conductance on the diagonal elements, V the net voltage vector and I the
@@ -171,45 +184,92 @@
 // Type definitions
 // ----------------------------------------------------------------------------------------
 
+/*! netlist_sig_t is the type used for logic signals. */
 using netlist_sig_t = std::uint_least32_t;
 
-	//============================================================
-	//  MACROS / New Syntax
-	//============================================================
+//============================================================
+//  MACROS / New Syntax
+//============================================================
 
+/*! Construct a netlist device name */
 #define NETLIB_NAME(chip) nld_ ## chip
 
 #define NETLIB_OBJECT_DERIVED(name, pclass)                                   \
 class NETLIB_NAME(name) : public NETLIB_NAME(pclass)
 
+/*! Start a netlist device class.
+ *  Used to start defining a netlist device class.
+ *  The simplest device without inputs or outputs would look like this:
+ *
+ * 		NETLIB_OBJECT(base_dummy)
+ * 		{
+ * 		public:
+ * 			NETLIB_CONSTRUCTOR(base_dummy) { }
+ * 		};
+ *
+ *	Also refer to #NETLIB_CONSTRUCTOR.
+ */
 #define NETLIB_OBJECT(name)                                                    \
 class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_CONSTRUCTOR_DERIVED(cname, pclass)                              \
-	private: family_setter_t m_famsetter;                                       \
+	private: family_setter_t m_famsetter;                                      \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
 	: NETLIB_NAME(pclass)(owner, name)
 
-#define NETLIB_CONSTRUCTOR(cname)                                               \
-	private: family_setter_t m_famsetter;                                       \
+/*! Used to define the constructor of a netlist device.
+ *  Use this to define the constructor of a netlist device. Please refer to
+ *  #NETLIB_OBJECT for an example.
+ */
+#define NETLIB_CONSTRUCTOR(cname)                                              \
+	private: family_setter_t m_famsetter;                                      \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
 		: device_t(owner, name)
 
+ /*! Used to define the destructor of a netlist device.
+  *  The use of a destructor for netlist device should normally not be necessary.
+  */
 #define NETLIB_DESTRUCTOR(name) public: virtual ~NETLIB_NAME(name)()
 
-#define NETLIB_CONSTRUCTOR_EX(cname, ...)                                       \
-	private: family_setter_t m_famsetter;                                       \
+ /*! Define an extended constructor and add further parameters to it.
+  *  The macro allows to add further parameters to a device constructor. This is
+  *  normally used for sub-devices and system devices only.
+  */
+#define NETLIB_CONSTRUCTOR_EX(cname, ...)                                      \
+	private: family_setter_t m_famsetter;                                      \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name, __VA_ARGS__) \
 		: device_t(owner, name)
 
-#define NETLIB_DYNAMIC()                                                        \
+ /*! Add this to a device definition to mark the device as dynamic.
+  *  If this is added to device definition the device is treated as an analog
+  *  dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI is called on a each step
+  *  of the Newton-Raphson step of solving the linear equations.
+  */
+#define NETLIB_DYNAMIC()                                                       \
 	public: virtual bool is_dynamic() const override { return true; }
 
-#define NETLIB_TIMESTEP()                                                       \
+ /*! Add this to a device definition to mark the device as a time-stepping device
+  *  and add code.
+  *  If this is added to device definition the device is treated as an analog
+  *  time-stepping device. Currently, only the capacitor device uses this. An other
+  *  example would be an inductor device.
+  *
+  *  Example:
+  *
+  *  	NETLIB_TIMESTEP()
+  *	 	{
+  *	 		// Gpar should support convergence
+  *	 		const nl_double G = m_C.Value() / step +  m_GParallel;
+  *	 		const nl_double I = -G * deltaV();
+  *	 		set(G, 0.0, I);
+  *	 	}
+  *
+  */
+#define NETLIB_TIMESTEP()                                                      \
 	public: virtual bool is_timestep() const override { return true; } \
 	public: virtual void step_time(const nl_double step) override
 
-#define NETLIB_UPDATE_AFTER_PARAM_CHANGE()                                      \
+#define NETLIB_UPDATE_AFTER_PARAM_CHANGE()                                     \
 	public: virtual bool needs_update_after_param_change() const override { return true; }
 
 #define NETLIB_FAMILY(family) , m_famsetter(*this, family)
@@ -253,8 +313,14 @@ class NETLIB_NAME(name) : public device_t
 // Namespace starts
 //============================================================
 
+ /*! The netlist namespace.
+  *  All netlist related code is contained in the netlist namespace
+  */
 namespace netlist
 {
+	/*! The netlist::devices namespace.
+	 *  All netlist devices are contained in the netlist::devices namespace.
+	 */
 	namespace devices
 	{
 		class matrix_solver_t;
@@ -270,10 +336,19 @@ namespace netlist
 	//  Exceptions
 	//============================================================
 
+	/*! Generic netlist expection.
+	 *  The exception is used in all events which are considered fatal.
+	 */
 	class nl_exception : public plib::pexception
 	{
 	public:
-		explicit nl_exception(const pstring text) : plib::pexception(text) { }
+		/*! Constructor.
+		 *  Allows a descriptive text to be assed to the exception
+		 */
+		explicit nl_exception(const pstring text //!< text to be passed
+				)
+		: plib::pexception(text) { }
+		/*! Copy constructor. */
 		nl_exception(const nl_exception &e) : plib::pexception(e) { }
 		virtual ~nl_exception() noexcept {}
 	};
@@ -287,16 +362,15 @@ namespace netlist
 	class core_device_t;
 	class device_t;
 
-	// -----------------------------------------------------------------------------
-	// model_map_t
-	// -----------------------------------------------------------------------------
-
+	/*! Type of the model map used.
+	 *  This is used to hold all #Models in an unordered map
+	 */
 	using model_map_t = std::unordered_map<pstring, pstring>;
 
-	// -----------------------------------------------------------------------------
-	// logic_family_t
-	// -----------------------------------------------------------------------------
-
+	/*! Logic families descriptors are used create proxy devices.
+	 *  The logic family describe the analog capabilities of logic devices,
+	 *  inputs and outputs.
+	 */
 	class logic_family_desc_t
 	{
 	public:
@@ -305,14 +379,25 @@ namespace netlist
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
 
-		nl_double m_low_thresh_V;
-		nl_double m_high_thresh_V;
-		nl_double m_low_V;
-		nl_double m_high_V;
-		nl_double m_R_low;
-		nl_double m_R_high;
+		nl_double m_low_thresh_V; 	//!< low input threshhold. If the input voltage is below this value, a "0" input is signalled
+		nl_double m_high_thresh_V;	//!< high input threshhold. If the input voltage is above this value, a "0" input is signalled
+		nl_double m_low_V;			//!< low output voltage. This voltage is output if the ouput is "0"
+		nl_double m_high_V;			//!< high output voltage. This voltage is output if the ouput is "1"
+		nl_double m_R_low;			//!< low output resistance. Value of series resistor used for low output
+		nl_double m_R_high;			//!< high output resistance. Value of series resistor used for high output
 	};
 
+	/*! Base class for devices, terminals, outputs and inputs which support
+	 *  logic families.
+	 *  This class is a storage container to store the logic family for a
+	 *  netlist object. You will not directly use it. Please refer to
+	 *  #NETLIB_FAMILY to learn how to define a logic family for a device.
+	 *
+	 * All terminals inherit the family description from the device
+	 * The default is the ttl family, but any device can override the family.
+	 * For individual terminals, the family can be overwritten as well.
+	 *
+	 */
 	class logic_family_t
 	{
 	public:
@@ -327,43 +412,50 @@ namespace netlist
 		const logic_family_desc_t *m_logic_family;
 	};
 
-	/* Terminals inherit the family description from the device
-	 * The default is the ttl family, but any device can override the family.
-	 * For individual terminals, these can be overwritten as well.
-	 *
-	 * Only devices of type GENERIC should have a family description entry
+	const logic_family_desc_t *family_TTL(); 		//*!< logic family for TTL devices.
+	const logic_family_desc_t *family_CD4XXX();		//*!< logic family for CD4XXX CMOS devices.
+
+	/*! A persistent variable template.
+	 *  Use the state_var template to define a variable whose value is saved.
+	 *  Please refer to the save state documentation.
 	 */
-
-
-	const logic_family_desc_t *family_TTL();
-	const logic_family_desc_t *family_CD4XXX();
-
-
-	// -----------------------------------------------------------------------------
-	// State variables - use to preserve state
-	// -----------------------------------------------------------------------------
 
 	template <typename T>
 	struct state_var
 	{
 	public:
 		template <typename O>
-		state_var(O &owner, const pstring name, const T &value);
+		//! Constructor.
+		state_var(O &owner,				//!< owner must have a netlist() method.
+				const pstring name, 	//!< identifier/name for this state variable
+				const T &value			//!< Initial value after construction
+				);
+		//! Copy Constructor.
 		state_var(const state_var &rhs) NOEXCEPT = default;
+		//! Move Constructor.
 		state_var(state_var &&rhs) NOEXCEPT = default;
+		//! Assignment operator to assign value of a state var.
 		state_var &operator=(state_var rhs) { std::swap(rhs.m_value, this->m_value); return *this; }
+		//! Assignment operator to assign value of type T.
 		state_var &operator=(const T rhs) { m_value = rhs; return *this; }
+		//! Return value of state variable.
 		operator T & () { return m_value; }
+		//! Return value of state variable.
 		T & operator()() { return m_value; }
+		//! Return const value of state variable.
 		operator const T & () const { return m_value; }
+		//! Return const value of state variable.
 		const T & operator()() const { return m_value; }
-
 		T * ptr() { return &m_value; }
 		const T * ptr() const { return &m_value; }
 	private:
 		T m_value;
 	};
 
+	/*! A persistent array template.
+	 *  Use this state_var template to define an array whose contents are saved.
+	 *  Please refer to \ref state_var.
+	 */
 	template <typename T, std::size_t N>
 	struct state_var<T[N]>
 	{
