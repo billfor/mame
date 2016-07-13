@@ -49,8 +49,8 @@ struct pstring_t
 public:
 	typedef F traits;
 
-	typedef typename traits::mem_t mem_t;
-	typedef typename traits::code_t code_t;
+	typedef typename F::mem_t mem_t;
+	typedef typename F::code_t code_t;
 	typedef std::size_t size_type;
 
 	// simple construction/destruction
@@ -77,11 +77,11 @@ public:
 		iter_t(const iter_t &rhs) noexcept = default;
 		iter_t(iter_t &&rhs) noexcept { p = rhs.p; }
 		iter_t &operator=(const iter_t &it) { p = it.p; return *this; }
-		iter_t& operator++() noexcept {p += F::codelen(p); return *this;}
+		iter_t& operator++() noexcept {p += traits::codelen(p); return *this;}
 		iter_t operator++(int) noexcept {iter_t tmp(*this); operator++(); return tmp;}
 		bool operator==(const iter_t& rhs) noexcept {return p==rhs.p;}
 		bool operator!=(const iter_t& rhs) noexcept {return p!=rhs.p;}
-		const pstring_t::code_t operator*() noexcept {return F::code(p);}
+		const code_t operator*() noexcept {return traits::code(p);}
 		iter_t& operator+=(size_type count) { while (count>0) { --count; ++(*this); } return *this; }
 		friend iter_t operator+(iter_t lhs, const size_type &rhs) { return (lhs += rhs); }
 	};
