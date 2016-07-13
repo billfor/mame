@@ -51,9 +51,9 @@ public:
 	inline void set(INT32 a, INT32 r, INT32 g, INT32 b)
 	{
 #ifdef __LITTLE_ENDIAN__
-		VECS32 result = { b, g, r, a };
+		const VECS32 result = { b, g, r, a };
 #else
-		VECS32 result = { a, r, g, b };
+		const VECS32 result = { a, r, g, b };
 #endif
 		m_value = result;
 	}
@@ -421,8 +421,13 @@ public:
 		const VECU32 zero = { 0, 0, 0, 0 };
 		m_value = VECS32(vec_packs(m_value, m_value));
 		m_value = VECS32(vec_packsu(VECS16(m_value), VECS16(m_value)));
+#ifdef __LITTLE_ENDIAN__
+		m_value = VECS32(vec_mergeh(VECU8(m_value), VECU8(zero)));
+		m_value = VECS32(vec_mergeh(VECS16(m_value), VECS16(zero)));
+#else
 		m_value = VECS32(vec_mergeh(VECU8(zero), VECU8(m_value)));
 		m_value = VECS32(vec_mergeh(VECS16(zero), VECS16(m_value)));
+#endif
 	}
 
 	inline void sign_extend(const UINT32 compare, const UINT32 sign)
@@ -606,16 +611,30 @@ public:
 	{
 		const VECS32 zero = vec_splat_s32(0);
 
+		// put each packed value into first element of a vector register
+#ifdef __LITTLE_ENDIAN__
+		VECS32 color00 = *reinterpret_cast<const VECS32 *>(&rgb00);
+		VECS32 color01 = *reinterpret_cast<const VECS32 *>(&rgb01);
+		VECS32 color10 = *reinterpret_cast<const VECS32 *>(&rgb10);
+		VECS32 color11 = *reinterpret_cast<const VECS32 *>(&rgb11);
+#else
 		VECS32 color00 = vec_perm(VECS32(vec_lde(0, &rgb00)), zero, vec_lvsl(0, &rgb00));
 		VECS32 color01 = vec_perm(VECS32(vec_lde(0, &rgb01)), zero, vec_lvsl(0, &rgb01));
 		VECS32 color10 = vec_perm(VECS32(vec_lde(0, &rgb10)), zero, vec_lvsl(0, &rgb10));
 		VECS32 color11 = vec_perm(VECS32(vec_lde(0, &rgb11)), zero, vec_lvsl(0, &rgb11));
+#endif
 
-		/* interleave color01 and color00 at the byte level */
+		// interleave color01/color00 and color10/color11 at the byte level then zero-extend
 		color01 = VECS32(vec_mergeh(VECU8(color01), VECU8(color00)));
 		color11 = VECS32(vec_mergeh(VECU8(color11), VECU8(color10)));
+#ifdef __LITTLE_ENDIAN__
+		color01 = VECS32(vec_mergeh(VECU8(color01), VECU8(zero)));
+		color11 = VECS32(vec_mergeh(VECU8(color11), VECU8(zero)));
+#else
 		color01 = VECS32(vec_mergeh(VECU8(zero), VECU8(color01)));
 		color11 = VECS32(vec_mergeh(VECU8(zero), VECU8(color11)));
+#endif
+
 		color01 = vec_msum(VECS16(color01), scale_table[u], zero);
 		color11 = vec_msum(VECS16(color11), scale_table[u], zero);
 		color01 = vec_sl(color01, vec_splat_u32(15));
@@ -635,16 +654,30 @@ public:
 	{
 		const VECS32 zero = vec_splat_s32(0);
 
+		// put each packed value into first element of a vector register
+#ifdef __LITTLE_ENDIAN__
+		VECS32 color00 = *reinterpret_cast<const VECS32 *>(&rgb00);
+		VECS32 color01 = *reinterpret_cast<const VECS32 *>(&rgb01);
+		VECS32 color10 = *reinterpret_cast<const VECS32 *>(&rgb10);
+		VECS32 color11 = *reinterpret_cast<const VECS32 *>(&rgb11);
+#else
 		VECS32 color00 = vec_perm(VECS32(vec_lde(0, &rgb00)), zero, vec_lvsl(0, &rgb00));
 		VECS32 color01 = vec_perm(VECS32(vec_lde(0, &rgb01)), zero, vec_lvsl(0, &rgb01));
 		VECS32 color10 = vec_perm(VECS32(vec_lde(0, &rgb10)), zero, vec_lvsl(0, &rgb10));
 		VECS32 color11 = vec_perm(VECS32(vec_lde(0, &rgb11)), zero, vec_lvsl(0, &rgb11));
+#endif
 
-		/* interleave color01 and color00 at the byte level */
+		// interleave color01/color00 and color10/color11 at the byte level then zero-extend
 		color01 = VECS32(vec_mergeh(VECU8(color01), VECU8(color00)));
 		color11 = VECS32(vec_mergeh(VECU8(color11), VECU8(color10)));
+#ifdef __LITTLE_ENDIAN__
+		color01 = VECS32(vec_mergeh(VECU8(color01), VECU8(zero)));
+		color11 = VECS32(vec_mergeh(VECU8(color11), VECU8(zero)));
+#else
 		color01 = VECS32(vec_mergeh(VECU8(zero), VECU8(color01)));
 		color11 = VECS32(vec_mergeh(VECU8(zero), VECU8(color11)));
+#endif
+
 		color01 = vec_msum(VECS16(color01), scale_table[u], zero);
 		color11 = vec_msum(VECS16(color11), scale_table[u], zero);
 		color01 = vec_sl(color01, vec_splat_u32(15));
