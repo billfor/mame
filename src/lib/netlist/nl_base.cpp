@@ -18,31 +18,36 @@
 
 namespace netlist
 {
-#if (NL_USE_MEMPOOL)
-static plib::mempool p(65536, 8);
+namespace detail
+{
+
+#if (USE_MEMPOOL)
+static plib::mempool pool(65536, 8);
 
 void * object_t::operator new (size_t size)
 {
-	return p.alloc(size);
+	return pool.alloc(size);
 }
 
 void object_t::operator delete (void * mem)
 {
 	if (mem)
-		p.free(mem);
+		pool.free(mem);
 }
 #else
-void * detail::object_t::operator new (size_t size)
+void * object_t::operator new (size_t size)
 {
 	return ::operator new(size);
 }
 
-void detail::object_t::operator delete (void * mem)
+void object_t::operator delete (void * mem)
 {
 	if (mem)
 		::operator delete(mem);
 }
 #endif
+
+}
 
 // ----------------------------------------------------------------------------------------
 // logic_family_ttl_t

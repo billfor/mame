@@ -1,169 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*!  \file nl_base.h
+/*!
  *
- *  \mainpage
- *
- *  Netlist
- *  =======
- *
- *  A mixed signal circuit simulation.
- *
- *  - D: Device
- *  - O: Rail output (output)
- *  - I: Infinite impedance input (input)
- *  - T: Terminal (finite impedance)
- *
- *  The following example shows a typical connection between several devices:
- *
- *  	+---+     +---+     +---+     +---+     +---+
- *  	|   |     |   |     |   |     |   |     |   |
- *  	| D |     | D |     | D |     | D |     | D |
- *  	|   |     |   |     |   |     |   |     |   |
- *  	+-O-+     +-I-+     +-I-+     +-T-+     +-T-+
- *  	  |         |         |         |         |
- *  	+-+---------+---------+---------+---------+-+
- *  	| rail net                                  |
- *  	+-------------------------------------------+
- *
- *  A rail net is a net which is driven by exactly one output with an
- *  (idealized) internal resistance of zero.
- *  Ideally, it can deliver infinite current.
- *
- *  A infinite resistance input does not source or sink current.
- *
- *  Terminals source or sink finite (but never zero) current.
- *
- *  The system differentiates between analog and logic input and outputs and
- *  analog terminals. Analog and logic devices can not be connected to the
- *  same net. Instead, proxy devices are inserted automatically:
- *
- *  	+---+     +---+
- *  	|   |     |   |
- *  	| D1|     | D2|
- *  	| A |     | L |
- *  	+-O-+     +-I-+
- *  	  |         |
- *  	+-+---------+---+
- *  	| rail net      |
- *  	+---------------+
- *
- *  is converted into
- *
- *  	            +----------+
- *  	            |          |
- *  	+---+     +-+-+        |   +---+
- *  	|   |     | L |  A-L   |   |   |
- *  	| D1|     | D | Proxy  |   | D2|
- *  	| A |     | A |        |   |   |
- *  	+-O-+     +-I-+        |   +-I-+
- *  	  |         |          |     |
- *  	+-+---------+--+     +-+-----+-------+
- *  	| rail net (A) |     | rail net (L)  |
- *  	+--------------|     +---------------+
- *
- *  This works both analog to logic as well as logic to analog.
- *
- *  The above is an advanced implementation of the existing discrete
- *  subsystem in MAME. Instead of relying on a fixed time-step, analog devices
- *  could either connect to fixed time-step clock or use an internal clock
- *  to update them. This would however introduce macro devices for RC, diodes
- *  and transistors again.
- *
- *  Instead, the following approach in case of a pure terminal/input network
- *  is taken:
- *
- *  	+---+     +---+     +---+     +---+     +---+
- *  	|   |     |   |     |   |     |   |     |   |
- *  	| D |     | D |     | D |     | D |     | D |
- *  	|   |     |   |     |   |     |   |     |   |
- *  	+-T-+     +-I-+     +-I-+     +-T-+     +-T-+
- *  	  |         |         |         |         |
- *  	 '+'        |         |        '-'       '-'
- *  	+-+---------+---------+---------+---------+-+
- *  	| Calculated net                            |
- *  	+-------------------------------------------+
- *
- *  Netlist uses the following basic two terminal device:
- *
- *  	     (k)
- *  	+-----T-----+
- *  	|     |     |
- *  	|  +--+--+  |
- *  	|  |     |  |
- *  	|  R     |  |
- *  	|  R     |  |
- *  	|  R     I  |
- *  	|  |     I  |  Device n
- *  	|  V+    I  |
- *  	|  V     |  |
- *  	|  V-    |  |
- *  	|  |     |  |
- *  	|  +--+--+  |
- *  	|     |     |
- *  	+-----T-----+
- *  	     (l)
- *
- *  This is a resistance in series to a voltage source and paralleled by a
- *  current source. This is suitable to model voltage sources, current sources,
- *  resistors, capacitors, inductances and diodes.
- *
- *  \f[
- *  	I_{n,l} = - I_{n,k} = ( V_k - V^N - V_l ) * \frac{1}{R^n} + I^n
- * 	\f]
- *
- *  Now, the sum of all currents for a given net must be 0:
- *
- *  \f[
- *  	\sum_n I_{n,l} = 0 = \sum_{n,k} (V_k - V^n - V_l ) * \frac{1}{R^n} + I^n
- * 	\f]
- *
- *  With \f$ G^n = \frac{1}{R^n} \f$ and \f$ \sum_n  G^n = G^{tot} \f$ and \f$k=k(n)\f$
- *
- *  \f[
- *  	0 = - V_l * G^{tot} + \sum_n (V_{k(n)} - V^n) * G^n + I^n)
- * 	\f]
- *
- *  and with \f$ l=l(n)\f$  and fixed \f$ k\f$
- *
- *  \f[
- *  	0 =  -V_k * G^{tot} + sum_n( V_{l(n)} + V^n ) * G^n - I^n)
- * 	\f]
- *
- *  These equations represent a linear Matrix equation (with more math).
- *
- *  In the end the solution of the analog subsystem boils down to
- *
- *  \f[
- *	  \mathbf{\it{(G - D) * v = i}}
- * 	\f]
- *
- *  with G being the conductance matrix, D a diagonal matrix with the total
- *  conductance on the diagonal elements, V the net voltage vector and I the
- *  current vector.
- *
- *  By using solely two terminal devices, we can simplify the whole calculation
- *  significantly. A BJT now is a four terminal device with two terminals being
- *  connected internally.
- *
- *  The system is solved using an iterative approach:
- *
- *  G * V - D * V = I
- *
- *  assuming V=Vn=Vo
- *
- *  Vn = D-1 * (I - G * Vo)
- *
- *  Each terminal thus has three properties:
- *
- *  a) Resistance
- *  b) Voltage source
- *  c) Current source/sink
- *
- *  Going forward, the approach can be extended e.g. to use a linear
- *  equation solver.
- *
- *  The formal representation of the circuit will stay the same, thus scales.
+ * \file nl_base.h
  *
  */
 
@@ -315,14 +154,8 @@ class NETLIB_NAME(name) : public device_t
 // Namespace starts
 //============================================================
 
- /*! The netlist namespace.
-  *  All netlist related code is contained in the netlist namespace
-  */
 namespace netlist
 {
-	/*! The netlist::devices namespace.
-	 *  All netlist devices are contained in the netlist::devices namespace.
-	 */
 	namespace devices
 	{
 		class matrix_solver_t;
@@ -334,10 +167,6 @@ namespace netlist
 		class NETLIB_NAME(base_d_to_a_proxy);
 	}
 
-	/*! The netlist::detail namespace.
-	 *  This namespace contains all internal support classes not intended
-	 *  to be used outside of the core.
-	 */
 	namespace detail {
 		class object_t;
 		class device_object_t;
@@ -499,25 +328,43 @@ namespace netlist
 	// State variables - predefined and c++11 non-optioanl
 	// -----------------------------------------------------------------------------
 
+	/*! predefined state variable type for uint_fast8_t */
 	using state_var_u8 = state_var<std::uint_fast8_t>;
+	/*! predefined state variable type for int_fast8_t */
 	using state_var_s8 = state_var<std::int_fast8_t>;
 
+	/*! predefined state variable type for uint_fast32_t */
 	using state_var_u32 = state_var<std::uint_fast32_t>;
+	/*! predefined state variable type for int_fast32_t */
 	using state_var_s32 = state_var<std::int_fast32_t>;
 
 	// -----------------------------------------------------------------------------
 	// object_t
 	// -----------------------------------------------------------------------------
 
-
+	/*! The base class for netlist devices, terminals and parameters.
+	 *
+	 *  This class serves as the base class for all device, terminal and
+	 *  objects. It provides new and delete operators to supported e.g. pooled
+	 *  memory allocation to enhance locality. Please refer to \ref USE_MEMPOOL as
+	 *  well.
+	 */
 	class detail::object_t
 	{
 		P_PREVENT_COPYING(object_t)
 	public:
 
-		object_t(const pstring &aname);
+		/*! Constructor.
+		 *
+		 *  Every class derived from the object_t class must have a name.
+		 */
+		object_t(const pstring &aname /*!< string containing name of the object */);
 		~object_t();
 
+		/*! return name of the object
+		 *
+		 *  \returns name of the object.
+		 */
 		const pstring &name() const;
 
 		void * operator new (size_t size, void *ptr) { return ptr; }
@@ -545,28 +392,53 @@ namespace netlist
 	// device_object_t
 	// -----------------------------------------------------------------------------
 
+	/*! Base class for all objects being owned by a device.
+	 *
+	 * Serves as the base class of all objects being owned by a device.
+	 *
+	 */
 	class detail::device_object_t : public detail::object_t
 	{
 		P_PREVENT_COPYING(device_object_t)
 	public:
+		/*! Enum specifying the type of object */
 		enum type_t {
-			TERMINAL = 0,
-			INPUT    = 1,
-			OUTPUT   = 2,
-			PARAM    = 3,
+			TERMINAL = 0, /*!< object is an analog terminal */
+			INPUT    = 1, /*!< object is an input */
+			OUTPUT   = 2, /*!< object is an output */
+			PARAM    = 3, /*!< object is a parameter */
 		};
 
-		device_object_t(core_device_t &dev, const pstring &aname, const type_t atype);
+		/*! Constructor.
+		 *
+		 * \param dev  device owning the object.
+		 * \param name string holding the name of the device
+		 * \param type type   of this object.
+		 */
+		device_object_t(core_device_t &dev, const pstring &name, const type_t type);
+		/*! returns reference to owning device.
+		 * \returns reference to owning device.
+		 */
 		core_device_t &device() const { return m_device; }
 
+		/*! The object type.
+		 * \returns type of the object
+		 */
 		type_t type() const { return m_type; }
-		bool is_type(const type_t atype) const { return (m_type == atype); }
+		/*! Checks if object is of specified type.
+		 * \param type type to check object against.
+		 * \returns true if object is of specified type else false.
+		 */
+		bool is_type(const type_t type) const { return (m_type == type); }
 
+		/*! The netlist owning the owner of this object.
+		 * \returns reference to netlist object.
+		 */
 		netlist_t &netlist();
 
 	private:
 		core_device_t & m_device;
-		const type_t m_type;
+		const type_t    m_type;
 	};
 
 
