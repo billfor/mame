@@ -217,13 +217,13 @@ namespace netlist
 			//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));
 		}
 
-		if (!m_clock.m_enableq && INPLOGIC(m_ENQ))
+		if (!m_clock.m_enableq && m_ENQ())
 		{
 			m_clock.m_enableq = 1;
 			m_clock.m_out = m_clock.m_out ^ 1;
 			m_clock.m_Y(m_clock.m_out, netlist_time::from_nsec(1));
 		}
-		else if (m_clock.m_enableq && !INPLOGIC(m_ENQ))
+		else if (m_clock.m_enableq && !m_ENQ())
 		{
 			m_clock.m_enableq = 0;
 			m_clock.m_out = m_clock.m_out ^ 1;

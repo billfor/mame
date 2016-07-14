@@ -67,8 +67,8 @@ namespace netlist
 		m_B.activate();
 		m_C.activate();
 		m_D.activate();
-		unsigned t1 = INPLOGIC(m_A) & INPLOGIC(m_B);
-		unsigned t2 = INPLOGIC(m_C) & INPLOGIC(m_D);
+		unsigned t1 = m_A() & m_B();
+		unsigned t2 = m_C() & m_D();
 
 		const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
 

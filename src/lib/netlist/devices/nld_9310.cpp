@@ -34,8 +34,7 @@ namespace netlist
 
 		unsigned read_ABCD() const
 		{
-			//return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
-			return (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
+			return (m_D() << 3) | (m_C() << 2) | (m_B() << 1) | (m_A() << 0);
 		}
 	};
 
@@ -186,11 +185,11 @@ namespace netlist
 
 	NETLIB_UPDATE(9310)
 	{
-		sub.m_loadq = INPLOGIC(m_LOADQ);
-		sub.m_ent = INPLOGIC(m_ENT);
-		const netlist_sig_t clrq = INPLOGIC(m_CLRQ);
+		sub.m_loadq = m_LOADQ();
+		sub.m_ent = m_ENT();
+		const netlist_sig_t clrq = m_CLRQ();
 
-		if ((!sub.m_loadq || (sub.m_ent & INPLOGIC(m_ENP))) && clrq)
+		if ((!sub.m_loadq || (sub.m_ent & m_ENP())) && clrq)
 		{
 			sub.m_CLK.activate_lh();
 			sub.m_RC(sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));

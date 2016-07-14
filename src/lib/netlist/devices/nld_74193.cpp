@@ -98,24 +98,24 @@ namespace netlist
 	{
 		netlist_sig_t tCarry = 1;
 		netlist_sig_t tBorrow = 1;
-		if (INPLOGIC(m_CLEAR))
+		if (m_CLEAR())
 		{
 			m_cnt = 0;
 		}
-		else if (!INPLOGIC(m_LOADQ))
+		else if (!m_LOADQ())
 		{
-			m_cnt = (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2)
-					| (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
+			m_cnt = (m_D() << 3) | (m_C() << 2)
+					| (m_B() << 1) | (m_A() << 0);
 		}
 		else
 		{
-			if (INPLOGIC(m_CD) && !m_last_CU && INPLOGIC(m_CU))
+			if (m_CD() && !m_last_CU && m_CU())
 			{
 				m_cnt++;
 				if (m_cnt > MAXCNT)
 					m_cnt = 0;
 			}
-			if (INPLOGIC(m_CU) && !m_last_CD && INPLOGIC(m_CD))
+			if (m_CU() && !m_last_CD && m_CD())
 			{
 				if (m_cnt > 0)
 					m_cnt--;
@@ -124,14 +124,14 @@ namespace netlist
 			}
 		}
 
-		if (!INPLOGIC(m_CU) && (m_cnt == MAXCNT))
+		if (!m_CU() && (m_cnt == MAXCNT))
 			tCarry = 0;
 
-		if (!INPLOGIC(m_CD) && (m_cnt == 0))
+		if (!m_CD() && (m_cnt == 0))
 					tBorrow = 0;
 
-		m_last_CD = INPLOGIC(m_CD);
-		m_last_CU = INPLOGIC(m_CU);
+		m_last_CD = m_CD();
+		m_last_CU = m_CU();
 
 		for (std::size_t i=0; i<4; i++)
 			m_Q[i]((m_cnt >> i) & 1, delay[i]);

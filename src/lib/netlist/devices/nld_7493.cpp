@@ -109,7 +109,7 @@ namespace netlist
 
 	NETLIB_UPDATE(7493)
 	{
-		const netlist_sig_t r = INPLOGIC(m_R1) & INPLOGIC(m_R2);
+		const netlist_sig_t r = m_R1() & m_R2();
 
 		if (r)
 		{

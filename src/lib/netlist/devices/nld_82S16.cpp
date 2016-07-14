@@ -68,7 +68,7 @@ namespace netlist
 	// FIXME: optimize device (separate address decoder!)
 	NETLIB_UPDATE(82S16)
 	{
-		if (INPLOGIC(m_CE1Q) || INPLOGIC(m_CE2Q) || INPLOGIC(m_CE3Q))
+		if (m_CE1Q() || m_CE2Q() || m_CE3Q())
 		{
 			// FIXME: Outputs are tristate. This needs to be properly implemented
 			m_DOUTQ(1, NLTIME_FROM_NS(20));
@@ -81,14 +81,14 @@ namespace netlist
 			for (std::size_t i=0; i<8; i++)
 			{
 				//m_A[i].activate();
-				adr |= (INPLOGIC(m_A[i]) << i);
+				adr |= (m_A[i]() << i);
 			}
 
-			if (!INPLOGIC(m_WEQ))
+			if (!m_WEQ())
 			{
 				m_ram[adr >> 6] = (m_ram[adr >> 6]
 					 & ~(static_cast<uint_fast64_t>(1) << (adr & 0x3f)))
-					 | (static_cast<uint_fast64_t>(INPLOGIC(m_DIN)) << (adr & 0x3f));
+					 | (static_cast<uint_fast64_t>(m_DIN()) << (adr & 0x3f));
 			}
 			m_DOUTQ(((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
 		}

@@ -67,12 +67,12 @@ namespace netlist
 
 	NETLIB_UPDATE(nicRSFF)
 	{
-		if (!INPLOGIC(m_S))
+		if (!m_S())
 		{
 			m_Q(1, NLTIME_FROM_NS(20));
 			m_QQ(0, NLTIME_FROM_NS(20));
 		}
-		else if (!INPLOGIC(m_R))
+		else if (!m_R())
 		{
 			m_Q(0, NLTIME_FROM_NS(20));
 			m_QQ(1, NLTIME_FROM_NS(20));
@@ -86,7 +86,7 @@ namespace netlist
 
 	NETLIB_UPDATE(nicDelay)
 	{
-		netlist_sig_t nval = INPLOGIC(m_I);
+		netlist_sig_t nval = m_I();
 		if (nval && !m_last)
 		{
 			// L_to_H

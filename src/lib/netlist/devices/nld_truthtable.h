@@ -309,7 +309,7 @@ namespace netlist
 					for (std::size_t i = 0; i < m_NI; i++)
 					{
 						m_I[i].activate();
-						state |= (INPLOGIC(m_I[i]) << i);
+						state |= (m_I[i]() << i);
 						mt = std::max(this->m_I[i].net().time(), mt);
 					}
 				else
@@ -317,7 +317,7 @@ namespace netlist
 					{
 						if ((ign & 1))
 							m_I[i].activate();
-						state |= (INPLOGIC(m_I[i]) << i);
+						state |= (m_I[i]() << i);
 					}
 			}
 			else
@@ -325,12 +325,12 @@ namespace netlist
 				if (!doOUT)
 					for (std::size_t i = 0; i < m_NI; i++)
 					{
-						state |= (INPLOGIC(m_I[i]) << i);
+						state |= (m_I[i]() << i);
 						mt = std::max(this->m_I[i].net().time(), mt);
 					}
 				else
 					for (std::size_t i = 0; i < m_NI; i++)
-						state |= (INPLOGIC(m_I[i]) << i);
+						state |= (m_I[i]() << i);
 			}
 			auto nstate = state;
 

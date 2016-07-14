@@ -104,9 +104,9 @@ namespace netlist
 	NETLIB_UPDATE(74153sub)
 	{
 		const netlist_time delay[2] = { NLTIME_FROM_NS(23), NLTIME_FROM_NS(18) };
-		if (!INPLOGIC(m_G))
+		if (!m_G())
 		{
-			auto t = INPLOGIC(m_C[m_chan]);
+			auto t = m_C[m_chan]();
 			m_Y(t, delay[t]);
 		}
 		else
@@ -118,14 +118,14 @@ namespace netlist
 
 	NETLIB_UPDATE(74153)
 	{
-		m_sub.m_chan = (INPLOGIC(m_A) | (INPLOGIC(m_B)<<1));
+		m_sub.m_chan = (m_A() | (m_B()<<1));
 		m_sub.do_update();
 	}
 
 
 	NETLIB_UPDATE(74153_dip)
 	{
-		m_2.m_chan = m_1.m_chan = (INPLOGIC(m_A) | (INPLOGIC(m_B)<<1));
+		m_2.m_chan = m_1.m_chan = (m_A() | (m_B()<<1));
 		m_1.do_update();
 		m_2.do_update();
 	}

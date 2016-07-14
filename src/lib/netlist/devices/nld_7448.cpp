@@ -136,18 +136,18 @@ namespace netlist
 
 	NETLIB_UPDATE(7448)
 	{
-		if (!INPLOGIC(m_BIQ) || (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ)))
+		if (!m_BIQ() || (m_BIQ() && !m_LTQ()))
 		{
 			m_A.inactivate();
 			m_B.inactivate();
 			m_C.inactivate();
 			m_D.inactivate();
 			m_RBIQ.inactivate();
-			if (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ))
+			if (m_BIQ() && !m_LTQ())
 			{
 				update_outputs(8);
 			}
-			else if (!INPLOGIC(m_BIQ))
+			else if (!m_BIQ())
 			{
 				update_outputs(15);
 			}
@@ -159,8 +159,8 @@ namespace netlist
 			m_A.activate();
 			unsigned v;
 
-			v = (INPLOGIC(m_A) << 0) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_D) << 3);
-			if ((!INPLOGIC(m_RBIQ) && (v==0)))
+			v = (m_A() << 0) | (m_B() << 1) | (m_C() << 2) | (m_D() << 3);
+			if ((!m_RBIQ() && (v==0)))
 					v = 15;
 			update_outputs(v);
 		}

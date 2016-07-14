@@ -606,6 +606,12 @@ namespace netlist
 
 		netlist_sig_t Q() const;
 
+		netlist_sig_t operator()() const
+		{
+			nl_assert(state() != STATE_INP_PASSIVE);
+			return Q();
+		}
+
 		void inactivate();
 		void activate();
 		void activate_hl();
@@ -933,13 +939,6 @@ namespace netlist
 		void do_reset() { reset(); }
 		void set_hint_deactivate(bool v) { m_hint_deactivate = v; }
 
-		netlist_sig_t INPLOGIC(const logic_input_t &inp) const
-		{
-			nl_assert(inp.state() != logic_t::STATE_INP_PASSIVE);
-			return inp.Q();
-		}
-
-		//void OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time delay) NOEXCEPT;
 		nl_double INPANALOG(const analog_input_t &inp) const { return inp.Q_Analog(); }
 		nl_double TERMANALOG(const terminal_t &term) const { return term.net().Q_Analog(); }
 		void OUTANALOG(analog_output_t &out, const nl_double val) { out.set_Q(val); }

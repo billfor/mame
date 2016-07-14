@@ -29,7 +29,7 @@ namespace netlist
 
 	NETLIB_UPDATE(clock)
 	{
-		m_Q(!INPLOGIC(m_feedback), m_inc);
+		m_Q(!m_feedback(), m_inc);
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ namespace netlist
 
 	NETLIB_UPDATE(d_to_a_proxy)
 	{
-		const int state = static_cast<int>(INPLOGIC(m_I));
+		const int state = static_cast<int>(m_I());
 		if (state != m_last_state)
 		{
 			m_last_state = state;
@@ -126,7 +126,7 @@ namespace netlist
 
 	NETLIB_UPDATE(res_sw)
 	{
-		const netlist_sig_t state = INPLOGIC(m_I);
+		const netlist_sig_t state = m_I();
 		if (state != m_last_state)
 		{
 			m_last_state = state;

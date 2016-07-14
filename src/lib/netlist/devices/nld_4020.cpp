@@ -83,7 +83,7 @@ namespace netlist
 
 	NETLIB_UPDATE(CD4020)
 	{
-		if (INPLOGIC(m_RESET))
+		if (m_RESET())
 		{
 			m_sub.m_cnt = 0;
 			m_sub.m_IP.inactivate();

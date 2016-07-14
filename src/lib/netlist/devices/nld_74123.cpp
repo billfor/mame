@@ -181,23 +181,23 @@ namespace netlist
 	NETLIB_UPDATE(74123)
 	{
 		netlist_sig_t m_trig;
-		netlist_sig_t res = !INPLOGIC(m_CLRQ);
+		netlist_sig_t res = !m_CLRQ();
 		netlist_time t_AB_to_Q = NLTIME_FROM_NS(10);
 		netlist_time t_C_to_Q = NLTIME_FROM_NS(10);
 
 		if (m_dev_type == 74123)
 		{
-			m_trig = (INPLOGIC(m_A) ^ 1) & INPLOGIC(m_B) & INPLOGIC(m_CLRQ);
+			m_trig = (m_A() ^ 1) & m_B() & m_CLRQ();
 		}
 		else if (m_dev_type == 9602)
 		{
-			m_trig = (INPLOGIC(m_A) ^ 1) | INPLOGIC(m_B);
+			m_trig = (m_A() ^ 1) | m_B();
 		}
 		else // 4538
 		{
-			m_trig = (INPLOGIC(m_B) ^ 1) | INPLOGIC(m_A);
+			m_trig = (m_B() ^ 1) | m_A();
 			// The line below is from the datasheet truthtable ... doesn't make sense at all
-			//res = res | INPLOGIC(m_A) | (INPLOGIC(m_B) ^ 1);
+			//res = res | m_A) | (m_B) ^ 1);
 			t_AB_to_Q = NLTIME_FROM_NS(300);
 			t_C_to_Q = NLTIME_FROM_NS(250);
 		}

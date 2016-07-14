@@ -120,9 +120,9 @@ namespace netlist
 		uint_fast8_t d = 0;
 		for (std::size_t i=0; i<4; i++)
 		{
-			d |= (INPLOGIC(m_D[i]) << i);
+			d |= (m_D[i]() << i);
 		}
-		m_sub.m_clrq = INPLOGIC(m_CLRQ);
+		m_sub.m_clrq = m_CLRQ();
 		if (!m_sub.m_clrq)
 		{
 			for (std::size_t i=0; i<4; i++)

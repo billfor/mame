@@ -121,7 +121,7 @@ namespace netlist
 			m_ff = false;
 		}
 
-		bool out = (!INPLOGIC(m_RESET) ? false : m_ff);
+		bool out = (!m_RESET() ? false : m_ff);
 
 		if (m_last_out && !out)
 		{

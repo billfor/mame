@@ -86,15 +86,15 @@ namespace netlist
 
 	NETLIB_UPDATE(7490)
 	{
-		const netlist_sig_t new_A = INPLOGIC(m_A);
-		const netlist_sig_t new_B = INPLOGIC(m_B);
+		const netlist_sig_t new_A = m_A();
+		const netlist_sig_t new_B = m_B();
 
-		if (INPLOGIC(m_R91) & INPLOGIC(m_R92))
+		if (m_R91() & m_R92())
 		{
 			m_cnt = 9;
 			update_outputs();
 		}
-		else if (INPLOGIC(m_R1) & INPLOGIC(m_R2))
+		else if (m_R1() & m_R2())
 		{
 			m_cnt = 0;
 			update_outputs();
