@@ -782,6 +782,11 @@ namespace netlist
 
 		void initial(const netlist_sig_t val);
 
+		void operator()(const netlist_sig_t newQ, const netlist_time delay) NOEXCEPT
+		{
+			m_my_net.set_Q(newQ, delay); // take the shortcut
+		}
+
 		void set_Q(const netlist_sig_t newQ, const netlist_time delay) NOEXCEPT
 		{
 			m_my_net.set_Q(newQ, delay); // take the shortcut
@@ -934,7 +939,7 @@ namespace netlist
 			return inp.Q();
 		}
 
-		void OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time delay) NOEXCEPT;
+		//void OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time delay) NOEXCEPT;
 		nl_double INPANALOG(const analog_input_t &inp) const { return inp.Q_Analog(); }
 		nl_double TERMANALOG(const terminal_t &term) const { return term.net().Q_Analog(); }
 		void OUTANALOG(analog_output_t &out, const nl_double val) { out.set_Q(val); }
@@ -1348,11 +1353,6 @@ namespace netlist
 	inline void netlist_t::remove_from_queue(detail::net_t &out)
 	{
 		m_queue.remove(&out);
-	}
-
-	inline void core_device_t::OUTLOGIC(logic_output_t &out, const netlist_sig_t val, const netlist_time delay) NOEXCEPT
-	{
-		out.set_Q(val, delay);
 	}
 
 	template <typename T>

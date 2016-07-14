@@ -96,11 +96,11 @@ namespace netlist
 		if (r != m_lastr)
 		{
 			m_lastr = r;
-			OUTLOGIC(m_S1, (r >> 0) & 1, NLTIME_FROM_NS(23));
-			OUTLOGIC(m_S2, (r >> 1) & 1, NLTIME_FROM_NS(23));
-			OUTLOGIC(m_S3, (r >> 2) & 1, NLTIME_FROM_NS(23));
-			OUTLOGIC(m_S4, (r >> 3) & 1, NLTIME_FROM_NS(23));
-			OUTLOGIC(m_C4, (r >> 4) & 1, NLTIME_FROM_NS(23));
+			m_S1((r >> 0) & 1, NLTIME_FROM_NS(23));
+			m_S2((r >> 1) & 1, NLTIME_FROM_NS(23));
+			m_S3((r >> 2) & 1, NLTIME_FROM_NS(23));
+			m_S4((r >> 3) & 1, NLTIME_FROM_NS(23));
+			m_C4((r >> 4) & 1, NLTIME_FROM_NS(23));
 		}
 	}
 

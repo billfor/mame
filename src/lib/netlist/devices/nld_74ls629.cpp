@@ -160,11 +160,11 @@ namespace netlist
 		if (!m_enableq)
 		{
 			m_out = m_out ^ 1;
-			OUTLOGIC(m_Y, m_out, m_inc);
+			m_Y(m_out, m_inc);
 		}
 		else
 		{
-			OUTLOGIC(m_Y, 1, m_inc);
+			m_Y(1, m_inc);
 		}
 	}
 
@@ -221,13 +221,13 @@ namespace netlist
 		{
 			m_clock.m_enableq = 1;
 			m_clock.m_out = m_clock.m_out ^ 1;
-			OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
+			m_clock.m_Y(m_clock.m_out, netlist_time::from_nsec(1));
 		}
 		else if (m_clock.m_enableq && !INPLOGIC(m_ENQ))
 		{
 			m_clock.m_enableq = 0;
 			m_clock.m_out = m_clock.m_out ^ 1;
-			OUTLOGIC(m_clock.m_Y, m_clock.m_out, netlist_time::from_nsec(1));
+			m_clock.m_Y(m_clock.m_out, netlist_time::from_nsec(1));
 		}
 	}
 

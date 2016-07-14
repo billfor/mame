@@ -473,9 +473,9 @@ namespace netlist
 		NETLIB_UPDATEI()
 		{
 			if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
-				OUTLOGIC(m_Q, 1, NLTIME_FROM_NS(1));
+				m_Q(1, NLTIME_FROM_NS(1));
 			else if (m_I.Q_Analog() < logic_family().m_low_thresh_V)
-				OUTLOGIC(m_Q, 0, NLTIME_FROM_NS(1));
+				m_Q(0, NLTIME_FROM_NS(1));
 			else
 			{
 				// do nothing

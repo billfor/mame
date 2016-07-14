@@ -91,7 +91,7 @@ namespace netlist
 				m_D.inactivate();
 			}
 		}
-		OUTLOGIC(m_Q, res, times[1 - res]);// ? 22000 : 15000);
+		m_Q(res, times[1 - res]);// ? 22000 : 15000);
 	}
 
 	NETLIB_DEVICE_IMPL(7450)

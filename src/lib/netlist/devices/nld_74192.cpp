@@ -156,10 +156,10 @@ namespace netlist
 		m_last_CU = INPLOGIC(m_CU);
 
 		for (std::size_t i=0; i<4; i++)
-			OUTLOGIC(m_Q[i], (m_cnt >> i) & 1, delay[i]);
+			m_Q[i]((m_cnt >> i) & 1, delay[i]);
 
-		OUTLOGIC(m_BORROWQ, tBorrow, NLTIME_FROM_NS(20)); //FIXME
-		OUTLOGIC(m_CARRYQ, tCarry, NLTIME_FROM_NS(20)); //FIXME
+		m_BORROWQ(tBorrow, NLTIME_FROM_NS(20)); //FIXME
+		m_CARRYQ(tCarry, NLTIME_FROM_NS(20)); //FIXME
 	}
 
 	NETLIB_DEVICE_IMPL(74192)

@@ -107,11 +107,11 @@ namespace netlist
 		if (!INPLOGIC(m_G))
 		{
 			auto t = INPLOGIC(m_C[m_chan]);
-			OUTLOGIC(m_Y, t, delay[t] );
+			m_Y(t, delay[t]);
 		}
 		else
 		{
-			OUTLOGIC(m_Y, 0, delay[0]);
+			m_Y(0, delay[0]);
 		}
 	}
 

@@ -29,7 +29,7 @@ namespace netlist
 
 	NETLIB_UPDATE(clock)
 	{
-		OUTLOGIC(m_Q, !INPLOGIC(m_feedback), m_inc  );
+		m_Q(!INPLOGIC(m_feedback), m_inc);
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ namespace netlist
 
 	NETLIB_UPDATE(extclock)
 	{
-		OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
+		m_Q((m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
 		m_cnt = (m_cnt + 1) % m_size;
 		m_off = netlist_time::zero();
 	}
@@ -61,7 +61,7 @@ namespace netlist
 
 	NETLIB_UPDATE(logic_input)
 	{
-		OUTLOGIC(m_Q, m_IN.Value() & 1, netlist_time::from_nsec(1));
+		m_Q(m_IN.Value() & 1, netlist_time::from_nsec(1));
 	}
 
 	NETLIB_UPDATE_PARAM(logic_input)

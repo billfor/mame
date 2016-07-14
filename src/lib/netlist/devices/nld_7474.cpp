@@ -95,8 +95,8 @@ namespace netlist
 	{
 		// 0: High-to-low 40 ns, 1: Low-to-high 25 ns
 		const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
-		OUTLOGIC(m_Q, stateQ, delay[stateQ]);
-		OUTLOGIC(m_QQ, stateQQ, delay[stateQQ]);
+		m_Q(stateQ, delay[stateQ]);
+		m_QQ(stateQQ, delay[stateQQ]);
 	}
 
 	NETLIB_UPDATE(7474sub)

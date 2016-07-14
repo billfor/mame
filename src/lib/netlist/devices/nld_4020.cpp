@@ -88,9 +88,9 @@ namespace netlist
 			m_sub.m_cnt = 0;
 			m_sub.m_IP.inactivate();
 			/* static */ const netlist_time reset_time = netlist_time::from_nsec(140);
-			OUTLOGIC(m_sub.m_Q[0], 0, reset_time);
+			m_sub.m_Q[0](0, reset_time);
 			for (std::size_t i=3; i<14; i++)
-				OUTLOGIC(m_sub.m_Q[i], 0, reset_time);
+				m_sub.m_Q[i](0, reset_time);
 		}
 		else
 			m_sub.m_IP.activate_hl();
@@ -108,9 +108,9 @@ namespace netlist
 				NLTIME_FROM_NS(1380), NLTIME_FROM_NS(1480),
 		};
 
-		OUTLOGIC(m_Q[0], cnt & 1, out_delayQn[0]);
+		m_Q[0](cnt & 1, out_delayQn[0]);
 		for (std::size_t i=3; i<14; i++)
-			OUTLOGIC(m_Q[i], (cnt >> i) & 1, out_delayQn[i]);
+			m_Q[i]((cnt >> i) & 1, out_delayQn[i]);
 	}
 
 	NETLIB_DEVICE_IMPL(CD4020)

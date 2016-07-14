@@ -184,7 +184,7 @@ namespace netlist
 			// max transfer time is 100 NS */
 
 			for (std::size_t i=0; i<7; i++)
-				OUTLOGIC(m_Q[i], tab7448[v][i], NLTIME_FROM_NS(100));
+				m_Q[i](tab7448[v][i], NLTIME_FROM_NS(100));
 			m_state = v;
 		}
 	}

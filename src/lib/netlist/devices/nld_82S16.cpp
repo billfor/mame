@@ -71,7 +71,7 @@ namespace netlist
 		if (INPLOGIC(m_CE1Q) || INPLOGIC(m_CE2Q) || INPLOGIC(m_CE3Q))
 		{
 			// FIXME: Outputs are tristate. This needs to be properly implemented
-			OUTLOGIC(m_DOUTQ, 1, NLTIME_FROM_NS(20));
+			m_DOUTQ(1, NLTIME_FROM_NS(20));
 			//for (int i=0; i<8; i++)
 				//m_A[i].inactivate();
 		}
@@ -90,7 +90,7 @@ namespace netlist
 					 & ~(static_cast<uint_fast64_t>(1) << (adr & 0x3f)))
 					 | (static_cast<uint_fast64_t>(INPLOGIC(m_DIN)) << (adr & 0x3f));
 			}
-			OUTLOGIC(m_DOUTQ, ((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
+			m_DOUTQ(((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
 		}
 	}
 
