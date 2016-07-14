@@ -577,7 +577,7 @@ public:
 
 	NETLIB_UPDATEI()
 	{
-		nl_double cur = INPANALOG(m_in);
+		nl_double cur = m_in();
 
 		// FIXME: make this a parameter
 		// avoid calls due to noise
@@ -637,7 +637,7 @@ public:
 
 	NETLIB_UPDATEI()
 	{
-		nl_double val = INPANALOG(m_in) * m_mult.Value() + m_offset.Value();
+		nl_double val = m_in() * m_mult.Value() + m_offset.Value();
 		sound_update(netlist().time());
 		/* ignore spikes */
 		if (std::abs(val) < 32767.0)

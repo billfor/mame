@@ -282,7 +282,7 @@ namespace netlist
 
 		NETLIB_UPDATEI()
 		{
-			OUTANALOG(m_Q, INPANALOG(m_I));
+			OUTANALOG(m_Q, m_I());
 		}
 
 	private:

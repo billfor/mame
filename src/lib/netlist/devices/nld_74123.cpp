@@ -231,7 +231,7 @@ namespace netlist
 		if (m_state == 1)
 		{
 			const nl_double vLow = m_KP * TERMANALOG(m_RP.m_R.m_P);
-			if (INPANALOG(m_CV) < vLow)
+			if (m_CV() < vLow)
 			{
 				m_RN_Q(0, NLTIME_FROM_NS(10)); // R_OFF
 				m_state = 2; // charging
@@ -240,7 +240,7 @@ namespace netlist
 		if (m_state == 2)
 		{
 			const nl_double vHigh = TERMANALOG(m_RP.m_R.m_P) * (1.0 - m_KP);
-			if (INPANALOG(m_CV) > vHigh)
+			if (m_CV() > vHigh)
 			{
 				m_RP_Q(0, NLTIME_FROM_NS(10)); // R_OFF
 

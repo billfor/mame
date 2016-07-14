@@ -109,8 +109,8 @@ namespace netlist
 		// FIXME: assumes GND is connected to 0V.
 
 		nl_double vt = clamp(TERMANALOG(m_R2.m_P), 0.7, 1.4);
-		bool bthresh = (INPANALOG(m_THRES) > vt);
-		bool btrig = (INPANALOG(m_TRIG) > clamp(TERMANALOG(m_R2.m_N), 0.7, 1.4));
+		bool bthresh = (m_THRES() > vt);
+		bool btrig = (m_TRIG() > clamp(TERMANALOG(m_R2.m_N), 0.7, 1.4));
 
 		if (!btrig)
 		{

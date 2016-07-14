@@ -639,6 +639,11 @@ namespace netlist
 		/*! returns voltage at terminal.
 		 *	\returns voltage at terminal.
 		 */
+		nl_double operator()() const { return Q_Analog(); }
+
+		/*! returns voltage at terminal.
+		 *	\returns voltage at terminal.
+		 */
 		nl_double Q_Analog() const;
 
 	};
@@ -939,7 +944,6 @@ namespace netlist
 		void do_reset() { reset(); }
 		void set_hint_deactivate(bool v) { m_hint_deactivate = v; }
 
-		nl_double INPANALOG(const analog_input_t &inp) const { return inp.Q_Analog(); }
 		nl_double TERMANALOG(const terminal_t &term) const { return term.net().Q_Analog(); }
 		void OUTANALOG(analog_output_t &out, const nl_double val) { out.set_Q(val); }
 

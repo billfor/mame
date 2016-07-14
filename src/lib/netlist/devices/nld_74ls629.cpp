@@ -174,8 +174,8 @@ namespace netlist
 			// recompute
 			nl_double  freq;
 			nl_double  v_freq_2, v_freq_3, v_freq_4;
-			nl_double  v_freq = INPANALOG(m_FC);
-			nl_double  v_rng = INPANALOG(m_RNG);
+			nl_double  v_freq = m_FC();
+			nl_double  v_rng = m_RNG();
 
 			/* coefficients */
 			const nl_double k1 = 1.9904769024796283E+03;
