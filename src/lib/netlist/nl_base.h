@@ -617,11 +617,22 @@ namespace netlist
 	// analog_input_t
 	// -----------------------------------------------------------------------------
 
+	/*! terminal providing analog input voltage.
+	 *
+	 * This terminal class provides a voltage measurement. The conductance against
+	 * ground is infinite.
+	 */
 	class analog_input_t : public analog_t
 	{
 	public:
-		analog_input_t(core_device_t &dev, const pstring &aname);
+		/*! Constructor */
+		analog_input_t(core_device_t &dev, /*!< owning device */
+				const pstring &aname       /*!< name of terminal */
+		);
 
+		/*! returns voltage at terminal.
+		 *	\returns voltage at terminal.
+		 */
 		nl_double Q_Analog() const;
 
 	};
@@ -917,7 +928,6 @@ namespace netlist
 		void do_reset() { reset(); }
 		void set_hint_deactivate(bool v) { m_hint_deactivate = v; }
 
-		netlist_sig_t INPLOGIC_PASSIVE(logic_input_t &inp);
 		netlist_sig_t INPLOGIC(const logic_input_t &inp) const
 		{
 			nl_assert(inp.state() != logic_t::STATE_INP_PASSIVE);

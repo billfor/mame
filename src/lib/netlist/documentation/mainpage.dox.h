@@ -5,8 +5,6 @@
 
 ###A mixed signal circuit simulation.
 
-Bekomme ich nun spell check?
-
 - D: Device
 - O: Rail output (output)
 - I: Infinite impedance input (input)

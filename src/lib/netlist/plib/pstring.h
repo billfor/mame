@@ -69,25 +69,25 @@ public:
 	pstring_t &operator=(const mem_t *string) { pcopy(string); return *this; }
 	pstring_t &operator=(const pstring_t &string) { pcopy(string); return *this; }
 
-	struct iter_t final : public std::iterator<std::forward_iterator_tag, mem_t>
+	struct iterator final : public std::iterator<std::forward_iterator_tag, mem_t>
 	{
 		const mem_t * p;
 	public:
-		explicit constexpr iter_t(const mem_t *x) noexcept : p(x) {}
-		iter_t(const iter_t &rhs) noexcept = default;
-		iter_t(iter_t &&rhs) noexcept { p = rhs.p; }
-		iter_t &operator=(const iter_t &it) { p = it.p; return *this; }
-		iter_t& operator++() noexcept {p += traits::codelen(p); return *this;}
-		iter_t operator++(int) noexcept {iter_t tmp(*this); operator++(); return tmp;}
-		bool operator==(const iter_t& rhs) noexcept {return p==rhs.p;}
-		bool operator!=(const iter_t& rhs) noexcept {return p!=rhs.p;}
+		explicit constexpr iterator(const mem_t *x) noexcept : p(x) {}
+		iterator(const iterator &rhs) noexcept = default;
+		iterator(iterator &&rhs) noexcept { p = rhs.p; }
+		iterator &operator=(const iterator &it) { p = it.p; return *this; }
+		iterator& operator++() noexcept {p += traits::codelen(p); return *this;}
+		iterator operator++(int) noexcept {iterator tmp(*this); operator++(); return tmp;}
+		bool operator==(const iterator& rhs) noexcept {return p==rhs.p;}
+		bool operator!=(const iterator& rhs) noexcept {return p!=rhs.p;}
 		const code_t operator*() noexcept {return traits::code(p);}
-		iter_t& operator+=(size_type count) { while (count>0) { --count; ++(*this); } return *this; }
-		friend iter_t operator+(iter_t lhs, const size_type &rhs) { return (lhs += rhs); }
+		iterator& operator+=(size_type count) { while (count>0) { --count; ++(*this); } return *this; }
+		friend iterator operator+(iterator lhs, const size_type &rhs) { return (lhs += rhs); }
 	};
 
-	iter_t begin() const { return iter_t(m_ptr->str()); }
-	iter_t end() const { return iter_t(m_ptr->str() + blen()); }
+	iterator begin() const { return iterator(m_ptr->str()); }
+	iterator end() const { return iterator(m_ptr->str() + blen()); }
 
 	// C string conversion helpers
 	const mem_t *cstr() const { return m_ptr->str(); }
@@ -145,22 +145,22 @@ public:
 	pstring_t& operator+=(const code_t c) { mem_t buf[traits::MAXCODELEN+1] = { 0 }; traits::encode(c, buf); pcat(buf); return *this; }
 	friend pstring_t operator+(const pstring_t &lhs, const code_t rhs) { return pstring_t(lhs) += rhs; }
 
-	iter_t find(const pstring_t &search, iter_t start) const;
-	iter_t find(const pstring_t &search) const { return find(search, begin()); }
-	iter_t find(const mem_t *search, iter_t start) const;
-	iter_t find(const mem_t *search) const { return find(search, begin()); }
-	iter_t find(const code_t search, iter_t start) const { mem_t buf[traits::MAXCODELEN+1] = { 0 }; traits::encode(search, buf); return find(buf, start); }
-	iter_t find(const code_t search) const { return find(search, begin()); }
+	iterator find(const pstring_t &search, iterator start) const;
+	iterator find(const pstring_t &search) const { return find(search, begin()); }
+	iterator find(const mem_t *search, iterator start) const;
+	iterator find(const mem_t *search) const { return find(search, begin()); }
+	iterator find(const code_t search, iterator start) const { mem_t buf[traits::MAXCODELEN+1] = { 0 }; traits::encode(search, buf); return find(buf, start); }
+	iterator find(const code_t search) const { return find(search, begin()); }
 
-	const pstring_t substr(const iter_t start, const iter_t end) const ;
-	const pstring_t substr(const iter_t start) const { return substr(start, end()); }
+	const pstring_t substr(const iterator start, const iterator end) const ;
+	const pstring_t substr(const iterator start) const { return substr(start, end()); }
 	const pstring_t substr(size_type start) const { if (start>=len()) return pstring_t(""); else return substr(begin() + start, end()); }
 
-	const pstring_t left(iter_t leftof) const { return substr(begin(), leftof); }
-	const pstring_t right(iter_t pos) const  { return substr(pos, end()); }
+	const pstring_t left(iterator leftof) const { return substr(begin(), leftof); }
+	const pstring_t right(iterator pos) const  { return substr(pos, end()); }
 
-	iter_t find_first_not_of(const pstring_t &no) const;
-	iter_t find_last_not_of(const pstring_t &no) const;
+	iterator find_first_not_of(const pstring_t &no) const;
+	iterator find_last_not_of(const pstring_t &no) const;
 
 	const pstring_t ltrim(const pstring_t &ws = " \t\n\r") const;
 	const pstring_t rtrim(const pstring_t &ws = " \t\n\r") const;

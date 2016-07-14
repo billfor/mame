@@ -43,8 +43,8 @@ namespace plib
 	pstring_vector_t::pstring_vector_t(const pstring &str, const pstring &onstr, bool ignore_empty)
 	: std::vector<pstring>()
 	{
-		pstring::iter_t p = str.begin();
-		pstring::iter_t pn = str.find(onstr, p);
+		pstring::iterator p = str.begin();
+		pstring::iterator pn = str.find(onstr, p);
 
 		while (pn != str.end())
 		{

@@ -542,20 +542,6 @@ void core_device_t::stop_dev()
 	//stop();
 }
 
-netlist_sig_t core_device_t::INPLOGIC_PASSIVE(logic_input_t &inp)
-{
-	if (inp.state() != logic_t::STATE_INP_PASSIVE)
-		return inp.Q();
-	else
-	{
-		inp.activate();
-		const netlist_sig_t ret = inp.Q();
-		inp.inactivate();
-		return ret;
-	}
-}
-
-
 // ----------------------------------------------------------------------------------------
 // device_t
 // ----------------------------------------------------------------------------------------

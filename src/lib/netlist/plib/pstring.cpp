@@ -94,7 +94,7 @@ void pstring_t<F>::pcopy(const mem_t *from, std::size_t size)
 }
 
 template<typename F>
-const pstring_t<F> pstring_t<F>::substr(const iter_t start, const iter_t end) const
+const pstring_t<F> pstring_t<F>::substr(const iterator start, const iterator end) const
 {
 	pstring_t ret;
 	//FIXME: throw ?
@@ -114,7 +114,7 @@ const pstring_t<F> pstring_t<F>::ucase() const
 }
 
 template<typename F>
-typename pstring_t<F>::iter_t pstring_t<F>::find_first_not_of(const pstring_t &no) const
+typename pstring_t<F>::iterator pstring_t<F>::find_first_not_of(const pstring_t &no) const
 {
 	for (auto it = begin(); it != end(); ++it)
 	{
@@ -134,10 +134,10 @@ typename pstring_t<F>::iter_t pstring_t<F>::find_first_not_of(const pstring_t &n
 }
 
 template<typename F>
-typename pstring_t<F>::iter_t pstring_t<F>::find_last_not_of(const pstring_t &no) const
+typename pstring_t<F>::iterator pstring_t<F>::find_last_not_of(const pstring_t &no) const
 {
 	/* FIXME: reverse iterator */
-	iter_t last_found = end();
+	iterator last_found = end();
 	for (auto it = begin(); it != end(); ++it)
 	{
 		bool f = true;
@@ -156,11 +156,11 @@ typename pstring_t<F>::iter_t pstring_t<F>::find_last_not_of(const pstring_t &no
 }
 
 template<typename F>
-typename pstring_t<F>::iter_t pstring_t<F>::find(const pstring_t &search, iter_t start) const
+typename pstring_t<F>::iterator pstring_t<F>::find(const pstring_t &search, iterator start) const
 {
 	for (; start != end(); ++start)
 	{
-		iter_t itc(start);
+		iterator itc(start);
 		auto cmp = search.begin();
 		while (itc != end() && cmp != search.end() && *itc == *cmp)
 		{
@@ -261,12 +261,12 @@ long pstring_t<F>::as_long(bool *error) const
 }
 
 template<typename F>
-typename pstring_t<F>::iter_t pstring_t<F>::find(const mem_t *search, iter_t start) const
+typename pstring_t<F>::iterator pstring_t<F>::find(const mem_t *search, iterator start) const
 {
 	for (; start != end(); ++start)
 	{
-		iter_t itc(start);
-		iter_t cmp(search);
+		iterator itc(start);
+		iterator cmp(search);
 		while (itc != end() && *cmp != 0 && *itc == *cmp)
 		{
 			++itc;

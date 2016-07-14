@@ -848,7 +848,7 @@ static pstring model_string(model_map_t &map)
 void setup_t::model_parse(const pstring &model_in, model_map_t &map)
 {
 	pstring model = model_in;
-	pstring::iter_t pos(nullptr);
+	pstring::iterator pos(nullptr);
 	pstring key;
 
 	while (true)
