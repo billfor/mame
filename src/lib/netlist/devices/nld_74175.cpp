@@ -108,8 +108,8 @@ namespace netlist
 			for (std::size_t i=0; i<4; i++)
 			{
 				netlist_sig_t d = (m_data >> i) & 1;
-				m_Q[i](d, delay[d]);
-				m_QQ[i](d ^ 1, delay[d ^ 1]);
+				m_Q[i].push(d, delay[d]);
+				m_QQ[i].push(d ^ 1, delay[d ^ 1]);
 			}
 			m_CLK.inactivate();
 		}
@@ -127,8 +127,8 @@ namespace netlist
 		{
 			for (std::size_t i=0; i<4; i++)
 			{
-				m_sub.m_Q[i](0, delay_clear[0]);
-				m_sub.m_QQ[i](1, delay_clear[1]);
+				m_sub.m_Q[i].push(0, delay_clear[0]);
+				m_sub.m_QQ[i].push(1, delay_clear[1]);
 			}
 			m_sub.m_data = 0;
 		} else if (d != m_sub.m_data)

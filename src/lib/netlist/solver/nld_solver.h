@@ -75,7 +75,7 @@ NETLIB_OBJECT(solver)
 	void post_start();
 	void stop() override;
 
-	inline nl_double gmin() { return m_gmin.Value(); }
+	inline nl_double gmin() { return m_gmin(); }
 
 	void create_solver_code(plib::postream &strm);
 

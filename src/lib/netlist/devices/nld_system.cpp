@@ -24,12 +24,12 @@ namespace netlist
 
 	NETLIB_UPDATE_PARAM(clock)
 	{
-		m_inc = netlist_time::from_double(1.0 / (m_freq.Value() * 2.0));
+		m_inc = netlist_time::from_double(1.0 / (m_freq() * 2.0));
 	}
 
 	NETLIB_UPDATE(clock)
 	{
-		m_Q(!m_feedback(), m_inc);
+		m_Q.push(!m_feedback(), m_inc);
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -39,13 +39,13 @@ namespace netlist
 	NETLIB_RESET(extclock)
 	{
 		m_cnt = 0;
-		m_off = netlist_time::from_double(m_offset.Value());
+		m_off = netlist_time::from_double(m_offset());
 		//m_Q.initial(0);
 	}
 
 	NETLIB_UPDATE(extclock)
 	{
-		m_Q((m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
+		m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
 		m_cnt = (m_cnt + 1) % m_size;
 		m_off = netlist_time::zero();
 	}
@@ -61,7 +61,7 @@ namespace netlist
 
 	NETLIB_UPDATE(logic_input)
 	{
-		m_Q(m_IN.Value() & 1, netlist_time::from_nsec(1));
+		m_Q.push(m_IN() & 1, netlist_time::from_nsec(1));
 	}
 
 	NETLIB_UPDATE_PARAM(logic_input)
@@ -79,7 +79,7 @@ namespace netlist
 
 	NETLIB_UPDATE(analog_input)
 	{
-		OUTANALOG(m_Q, m_IN.Value());
+		m_Q.push(m_IN());
 	}
 
 	NETLIB_UPDATE_PARAM(analog_input)
@@ -130,7 +130,7 @@ namespace netlist
 		if (state != m_last_state)
 		{
 			m_last_state = state;
-			const nl_double R = state ? m_RON.Value() : m_ROFF.Value();
+			const nl_double R = state ? m_RON() : m_ROFF();
 
 			// We only need to update the net first if this is a time stepping net
 			if ((0)) // m_R->m_P.net().as_analog().solver()->is_timestep())
@@ -193,7 +193,7 @@ namespace netlist
 					break;
 			}
 		}
-		OUTANALOG(m_Q, stack[ptr-1]);
+		m_Q.push(stack[ptr-1]);
 	}
 
 

@@ -267,7 +267,7 @@ void netlist_t::start()
 		}
 	}
 
-	bool use_deactivate = (m_params->m_use_deactivate.Value() ? true : false);
+	bool use_deactivate = (m_params->m_use_deactivate() ? true : false);
 
 	for (auto &d : m_devices)
 	{

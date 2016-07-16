@@ -344,7 +344,7 @@ namespace netlist
 			if (doOUT)
 			{
 				for (std::size_t i = 0; i < m_NO; i++)
-					m_Q[i]((out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
+					m_Q[i].push((out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[timebase + i]]);
 			}
 			else
 				for (std::size_t i = 0; i < m_NO; i++)

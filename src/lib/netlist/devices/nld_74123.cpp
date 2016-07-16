@@ -204,24 +204,24 @@ namespace netlist
 
 		if (res)
 		{
-			m_Q(0, t_C_to_Q);
-			m_QQ(1, t_C_to_Q);
+			m_Q.push(0, t_C_to_Q);
+			m_QQ.push(1, t_C_to_Q);
 			/* quick charge until trigger */
 			/* FIXME: SGS datasheet shows quick charge to 5V,
 			 * though schematics indicate quick charge to Vhigh only.
 			 */
-			m_RP_Q(1, t_C_to_Q); // R_ON
-			m_RN_Q(0, t_C_to_Q); // R_OFF
+			m_RP_Q.push(1, t_C_to_Q); // R_ON
+			m_RN_Q.push(0, t_C_to_Q); // R_OFF
 			m_state = 2; //charging (quick)
 		}
 		else if (!m_last_trig && m_trig)
 		{
 			// FIXME: Timing!
-			m_Q(1, t_AB_to_Q);
-			m_QQ(0,t_AB_to_Q);
+			m_Q.push(1, t_AB_to_Q);
+			m_QQ.push(0,t_AB_to_Q);
 
-			m_RN_Q(1, t_AB_to_Q); // R_ON
-			m_RP_Q(0, t_AB_to_Q); // R_OFF
+			m_RN_Q.push(1, t_AB_to_Q); // R_ON
+			m_RP_Q.push(0, t_AB_to_Q); // R_OFF
 
 			m_state = 1; // discharging
 		}
@@ -230,22 +230,22 @@ namespace netlist
 
 		if (m_state == 1)
 		{
-			const nl_double vLow = m_KP * TERMANALOG(m_RP.m_R.m_P);
+			const nl_double vLow = m_KP * m_RP.m_R.m_P();
 			if (m_CV() < vLow)
 			{
-				m_RN_Q(0, NLTIME_FROM_NS(10)); // R_OFF
+				m_RN_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
 				m_state = 2; // charging
 			}
 		}
 		if (m_state == 2)
 		{
-			const nl_double vHigh = TERMANALOG(m_RP.m_R.m_P) * (1.0 - m_KP);
+			const nl_double vHigh = m_RP.m_R.m_P() * (1.0 - m_KP);
 			if (m_CV() > vHigh)
 			{
-				m_RP_Q(0, NLTIME_FROM_NS(10)); // R_OFF
+				m_RP_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
 
-				m_Q(0, NLTIME_FROM_NS(10));
-				m_QQ(1, NLTIME_FROM_NS(10));
+				m_Q.push(0, NLTIME_FROM_NS(10));
+				m_QQ.push(1, NLTIME_FROM_NS(10));
 				m_state = 0; // waiting
 			}
 		}
@@ -253,7 +253,7 @@ namespace netlist
 
 	NETLIB_RESET(74123)
 	{
-		m_KP = 1.0 / (1.0 + exp(m_K.Value()));
+		m_KP = 1.0 / (1.0 + exp(m_K()));
 
 		m_RP.do_reset();
 		m_RN.do_reset();

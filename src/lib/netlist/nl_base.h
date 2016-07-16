@@ -520,7 +520,7 @@ namespace netlist
 
 		terminal_t(core_device_t &dev, const pstring &aname);
 
-		terminal_t *m_otherterm;
+		nl_double operator ()() const;
 
 		void set(const nl_double G)
 		{
@@ -552,6 +552,8 @@ namespace netlist
 			m_go1 = go;
 			m_Idr1 = Idr;
 		}
+
+		terminal_t *m_otherterm;
 
 	private:
 		void set_ptr(nl_double *ptr, const nl_double val)
@@ -793,12 +795,7 @@ namespace netlist
 
 		void initial(const netlist_sig_t val);
 
-		void operator()(const netlist_sig_t newQ, const netlist_time delay) NOEXCEPT
-		{
-			m_my_net.set_Q(newQ, delay); // take the shortcut
-		}
-
-		void set_Q(const netlist_sig_t newQ, const netlist_time delay) NOEXCEPT
+		void push(const netlist_sig_t newQ, const netlist_time delay) NOEXCEPT
 		{
 			m_my_net.set_Q(newQ, delay); // take the shortcut
 		}
@@ -811,13 +808,13 @@ namespace netlist
 	{
 		P_PREVENT_COPYING(analog_output_t)
 	public:
-
 		analog_output_t(core_device_t &dev, const pstring &aname);
 
+		void push(const nl_double val) { set_Q(val); }
 		void initial(const nl_double val);
-		void set_Q(const nl_double newQ);
 
 	private:
+		void set_Q(const nl_double newQ);
 		analog_net_t m_my_net;
 	};
 
@@ -854,13 +851,13 @@ namespace netlist
 	public:
 		param_template_t(device_t &device, const pstring name, const C val);
 
-		operator const C() const { return Value(); }
+		 const C operator()() const { return Value(); }
 
 		void setTo(const C &param);
 		void initial(const C &val) { m_param = val; }
-		C Value() const { return m_param;   }
 
 	protected:
+		C Value() const { return m_param;   }
 		virtual void changed() { }
 		C m_param;
 	private:
@@ -943,9 +940,6 @@ namespace netlist
 		}
 		void do_reset() { reset(); }
 		void set_hint_deactivate(bool v) { m_hint_deactivate = v; }
-
-		nl_double TERMANALOG(const terminal_t &term) const { return term.net().Q_Analog(); }
-		void OUTANALOG(analog_output_t &out, const nl_double val) { out.set_Q(val); }
 
 		/* stats */
 		nperftime_t  m_stat_total_time;
@@ -1317,6 +1311,8 @@ namespace netlist
 	{
 		return static_cast<analog_net_t &>(core_terminal_t::net());
 	}
+
+	inline nl_double terminal_t::operator ()() const { return net().Q_Analog(); }
 
 	inline logic_net_t & logic_t::net()
 	{

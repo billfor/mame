@@ -104,7 +104,7 @@ namespace netlist
 			if (m_last_A && !new_A)  // High - Low
 			{
 				m_cnt ^= 1;
-				m_Q[0](m_cnt & 1, delay[0]);
+				m_Q[0].push(m_cnt & 1, delay[0]);
 			}
 			if (m_last_B && !new_B)  // High - Low
 			{
@@ -121,7 +121,7 @@ namespace netlist
 	NETLIB_FUNC_VOID(7490, update_outputs, (void))
 	{
 		for (std::size_t i=0; i<4; i++)
-			m_Q[i]((m_cnt >> i) & 1, delay[i]);
+			m_Q[i].push((m_cnt >> i) & 1, delay[i]);
 	}
 
 	NETLIB_DEVICE_IMPL(7490)

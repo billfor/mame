@@ -197,8 +197,8 @@ protected:
 	NETLIB_UPDATE_PARAMI()
 	{
 		update_dev();
-		if (m_R.Value() > 1e-9)
-			set_R(m_R.Value());
+		if (m_R() > 1e-9)
+			set_R(m_R());
 		else
 			set_R(1e-9);
 	}
@@ -285,7 +285,7 @@ public:
 	NETLIB_TIMESTEP()
 	{
 		/* Gpar should support convergence */
-		const nl_double G = m_C.Value() / step +  m_GParallel;
+		const nl_double G = m_C() / step +  m_GParallel;
 		const nl_double I = -G * deltaV();
 		set(G, 0.0, I);
 	}

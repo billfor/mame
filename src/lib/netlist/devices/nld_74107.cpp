@@ -121,8 +121,8 @@ namespace netlist
 	{
 		const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
 
-		m_Q(state, delay[state]);
-		m_QQ(state ^ 1, delay[state ^ 1]);
+		m_Q.push(state, delay[state]);
+		m_QQ.push(state ^ 1, delay[state ^ 1]);
 	}
 
 	NETLIB_UPDATE(74107Asub)

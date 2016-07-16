@@ -162,11 +162,11 @@ namespace netlist
 			{
 				case MAXCNT - 1:
 					m_cnt = MAXCNT;
-					m_RC(m_ent, NLTIME_FROM_NS(20));
-					m_QA(1, NLTIME_FROM_NS(20));
+					m_RC.push(m_ent, NLTIME_FROM_NS(20));
+					m_QA.push(1, NLTIME_FROM_NS(20));
 					break;
 				case MAXCNT:
-					m_RC(0, NLTIME_FROM_NS(20));
+					m_RC.push(0, NLTIME_FROM_NS(20));
 					m_cnt = 0;
 					update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
 					break;
@@ -179,7 +179,7 @@ namespace netlist
 		{
 			m_cnt = m_ABCD->read_ABCD();
 			update_outputs_all(m_cnt, NLTIME_FROM_NS(22));
-			m_RC(m_ent & (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+			m_RC.push(m_ent & (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 		}
 	}
 
@@ -192,7 +192,7 @@ namespace netlist
 		if ((!sub.m_loadq || (sub.m_ent & m_ENP())) && clrq)
 		{
 			sub.m_CLK.activate_lh();
-			sub.m_RC(sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+			sub.m_RC.push(sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 		}
 		else
 		{
@@ -203,16 +203,16 @@ namespace netlist
 				sub.m_cnt = 0;
 				//return;
 			}
-			sub.m_RC(sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+			sub.m_RC.push(sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 		}
 	}
 
 	inline NETLIB_FUNC_VOID(9310_sub, update_outputs_all, (const unsigned cnt, const netlist_time out_delay))
 	{
-		m_QA((cnt >> 0) & 1, out_delay);
-		m_QB((cnt >> 1) & 1, out_delay);
-		m_QC((cnt >> 2) & 1, out_delay);
-		m_QD((cnt >> 3) & 1, out_delay);
+		m_QA.push((cnt >> 0) & 1, out_delay);
+		m_QB.push((cnt >> 1) & 1, out_delay);
+		m_QC.push((cnt >> 2) & 1, out_delay);
+		m_QD.push((cnt >> 3) & 1, out_delay);
 	}
 
 	inline NETLIB_FUNC_VOID(9310_sub, update_outputs, (const unsigned cnt))
@@ -227,32 +227,32 @@ namespace netlist
 		m_QD, (cnt >> 3) & 1, out_delay);
 	#else
 		if ((cnt & 1) == 1)
-			m_QA(1, out_delay);
+			m_QA.push(1, out_delay);
 		else
 		{
-			m_QA(0, out_delay);
+			m_QA.push(0, out_delay);
 			switch (cnt)
 			{
 			case 0x00:
-				m_QB(0, out_delay);
-				m_QC(0, out_delay);
-				m_QD(0, out_delay);
+				m_QB.push(0, out_delay);
+				m_QC.push(0, out_delay);
+				m_QD.push(0, out_delay);
 				break;
 			case 0x02:
 			case 0x06:
 			case 0x0A:
 			case 0x0E:
-				m_QB(1, out_delay);
+				m_QB.push(1, out_delay);
 				break;
 			case 0x04:
 			case 0x0C:
-				m_QB(0, out_delay);
-				m_QC(1, out_delay);
+				m_QB.push(0, out_delay);
+				m_QC.push(1, out_delay);
 				break;
 			case 0x08:
-				m_QB(0, out_delay);
-				m_QC(0, out_delay);
-				m_QD(1, out_delay);
+				m_QB.push(0, out_delay);
+				m_QC.push(0, out_delay);
+				m_QD.push(1, out_delay);
 				break;
 			}
 

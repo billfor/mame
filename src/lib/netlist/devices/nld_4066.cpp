@@ -41,7 +41,7 @@ namespace netlist
 		nl_double low = NL_FCONST(0.45) * sup;
 		nl_double high = NL_FCONST(0.55) * sup;
 		nl_double in = m_control() - m_supply.vss();
-		nl_double rON = m_base_r * NL_FCONST(5.0) / sup;
+		nl_double rON = m_base_r() * NL_FCONST(5.0) / sup;
 		nl_double R = -1.0;
 
 		if (in < low)

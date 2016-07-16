@@ -49,7 +49,7 @@ namespace netlist
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5)
 		{
-			m_inc = netlist_time::from_double(1.0 / (m_freq.Value()*2.0));
+			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
 		}
 
 		NETLIB_RESETI()
@@ -59,7 +59,7 @@ namespace netlist
 
 		NETLIB_UPDATE_PARAMI()
 		{
-			m_inc = netlist_time::from_double(1.0 / (m_freq.Value()*2.0));
+			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
 		}
 
 		NETLIB_UPDATEI()
@@ -90,7 +90,7 @@ namespace netlist
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
 		{
-			m_inc = netlist_time::from_double(1.0 / (m_freq.Value()*2.0));
+			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
 
 			connect_late(m_feedback, m_Q);
 		}
@@ -121,13 +121,13 @@ namespace netlist
 		, m_cnt(*this, "m_cnt", 0)
 		, m_off(*this, "m_off", netlist_time::zero())
 		{
-			m_inc[0] = netlist_time::from_double(1.0 / (m_freq.Value()*2.0));
+			m_inc[0] = netlist_time::from_double(1.0 / (m_freq()*2.0));
 
 			connect_late(m_feedback, m_Q);
 			{
-				netlist_time base = netlist_time::from_double(1.0 / (m_freq.Value()*2.0));
-				plib::pstring_vector_t pat(m_pattern.Value(),",");
-				m_off = netlist_time::from_double(m_offset.Value());
+				netlist_time base = netlist_time::from_double(1.0 / (m_freq()*2.0));
+				plib::pstring_vector_t pat(m_pattern(),",");
+				m_off = netlist_time::from_double(m_offset());
 
 				unsigned long pati[256];
 				m_size = pat.size();
@@ -175,7 +175,7 @@ namespace netlist
 		/* make sure we get the family first */
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
-			set_logic_family(netlist().setup().family_from_model(m_FAMILY.Value()));
+			set_logic_family(netlist().setup().family_from_model(m_FAMILY()));
 		}
 
 		NETLIB_UPDATE_AFTER_PARAM_CHANGE()
@@ -220,7 +220,7 @@ namespace netlist
 		}
 		NETLIB_UPDATEI()
 		{
-			OUTANALOG(m_Q, 0.0);
+			m_Q.push(0.0);
 		}
 		NETLIB_RESETI() { }
 	protected:
@@ -276,13 +276,13 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_RIN.set(1.0 / m_p_RIN.Value(),0,0);
-			m_ROUT.set(1.0 / m_p_ROUT.Value(),0,0);
+			m_RIN.set(1.0 / m_p_RIN(),0,0);
+			m_ROUT.set(1.0 / m_p_ROUT(),0,0);
 		}
 
 		NETLIB_UPDATEI()
 		{
-			OUTANALOG(m_Q, m_I());
+			m_Q.push(m_I());
 		}
 
 	private:
@@ -309,10 +309,10 @@ namespace netlist
 		, m_func(*this, "FUNC", "")
 		, m_Q(*this, "Q")
 		{
-			for (int i=0; i < m_N; i++)
+			for (int i=0; i < m_N(); i++)
 				m_I.push_back(plib::make_unique<analog_input_t>(*this, plib::pfmt("A{1}")(i)));
 
-			plib::pstring_vector_t cmds(m_func.Value(), " ");
+			plib::pstring_vector_t cmds(m_func(), " ");
 			m_precompiled.clear();
 
 			for (std::size_t i=0; i < cmds.size(); i++)
@@ -338,7 +338,7 @@ namespace netlist
 					rc.m_cmd = PUSH_CONST;
 					rc.m_param = cmd.as_double(&err);
 					if (err)
-						netlist().log().fatal("nld_function: unknown/misformatted token <{1}> in <{2}>", cmd, m_func.Value());
+						netlist().log().fatal("nld_function: unknown/misformatted token <{1}> in <{2}>", cmd, m_func());
 				}
 				m_precompiled.push_back(rc);
 			}
@@ -404,7 +404,7 @@ namespace netlist
 		NETLIB_RESETI()
 		{
 			m_last_state = 0;
-			m_R.set_R(m_ROFF.Value());
+			m_R.set_R(m_ROFF());
 		}
 		//NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATEI();
@@ -473,9 +473,9 @@ namespace netlist
 		NETLIB_UPDATEI()
 		{
 			if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
-				m_Q(1, NLTIME_FROM_NS(1));
+				m_Q.push(1, NLTIME_FROM_NS(1));
 			else if (m_I.Q_Analog() < logic_family().m_low_thresh_V)
-				m_Q(0, NLTIME_FROM_NS(1));
+				m_Q.push(0, NLTIME_FROM_NS(1));
 			else
 			{
 				// do nothing

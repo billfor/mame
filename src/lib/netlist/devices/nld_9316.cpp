@@ -60,10 +60,10 @@ namespace netlist
 	public:
 		void update_outputs_all(const unsigned cnt, const netlist_time out_delay)
 		{
-			m_QA((cnt >> 0) & 1, out_delay);
-			m_QB((cnt >> 1) & 1, out_delay);
-			m_QC((cnt >> 2) & 1, out_delay);
-			m_QD((cnt >> 3) & 1, out_delay);
+			m_QA.push((cnt >> 0) & 1, out_delay);
+			m_QB.push((cnt >> 1) & 1, out_delay);
+			m_QC.push((cnt >> 2) & 1, out_delay);
+			m_QD.push((cnt >> 3) & 1, out_delay);
 		}
 
 		logic_input_t m_CLK;
@@ -165,11 +165,11 @@ namespace netlist
 			{
 				case MAXCNT - 1:
 					m_cnt = MAXCNT;
-					m_RC(m_ent, NLTIME_FROM_NS(27));
-					m_QA(1, NLTIME_FROM_NS(20));
+					m_RC.push(m_ent, NLTIME_FROM_NS(27));
+					m_QA.push(1, NLTIME_FROM_NS(20));
 					break;
 				case MAXCNT:
-					m_RC(0, NLTIME_FROM_NS(27));
+					m_RC.push(0, NLTIME_FROM_NS(27));
 					m_cnt = 0;
 					update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
 					break;
@@ -182,7 +182,7 @@ namespace netlist
 		else
 		{
 			m_cnt = m_ABCD->read_ABCD();
-			m_RC(m_ent & (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+			m_RC.push(m_ent & (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 			update_outputs_all(m_cnt, NLTIME_FROM_NS(22));
 		}
 	}
@@ -196,7 +196,7 @@ namespace netlist
 		if (((sub.m_loadq ^ 1) | (sub.m_ent & m_ENP())) & clrq)
 		{
 			sub.m_CLK.activate_lh();
-			sub.m_RC(sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+			sub.m_RC.push(sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 		}
 		else
 		{
@@ -207,7 +207,7 @@ namespace netlist
 				sub.m_cnt = 0;
 				//return;
 			}
-			sub.m_RC(sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+			sub.m_RC.push(sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 		}
 	}
 

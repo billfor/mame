@@ -107,11 +107,11 @@ namespace netlist
 		if (!m_G())
 		{
 			auto t = m_C[m_chan]();
-			m_Y(t, delay[t]);
+			m_Y.push(t, delay[t]);
 		}
 		else
 		{
-			m_Y(0, delay[0]);
+			m_Y.push(0, delay[0]);
 		}
 	}
 

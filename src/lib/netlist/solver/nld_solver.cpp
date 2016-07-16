@@ -369,15 +369,15 @@ void matrix_solver_t::setup_matrix()
 void matrix_solver_t::update_inputs()
 {
 	// avoid recursive calls. Inputs are updated outside this call
-	for (std::size_t i=0; i<m_inps.size(); i++)
-		m_inps[i]->set_Q(m_inps[i]->m_proxied_net->Q_Analog());
+	for (auto &inp : m_inps)
+		inp->push(inp->m_proxied_net->Q_Analog());
 }
 
 void matrix_solver_t::update_dynamic()
 {
 	/* update all non-linear devices  */
-	for (std::size_t i=0; i < m_dynamic_devices.size(); i++)
-		m_dynamic_devices[i]->update_terminals();
+	for (auto &dyn : m_dynamic_devices)
+		dyn->update_terminals();
 }
 
 void matrix_solver_t::reset()
@@ -591,7 +591,7 @@ NETLIB_UPDATE(solver)
 
 #if HAS_OPENMP && USE_OPENMP
 	const std::size_t t_cnt = m_mat_solvers.size();
-	if (m_parallel.Value())
+	if (m_parallel())
 	{
 		omp_set_num_threads(3);
 		//omp_set_dynamic(0);
@@ -638,48 +638,48 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(unsigned siz
 		return plib::make_unique<matrix_solver_direct2_t>(netlist(), solvername, &m_params);
 	else
 	{
-		if (static_cast<int>(size) >= m_gs_threshold)
+		if (static_cast<int>(size) >= m_gs_threshold())
 		{
-			if (pstring("SOR_MAT").equals(m_iterative_solver))
+			if (pstring("SOR_MAT").equals(m_iterative_solver()))
 			{
 				typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
 				return plib::make_unique<solver_sor_mat>(netlist(), solvername, &m_params, size);
 			}
-			else if (pstring("MAT_CR").equals(m_iterative_solver))
+			else if (pstring("MAT_CR").equals(m_iterative_solver()))
 			{
 				typedef matrix_solver_GCR_t<m_N,storage_N> solver_mat;
 				return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 			}
-			else if (pstring("MAT").equals(m_iterative_solver))
+			else if (pstring("MAT").equals(m_iterative_solver()))
 			{
 				typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
 				return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 			}
-			else if (pstring("SM").equals(m_iterative_solver))
+			else if (pstring("SM").equals(m_iterative_solver()))
 			{
 				/* Sherman-Morrison Formula */
 				typedef matrix_solver_sm_t<m_N,storage_N> solver_mat;
 				return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 			}
-			else if (pstring("W").equals(m_iterative_solver))
+			else if (pstring("W").equals(m_iterative_solver()))
 			{
 				/* Woodbury Formula */
 				typedef matrix_solver_w_t<m_N,storage_N> solver_mat;
 				return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 			}
-			else if (pstring("SOR").equals(m_iterative_solver))
+			else if (pstring("SOR").equals(m_iterative_solver()))
 			{
 				typedef matrix_solver_SOR_t<m_N,storage_N> solver_GS;
 				return plib::make_unique<solver_GS>(netlist(), solvername, &m_params, size);
 			}
-			else if (pstring("GMRES").equals(m_iterative_solver))
+			else if (pstring("GMRES").equals(m_iterative_solver()))
 			{
 				typedef matrix_solver_GMRES_t<m_N,storage_N> solver_GMRES;
 				return plib::make_unique<solver_GMRES>(netlist(), solvername, &m_params, size);
 			}
 			else
 			{
-				netlist().log().fatal("Unknown solver type: {1}\n", m_iterative_solver.Value());
+				netlist().log().fatal("Unknown solver type: {1}\n", m_iterative_solver());
 				return nullptr;
 			}
 		}
@@ -696,18 +696,18 @@ void NETLIB_NAME(solver)::post_start()
 	std::vector<analog_net_t::list_t> groups;
 	const bool use_specific = true;
 
-	m_params.m_pivot = m_pivot.Value();
-	m_params.m_accuracy = m_accuracy.Value();
+	m_params.m_pivot = m_pivot();
+	m_params.m_accuracy = m_accuracy();
 	/* FIXME: Throw when negative */
-	m_params.m_gs_loops = static_cast<unsigned>(m_gs_loops.Value());
-	m_params.m_nr_loops = static_cast<unsigned>(m_nr_loops.Value());
-	m_params.m_nt_sync_delay = netlist_time::from_double(m_sync_delay.Value());
-	m_params.m_lte = m_lte.Value();
-	m_params.m_sor = m_sor.Value();
+	m_params.m_gs_loops = static_cast<unsigned>(m_gs_loops());
+	m_params.m_nr_loops = static_cast<unsigned>(m_nr_loops());
+	m_params.m_nt_sync_delay = netlist_time::from_double(m_sync_delay());
+	m_params.m_lte = m_lte();
+	m_params.m_sor = m_sor();
 
-	m_params.m_min_timestep = m_min_timestep.Value();
-	m_params.m_dynamic = (m_dynamic.Value() == 1 ? true : false);
-	m_params.m_max_timestep = netlist_time::from_double(1.0 / m_freq.Value()).as_double();
+	m_params.m_min_timestep = m_min_timestep();
+	m_params.m_dynamic = (m_dynamic() == 1 ? true : false);
+	m_params.m_max_timestep = netlist_time::from_double(1.0 / m_freq()).as_double();
 
 	if (m_params.m_dynamic)
 	{
@@ -725,7 +725,7 @@ void NETLIB_NAME(solver)::post_start()
 	if (p != "")
 		m_params.m_log_stats = p.as_long();
 	else
-		m_params.m_log_stats = m_log_stats.Value();
+		m_params.m_log_stats = m_log_stats();
 
 	netlist().log().verbose("Scanning net groups ...");
 	// determine net groups

@@ -69,13 +69,13 @@ namespace netlist
 	{
 		if (!m_S())
 		{
-			m_Q(1, NLTIME_FROM_NS(20));
-			m_QQ(0, NLTIME_FROM_NS(20));
+			m_Q.push(1, NLTIME_FROM_NS(20));
+			m_QQ.push(0, NLTIME_FROM_NS(20));
 		}
 		else if (!m_R())
 		{
-			m_Q(0, NLTIME_FROM_NS(20));
-			m_QQ(1, NLTIME_FROM_NS(20));
+			m_Q.push(0, NLTIME_FROM_NS(20));
+			m_QQ.push(1, NLTIME_FROM_NS(20));
 		}
 	}
 
@@ -90,12 +90,12 @@ namespace netlist
 		if (nval && !m_last)
 		{
 			// L_to_H
-			m_Q(1, NLTIME_FROM_NS(static_cast<unsigned>(m_L_to_H.Value())));
+			m_Q.push(1, NLTIME_FROM_NS(static_cast<unsigned>(m_L_to_H())));
 		}
 		else if (!nval && m_last)
 		{
 			// H_to_L
-			m_Q(0, NLTIME_FROM_NS(static_cast<unsigned>(m_H_to_L.Value())));
+			m_Q.push(0, NLTIME_FROM_NS(static_cast<unsigned>(m_H_to_L())));
 		}
 		m_last = nval;
 	}

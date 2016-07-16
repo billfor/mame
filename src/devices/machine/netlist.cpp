@@ -604,7 +604,7 @@ void netlist_mame_sound_device_t::device_start()
 	for (int i=0; i < MAX_OUT; i++) m_out[i] = nullptr;
 	for (int i=0; i < m_num_outputs; i++)
 	{
-		int chan = outdevs[i]->m_channel.Value();
+		int chan = outdevs[i]->m_channel();
 
 		netlist().log().verbose("Output %d on channel %d", i, chan);
 
