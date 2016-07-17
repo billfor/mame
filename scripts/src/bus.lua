@@ -583,6 +583,8 @@ if (BUSES["ELECTRON"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/electron/exp.cpp",
 		MAME_DIR .. "src/devices/bus/electron/exp.h",
+		MAME_DIR .. "src/devices/bus/electron/m2105.cpp",
+		MAME_DIR .. "src/devices/bus/electron/m2105.h",
 	}
 end
 
@@ -831,6 +833,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/p1_hdc.h",
 		MAME_DIR .. "src/devices/bus/isa/p1_rom.cpp",
 		MAME_DIR .. "src/devices/bus/isa/p1_rom.h",
+		MAME_DIR .. "src/devices/bus/isa/p1_sound.cpp",
+		MAME_DIR .. "src/devices/bus/isa/p1_sound.h",
 		MAME_DIR .. "src/devices/bus/isa/mc1502_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/isa/mc1502_fdc.h",
 		MAME_DIR .. "src/devices/bus/isa/mc1502_rom.cpp",
@@ -1606,6 +1610,8 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/pty.h",
 		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/ser_mouse.h",
+		MAME_DIR .. "src/devices/bus/rs232/sparckbd.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/sparckbd.h",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/terminal.h",
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.cpp",
