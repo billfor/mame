@@ -12133,6 +12133,7 @@ feasgla                         // EAS: Elite A/S Challenger (Glasgow program, E
 fexcel                          //
 fexcelv                         //
 fscc9                           //
+fscc9b                          //
 fscc12                          //
 reversic                        //
 super9cc                        // SU9: Super 9 Sensory Chess Challenger (English)
@@ -27790,7 +27791,8 @@ truckk                          // 2000.06 Truck Kyousoukyoku (Metro)
 assault                         // (c) 1988
 assaultj                        // (c) 1988 (Japan)
 assaultp                        // (c) 1988 (Japan)
-bubbletr                        // (c) 1992
+bubbletr                        // (c) 1992 (World)
+bubbletrj                       // (c) 1992 (Japan)
 burnforc                        // (c) 1989 (Japan, new version)
 burnforco                       // (c) 1989 (Japan, old version)
 cosmogng                        // (c) 1991 (US)
