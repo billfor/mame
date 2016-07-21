@@ -20,7 +20,6 @@ namespace netlist
 {
 namespace detail
 {
-
 #if (USE_MEMPOOL)
 static plib::mempool pool(65536, 8);
 

@@ -15,7 +15,7 @@ namespace netlist
 	 *  This namespace contains all internal support classes not intended
 	 *  to be used outside of the core.
 	 */
-	namespace detail 
+	namespace detail
 	{
 	}
 }

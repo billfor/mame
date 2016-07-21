@@ -87,8 +87,8 @@ namespace netlist
 			if (!m_WEQ())
 			{
 				m_ram[adr >> 6] = (m_ram[adr >> 6]
-					 & ~(static_cast<uint_fast64_t>(1) << (adr & 0x3f)))
-					 | (static_cast<uint_fast64_t>(m_DIN()) << (adr & 0x3f));
+						& ~(static_cast<uint_fast64_t>(1) << (adr & 0x3f)))
+						| (static_cast<uint_fast64_t>(m_DIN()) << (adr & 0x3f));
 			}
 			m_DOUTQ.push(((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
 		}

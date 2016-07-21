@@ -77,12 +77,12 @@ private:
 
 	struct riff_format_t
 	{
-		char        		signature[4];
-		unsigned    		fmt_length;
-		short       		format_tag;
+		char                signature[4];
+		unsigned            fmt_length;
+		short               format_tag;
 		unsigned short      channels;
-		unsigned    		sample_rate;
-		unsigned    		bytes_per_second;
+		unsigned            sample_rate;
+		unsigned            bytes_per_second;
 		unsigned short      block_align;
 		unsigned short      bits_sample;
 	};

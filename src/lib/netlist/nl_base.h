@@ -42,13 +42,13 @@ class NETLIB_NAME(name) : public NETLIB_NAME(pclass)
  *  Used to start defining a netlist device class.
  *  The simplest device without inputs or outputs would look like this:
  *
- * 		NETLIB_OBJECT(base_dummy)
- * 		{
- * 		public:
- * 			NETLIB_CONSTRUCTOR(base_dummy) { }
- * 		};
+ *      NETLIB_OBJECT(base_dummy)
+ *      {
+ *      public:
+ *          NETLIB_CONSTRUCTOR(base_dummy) { }
+ *      };
  *
- *	Also refer to #NETLIB_CONSTRUCTOR.
+ *  Also refer to #NETLIB_CONSTRUCTOR.
  */
 #define NETLIB_OBJECT(name)                                                    \
 class NETLIB_NAME(name) : public device_t
@@ -67,45 +67,45 @@ class NETLIB_NAME(name) : public device_t
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name) \
 		: device_t(owner, name)
 
- /*! Used to define the destructor of a netlist device.
-  *  The use of a destructor for netlist device should normally not be necessary.
-  */
+	/*! Used to define the destructor of a netlist device.
+	*  The use of a destructor for netlist device should normally not be necessary.
+	*/
 #define NETLIB_DESTRUCTOR(name) public: virtual ~NETLIB_NAME(name)()
 
- /*! Define an extended constructor and add further parameters to it.
-  *  The macro allows to add further parameters to a device constructor. This is
-  *  normally used for sub-devices and system devices only.
-  */
+	/*! Define an extended constructor and add further parameters to it.
+	*  The macro allows to add further parameters to a device constructor. This is
+	*  normally used for sub-devices and system devices only.
+	*/
 #define NETLIB_CONSTRUCTOR_EX(cname, ...)                                      \
 	private: detail::family_setter_t m_famsetter;                              \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring name, __VA_ARGS__) \
 		: device_t(owner, name)
 
- /*! Add this to a device definition to mark the device as dynamic.
-  *  If this is added to device definition the device is treated as an analog
-  *  dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI is called on a each step
-  *  of the Newton-Raphson step of solving the linear equations.
-  */
+	/*! Add this to a device definition to mark the device as dynamic.
+	*  If this is added to device definition the device is treated as an analog
+	*  dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI is called on a each step
+	*  of the Newton-Raphson step of solving the linear equations.
+	*/
 #define NETLIB_DYNAMIC()                                                       \
 	public: virtual bool is_dynamic() const override { return true; }
 
- /*! Add this to a device definition to mark the device as a time-stepping device
-  *  and add code.
-  *  If this is added to device definition the device is treated as an analog
-  *  time-stepping device. Currently, only the capacitor device uses this. An other
-  *  example would be an inductor device.
-  *
-  *  Example:
-  *
-  *  	NETLIB_TIMESTEP()
-  *	 	{
-  *	 		// Gpar should support convergence
-  *	 		const nl_double G = m_C.Value() / step +  m_GParallel;
-  *	 		const nl_double I = -G * deltaV();
-  *	 		set(G, 0.0, I);
-  *	 	}
-  *
-  */
+	/*! Add this to a device definition to mark the device as a time-stepping device
+	*  and add code.
+	*  If this is added to device definition the device is treated as an analog
+	*  time-stepping device. Currently, only the capacitor device uses this. An other
+	*  example would be an inductor device.
+	*
+	*  Example:
+	*
+	*   NETLIB_TIMESTEP()
+	*       {
+	*           // Gpar should support convergence
+	*           const nl_double G = m_C.Value() / step +  m_GParallel;
+	*           const nl_double I = -G * deltaV();
+	*           set(G, 0.0, I);
+	*       }
+	*
+	*/
 #define NETLIB_TIMESTEP()                                                      \
 	public: virtual bool is_timestep() const override { return true; } \
 	public: virtual void step_time(const nl_double step) override
@@ -224,12 +224,12 @@ namespace netlist
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
 
-		nl_double m_low_thresh_V; 	//!< low input threshhold. If the input voltage is below this value, a "0" input is signalled
-		nl_double m_high_thresh_V;	//!< high input threshhold. If the input voltage is above this value, a "0" input is signalled
-		nl_double m_low_V;			//!< low output voltage. This voltage is output if the ouput is "0"
-		nl_double m_high_V;			//!< high output voltage. This voltage is output if the ouput is "1"
-		nl_double m_R_low;			//!< low output resistance. Value of series resistor used for low output
-		nl_double m_R_high;			//!< high output resistance. Value of series resistor used for high output
+		nl_double m_low_thresh_V;   //!< low input threshhold. If the input voltage is below this value, a "0" input is signalled
+		nl_double m_high_thresh_V;  //!< high input threshhold. If the input voltage is above this value, a "0" input is signalled
+		nl_double m_low_V;          //!< low output voltage. This voltage is output if the ouput is "0"
+		nl_double m_high_V;         //!< high output voltage. This voltage is output if the ouput is "1"
+		nl_double m_R_low;          //!< low output resistance. Value of series resistor used for low output
+		nl_double m_R_high;         //!< high output resistance. Value of series resistor used for high output
 	};
 
 	/*! Base class for devices, terminals, outputs and inputs which support
@@ -257,20 +257,20 @@ namespace netlist
 		const logic_family_desc_t *m_logic_family;
 	};
 
-	const logic_family_desc_t *family_TTL(); 		//*!< logic family for TTL devices.
-	const logic_family_desc_t *family_CD4XXX();		//*!< logic family for CD4XXX CMOS devices.
+	const logic_family_desc_t *family_TTL();        //*!< logic family for TTL devices.
+	const logic_family_desc_t *family_CD4XXX();     //*!< logic family for CD4XXX CMOS devices.
 
 	/*! A persistent variable template.
 	 *  Use the state_var template to define a variable whose value is saved.
 	 *  Within a device definition use
 	 *
-	 *  	NETLIB_OBJECT(abc)
-	 *  	{
-	 *  		NETLIB_CONSTRUCTOR(abc)
-	 *  		, m_var(*this, "myvar", 0)
-	 *  		...
-	 *  		state_var<unsigned> m_var;
-	 *  	}
+	 *      NETLIB_OBJECT(abc)
+	 *      {
+	 *          NETLIB_CONSTRUCTOR(abc)
+	 *          , m_var(*this, "myvar", 0)
+	 *          ...
+	 *          state_var<unsigned> m_var;
+	 *      }
 	 */
 
 	template <typename T>
@@ -279,9 +279,9 @@ namespace netlist
 	public:
 		template <typename O>
 		//! Constructor.
-		state_var(O &owner,				//!< owner must have a netlist() method.
-				const pstring name, 	//!< identifier/name for this state variable
-				const T &value			//!< Initial value after construction
+		state_var(O &owner,             //!< owner must have a netlist() method.
+				const pstring name,     //!< identifier/name for this state variable
+				const T &value          //!< Initial value after construction
 				);
 		//! Copy Constructor.
 		state_var(const state_var &rhs) NOEXCEPT = default;
@@ -639,12 +639,12 @@ namespace netlist
 		);
 
 		/*! returns voltage at terminal.
-		 *	\returns voltage at terminal.
+		 *  \returns voltage at terminal.
 		 */
 		nl_double operator()() const { return Q_Analog(); }
 
 		/*! returns voltage at terminal.
-		 *	\returns voltage at terminal.
+		 *  \returns voltage at terminal.
 		 */
 		nl_double Q_Analog() const;
 
@@ -851,7 +851,7 @@ namespace netlist
 	public:
 		param_template_t(device_t &device, const pstring name, const C val);
 
-		 const C operator()() const { return Value(); }
+			const C operator()() const { return Value(); }
 
 		void setTo(const C &param);
 		void initial(const C &val) { m_param = val; }
@@ -1153,17 +1153,17 @@ namespace netlist
 
 		void print_stats() const;
 
-		std::vector<plib::owned_ptr<core_device_t>> 						  m_devices;
+		std::vector<plib::owned_ptr<core_device_t>>                           m_devices;
 		/* sole use is to manage lifetime of net objects */
-		std::vector<plib::owned_ptr<detail::net_t>> 						  m_nets;
+		std::vector<plib::owned_ptr<detail::net_t>>                           m_nets;
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 
 	private:
-		plib::state_manager_t       		m_state;
+		plib::state_manager_t               m_state;
 		/* mostly rw */
-		netlist_time                		m_time;
-		detail::queue_t                		m_queue;
+		netlist_time                        m_time;
+		detail::queue_t                     m_queue;
 
 		/* mostly ro */
 
@@ -1172,16 +1172,16 @@ namespace netlist
 		devices::NETLIB_NAME(gnd) *          m_gnd;
 		devices::NETLIB_NAME(netlistparams) *m_params;
 
-		pstring 							m_name;
-		setup_t *							m_setup;
-		plib::plog_base<NL_DEBUG> 			m_log;
-		plib::dynlib *						m_lib; // external lib needs to be loaded as long as netlist exists
+		pstring                             m_name;
+		setup_t *                           m_setup;
+		plib::plog_base<NL_DEBUG>           m_log;
+		plib::dynlib *                      m_lib; // external lib needs to be loaded as long as netlist exists
 
 		// performance
-		nperftime_t		m_stat_mainloop;
-		nperfcount_t 	m_perf_out_processed;
-		nperfcount_t 	m_perf_inp_processed;
-		nperfcount_t 	m_perf_inp_active;
+		nperftime_t     m_stat_mainloop;
+		nperfcount_t    m_perf_out_processed;
+		nperfcount_t    m_perf_inp_processed;
+		nperfcount_t    m_perf_inp_active;
 	};
 
 	// -----------------------------------------------------------------------------

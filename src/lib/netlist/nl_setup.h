@@ -282,16 +282,16 @@ namespace netlist
 
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
 
-		netlist_t 									&m_netlist;
-		std::unordered_map<pstring, param_ref_t>  	m_params;
-		std::vector<link_t> 						m_links;
-		factory_list_t 								m_factory;
-		std::unordered_map<pstring, pstring> 		m_models;
+		netlist_t                                   &m_netlist;
+		std::unordered_map<pstring, param_ref_t>    m_params;
+		std::vector<link_t>                         m_links;
+		factory_list_t                              m_factory;
+		std::unordered_map<pstring, pstring>        m_models;
 
-		std::stack<pstring> 						m_namespace_stack;
-		source_t::list_t 							m_sources;
-		std::vector<plib::ppreprocessor::define_t> 	m_defines;
-		std::vector<pstring> 						m_lib;
+		std::stack<pstring>                         m_namespace_stack;
+		source_t::list_t                            m_sources;
+		std::vector<plib::ppreprocessor::define_t>  m_defines;
+		std::vector<pstring>                        m_lib;
 
 		unsigned m_proxy_cnt;
 		unsigned m_frontier_cnt;

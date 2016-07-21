@@ -224,7 +224,7 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 			}
 			break;
 			//default:
-			//	log().fatal("Parameter is not supported {1} : {2}\n", name, val);
+			//  log().fatal("Parameter is not supported {1} : {2}\n", name, val);
 		}
 	}
 	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
