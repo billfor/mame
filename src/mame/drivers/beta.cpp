@@ -71,14 +71,14 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( riot_pa_r );
-	DECLARE_WRITE8_MEMBER( riot_pa_w );
-	DECLARE_READ8_MEMBER( riot_pb_r );
-	DECLARE_WRITE8_MEMBER( riot_pb_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	uint8_t riot_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void riot_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t riot_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void riot_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( beta_eprom );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( beta_eprom );
+	image_init_result device_image_load_beta_eprom(device_image_interface &image);
+	void device_image_unload_beta_eprom(device_image_interface &image);
 
 	/* EPROM state */
 	int m_eprom_oe;
@@ -93,7 +93,7 @@ public:
 	uint8_t m_segment;
 
 	emu_timer *m_led_refresh_timer;
-	TIMER_CALLBACK_MEMBER(led_refresh);
+	void led_refresh(void *ptr, int32_t param);
 };
 
 
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_CHANGED_MEMBER( beta_state::trigger_reset )
+void beta_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -151,7 +151,7 @@ INPUT_PORTS_END
 
 /* M6532 Interface */
 
-TIMER_CALLBACK_MEMBER(beta_state::led_refresh)
+void beta_state::led_refresh(void *ptr, int32_t param)
 {
 	if (m_ls145_p < 6)
 	{
@@ -159,7 +159,7 @@ TIMER_CALLBACK_MEMBER(beta_state::led_refresh)
 	}
 }
 
-READ8_MEMBER( beta_state::riot_pa_r )
+uint8_t beta_state::riot_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -195,7 +195,7 @@ READ8_MEMBER( beta_state::riot_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( beta_state::riot_pa_w )
+void beta_state::riot_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -222,12 +222,12 @@ WRITE8_MEMBER( beta_state::riot_pa_w )
 	m_eprom_data = data;
 }
 
-READ8_MEMBER( beta_state::riot_pb_r )
+uint8_t beta_state::riot_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( beta_state::riot_pb_w )
+void beta_state::riot_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -282,7 +282,7 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 
 /* EPROM socket */
 
-DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
+image_init_result beta_state::device_image_load_beta_eprom(device_image_interface &image)
 {
 	uint32_t size = m_eprom->common_get_size("rom");
 
@@ -298,7 +298,7 @@ DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
+void beta_state::device_image_unload_beta_eprom(device_image_interface &image)
 {
 	if (image.software_entry() == nullptr)
 		image.fwrite(&m_eprom_rom[0], 0x800);

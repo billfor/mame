@@ -23,7 +23,7 @@ const device_type CPC_DKSPEECH = &device_creator<cpc_dkspeech_device>;
 //  device I/O handlers
 //-------------------------------------------------
 
-READ8_MEMBER(cpc_ssa1_device::ssa1_r)
+uint8_t cpc_ssa1_device::ssa1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0xff;
 
@@ -36,12 +36,12 @@ READ8_MEMBER(cpc_ssa1_device::ssa1_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cpc_ssa1_device::ssa1_w)
+void cpc_ssa1_device::ssa1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sp0256_device->ald_w(space, 0, data);
 }
 
-READ8_MEMBER(cpc_dkspeech_device::dkspeech_r)
+uint8_t cpc_dkspeech_device::dkspeech_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0xff;
 
@@ -53,27 +53,27 @@ READ8_MEMBER(cpc_dkspeech_device::dkspeech_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cpc_dkspeech_device::dkspeech_w)
+void cpc_dkspeech_device::dkspeech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sp0256_device->ald_w(space, 0, data & 0x3f);
 }
 
-WRITE_LINE_MEMBER(cpc_ssa1_device::lrq_cb)
+void cpc_ssa1_device::lrq_cb(int state)
 {
 	set_lrq(state);
 }
 
-WRITE_LINE_MEMBER(cpc_ssa1_device::sby_cb)
+void cpc_ssa1_device::sby_cb(int state)
 {
 	set_sby(state);
 }
 
-WRITE_LINE_MEMBER(cpc_dkspeech_device::lrq_cb)
+void cpc_dkspeech_device::lrq_cb(int state)
 {
 	set_lrq(state);
 }
 
-WRITE_LINE_MEMBER(cpc_dkspeech_device::sby_cb)
+void cpc_dkspeech_device::sby_cb(int state)
 {
 	set_sby(state);
 }

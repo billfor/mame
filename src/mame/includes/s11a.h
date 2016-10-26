@@ -18,10 +18,10 @@ public:
 		: s11_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bgbank_w);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_MACHINE_RESET(s11a);
-	DECLARE_DRIVER_INIT(s11a);
+	void bgbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dig0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void machine_reset_s11a();
+	void init_s11a();
 
 protected:
 

@@ -558,13 +558,13 @@ void itech8_state::update_interrupts(int periodic, int tms34061, int blitter)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(itech8_state::irq_off)
+void itech8_state::irq_off(void *ptr, int32_t param)
 {
 	update_interrupts(0, -1, -1);
 }
 
 
-INTERRUPT_GEN_MEMBER(itech8_state::generate_nmi)
+void itech8_state::generate_nmi(device_t &device)
 {
 	/* signal the NMI */
 	update_interrupts(1, -1, -1);
@@ -574,7 +574,7 @@ INTERRUPT_GEN_MEMBER(itech8_state::generate_nmi)
 }
 
 
-WRITE8_MEMBER(itech8_state::nmi_ack_w)
+void itech8_state::nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
 /*  m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);*/
@@ -591,7 +591,7 @@ WRITE8_MEMBER(itech8_state::nmi_ack_w)
 
 
 
-MACHINE_START_MEMBER(itech8_state,sstrike)
+void itech8_state::machine_start_sstrike()
 {
 	/* we need to update behind the beam as well */
 	m_behind_beam_update_timer = timer_alloc(TIMER_BEHIND_BEAM_UPDATE);
@@ -669,7 +669,7 @@ void itech8_state::device_timer(emu_timer &timer, device_timer_id id, int param,
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(itech8_state::behind_the_beam_update)
+void itech8_state::behind_the_beam_update(void *ptr, int32_t param)
 {
 	int scanline = param >> 8;
 	int interval = param & 0xff;
@@ -693,7 +693,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::behind_the_beam_update)
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::blitter_bank_w)
+void itech8_state::blitter_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
@@ -704,7 +704,7 @@ WRITE8_MEMBER(itech8_state::blitter_bank_w)
 }
 
 
-WRITE8_MEMBER(itech8_state::rimrockn_bank_w)
+void itech8_state::rimrockn_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* banking is controlled here instead of by the blitter output */
 	membank("bank1")->set_entry(data & 3);
@@ -718,7 +718,7 @@ WRITE8_MEMBER(itech8_state::rimrockn_bank_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(itech8_state::special_r)
+ioport_value itech8_state::special_r(ioport_field &field, void *param)
 {
 	return m_pia_portb_data & 0x01;
 }
@@ -730,14 +730,14 @@ CUSTOM_INPUT_MEMBER(itech8_state::special_r)
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::pia_porta_out)
+void itech8_state::pia_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("PIA port A write = %02x\n", data);
 	m_pia_porta_data = data;
 }
 
 
-WRITE8_MEMBER(itech8_state::pia_portb_out)
+void itech8_state::pia_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("PIA port B write = %02x\n", data);
 
@@ -751,7 +751,7 @@ WRITE8_MEMBER(itech8_state::pia_portb_out)
 }
 
 
-WRITE8_MEMBER(itech8_state::ym2203_portb_out)
+void itech8_state::ym2203_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("YM2203 port B write = %02x\n", data);
 
@@ -772,20 +772,20 @@ WRITE8_MEMBER(itech8_state::ym2203_portb_out)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(itech8_state::delayed_sound_data_w)
+void itech8_state::delayed_sound_data_w(void *ptr, int32_t param)
 {
 	m_sound_data = param;
 	m_soundcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(itech8_state::sound_data_w)
+void itech8_state::sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	synchronize(TIMER_DELAYED_SOUND_DATA, data);
 }
 
 
-WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
+void itech8_state::gtg2_sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* on the later GTG2 board, they swizzle the data lines */
 	data = ((data & 0x80) >> 7) |
@@ -796,14 +796,14 @@ WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
 }
 
 
-READ8_MEMBER(itech8_state::sound_data_r)
+uint8_t itech8_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	return m_sound_data;
 }
 
 
-WRITE8_MEMBER(itech8_state::grom_bank_w)
+void itech8_state::grom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_grom_bank = data;
 }
@@ -816,21 +816,21 @@ WRITE8_MEMBER(itech8_state::grom_bank_w)
  *
  *************************************/
 
-WRITE16_MEMBER(itech8_state::grom_bank16_w)
+void itech8_state::grom_bank16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_grom_bank = data >> 8;
 }
 
 
-WRITE16_MEMBER(itech8_state::display_page16_w)
+void itech8_state::display_page16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		page_w(space, 0, ~data >> 8);
 }
 
 
-WRITE16_MEMBER(itech8_state::palette16_w)
+void itech8_state::palette16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		palette_w(space, offset / 8, data >> 8);
@@ -1100,7 +1100,7 @@ INPUT_PORTS_END
 
 
 
-CUSTOM_INPUT_MEMBER(itech8_state::gtg_mux)
+ioport_value itech8_state::gtg_mux(ioport_field &field, void *param)
 {
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
@@ -1638,7 +1638,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(itech8_state::generate_tms34061_interrupt)
+void itech8_state::generate_tms34061_interrupt(int state)
 {
 	update_interrupts(-1, state, -1);
 
@@ -2642,7 +2642,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(itech8_state,grmatch)
+void itech8_state::init_grmatch()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(itech8_state::grmatch_palette_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(itech8_state::grmatch_xscroll_w),this));
@@ -2654,7 +2654,7 @@ DRIVER_INIT_MEMBER(itech8_state,grmatch)
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,slikshot)
+void itech8_state::init_slikshot()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x0180, 0x0180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x01cf, 0x01cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
@@ -2681,7 +2681,7 @@ DRIVER_INIT_MEMBER(itech8_state,slikshot)
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,sstrike)
+void itech8_state::init_sstrike()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x1180, 0x1180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler (0x11cf, 0x11cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
@@ -2689,31 +2689,31 @@ DRIVER_INIT_MEMBER(itech8_state,sstrike)
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,hstennis)
+void itech8_state::init_hstennis()
 {
 	m_visarea.set(0, 375, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,arligntn)
+void itech8_state::init_arligntn()
 {
 	m_visarea.set(16, 389, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,peggle)
+void itech8_state::init_peggle()
 {
 	m_visarea.set(18, 367, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,neckneck)
+void itech8_state::init_neckneck()
 {
 	m_visarea.set(8, 375, 0, 239);
 }
 
 
-DRIVER_INIT_MEMBER(itech8_state,rimrockn)
+void itech8_state::init_rimrockn()
 {
 	/* additional input ports */
 	m_maincpu->space(AS_PROGRAM).install_read_port (0x0161, 0x0161, "161");

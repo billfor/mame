@@ -56,13 +56,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pb_w );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_irq );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_res );
-	DECLARE_DIRECT_UPDATE_MEMBER(mpf1_direct_update_handler);
+	uint8_t ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void trigger_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void trigger_res(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	offs_t mpf1_direct_update_handler(direct_read_data &direct, offs_t address);
 
 	int m_break;
 	int m_m1;
@@ -70,9 +70,9 @@ public:
 	uint8_t m_lednum;
 
 	emu_timer *m_led_refresh_timer;
-	DECLARE_DRIVER_INIT(mpf1);
-	TIMER_CALLBACK_MEMBER(led_refresh);
-	TIMER_DEVICE_CALLBACK_MEMBER(check_halt_callback);
+	void init_mpf1();
+	void led_refresh(void *ptr, int32_t param);
+	void check_halt_callback(timer_device &timer, void *ptr, int32_t param);
 };
 
 #endif

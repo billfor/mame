@@ -75,7 +75,7 @@ const uint16_t dai_sound_device::s_noise_volume_table[] = {
 //  set_volume
 //-------------------------------------------------
 
-WRITE8_MEMBER(dai_sound_device::set_volume)
+void dai_sound_device::set_volume(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mixer_channel->update();
 
@@ -96,19 +96,19 @@ WRITE8_MEMBER(dai_sound_device::set_volume)
 //  PIT callbacks
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(dai_sound_device::set_input_ch0)
+void dai_sound_device::set_input_ch0(int state)
 {
 	m_mixer_channel->update();
 	m_dai_input[0] = state;
 }
 
-WRITE_LINE_MEMBER(dai_sound_device::set_input_ch1)
+void dai_sound_device::set_input_ch1(int state)
 {
 	m_mixer_channel->update();
 	m_dai_input[1] = state;
 }
 
-WRITE_LINE_MEMBER(dai_sound_device::set_input_ch2)
+void dai_sound_device::set_input_ch2(int state)
 {
 	m_mixer_channel->update();
 	m_dai_input[2] = state;

@@ -77,7 +77,7 @@ void ohci_usb_controller::device_reset()
 {
 }
 
-READ32_MEMBER(ohci_usb_controller::read)
+uint32_t ohci_usb_controller::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret;
 
@@ -91,7 +91,7 @@ READ32_MEMBER(ohci_usb_controller::read)
 	return ret;
 }
 
-WRITE32_MEMBER(ohci_usb_controller::write)
+void ohci_usb_controller::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = ohcist.hc_regs[offset];
 
@@ -1525,7 +1525,7 @@ ioport_constructor ohci_game_controller_device::device_input_ports() const
 	return INPUT_PORTS_NAME(xbox_controller);
 }
 
-WRITE_LINE_MEMBER(xbox_base_state::xbox_ohci_usb_interrupt_changed)
+void xbox_base_state::xbox_ohci_usb_interrupt_changed(int state)
 {
 	xbox_base_devs.pic8259_1->ir1_w(state);
 }

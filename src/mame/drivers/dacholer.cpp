@@ -81,37 +81,37 @@ public:
 	uint8_t m_music_interrupt_enable;
 	uint8_t m_snd_ack;
 
-	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
-	DECLARE_WRITE8_MEMBER(bg_scroll_y_w);
-	DECLARE_WRITE8_MEMBER(background_w);
-	DECLARE_WRITE8_MEMBER(foreground_w);
-	DECLARE_WRITE8_MEMBER(bg_bank_w);
-	DECLARE_WRITE8_MEMBER(coins_w);
-	DECLARE_WRITE8_MEMBER(snd_w);
-	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
-	DECLARE_WRITE8_MEMBER(snd_ack_w);
-	DECLARE_WRITE8_MEMBER(snd_irq_w);
-	DECLARE_WRITE8_MEMBER(music_irq_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void bg_scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void background_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void foreground_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void main_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snd_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snd_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void music_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value snd_ack_r(ioport_field &field, void *param);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(dacholer);
+	void palette_init_dacholer(palette_device &palette);
 	uint32_t screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_irq);
+	void sound_irq(device_t &device);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 };
 
-TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
+void dacholer_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1, m_bgvideoram[tile_index] + m_bg_bank * 0x100, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(dacholer_state::get_fg_tile_info)
+void dacholer_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_fgvideoram[tile_index], 0, 0);
 }
@@ -124,12 +124,12 @@ void dacholer_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-WRITE8_MEMBER(dacholer_state::bg_scroll_x_w)
+void dacholer_state::bg_scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_x = data;
 }
 
-WRITE8_MEMBER(dacholer_state::bg_scroll_y_w)
+void dacholer_state::bg_scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_y = data;
 }
@@ -184,19 +184,19 @@ uint32_t dacholer_state::screen_update_dacholer(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(dacholer_state::background_w)
+void dacholer_state::background_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(dacholer_state::foreground_w)
+void dacholer_state::foreground_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(dacholer_state::bg_bank_w)
+void dacholer_state::bg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 3) != m_bg_bank)
 	{
@@ -208,7 +208,7 @@ WRITE8_MEMBER(dacholer_state::bg_bank_w)
 
 }
 
-WRITE8_MEMBER(dacholer_state::coins_w)
+void dacholer_state::coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -217,13 +217,13 @@ WRITE8_MEMBER(dacholer_state::coins_w)
 	output().set_led_value(1, data & 8);
 }
 
-WRITE8_MEMBER(dacholer_state::snd_w)
+void dacholer_state::snd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
+void dacholer_state::main_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -272,28 +272,28 @@ static ADDRESS_MAP_START( itaten_snd_map, AS_PROGRAM, 8, dacholer_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(dacholer_state::adpcm_w)
+void dacholer_state::adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_data = data;
 	m_msm_toggle = 0;
 }
 
-WRITE8_MEMBER(dacholer_state::snd_ack_w)
+void dacholer_state::snd_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_ack = data;
 }
 
-CUSTOM_INPUT_MEMBER(dacholer_state::snd_ack_r)
+ioport_value dacholer_state::snd_ack_r(ioport_field &field, void *param)
 {
 	return m_snd_ack;       //guess ...
 }
 
-WRITE8_MEMBER(dacholer_state::snd_irq_w)
+void dacholer_state::snd_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_interrupt_enable = data;
 }
 
-WRITE8_MEMBER(dacholer_state::music_irq_w)
+void dacholer_state::music_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_music_interrupt_enable = data;
 }
@@ -561,7 +561,7 @@ static GFXDECODE_START( itaten )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(dacholer_state::sound_irq)
+void dacholer_state::sound_irq(device_t &device)
 {
 	if (m_music_interrupt_enable == 1)
 	{
@@ -569,7 +569,7 @@ INTERRUPT_GEN_MEMBER(dacholer_state::sound_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
+void dacholer_state::adpcm_int(int state)
 {
 	if (m_snd_interrupt_enable == 1 || (m_snd_interrupt_enable == 0 && m_msm_toggle == 1))
 	{
@@ -605,7 +605,7 @@ void dacholer_state::machine_reset()
 }
 
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-PALETTE_INIT_MEMBER(dacholer_state, dacholer)
+void dacholer_state::palette_init_dacholer(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };

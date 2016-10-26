@@ -51,37 +51,37 @@ public:
 	int m_sy1;
 	int m_sy2;
 
-	DECLARE_READ8_MEMBER(bankselect_r);
-	DECLARE_READ8_MEMBER(vram_page_select_r);
-	DECLARE_WRITE8_MEMBER(vram_page_select_w);
-	DECLARE_WRITE8_MEMBER(fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(sprite_col_w);
-	DECLARE_WRITE8_MEMBER(bg_col_w);
-	DECLARE_WRITE8_MEMBER(tx_col_w);
+	uint8_t bankselect_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vram_page_select_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_page_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sprite_col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tx_col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* psychic5 specific */
-	DECLARE_WRITE8_MEMBER(psychic5_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(psychic5_bankselect_w);
-	DECLARE_WRITE8_MEMBER(psychic5_title_screen_w);
+	void psychic5_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void psychic5_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void psychic5_title_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* bombsa specific */
-	DECLARE_WRITE8_MEMBER(bombsa_bankselect_w);
-	DECLARE_WRITE8_MEMBER(bombsa_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(bombsa_unknown_w);
+	void bombsa_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bombsa_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bombsa_unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_START(psychic5);
-	DECLARE_MACHINE_START(bombsa);
+	void machine_start_psychic5();
+	void machine_start_bombsa();
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(psychic5);
-	DECLARE_VIDEO_START(bombsa);
-	DECLARE_VIDEO_RESET(psychic5);
+	void video_start_psychic5();
+	void video_start_bombsa();
+	void video_reset_psychic5();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 
 	uint32_t screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bombsa(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

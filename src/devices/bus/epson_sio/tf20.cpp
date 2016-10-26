@@ -212,13 +212,13 @@ void epson_tf20_device::device_timer(emu_timer &timer, device_timer_id id, int p
 //  irq vector callback
 //-------------------------------------------------
 
-IRQ_CALLBACK_MEMBER( epson_tf20_device::irq_callback )
+int epson_tf20_device::irq_callback(device_t &device, int irqline)
 {
 	return 0x00;
 }
 
 // a read from this location disables the rom
-READ8_MEMBER( epson_tf20_device::rom_disable_r )
+uint8_t epson_tf20_device::rom_disable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// switch in ram
 	m_cpu->space(AS_PROGRAM).install_ram(0x0000, 0x7fff, m_ram->pointer());
@@ -234,7 +234,7 @@ READ8_MEMBER( epson_tf20_device::rom_disable_r )
 //  fdc interrupt
 //-------------------------------------------------
 
-READ8_MEMBER( epson_tf20_device::upd765_tc_r )
+uint8_t epson_tf20_device::upd765_tc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: upd765_tc_r\n", space.machine().describe_context());
 
@@ -245,7 +245,7 @@ READ8_MEMBER( epson_tf20_device::upd765_tc_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( epson_tf20_device::fdc_control_w )
+void epson_tf20_device::fdc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: tf20_fdc_control_w(%02x)\n", space.machine().describe_context(), data);
 
@@ -263,7 +263,7 @@ WRITE8_MEMBER( epson_tf20_device::fdc_control_w )
 //  rxc_w - rx input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_tf20_device::rxc_w )
+void epson_tf20_device::rxc_w(int state)
 {
 	m_rxc = state;
 	m_sio_input->rx_w(m_txda && m_rxc);
@@ -273,7 +273,7 @@ WRITE_LINE_MEMBER( epson_tf20_device::rxc_w )
 //  pinc_w - pin input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_tf20_device::pinc_w )
+void epson_tf20_device::pinc_w(int state)
 {
 	m_pinc = state;
 	m_sio_input->pin_w(!m_dtra || m_pinc);
@@ -283,7 +283,7 @@ WRITE_LINE_MEMBER( epson_tf20_device::pinc_w )
 //  txda_w - rx output
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_tf20_device::txda_w )
+void epson_tf20_device::txda_w(int state)
 {
 	m_txda = state;
 	m_sio_input->rx_w(m_txda && m_rxc);
@@ -293,7 +293,7 @@ WRITE_LINE_MEMBER( epson_tf20_device::txda_w )
 //  dtra_w - pin output
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_tf20_device::dtra_w )
+void epson_tf20_device::dtra_w(int state)
 {
 	m_dtra = state;
 	m_sio_input->pin_w(!m_dtra || m_pinc);

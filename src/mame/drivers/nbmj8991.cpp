@@ -40,7 +40,7 @@ Notes:
 #include "sound/volt_reg.h"
 
 
-WRITE8_MEMBER(nbmj8991_state::soundbank_w)
+void nbmj8991_state::soundbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x80)) m_soundlatch->clear_w(space, 0, 0);
 	membank("bank1")->set_entry(data & 0x03);
@@ -55,7 +55,7 @@ void nbmj8991_state::machine_reset()
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8991_state,finalbny)
+void nbmj8991_state::init_finalbny()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
@@ -63,7 +63,7 @@ DRIVER_INIT_MEMBER(nbmj8991_state,finalbny)
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(nbmj8991_state,galkaika)
+void nbmj8991_state::init_galkaika()
 {
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -73,7 +73,7 @@ DRIVER_INIT_MEMBER(nbmj8991_state,galkaika)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8991_state,tokyogal)
+void nbmj8991_state::init_tokyogal()
 {
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -83,7 +83,7 @@ DRIVER_INIT_MEMBER(nbmj8991_state,tokyogal)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8991_state,tokimbsj)
+void nbmj8991_state::init_tokimbsj()
 {
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( nbmj8991_sound_io_map, AS_IO, 8, nbmj8991_state )
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("fmsnd", ym3812_device, write)
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER( nbmj8991_state::nb1413m3_busyflag_r )
+ioport_value nbmj8991_state::nb1413m3_busyflag_r(ioport_field &field, void *param)
 {
 	return m_nb1413m3->m_busyflag & 0x01;
 }

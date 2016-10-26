@@ -306,7 +306,7 @@ space. This mapper uses 32KB sized banks.
 #define SGB_FRAMES_PER_SECOND   61.17
 
 
-READ8_MEMBER(gb_state::gb_cart_r)
+uint8_t gb_state::gb_cart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_bios_disable && m_cartslot)
 		return m_cartslot->read_rom(space, offset);
@@ -336,7 +336,7 @@ READ8_MEMBER(gb_state::gb_cart_r)
 	}
 }
 
-READ8_MEMBER(gb_state::gbc_cart_r)
+uint8_t gb_state::gbc_cart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_bios_disable && m_cartslot)
 		return m_cartslot->read_rom(space, offset);
@@ -371,13 +371,13 @@ READ8_MEMBER(gb_state::gbc_cart_r)
 	}
 }
 
-WRITE8_MEMBER(gb_state::gb_bank_w)
+void gb_state::gb_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cartslot)
 		m_cartslot->write_bank(space, offset, data);
 }
 
-READ8_MEMBER(gb_state::gb_ram_r)
+uint8_t gb_state::gb_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cartslot)
 		return m_cartslot->read_ram(space, offset);
@@ -385,23 +385,23 @@ READ8_MEMBER(gb_state::gb_ram_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(gb_state::gb_ram_w)
+void gb_state::gb_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cartslot)
 		m_cartslot->write_ram(space, offset, data);
 }
 
-READ8_MEMBER(gb_state::gb_echo_r)
+uint8_t gb_state::gb_echo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return space.read_byte(0xc000 + offset);
 }
 
-WRITE8_MEMBER(gb_state::gb_echo_w)
+void gb_state::gb_echo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	return space.write_byte(0xc000 + offset, data);
 }
 
-READ8_MEMBER(megaduck_state::cart_r)
+uint8_t megaduck_state::cart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cartslot)
 		return m_cartslot->read_rom(space, offset);
@@ -409,13 +409,13 @@ READ8_MEMBER(megaduck_state::cart_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(megaduck_state::bank1_w)
+void megaduck_state::bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cartslot)
 		m_cartslot->write_bank(space, offset, data);
 }
 
-WRITE8_MEMBER(megaduck_state::bank2_w)
+void megaduck_state::bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cartslot)
 		m_cartslot->write_ram(space, offset, data); /* used for bankswitch, but we re-use GB name */
@@ -578,19 +578,19 @@ static const unsigned char palette_megaduck[] = {
 };
 
 /* Initialise the palettes */
-PALETTE_INIT_MEMBER(gb_state, gb)
+void gb_state::palette_init_gb(palette_device &palette)
 {
 	for (int i = 0; i < 4; i++)
 		palette.set_pen_color(i, palette_gb[i * 3 + 0], palette_gb[i * 3 + 1], palette_gb[i * 3 + 2]);
 }
 
-PALETTE_INIT_MEMBER(gb_state, gbp)
+void gb_state::palette_init_gbp(palette_device &palette)
 {
 	for (int i = 0; i < 4; i++)
 		palette.set_pen_color(i, palette_gb[(i + 4) * 3 + 0], palette_gb[(i + 4) * 3 + 1], palette_gb[(i + 4) * 3 + 2]);
 }
 
-PALETTE_INIT_MEMBER(gb_state, sgb)
+void gb_state::palette_init_sgb(palette_device &palette)
 {
 	int r, g, b;
 
@@ -603,7 +603,7 @@ PALETTE_INIT_MEMBER(gb_state, sgb)
 	}
 }
 
-PALETTE_INIT_MEMBER(gb_state, gbc)
+void gb_state::palette_init_gbc(palette_device &palette)
 {
 	int r, g, b;
 
@@ -616,7 +616,7 @@ PALETTE_INIT_MEMBER(gb_state, gbc)
 	}
 }
 
-PALETTE_INIT_MEMBER(megaduck_state, megaduck)
+void megaduck_state::palette_init_megaduck(palette_device &palette)
 {
 	for (int i = 0; i < 4; i++)
 		palette.set_pen_color(i, palette_megaduck[i * 3 + 0], palette_megaduck[i * 3 + 1], palette_megaduck[i * 3 + 2]);

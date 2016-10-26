@@ -165,7 +165,7 @@ void thomson_state::thom_set_lightpen_callback( int nb )
 	m_thom_lightpen_nb = nb;
 }
 
-TIMER_CALLBACK_MEMBER( thomson_state::thom_lightpen_step )
+void thomson_state::thom_lightpen_step(void *ptr, int32_t param)
 {
 	int step = param;
 
@@ -792,7 +792,7 @@ static const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] =
 /* called at the start of each scanline in the active area, just after
    left border (-1<=y<199), and also after the last scanline (y=199)
 */
-TIMER_CALLBACK_MEMBER( thomson_state::thom_scanline_start )
+void thomson_state::thom_scanline_start(void *ptr, int32_t param)
 {
 	int y = param;
 
@@ -1009,7 +1009,7 @@ uint32_t thomson_state::screen_update_thom(screen_device &screen, bitmap_ind16 &
 /* -------------- frame start ------------------ */
 
 
-TIMER_CALLBACK_MEMBER( thomson_state::thom_set_init )
+void thomson_state::thom_set_init(void *ptr, int32_t param)
 {
 	int init = param;
 	LOG (( "%f thom_set_init: %i, at line %i col %i\n", machine().time().as_double(), init, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
@@ -1117,7 +1117,7 @@ static const uint16_t mo5_pal_init[16] =
 };
 
 
-VIDEO_START_MEMBER( thomson_state, thom )
+void thomson_state::video_start_thom()
 {
 	LOG (( "thom: video start called\n" ));
 
@@ -1197,7 +1197,7 @@ void thomson_state::thom_configure_palette(double gamma, const uint16_t* pal, pa
 }
 
 
-PALETTE_INIT_MEMBER(thomson_state, thom)
+void thomson_state::palette_init_thom(palette_device &palette)
 {
 	LOG (( "thom: palette init called\n" ));
 
@@ -1213,7 +1213,7 @@ PALETTE_INIT_MEMBER(thomson_state, thom)
 		thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
 }
 
-PALETTE_INIT_MEMBER(thomson_state, mo5)
+void thomson_state::palette_init_mo5(palette_device &palette)
 {
 	LOG (( "thom: MO5 palette init called\n" ));
 
@@ -1231,7 +1231,7 @@ PALETTE_INIT_MEMBER(thomson_state, mo5)
 
 
 /* write to video memory through addresses 0x4000-0x5fff */
-WRITE8_MEMBER( thomson_state::to7_vram_w )
+void thomson_state::to7_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	assert( offset < 0x2000 );
 	/* force two topmost color bits to 1 */
@@ -1270,7 +1270,7 @@ unsigned thomson_state::to7_lightpen_gpl ( int decx, int decy )
 
 /* write to video memory through addresses 0x4000-0x5fff (TO)
    or 0x0000-0x1fff (MO) */
-WRITE8_MEMBER( thomson_state::to770_vram_w )
+void thomson_state::to770_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	assert( offset < 0x2000 );
 	if ( m_thom_vram[ offset + m_thom_mode_point ] == data )
@@ -1289,7 +1289,7 @@ WRITE8_MEMBER( thomson_state::to770_vram_w )
 
 /* write to video memory through system space (always page 1) */
 
-WRITE8_MEMBER( thomson_state::to8_sys_lo_w )
+void thomson_state::to8_sys_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t* dst = m_thom_vram + offset + 0x6000;
 	assert( offset < 0x2000 );
@@ -1302,7 +1302,7 @@ WRITE8_MEMBER( thomson_state::to8_sys_lo_w )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_sys_hi_w )
+void thomson_state::to8_sys_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t* dst = m_thom_vram + offset + 0x4000;
 	assert( offset < 0x2000 );
@@ -1316,7 +1316,7 @@ WRITE8_MEMBER( thomson_state::to8_sys_hi_w )
 
 /* write to video memory through data space */
 
-WRITE8_MEMBER( thomson_state::to8_data_lo_w )
+void thomson_state::to8_data_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage + 0x2000 ) & m_ram->mask() );
 	assert( offset < 0x2000 );
@@ -1331,7 +1331,7 @@ WRITE8_MEMBER( thomson_state::to8_data_lo_w )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_data_hi_w )
+void thomson_state::to8_data_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_data_vpage ) & m_ram->mask() );
 	assert( offset < 0x2000 );
@@ -1347,7 +1347,7 @@ WRITE8_MEMBER( thomson_state::to8_data_hi_w )
 
 
 /* write to video memory page through cartridge addresses space */
-WRITE8_MEMBER( thomson_state::to8_vcart_w )
+void thomson_state::to8_vcart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x4000 );
@@ -1360,7 +1360,7 @@ WRITE8_MEMBER( thomson_state::to8_vcart_w )
 	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = 1;
 }
 
-WRITE8_MEMBER( thomson_state::mo6_vcart_lo_w )
+void thomson_state::mo6_vcart_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x3000 + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x1000 );
@@ -1373,7 +1373,7 @@ WRITE8_MEMBER( thomson_state::mo6_vcart_lo_w )
 	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = 1;
 }
 
-WRITE8_MEMBER( thomson_state::mo6_vcart_hi_w )
+void thomson_state::mo6_vcart_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
 	assert( offset < 0x3000 );

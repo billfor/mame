@@ -15,7 +15,7 @@ Video hardware
 #include "includes/quizdna.h"
 
 
-TILE_GET_INFO_MEMBER(quizdna_state::get_bg_tile_info)
+void quizdna_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_ram[tile_index*2] + m_bg_ram[tile_index*2+1]*0x100 ;
 	int col = m_bg_ram[tile_index*2+0x1000] & 0x7f;
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(quizdna_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, col, 0);
 }
 
-TILE_GET_INFO_MEMBER(quizdna_state::get_fg_tile_info)
+void quizdna_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code,col,x,y;
 	uint8_t *FG = memregion("user1")->base();
@@ -68,7 +68,7 @@ void quizdna_state::video_start()
 	save_item(NAME(m_video_enable));
 }
 
-WRITE8_MEMBER(quizdna_state::bg_ram_w)
+void quizdna_state::bg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bg_ram[offset] = data;
@@ -77,7 +77,7 @@ WRITE8_MEMBER(quizdna_state::bg_ram_w)
 	m_bg_tilemap->mark_tile_dirty((offset & 0xfff) / 2 );
 }
 
-WRITE8_MEMBER(quizdna_state::fg_ram_w)
+void quizdna_state::fg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	int offs = offset & 0xfff;
@@ -91,12 +91,12 @@ WRITE8_MEMBER(quizdna_state::fg_ram_w)
 		m_fg_tilemap->mark_tile_dirty(((offs/2) & 0x1f) + i*0x20 );
 }
 
-WRITE8_MEMBER(quizdna_state::bg_yscroll_w)
+void quizdna_state::bg_yscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolldy(255-data, 255-data+1 );
 }
 
-WRITE8_MEMBER(quizdna_state::bg_xscroll_w)
+void quizdna_state::bg_xscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x;
 	m_bg_xscroll[offset] = data;
@@ -105,7 +105,7 @@ WRITE8_MEMBER(quizdna_state::bg_xscroll_w)
 	m_bg_tilemap->set_scrolldx(x+64, x-64+10 );
 }
 
-WRITE8_MEMBER(quizdna_state::screen_ctrl_w)
+void quizdna_state::screen_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int tmp = (data & 0x10) >> 4;
 	m_video_enable = data & 0x20;
@@ -121,7 +121,7 @@ WRITE8_MEMBER(quizdna_state::screen_ctrl_w)
 	m_fg_tilemap->set_scrolldx(64, -64 +16);
 }
 
-WRITE8_MEMBER(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)
+void quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r,g,b,d0,d1;
 	int offs = offset & ~1;

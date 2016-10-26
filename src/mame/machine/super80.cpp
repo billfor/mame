@@ -8,13 +8,13 @@
 /**************************** PIO ******************************************************************************/
 
 
-WRITE8_MEMBER( super80_state::pio_port_a_w )
+void super80_state::pio_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data;
 	m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff)); // refresh kbd int
 }
 
-READ8_MEMBER( super80_state::pio_port_b_r )
+uint8_t super80_state::pio_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -53,7 +53,7 @@ void super80_state::super80_cassette_motor( bool motor_state )
 
 
 // If normal keyboard scan has stopped, then do a scan to allow the interrupt key sequence
-TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_k )
+void super80_state::timer_k(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_key_pressed)
 		m_key_pressed--;
@@ -72,7 +72,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_k )
     bit 0 = original system (U79 and U1)
     bit 1 = MDS fast system
     bit 2 = CA3140 */
-TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_p )
+void super80_state::timer_p(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t cass_ws=0;
 
@@ -89,12 +89,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_p )
 }
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER(super80_state::super80_reset)
+void super80_state::super80_reset(void *ptr, int32_t param)
 {
 	membank("boot")->set_entry(0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_h )
+void super80_state::timer_h(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t go_fast = 0;
 	if ( (!BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 1)) )    /* bit 2 of port F0 is low, OR user turned on config switch */
@@ -136,13 +136,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_h )
 
 /**************************** I/O PORTS *****************************************************************/
 
-READ8_MEMBER( super80_state::port3e_r )
+uint8_t super80_state::port3e_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xF8 | (m_fdc->intrq_r() << 0) | (m_fdc->drq_r() << 1) | 4;
 }
 
 // UFDC board can support 4 drives; we support 2
-WRITE8_MEMBER( super80_state::port3f_w )
+void super80_state::port3f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// m_fdc->58(BIT(data, 0));   5/8 pin not emulated in wd_fdc
 	m_fdc->enmf_w(BIT(data,1));
@@ -164,7 +164,7 @@ WRITE8_MEMBER( super80_state::port3f_w )
 	m_fdc->dden_w(BIT(data, 7));
 }
 
-READ8_MEMBER( super80_state::super80_f2_r )
+uint8_t super80_state::super80_f2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_io_dsw->read() & 0xf0;  // dip switches on pcb
 	data |= m_cass_data[2];         // bit 0 = output of U1, bit 1 = MDS cass state, bit 2 = current wave_state
@@ -172,7 +172,7 @@ READ8_MEMBER( super80_state::super80_f2_r )
 	return data;
 }
 
-WRITE8_MEMBER( super80_state::super80_dc_w )
+void super80_state::super80_dc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* hardware strobe driven from port select, bit 7..0 = data */
 	m_cent_data_out->write(space, 0, data);
@@ -181,7 +181,7 @@ WRITE8_MEMBER( super80_state::super80_dc_w )
 }
 
 
-WRITE8_MEMBER( super80_state::super80_f0_w )
+void super80_state::super80_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bits = data ^ m_last_data;
 	m_portf0 = data;
@@ -192,7 +192,7 @@ WRITE8_MEMBER( super80_state::super80_f0_w )
 	m_last_data = data;
 }
 
-WRITE8_MEMBER( super80_state::super80r_f0_w )
+void super80_state::super80r_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bits = data ^ m_last_data;
 	m_portf0 = data | 0x14;
@@ -205,7 +205,7 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 
 /**************************** BASIC MACHINE CONSTRUCTION ***********************************************************/
 
-MACHINE_RESET_MEMBER( super80_state, super80 )
+void super80_state::machine_reset_super80()
 {
 	m_portf0 = 0; // must be 0 like real machine, or banking breaks on 32-col systems
 	m_keylatch = 0xff;
@@ -215,7 +215,7 @@ MACHINE_RESET_MEMBER( super80_state, super80 )
 	membank("boot")->set_entry(1);
 }
 
-MACHINE_RESET_MEMBER( super80_state, super80r )
+void super80_state::machine_reset_super80r()
 {
 	m_portf0 = 0x14;
 	m_keylatch = 0xff;
@@ -225,7 +225,7 @@ MACHINE_RESET_MEMBER( super80_state, super80r )
 	membank("boot")->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER( super80_state,super80 )
+void super80_state::init_super80()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);

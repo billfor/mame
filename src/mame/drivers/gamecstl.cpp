@@ -88,10 +88,10 @@ public:
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
 
-	DECLARE_WRITE32_MEMBER(pnp_config_w);
-	DECLARE_WRITE32_MEMBER(pnp_data_w);
-	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_DRIVER_INIT(gamecstl);
+	void pnp_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void pnp_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void bios_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void init_gamecstl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -308,7 +308,7 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 }
 
 // ISA Plug-n-Play
-WRITE32_MEMBER(gamecstl_state::pnp_config_w)
+void gamecstl_state::pnp_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -316,7 +316,7 @@ WRITE32_MEMBER(gamecstl_state::pnp_config_w)
 	}
 }
 
-WRITE32_MEMBER(gamecstl_state::pnp_data_w)
+void gamecstl_state::pnp_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -326,7 +326,7 @@ WRITE32_MEMBER(gamecstl_state::pnp_data_w)
 
 
 
-WRITE32_MEMBER(gamecstl_state::bios_ram_w)
+void gamecstl_state::bios_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -458,7 +458,7 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(gamecstl_state,gamecstl)
+void gamecstl_state::init_gamecstl()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
 

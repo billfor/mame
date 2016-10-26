@@ -29,14 +29,14 @@ TODO:
 #include "includes/mjkjidai.h"
 
 
-WRITE8_MEMBER(mjkjidai_state::adpcm_w)
+void mjkjidai_state::adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_pos = (data & 0x07) * 0x1000 * 2;
 	m_adpcm_end = m_adpcm_pos + 0x1000 * 2;
 	m_msm->reset_w(0);
 }
 
-WRITE_LINE_MEMBER(mjkjidai_state::adpcm_int)
+void mjkjidai_state::adpcm_int(int state)
 {
 	if (m_adpcm_pos >= m_adpcm_end)
 	{
@@ -50,7 +50,7 @@ WRITE_LINE_MEMBER(mjkjidai_state::adpcm_int)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(mjkjidai_state::keyboard_r)
+ioport_value mjkjidai_state::keyboard_r(ioport_field &field, void *param)
 {
 	int res = 0x3f;
 
@@ -66,7 +66,7 @@ CUSTOM_INPUT_MEMBER(mjkjidai_state::keyboard_r)
 	return res;
 }
 
-WRITE8_MEMBER(mjkjidai_state::keyboard_select_w)
+void mjkjidai_state::keyboard_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("%04x: keyboard_select %d = %02x\n",space.device().safe_pc(),offset,data);
 
@@ -275,7 +275,7 @@ static GFXDECODE_START( mjkjidai )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(mjkjidai_state::vblank_irq)
+void mjkjidai_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

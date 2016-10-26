@@ -44,9 +44,9 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_READ8_MEMBER( fdc_input_r );
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	uint8_t fdc_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 
 protected:
 	// device-level overrides

@@ -51,7 +51,7 @@ ioport_constructor beckerport_device::device_input_ports() const
 //-------------------------------------------------
 //  drivewire_port_changed
 //-------------------------------------------------
-INPUT_CHANGED_MEMBER(beckerport_device::drivewire_port_changed)
+void beckerport_device::drivewire_port_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	this->update_port();
 }
@@ -129,7 +129,7 @@ void beckerport_device::device_config_complete(void)
     read
 -------------------------------------------------*/
 
-READ8_MEMBER(beckerport_device::read)
+uint8_t beckerport_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	unsigned char data = 0x5a;
 
@@ -171,7 +171,7 @@ READ8_MEMBER(beckerport_device::read)
     write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(beckerport_device::write)
+void beckerport_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	char d = char(data);
 	osd_file::error filerr;

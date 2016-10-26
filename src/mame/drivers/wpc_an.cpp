@@ -41,18 +41,18 @@ protected:
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
 public:
-	DECLARE_DRIVER_INIT(wpc_an);
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
-	DECLARE_WRITE_LINE_MEMBER(wpc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(wpc_firq_w);
-	DECLARE_READ8_MEMBER(wpc_sound_ctrl_r);
-	DECLARE_WRITE8_MEMBER(wpc_sound_ctrl_w);
-	DECLARE_READ8_MEMBER(wpc_sound_data_r);
-	DECLARE_WRITE8_MEMBER(wpc_sound_data_w);
-	DECLARE_WRITE8_MEMBER(wpc_sound_s11_w);
-	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
+	void init_wpc_an();
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wpcsnd_reply_w(int state);
+	void wpc_irq_w(int state);
+	void wpc_firq_w(int state);
+	uint8_t wpc_sound_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wpc_sound_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t wpc_sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wpc_sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wpc_sound_s11_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wpc_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	uint16_t m_vblank_count;
 	uint32_t m_irq_count;
@@ -207,35 +207,35 @@ void wpc_an_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-WRITE8_MEMBER(wpc_an_state::wpc_rombank_w)
+void wpc_an_state::wpc_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpubank->set_entry(data & m_bankmask);
 }
 
-WRITE_LINE_MEMBER(wpc_an_state::wpcsnd_reply_w)
+void wpc_an_state::wpcsnd_reply_w(int state)
 {
 	if(state)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_an_state::wpc_irq_w)
+void wpc_an_state::wpc_irq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_an_state::wpc_firq_w)
+void wpc_an_state::wpc_firq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE,CLEAR_LINE);
 }
 
-READ8_MEMBER(wpc_an_state::wpc_sound_ctrl_r)
+uint8_t wpc_an_state::wpc_sound_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_wpcsnd)
 		return m_wpcsnd->ctrl_r();  // ack FIRQ?
 	return 0;
 }
 
-WRITE8_MEMBER(wpc_an_state::wpc_sound_ctrl_w)
+void wpc_an_state::wpc_sound_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_bg)
 	{
@@ -246,14 +246,14 @@ WRITE8_MEMBER(wpc_an_state::wpc_sound_ctrl_w)
 		m_wpcsnd->ctrl_w(data);
 }
 
-READ8_MEMBER(wpc_an_state::wpc_sound_data_r)
+uint8_t wpc_an_state::wpc_sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_wpcsnd)
 		return m_wpcsnd->data_r();
 	return 0;
 }
 
-WRITE8_MEMBER(wpc_an_state::wpc_sound_data_w)
+void wpc_an_state::wpc_sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_bg)
 	{
@@ -264,7 +264,7 @@ WRITE8_MEMBER(wpc_an_state::wpc_sound_data_w)
 		m_wpcsnd->data_w(data);
 }
 
-WRITE8_MEMBER(wpc_an_state::wpc_sound_s11_w)
+void wpc_an_state::wpc_sound_s11_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_bg)
 	{
@@ -274,12 +274,12 @@ WRITE8_MEMBER(wpc_an_state::wpc_sound_s11_w)
 	}
 }
 
-READ8_MEMBER(wpc_an_state::ram_r)
+uint8_t wpc_an_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER(wpc_an_state::ram_w)
+void wpc_an_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((!m_wpc->memprotect_active()) || ((offset & m_wpc->get_memprotect_mask()) != m_wpc->get_memprotect_mask()))
 		m_ram[offset] = data;
@@ -294,7 +294,7 @@ void wpc_an_state::machine_reset()
 	m_irq_count = 0;
 }
 
-DRIVER_INIT_MEMBER(wpc_an_state,wpc_an)
+void wpc_an_state::init_wpc_an()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t *fixed = memregion("fixed")->base();

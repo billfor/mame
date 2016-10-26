@@ -98,26 +98,26 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( bankswitch_r );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
-	DECLARE_READ8_MEMBER( lcd_base_r );
-	DECLARE_WRITE8_MEMBER( lcd_base_w );
-	DECLARE_READ8_MEMBER( beep_r );
-	DECLARE_WRITE8_MEMBER( beep_w );
-	DECLARE_READ8_MEMBER( lcd_io_r );
-	DECLARE_WRITE8_MEMBER( lcd_io_w );
-	DECLARE_READ8_MEMBER( irq_r );
-	DECLARE_WRITE8_MEMBER( irq_w );
-	DECLARE_READ8_MEMBER( touchscreen_r );
-	DECLARE_WRITE8_MEMBER( touchscreen_w );
-	DECLARE_WRITE_LINE_MEMBER( alarm_irq );
-	DECLARE_WRITE_LINE_MEMBER( serial_irq );
+	uint8_t bankswitch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lcd_base_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lcd_base_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t beep_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lcd_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lcd_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t touchscreen_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void touchscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void alarm_irq(int state);
+	void serial_irq(int state);
 
-	DECLARE_PALETTE_INIT(rex6000);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer1);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer2);
-	TIMER_DEVICE_CALLBACK_MEMBER(sec_timer);
+	void palette_init_rex6000(palette_device &palette);
+	void trigger_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void irq_timer1(timer_device &timer, void *ptr, int32_t param);
+	void irq_timer2(timer_device &timer, void *ptr, int32_t param);
+	void sec_timer(timer_device &timer, void *ptr, int32_t param);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(rex6000);
 };
 
@@ -133,10 +133,10 @@ public:
 
 	optional_ioport_array<10> m_keyboard;
 
-	DECLARE_READ8_MEMBER( kb_status_r );
-	DECLARE_READ8_MEMBER( kb_data_r );
-	DECLARE_WRITE8_MEMBER( kb_mask_w );
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_on_irq);
+	uint8_t kb_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kb_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kb_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trigger_on_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(oz750);
 
 	virtual void machine_reset() override;
@@ -149,12 +149,12 @@ private:
 };
 
 
-READ8_MEMBER( rex6000_state::bankswitch_r )
+uint8_t rex6000_state::bankswitch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank[offset];
 }
 
-WRITE8_MEMBER( rex6000_state::bankswitch_w )
+void rex6000_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank[offset&3] = data;
 
@@ -176,12 +176,12 @@ WRITE8_MEMBER( rex6000_state::bankswitch_w )
 	}
 }
 
-READ8_MEMBER( rex6000_state::beep_r )
+uint8_t rex6000_state::beep_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_beep_io[offset];
 }
 
-WRITE8_MEMBER( rex6000_state::beep_w )
+void rex6000_state::beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_beep_io[offset] = data;
 
@@ -222,22 +222,22 @@ WRITE8_MEMBER( rex6000_state::beep_w )
 	}
 }
 
-READ8_MEMBER( rex6000_state::lcd_base_r )
+uint8_t rex6000_state::lcd_base_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_lcd_base[offset];
 }
 
-WRITE8_MEMBER( rex6000_state::lcd_base_w )
+void rex6000_state::lcd_base_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lcd_base[offset&1] = data;
 }
 
-READ8_MEMBER( rex6000_state::lcd_io_r )
+uint8_t rex6000_state::lcd_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (offset == 0) ? m_lcd_enabled : m_lcd_cmd;
 }
 
-WRITE8_MEMBER( rex6000_state::lcd_io_w )
+void rex6000_state::lcd_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -250,7 +250,7 @@ WRITE8_MEMBER( rex6000_state::lcd_io_w )
 	}
 }
 
-READ8_MEMBER( rex6000_state::irq_r )
+uint8_t rex6000_state::irq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -278,7 +278,7 @@ READ8_MEMBER( rex6000_state::irq_r )
 	}
 }
 
-WRITE8_MEMBER( rex6000_state::irq_w )
+void rex6000_state::irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -298,7 +298,7 @@ WRITE8_MEMBER( rex6000_state::irq_w )
 	}
 }
 
-READ8_MEMBER( rex6000_state::touchscreen_r )
+uint8_t rex6000_state::touchscreen_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t x = m_pen_x->read();
 	uint16_t y = m_pen_y->read();
@@ -327,12 +327,12 @@ READ8_MEMBER( rex6000_state::touchscreen_r )
 	return m_touchscreen[offset&0x0f];
 }
 
-WRITE8_MEMBER( rex6000_state::touchscreen_w )
+void rex6000_state::touchscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_touchscreen[offset&0x0f] = data;
 }
 
-READ8_MEMBER( oz750_state::kb_status_r )
+uint8_t oz750_state::kb_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x6b;
 	if (m_battery->read() & 0x01)   data |= 0x80;
@@ -340,7 +340,7 @@ READ8_MEMBER( oz750_state::kb_status_r )
 	return data;
 }
 
-READ8_MEMBER( oz750_state::kb_data_r )
+uint8_t oz750_state::kb_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	for(int i=0; i<10; i++)
@@ -351,7 +351,7 @@ READ8_MEMBER( oz750_state::kb_data_r )
 
 	return data;
 }
-WRITE8_MEMBER( oz750_state::kb_mask_w )
+void oz750_state::kb_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 		m_kb_mask = (m_kb_mask & 0x00ff) | (data << 8);
@@ -413,7 +413,7 @@ static ADDRESS_MAP_START( oz750_io, AS_IO, 8, oz750_state)
 	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0x08)  AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w )
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(rex6000_state::trigger_irq)
+void rex6000_state::trigger_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!(m_irq_mask & IRQ_FLAG_KEYCHANGE))
 	{
@@ -423,7 +423,7 @@ INPUT_CHANGED_MEMBER(rex6000_state::trigger_irq)
 	}
 }
 
-INPUT_CHANGED_MEMBER(oz750_state::trigger_on_irq)
+void oz750_state::trigger_on_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_uart->cts_w(!newval);
 
@@ -645,7 +645,7 @@ uint32_t oz750_state::screen_update_oz(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer1)
+void rex6000_state::irq_timer1(timer_device &timer, void *ptr, int32_t param)
 {
 	if (!(m_irq_mask & IRQ_FLAG_IRQ2))
 	{
@@ -656,7 +656,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer1)
 
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer2)
+void rex6000_state::irq_timer2(timer_device &timer, void *ptr, int32_t param)
 {
 	if (!(m_irq_mask & IRQ_FLAG_IRQ1))
 	{
@@ -666,7 +666,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer2)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::sec_timer)
+void rex6000_state::sec_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	if (!(m_irq_mask & IRQ_FLAG_1HZ))
 	{
@@ -676,7 +676,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::sec_timer)
 	}
 }
 
-WRITE_LINE_MEMBER( rex6000_state::alarm_irq )
+void rex6000_state::alarm_irq(int state)
 {
 	if (!(m_irq_mask & IRQ_FLAG_ALARM) && state)
 	{
@@ -685,7 +685,7 @@ WRITE_LINE_MEMBER( rex6000_state::alarm_irq )
 	}
 }
 
-WRITE_LINE_MEMBER( rex6000_state::serial_irq )
+void rex6000_state::serial_irq(int state)
 {
 	if (!(m_irq_mask & IRQ_FLAG_SERIAL))
 	{
@@ -694,7 +694,7 @@ WRITE_LINE_MEMBER( rex6000_state::serial_irq )
 	}
 }
 
-PALETTE_INIT_MEMBER(rex6000_state, rex6000)
+void rex6000_state::palette_init_rex6000(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

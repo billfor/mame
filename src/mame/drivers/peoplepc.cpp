@@ -47,15 +47,15 @@ public:
 	std::vector<uint8_t> m_charram;
 
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE16_MEMBER(charram_w);
-	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
-	DECLARE_WRITE8_MEMBER(dmapg_w);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void charram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tty_clock_tick_w(int state);
+	void kbd_clock_tick_w(int state);
+	void dmapg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tc_w(int state);
+	void hrq_w(int state);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	image_init_result floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
@@ -103,7 +103,7 @@ MC6845_UPDATE_ROW(peoplepc_state::update_row)
 	}
 }
 
-READ8_MEMBER(peoplepc_state::get_slave_ack)
+uint8_t peoplepc_state::get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 7)
 		return m_pic_1->acknowledge();
@@ -111,47 +111,47 @@ READ8_MEMBER(peoplepc_state::get_slave_ack)
 	return 0x00;
 }
 
-WRITE16_MEMBER(peoplepc_state::charram_w)
+void peoplepc_state::charram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_charram[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
 }
 
-WRITE_LINE_MEMBER(peoplepc_state::tty_clock_tick_w)
+void peoplepc_state::tty_clock_tick_w(int state)
 {
 	m_8251ser->write_txc(state);
 	m_8251ser->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(peoplepc_state::kbd_clock_tick_w)
+void peoplepc_state::kbd_clock_tick_w(int state)
 {
 	m_8251key->write_txc(state);
 	m_8251key->write_rxc(state);
 }
 
-WRITE8_MEMBER(peoplepc_state::dmapg_w)
+void peoplepc_state::dmapg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma0pg = data;
 }
 
-WRITE_LINE_MEMBER(peoplepc_state::tc_w)
+void peoplepc_state::tc_w(int state)
 {
 	m_fdc->tc_w(state);
 }
 
-WRITE_LINE_MEMBER(peoplepc_state::hrq_w)
+void peoplepc_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dmac->hlda_w(state);
 }
 
-READ8_MEMBER(peoplepc_state::memory_read_byte)
+uint8_t peoplepc_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset | (m_dma0pg << 16));
 }
 
-WRITE8_MEMBER(peoplepc_state::memory_write_byte)
+void peoplepc_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);

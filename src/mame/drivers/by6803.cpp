@@ -44,24 +44,24 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	DECLARE_DRIVER_INIT(by6803);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_READ8_MEMBER(pia0_a_r);
-	DECLARE_WRITE8_MEMBER(pia0_a_w);
-	DECLARE_READ8_MEMBER(pia0_b_r);
-	DECLARE_WRITE8_MEMBER(pia0_b_w);
-	DECLARE_READ8_MEMBER(pia1_a_r);
-	DECLARE_WRITE8_MEMBER(pia1_a_w);
-	DECLARE_WRITE8_MEMBER(pia1_b_w);
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	TIMER_DEVICE_CALLBACK_MEMBER(pia0_timer);
+	void init_by6803();
+	uint8_t port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia0_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia0_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia0_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia0_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia1_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia0_ca2_w(int state);
+	void pia0_cb2_w(int state);
+	void pia1_cb2_w(int state);
+	void activity_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void pia0_timer(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_pia0_a;
 	uint8_t m_pia0_b;
@@ -151,29 +151,29 @@ static INPUT_PORTS_START( by6803 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( by6803_state::activity_test )
+void by6803_state::activity_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( by6803_state::self_test )
+void by6803_state::self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_pia0->ca1_w(newval);
 }
 
-READ8_MEMBER( by6803_state::port1_r )
+uint8_t by6803_state::port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port1;
 }
 
 // P10-17 - goes to peripheral bus
-WRITE8_MEMBER( by6803_state::port1_w )
+void by6803_state::port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port1 = data; // sound data = P10,11,12,13,24; P14-17 unknown
 }
 
-READ8_MEMBER( by6803_state::port2_r )
+uint8_t by6803_state::port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port2;
 }
@@ -183,28 +183,28 @@ READ8_MEMBER( by6803_state::port2_r )
 // P22 - LED, connects to reset circuit, could be a watchdog
 // P23 - high
 // P24 - sound strobe
-WRITE8_MEMBER( by6803_state::port2_w )
+void by6803_state::port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port2 = data;
 	output().set_value("led0", BIT(data, 2)); // P22 drives LED
 }
 
 // display latch strobes; display blanking
-WRITE_LINE_MEMBER( by6803_state::pia0_ca2_w )
+void by6803_state::pia0_ca2_w(int state)
 {
 }
 
 // lamp strobe 1 when high
-WRITE_LINE_MEMBER( by6803_state::pia0_cb2_w )
+void by6803_state::pia0_cb2_w(int state)
 {
 }
 
 // sol bank select (0 to enable sol selection)
-WRITE_LINE_MEMBER( by6803_state::pia1_cb2_w )
+void by6803_state::pia1_cb2_w(int state)
 {
 }
 
-READ8_MEMBER( by6803_state::pia0_a_r )
+uint8_t by6803_state::pia0_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pia0_a;
 }
@@ -214,7 +214,7 @@ READ8_MEMBER( by6803_state::pia0_a_r )
 // d0-3 lamp rows & d5=0 & pia0:cb2=1 (1st lamp bank)
 // d0-3 lamp rows & d6=0 & pia0:cb2=1 (2nd lamp bank)
 // d0-3 lamp rows & d7=0 & pia0:cb2=1 (3rd lamp bank)
-WRITE8_MEMBER( by6803_state::pia0_a_w )
+void by6803_state::pia0_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia0_a = data;
 #if 0
@@ -243,7 +243,7 @@ WRITE8_MEMBER( by6803_state::pia0_a_w )
 }
 
 // switch returns
-READ8_MEMBER( by6803_state::pia0_b_r )
+uint8_t by6803_state::pia0_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -265,25 +265,25 @@ READ8_MEMBER( by6803_state::pia0_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( by6803_state::pia0_b_w )
+void by6803_state::pia0_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia0_b = data;
 }
 
-READ8_MEMBER( by6803_state::pia1_a_r )
+uint8_t by6803_state::pia1_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pia1_a;
 }
 
 // segment data; d0 & pia0:ca2 = comma; passed to digits when PA0? is high (assume they mean pia0:pa0)
-WRITE8_MEMBER( by6803_state::pia1_a_w )
+void by6803_state::pia1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia1_a = data;
 	m_segment = data >> 1;
 }
 
 // solenoids, activated when pia1:cb2 is low
-WRITE8_MEMBER( by6803_state::pia1_b_w )
+void by6803_state::pia1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia1_b = data;
 	switch (data & 15)
@@ -345,12 +345,12 @@ void by6803_state::machine_reset()
 	m_port2 = 2+8;
 }
 
-DRIVER_INIT_MEMBER(by6803_state,by6803)
+void by6803_state::init_by6803()
 {
 }
 
 // zero-cross detection
-TIMER_DEVICE_CALLBACK_MEMBER( by6803_state::pia0_timer )
+void by6803_state::pia0_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	// Phase A
 	if ((m_pia0_timer) && (!BIT(m_port2, 1)))

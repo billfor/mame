@@ -53,28 +53,28 @@ public:
 	uint8_t m_vram_latch;
 	uint8_t m_color;
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(color_w);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_off);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_on);
+	void interrupt(timer_device &timer, void *ptr, int32_t param);
+	void scanline_off(timer_device &timer, void *ptr, int32_t param);
+	void scanline_on(timer_device &timer, void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
 
-TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::interrupt)
+void dotrikun_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	generic_pulse_irq_line(*m_maincpu, 0, 1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_off)
+void dotrikun_state::scanline_off(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_unscaled_clock(XTAL_4MHz);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_on)
+void dotrikun_state::scanline_on(timer_device &timer, void *ptr, int32_t param)
 {
 	// on vram fetch(every 8 pixels during active display), z80 is stalled for 2 clocks
 	if (param < 192)
@@ -95,13 +95,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::scanline_on)
  *
  *************************************/
 
-WRITE8_MEMBER(dotrikun_state::vram_w)
+void dotrikun_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_screen->update_now();
 	m_vram[offset] = data;
 }
 
-WRITE8_MEMBER(dotrikun_state::color_w)
+void dotrikun_state::color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d2: fg palette
 	// d3-d5: bg palette

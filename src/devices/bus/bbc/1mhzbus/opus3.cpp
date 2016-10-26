@@ -134,10 +134,10 @@ void bbc_opus3_device::device_start()
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<bbc_1mhzbus_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfcf8, 0xfcfb, READ8_DEVICE_DELEGATE(m_fdc, wd1770_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_t, write));
-	space.install_write_handler(0xfcfc, 0xfcfc, WRITE8_DELEGATE(bbc_opus3_device, wd1770l_write));
-	space.install_write_handler(0xfcfe, 0xfcff, WRITE8_DELEGATE(bbc_opus3_device, page_w));
-	space.install_readwrite_handler(0xfd00, 0xfdff, READ8_DELEGATE(bbc_opus3_device, ramdisk_r), WRITE8_DELEGATE(bbc_opus3_device, ramdisk_w));
+	space.install_readwrite_handler(0xfcf8, 0xfcfb, read8_delegate(FUNC(wd1770_t::read), (wd1770_t *)m_fdc), write8_delegate(FUNC(wd1770_t::write), (wd1770_t *)m_fdc));
+	space.install_write_handler(0xfcfc, 0xfcfc, write8_delegate(FUNC(bbc_opus3_device::wd1770l_write), this));
+	space.install_write_handler(0xfcfe, 0xfcff, write8_delegate(FUNC(bbc_opus3_device::page_w), this));
+	space.install_readwrite_handler(0xfd00, 0xfdff, read8_delegate(FUNC(bbc_opus3_device::ramdisk_r), this), write8_delegate(FUNC(bbc_opus3_device::ramdisk_w), this));
 }
 
 //-------------------------------------------------
@@ -154,7 +154,7 @@ void bbc_opus3_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE8_MEMBER(bbc_opus3_device::wd1770l_write)
+void bbc_opus3_device::wd1770l_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -174,14 +174,14 @@ WRITE8_MEMBER(bbc_opus3_device::wd1770l_write)
 	m_fdc->dden_w(BIT(data, 5));
 }
 
-WRITE_LINE_MEMBER(bbc_opus3_device::fdc_drq_w)
+void bbc_opus3_device::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 
 	m_slot->nmi_w((m_fdc_drq && m_fdc_ie) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(bbc_opus3_device::page_w)
+void bbc_opus3_device::page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -190,7 +190,7 @@ WRITE8_MEMBER(bbc_opus3_device::page_w)
 	}
 }
 
-READ8_MEMBER(bbc_opus3_device::ramdisk_r)
+uint8_t bbc_opus3_device::ramdisk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_ramdisk_page << 8) < m_ramdisk->size())
 		return m_ramdisk->read((m_ramdisk_page << 8) + offset);
@@ -198,7 +198,7 @@ READ8_MEMBER(bbc_opus3_device::ramdisk_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(bbc_opus3_device::ramdisk_w)
+void bbc_opus3_device::ramdisk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_ramdisk_page << 8) < m_ramdisk->size())
 		m_ramdisk->write((m_ramdisk_page << 8) + offset, data);

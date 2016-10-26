@@ -73,28 +73,28 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
-	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+	void master_scanline(timer_device &timer, void *ptr, int32_t param);
+	void slave_vblank_irq(device_t &device);
 
-	DECLARE_READ8_MEMBER(irq_enable_r);
-	DECLARE_WRITE8_MEMBER(irq_disable_w);
-	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
-	DECLARE_PALETTE_INIT(toypop);
-	DECLARE_READ8_MEMBER(dipA_l);
-	DECLARE_READ8_MEMBER(dipA_h);
-	DECLARE_READ8_MEMBER(dipB_l);
-	DECLARE_READ8_MEMBER(dipB_h);
-	//DECLARE_WRITE8_MEMBER(out_coin0);
-	//DECLARE_WRITE8_MEMBER(out_coin1);
-	DECLARE_WRITE8_MEMBER(pal_bank_w);
-	DECLARE_WRITE8_MEMBER(flip);
-	DECLARE_WRITE8_MEMBER(slave_halt_ctrl_w);
-	DECLARE_READ8_MEMBER(slave_shared_r);
-	DECLARE_WRITE8_MEMBER(slave_shared_w);
-	DECLARE_WRITE16_MEMBER(slave_irq_enable_w);
-	DECLARE_WRITE8_MEMBER(sound_halt_ctrl_w);
-	DECLARE_READ8_MEMBER(bg_rmw_r);
-	DECLARE_WRITE8_MEMBER(bg_rmw_w);
+	uint8_t irq_enable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_init_toypop(palette_device &palette);
+	uint8_t dipA_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dipA_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dipB_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dipB_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	//void out_coin0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	//void out_coin1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pal_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void slave_halt_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t slave_shared_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slave_shared_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void slave_irq_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_halt_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bg_rmw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bg_rmw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 protected:
 	// driver_device overrides
 //  virtual void machine_start() override;
@@ -111,7 +111,7 @@ private:
 	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };
 
-PALETTE_INIT_MEMBER(namcos16_state, toypop)
+void namcos16_state::palette_init_toypop(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -268,49 +268,49 @@ uint32_t namcos16_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-READ8_MEMBER(namcos16_state::irq_enable_r)
+uint8_t namcos16_state::irq_enable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_master_irq_enable = true;
 	return 0;
 }
 
-WRITE8_MEMBER(namcos16_state::irq_disable_w)
+void namcos16_state::irq_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_master_irq_enable = false;
 }
 
 
-WRITE8_MEMBER(namcos16_state::irq_ctrl_w)
+void namcos16_state::irq_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_master_irq_enable = (offset & 0x0800) ? false : true;
 }
 
-WRITE8_MEMBER(namcos16_state::slave_halt_ctrl_w)
+void namcos16_state::slave_halt_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_slave_cpu->set_input_line(INPUT_LINE_RESET,offset & 0x800 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(namcos16_state::sound_halt_ctrl_w)
+void namcos16_state::sound_halt_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_cpu->set_input_line(INPUT_LINE_RESET,offset & 0x800 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(namcos16_state::slave_shared_r)
+uint8_t namcos16_state::slave_shared_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_slave_sharedram[offset];
 }
 
-WRITE8_MEMBER(namcos16_state::slave_shared_w)
+void namcos16_state::slave_shared_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_slave_sharedram[offset] = data;
 }
 
-WRITE16_MEMBER(namcos16_state::slave_irq_enable_w)
+void namcos16_state::slave_irq_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_slave_irq_enable = (offset & 0x40000) ? false : true;
 }
 
-READ8_MEMBER(namcos16_state::bg_rmw_r)
+uint8_t namcos16_state::bg_rmw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -321,23 +321,23 @@ READ8_MEMBER(namcos16_state::bg_rmw_r)
 	return res;
 }
 
-WRITE8_MEMBER(namcos16_state::bg_rmw_w)
+void namcos16_state::bg_rmw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// note: following offset is written as offset * 2
 	m_bgvram[offset] = (data & 0xf) | ((data & 0xf0) << 4);
 }
 
-READ8_MEMBER(namcos16_state::dipA_l){ return ioport("DSW1")->read(); }                // dips A
-READ8_MEMBER(namcos16_state::dipA_h){ return ioport("DSW1")->read() >> 4; }           // dips A
-READ8_MEMBER(namcos16_state::dipB_l){ return ioport("DSW2")->read(); }                // dips B
-READ8_MEMBER(namcos16_state::dipB_h){ return ioport("DSW2")->read() >> 4; }           // dips B
+uint8_t namcos16_state::dipA_l(address_space &space, offs_t offset, uint8_t mem_mask){ return ioport("DSW1")->read(); }                // dips A
+uint8_t namcos16_state::dipA_h(address_space &space, offs_t offset, uint8_t mem_mask){ return ioport("DSW1")->read() >> 4; }           // dips A
+uint8_t namcos16_state::dipB_l(address_space &space, offs_t offset, uint8_t mem_mask){ return ioport("DSW2")->read(); }                // dips B
+uint8_t namcos16_state::dipB_h(address_space &space, offs_t offset, uint8_t mem_mask){ return ioport("DSW2")->read() >> 4; }           // dips B
 
-WRITE8_MEMBER(namcos16_state::flip)
+void namcos16_state::flip(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }
 
-WRITE8_MEMBER(namcos16_state::pal_bank_w)
+void namcos16_state::pal_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pal_bank = offset & 1;
 }
@@ -619,7 +619,7 @@ void namcos16_state::machine_reset()
 	m_sound_cpu->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::master_scanline)
+void namcos16_state::master_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -640,7 +640,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::master_scanline)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(namcos16_state::slave_vblank_irq)
+void namcos16_state::slave_vblank_irq(device_t &device)
 {
 	if(m_slave_irq_enable == true)
 		device.execute().set_input_line(6,HOLD_LINE);

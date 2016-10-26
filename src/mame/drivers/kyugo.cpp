@@ -62,12 +62,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-WRITE8_MEMBER(kyugo_state::kyugo_nmi_mask_w)
+void kyugo_state::kyugo_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }
 
-WRITE8_MEMBER(kyugo_state::kyugo_sub_cpu_control_w)
+void kyugo_state::kyugo_sub_cpu_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -140,7 +140,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-WRITE8_MEMBER(kyugo_state::kyugo_coin_counter_w)
+void kyugo_state::kyugo_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
@@ -508,7 +508,7 @@ void kyugo_state::machine_reset()
 	m_fgcolor = 0;
 }
 
-INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)
+void kyugo_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -1357,7 +1357,7 @@ ROM_END
  *************************************/
 
 
-DRIVER_INIT_MEMBER(kyugo_state,srdmissn)
+void kyugo_state::init_srdmissn()
 {
 	/* shared RAM is mapped at 0xe000 as well  */
 	m_maincpu->space(AS_PROGRAM).install_ram(0xe000, 0xe7ff, m_shared_ram);

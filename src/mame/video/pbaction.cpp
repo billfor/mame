@@ -11,31 +11,31 @@
 #include "emu.h"
 #include "includes/pbaction.h"
 
-WRITE8_MEMBER(pbaction_state::pbaction_videoram_w)
+void pbaction_state::pbaction_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pbaction_state::pbaction_colorram_w)
+void pbaction_state::pbaction_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pbaction_state::pbaction_videoram2_w)
+void pbaction_state::pbaction_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pbaction_state::pbaction_colorram2_w)
+void pbaction_state::pbaction_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pbaction_state::pbaction_scroll_w)
+void pbaction_state::pbaction_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll = data - 3;
 	if (flip_screen())
@@ -45,12 +45,12 @@ WRITE8_MEMBER(pbaction_state::pbaction_scroll_w)
 	m_fg_tilemap->set_scrollx(0, m_scroll);
 }
 
-WRITE8_MEMBER(pbaction_state::pbaction_flipscreen_w)
+void pbaction_state::pbaction_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 }
 
-TILE_GET_INFO_MEMBER(pbaction_state::get_bg_tile_info)
+void pbaction_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + 0x10 * (attr & 0x70);
@@ -60,7 +60,7 @@ TILE_GET_INFO_MEMBER(pbaction_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(pbaction_state::get_fg_tile_info)
+void pbaction_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram2[tile_index];
 	int code = m_videoram2[tile_index] + 0x10 * (attr & 0x30);

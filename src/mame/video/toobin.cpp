@@ -18,7 +18,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(toobin_state::get_alpha_tile_info)
+void toobin_state::get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(toobin_state::get_alpha_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(toobin_state::get_playfield_tile_info)
+void toobin_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3fff;
@@ -78,7 +78,7 @@ const atari_motion_objects_config toobin_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(toobin_state,toobin)
+void toobin_state::video_start_toobin()
 {
 	/* allocate a playfield bitmap for rendering */
 	m_screen->register_screen_bitmap(m_pfbitmap);
@@ -94,7 +94,7 @@ VIDEO_START_MEMBER(toobin_state,toobin)
  *
  *************************************/
 
-WRITE16_MEMBER( toobin_state::paletteram_w )
+void toobin_state::paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int newword;
 
@@ -119,7 +119,7 @@ WRITE16_MEMBER( toobin_state::paletteram_w )
 }
 
 
-WRITE16_MEMBER( toobin_state::intensity_w )
+void toobin_state::intensity_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i;
 
@@ -141,7 +141,7 @@ WRITE16_MEMBER( toobin_state::intensity_w )
  *
  *************************************/
 
-WRITE16_MEMBER( toobin_state::xscroll_w )
+void toobin_state::xscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_xscroll;
 	uint16_t newscroll = oldscroll;
@@ -160,7 +160,7 @@ WRITE16_MEMBER( toobin_state::xscroll_w )
 }
 
 
-WRITE16_MEMBER( toobin_state::yscroll_w )
+void toobin_state::yscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_yscroll;
 	uint16_t newscroll = oldscroll;
@@ -186,7 +186,7 @@ WRITE16_MEMBER( toobin_state::yscroll_w )
  *
  *************************************/
 
-WRITE16_MEMBER( toobin_state::slip_w )
+void toobin_state::slip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldslip = m_mob->slipram(offset);
 	uint16_t newslip = oldslip;

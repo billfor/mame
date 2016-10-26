@@ -80,16 +80,16 @@ public:
 	uint8_t m_cart_bank;
 	std::unique_ptr<uint8_t[]> m_ram1;
 	required_shared_ptr<uint8_t> m_ram2;
-	DECLARE_WRITE8_MEMBER(rambank_w);
-	DECLARE_READ8_MEMBER(macs_input_r);
-	DECLARE_WRITE8_MEMBER(macs_rom_bank_w);
-	DECLARE_WRITE8_MEMBER(macs_output_w);
-	DECLARE_DRIVER_INIT(macs);
-	DECLARE_DRIVER_INIT(kisekaeh);
-	DECLARE_DRIVER_INIT(kisekaem);
-	DECLARE_DRIVER_INIT(macs2);
-	DECLARE_MACHINE_RESET(macs);
-	DECLARE_MACHINE_START(macs);
+	void rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t macs_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void macs_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void macs_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_macs();
+	void init_kisekaeh();
+	void init_kisekaem();
+	void init_macs2();
+	void machine_reset_macs();
+	void machine_start_macs();
 	ST0016_DMA_OFFS_CB(dma_offset);
 
 	uint32_t screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -116,12 +116,12 @@ static ADDRESS_MAP_START( macs_mem, AS_PROGRAM, 8, macs_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAMBANK("bank2") /* common /backup ram ?*/
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(macs_state::rambank_w)
+void macs_state::rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank3")->set_entry(2 + (data & 1));
 }
 
-READ8_MEMBER(macs_state::macs_input_r)
+uint8_t macs_state::macs_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -154,12 +154,12 @@ READ8_MEMBER(macs_state::macs_input_r)
 }
 
 
-WRITE8_MEMBER(macs_state::macs_rom_bank_w)
+void macs_state::macs_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(m_cart_bank * 0x100 + data);
 }
 
-WRITE8_MEMBER(macs_state::macs_output_w)
+void macs_state::macs_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -644,7 +644,7 @@ static const uint8_t ramdata[160]=
 };
 #endif
 
-MACHINE_START_MEMBER(macs_state,macs)
+void macs_state::machine_start_macs()
 {
 	membank("bank1")->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
 	membank("bank1")->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
@@ -663,7 +663,7 @@ MACHINE_START_MEMBER(macs_state,macs)
 	membank("bank4")->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(macs_state,macs)
+void macs_state::machine_reset_macs()
 {
 	#if 0
 	uint8_t *macs_ram1 = m_ram1.get();
@@ -738,28 +738,28 @@ MACHINE_RESET_MEMBER(macs_state,macs)
 }
 
 
-DRIVER_INIT_MEMBER(macs_state,macs)
+void macs_state::init_macs()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_st0016_game_flag((10 | 0x80));
 	m_rev = 1;
 }
 
-DRIVER_INIT_MEMBER(macs_state,macs2)
+void macs_state::init_macs2()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_st0016_game_flag((10 | 0x80));
 	m_rev = 2;
 }
 
-DRIVER_INIT_MEMBER(macs_state,kisekaeh)
+void macs_state::init_kisekaeh()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_st0016_game_flag((11 | 0x180));
 	m_rev = 1;
 }
 
-DRIVER_INIT_MEMBER(macs_state,kisekaem)
+void macs_state::init_kisekaem()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_st0016_game_flag((10 | 0x180));

@@ -47,20 +47,20 @@ public:
 		, m_switch(*this, "SWITCH.%u", 0)
 	{ }
 
-	DECLARE_READ8_MEMBER(sw_r);
-	DECLARE_WRITE8_MEMBER(col_w);
-	DECLARE_WRITE8_MEMBER(disp_w);
-	DECLARE_WRITE8_MEMBER(lamp_w);
-	DECLARE_WRITE8_MEMBER(lamp7_w);
-	DECLARE_WRITE8_MEMBER(sol_w);
-	DECLARE_WRITE8_MEMBER(p1a_w) { }; // more lamps
-	DECLARE_WRITE8_MEMBER(p1b_w) { }; // more lamps
-	DECLARE_WRITE8_MEMBER(p2a_w) { }; // more lamps
-	DECLARE_WRITE8_MEMBER(p2b_w) { }; // more lamps
-	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
-	DECLARE_DRIVER_INIT(peyper);
-	DECLARE_DRIVER_INIT(odin);
-	DECLARE_DRIVER_INIT(wolfman);
+	uint8_t sw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p1a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // more lamps
+	void p1b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // more lamps
+	void p2a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // more lamps
+	void p2b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // more lamps
+	ioport_value wolfman_replay_hs_r(ioport_field &field, void *param);
+	void init_peyper();
+	void init_odin();
+	void init_wolfman();
 private:
 	uint8_t m_digit;
 	uint8_t m_disp_layout[36];
@@ -69,12 +69,12 @@ private:
 	required_ioport_array<4> m_switch;
 };
 
-WRITE8_MEMBER( peyper_state::col_w )
+void peyper_state::col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit = data;
 }
 
-READ8_MEMBER( peyper_state::sw_r )
+uint8_t peyper_state::sw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_digit < 4)
 		return m_switch[m_digit]->read();
@@ -82,7 +82,7 @@ READ8_MEMBER( peyper_state::sw_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( peyper_state::disp_w )
+void peyper_state::disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
 /*
@@ -155,24 +155,24 @@ WRITE8_MEMBER( peyper_state::disp_w )
 	}
 }
 
-WRITE8_MEMBER(peyper_state::lamp_w)
+void peyper_state::lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("lamp_w %02x\n",data);
 	//logerror("[%d]= %02x\n",4+offset/4,data);
 }
 
-WRITE8_MEMBER(peyper_state::lamp7_w)
+void peyper_state::lamp7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("[7]= %02x\n",data);
 }
 
-WRITE8_MEMBER(peyper_state::sol_w)
+void peyper_state::sol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("sol_w %02x\n",data);
 }
 
 
-CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
+ioport_value peyper_state::wolfman_replay_hs_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 
@@ -605,7 +605,7 @@ static MACHINE_CONFIG_START( peyper, peyper_state )
 MACHINE_CONFIG_END
 
 // Not allowed to set up an array all at once, so we have this mess
-DRIVER_INIT_MEMBER( peyper_state, peyper )
+void peyper_state::init_peyper()
 {
 	m_disp_layout[0] = 25;
 	m_disp_layout[1] = 27;
@@ -645,7 +645,7 @@ DRIVER_INIT_MEMBER( peyper_state, peyper )
 	m_disp_layout[35] = 24;
 }
 
-DRIVER_INIT_MEMBER( peyper_state, odin )
+void peyper_state::init_odin()
 {
 	m_disp_layout[0] = 25;
 	m_disp_layout[1] = 27;
@@ -685,7 +685,7 @@ DRIVER_INIT_MEMBER( peyper_state, odin )
 	m_disp_layout[35] = 24;
 }
 
-DRIVER_INIT_MEMBER( peyper_state, wolfman )
+void peyper_state::init_wolfman()
 {
 	m_disp_layout[0] = 25;
 	m_disp_layout[1] = 27;

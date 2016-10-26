@@ -26,14 +26,14 @@
 const device_type VIC1112 = &device_creator<vic1112_device>;
 
 
-WRITE_LINE_MEMBER( vic1112_device::via0_irq_w )
+void vic1112_device::via0_irq_w(int state)
 {
 	m_via0_irq = state;
 
 	m_slot->irq_w(m_via0_irq | m_via1_irq);
 }
 
-READ8_MEMBER( vic1112_device::via0_pb_r )
+uint8_t vic1112_device::via0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -61,7 +61,7 @@ READ8_MEMBER( vic1112_device::via0_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( vic1112_device::via0_pb_w )
+void vic1112_device::via0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -84,7 +84,7 @@ WRITE8_MEMBER( vic1112_device::via0_pb_w )
 }
 
 
-WRITE_LINE_MEMBER( vic1112_device::via1_irq_w )
+void vic1112_device::via1_irq_w(int state)
 {
 	m_via1_irq = state;
 

@@ -46,7 +46,7 @@ enum
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( cosmicos_state::read )
+uint8_t cosmicos_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_boot) offset |= 0xc0c0;
 
@@ -68,7 +68,7 @@ READ8_MEMBER( cosmicos_state::read )
 	return data;
 }
 
-WRITE8_MEMBER( cosmicos_state::write )
+void cosmicos_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_boot) offset |= 0xc0c0;
 
@@ -82,7 +82,7 @@ WRITE8_MEMBER( cosmicos_state::write )
 	}
 }
 
-READ8_MEMBER( cosmicos_state::video_off_r )
+uint8_t cosmicos_state::video_off_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -94,7 +94,7 @@ READ8_MEMBER( cosmicos_state::video_off_r )
 	return data;
 }
 
-READ8_MEMBER( cosmicos_state::video_on_r )
+uint8_t cosmicos_state::video_on_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -106,7 +106,7 @@ READ8_MEMBER( cosmicos_state::video_on_r )
 	return data;
 }
 
-WRITE8_MEMBER( cosmicos_state::audio_latch_w )
+void cosmicos_state::audio_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_q)
 	{
@@ -114,7 +114,7 @@ WRITE8_MEMBER( cosmicos_state::audio_latch_w )
 	}
 }
 
-READ8_MEMBER( cosmicos_state::hex_keyboard_r )
+uint8_t cosmicos_state::hex_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	int i;
@@ -135,19 +135,19 @@ READ8_MEMBER( cosmicos_state::hex_keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( cosmicos_state::hex_keylatch_w )
+void cosmicos_state::hex_keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data & 0x0f;
 }
 
-READ8_MEMBER( cosmicos_state::reset_counter_r )
+uint8_t cosmicos_state::reset_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_counter = 0;
 
 	return 0;
 }
 
-WRITE8_MEMBER( cosmicos_state::segment_w )
+void cosmicos_state::segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_counter++;
 
@@ -162,12 +162,12 @@ WRITE8_MEMBER( cosmicos_state::segment_w )
 	}
 }
 
-READ8_MEMBER( cosmicos_state::data_r )
+uint8_t cosmicos_state::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( cosmicos_state::display_w )
+void cosmicos_state::display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_segment = data;
 }
@@ -191,7 +191,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_CHANGED_MEMBER( cosmicos_state::data )
+void cosmicos_state::data(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t data = m_io_data->read();
 	int i;
@@ -206,7 +206,7 @@ INPUT_CHANGED_MEMBER( cosmicos_state::data )
 	}
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::enter )
+void cosmicos_state::enter(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!newval && !m_wait && !m_clear)
 	{
@@ -214,7 +214,7 @@ INPUT_CHANGED_MEMBER( cosmicos_state::enter )
 	}
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::single_step )
+void cosmicos_state::single_step(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// if in PAUSE mode, set RUN mode until TPB=active
 }
@@ -262,10 +262,10 @@ void cosmicos_state::set_cdp1802_mode(int mode)
 	}
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::run )             { if (!newval) set_cdp1802_mode(MODE_RUN); }
-INPUT_CHANGED_MEMBER( cosmicos_state::load )            { if (!newval) set_cdp1802_mode(MODE_LOAD); }
-INPUT_CHANGED_MEMBER( cosmicos_state::cosmicos_pause )  { if (!newval) set_cdp1802_mode(MODE_PAUSE); }
-INPUT_CHANGED_MEMBER( cosmicos_state::reset )           { if (!newval) set_cdp1802_mode(MODE_RESET); }
+void cosmicos_state::run(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)             { if (!newval) set_cdp1802_mode(MODE_RUN); }
+void cosmicos_state::load(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)            { if (!newval) set_cdp1802_mode(MODE_LOAD); }
+void cosmicos_state::cosmicos_pause(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)  { if (!newval) set_cdp1802_mode(MODE_PAUSE); }
+void cosmicos_state::reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)           { if (!newval) set_cdp1802_mode(MODE_RESET); }
 
 void cosmicos_state::clear_input_data()
 {
@@ -279,17 +279,17 @@ void cosmicos_state::clear_input_data()
 	}
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::clear_data )
+void cosmicos_state::clear_data(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	clear_input_data();
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::memory_protect )
+void cosmicos_state::memory_protect(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_ram_protect = newval;
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::memory_disable )
+void cosmicos_state::memory_disable(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_ram_disable = newval;
 }
@@ -349,48 +349,48 @@ INPUT_PORTS_END
 
 /* Video */
 
-TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::digit_tick)
+void cosmicos_state::digit_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_digit = !m_digit;
 
 	output().set_digit_value(m_digit, m_segment);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::int_tick)
+void cosmicos_state::int_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( cosmicos_state::dmaout_w )
+void cosmicos_state::dmaout_w(int state)
 {
 	m_dmaout = state;
 }
 
-WRITE_LINE_MEMBER( cosmicos_state::efx_w )
+void cosmicos_state::efx_w(int state)
 {
 	m_efx = state;
 }
 
 /* CDP1802 Configuration */
 
-READ_LINE_MEMBER( cosmicos_state::wait_r )
+int cosmicos_state::wait_r()
 {
 	return m_wait;
 }
 
-READ_LINE_MEMBER( cosmicos_state::clear_r )
+int cosmicos_state::clear_r()
 {
 	return m_clear;
 }
 
-READ_LINE_MEMBER( cosmicos_state::ef1_r )
+int cosmicos_state::ef1_r()
 {
 	uint8_t special = m_special->read();
 
 	return BIT(special, 0);
 }
 
-READ_LINE_MEMBER( cosmicos_state::ef2_r )
+int cosmicos_state::ef2_r()
 {
 	uint8_t special = m_special->read();
 	int casin = (m_cassette)->input() < 0.0;
@@ -400,19 +400,19 @@ READ_LINE_MEMBER( cosmicos_state::ef2_r )
 	return BIT(special, 1) | BIT(special, 3) | casin;
 }
 
-READ_LINE_MEMBER( cosmicos_state::ef3_r )
+int cosmicos_state::ef3_r()
 {
 	uint8_t special = m_special->read();
 
 	return BIT(special, 2) | BIT(special, 3);
 }
 
-READ_LINE_MEMBER( cosmicos_state::ef4_r )
+int cosmicos_state::ef4_r()
 {
 	return BIT(m_buttons->read(), 0);
 }
 
-WRITE_LINE_MEMBER( cosmicos_state::q_w )
+void cosmicos_state::q_w(int state)
 {
 	/* cassette */
 	m_cassette->output(state ? +1.0 : -1.0);
@@ -426,12 +426,12 @@ WRITE_LINE_MEMBER( cosmicos_state::q_w )
 	m_q = state;
 }
 
-READ8_MEMBER( cosmicos_state::dma_r )
+uint8_t cosmicos_state::dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( cosmicos_state::sc_w )
+void cosmicos_state::sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sc1 = BIT(data, 1);
 

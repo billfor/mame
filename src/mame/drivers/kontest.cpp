@@ -48,7 +48,7 @@ public:
 	uint8_t m_control;
 
 	// member functions
-	DECLARE_WRITE8_MEMBER(control_w);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// driver_device overrides
@@ -57,8 +57,8 @@ protected:
 
 	virtual void video_start() override;
 public:
-	DECLARE_PALETTE_INIT(kontest);
-	INTERRUPT_GEN_MEMBER(kontest_interrupt);
+	void palette_init_kontest(palette_device &palette);
+	void kontest_interrupt(device_t &device);
 };
 
 
@@ -68,7 +68,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(kontest_state, kontest)
+void kontest_state::palette_init_kontest(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
@@ -153,7 +153,7 @@ uint32_t kontest_state::screen_update( screen_device &screen, bitmap_rgb32 &bitm
 
 ***************************************************************************/
 
-WRITE8_MEMBER(kontest_state::control_w)
+void kontest_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d3: irq mask
 	// d2: ? (reset during 1st grid test and color test)
@@ -228,7 +228,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(kontest_state::kontest_interrupt)
+void kontest_state::kontest_interrupt(device_t &device)
 {
 	if (m_control & 8)
 		device.execute().set_input_line(0, ASSERT_LINE);

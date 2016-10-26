@@ -71,54 +71,54 @@ public:
 	tilemap_t *m_bg1_tilemap;
 
 	// common
-	DECLARE_WRITE8_MEMBER(bankselect_w);
-	DECLARE_WRITE8_MEMBER(valtric_mosaic_w);
-	DECLARE_WRITE8_MEMBER(txram_w);
-	DECLARE_WRITE8_MEMBER(bg1ram_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void valtric_mosaic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void txram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg1ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// argus specific
-	DECLARE_WRITE8_MEMBER(argus_bg_status_w);
-	DECLARE_WRITE8_MEMBER(argus_paletteram_w);
+	void argus_bg_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void argus_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// butasan specific
-	DECLARE_WRITE8_MEMBER(butasan_bg0_status_w);
-	DECLARE_WRITE8_MEMBER(butasan_bg1_status_w);
-	DECLARE_WRITE8_MEMBER(butasan_paletteram_w);
-	DECLARE_WRITE8_MEMBER(butasan_bg1ram_w);
-	DECLARE_WRITE8_MEMBER(butasan_pageselect_w);
-	DECLARE_READ8_MEMBER(butasan_pagedram_r);
-	DECLARE_WRITE8_MEMBER(butasan_pagedram_w);
-	DECLARE_WRITE8_MEMBER(butasan_unknown_w);
+	void butasan_bg0_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void butasan_bg1_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void butasan_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void butasan_bg1ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void butasan_pageselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t butasan_pagedram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void butasan_pagedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void butasan_unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// valtric specific
-	DECLARE_WRITE8_MEMBER(valtric_bg_status_w);
-	DECLARE_WRITE8_MEMBER(valtric_paletteram_w);
-	DECLARE_WRITE8_MEMBER(valtric_unknown_w);
+	void valtric_bg_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void valtric_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void valtric_unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(argus_get_tx_tile_info);
-	TILE_GET_INFO_MEMBER(argus_get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(argus_get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(valtric_get_tx_tile_info);
-	TILE_GET_INFO_MEMBER(valtric_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(butasan_get_tx_tile_info);
-	TILE_GET_INFO_MEMBER(butasan_get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(butasan_get_bg1_tile_info);
+	void argus_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void argus_get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void argus_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void valtric_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void valtric_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void butasan_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void butasan_get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void butasan_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
-	DECLARE_VIDEO_START(argus);
-	DECLARE_VIDEO_RESET(argus);
-	DECLARE_VIDEO_START(valtric);
-	DECLARE_VIDEO_RESET(valtric);
-	DECLARE_VIDEO_START(butasan);
-	DECLARE_VIDEO_RESET(butasan);
+	void video_start_argus();
+	void video_reset_argus();
+	void video_start_valtric();
+	void video_reset_valtric();
+	void video_start_butasan();
+	void video_reset_butasan();
 
 	uint32_t screen_update_argus(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_valtric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_butasan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(butasan_scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
+	void butasan_scanline(timer_device &timer, void *ptr, int32_t param);
 
 	void reset_common();
 	void change_palette(int color, int lo_offs, int hi_offs);

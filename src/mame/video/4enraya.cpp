@@ -11,14 +11,14 @@
 #include "emu.h"
 #include "includes/4enraya.h"
 
-WRITE8_MEMBER(_4enraya_state::fenraya_videoram_w)
+void _4enraya_state::fenraya_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[(offset & 0x3ff) * 2] = data;
 	m_videoram[(offset & 0x3ff) * 2 + 1] = (offset & 0xc00) >> 10;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-TILE_GET_INFO_MEMBER(_4enraya_state::get_tile_info)
+void _4enraya_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index * 2] + (m_videoram[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);

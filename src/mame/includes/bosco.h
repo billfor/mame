@@ -21,12 +21,12 @@ public:
 	uint8_t *m_spriteram;
 	uint8_t *m_spriteram2;
 	uint32_t m_spriteram_size;
-	DECLARE_WRITE8_MEMBER(bosco_flip_screen_w);
-	TILEMAP_MAPPER_MEMBER(fg_tilemap_scan);
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-	DECLARE_VIDEO_START(bosco);
-	DECLARE_PALETTE_INIT(bosco);
+	void bosco_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	tilemap_memory_index fg_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void video_start_bosco();
+	void palette_init_bosco(palette_device &palette);
 	uint32_t screen_update_bosco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_bosco(screen_device &screen, bool state);
 
@@ -34,8 +34,8 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
-	DECLARE_WRITE8_MEMBER( bosco_videoram_w );
-	DECLARE_WRITE8_MEMBER( bosco_scrollx_w );
-	DECLARE_WRITE8_MEMBER( bosco_scrolly_w );
-	DECLARE_WRITE8_MEMBER( bosco_starclr_w );
+	void bosco_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bosco_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bosco_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bosco_starclr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };

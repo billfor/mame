@@ -38,10 +38,10 @@ public:
 	m_wom(*this, "wom")
 	{ }
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
-	DECLARE_WRITE16_MEMBER( write_protect_w );
+	void write_protect_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void machine_start() override;
@@ -64,14 +64,14 @@ public:
 	m_zorro2_int6(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
-	DECLARE_WRITE_LINE_MEMBER( zorro2_int2_w );
-	DECLARE_WRITE_LINE_MEMBER( zorro2_int6_w );
+	void zorro2_int2_w(int state);
+	void zorro2_int6_w(int state);
 
-	DECLARE_READ16_MEMBER( clock_r );
-	DECLARE_WRITE16_MEMBER( clock_w );
+	uint16_t clock_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void machine_reset() override;
@@ -100,11 +100,11 @@ public:
 	m_side_int6(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
-	DECLARE_WRITE_LINE_MEMBER( side_int2_w );
-	DECLARE_WRITE_LINE_MEMBER( side_int6_w );
+	void side_int2_w(int state);
+	void side_int6_w(int state);
 
 protected:
 	virtual void machine_reset() override;
@@ -135,20 +135,20 @@ public:
 	m_tpi_irq(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
-	DECLARE_READ16_MEMBER( clock_r );
-	DECLARE_WRITE16_MEMBER( clock_w );
+	uint16_t clock_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ8_MEMBER( dmac_scsi_data_read );
-	DECLARE_WRITE8_MEMBER( dmac_scsi_data_write );
-	DECLARE_READ8_MEMBER( dmac_io_read );
-	DECLARE_WRITE8_MEMBER( dmac_io_write );
-	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
+	uint8_t dmac_scsi_data_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmac_scsi_data_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dmac_io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmac_io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dmac_int_w(int state);
 
-	DECLARE_WRITE8_MEMBER( tpi_port_b_write );
-	DECLARE_WRITE_LINE_MEMBER( tpi_int_w );
+	void tpi_port_b_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tpi_int_w(int state);
 
 protected:
 	// driver_device overrides
@@ -177,13 +177,13 @@ public:
 	amiga_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ32_MEMBER( scsi_r );
-	DECLARE_WRITE32_MEMBER( scsi_w );
-	DECLARE_READ32_MEMBER( motherboard_r );
-	DECLARE_WRITE32_MEMBER( motherboard_w );
+	uint32_t scsi_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void scsi_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t motherboard_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void motherboard_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 protected:
 
@@ -201,11 +201,11 @@ public:
 	m_side_int6(0)
 	{ }
 
-	DECLARE_READ16_MEMBER( clock_r );
-	DECLARE_WRITE16_MEMBER( clock_w );
+	uint16_t clock_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 protected:
 	virtual void machine_reset() override;
@@ -232,10 +232,10 @@ public:
 	m_gayle_int2(0)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
+	void gayle_int2_w(int state);
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	static const uint8_t GAYLE_ID = 0xd0;
 
@@ -254,10 +254,10 @@ public:
 	m_gayle_int2(0)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
+	void gayle_int2_w(int state);
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	static const uint8_t GAYLE_ID = 0xd1;
 
@@ -281,16 +281,16 @@ public:
 	m_ide_interrupt(0)
 	{ }
 
-	DECLARE_READ32_MEMBER( scsi_r );
-	DECLARE_WRITE32_MEMBER( scsi_w );
-	DECLARE_READ16_MEMBER( ide_r );
-	DECLARE_WRITE16_MEMBER( ide_w );
-	DECLARE_WRITE_LINE_MEMBER( ide_interrupt_w );
-	DECLARE_READ32_MEMBER( motherboard_r );
-	DECLARE_WRITE32_MEMBER( motherboard_w );
+	uint32_t scsi_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void scsi_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint16_t ide_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ide_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ide_interrupt_w(int state);
+	uint32_t motherboard_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void motherboard_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 protected:
 
@@ -313,16 +313,16 @@ public:
 	m_cdda(*this, "cdda")
 	{ }
 
-	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
+	void akiko_cia_0_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void handle_joystick_cia(uint8_t pra, uint8_t dra);
 	uint16_t handle_joystick_potgor(uint16_t potgor);
 
-	DECLARE_CUSTOM_INPUT_MEMBER( cd32_input );
-	DECLARE_CUSTOM_INPUT_MEMBER( cd32_sel_mirror_input );
+	ioport_value cd32_input(ioport_field &field, void *param);
+	ioport_value cd32_sel_mirror_input(ioport_field &field, void *param);
 
-	DECLARE_DRIVER_INIT( pal );
-	DECLARE_DRIVER_INIT( ntsc );
+	void init_pal();
+	void init_ntsc();
 
 	required_ioport_array<2> m_player_ports;
 
@@ -343,32 +343,32 @@ private:
 //  REAL TIME CLOCK
 //**************************************************************************
 
-READ16_MEMBER( cdtv_state::clock_r )
+uint16_t cdtv_state::clock_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_rtc->read(space, offset / 2);
 }
 
-WRITE16_MEMBER( cdtv_state::clock_w )
+void cdtv_state::clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_rtc->write(space, offset / 2, data);
 }
 
-READ16_MEMBER( a2000_state::clock_r )
+uint16_t a2000_state::clock_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_rtc->read(space, offset / 2);
 }
 
-WRITE16_MEMBER( a2000_state::clock_w )
+void a2000_state::clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_rtc->write(space, offset / 2, data);
 }
 
-READ16_MEMBER( a500p_state::clock_r )
+uint16_t a500p_state::clock_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_rtc->read(space, offset / 2);
 }
 
-WRITE16_MEMBER( a500p_state::clock_w )
+void a500p_state::clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_rtc->write(space, offset / 2, data);
 }
@@ -378,7 +378,7 @@ WRITE16_MEMBER( a500p_state::clock_w )
 //  CD-ROM CONTROLLER
 //**************************************************************************
 
-READ8_MEMBER( cdtv_state::dmac_scsi_data_read )
+uint8_t cdtv_state::dmac_scsi_data_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0xb0 && offset <= 0xbf)
 		return m_tpi->read(space, offset);
@@ -386,35 +386,35 @@ READ8_MEMBER( cdtv_state::dmac_scsi_data_read )
 	return 0xff;
 }
 
-WRITE8_MEMBER( cdtv_state::dmac_scsi_data_write )
+void cdtv_state::dmac_scsi_data_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0xb0 && offset <= 0xbf)
 		m_tpi->write(space, offset, data);
 }
 
-READ8_MEMBER( cdtv_state::dmac_io_read )
+uint8_t cdtv_state::dmac_io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cdrom->read(space, 0);
 }
 
-WRITE8_MEMBER( cdtv_state::dmac_io_write )
+void cdtv_state::dmac_io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cdrom->write(space, 0, data);
 }
 
-WRITE_LINE_MEMBER( cdtv_state::dmac_int_w )
+void cdtv_state::dmac_int_w(int state)
 {
 	m_dmac_irq = state;
 	update_int2();
 }
 
-WRITE8_MEMBER( cdtv_state::tpi_port_b_write )
+void cdtv_state::tpi_port_b_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cdrom->cmd_w(BIT(data, 0));
 	m_cdrom->enable_w(BIT(data, 1));
 }
 
-WRITE_LINE_MEMBER( cdtv_state::tpi_int_w )
+void cdtv_state::tpi_int_w(int state)
 {
 	m_tpi_irq = state;
 	update_int2();
@@ -426,123 +426,123 @@ WRITE_LINE_MEMBER( cdtv_state::tpi_int_w )
 //**************************************************************************
 
 // ocs chipset (agnus with support for 512k or 1mb chip ram, denise)
-DRIVER_INIT_MEMBER( a1000_state, pal )
+void a1000_state::init_pal()
 {
 	m_agnus_id = AGNUS_PAL;     // 8367
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a1000_state, ntsc )
+void a1000_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_NTSC;    // 8361
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a2000_state, pal )
+void a2000_state::init_pal()
 {
 	m_agnus_id = AGNUS_PAL;     // 8371 (later versions 8372A)
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a2000_state, ntsc )
+void a2000_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_NTSC;    // 8370 (later versions 8372A)
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a500_state, pal )
+void a500_state::init_pal()
 {
 	m_agnus_id = AGNUS_PAL;     // 8371 (later versions 8372A)
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( a500_state, ntsc )
+void a500_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_NTSC;    // 8370 (later versions 8372A)
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( cdtv_state, pal )
+void cdtv_state::init_pal()
 {
 	m_agnus_id = AGNUS_HR_PAL;  // 8372A
 	m_denise_id = DENISE;       // 8362
 }
 
-DRIVER_INIT_MEMBER( cdtv_state, ntsc )
+void cdtv_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_HR_NTSC; // 8372A
 	m_denise_id = DENISE;       // 8362
 }
 
 // ecs chipset (agnus with support for 2mb chip ram, super denise)
-DRIVER_INIT_MEMBER( a3000_state, pal )
+void a3000_state::init_pal()
 {
 	m_agnus_id = AGNUS_HR_PAL_NEW;  // 8372B (early versions: 8372AB)
 	m_denise_id = DENISE_HR;        // 8373
 }
 
-DRIVER_INIT_MEMBER( a3000_state, ntsc )
+void a3000_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_HR_NTSC_NEW; // 8372B (early versions: 8372AB)
 	m_denise_id = DENISE_HR;        // 8373
 }
 
-DRIVER_INIT_MEMBER( a500p_state, pal )
+void a500p_state::init_pal()
 {
 	m_agnus_id = AGNUS_HR_PAL;  // 8375 (390544-01)
 	m_denise_id = DENISE_HR;    // 8373
 }
 
-DRIVER_INIT_MEMBER( a500p_state, ntsc )
+void a500p_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_HR_NTSC; // 8375 (390544-02)
 	m_denise_id = DENISE_HR;    // 8373
 }
 
-DRIVER_INIT_MEMBER( a600_state, pal )
+void a600_state::init_pal()
 {
 	m_agnus_id = AGNUS_HR_PAL;  // 8375 (390544-01)
 	m_denise_id = DENISE_HR;    // 8373
 }
 
-DRIVER_INIT_MEMBER( a600_state, ntsc )
+void a600_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_HR_NTSC; // 8375 (390544-02)
 	m_denise_id = DENISE_HR;    // 8373
 }
 
 // aga chipset (alice and lisa)
-DRIVER_INIT_MEMBER( a1200_state, pal )
+void a1200_state::init_pal()
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( a1200_state, ntsc )
+void a1200_state::init_ntsc()
 {
 	m_agnus_id = ALICE_NTSC_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( a4000_state, pal )
+void a4000_state::init_pal()
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( a4000_state, ntsc )
+void a4000_state::init_ntsc()
 {
 	m_agnus_id = ALICE_NTSC_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( cd32_state, pal )
+void cd32_state::init_pal()
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
 }
 
-DRIVER_INIT_MEMBER( cd32_state, ntsc )
+void cd32_state::init_ntsc()
 {
 	m_agnus_id = ALICE_NTSC_NEW;
 	m_denise_id = LISA;
@@ -574,7 +574,7 @@ void a1000_state::machine_reset()
 }
 
 // any write to this area will write protect the wom and disable the bootrom
-WRITE16_MEMBER( a1000_state::write_protect_w )
+void a1000_state::write_protect_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_bootrom->set_bank(1);
 	m_maincpu->space(AS_PROGRAM).nop_write(0xfc0000, 0xffffff);
@@ -589,13 +589,13 @@ void a2000_state::machine_reset()
 	m_zorro->reset();
 }
 
-WRITE_LINE_MEMBER( a2000_state::zorro2_int2_w )
+void a2000_state::zorro2_int2_w(int state)
 {
 	m_zorro2_int2 = state;
 	update_int2();
 }
 
-WRITE_LINE_MEMBER( a2000_state::zorro2_int6_w )
+void a2000_state::zorro2_int6_w(int state)
 {
 	m_zorro2_int6 = state;
 	update_int6();
@@ -620,13 +620,13 @@ void a500_state::machine_reset()
 	m_side->reset();
 }
 
-WRITE_LINE_MEMBER( a500_state::side_int2_w )
+void a500_state::side_int2_w(int state)
 {
 	m_side_int2 = state;
 	update_int2();
 }
 
-WRITE_LINE_MEMBER( a500_state::side_int6_w )
+void a500_state::side_int6_w(int state)
 {
 	m_side_int6 = state;
 	update_int6();
@@ -662,26 +662,26 @@ bool cdtv_state::int6_pending()
 	return m_cia_1_irq;
 }
 
-READ32_MEMBER( a3000_state::scsi_r )
+uint32_t a3000_state::scsi_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0xffffffff;
 	logerror("scsi_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
 
-WRITE32_MEMBER( a3000_state::scsi_w )
+void a3000_state::scsi_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("scsi_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-READ32_MEMBER( a3000_state::motherboard_r )
+uint32_t a3000_state::motherboard_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0xffffffff;
 	logerror("motherboard_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
 
-WRITE32_MEMBER( a3000_state::motherboard_w )
+void a3000_state::motherboard_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
@@ -710,7 +710,7 @@ bool a600_state::int2_pending()
 	return m_cia_0_irq || m_gayle_int2;
 }
 
-WRITE_LINE_MEMBER( a600_state::gayle_int2_w )
+void a600_state::gayle_int2_w(int state)
 {
 	m_gayle_int2 = state;
 	update_int2();
@@ -721,25 +721,25 @@ bool a1200_state::int2_pending()
 	return m_cia_0_irq || m_gayle_int2;
 }
 
-WRITE_LINE_MEMBER( a1200_state::gayle_int2_w )
+void a1200_state::gayle_int2_w(int state)
 {
 	m_gayle_int2 = state;
 	update_int2();
 }
 
-READ32_MEMBER( a4000_state::scsi_r )
+uint32_t a4000_state::scsi_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t data = 0xffff;
 	logerror("scsi_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
 
-WRITE32_MEMBER( a4000_state::scsi_w )
+void a4000_state::scsi_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("scsi_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-READ16_MEMBER( a4000_state::ide_r )
+uint16_t a4000_state::ide_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -762,7 +762,7 @@ READ16_MEMBER( a4000_state::ide_r )
 	return data;
 }
 
-WRITE16_MEMBER( a4000_state::ide_w )
+void a4000_state::ide_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// ide interrupt register, read only
 	if (offset == 0x1010)
@@ -779,12 +779,12 @@ WRITE16_MEMBER( a4000_state::ide_w )
 		m_ata->write_cs0(space, (offset >> 1) & 0x07, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )
+void a4000_state::ide_interrupt_w(int state)
 {
 	m_ide_interrupt = state;
 }
 
-READ32_MEMBER( a4000_state::motherboard_r )
+uint32_t a4000_state::motherboard_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 
@@ -807,7 +807,7 @@ READ32_MEMBER( a4000_state::motherboard_r )
 	return data;
 }
 
-WRITE32_MEMBER( a4000_state::motherboard_w )
+void a4000_state::motherboard_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -900,18 +900,18 @@ uint16_t cd32_state::handle_joystick_potgor(uint16_t potgor)
 	return potgor;
 }
 
-CUSTOM_INPUT_MEMBER( cd32_state::cd32_input )
+ioport_value cd32_state::cd32_input(ioport_field &field, void *param)
 {
 	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
 
-CUSTOM_INPUT_MEMBER( cd32_state::cd32_sel_mirror_input )
+ioport_value cd32_state::cd32_sel_mirror_input(ioport_field &field, void *param)
 {
 	uint8_t bits = m_player_ports[(int)(uintptr_t)param]->read();
 	return (bits & 0x20)>>5;
 }
 
-WRITE8_MEMBER( cd32_state::akiko_cia_0_port_a_write )
+void cd32_state::akiko_cia_0_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0, cd audio mute
 	m_cdda->set_output_gain(0, BIT(data, 0) ? 0.0 : 1.0);

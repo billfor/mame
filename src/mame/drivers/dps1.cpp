@@ -29,21 +29,21 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_WRITE8_MEMBER(portb2_w);
-	DECLARE_WRITE8_MEMBER(portb4_w);
-	DECLARE_WRITE8_MEMBER(portb6_w);
-	DECLARE_WRITE8_MEMBER(portb8_w);
-	DECLARE_WRITE8_MEMBER(portba_w);
-	DECLARE_WRITE8_MEMBER(portbc_w);
-	DECLARE_WRITE8_MEMBER(portbe_w);
-	DECLARE_READ8_MEMBER(portff_r);
-	DECLARE_WRITE8_MEMBER(portff_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_DRIVER_INIT(dps1);
-	DECLARE_MACHINE_RESET(dps1);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t port00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portba_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portbc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portbe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fdc_drq_w(int state);
+	void init_dps1();
+	void machine_reset_dps1();
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	bool m_dma_dir;
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( dps1_io, AS_IO, 8, dps1_state )
 ADDRESS_MAP_END
 
 // uart in
-READ8_MEMBER( dps1_state::port00_r )
+uint8_t dps1_state::port00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x4e;
 	switch(offset)
@@ -98,66 +98,66 @@ READ8_MEMBER( dps1_state::port00_r )
 }
 
 // uart out
-WRITE8_MEMBER( dps1_state::port00_w )
+void dps1_state::port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 		m_terminal->write(space, 0, data);
 }
 
 // read from disk, to memory
-WRITE8_MEMBER( dps1_state::portb2_w )
+void dps1_state::portb2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma_dir = 1;
 }
 
 // write to disk, from memory
-WRITE8_MEMBER( dps1_state::portb4_w )
+void dps1_state::portb4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma_dir = 0;
 }
 
 // enable eprom
-WRITE8_MEMBER( dps1_state::portb6_w )
+void dps1_state::portb6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(1); // point at rom
 }
 
 // set A16-23
-WRITE8_MEMBER( dps1_state::portb8_w )
+void dps1_state::portb8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 // set A8-15
-WRITE8_MEMBER( dps1_state::portba_w )
+void dps1_state::portba_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma_adr = (data << 8) | (m_dma_adr & 0xff);
 }
 
 // set A0-7
-WRITE8_MEMBER( dps1_state::portbc_w )
+void dps1_state::portbc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma_adr = (m_dma_adr & 0xff00) | data;
 }
 
 // disable eprom
-WRITE8_MEMBER( dps1_state::portbe_w )
+void dps1_state::portbe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(0); // point at ram
 }
 
 // read 8 front-panel switches
-READ8_MEMBER( dps1_state::portff_r )
+uint8_t dps1_state::portff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x0e;
 }
 
 // write to 8 leds
-WRITE8_MEMBER( dps1_state::portff_w )
+void dps1_state::portff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 // do dma
-WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
+void dps1_state::fdc_drq_w(int state)
 {
 	if (state)
 	{
@@ -177,7 +177,7 @@ WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
 	// else take /dack high (unsupported)
 }
 
-MACHINE_RESET_MEMBER( dps1_state, dps1 )
+void dps1_state::machine_reset_dps1()
 {
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -189,7 +189,7 @@ MACHINE_RESET_MEMBER( dps1_state, dps1 )
 	floppy->mon_w(0);
 }
 
-DRIVER_INIT_MEMBER( dps1_state, dps1 )
+void dps1_state::init_dps1()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -201,7 +201,7 @@ DRIVER_INIT_MEMBER( dps1_state, dps1 )
 static INPUT_PORTS_START( dps1 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( dps1_state::kbd_put )
+void dps1_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

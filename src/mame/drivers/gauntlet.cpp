@@ -156,14 +156,14 @@ void gauntlet_state::scanline_update(screen_device &screen, int scanline)
 }
 
 
-MACHINE_START_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::machine_start_gauntlet()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_sound_reset_val));
 }
 
 
-MACHINE_RESET_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::machine_reset_gauntlet()
 {
 	m_sound_reset_val = 1;
 
@@ -179,7 +179,7 @@ MACHINE_RESET_MEMBER(gauntlet_state,gauntlet)
  *
  *************************************/
 
-WRITE16_MEMBER(gauntlet_state::sound_reset_w)
+void gauntlet_state::sound_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -211,7 +211,7 @@ WRITE16_MEMBER(gauntlet_state::sound_reset_w)
  *
  *************************************/
 
-READ8_MEMBER(gauntlet_state::switch_6502_r)
+uint8_t gauntlet_state::switch_6502_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int temp = 0x30;
 
@@ -230,7 +230,7 @@ READ8_MEMBER(gauntlet_state::switch_6502_r)
  *
  *************************************/
 
-WRITE8_MEMBER(gauntlet_state::sound_ctl_w)
+void gauntlet_state::sound_ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 7)
 	{
@@ -261,7 +261,7 @@ WRITE8_MEMBER(gauntlet_state::sound_ctl_w)
  *
  *************************************/
 
-WRITE8_MEMBER(gauntlet_state::mixer_w)
+void gauntlet_state::mixer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ym2151->set_output_gain(ALL_OUTPUTS, (data & 7) / 7.0f);
 	m_pokey->set_output_gain(ALL_OUTPUTS, ((data >> 3) & 3) / 3.0f);
@@ -1663,13 +1663,13 @@ void gauntlet_state::common_init(int vindctr2)
 }
 
 
-DRIVER_INIT_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::init_gauntlet()
 {
 	common_init(0);
 }
 
 
-DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
+void gauntlet_state::init_vindctr2()
 {
 	uint8_t *gfx2_base = memregion("gfx2")->base();
 	std::vector<uint8_t> data(0x8000);

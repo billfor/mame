@@ -41,7 +41,7 @@ RUN
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( phc25_state::port40_r )
+uint8_t phc25_state::port40_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -75,7 +75,7 @@ READ8_MEMBER( phc25_state::port40_r )
 	return data;
 }
 
-WRITE8_MEMBER( phc25_state::port40_w )
+void phc25_state::port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -108,7 +108,7 @@ WRITE8_MEMBER( phc25_state::port40_w )
 	m_port40 = data;
 }
 
-WRITE_LINE_MEMBER( phc25_state::write_centronics_busy )
+void phc25_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -260,7 +260,7 @@ INPUT_PORTS_END
 
 /* Video */
 
-READ8_MEMBER( phc25_state::video_ram_r )
+uint8_t phc25_state::video_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(m_port40, 7)) // graphics
 	{
@@ -283,7 +283,7 @@ MC6847_GET_CHARROM_MEMBER(phc25_state::pal_char_rom_r)
 }
 
 // irq is inverted in emulation, so we need this trampoline
-WRITE_LINE_MEMBER( phc25_state::irq_w )
+void phc25_state::irq_w(int state)
 {
 	m_maincpu->set_input_line(0, state ? CLEAR_LINE : ASSERT_LINE);
 }

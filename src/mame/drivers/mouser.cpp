@@ -21,13 +21,13 @@
 
 /* Mouser has external masking circuitry around
  * the NMI input on the main CPU */
-WRITE8_MEMBER(mouser_state::mouser_nmi_enable_w)
+void mouser_state::mouser_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("nmi_enable %02x\n", data);
 	m_nmi_enable = data;
 }
 
-INTERRUPT_GEN_MEMBER(mouser_state::mouser_nmi_interrupt)
+void mouser_state::mouser_nmi_interrupt(device_t &device)
 {
 	if (BIT(m_nmi_enable, 0))
 		nmi_line_pulse(device);
@@ -35,26 +35,26 @@ INTERRUPT_GEN_MEMBER(mouser_state::mouser_nmi_interrupt)
 
 /* Sound CPU interrupted on write */
 
-WRITE8_MEMBER(mouser_state::mouser_sound_interrupt_w)
+void mouser_state::mouser_sound_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("int %02x\n", data);
 	m_sound_byte = data;
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(mouser_state::mouser_sound_byte_r)
+uint8_t mouser_state::mouser_sound_byte_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("sound r\n");
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_sound_byte;
 }
 
-WRITE8_MEMBER(mouser_state::mouser_sound_nmi_clear_w)
+void mouser_state::mouser_sound_nmi_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mouser_state::mouser_sound_nmi_assert)
+void mouser_state::mouser_sound_nmi_assert(device_t &device)
 {
 	if (BIT(m_nmi_enable, 0))
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -283,7 +283,7 @@ ROM_START( mouserc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(mouser_state,mouser)
+void mouser_state::init_mouser()
 {
 	/* Decode the opcodes */
 

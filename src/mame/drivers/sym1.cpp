@@ -57,20 +57,20 @@ public:
 	uint8_t m_riot_port_a;
 	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
-	DECLARE_DRIVER_INIT(sym1);
+	void init_sym1();
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(led_refresh);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_0_w);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_1_w);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_2_w);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_3_w);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_4_w);
-	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_5_w);
-	DECLARE_READ8_MEMBER(sym1_riot_a_r);
-	DECLARE_READ8_MEMBER(sym1_riot_b_r);
-	DECLARE_WRITE8_MEMBER(sym1_riot_a_w);
-	DECLARE_WRITE8_MEMBER(sym1_riot_b_w);
-	DECLARE_WRITE8_MEMBER(sym1_via2_a_w);
+	void led_refresh(void *ptr, int32_t param);
+	void sym1_74145_output_0_w(int state);
+	void sym1_74145_output_1_w(int state);
+	void sym1_74145_output_2_w(int state);
+	void sym1_74145_output_3_w(int state);
+	void sym1_74145_output_4_w(int state);
+	void sym1_74145_output_5_w(int state);
+	uint8_t sym1_riot_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sym1_riot_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sym1_riot_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sym1_riot_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sym1_via2_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -88,19 +88,19 @@ protected:
 //  KEYBOARD INPUT & LED OUTPUT
 //**************************************************************************
 
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_0_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 0); }
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_1_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 1); }
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_2_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 2); }
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_3_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 3); }
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_4_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 4); }
-WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_5_w ) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 5); }
+void sym1_state::sym1_74145_output_0_w(int state) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 0); }
+void sym1_state::sym1_74145_output_1_w(int state) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 1); }
+void sym1_state::sym1_74145_output_2_w(int state) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 2); }
+void sym1_state::sym1_74145_output_3_w(int state) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 3); }
+void sym1_state::sym1_74145_output_4_w(int state) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 4); }
+void sym1_state::sym1_74145_output_5_w(int state) { if (state) m_led_update->adjust(LED_REFRESH_DELAY, 5); }
 
-TIMER_CALLBACK_MEMBER( sym1_state::led_refresh )
+void sym1_state::led_refresh(void *ptr, int32_t param)
 {
 	output().set_digit_value(param, m_riot_port_a);
 }
 
-READ8_MEMBER( sym1_state::sym1_riot_a_r )
+uint8_t sym1_state::sym1_riot_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0x7f;
 
@@ -117,7 +117,7 @@ READ8_MEMBER( sym1_state::sym1_riot_a_r )
 	return data;
 }
 
-READ8_MEMBER( sym1_state::sym1_riot_b_r )
+uint8_t sym1_state::sym1_riot_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 
@@ -136,7 +136,7 @@ READ8_MEMBER( sym1_state::sym1_riot_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( sym1_state::sym1_riot_a_w )
+void sym1_state::sym1_riot_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%x: riot_a_w 0x%02x\n", m_maincpu->pc(), data);
 
@@ -144,7 +144,7 @@ WRITE8_MEMBER( sym1_state::sym1_riot_a_w )
 	m_riot_port_a = data;
 }
 
-WRITE8_MEMBER( sym1_state::sym1_riot_b_w )
+void sym1_state::sym1_riot_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%x: riot_b_w 0x%02x\n", m_maincpu->pc(), data);
 
@@ -227,7 +227,7 @@ INPUT_PORTS_END
     PA2: Write protect RAM 0x800-0xbff
     PA3: Write protect RAM 0xc00-0xfff
  */
-WRITE8_MEMBER( sym1_state::sym1_via2_a_w )
+void sym1_state::sym1_via2_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &cpu0space = m_maincpu->space( AS_PROGRAM );
 
@@ -255,7 +255,7 @@ WRITE8_MEMBER( sym1_state::sym1_via2_a_w )
 	}
 }
 
-DRIVER_INIT_MEMBER( sym1_state, sym1 )
+void sym1_state::init_sym1()
 {
 	// wipe expansion memory banks that are not installed
 	if (m_ram->size() < 4*1024)

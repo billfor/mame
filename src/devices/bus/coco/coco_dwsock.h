@@ -38,10 +38,10 @@ public:
 	void    update_port(void);
 
 	// driver update handlers
-	DECLARE_INPUT_CHANGED_MEMBER(drivewire_port_changed);
+	void drivewire_port_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// types
 	enum dwsock_ports {

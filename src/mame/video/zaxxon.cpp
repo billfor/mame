@@ -17,7 +17,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(zaxxon_state, zaxxon)
+void zaxxon_state::palette_init_zaxxon(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
@@ -68,7 +68,7 @@ PALETTE_INIT_MEMBER(zaxxon_state, zaxxon)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(zaxxon_state::get_bg_tile_info)
+void zaxxon_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint8_t *source = memregion("tilemap_dat")->base();
 	int size = memregion("tilemap_dat")->bytes() / 2;
@@ -80,7 +80,7 @@ TILE_GET_INFO_MEMBER(zaxxon_state::get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(zaxxon_state::zaxxon_get_fg_tile_info)
+void zaxxon_state::zaxxon_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int sx = tile_index % 32;
 	int sy = tile_index / 32;
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(zaxxon_state::zaxxon_get_fg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(zaxxon_state::razmataz_get_fg_tile_info)
+void zaxxon_state::razmataz_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_color_codes[code] & 0x0f;
@@ -100,7 +100,7 @@ TILE_GET_INFO_MEMBER(zaxxon_state::razmataz_get_fg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(zaxxon_state::congo_get_fg_tile_info)
+void zaxxon_state::congo_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + (m_congo_fg_bank << 8);
 	int color = m_colorram[tile_index] & 0x1f;
@@ -148,13 +148,13 @@ void zaxxon_state::video_start()
 }
 
 
-VIDEO_START_MEMBER(zaxxon_state,razmataz)
+void zaxxon_state::video_start_razmataz()
 {
 	video_start_common(tilemap_get_info_delegate(FUNC(zaxxon_state::razmataz_get_fg_tile_info),this));
 }
 
 
-VIDEO_START_MEMBER(zaxxon_state,congo)
+void zaxxon_state::video_start_congo()
 {
 	/* allocate our own spriteram since it is not accessible by the main CPU */
 	m_spriteram.allocate(0x100);
@@ -175,7 +175,7 @@ VIDEO_START_MEMBER(zaxxon_state,congo)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_flipscreen_w)
+void zaxxon_state::zaxxon_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low bit controls flip; background and sprite flip are handled at render time */
 	flip_screen_set_no_update(~data & 1);
@@ -183,7 +183,7 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_flipscreen_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_fg_color_w)
+void zaxxon_state::zaxxon_fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low bit selects high color palette index */
 	m_fg_color = (data & 1) * 0x80;
@@ -191,7 +191,7 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_fg_color_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_bg_position_w)
+void zaxxon_state::zaxxon_bg_position_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 11 bits of scroll position are stored */
 	if (offset == 0)
@@ -201,21 +201,21 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_bg_position_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_bg_color_w)
+void zaxxon_state::zaxxon_bg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low bit selects high color palette index */
 	m_bg_color = (data & 1) * 0x80;
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_bg_enable_w)
+void zaxxon_state::zaxxon_bg_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low bit enables/disables the background layer */
 	m_bg_enable = data & 1;
 }
 
 
-WRITE8_MEMBER(zaxxon_state::congo_fg_bank_w)
+void zaxxon_state::congo_fg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low bit controls the topmost character bit */
 	m_congo_fg_bank = data & 1;
@@ -223,7 +223,7 @@ WRITE8_MEMBER(zaxxon_state::congo_fg_bank_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::congo_color_bank_w)
+void zaxxon_state::congo_color_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low bit controls the topmost bit into the color PROM */
 	m_congo_color_bank = data & 1;
@@ -238,14 +238,14 @@ WRITE8_MEMBER(zaxxon_state::congo_color_bank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_videoram_w)
+void zaxxon_state::zaxxon_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(zaxxon_state::congo_colorram_w)
+void zaxxon_state::congo_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -259,7 +259,7 @@ WRITE8_MEMBER(zaxxon_state::congo_colorram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::congo_sprite_custom_w)
+void zaxxon_state::congo_sprite_custom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *spriteram = m_spriteram;
 

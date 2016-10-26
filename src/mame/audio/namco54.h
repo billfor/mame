@@ -25,20 +25,20 @@ public:
 	static void set_discrete(device_t &device, const char *tag) { downcast<namco_54xx_device &>(device).m_discrete.set_tag(tag); }
 	static void set_basenote(device_t &device, int node) { downcast<namco_54xx_device &>(device).m_basenode = node; }
 
-	DECLARE_READ8_MEMBER( K_r );
-	DECLARE_READ8_MEMBER( R0_r );
-	DECLARE_WRITE8_MEMBER( O_w );
-	DECLARE_WRITE8_MEMBER( R1_w );
+	uint8_t K_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t R0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void O_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void R1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	TIMER_CALLBACK_MEMBER( latch_callback );
-	TIMER_CALLBACK_MEMBER( irq_clear );
+	void latch_callback(void *ptr, int32_t param);
+	void irq_clear(void *ptr, int32_t param);
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;

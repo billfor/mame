@@ -296,7 +296,7 @@ void uv201_device::do_partial_update()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( uv201_device::read )
+uint8_t uv201_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -356,7 +356,7 @@ READ8_MEMBER( uv201_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( uv201_device::write )
+void uv201_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -458,7 +458,7 @@ WRITE8_MEMBER( uv201_device::write )
 //  ext_int_w - external interrupt write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( uv201_device::ext_int_w )
+void uv201_device::ext_int_w(int state)
 {
 	if (!state && (m_cmd & COMMAND_FRZ))
 	{
@@ -472,7 +472,7 @@ WRITE_LINE_MEMBER( uv201_device::ext_int_w )
 //  kbd_r - keyboard select read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( uv201_device::kbd_r )
+int uv201_device::kbd_r()
 {
 	return (m_cmd & COMMAND_KBD) ? 1 : 0;
 }

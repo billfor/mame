@@ -158,7 +158,7 @@ void wpc_dot_state::machine_reset()
 	m_irq_count = 0;
 }
 
-DRIVER_INIT_MEMBER(wpc_dot_state,wpc_dot)
+void wpc_dot_state::init_wpc_dot()
 {
 	uint8_t *fixed = memregion("code")->base();
 	uint32_t codeoff = memregion("code")->bytes() - 0x8000;
@@ -189,12 +189,12 @@ DRIVER_INIT_MEMBER(wpc_dot_state,wpc_dot)
 	save_pointer(m_dmdram,"DMD RAM",0x2000);
 }
 
-READ8_MEMBER(wpc_dot_state::ram_r)
+uint8_t wpc_dot_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER(wpc_dot_state::ram_w)
+void wpc_dot_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((!m_wpc->memprotect_active()) || ((offset & m_wpc->get_memprotect_mask()) != m_wpc->get_memprotect_mask()))
 		m_ram[offset] = data;
@@ -202,12 +202,12 @@ WRITE8_MEMBER(wpc_dot_state::ram_w)
 		logerror("WPC: Memory protection violation at 0x%04x (mask=0x%04x)\n",offset,m_wpc->get_memprotect_mask());
 }
 
-WRITE8_MEMBER(wpc_dot_state::wpc_rombank_w)
+void wpc_dot_state::wpc_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpubank->set_entry(data & m_bankmask);
 }
 
-WRITE8_MEMBER(wpc_dot_state::wpc_dmdbank_w)
+void wpc_dot_state::wpc_dmdbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t page = offset >> 4;
 
@@ -234,7 +234,7 @@ WRITE8_MEMBER(wpc_dot_state::wpc_dmdbank_w)
 	}
 }
 
-WRITE_LINE_MEMBER(wpc_dot_state::wpcsnd_reply_w)
+void wpc_dot_state::wpcsnd_reply_w(int state)
 {
 	if(state)
 	{
@@ -243,32 +243,32 @@ WRITE_LINE_MEMBER(wpc_dot_state::wpcsnd_reply_w)
 	}
 }
 
-WRITE_LINE_MEMBER(wpc_dot_state::wpc_irq_w)
+void wpc_dot_state::wpc_irq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_dot_state::wpc_firq_w)
+void wpc_dot_state::wpc_firq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE,CLEAR_LINE);
 }
 
-READ8_MEMBER(wpc_dot_state::wpc_sound_ctrl_r)
+uint8_t wpc_dot_state::wpc_sound_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_wpcsnd->ctrl_r();  // ack FIRQ?
 }
 
-WRITE8_MEMBER(wpc_dot_state::wpc_sound_ctrl_w)
+void wpc_dot_state::wpc_sound_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_wpcsnd->ctrl_w(data);
 }
 
-READ8_MEMBER(wpc_dot_state::wpc_sound_data_r)
+uint8_t wpc_dot_state::wpc_sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_wpcsnd->data_r();
 }
 
-WRITE8_MEMBER(wpc_dot_state::wpc_sound_data_w)
+void wpc_dot_state::wpc_sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_wpcsnd->data_w(data);
 }

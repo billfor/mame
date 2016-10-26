@@ -241,13 +241,13 @@ Custom: GX61A01
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
-INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
+void homedata_state::homedata_irq(device_t &device)
 {
 	m_vblank = 1;
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(homedata_state::upd7807_irq)
+void homedata_state::upd7807_irq(device_t &device)
 {
 	generic_pulse_irq_line(device.execute(), UPD7810_INTF1, 1);
 }
@@ -261,7 +261,7 @@ INTERRUPT_GEN_MEMBER(homedata_state::upd7807_irq)
 
  ********************************************************************************/
 
-READ8_MEMBER(homedata_state::mrokumei_keyboard_r)
+uint8_t homedata_state::mrokumei_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = 0x3f,i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
@@ -296,13 +296,13 @@ READ8_MEMBER(homedata_state::mrokumei_keyboard_r)
 	return res;
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_keyboard_select_w)
+void homedata_state::mrokumei_keyboard_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyb = data;
 }
 
 
-READ8_MEMBER(homedata_state::mrokumei_sound_io_r)
+uint8_t homedata_state::mrokumei_sound_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_sndbank & 4)
 		return(m_soundlatch->read(space, 0));
@@ -310,7 +310,7 @@ READ8_MEMBER(homedata_state::mrokumei_sound_io_r)
 		return memregion("audiocpu")->base()[0x10000 + offset + (m_sndbank & 1) * 0x10000];
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_sound_bank_w)
+void homedata_state::mrokumei_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = ROM bank
 	   bit 2 = ROM or soundlatch
@@ -318,7 +318,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_bank_w)
 	m_sndbank = data;
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
+void homedata_state::mrokumei_sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -333,17 +333,17 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
 
  ********************************************************************************/
 
-READ8_MEMBER(homedata_state::reikaids_upd7807_porta_r)
+uint8_t homedata_state::reikaids_upd7807_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_upd7807_porta;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_upd7807_porta_w)
+void homedata_state::reikaids_upd7807_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7807_porta = data;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
+void homedata_state::reikaids_upd7807_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port C layout:
 	   7 coin counter
@@ -370,7 +370,7 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 	m_upd7807_portc = data;
 }
 
-READ8_MEMBER(homedata_state::reikaids_io_r)
+uint8_t homedata_state::reikaids_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = ioport("IN2")->read();    // bit 4 = coin, bit 5 = service
 
@@ -387,13 +387,13 @@ READ8_MEMBER(homedata_state::reikaids_io_r)
 	return res;
 }
 
-READ8_MEMBER(homedata_state::reikaids_snd_command_r)
+uint8_t homedata_state::reikaids_snd_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: sndmcd_r (%02x)\n", space.device().safe_pc(), m_snd_command);
 	return m_snd_command;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_snd_command_w)
+void homedata_state::reikaids_snd_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_command = data;
 	//logerror("%04x: coprocessor_command_w %02x\n", space.device().safe_pc(), data);
@@ -408,19 +408,19 @@ WRITE8_MEMBER(homedata_state::reikaids_snd_command_w)
 
  ********************************************************************************/
 
-WRITE8_MEMBER(homedata_state::pteacher_snd_command_w)
+void homedata_state::pteacher_snd_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: snd_command_w %02x\n", space.device().safe_pc(), data);
 	m_from_cpu = data;
 }
 
-READ8_MEMBER(homedata_state::pteacher_snd_r)
+uint8_t homedata_state::pteacher_snd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: pteacher_snd_r %02x\n",space.device().safe_pc(),to_cpu);
 	return m_to_cpu;
 }
 
-READ8_MEMBER(homedata_state::pteacher_io_r)
+uint8_t homedata_state::pteacher_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bit 6: !vblank
 	 * bit 7: visible page
@@ -437,7 +437,7 @@ READ8_MEMBER(homedata_state::pteacher_io_r)
 	return res;
 }
 
-READ8_MEMBER(homedata_state::pteacher_keyboard_r)
+uint8_t homedata_state::pteacher_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 	int dips = ioport("DSW")->read();
@@ -460,7 +460,7 @@ READ8_MEMBER(homedata_state::pteacher_keyboard_r)
 	return 0xff;
 }
 
-READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
+uint8_t homedata_state::pteacher_upd7807_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_upd7807_portc, 6))
 		m_upd7807_porta = m_from_cpu;
@@ -470,18 +470,18 @@ READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
 	return m_upd7807_porta;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_snd_answer_w)
+void homedata_state::pteacher_snd_answer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_to_cpu = data;
 	//logerror("%04x: to_cpu = %02x\n", space.device().safe_pc(), m_to_cpu);
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_upd7807_porta_w)
+void homedata_state::pteacher_upd7807_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7807_porta = data;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
+void homedata_state::pteacher_upd7807_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port C layout:
 	   7 coin counter
@@ -509,7 +509,7 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 /********************************************************************************/
 
 
-WRITE8_MEMBER(homedata_state::bankswitch_w)
+void homedata_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int last_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 
@@ -1126,7 +1126,7 @@ static GFXDECODE_START( lemnangl )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(homedata_state,homedata)
+void homedata_state::machine_start_homedata()
 {
 	save_item(NAME(m_visible_page));
 	save_item(NAME(m_flipscreen));
@@ -1139,14 +1139,14 @@ MACHINE_START_MEMBER(homedata_state,homedata)
 	save_item(NAME(m_snd_command));
 }
 
-MACHINE_START_MEMBER(homedata_state,reikaids)
+void homedata_state::machine_start_reikaids()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0xc000], 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x10000);
 
-	MACHINE_START_CALL_MEMBER(homedata);
+	machine_start_homedata();
 
 	save_item(NAME(m_upd7807_porta));
 	save_item(NAME(m_upd7807_portc));
@@ -1155,14 +1155,14 @@ MACHINE_START_MEMBER(homedata_state,reikaids)
 	save_item(NAME(m_gfx_bank));
 }
 
-MACHINE_START_MEMBER(homedata_state,pteacher)
+void homedata_state::machine_start_pteacher()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x10000);
 
-	MACHINE_START_CALL_MEMBER(homedata);
+	machine_start_homedata();
 
 	save_item(NAME(m_upd7807_porta));
 	save_item(NAME(m_upd7807_portc));
@@ -1172,7 +1172,7 @@ MACHINE_START_MEMBER(homedata_state,pteacher)
 	save_item(NAME(m_from_cpu));
 }
 
-MACHINE_RESET_MEMBER(homedata_state,homedata)
+void homedata_state::machine_reset_homedata()
 {
 	m_visible_page = 0;
 	m_flipscreen = 0;
@@ -1188,14 +1188,14 @@ MACHINE_RESET_MEMBER(homedata_state,homedata)
 	m_snd_command = 0;
 }
 
-MACHINE_RESET_MEMBER(homedata_state,pteacher)
+void homedata_state::machine_reset_pteacher()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	pteacher_upd7807_portc_w(space, 0, 0xff);
 
-	MACHINE_RESET_CALL_MEMBER(homedata);
+	machine_reset_homedata();
 
 	m_upd7807_porta = 0;
 	m_gfx_bank[0] = 0;
@@ -1204,14 +1204,14 @@ MACHINE_RESET_MEMBER(homedata_state,pteacher)
 	m_from_cpu = 0;
 }
 
-MACHINE_RESET_MEMBER(homedata_state,reikaids)
+void homedata_state::machine_reset_reikaids()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	reikaids_upd7807_portc_w(space, 0, 0xff);
 
-	MACHINE_RESET_CALL_MEMBER(homedata);
+	machine_reset_homedata();
 
 	m_reikaids_which = m_priority;  // m_priority is set in DRIVER_INIT
 	m_upd7807_porta = 0;
@@ -1396,13 +1396,13 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, homedata_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(homedata_state::mirderby_prot_r)
+uint8_t homedata_state::mirderby_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_prot_data&=0x7f;
 	return m_prot_data++;
 }
 
-WRITE8_MEMBER(homedata_state::mirderby_prot_w)
+void homedata_state::mirderby_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot_data = data;
 }
@@ -2007,7 +2007,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(homedata_state,jogakuen)
+void homedata_state::init_jogakuen()
 {
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
 	   but with just these two addresses swapped. Instead of creating a new
@@ -2016,24 +2016,24 @@ DRIVER_INIT_MEMBER(homedata_state,jogakuen)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8005, 0x8005, write8_delegate(FUNC(homedata_state::pteacher_gfx_bank_w),this));
 }
 
-DRIVER_INIT_MEMBER(homedata_state,mjikaga)
+void homedata_state::init_mjikaga()
 {
 	/* Mahjong Ikagadesuka is different as well. */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7802, 0x7802, read8_delegate(FUNC(homedata_state::pteacher_snd_r),this));
 	m_audiocpu->space(AS_PROGRAM).install_write_handler(0x0123, 0x0123, write8_delegate(FUNC(homedata_state::pteacher_snd_answer_w),this));
 }
 
-DRIVER_INIT_MEMBER(homedata_state,reikaids)
+void homedata_state::init_reikaids()
 {
 	m_priority = 0;
 }
 
-DRIVER_INIT_MEMBER(homedata_state,battlcry)
+void homedata_state::init_battlcry()
 {
 	m_priority = 1; /* priority and initial value for bank write */
 }
 
-DRIVER_INIT_MEMBER(homedata_state,mirderby)
+void homedata_state::init_mirderby()
 {
 }
 

@@ -167,14 +167,14 @@ public:
 	uint32_t m_a2_palette[16];
 	uint32_t m_shr_palette[256];
 
-	READ8_MEMBER( apple2gs_c0xx_r );
-	WRITE8_MEMBER( apple2gs_c0xx_w );
-	WRITE8_MEMBER( apple2gs_main0400_w );
-	WRITE8_MEMBER( apple2gs_aux0400_w );
-	WRITE8_MEMBER( apple2gs_main2000_w );
-	WRITE8_MEMBER( apple2gs_aux2000_w );
-	WRITE8_MEMBER( apple2gs_main4000_w );
-	WRITE8_MEMBER( apple2gs_aux4000_w );
+	uint8_t apple2gs_c0xx_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void apple2gs_c0xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	void apple2gs_main0400_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	void apple2gs_aux0400_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	void apple2gs_main2000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	void apple2gs_aux2000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	void apple2gs_main4000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	void apple2gs_aux4000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
 	uint8_t adb_read_datareg();
 	uint8_t adb_read_kmstatus();
@@ -184,20 +184,20 @@ public:
 	write8_delegate write_delegates_2gs0400[2];
 	write8_delegate write_delegates_2gs2000[2];
 	write8_delegate write_delegates_2gs4000[2];
-	DECLARE_MACHINE_START(apple2gs);
-	DECLARE_MACHINE_RESET(apple2gs);
-	DECLARE_VIDEO_START(apple2gs);
-	DECLARE_PALETTE_INIT(apple2gs);
-	DECLARE_MACHINE_START(apple2gsr1);
-	DECLARE_MACHINE_START(apple2gscommon);
+	void machine_start_apple2gs();
+	void machine_reset_apple2gs();
+	void video_start_apple2gs();
+	void palette_init_apple2gs(palette_device &palette);
+	void machine_start_apple2gsr1();
+	void machine_start_apple2gscommon();
 	uint32_t screen_update_apple2gs(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(apple2gs_clock_tick);
-	TIMER_CALLBACK_MEMBER(apple2gs_qsecond_tick);
-	TIMER_CALLBACK_MEMBER(apple2gs_scanline_tick);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
-	DECLARE_READ8_MEMBER(apple2gs_read_vector);
+	void apple2gs_clock_tick(void *ptr, int32_t param);
+	void apple2gs_qsecond_tick(void *ptr, int32_t param);
+	void apple2gs_scanline_tick(void *ptr, int32_t param);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void a2bus_inh_w(int state);
+	uint8_t apple2gs_read_vector(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// ADB MCU and ADB GLU stuff
 	#if RUN_ADB_MICRO
@@ -209,14 +209,14 @@ public:
 	uint8_t keyglu_816_read(uint8_t offset);
 	void keyglu_816_write(uint8_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER(adbmicro_p0_in);
-	DECLARE_READ8_MEMBER(adbmicro_p1_in);
-	DECLARE_READ8_MEMBER(adbmicro_p2_in);
-	DECLARE_READ8_MEMBER(adbmicro_p3_in);
-	DECLARE_WRITE8_MEMBER(adbmicro_p0_out);
-	DECLARE_WRITE8_MEMBER(adbmicro_p1_out);
-	DECLARE_WRITE8_MEMBER(adbmicro_p2_out);
-	DECLARE_WRITE8_MEMBER(adbmicro_p3_out);
+	uint8_t adbmicro_p0_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t adbmicro_p1_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t adbmicro_p2_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t adbmicro_p3_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adbmicro_p0_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adbmicro_p1_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adbmicro_p2_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adbmicro_p3_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	#endif
 	void process_clock();
 	const char *apple2gs_irq_name(uint16_t irq_mask);
@@ -242,25 +242,25 @@ public:
 	void apple2gs_xxCxxx_w(address_space &space, offs_t address, uint8_t data);
 	void apple2gs_setup_memory();
 
-	DECLARE_READ8_MEMBER( gssnd_r );
-	DECLARE_WRITE8_MEMBER( gssnd_w );
-	DECLARE_READ8_MEMBER( apple2gs_00Cxxx_r );
-	DECLARE_READ8_MEMBER( apple2gs_01Cxxx_r );
-	DECLARE_READ8_MEMBER( apple2gs_E0Cxxx_r );
-	DECLARE_READ8_MEMBER( apple2gs_E1Cxxx_r );
-	DECLARE_WRITE8_MEMBER( apple2gs_00Cxxx_w );
-	DECLARE_WRITE8_MEMBER( apple2gs_01Cxxx_w );
-	DECLARE_WRITE8_MEMBER( apple2gs_E0Cxxx_w );
-	DECLARE_WRITE8_MEMBER( apple2gs_E1Cxxx_w );
-	DECLARE_WRITE8_MEMBER( apple2gs_Exxxxx_w );
-	DECLARE_WRITE8_MEMBER( apple2gs_E004xx_w );
-	DECLARE_WRITE8_MEMBER( apple2gs_E02xxx_w );
-	DECLARE_WRITE8_MEMBER( apple2gs_E104xx_w );
-	DECLARE_WRITE8_MEMBER( apple2gs_E12xxx_w );
-	DECLARE_WRITE8_MEMBER( apple2gs_slowmem_w );
-	DECLARE_READ8_MEMBER(apple2gs_bank_echo_r);
-	DECLARE_WRITE_LINE_MEMBER( apple2gs_doc_irq);
-	DECLARE_READ8_MEMBER(apple2gs_adc_read);
+	uint8_t gssnd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gssnd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t apple2gs_00Cxxx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t apple2gs_01Cxxx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t apple2gs_E0Cxxx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t apple2gs_E1Cxxx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apple2gs_00Cxxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apple2gs_01Cxxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apple2gs_E0Cxxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apple2gs_E1Cxxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apple2gs_Exxxxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apple2gs_E004xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apple2gs_E02xxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apple2gs_E104xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apple2gs_E12xxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apple2gs_slowmem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t apple2gs_bank_echo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apple2gs_doc_irq(int state);
+	uint8_t apple2gs_adc_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 };
 

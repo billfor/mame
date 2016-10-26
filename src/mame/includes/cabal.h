@@ -42,33 +42,33 @@ public:
 	int m_last[4];
 
 	// common
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(background_videoram_w);
-	DECLARE_WRITE16_MEMBER(text_videoram_w);
+	void flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void background_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void text_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// cabal specific
-	DECLARE_WRITE16_MEMBER(track_reset_w);
-	DECLARE_READ16_MEMBER(track_r);
-	DECLARE_WRITE16_MEMBER(sound_irq_trigger_word_w);
+	void track_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t track_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_irq_trigger_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// cabalbl specific
-	DECLARE_WRITE16_MEMBER(cabalbl_sndcmd_w);
-	DECLARE_WRITE16_MEMBER(cabalbl_sound_irq_trigger_word_w);
-	DECLARE_READ8_MEMBER(cabalbl_snd2_r);
-	DECLARE_READ8_MEMBER(cabalbl_snd1_r);
-	DECLARE_WRITE8_MEMBER(cabalbl_coin_w);
-	DECLARE_WRITE8_MEMBER(cabalbl_1_adpcm_w);
-	DECLARE_WRITE8_MEMBER(cabalbl_2_adpcm_w);
+	void cabalbl_sndcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cabalbl_sound_irq_trigger_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t cabalbl_snd2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cabalbl_snd1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cabalbl_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cabalbl_1_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cabalbl_2_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(cabal);
-	DECLARE_DRIVER_INIT(cabalbl2);
-	DECLARE_MACHINE_START(cabal);
-	DECLARE_MACHINE_START(cabalbl);
-	DECLARE_MACHINE_RESET(cabalbl);
+	void init_cabal();
+	void init_cabalbl2();
+	void machine_start_cabal();
+	void machine_start_cabalbl();
+	void machine_reset_cabalbl();
 	virtual void video_start() override;
 
-	TILE_GET_INFO_MEMBER(get_back_tile_info);
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	void get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

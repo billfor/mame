@@ -679,12 +679,12 @@ void x07_state::cassette_w()
 	m_cass_data = m_regs_w[7];
 }
 
-TIMER_CALLBACK_MEMBER(x07_state::cassette_tick)
+void x07_state::cassette_tick(void *ptr, int32_t param)
 {
 	m_cass_clk++;
 }
 
-TIMER_CALLBACK_MEMBER(x07_state::cassette_poll)
+void x07_state::cassette_poll(void *ptr, int32_t param)
 {
 	if ((m_cassette->get_state() & 0x03) == CASSETTE_PLAY)
 		cassette_load();
@@ -913,7 +913,7 @@ inline uint8_t x07_state::get_char(uint16_t pos)
 	}
 }
 
-INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
+void x07_state::kb_func_keys(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t data = 0;
 	uint8_t idx = (uint8_t)(uintptr_t)param;
@@ -938,7 +938,7 @@ INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 	}
 }
 
-INPUT_CHANGED_MEMBER( x07_state::kb_keys )
+void x07_state::kb_keys(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t modifier;
 	uint8_t a1 = ioport("A1")->read();
@@ -972,12 +972,12 @@ INPUT_CHANGED_MEMBER( x07_state::kb_keys )
 	}
 }
 
-INPUT_CHANGED_MEMBER( x07_state::kb_update_udk )
+void x07_state::kb_update_udk(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	draw_udk();
 }
 
-INPUT_CHANGED_MEMBER( x07_state::kb_break )
+void x07_state::kb_break(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{
@@ -1047,7 +1047,7 @@ inline void x07_state::draw_udk()
 		}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
+image_init_result x07_state::device_image_load_x07_card(device_image_interface &image)
 {
 	uint32_t size = m_card->common_get_size("rom");
 
@@ -1071,7 +1071,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 	return image_init_result::PASS;
 }
 
-PALETTE_INIT_MEMBER(x07_state, x07)
+void x07_state::palette_init_x07(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -1103,7 +1103,7 @@ uint32_t x07_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
     Machine
 ***************************************************************************/
 
-READ8_MEMBER( x07_state::x07_io_r )
+uint8_t x07_state::x07_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -1153,7 +1153,7 @@ READ8_MEMBER( x07_state::x07_io_r )
 }
 
 
-WRITE8_MEMBER( x07_state::x07_io_w )
+void x07_state::x07_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1330,12 +1330,12 @@ void x07_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 	m_warm_start = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(x07_state::blink_timer)
+void x07_state::blink_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_blink = !m_blink;
 }
 
-TIMER_CALLBACK_MEMBER(x07_state::rsta_clear)
+void x07_state::rsta_clear(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(NSC800_RSTA, CLEAR_LINE);
 
@@ -1343,12 +1343,12 @@ TIMER_CALLBACK_MEMBER(x07_state::rsta_clear)
 		kb_irq();
 }
 
-TIMER_CALLBACK_MEMBER(x07_state::rstb_clear)
+void x07_state::rstb_clear(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(NSC800_RSTB, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(x07_state::beep_stop)
+void x07_state::beep_stop(void *ptr, int32_t param)
 {
 	m_beep->set_state(0);
 }
@@ -1548,7 +1548,7 @@ ROM_START( x07 )
 	ROM_REGION( 0x0800, "default", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(x07_state, x07)
+void x07_state::init_x07()
 {
 	uint8_t *RAM = memregion("default")->base();
 	uint8_t *GFX = memregion("gfx1")->base();

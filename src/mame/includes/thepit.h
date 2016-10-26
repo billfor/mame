@@ -34,31 +34,31 @@ public:
 	int m_question_rom;
 	int m_remap_address[16];
 
-	DECLARE_WRITE8_MEMBER(sound_enable_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
-	DECLARE_READ8_MEMBER(input_port_0_r);
+	void sound_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(intrepid_colorram_mirror_r);
-	DECLARE_WRITE8_MEMBER(intrepid_graphics_bank_w);
+	uint8_t intrepid_colorram_mirror_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void intrepid_graphics_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(rtriv_question_r);
+	uint8_t rtriv_question_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(solid_get_tile_info);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void solid_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	DECLARE_DRIVER_INIT(rtriv);
+	void init_rtriv();
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(thepit);
-	DECLARE_PALETTE_INIT(suprmous);
+	void palette_init_thepit(palette_device &palette);
+	void palette_init_suprmous(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 };

@@ -78,28 +78,28 @@ public:
 	bitmap_ind16 m_motion_object_2_vid;
 	bitmap_ind16 m_motion_object_2_clip;
 
-	DECLARE_WRITE8_MEMBER(fax_bank_select_w);
-	DECLARE_READ8_MEMBER(exidy_interrupt_r);
+	void fax_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t exidy_interrupt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
+	ioport_value teetert_input_r(ioport_field &field, void *param);
 
-	DECLARE_DRIVER_INIT(fax);
-	DECLARE_DRIVER_INIT(sidetrac);
-	DECLARE_DRIVER_INIT(pepper2);
-	DECLARE_DRIVER_INIT(targ);
-	DECLARE_DRIVER_INIT(rallys);
-	DECLARE_DRIVER_INIT(mtrap);
-	DECLARE_DRIVER_INIT(teetert);
-	DECLARE_DRIVER_INIT(venture);
-	DECLARE_DRIVER_INIT(spectar);
-	DECLARE_DRIVER_INIT(phantoma);
+	void init_fax();
+	void init_sidetrac();
+	void init_pepper2();
+	void init_targ();
+	void init_rallys();
+	void init_mtrap();
+	void init_teetert();
+	void init_venture();
+	void init_spectar();
+	void init_phantoma();
 
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(teetert);
+	void machine_start_teetert();
 
 	uint32_t screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(exidy_vblank_interrupt);
+	void exidy_vblank_interrupt(device_t &device);
 
 	void exidy_video_config(uint8_t _collision_mask, uint8_t _collision_invert, int _is_2bpp);
 	inline void latch_condition(int collision);
@@ -117,9 +117,9 @@ public:
 	uint8_t m_tone_freq;
 	uint8_t m_tone_active;
 	uint8_t m_tone_pointer;
-	DECLARE_WRITE8_MEMBER(targ_audio_1_w);
-	DECLARE_WRITE8_MEMBER(targ_audio_2_w);
-	DECLARE_WRITE8_MEMBER(spectar_audio_2_w);
+	void targ_audio_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void targ_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spectar_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void adjust_sample(uint8_t freq);
 	void common_audio_start(int freq);
 	SAMPLES_START_CB_MEMBER(spectar_audio_start);

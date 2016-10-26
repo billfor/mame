@@ -42,7 +42,7 @@ Year + Game                 By      Board      Hardware
 
 ***************************************************************************/
 
-WRITE16_MEMBER(suna16_state::soundlatch_w)
+void suna16_state::soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -52,7 +52,7 @@ WRITE16_MEMBER(suna16_state::soundlatch_w)
 }
 
 
-WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
+void suna16_state::bssoccer_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -66,7 +66,7 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 }
 
 
-WRITE16_MEMBER(suna16_state::uballoon_leds_w)
+void suna16_state::uballoon_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -78,7 +78,7 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 }
 
 
-WRITE16_MEMBER(suna16_state::bestbest_coin_w)
+void suna16_state::bestbest_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -111,7 +111,7 @@ ADDRESS_MAP_END
                                 Ultra Balloon
 ***************************************************************************/
 
-READ8_MEMBER(suna16_state::uballoon_prot_r)
+uint8_t suna16_state::uballoon_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -134,7 +134,7 @@ READ8_MEMBER(suna16_state::uballoon_prot_r)
 	return ret;
 }
 
-WRITE8_MEMBER(suna16_state::uballoon_prot_w)
+void suna16_state::uballoon_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -186,12 +186,12 @@ ADDRESS_MAP_END
                             Best Of Best
 ***************************************************************************/
 
-READ8_MEMBER(suna16_state::bestbest_prot_r)
+uint8_t suna16_state::bestbest_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_prot;
 }
 
-WRITE8_MEMBER(suna16_state::bestbest_prot_w)
+void suna16_state::bestbest_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -217,7 +217,7 @@ static ADDRESS_MAP_START( bestbest_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE( 0x5e0000, 0x5fffff ) AM_RAM AM_SHARE("spriteram2")    // Sprites (Chip 2)
 ADDRESS_MAP_END
 
-MACHINE_START_MEMBER(suna16_state,bestbest)
+void suna16_state::machine_start_bestbest()
 {
 	save_item(NAME(m_prot));
 }
@@ -296,7 +296,7 @@ ADDRESS_MAP_END
                             Back Street Soccer
 ***************************************************************************/
 
-MACHINE_START_MEMBER(suna16_state, bssoccer)
+void suna16_state::machine_start_bssoccer()
 {
 	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
 	m_bank2->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
@@ -304,14 +304,14 @@ MACHINE_START_MEMBER(suna16_state, bssoccer)
 
 /* Bank Switching */
 
-WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
+void suna16_state::bssoccer_pcm_1_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	const int bank = data & 7;
 	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
 	m_bank1->set_entry(bank);
 }
 
-WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
+void suna16_state::bssoccer_pcm_2_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	const int bank = data & 7;
 	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
@@ -357,7 +357,7 @@ ADDRESS_MAP_END
 
 /* Bank Switching */
 
-WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
+void suna16_state::uballoon_pcm_1_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	const int bank = data & 1;
 	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
@@ -379,14 +379,14 @@ static ADDRESS_MAP_START( uballoon_pcm_1_io_map, AS_IO, 8, suna16_state )
 	AM_RANGE(0x03, 0x03) AM_WRITE(uballoon_pcm_1_bankswitch_w)  // Rom Bank
 ADDRESS_MAP_END
 
-MACHINE_START_MEMBER(suna16_state,uballoon)
+void suna16_state::machine_start_uballoon()
 {
 	m_bank1->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
 
 	save_item(NAME(m_prot));
 }
 
-MACHINE_RESET_MEMBER(suna16_state,uballoon)
+void suna16_state::machine_reset_uballoon()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uballoon_pcm_1_bankswitch_w(space, 0, 0);
@@ -782,7 +782,7 @@ GFXDECODE_END
                             Back Street Soccer
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(suna16_state::bssoccer_interrupt)
+void suna16_state::bssoccer_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -967,7 +967,7 @@ MACHINE_CONFIG_END
                             Best Of Best
 ***************************************************************************/
 
-WRITE8_MEMBER(suna16_state::bestbest_ay8910_port_a_w)
+void suna16_state::bestbest_ay8910_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ?
 }

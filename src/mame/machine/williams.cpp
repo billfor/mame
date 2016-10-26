@@ -16,7 +16,7 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_va11_callback)
+void williams_state::williams_va11_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 	int scanline = param;
@@ -31,7 +31,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_va11_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(williams_state::williams_count240_off_callback)
+void williams_state::williams_count240_off_callback(void *ptr, int32_t param)
 {
 	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 
@@ -40,7 +40,7 @@ TIMER_CALLBACK_MEMBER(williams_state::williams_count240_off_callback)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_count240_callback)
+void williams_state::williams_count240_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 
@@ -55,7 +55,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_count240_callback)
 }
 
 
-WRITE_LINE_MEMBER(williams_state::williams_main_irq)
+void williams_state::williams_main_irq(int state)
 {
 	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 	int combined_state = pia_1->irq_a_state() | pia_1->irq_b_state();
@@ -65,14 +65,14 @@ WRITE_LINE_MEMBER(williams_state::williams_main_irq)
 }
 
 
-WRITE_LINE_MEMBER(williams_state::williams_main_firq)
+void williams_state::williams_main_firq(int state)
 {
 	/* FIRQ to the main CPU */
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-WRITE_LINE_MEMBER(williams_state::williams_snd_irq)
+void williams_state::williams_snd_irq(int state)
 {
 	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
 	int combined_state = pia_2->irq_a_state() | pia_2->irq_b_state();
@@ -81,7 +81,7 @@ WRITE_LINE_MEMBER(williams_state::williams_snd_irq)
 	m_soundcpu->set_input_line(M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 /* Same as above, but for second sound board */
-WRITE_LINE_MEMBER(blaster_state::williams_snd_irq_b)
+void blaster_state::williams_snd_irq_b(int state)
 {
 	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2b");
 	int combined_state = pia_2->irq_a_state() | pia_2->irq_b_state();
@@ -98,7 +98,7 @@ WRITE_LINE_MEMBER(blaster_state::williams_snd_irq_b)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(williams2_state::mysticm_main_irq)
+void williams2_state::mysticm_main_irq(int state)
 {
 	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
@@ -109,7 +109,7 @@ WRITE_LINE_MEMBER(williams2_state::mysticm_main_irq)
 }
 
 
-WRITE_LINE_MEMBER(williams2_state::tshoot_main_irq)
+void williams2_state::tshoot_main_irq(int state)
 {
 	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
@@ -127,7 +127,7 @@ WRITE_LINE_MEMBER(williams2_state::tshoot_main_irq)
  *
  *************************************/
 
-MACHINE_START_MEMBER(williams_state,williams_common)
+void williams_state::machine_start_williams_common()
 {
 	/* configure the memory bank */
 	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + 0x10000);
@@ -135,7 +135,7 @@ MACHINE_START_MEMBER(williams_state,williams_common)
 }
 
 
-MACHINE_RESET_MEMBER(williams_state,williams_common)
+void williams_state::machine_reset_williams_common()
 {
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
 	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
@@ -147,15 +147,15 @@ MACHINE_RESET_MEMBER(williams_state,williams_common)
 }
 
 
-MACHINE_START_MEMBER(williams_state,williams)
+void williams_state::machine_start_williams()
 {
-	MACHINE_START_CALL_MEMBER(williams_common);
+	machine_start_williams_common();
 }
 
 
-MACHINE_RESET_MEMBER(williams_state,williams)
+void williams_state::machine_reset_williams()
 {
-	MACHINE_RESET_CALL_MEMBER(williams_common);
+	machine_reset_williams_common();
 }
 
 
@@ -166,7 +166,7 @@ MACHINE_RESET_MEMBER(williams_state,williams)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_va11_callback)
+void williams2_state::williams2_va11_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
@@ -183,7 +183,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_va11_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(williams2_state::williams2_endscreen_off_callback)
+void williams2_state::williams2_endscreen_off_callback(void *ptr, int32_t param)
 {
 	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 
@@ -192,7 +192,7 @@ TIMER_CALLBACK_MEMBER(williams2_state::williams2_endscreen_off_callback)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_endscreen_callback)
+void williams2_state::williams2_endscreen_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
 
@@ -214,7 +214,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_endscreen_callback)
  *
  *************************************/
 
-MACHINE_START_MEMBER(williams2_state,williams2)
+void williams2_state::machine_start_williams2()
 {
 	/* configure memory banks */
 	membank("bank1")->configure_entries(1, 4, memregion("maincpu")->base() + 0x10000, 0x10000);
@@ -223,7 +223,7 @@ MACHINE_START_MEMBER(williams2_state,williams2)
 }
 
 
-MACHINE_RESET_MEMBER(williams2_state,williams2)
+void williams2_state::machine_reset_williams2()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -247,7 +247,7 @@ MACHINE_RESET_MEMBER(williams2_state,williams2)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::williams_vram_select_w)
+void williams_state::williams_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* VRAM/ROM banking from bit 0 */
 	membank("bank1")->set_entry(data & 0x01);
@@ -257,7 +257,7 @@ WRITE8_MEMBER(williams_state::williams_vram_select_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_bank_select_w)
+void williams2_state::williams2_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the low two bits control the paging */
 	switch (data & 0x03)
@@ -291,7 +291,7 @@ WRITE8_MEMBER(williams2_state::williams2_bank_select_w)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(williams_state::williams_deferred_snd_cmd_w)
+void williams_state::williams_deferred_snd_cmd_w(void *ptr, int32_t param)
 {
 	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
 
@@ -299,25 +299,25 @@ TIMER_CALLBACK_MEMBER(williams_state::williams_deferred_snd_cmd_w)
 	pia_2->cb1_w((param == 0xff) ? 0 : 1);
 }
 
-WRITE8_MEMBER(williams_state::williams_snd_cmd_w)
+void williams_state::williams_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the high two bits are set externally, and should be 1 */
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),this), data | 0xc0);
 }
 
-WRITE8_MEMBER(williams_state::playball_snd_cmd_w)
+void williams_state::playball_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),this), data);
 }
 
-TIMER_CALLBACK_MEMBER(williams2_state::williams2_deferred_snd_cmd_w)
+void williams2_state::williams2_deferred_snd_cmd_w(void *ptr, int32_t param)
 {
 	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
 
 	pia_2->porta_w(param);
 }
 
-WRITE8_MEMBER(williams2_state::williams2_snd_cmd_w)
+void williams2_state::williams2_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams2_state::williams2_deferred_snd_cmd_w),this), data);
 }
@@ -330,12 +330,12 @@ WRITE8_MEMBER(williams2_state::williams2_snd_cmd_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(williams_state::williams_port_select_w)
+void williams_state::williams_port_select_w(int state)
 {
 	m_port_select = state;
 }
 
-CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
+ioport_value williams_state::williams_mux_r(ioport_field &field, void *param)
 {
 	const char *tag = (const char *)param;
 
@@ -370,14 +370,14 @@ CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
  *      1000 = right/down full
  */
 
-READ8_MEMBER(williams_state::williams_49way_port_0_r)
+uint8_t williams_state::williams_49way_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const uint8_t translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
 	return (translate49[ioport("49WAYX")->read() >> 4] << 4) | translate49[ioport("49WAYY")->read() >> 4];
 }
 
 
-READ8_MEMBER(williams_state::williams_input_port_49way_0_5_r)
+uint8_t williams_state::williams_input_port_49way_0_5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_port_select)
 		return williams_49way_port_0_r(space, 0);
@@ -393,14 +393,14 @@ READ8_MEMBER(williams_state::williams_input_port_49way_0_5_r)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::williams_cmos_w)
+void williams_state::williams_cmos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* only 4 bits are valid */
 	m_nvram[offset] = data | 0xf0;
 }
 
 
-WRITE8_MEMBER(williams_state::bubbles_cmos_w)
+void williams_state::bubbles_cmos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bubbles has additional CMOS for a full 8 bits */
 	m_nvram[offset] = data;
@@ -414,7 +414,7 @@ WRITE8_MEMBER(williams_state::bubbles_cmos_w)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::williams_watchdog_reset_w)
+void williams_state::williams_watchdog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* yes, the data bits are checked for this specific value */
 	if (data == 0x39)
@@ -422,7 +422,7 @@ WRITE8_MEMBER(williams_state::williams_watchdog_reset_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_watchdog_reset_w)
+void williams2_state::williams2_watchdog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* yes, the data bits are checked for this specific value */
 	if ((data & 0x3f) == 0x14)
@@ -437,7 +437,7 @@ WRITE8_MEMBER(williams2_state::williams2_watchdog_reset_w)
  *
  *************************************/
 
-WRITE8_MEMBER(williams2_state::williams2_7segment_w)
+void williams2_state::williams2_7segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int n;
 	char dot;
@@ -478,28 +478,28 @@ WRITE8_MEMBER(williams2_state::williams2_7segment_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(williams_state,defender)
+void williams_state::machine_start_defender()
 {
 }
 
 
-MACHINE_RESET_MEMBER(williams_state,defender)
+void williams_state::machine_reset_defender()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	MACHINE_RESET_CALL_MEMBER(williams_common);
+	machine_reset_williams_common();
 
 	defender_bank_select_w(space, 0, 0);
 }
 
 
-WRITE8_MEMBER(williams_state::defender_video_control_w)
+void williams_state::defender_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cocktail = data & 0x01;
 }
 
 
-WRITE8_MEMBER(williams_state::defender_bank_select_w)
+void williams_state::defender_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bankc000->set_bank(data & 0x0f);
 }
@@ -512,7 +512,7 @@ WRITE8_MEMBER(williams_state::defender_bank_select_w)
  *
  *************************************/
 
-READ8_MEMBER(williams_state::mayday_protection_r)
+uint8_t williams_state::mayday_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Mayday does some kind of protection check that is not currently understood  */
 	/* However, the results of that protection check are stored at $a190 and $a191 */
@@ -530,7 +530,7 @@ READ8_MEMBER(williams_state::mayday_protection_r)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::sinistar_vram_select_w)
+void williams_state::sinistar_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low two bits are standard */
 	williams_vram_select_w(space, offset, data);
@@ -547,7 +547,7 @@ WRITE8_MEMBER(williams_state::sinistar_vram_select_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(blaster_state,blaster)
+void blaster_state::machine_start_blaster()
 {
 	/* banking is different for blaster */
 	membank("bank1")->configure_entries(1, 16, memregion("maincpu")->base() + 0x18000, 0x4000);
@@ -562,9 +562,9 @@ MACHINE_START_MEMBER(blaster_state,blaster)
 }
 
 
-MACHINE_RESET_MEMBER(blaster_state,blaster)
+void blaster_state::machine_reset_blaster()
 {
-	MACHINE_RESET_CALL_MEMBER(williams_common);
+	machine_reset_williams_common();
 }
 
 
@@ -575,7 +575,7 @@ inline void blaster_state::update_blaster_banking()
 }
 
 
-WRITE8_MEMBER(blaster_state::blaster_vram_select_w)
+void blaster_state::blaster_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* VRAM/ROM banking from bit 0 */
 	m_vram_bank = data & 0x01;
@@ -589,14 +589,14 @@ WRITE8_MEMBER(blaster_state::blaster_vram_select_w)
 }
 
 
-WRITE8_MEMBER(blaster_state::blaster_bank_select_w)
+void blaster_state::blaster_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rom_bank = data & 0x0f;
 	update_blaster_banking();
 }
 
 
-TIMER_CALLBACK_MEMBER(blaster_state::blaster_deferred_snd_cmd_w)
+void blaster_state::blaster_deferred_snd_cmd_w(void *ptr, int32_t param)
 {
 	pia6821_device *pia_2l = machine().device<pia6821_device>("pia_2");
 	pia6821_device *pia_2r = machine().device<pia6821_device>("pia_2b");
@@ -608,7 +608,7 @@ TIMER_CALLBACK_MEMBER(blaster_state::blaster_deferred_snd_cmd_w)
 }
 
 
-WRITE8_MEMBER(blaster_state::blaster_snd_cmd_w)
+void blaster_state::blaster_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(blaster_state::blaster_deferred_snd_cmd_w),this), data);
 }
@@ -621,7 +621,7 @@ WRITE8_MEMBER(blaster_state::blaster_snd_cmd_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
+void williams_state::lottofun_coin_lock_w(int state)
 {
 	machine().bookkeeping().coin_lockout_global_w(state & 1); /* bit 5 of PIC control port A */
 }
@@ -634,7 +634,7 @@ WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
  *
  *************************************/
 
-READ8_MEMBER(williams2_state::tshoot_input_port_0_3_r)
+uint8_t williams2_state::tshoot_input_port_0_3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* merge in the gun inputs with the standard data */
 	int data = ioport("IN0")->read();
@@ -643,14 +643,14 @@ READ8_MEMBER(williams2_state::tshoot_input_port_0_3_r)
 }
 
 
-WRITE_LINE_MEMBER(williams2_state::tshoot_maxvol_w)
+void williams2_state::tshoot_maxvol_w(int state)
 {
 	/* something to do with the sound volume */
 	logerror("tshoot maxvol = %d (%s)\n", state, machine().describe_context());
 }
 
 
-WRITE8_MEMBER(williams2_state::tshoot_lamp_w)
+void williams2_state::tshoot_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* set the grenade lamp */
 	output().set_value("Grenade_lamp", (~data & 0x4)>>2 );
@@ -670,34 +670,34 @@ WRITE8_MEMBER(williams2_state::tshoot_lamp_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(joust2_state,joust2)
+void joust2_state::machine_start_joust2()
 {
-	MACHINE_START_CALL_MEMBER(williams2);
+	machine_start_williams2();
 	save_item(NAME(m_joust2_current_sound_data));
 }
 
 
-MACHINE_RESET_MEMBER(joust2_state,joust2)
+void joust2_state::machine_reset_joust2()
 {
-	MACHINE_RESET_CALL_MEMBER(williams2);
+	machine_reset_williams2();
 }
 
 
-TIMER_CALLBACK_MEMBER(joust2_state::joust2_deferred_snd_cmd_w)
+void joust2_state::joust2_deferred_snd_cmd_w(void *ptr, int32_t param)
 {
 	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
 	pia_2->porta_w(param & 0xff);
 }
 
 
-WRITE_LINE_MEMBER(joust2_state::joust2_pia_3_cb1_w)
+void joust2_state::joust2_pia_3_cb1_w(int state)
 {
 	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0x100) | ((state << 8) & 0x100);
 	m_cvsd_sound->write(machine().driver_data()->generic_space(), 0, m_joust2_current_sound_data);
 }
 
 
-WRITE8_MEMBER(joust2_state::joust2_snd_cmd_w)
+void joust2_state::joust2_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0xff) | (data & 0xff);
 	m_cvsd_sound->write(machine().driver_data()->generic_space(), 0, m_joust2_current_sound_data);

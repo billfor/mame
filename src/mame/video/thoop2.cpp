@@ -38,7 +38,7 @@
       1  | x------- -------- | flip y
 */
 
-TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_screen0)
+void thoop2_state::get_tile_info_screen0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[tile_index << 1];
 	int data2 = m_videoram[(tile_index << 1) + 1];
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_screen0)
 }
 
 
-TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_screen1)
+void thoop2_state::get_tile_info_screen1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[(0x1000/2) + (tile_index << 1)];
 	int data2 = m_videoram[(0x1000/2) + (tile_index << 1) + 1];
@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(thoop2_state::get_tile_info_screen1)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(thoop2_state::vram_w)
+void thoop2_state::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_pant[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);

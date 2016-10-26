@@ -96,24 +96,24 @@ public:
 	emu_timer*  m_gameplay_timer;
 	uint8_t       m_money_reg;
 
-	DECLARE_WRITE8_MEMBER(famibox_nt_w);
-	DECLARE_READ8_MEMBER(famibox_nt_r);
-	DECLARE_WRITE8_MEMBER(sprite_dma_w);
-	DECLARE_READ8_MEMBER(famibox_IN0_r);
-	DECLARE_WRITE8_MEMBER(famibox_IN0_w);
-	DECLARE_READ8_MEMBER(famibox_IN1_r);
-	DECLARE_READ8_MEMBER(famibox_system_r);
-	DECLARE_WRITE8_MEMBER(famibox_system_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
-	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void famibox_nt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t famibox_nt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t famibox_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void famibox_IN0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t famibox_IN1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t famibox_system_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void famibox_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value famibox_coin_r(ioport_field &field, void *param);
+	void famibox_keyswitch_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(famibox);
+	void palette_init_famibox(palette_device &palette);
 	uint32_t screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
-	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
+	void famicombox_attract_timer_callback(void *ptr, int32_t param);
+	void famicombox_gameplay_timer_callback(void *ptr, int32_t param);
 	void famicombox_bankswitch(uint8_t bank);
 	void famicombox_reset();
 	void ppu_irq(int *ppu_regs);
@@ -159,14 +159,14 @@ void famibox_state::set_mirroring(int mirroring)
 }
 #endif
 
-WRITE8_MEMBER(famibox_state::famibox_nt_w)
+void famibox_state::famibox_nt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int page = ((offset & 0xc00) >> 10);
 	m_nt_page[page][offset & 0x3ff] = data;
 }
 
 
-READ8_MEMBER(famibox_state::famibox_nt_r)
+uint8_t famibox_state::famibox_nt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int page = ((offset & 0xc00) >> 10);
 	return m_nt_page[page][offset & 0x3ff];
@@ -178,7 +178,7 @@ READ8_MEMBER(famibox_state::famibox_nt_r)
 
 *******************************************************/
 
-WRITE8_MEMBER(famibox_state::sprite_dma_w)
+void famibox_state::sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int source = (data & 7);
 	m_ppu->spriteram_dma(space, source);
@@ -193,12 +193,12 @@ WRITE8_MEMBER(famibox_state::sprite_dma_w)
 *******************************************************/
 
 
-READ8_MEMBER(famibox_state::famibox_IN0_r)
+uint8_t famibox_state::famibox_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_in_0 >> m_in_0_shift++) & 0x01) | 0x40;
 }
 
-WRITE8_MEMBER(famibox_state::famibox_IN0_w)
+void famibox_state::famibox_IN0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x01)
 	{
@@ -212,7 +212,7 @@ WRITE8_MEMBER(famibox_state::famibox_IN0_w)
 	m_in_1 = ioport("P2")->read();
 }
 
-READ8_MEMBER(famibox_state::famibox_IN1_r)
+uint8_t famibox_state::famibox_IN1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
@@ -271,7 +271,7 @@ void famibox_state::famicombox_reset()
 	m_maincpu->reset();
 }
 
-TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
+void famibox_state::famicombox_attract_timer_callback(void *ptr, int32_t param)
 {
 	m_attract_timer->adjust(attotime::never, 0, attotime::never);
 	if ( BIT(m_exception_mask,1) )
@@ -281,7 +281,7 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(famibox_state::famicombox_gameplay_timer_callback)
+void famibox_state::famicombox_gameplay_timer_callback(void *ptr, int32_t param)
 {
 	if (m_coins > 0)
 		m_coins--;
@@ -297,7 +297,7 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_gameplay_timer_callback)
 	}
 }
 
-READ8_MEMBER(famibox_state::famibox_system_r)
+uint8_t famibox_state::famibox_system_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( offset & 0x07 )
 	{
@@ -319,7 +319,7 @@ READ8_MEMBER(famibox_state::famibox_system_r)
 	}
 }
 
-WRITE8_MEMBER(famibox_state::famibox_system_w)
+void famibox_state::famibox_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset & 0x07 )
 	{
@@ -390,7 +390,7 @@ ADDRESS_MAP_END
 
 *******************************************************/
 
-INPUT_CHANGED_MEMBER(famibox_state::famibox_keyswitch_changed)
+void famibox_state::famibox_keyswitch_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if ( BIT(m_exception_mask, 3) )
 	{
@@ -399,7 +399,7 @@ INPUT_CHANGED_MEMBER(famibox_state::famibox_keyswitch_changed)
 	}
 }
 
-INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
+void famibox_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if ( newval )
 	{
@@ -417,7 +417,7 @@ INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(famibox_state::famibox_coin_r)
+ioport_value famibox_state::famibox_coin_r(ioport_field &field, void *param)
 {
 	return m_coins > 0;
 }
@@ -489,7 +489,7 @@ INPUT_PORTS_END
 
 *******************************************************/
 
-PALETTE_INIT_MEMBER(famibox_state, famibox)
+void famibox_state::palette_init_famibox(palette_device &palette)
 {
 	m_ppu->init_palette(palette, 0);
 }

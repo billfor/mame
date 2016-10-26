@@ -91,23 +91,23 @@ public:
 	required_device<sn76489_device> m_sn;
 	required_ioport m_kbspecial;
 
-	READ8_MEMBER( ram_r );
-	WRITE8_MEMBER( ram_w );
-	READ8_MEMBER( io_r );
-	WRITE8_MEMBER( io_w );
-	READ8_MEMBER( io2_r );
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	uint8_t io2_r(address_space &space, offs_t offset, uint8_t mem_mask);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(laser3k);
+	void palette_init_laser3k(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
 
 private:
 	uint8_t m_bank0val, m_bank1val, m_bank2val, m_bank3val;
@@ -235,12 +235,12 @@ void laser3k_state::machine_reset()
 	rom[0x4607] = 0;
 }
 
-READ8_MEMBER( laser3k_state::ram_r )
+uint8_t laser3k_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram->read(offset);
 }
 
-WRITE8_MEMBER( laser3k_state::ram_w )
+void laser3k_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram->write(offset, data);
 }
@@ -383,7 +383,7 @@ void laser3k_state::do_io(int offset)
 	}
 }
 
-READ8_MEMBER( laser3k_state::io_r )
+uint8_t laser3k_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -417,7 +417,7 @@ READ8_MEMBER( laser3k_state::io_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( laser3k_state::io_w )
+void laser3k_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -458,7 +458,7 @@ WRITE8_MEMBER( laser3k_state::io_w )
 	}
 }
 
-READ8_MEMBER( laser3k_state::io2_r )
+uint8_t laser3k_state::io2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -709,7 +709,7 @@ uint32_t laser3k_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ_LINE_MEMBER(laser3k_state::ay3600_shift_r)
+int laser3k_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -720,7 +720,7 @@ READ_LINE_MEMBER(laser3k_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(laser3k_state::ay3600_control_r)
+int laser3k_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -785,7 +785,7 @@ static const uint8_t key_remap[0x32][4] =
 	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
 };
 
-WRITE_LINE_MEMBER(laser3k_state::ay3600_data_ready_w)
+void laser3k_state::ay3600_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -953,7 +953,7 @@ static const rgb_t laser3k_palette[] =
 };
 
 /* Initialize the palette */
-PALETTE_INIT_MEMBER(laser3k_state, laser3k)
+void laser3k_state::palette_init_laser3k(palette_device &palette)
 {
 	palette.set_pen_colors(0, laser3k_palette, ARRAY_LENGTH(laser3k_palette));
 }

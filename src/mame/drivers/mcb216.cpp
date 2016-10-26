@@ -48,11 +48,11 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_MACHINE_RESET(mcb216);
-	DECLARE_MACHINE_RESET(cb308);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void machine_reset_mcb216();
+	void machine_reset_cb308();
 
 private:
 	uint8_t m_term_data;
@@ -85,7 +85,7 @@ static INPUT_PORTS_START( mcb216 )
 INPUT_PORTS_END
 
 
-READ8_MEMBER( mcb216_state::keyin_r )
+uint8_t mcb216_state::keyin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
@@ -94,22 +94,22 @@ READ8_MEMBER( mcb216_state::keyin_r )
 
 // 0x40 - a keystroke is available
 // 0x80 - ok to send to terminal
-READ8_MEMBER( mcb216_state::status_r )
+uint8_t mcb216_state::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 0xc0 : 0x80;
 }
 
-WRITE8_MEMBER( mcb216_state::kbd_put )
+void mcb216_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }
 
-MACHINE_RESET_MEMBER( mcb216_state, mcb216 )
+void mcb216_state::machine_reset_mcb216()
 {
 	m_term_data = 0;
 }
 
-MACHINE_RESET_MEMBER( mcb216_state, cb308 )
+void mcb216_state::machine_reset_cb308()
 {
 	m_term_data = 0;
 	m_maincpu->set_state_int(Z80_PC, 0xe000);

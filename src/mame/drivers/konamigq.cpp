@@ -105,18 +105,18 @@ public:
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_intck;
 
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE8_MEMBER(pcmram_w);
-	DECLARE_READ8_MEMBER(pcmram_r);
-	DECLARE_READ16_MEMBER(tms57002_data_word_r);
-	DECLARE_WRITE16_MEMBER(tms57002_data_word_w);
-	DECLARE_READ16_MEMBER(tms57002_status_word_r);
-	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
-	DECLARE_DRIVER_INIT(konamigq);
-	DECLARE_MACHINE_START(konamigq);
-	DECLARE_MACHINE_RESET(konamigq);
-	INTERRUPT_GEN_MEMBER(tms_sync);
-	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
+	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pcmram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pcmram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t tms57002_data_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tms57002_data_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tms57002_status_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tms57002_control_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void init_konamigq();
+	void machine_start_konamigq();
+	void machine_reset_konamigq();
+	void tms_sync(device_t &device);
+	void k054539_irq_gen(int state);
 
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
@@ -136,7 +136,7 @@ static const uint16_t konamigq_def_eeprom[64] =
 	0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa,
 };
 
-WRITE16_MEMBER(konamigq_state::eeprom_w)
+void konamigq_state::eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	ioport("EEPROMOUT")->write(data & 0x07, 0xff);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
@@ -145,12 +145,12 @@ WRITE16_MEMBER(konamigq_state::eeprom_w)
 
 /* PCM RAM */
 
-WRITE8_MEMBER(konamigq_state::pcmram_w)
+void konamigq_state::pcmram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p_n_pcmram[ offset ] = data;
 }
 
-READ8_MEMBER(konamigq_state::pcmram_r)
+uint8_t konamigq_state::pcmram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p_n_pcmram[ offset ];
 }
@@ -179,32 +179,32 @@ ADDRESS_MAP_END
 
 /* SOUND CPU */
 
-INTERRUPT_GEN_MEMBER(konamigq_state::tms_sync)
+void konamigq_state::tms_sync(device_t &device)
 {
 	// DASP is synced to the LRCLK of the 058141
 	if (m_sound_ctrl & 0x20)
 		m_dasp->sync_w(1);
 }
 
-READ16_MEMBER(konamigq_state::tms57002_data_word_r)
+uint16_t konamigq_state::tms57002_data_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dasp->data_r(space, 0);
 }
 
-WRITE16_MEMBER(konamigq_state::tms57002_data_word_w)
+void konamigq_state::tms57002_data_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_dasp->data_w(space, 0, data);
 }
 
-READ16_MEMBER(konamigq_state::tms57002_status_word_r)
+uint16_t konamigq_state::tms57002_status_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_dasp->dready_r() ? 4 : 0) |
 		(m_dasp->pc0_r() ? 2 : 0) |
 		(m_dasp->empty_r() ? 1 : 0);
 }
 
-WRITE16_MEMBER(konamigq_state::tms57002_control_word_w)
+void konamigq_state::tms57002_control_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -239,7 +239,7 @@ ADDRESS_MAP_END
 
 
 /* 058141 */
-WRITE_LINE_MEMBER(konamigq_state::k054539_irq_gen)
+void konamigq_state::k054539_irq_gen(int state)
 {
 	if (m_sound_ctrl & 1)
 	{
@@ -291,12 +291,12 @@ void konamigq_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, i
 {
 }
 
-DRIVER_INIT_MEMBER(konamigq_state,konamigq)
+void konamigq_state::init_konamigq()
 {
 	m_p_n_pcmram = memregion( "shared" )->base() + 0x80000;
 }
 
-MACHINE_START_MEMBER(konamigq_state,konamigq)
+void konamigq_state::machine_start_konamigq()
 {
 	save_pointer(NAME(m_p_n_pcmram), 0x380000);
 	save_item(NAME(m_sector_buffer));
@@ -304,7 +304,7 @@ MACHINE_START_MEMBER(konamigq_state,konamigq)
 	save_item(NAME(m_sound_intck));
 }
 
-MACHINE_RESET_MEMBER(konamigq_state,konamigq)
+void konamigq_state::machine_reset_konamigq()
 {
 }
 

@@ -111,7 +111,7 @@
 
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::vregs_w)
+void seta2_state::vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* 02/04 = horizontal display start/end
 	           mj4simai = 0065/01E5 (0180 visible area)
@@ -457,14 +457,14 @@ void seta2_state::video_start()
 	m_yoffset = 0;
 }
 
-VIDEO_START_MEMBER(seta2_state,xoffset)
+void seta2_state::video_start_xoffset()
 {
 	video_start();
 
 	m_xoffset = 0x200;
 }
 
-VIDEO_START_MEMBER(seta2_state,yoffset)
+void seta2_state::video_start_yoffset()
 {
 	video_start();
 

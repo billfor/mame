@@ -54,9 +54,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_DRIVER_INIT(metlfrzr);
-	DECLARE_WRITE8_MEMBER(output_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void init_metlfrzr();
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 	uint8_t m_fg_tilebank;
 	bool m_rowscroll_enable;
 };
@@ -153,7 +153,7 @@ uint32_t metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(metlfrzr_state::output_w)
+void metlfrzr_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 7: flip screen
 	// bit 6-5: coin lockouts
@@ -341,7 +341,7 @@ static GFXDECODE_START(metlfrzr)
 	GFXDECODE_ENTRY("gfx4", 0, sprite_layout, 0, 16)
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
+void metlfrzr_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -425,7 +425,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
+void metlfrzr_state::init_metlfrzr()
 {
 	// same as cshooter.cpp
 	uint8_t *rom = memregion("maincpu")->base();

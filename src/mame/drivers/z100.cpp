@@ -184,20 +184,20 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(z100_vram_r);
-	DECLARE_WRITE8_MEMBER(z100_vram_w);
-	DECLARE_READ8_MEMBER(keyb_data_r);
-	DECLARE_READ8_MEMBER(keyb_status_r);
-	DECLARE_WRITE8_MEMBER(keyb_command_w);
-	DECLARE_WRITE8_MEMBER(z100_6845_address_w);
-	DECLARE_WRITE8_MEMBER(z100_6845_data_w);
-	DECLARE_WRITE8_MEMBER(floppy_select_w);
-	DECLARE_WRITE8_MEMBER(floppy_motor_w);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE8_MEMBER(video_pia_A_w);
-	DECLARE_WRITE8_MEMBER(video_pia_B_w);
-	DECLARE_WRITE_LINE_MEMBER(video_pia_CA2_w);
-	DECLARE_WRITE_LINE_MEMBER(video_pia_CB2_w);
+	uint8_t z100_vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void z100_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyb_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t keyb_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyb_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void z100_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void z100_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void floppy_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void floppy_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_pia_A_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_pia_B_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_pia_CA2_w(int state);
+	void video_pia_CB2_w(int state);
 	std::unique_ptr<uint8_t[]> m_gvram;
 	uint8_t m_keyb_press,m_keyb_status;
 	uint8_t m_vram_enable;
@@ -211,12 +211,12 @@ public:
 	floppy_image_device *m_floppy;
 
 	mc6845_device *m_mc6845;
-	DECLARE_DRIVER_INIT(z100);
+	void init_z100();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	void key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -282,12 +282,12 @@ uint32_t z100_state::screen_update_z100(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-READ8_MEMBER( z100_state::z100_vram_r )
+uint8_t z100_state::z100_vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_gvram[offset];
 }
 
-WRITE8_MEMBER( z100_state::z100_vram_w )
+void z100_state::z100_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_vram_enable)
 	{
@@ -314,7 +314,7 @@ static ADDRESS_MAP_START(z100_mem, AS_PROGRAM, 8, z100_state)
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-READ8_MEMBER( z100_state::keyb_data_r )
+uint8_t z100_state::keyb_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_keyb_press)
 	{
@@ -329,7 +329,7 @@ READ8_MEMBER( z100_state::keyb_data_r )
 	return m_keyb_press;
 }
 
-READ8_MEMBER( z100_state::keyb_status_r )
+uint8_t z100_state::keyb_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_keyb_status)
 	{
@@ -340,19 +340,19 @@ READ8_MEMBER( z100_state::keyb_status_r )
 	return m_keyb_status;
 }
 
-WRITE8_MEMBER( z100_state::keyb_command_w )
+void z100_state::keyb_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ...
 }
 
-WRITE8_MEMBER( z100_state::z100_6845_address_w )
+void z100_state::z100_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0x1f;
 	m_crtc_index = data;
 	m_crtc->address_w( space, offset, data );
 }
 
-WRITE8_MEMBER( z100_state::z100_6845_data_w )
+void z100_state::z100_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_vreg[m_crtc_index] = data;
 	m_crtc->register_w(space, offset, data);
@@ -360,7 +360,7 @@ WRITE8_MEMBER( z100_state::z100_6845_data_w )
 
 // todo: side select?
 
-WRITE8_MEMBER( z100_state::floppy_select_w )
+void z100_state::floppy_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data & 0x03)
 	{
@@ -373,7 +373,7 @@ WRITE8_MEMBER( z100_state::floppy_select_w )
 	m_fdc->set_floppy(m_floppy);
 }
 
-WRITE8_MEMBER( z100_state::floppy_motor_w )
+void z100_state::floppy_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_floppy)
 		m_floppy->mon_w(!BIT(data, 1));
@@ -417,7 +417,7 @@ static ADDRESS_MAP_START(z100_io, AS_IO, 8, z100_state)
 	AM_RANGE (0xff, 0xff) AM_READ_PORT("DSW101")
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(z100_state::key_stroke)
+void z100_state::key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval && !oldval)
 	{
@@ -591,7 +591,7 @@ INPUT_PORTS_START( z100 )
 	PORT_CONFSETTING( 0x01, "Color" )
 INPUT_PORTS_END
 
-READ8_MEMBER( z100_state::get_slave_ack )
+uint8_t z100_state::get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset==7) { // IRQ = 7
 		return m_pics->acknowledge();
@@ -599,7 +599,7 @@ READ8_MEMBER( z100_state::get_slave_ack )
 	return 0;
 }
 
-WRITE8_MEMBER( z100_state::video_pia_A_w )
+void z100_state::video_pia_A_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	all bits are active low
@@ -619,13 +619,13 @@ WRITE8_MEMBER( z100_state::video_pia_A_w )
 	m_display_mask = BITSWAP8((data & 7) ^ 7,7,6,5,4,3,1,0,2);
 }
 
-WRITE8_MEMBER( z100_state::video_pia_B_w )
+void z100_state::video_pia_B_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_start_addr = data << 4; //<- TODO
 }
 
 /* clear screen */
-WRITE_LINE_MEMBER( z100_state::video_pia_CA2_w )
+void z100_state::video_pia_CA2_w(int state)
 {
 	int i;
 
@@ -633,7 +633,7 @@ WRITE_LINE_MEMBER( z100_state::video_pia_CA2_w )
 		m_gvram[i] = m_clr_val;
 }
 
-WRITE_LINE_MEMBER( z100_state::video_pia_CB2_w )
+void z100_state::video_pia_CB2_w(int state)
 {
 	m_clr_val = (state & 1) ? 0x00 : 0xff;
 }
@@ -714,7 +714,7 @@ ROM_START( z100 )
 	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
-DRIVER_INIT_MEMBER(z100_state,z100)
+void z100_state::init_z100()
 {
 	uint8_t *ROM = memregion("ipl")->base();
 

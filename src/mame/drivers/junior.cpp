@@ -41,17 +41,17 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<mos6532_t> m_riot;
-	DECLARE_READ8_MEMBER(junior_riot_a_r);
-	DECLARE_READ8_MEMBER(junior_riot_b_r);
-	DECLARE_WRITE8_MEMBER(junior_riot_a_w);
-	DECLARE_WRITE8_MEMBER(junior_riot_b_w);
+	uint8_t junior_riot_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t junior_riot_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void junior_riot_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void junior_riot_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_port_a;
 	uint8_t m_port_b;
 	uint8_t m_led_time[6];
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
-	TIMER_DEVICE_CALLBACK_MEMBER(junior_update_leds);
+	void junior_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void junior_update_leds(timer_device &timer, void *ptr, int32_t param);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START(junior_mem, AS_PROGRAM, 8, junior_state)
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(junior_state::junior_reset)
+void junior_state::junior_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval == 0)
 		m_maincpu->reset();
@@ -122,7 +122,7 @@ INPUT_PORTS_END
 
 
 
-READ8_MEMBER( junior_state::junior_riot_a_r )
+uint8_t junior_state::junior_riot_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -143,7 +143,7 @@ READ8_MEMBER( junior_state::junior_riot_a_r )
 }
 
 
-READ8_MEMBER( junior_state::junior_riot_b_r )
+uint8_t junior_state::junior_riot_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( m_port_b & 0x20 )
 		return 0xFF;
@@ -153,7 +153,7 @@ READ8_MEMBER( junior_state::junior_riot_b_r )
 }
 
 
-WRITE8_MEMBER( junior_state::junior_riot_a_w )
+void junior_state::junior_riot_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t idx = ( m_port_b >> 1 ) & 0x0f;
 
@@ -167,7 +167,7 @@ WRITE8_MEMBER( junior_state::junior_riot_a_w )
 }
 
 
-WRITE8_MEMBER( junior_state::junior_riot_b_w )
+void junior_state::junior_riot_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t idx = ( data >> 1 ) & 0x0f;
 
@@ -181,7 +181,7 @@ WRITE8_MEMBER( junior_state::junior_riot_b_w )
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(junior_state::junior_update_leds)
+void junior_state::junior_update_leds(timer_device &timer, void *ptr, int32_t param)
 {
 	int i;
 

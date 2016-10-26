@@ -67,39 +67,39 @@ public:
 	tilemap_t * m_center_tilemap;
 	tilemap_t * m_right_tilemap;
 
-	DECLARE_WRITE8_MEMBER(cpu0_outputs_w);
-	DECLARE_WRITE8_MEMBER(led_board_w);
-	DECLARE_WRITE8_MEMBER(cpu1_outputs_w);
-	DECLARE_READ8_MEMBER(pc3259_0_r);
-	DECLARE_READ8_MEMBER(pc3259_1_r);
-	DECLARE_READ8_MEMBER(pc3259_2_r);
-	DECLARE_READ8_MEMBER(pc3259_3_r);
-	DECLARE_READ8_MEMBER(sub_to_main_comm_r);
-	DECLARE_WRITE8_MEMBER(main_to_sub_comm_w);
-	DECLARE_READ8_MEMBER(main_to_sub_comm_r);
+	void cpu0_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void led_board_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cpu1_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc3259_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc3259_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc3259_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc3259_3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sub_to_main_comm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void main_to_sub_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t main_to_sub_comm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t get_pc3259_bits(int offs);
-	DECLARE_WRITE8_MEMBER(left_w);
-	DECLARE_WRITE8_MEMBER(center_w);
-	DECLARE_WRITE8_MEMBER(right_w);
-	DECLARE_WRITE8_MEMBER(portA_0_w);
-	DECLARE_WRITE8_MEMBER(portB_0_w);
-	DECLARE_WRITE8_MEMBER(portA_2_w);
-	DECLARE_WRITE8_MEMBER(portB_2_w);
+	void left_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void center_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void right_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portA_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portB_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portA_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portB_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	TILE_GET_INFO_MEMBER(get_left_tile_info);
-	TILE_GET_INFO_MEMBER(get_right_tile_info);
-	TILE_GET_INFO_MEMBER(get_center_tile_info);
-	TILEMAP_MAPPER_MEMBER(get_memory_offset);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_left_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_right_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_center_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index get_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
-	DECLARE_PALETTE_INIT(grchamp);
+	void palette_init_grchamp(palette_device &palette);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	INTERRUPT_GEN_MEMBER(cpu0_interrupt);
-	INTERRUPT_GEN_MEMBER(cpu1_interrupt);
-	TIMER_CALLBACK_MEMBER(main_to_sub_comm_sync_w);
+	void cpu0_interrupt(device_t &device);
+	void cpu1_interrupt(device_t &device);
+	void main_to_sub_comm_sync_w(void *ptr, int32_t param);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_objects(int y, uint8_t *objdata);

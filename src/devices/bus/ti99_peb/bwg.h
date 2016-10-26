@@ -26,16 +26,16 @@ class snug_bwg_device : public ti_expansion_card_device
 public:
 	snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 
 protected:
 	void device_start() override;

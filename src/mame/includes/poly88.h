@@ -48,20 +48,20 @@ public:
 	int m_previous_level;
 	int m_clk_level;
 	int m_clk_level_tape;
-	DECLARE_WRITE8_MEMBER(poly88_baud_rate_w);
-	DECLARE_READ8_MEMBER(poly88_keyboard_r);
-	DECLARE_WRITE8_MEMBER(poly88_intr_w);
-	DECLARE_DRIVER_INIT(poly88);
+	void poly88_baud_rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t poly88_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void poly88_intr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_poly88();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_poly88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(poly88_interrupt);
-	TIMER_CALLBACK_MEMBER(poly88_usart_timer_callback);
-	TIMER_CALLBACK_MEMBER(keyboard_callback);
-	TIMER_CALLBACK_MEMBER(poly88_cassette_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(write_cas_tx);
-	DECLARE_WRITE_LINE_MEMBER(poly88_usart_rxready);
-	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
+	void poly88_interrupt(device_t &device);
+	void poly88_usart_timer_callback(void *ptr, int32_t param);
+	void keyboard_callback(void *ptr, int32_t param);
+	void poly88_cassette_timer_callback(void *ptr, int32_t param);
+	void write_cas_tx(int state);
+	void poly88_usart_rxready(int state);
+	int poly88_irq_callback(device_t &device, int irqline);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( poly88 );
 
 protected:

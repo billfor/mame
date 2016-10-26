@@ -235,25 +235,25 @@ public:
 		m_joyport(*this,JOYPORT_TAG)    { }
 
 	// CRU (Communication Register Unit) handling
-	DECLARE_READ8_MEMBER(cruread);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	uint8_t cruread(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// Connections with the system interface TMS9901
-	DECLARE_READ8_MEMBER(read_by_9901);
-	DECLARE_WRITE_LINE_MEMBER(peripheral_bus_reset);
-	DECLARE_WRITE_LINE_MEMBER(VDP_reset);
-	DECLARE_WRITE_LINE_MEMBER(joystick_select);
-	DECLARE_WRITE_LINE_MEMBER(extbus_wait_states);
-	DECLARE_WRITE_LINE_MEMBER(video_wait_states);
+	uint8_t read_by_9901(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void peripheral_bus_reset(int state);
+	void VDP_reset(int state);
+	void joystick_select(int state);
+	void extbus_wait_states(int state);
+	void video_wait_states(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(clock_out);
-	DECLARE_WRITE_LINE_MEMBER(dbin_line);
+	void clock_out(int state);
+	void dbin_line(int state);
 
-	DECLARE_WRITE8_MEMBER(external_operation);
+	void external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
+	void tms9901_interrupt(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( keyboard_interrupt );
+	void keyboard_interrupt(int state);
 
 	required_device<tms9995_device>         m_cpu;
 	required_device<tms9901_device>         m_tms9901;
@@ -263,17 +263,17 @@ public:
 	required_device<geneve_mouse_device>    m_mouse;
 	required_device<joyport_device>         m_joyport;
 
-	DECLARE_WRITE_LINE_MEMBER( inta );
-	DECLARE_WRITE_LINE_MEMBER( intb );
-	DECLARE_WRITE_LINE_MEMBER( ext_ready );
-	DECLARE_WRITE_LINE_MEMBER( mapper_ready );
+	void inta(int state);
+	void intb(int state);
+	void ext_ready(int state);
+	void mapper_ready(int state);
 
-	DECLARE_DRIVER_INIT(geneve);
+	void init_geneve();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(geneve_hblank_interrupt);
+	void geneve_hblank_interrupt(timer_device &timer, void *ptr, int32_t param);
 
-	DECLARE_WRITE_LINE_MEMBER(set_tms9901_INT2_from_v9938);
+	void set_tms9901_INT2_from_v9938(int state);
 
 	int  m_inta;
 	int  m_intb;
@@ -347,7 +347,7 @@ INPUT_PORTS_END
 #define CRU_CONTROL_BASE 0x1ee0
 #define CRU_SSTEP_BASE 0x13c0
 
-WRITE8_MEMBER ( geneve_state::cruwrite )
+void geneve_state::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int addroff = offset << 1;
 
@@ -417,7 +417,7 @@ WRITE8_MEMBER ( geneve_state::cruwrite )
 	}
 }
 
-READ8_MEMBER( geneve_state::cruread )
+uint8_t geneve_state::cruread(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 	int addroff = offset << 4;
@@ -443,7 +443,7 @@ READ8_MEMBER( geneve_state::cruread )
     CRU callbacks
 ***********************************************************************/
 
-READ8_MEMBER( geneve_state::read_by_9901 )
+uint8_t geneve_state::read_by_9901(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int answer = 0;
 
@@ -505,7 +505,7 @@ READ8_MEMBER( geneve_state::read_by_9901 )
 /*
     Write PE bus reset line
 */
-WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
+void geneve_state::peripheral_bus_reset(int state)
 {
 	logerror("Peripheral bus reset request; not implemented yet.\n");
 }
@@ -513,7 +513,7 @@ WRITE_LINE_MEMBER( geneve_state::peripheral_bus_reset )
 /*
     Write VDP reset line
 */
-WRITE_LINE_MEMBER( geneve_state::VDP_reset )
+void geneve_state::VDP_reset(int state)
 {
 	logerror("Video reset request; not implemented yet.\n");
 }
@@ -521,7 +521,7 @@ WRITE_LINE_MEMBER( geneve_state::VDP_reset )
 /*
     Write joystick select line. 1 selects joystick 1 (pin 7), 0 selects joystick 2 (pin 2)
 */
-WRITE_LINE_MEMBER( geneve_state::joystick_select )
+void geneve_state::joystick_select(int state)
 {
 	m_joyport->write_port((state==ASSERT_LINE)? 1:2);
 }
@@ -529,7 +529,7 @@ WRITE_LINE_MEMBER( geneve_state::joystick_select )
 /*
     Write external mem cycles (0=long, 1=short)
 */
-WRITE_LINE_MEMBER( geneve_state::extbus_wait_states )
+void geneve_state::extbus_wait_states(int state)
 {
 	logerror("External bus wait states set to %d, not implemented yet.\n", state);
 }
@@ -538,7 +538,7 @@ WRITE_LINE_MEMBER( geneve_state::extbus_wait_states )
     Write vdp wait cycles (1=add 14 cycles, 0=add none)
     see above for waitstate handling
 */
-WRITE_LINE_MEMBER( geneve_state::video_wait_states )
+void geneve_state::video_wait_states(int state)
 {
 	if (TRACE_LINES) logerror("Video wait states set to %d\n", state);
 	m_mapper->set_video_waitstates(state==ASSERT_LINE);
@@ -551,7 +551,7 @@ WRITE_LINE_MEMBER( geneve_state::video_wait_states )
     but again it is ignored. Anyway, the TMS9995 has only two external inputs
     (INT1 and INT4).
 */
-WRITE8_MEMBER( geneve_state::tms9901_interrupt )
+void geneve_state::tms9901_interrupt(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* INTREQ is connected to INT1. */
 	m_cpu->set_input_line(INT_9995_INT1, data);
@@ -564,7 +564,7 @@ WRITE8_MEMBER( geneve_state::tms9901_interrupt )
 /*
     inta is connected to both tms9901 IRQ1 line and to tms9995 INT4/EC line.
 */
-WRITE_LINE_MEMBER( geneve_state::inta )
+void geneve_state::inta(int state)
 {
 	m_inta = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(1, state);
@@ -574,20 +574,20 @@ WRITE_LINE_MEMBER( geneve_state::inta )
 /*
     intb is connected to tms9901 IRQ12 line.
 */
-WRITE_LINE_MEMBER( geneve_state::intb )
+void geneve_state::intb(int state)
 {
 	m_intb = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(12, state);
 }
 
-WRITE_LINE_MEMBER( geneve_state::ext_ready )
+void geneve_state::ext_ready(int state)
 {
 	if (TRACE_READY) logerror("READY level (ext) = %02x\n", state);
 	m_ready_line = state;
 	m_cpu->ready_line((m_ready_line == ASSERT_LINE && m_ready_line1 == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( geneve_state::mapper_ready )
+void geneve_state::mapper_ready(int state)
 {
 	if (TRACE_READY) logerror("READY level (mapper) = %02x\n", state);
 	m_ready_line1 = state;
@@ -597,7 +597,7 @@ WRITE_LINE_MEMBER( geneve_state::mapper_ready )
 /*
     set the state of int2 (called by the v9938 core)
 */
-WRITE_LINE_MEMBER(geneve_state::set_tms9901_INT2_from_v9938)
+void geneve_state::set_tms9901_INT2_from_v9938(int state)
 {
 	m_int2 = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(2, state);
@@ -606,7 +606,7 @@ WRITE_LINE_MEMBER(geneve_state::set_tms9901_INT2_from_v9938)
 /*
     Interrupt from the keyboard.
 */
-WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
+void geneve_state::keyboard_interrupt(int state)
 {
 	m_keyint = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(8, state);
@@ -615,7 +615,7 @@ WRITE_LINE_MEMBER( geneve_state::keyboard_interrupt )
 /*
     scanline interrupt
 */
-TIMER_DEVICE_CALLBACK_MEMBER(geneve_state::geneve_hblank_interrupt)
+void geneve_state::geneve_hblank_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -631,7 +631,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(geneve_state::geneve_hblank_interrupt)
 	}
 }
 
-WRITE8_MEMBER( geneve_state::external_operation )
+void geneve_state::external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP) logerror("External operation %s not implemented on Geneve board\n", extop[offset]);
@@ -640,7 +640,7 @@ WRITE8_MEMBER( geneve_state::external_operation )
 /*
     Clock line from the CPU. Used to control wait state generation.
 */
-WRITE_LINE_MEMBER( geneve_state::clock_out )
+void geneve_state::clock_out(int state)
 {
 	m_mapper->clock_in(state);
 }
@@ -648,12 +648,12 @@ WRITE_LINE_MEMBER( geneve_state::clock_out )
 /*
     DBIN line from the CPU. Used to control wait state generation.
 */
-WRITE_LINE_MEMBER( geneve_state::dbin_line )
+void geneve_state::dbin_line(int state)
 {
 	m_mapper->dbin_in(state);
 }
 
-DRIVER_INIT_MEMBER(geneve_state,geneve)
+void geneve_state::init_geneve()
 {
 }
 

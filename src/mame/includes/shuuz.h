@@ -22,13 +22,13 @@ public:
 
 	virtual void update_interrupts() override;
 
-	DECLARE_WRITE16_MEMBER(latch_w);
-	DECLARE_READ16_MEMBER(leta_r);
-	DECLARE_READ16_MEMBER(special_port0_r);
+	void latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t leta_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t special_port0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	virtual void machine_start() override;
 
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

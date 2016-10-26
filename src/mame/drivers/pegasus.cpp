@@ -65,25 +65,25 @@ public:
 		, m_io_keyboard(*this, "KEY.%u", 0)
 	{ }
 
-	DECLARE_READ8_MEMBER(pegasus_keyboard_r);
-	DECLARE_READ8_MEMBER(pegasus_protection_r);
-	DECLARE_READ8_MEMBER(pegasus_pcg_r);
-	DECLARE_WRITE8_MEMBER(pegasus_controls_w);
-	DECLARE_WRITE8_MEMBER(pegasus_keyboard_w);
-	DECLARE_WRITE8_MEMBER(pegasus_pcg_w);
-	DECLARE_READ_LINE_MEMBER(pegasus_keyboard_irq);
-	DECLARE_READ_LINE_MEMBER(pegasus_cassette_r);
-	DECLARE_WRITE_LINE_MEMBER(pegasus_cassette_w);
-	DECLARE_WRITE_LINE_MEMBER(pegasus_firq_clr);
+	uint8_t pegasus_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pegasus_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pegasus_pcg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pegasus_controls_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pegasus_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pegasus_pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int pegasus_keyboard_irq();
+	int pegasus_cassette_r();
+	void pegasus_cassette_w(int state);
+	void pegasus_firq_clr(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(pegasus);
-	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
+	void init_pegasus();
+	void pegasus_firq(timer_device &timer, void *ptr, int32_t param);
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp01_load) { return load_cart(image, m_exp_01, "1000"); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp02_load) { return load_cart(image, m_exp_02, "2000"); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0c_load) { return load_cart(image, m_exp_0c, "c000"); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0d_load) { return load_cart(image, m_exp_0d, "d000"); }
+	image_init_result device_image_load_exp00_load(device_image_interface &image) { return load_cart(image, m_exp_00, "0000"); }
+	image_init_result device_image_load_exp01_load(device_image_interface &image) { return load_cart(image, m_exp_01, "1000"); }
+	image_init_result device_image_load_exp02_load(device_image_interface &image) { return load_cart(image, m_exp_02, "2000"); }
+	image_init_result device_image_load_exp0c_load(device_image_interface &image) { return load_cart(image, m_exp_0c, "c000"); }
+	image_init_result device_image_load_exp0d_load(device_image_interface &image) { return load_cart(image, m_exp_0d, "d000"); }
 private:
 	uint8_t m_kbd_row;
 	bool m_kbd_irq;
@@ -107,17 +107,17 @@ private:
 	required_ioport_array<8> m_io_keyboard;
 };
 
-TIMER_DEVICE_CALLBACK_MEMBER(pegasus_state::pegasus_firq)
+void pegasus_state::pegasus_firq(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
+void pegasus_state::pegasus_firq_clr(int state)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
-READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
+uint8_t pegasus_state::pegasus_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t i,data = 0xff;
 	for (i = 0; i < 8; i++)
@@ -129,12 +129,12 @@ READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( pegasus_state::pegasus_keyboard_w )
+void pegasus_state::pegasus_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbd_row = data;
 }
 
-WRITE8_MEMBER( pegasus_state::pegasus_controls_w )
+void pegasus_state::pegasus_controls_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  d0,d2 - not emulated
     d0 - Blank - Video blanking
@@ -146,28 +146,28 @@ WRITE8_MEMBER( pegasus_state::pegasus_controls_w )
 	m_control_bits = data;
 }
 
-READ_LINE_MEMBER( pegasus_state::pegasus_keyboard_irq )
+int pegasus_state::pegasus_keyboard_irq()
 {
 	return m_kbd_irq;
 }
 
-READ_LINE_MEMBER( pegasus_state::pegasus_cassette_r )
+int pegasus_state::pegasus_cassette_r()
 {
 	return m_cass->input();
 }
 
-WRITE_LINE_MEMBER( pegasus_state::pegasus_cassette_w )
+void pegasus_state::pegasus_cassette_w(int state)
 {
 	m_cass->output(state ? 1 : -1);
 }
 
-READ8_MEMBER( pegasus_state::pegasus_pcg_r )
+uint8_t pegasus_state::pegasus_pcg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t code = m_p_videoram[offset] & 0x7f;
 	return m_p_pcgram[(code << 4) | (~m_kbd_row & 15)];
 }
 
-WRITE8_MEMBER( pegasus_state::pegasus_pcg_w )
+void pegasus_state::pegasus_pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  if (BIT(m_control_bits, 1))
 	{
@@ -177,7 +177,7 @@ WRITE8_MEMBER( pegasus_state::pegasus_pcg_w )
 }
 
 /* Must return the A register except when it is doing a rom search */
-READ8_MEMBER( pegasus_state::pegasus_protection_r )
+uint8_t pegasus_state::pegasus_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_maincpu->state_int(M6809_A);
 	if (data == 0x20) data = 0xff;
@@ -473,7 +473,7 @@ void pegasus_state::machine_reset()
 	m_control_bits = 0;
 }
 
-DRIVER_INIT_MEMBER(pegasus_state, pegasus)
+void pegasus_state::init_pegasus()
 {
 	// decrypt monitor
 	uint8_t *base = memregion("maincpu")->base() + 0xf000;

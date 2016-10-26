@@ -41,12 +41,12 @@
 
 /* Protection Handlers */
 
-WRITE8_MEMBER(_1943_state::c1943_protection_w)
+void _1943_state::c1943_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot_value = data;
 }
 
-READ8_MEMBER(_1943_state::c1943_protection_r)
+uint8_t _1943_state::c1943_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// The game crashes (through a jump to 0x8000) if the return value is not what it expects..
 
@@ -91,7 +91,7 @@ READ8_MEMBER(_1943_state::c1943_protection_r)
 }
 
 // The bootleg expects 0x00 to be returned from the protection reads because the protection has been patched out.
-READ8_MEMBER(_1943_state::_1943b_c007_r)
+uint8_t _1943_state::_1943b_c007_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -872,15 +872,15 @@ ROM_START( 1943bj )
 	ROM_LOAD( "bm6.4b",    0x0b00, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
 ROM_END
 
-DRIVER_INIT_MEMBER(_1943_state,1943)
+void _1943_state::init_1943()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(_1943_state,1943b)
+void _1943_state::init_1943b()
 {
-	DRIVER_INIT_CALL(1943);
+	init_1943();
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc007, 0xc007, read8_delegate(FUNC(_1943_state::_1943b_c007_r),this));
 }

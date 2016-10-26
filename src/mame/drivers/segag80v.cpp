@@ -159,7 +159,7 @@
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(segag80v_state::service_switch)
+void segag80v_state::service_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
@@ -196,13 +196,13 @@ offs_t segag80v_state::decrypt_offset(address_space &space, offs_t offset)
 	return (offset & 0xff00) | (*m_decrypt)(pc, space.read_byte(pc + 1));
 }
 
-WRITE8_MEMBER(segag80v_state::mainram_w)
+void segag80v_state::mainram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mainram[decrypt_offset(space, offset)] = data;
 }
 
-WRITE8_MEMBER(segag80v_state::usb_ram_w){ m_usb->ram_w(space, decrypt_offset(m_maincpu->space(AS_PROGRAM), offset), data); }
-WRITE8_MEMBER(segag80v_state::vectorram_w)
+void segag80v_state::usb_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_usb->ram_w(space, decrypt_offset(m_maincpu->space(AS_PROGRAM), offset), data); }
+void segag80v_state::vectorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vectorram[decrypt_offset(space, offset)] = data;
 }
@@ -224,7 +224,7 @@ inline uint8_t segag80v_state::demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2
 }
 
 
-READ8_MEMBER(segag80v_state::mangled_ports_r)
+uint8_t segag80v_state::mangled_ports_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* The input ports are odd. Neighboring lines are read via a mux chip  */
 	/* one bit at a time. This means that one bank of DIP switches will be */
@@ -247,13 +247,13 @@ READ8_MEMBER(segag80v_state::mangled_ports_r)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80v_state::spinner_select_w)
+void segag80v_state::spinner_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spinner_select = data;
 }
 
 
-READ8_MEMBER(segag80v_state::spinner_input_r)
+uint8_t segag80v_state::spinner_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int8_t delta;
 
@@ -285,13 +285,13 @@ READ8_MEMBER(segag80v_state::spinner_input_r)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(segag80v_state::elim4_joint_coin_r)
+ioport_value segag80v_state::elim4_joint_coin_r(ioport_field &field, void *param)
 {
 	return (ioport("COINS")->read() & 0xf) != 0xf;
 }
 
 
-READ8_MEMBER(segag80v_state::elim4_input_r)
+uint8_t segag80v_state::elim4_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -324,7 +324,7 @@ READ8_MEMBER(segag80v_state::elim4_input_r)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80v_state::multiply_w)
+void segag80v_state::multiply_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mult_data[offset] = data;
 	if (offset == 1)
@@ -332,7 +332,7 @@ WRITE8_MEMBER(segag80v_state::multiply_w)
 }
 
 
-READ8_MEMBER(segag80v_state::multiply_r)
+uint8_t segag80v_state::multiply_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = m_mult_result;
 	m_mult_result >>= 8;
@@ -347,14 +347,14 @@ READ8_MEMBER(segag80v_state::multiply_r)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80v_state::coin_count_w)
+void segag80v_state::coin_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
 	machine().bookkeeping().coin_counter_w(1, (data >> 6) & 1);
 }
 
 
-WRITE8_MEMBER(segag80v_state::unknown_w)
+void segag80v_state::unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* writing an 0x04 here enables interrupts */
 	/* some games write 0x00/0x01 here as well */
@@ -1269,7 +1269,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segag80v_state,elim2)
+void segag80v_state::init_elim2()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1282,7 +1282,7 @@ DRIVER_INIT_MEMBER(segag80v_state,elim2)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,elim4)
+void segag80v_state::init_elim4()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1299,7 +1299,7 @@ DRIVER_INIT_MEMBER(segag80v_state,elim4)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,spacfury)
+void segag80v_state::init_spacfury()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1314,7 +1314,7 @@ DRIVER_INIT_MEMBER(segag80v_state,spacfury)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,zektor)
+void segag80v_state::init_zektor()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
@@ -1335,7 +1335,7 @@ DRIVER_INIT_MEMBER(segag80v_state,zektor)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,tacscan)
+void segag80v_state::init_tacscan()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
@@ -1354,7 +1354,7 @@ DRIVER_INIT_MEMBER(segag80v_state,tacscan)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,startrek)
+void segag80v_state::init_startrek()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);

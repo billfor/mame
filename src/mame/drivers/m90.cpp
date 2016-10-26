@@ -38,7 +38,7 @@ void m90_state::machine_start()
 
 /***************************************************************************/
 
-WRITE16_MEMBER(m90_state::m90_coincounter_w)
+void m90_state::m90_coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -49,13 +49,13 @@ WRITE16_MEMBER(m90_state::m90_coincounter_w)
 	}
 }
 
-WRITE16_MEMBER(m90_state::quizf1_bankswitch_w)
+void m90_state::quizf1_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		membank("bank1")->set_entry(data & 0xf);
 }
 
-WRITE16_MEMBER(m90_state::dynablsb_sound_command_w)
+void m90_state::dynablsb_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -65,7 +65,7 @@ WRITE16_MEMBER(m90_state::dynablsb_sound_command_w)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE16_MEMBER(m90_state::unknown_w)
+void m90_state::unknown_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	printf("%04x    ",data);
 }
@@ -682,7 +682,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-INTERRUPT_GEN_MEMBER(m90_state::fake_nmi)
+void m90_state::fake_nmi(device_t &device)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int sample = m_audio->sample_r(space,0);
@@ -690,7 +690,7 @@ INTERRUPT_GEN_MEMBER(m90_state::fake_nmi)
 		m_audio->sample_w(space,0,sample);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
+void m90_state::bomblord_fake_nmi(device_t &device)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int sample = m_audio->sample_r(space,0);
@@ -698,17 +698,17 @@ INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 		m_audio->sample_w(space,0,sample);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::m90_interrupt)
+void m90_state::m90_interrupt(device_t &device)
 {
 	generic_pulse_irq_line(device.execute(), NEC_INPUT_LINE_INTP0, 1);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::dynablsb_interrupt)
+void m90_state::dynablsb_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x60/4);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::bomblord_interrupt)
+void m90_state::bomblord_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x50/4);
 }
@@ -1202,7 +1202,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(m90_state,quizf1)
+void m90_state::init_quizf1()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("user1")->base(), 0x10000);
 	m_maincpu->space(AS_IO).install_write_handler(0x04, 0x05, write16_delegate(FUNC(m90_state::quizf1_bankswitch_w),this));
@@ -1210,7 +1210,7 @@ DRIVER_INIT_MEMBER(m90_state,quizf1)
 
 
 
-DRIVER_INIT_MEMBER(m90_state,bomblord)
+void m90_state::init_bomblord()
 {
 	uint16_t *ROM = (uint16_t *)(memregion("maincpu")->base());
 

@@ -33,12 +33,12 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( i8355_a_r );
-	DECLARE_WRITE8_MEMBER( i8355_a_w );
-	DECLARE_READ_LINE_MEMBER( sid_r );
-	DECLARE_WRITE_LINE_MEMBER( sod_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_rst75 );
+	uint8_t i8355_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8355_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int sid_r();
+	void sod_w(int state);
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void trigger_rst75(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	/* cassette state */
 	int m_tape_control;

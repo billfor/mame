@@ -120,15 +120,15 @@ public:
 	uint8_t m_bank;
 	uint8_t m_layer;
 
-	DECLARE_WRITE8_MEMBER(flipjack_sound_nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(flipjack_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(flipjack_bank_w);
-	DECLARE_WRITE8_MEMBER(flipjack_layer_w);
-	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
-	DECLARE_READ8_MEMBER(flipjack_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(flipjack_portc_w);
+	void flipjack_sound_nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipjack_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipjack_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipjack_layer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipjack_coin(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	uint8_t flipjack_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void flipjack_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(flipjack);
+	void palette_init_flipjack(palette_device &palette);
 	uint32_t screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -139,7 +139,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(flipjack_state, flipjack)
+void flipjack_state::palette_init_flipjack(palette_device &palette)
 {
 	// from prom
 	const uint8_t *color_prom = memregion("proms")->base();
@@ -248,7 +248,7 @@ uint32_t flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rg
 
 ***************************************************************************/
 
-WRITE8_MEMBER(flipjack_state::flipjack_bank_w)
+void flipjack_state::flipjack_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d1: tile bank
 	// d2: prg bank
@@ -258,7 +258,7 @@ WRITE8_MEMBER(flipjack_state::flipjack_bank_w)
 	membank("bank1")->set_entry(data >> 2 & 1);
 }
 
-WRITE8_MEMBER(flipjack_state::flipjack_layer_w)
+void flipjack_state::flipjack_layer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: flip screen
 	// d1: enable playfield layer
@@ -268,29 +268,29 @@ WRITE8_MEMBER(flipjack_state::flipjack_layer_w)
 	m_layer = data;
 }
 
-READ8_MEMBER(flipjack_state::flipjack_soundlatch_r)
+uint8_t flipjack_state::flipjack_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_soundlatch;
 }
 
-WRITE8_MEMBER(flipjack_state::flipjack_soundlatch_w)
+void flipjack_state::flipjack_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch = data;
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(flipjack_state::flipjack_sound_nmi_ack_w)
+void flipjack_state::flipjack_sound_nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(flipjack_state::flipjack_portc_w)
+void flipjack_state::flipjack_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// watchdog?
 }
 
-INPUT_CHANGED_MEMBER(flipjack_state::flipjack_coin)
+void flipjack_state::flipjack_coin(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

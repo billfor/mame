@@ -78,41 +78,41 @@ public:
 	uint8_t m_out[3];
 	uint8_t m_igs_magic[2];
 
-	DECLARE_WRITE8_MEMBER(reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(reel4_ram_w);
-	DECLARE_WRITE8_MEMBER(bg_scroll_w);
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(video_and_leds_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(magic_w);
-	DECLARE_READ8_MEMBER(magic_r);
+	void reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel4_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_and_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_and_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void magic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t magic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void show_out();
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
-	INTERRUPT_GEN_MEMBER(interrupt);
+	ioport_value hopper_r(ioport_field &field, void *param);
+	void interrupt(device_t &device);
 
-	TILE_GET_INFO_MEMBER(get_jingbell_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_gp98_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_jingbell_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_gp98_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_jingbell_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_gp98_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_jingbell_reel4_tile_info);
-	TILE_GET_INFO_MEMBER(get_gp98_reel4_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_jingbell_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_gp98_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_jingbell_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_gp98_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_jingbell_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_gp98_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_jingbell_reel4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_gp98_reel4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void decrypt_jingbell();
-	DECLARE_DRIVER_INIT(jingbell);
-	DECLARE_DRIVER_INIT(jingbelli);
+	void init_jingbell();
+	void init_jingbelli();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(gp98);
+	void video_start_gp98();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -124,13 +124,13 @@ public:
 
 
 
-WRITE8_MEMBER(igs009_state::reel1_ram_w)
+void igs009_state::reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel1_tile_info)
+void igs009_state::get_jingbell_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel1_ram[tile_index];
 
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel1_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel1_tile_info)
+void igs009_state::get_gp98_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel1_ram[tile_index];
 
@@ -152,13 +152,13 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel1_tile_info)
 }
 
 
-WRITE8_MEMBER(igs009_state::reel2_ram_w)
+void igs009_state::reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel2_ram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel2_tile_info)
+void igs009_state::get_jingbell_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel2_ram[tile_index];
 
@@ -168,7 +168,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel2_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel2_tile_info)
+void igs009_state::get_gp98_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel2_ram[tile_index];
 
@@ -180,13 +180,13 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel2_tile_info)
 
 
 
-WRITE8_MEMBER(igs009_state::reel3_ram_w)
+void igs009_state::reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel3_tile_info)
+void igs009_state::get_jingbell_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel3_ram[tile_index];
 
@@ -196,7 +196,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel3_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel3_tile_info)
+void igs009_state::get_gp98_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel3_ram[tile_index];
 
@@ -208,13 +208,13 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel3_tile_info)
 
 
 
-WRITE8_MEMBER(igs009_state::reel4_ram_w)
+void igs009_state::reel4_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel4_ram[offset] = data;
 	m_reel4_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel4_tile_info)
+void igs009_state::get_jingbell_reel4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel4_ram[tile_index];
 
@@ -224,7 +224,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_jingbell_reel4_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel4_tile_info)
+void igs009_state::get_gp98_reel4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel4_ram[tile_index];
 
@@ -236,26 +236,26 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel4_tile_info)
 
 
 
-WRITE8_MEMBER(igs009_state::bg_scroll_w)
+void igs009_state::bg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_scroll[offset] = data;
 //  bg_tilemap->set_scrolly(offset,data);
 }
 
 
-TILE_GET_INFO_MEMBER(igs009_state::get_fg_tile_info)
+void igs009_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
 	SET_TILE_INFO_MEMBER(1, code, (4*(code >> 14)+3), 0);
 }
 
-WRITE8_MEMBER(igs009_state::fg_tile_w)
+void igs009_state::fg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(igs009_state::fg_color_w)
+void igs009_state::fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -278,7 +278,7 @@ void igs009_state::video_start()
 }
 
 
-VIDEO_START_MEMBER(igs009_state,gp98)
+void igs009_state::video_start_gp98()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -369,7 +369,7 @@ uint32_t igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 ***************************************************************************/
 
 
-CUSTOM_INPUT_MEMBER(igs009_state::hopper_r)
+ioport_value igs009_state::hopper_r(ioport_field &field, void *param)
 {
 	return m_hopper && !(m_screen->frame_number()%10);
 }
@@ -382,7 +382,7 @@ void igs009_state::show_out()
 #endif
 }
 
-WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
+void igs009_state::nmi_and_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_nmi_enable ^ data) & (~0xdd))
 	{
@@ -403,7 +403,7 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 	show_out();
 }
 
-WRITE8_MEMBER(igs009_state::video_and_leds_w)
+void igs009_state::video_and_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(4,      data & 0x01); // start?
 	output().set_led_value(5,      data & 0x04); // l_bet?
@@ -415,7 +415,7 @@ WRITE8_MEMBER(igs009_state::video_and_leds_w)
 	show_out();
 }
 
-WRITE8_MEMBER(igs009_state::leds_w)
+void igs009_state::leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 0x01);  // stop_1
 	output().set_led_value(1, data & 0x02);  // stop_2
@@ -428,7 +428,7 @@ WRITE8_MEMBER(igs009_state::leds_w)
 }
 
 
-WRITE8_MEMBER(igs009_state::magic_w)
+void igs009_state::magic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_igs_magic[offset] = data;
 
@@ -446,7 +446,7 @@ WRITE8_MEMBER(igs009_state::magic_w)
 	}
 }
 
-READ8_MEMBER(igs009_state::magic_r)
+uint8_t igs009_state::magic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(m_igs_magic[0])
 	{
@@ -799,7 +799,7 @@ void igs009_state::machine_reset()
 	m_video_enable  =   1;
 }
 
-INTERRUPT_GEN_MEMBER(igs009_state::interrupt)
+void igs009_state::interrupt(device_t &device)
 {
 	if (m_nmi_enable & 0x80)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -1079,7 +1079,7 @@ void igs009_state::decrypt_jingbell()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs009_state,jingbelli)
+void igs009_state::init_jingbelli()
 {
 	decrypt_jingbell();
 
@@ -1088,7 +1088,7 @@ DRIVER_INIT_MEMBER(igs009_state,jingbelli)
 	rom[0x01f19] = 0x18;
 }
 
-DRIVER_INIT_MEMBER(igs009_state,jingbell)
+void igs009_state::init_jingbell()
 {
 	decrypt_jingbell();
 

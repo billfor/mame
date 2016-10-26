@@ -12,7 +12,7 @@
 #include "includes/mustache.h"
 
 
-PALETTE_INIT_MEMBER(mustache_state, mustache)
+void mustache_state::palette_init_mustache(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -46,13 +46,13 @@ PALETTE_INIT_MEMBER(mustache_state, mustache)
 	}
 }
 
-WRITE8_MEMBER(mustache_state::videoram_w)
+void mustache_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(mustache_state::video_control_w)
+void mustache_state::video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (data & 0x01))
 	{
@@ -69,7 +69,7 @@ WRITE8_MEMBER(mustache_state::video_control_w)
 	}
 }
 
-WRITE8_MEMBER(mustache_state::scroll_w)
+void mustache_state::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, 0x100 - data);
 	m_bg_tilemap->set_scrollx(1, 0x100 - data);
@@ -77,7 +77,7 @@ WRITE8_MEMBER(mustache_state::scroll_w)
 	m_bg_tilemap->set_scrollx(3, 0x100);
 }
 
-TILE_GET_INFO_MEMBER(mustache_state::get_bg_tile_info)
+void mustache_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[2 * tile_index + 1];
 	int code = m_videoram[2 * tile_index] + ((attr & 0x60) << 3) + ((m_control_byte & 0x08) << 7);

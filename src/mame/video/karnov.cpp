@@ -37,7 +37,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(karnov_state, karnov)
+void karnov_state::palette_init_karnov(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -134,7 +134,7 @@ uint32_t karnov_state::screen_update_karnov(screen_device &screen, bitmap_ind16 
 
 /******************************************************************************/
 
-TILE_GET_INFO_MEMBER(karnov_state::get_fix_tile_info)
+void karnov_state::get_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -143,13 +143,13 @@ TILE_GET_INFO_MEMBER(karnov_state::get_fix_tile_info)
 			0);
 }
 
-WRITE16_MEMBER(karnov_state::karnov_videoram_w)
+void karnov_state::karnov_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(karnov_state::karnov_playfield_swap_w)
+void karnov_state::karnov_playfield_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset = ((offset & 0x1f) << 5) | ((offset & 0x3e0) >> 5);
 	COMBINE_DATA(&m_pf_data[offset]);
@@ -157,7 +157,7 @@ WRITE16_MEMBER(karnov_state::karnov_playfield_swap_w)
 
 /******************************************************************************/
 
-VIDEO_START_MEMBER(karnov_state,karnov)
+void karnov_state::video_start_karnov()
 {
 	/* Allocate bitmap & tilemap */
 	m_bitmap_f = std::make_unique<bitmap_ind16>(512, 512);
@@ -168,7 +168,7 @@ VIDEO_START_MEMBER(karnov_state,karnov)
 	m_fix_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(karnov_state,wndrplnt)
+void karnov_state::video_start_wndrplnt()
 {
 	/* Allocate bitmap & tilemap */
 	m_bitmap_f = std::make_unique<bitmap_ind16>(512, 512);

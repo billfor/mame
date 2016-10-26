@@ -99,7 +99,7 @@ void decobsmt_device::device_reset()
 	m_bsmt_comms = 0;
 }
 
-WRITE8_MEMBER(decobsmt_device::bsmt_reset_w)
+void decobsmt_device::bsmt_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_bsmt_reset;
 	m_bsmt_reset = data;
@@ -107,39 +107,39 @@ WRITE8_MEMBER(decobsmt_device::bsmt_reset_w)
 		m_bsmt->reset();
 }
 
-WRITE8_MEMBER(decobsmt_device::bsmt0_w)
+void decobsmt_device::bsmt0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bsmt_latch = data;
 }
 
-WRITE8_MEMBER(decobsmt_device::bsmt1_w)
+void decobsmt_device::bsmt1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bsmt->write_reg(offset ^ 0xff);
 	m_bsmt->write_data((m_bsmt_latch << 8) | data);
 	m_ourcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); /* BSMT is not ready */
 }
 
-READ8_MEMBER(decobsmt_device::bsmt_status_r)
+uint8_t decobsmt_device::bsmt_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bsmt->read_status() << 7;
 }
 
-READ8_MEMBER(decobsmt_device::bsmt_comms_r)
+uint8_t decobsmt_device::bsmt_comms_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bsmt_comms;
 }
 
-WRITE8_MEMBER(decobsmt_device::bsmt_comms_w)
+void decobsmt_device::bsmt_comms_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bsmt_comms = data;
 }
 
-WRITE_LINE_MEMBER(decobsmt_device::bsmt_reset_line)
+void decobsmt_device::bsmt_reset_line(int state)
 {
 	m_ourcpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
-INTERRUPT_GEN_MEMBER(decobsmt_device::decobsmt_firq_interrupt)
+void decobsmt_device::decobsmt_firq_interrupt(device_t &device)
 {
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }

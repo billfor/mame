@@ -7,14 +7,14 @@
 
 static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
 
-TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_clock_timer_callback)
+void gamecom_state::gamecom_clock_timer_callback(void *ptr, int32_t param)
 {
 	uint8_t val = m_p_ram[SM8521_CLKT] + 1;
 	m_p_ram[SM8521_CLKT] = ( m_p_ram[SM8521_CLKT] & 0xC0 ) | (val & 0x3f);
 	m_maincpu->set_input_line(sm8500_cpu_device::CK_INT, ASSERT_LINE );
 }
 
-TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound0_timer_callback)
+void gamecom_state::gamecom_sound0_timer_callback(void *ptr, int32_t param)
 {
 	if (m_sound0_cnt > 0x3f)
 	{
@@ -32,7 +32,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound0_timer_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound1_timer_callback)
+void gamecom_state::gamecom_sound1_timer_callback(void *ptr, int32_t param)
 {
 	if (m_sound1_cnt > 0x3f)
 	{
@@ -200,7 +200,7 @@ void gamecom_state::handle_input_press(uint16_t mux_data)
 	}
 }
 
-WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
+void gamecom_state::gamecom_pio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += 0x14;
 	m_p_ram[offset] = data;
@@ -223,12 +223,12 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 	}
 }
 
-READ8_MEMBER( gamecom_state::gamecom_pio_r )
+uint8_t gamecom_state::gamecom_pio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p_ram[offset + 0x14];
 }
 
-READ8_MEMBER( gamecom_state::gamecom_internal_r )
+uint8_t gamecom_state::gamecom_internal_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // ToDo: Read from vblank bit
 //  if(SM8521_LCV == offset + 0x20)
@@ -267,7 +267,7 @@ void gamecom_state::recompute_lcd_params()
 	machine().first_screen()->configure((hblank_period), (vblank_period), visarea, refresh );
 }
 
-WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
+void gamecom_state::gamecom_internal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += 0x20;
 	switch( offset )
@@ -456,7 +456,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 
 /* The manual is not conclusive as to which bit of the DMVP register (offset 0x3D) determines
    which page for source or destination is used */
-WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
+void gamecom_state::gamecom_handle_dma(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t dmc = m_p_ram[SM8521_DMC];
 	m_dma.overwrite_mode = dmc & 0x01;
@@ -587,7 +587,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 	m_maincpu->set_input_line(sm8500_cpu_device::DMA_INT, ASSERT_LINE );
 }
 
-WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
+void gamecom_state::gamecom_update_timers(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( m_timer[0].enabled )
 	{
@@ -619,7 +619,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
 	}
 }
 
-DRIVER_INIT_MEMBER(gamecom_state,gamecom)
+void gamecom_state::init_gamecom()
 {
 	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_clock_timer_callback),this));
 	m_sound0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_sound0_timer_callback),this));
@@ -660,12 +660,12 @@ image_init_result gamecom_state::common_load(device_image_interface &image, gene
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart1 )
+image_init_result gamecom_state::device_image_load_gamecom_cart1(device_image_interface &image)
 {
 	return common_load(image, m_cart1);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart2 )
+image_init_result gamecom_state::device_image_load_gamecom_cart2(device_image_interface &image)
 {
 	return common_load(image, m_cart2);
 }

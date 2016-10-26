@@ -48,13 +48,13 @@ void eprom_state::update_interrupts()
 	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-MACHINE_START_MEMBER(eprom_state,eprom)
+void eprom_state::machine_start_eprom()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_sync_data));
 }
 
-MACHINE_RESET_MEMBER(eprom_state,eprom)
+void eprom_state::machine_reset_eprom()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -69,7 +69,7 @@ MACHINE_RESET_MEMBER(eprom_state,eprom)
  *
  *************************************/
 
-READ16_MEMBER(eprom_state::special_port1_r)
+uint16_t eprom_state::special_port1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = ioport("260010")->read();
 	result ^= 0x0010;
@@ -77,7 +77,7 @@ READ16_MEMBER(eprom_state::special_port1_r)
 }
 
 
-READ16_MEMBER(eprom_state::adc_r)
+uint16_t eprom_state::adc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 	int result = ioport(adcnames[m_last_offset & 3])->read();
@@ -94,7 +94,7 @@ READ16_MEMBER(eprom_state::adc_r)
  *
  *************************************/
 
-WRITE16_MEMBER(eprom_state::eprom_latch_w)
+void eprom_state::eprom_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7 && (m_extra != nullptr))
 	{
@@ -120,13 +120,13 @@ WRITE16_MEMBER(eprom_state::eprom_latch_w)
  *
  *************************************/
 
-READ16_MEMBER(eprom_state::sync_r)
+uint16_t eprom_state::sync_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sync_data;
 }
 
 
-WRITE16_MEMBER(eprom_state::sync_w)
+void eprom_state::sync_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword = m_sync_data;
 	COMBINE_DATA(&m_sync_data);
@@ -733,17 +733,17 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(eprom_state,eprom)
+void eprom_state::init_eprom()
 {
 }
 
 
-DRIVER_INIT_MEMBER(eprom_state,klaxp)
+void eprom_state::init_klaxp()
 {
 }
 
 
-DRIVER_INIT_MEMBER(eprom_state,guts)
+void eprom_state::init_guts()
 {
 }
 

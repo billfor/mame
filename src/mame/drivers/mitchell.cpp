@@ -133,7 +133,7 @@ mw-9.rom = ST M27C1001 / GFX
  *
  *************************************/
 
-READ8_MEMBER(mitchell_state::pang_port5_r)
+uint8_t mitchell_state::pang_port5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler.
 	    bit 3 is checked before updating the palette so it really seems to be vblank.
@@ -145,17 +145,17 @@ READ8_MEMBER(mitchell_state::pang_port5_r)
 	return (ioport("SYS0")->read() & 0xfe) | (m_irq_source & 1);
 }
 
-WRITE8_MEMBER(mitchell_state::eeprom_cs_w)
+void mitchell_state::eeprom_cs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_eeprom->cs_write(data ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mitchell_state::eeprom_clock_w)
+void mitchell_state::eeprom_clock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_eeprom->clk_write(data ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mitchell_state::eeprom_serial_w)
+void mitchell_state::eeprom_serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_eeprom->di_write(data & 1);
 }
@@ -167,7 +167,7 @@ WRITE8_MEMBER(mitchell_state::eeprom_serial_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mitchell_state::pang_bankswitch_w)
+void mitchell_state::pang_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank1->set_entry(data & 0x0f);
 	if(m_bank1d)
@@ -180,7 +180,7 @@ WRITE8_MEMBER(mitchell_state::pang_bankswitch_w)
  *
  *************************************/
 
-READ8_MEMBER(mitchell_state::block_input_r)
+uint8_t mitchell_state::block_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const dialnames[] = { "DIAL1", "DIAL2" };
 	static const char *const portnames[] = { "IN1", "IN2" };
@@ -224,7 +224,7 @@ READ8_MEMBER(mitchell_state::block_input_r)
 	}
 }
 
-WRITE8_MEMBER(mitchell_state::block_dial_control_w)
+void mitchell_state::block_dial_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0x08)
 	{
@@ -239,7 +239,7 @@ WRITE8_MEMBER(mitchell_state::block_dial_control_w)
 }
 
 
-READ8_MEMBER(mitchell_state::mahjong_input_r)
+uint8_t mitchell_state::mahjong_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int i;
 	static const char *const keynames[2][5] =
@@ -257,13 +257,13 @@ READ8_MEMBER(mitchell_state::mahjong_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mitchell_state::mahjong_input_select_w)
+void mitchell_state::mahjong_input_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keymatrix = data;
 }
 
 
-READ8_MEMBER(mitchell_state::input_r)
+uint8_t mitchell_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
@@ -288,7 +288,7 @@ READ8_MEMBER(mitchell_state::input_r)
 }
 
 
-WRITE8_MEMBER(mitchell_state::input_w)
+void mitchell_state::input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_input_type)
 	{
@@ -380,7 +380,7 @@ ADDRESS_MAP_END
 
 
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(mitchell_state::spangbl_msm5205_data_w)
+void mitchell_state::spangbl_msm5205_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sample_buffer = data;
 }
@@ -398,7 +398,7 @@ ADDRESS_MAP_END
 
 
 /**** Monsters World ****/
-WRITE8_MEMBER(mitchell_state::oki_banking_w)
+void mitchell_state::oki_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank(data & 3);
 }
@@ -411,7 +411,7 @@ static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
+void mitchell_state::mstworld_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -1090,7 +1090,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mitchell_state,mitchell)
+void mitchell_state::machine_start_mitchell()
 {
 	save_item(NAME(m_sample_buffer));
 	save_item(NAME(m_sample_select));
@@ -1102,7 +1102,7 @@ MACHINE_START_MEMBER(mitchell_state,mitchell)
 //  save_item(NAME(init_eeprom_count));
 }
 
-MACHINE_RESET_MEMBER(mitchell_state,mitchell)
+void mitchell_state::machine_reset_mitchell()
 {
 	m_sample_buffer = 0;
 	m_sample_select = 0;
@@ -1114,7 +1114,7 @@ MACHINE_RESET_MEMBER(mitchell_state,mitchell)
 	m_keymatrix = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mitchell_state::mitchell_irq)
+void mitchell_state::mitchell_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -1230,7 +1230,7 @@ GFXDECODE_END
 
 
 
-WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
+void mitchell_state::spangbl_adpcm_int(int state)
 {
 	m_msm->data_w(m_sample_buffer & 0x0f);
 	m_sample_buffer >>= 4;
@@ -2187,111 +2187,111 @@ void mitchell_state::configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, 
 }
 
 
-DRIVER_INIT_MEMBER(mitchell_state,dokaben)
+void mitchell_state::init_dokaben()
 {
 	m_input_type = 0;
 	configure_banks(mgakuen2_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pang)
+void mitchell_state::init_pang()
 {
 	m_input_type = 0;
 	configure_banks(pang_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pangb)
+void mitchell_state::init_pangb()
 {
 	m_input_type = 0;
 	bootleg_decode();
 	if (m_nvram != nullptr)
 		m_nvram->set_base(&m_dummy_nvram, sizeof(m_dummy_nvram));   /* for pangba */
 }
-DRIVER_INIT_MEMBER(mitchell_state,cworld)
+void mitchell_state::init_cworld()
 {
 	m_input_type = 0;
 	configure_banks(cworld_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,hatena)
+void mitchell_state::init_hatena()
 {
 	m_input_type = 0;
 	configure_banks(hatena_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,spang)
+void mitchell_state::init_spang()
 {
 	m_input_type = 3;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
 	configure_banks(spang_decode);
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,spangbl)
+void mitchell_state::init_spangbl()
 {
 	m_input_type = 3;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
 	bootleg_decode();
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,spangj)
+void mitchell_state::init_spangj()
 {
 	m_input_type = 3;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
 	configure_banks(spangj_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,sbbros)
+void mitchell_state::init_sbbros()
 {
 	m_input_type = 3;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
 	configure_banks(sbbros_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,qtono1)
+void mitchell_state::init_qtono1()
 {
 	m_input_type = 0;
 	configure_banks(qtono1_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,qsangoku)
+void mitchell_state::init_qsangoku()
 {
 	m_input_type = 0;
 	configure_banks(qsangoku_decode);
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,mgakuen)
+void mitchell_state::init_mgakuen()
 {
 	m_input_type = 1;
 	m_bank1->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 	m_maincpu->space(AS_IO).install_read_port(0x03, 0x03, "DSW0");
 	m_maincpu->space(AS_IO).install_read_port(0x04, 0x04, "DSW1");
 }
-DRIVER_INIT_MEMBER(mitchell_state,mgakuen2)
+void mitchell_state::init_mgakuen2()
 {
 	m_input_type = 1;
 	configure_banks(mgakuen2_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pkladies)
+void mitchell_state::init_pkladies()
 {
 	m_input_type = 1;
 	configure_banks(mgakuen2_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,pkladiesbl)
+void mitchell_state::init_pkladiesbl()
 {
 	m_input_type = 1;
 	bootleg_decode();
 }
-DRIVER_INIT_MEMBER(mitchell_state,marukin)
+void mitchell_state::init_marukin()
 {
 	m_input_type = 1;
 	configure_banks(marukin_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,block)
+void mitchell_state::init_block()
 {
 	m_input_type = 2;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xff80], 0x80); /* NVRAM */
 	configure_banks(block_decode);
 }
-DRIVER_INIT_MEMBER(mitchell_state,blockbl)
+void mitchell_state::init_blockbl()
 {
 	m_input_type = 2;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xff80], 0x80); /* NVRAM */
 	bootleg_decode();
 }
 
-DRIVER_INIT_MEMBER(mitchell_state,mstworld)
+void mitchell_state::init_mstworld()
 {
 	/* descramble the program rom .. */
 	int len = memregion("maincpu")->bytes();

@@ -62,28 +62,28 @@ public:
 	int m_vblank;
 	int m_prev_value;
 
-	DECLARE_WRITE16_MEMBER(flip_screen);
-	DECLARE_READ16_MEMBER(input_ports_r);
-	DECLARE_WRITE16_MEMBER(sound_brt_w);
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_WRITE16_MEMBER(irq_w);
-	DECLARE_WRITE16_MEMBER(scanline_w);
-	DECLARE_WRITE16_MEMBER(fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(bg0videoram_w);
-	DECLARE_WRITE16_MEMBER(bg1videoram_w);
-	DECLARE_WRITE16_MEMBER(bg0scrollx_w);
-	DECLARE_WRITE16_MEMBER(bg0scrolly_w);
-	DECLARE_WRITE16_MEMBER(bg1scrollx_w);
-	DECLARE_WRITE16_MEMBER(bg1scrolly_w);
-	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
+	void flip_screen(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t input_ports_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_brt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void scanline_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void fgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bg0videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bg1videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bg0scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bg0scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bg1scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bg1scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oki_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_fgtile_info);
-	TILE_GET_INFO_MEMBER(get_bg0tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1tile_info);
+	void get_fgtile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg0tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg1tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);

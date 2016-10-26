@@ -408,7 +408,7 @@ void superpet_device::pet_irq_w(int state)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( superpet_device::read )
+uint8_t superpet_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_slot->dma_bd_r(offset);
 }
@@ -418,7 +418,7 @@ READ8_MEMBER( superpet_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( superpet_device::write )
+void superpet_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_slot->dma_bd_w(offset, data);
 }
@@ -428,7 +428,7 @@ WRITE8_MEMBER( superpet_device::write )
 //  acia_irq_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( superpet_device::acia_irq_w )
+void superpet_device::acia_irq_w(int state)
 {
 	m_acia_irq = state;
 

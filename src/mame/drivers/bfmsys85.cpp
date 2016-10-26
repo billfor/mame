@@ -90,10 +90,10 @@ public:
 	int m_alpha_clock;
 	int m_irq_status;
 	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	void reel0_optic_cb(int state) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	void reel1_optic_cb(int state) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	void reel2_optic_cb(int state) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	void reel3_optic_cb(int state) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 	int m_locked;
 	int m_is_timer_enabled;
 	int m_coin_inhibits;
@@ -103,27 +103,27 @@ public:
 	uint8_t m_Inputs[64];
 	uint8_t m_codec_data[256];
 	uint8_t m_sys85_data_line_t;
-	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_READ8_MEMBER(irqlatch_r);
-	DECLARE_WRITE8_MEMBER(reel12_w);
-	DECLARE_WRITE8_MEMBER(reel34_w);
-	DECLARE_WRITE8_MEMBER(mmtr_w);
-	DECLARE_READ8_MEMBER(mmtr_r);
-	DECLARE_WRITE8_MEMBER(vfd_w);
-	DECLARE_WRITE8_MEMBER(mux_ctrl_w);
-	DECLARE_READ8_MEMBER(mux_ctrl_r);
-	DECLARE_WRITE8_MEMBER(mux_data_w);
-	DECLARE_READ8_MEMBER(mux_data_r);
-	DECLARE_WRITE8_MEMBER(mux_enable_w);
-	DECLARE_WRITE8_MEMBER(triac_w);
-	DECLARE_READ8_MEMBER(triac_r);
-	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_DRIVER_INIT(decode);
-	DECLARE_DRIVER_INIT(nodecode);
+	void watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irqlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void reel12_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel34_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmtr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mmtr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vfd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mux_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void triac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t triac_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sys85_data_w(int state);
+	void write_acia_clock(int state);
+	void init_decode();
+	void init_nodecode();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(timer_irq);
+	void timer_irq(device_t &device);
 	int b85_find_project_string( );
 	optional_device<roc10937_t> m_vfd;
 	required_device<cpu_device> m_maincpu;
@@ -142,13 +142,13 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 
 
-WRITE_LINE_MEMBER(bfmsys85_state::sys85_data_w)
+void bfmsys85_state::sys85_data_w(int state)
 {
 	m_sys85_data_line_t = state;
 }
 
 
-WRITE_LINE_MEMBER(bfmsys85_state::write_acia_clock)
+void bfmsys85_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);
@@ -178,13 +178,13 @@ void bfmsys85_state::machine_reset()
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::watchdog_w)
+void bfmsys85_state::watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-INTERRUPT_GEN_MEMBER(bfmsys85_state::timer_irq)
+void bfmsys85_state::timer_irq(device_t &device)
 {
 	if ( m_is_timer_enabled )
 	{
@@ -195,7 +195,7 @@ INTERRUPT_GEN_MEMBER(bfmsys85_state::timer_irq)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfmsys85_state::irqlatch_r)
+uint8_t bfmsys85_state::irqlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = m_irq_status | 0x02;
 
@@ -206,7 +206,7 @@ READ8_MEMBER(bfmsys85_state::irqlatch_r)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::reel12_w)
+void bfmsys85_state::reel12_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel0->update((data>>4)&0x0f);
 	m_reel1->update( data    &0x0f);
@@ -217,7 +217,7 @@ WRITE8_MEMBER(bfmsys85_state::reel12_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::reel34_w)
+void bfmsys85_state::reel34_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel2->update((data>>4)&0x0f);
 	m_reel3->update( data    &0x0f);
@@ -230,7 +230,7 @@ WRITE8_MEMBER(bfmsys85_state::reel34_w)
 // mechanical meters //////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::mmtr_w)
+void bfmsys85_state::mmtr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int  changed = m_mmtr_latch ^ data;
 
@@ -244,13 +244,13 @@ WRITE8_MEMBER(bfmsys85_state::mmtr_w)
 }
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfmsys85_state::mmtr_r)
+uint8_t bfmsys85_state::mmtr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mmtr_latch;
 }
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::vfd_w)
+void bfmsys85_state::vfd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //reset 0x20, clock 0x80, data 0x40
 
@@ -263,7 +263,7 @@ WRITE8_MEMBER(bfmsys85_state::vfd_w)
 // input / output multiplexers ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::mux_ctrl_w)
+void bfmsys85_state::mux_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( data & 0xF0 )
 	{
@@ -298,14 +298,14 @@ WRITE8_MEMBER(bfmsys85_state::mux_ctrl_w)
 	}
 }
 
-READ8_MEMBER(bfmsys85_state::mux_ctrl_r)
+uint8_t bfmsys85_state::mux_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// software waits for bit7 to become low
 
 	return 0;
 }
 
-WRITE8_MEMBER(bfmsys85_state::mux_data_w)
+void bfmsys85_state::mux_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int pattern = 0x01, i,
 	off = m_mux_output_strobe<<4;
@@ -318,14 +318,14 @@ WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 	}
 }
 
-READ8_MEMBER(bfmsys85_state::mux_data_r)
+uint8_t bfmsys85_state::mux_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mux_input;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::mux_enable_w)
+void bfmsys85_state::mux_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -333,14 +333,14 @@ WRITE8_MEMBER(bfmsys85_state::mux_enable_w)
 // payslide triacs ////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::triac_w)
+void bfmsys85_state::triac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_triac_latch = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfmsys85_state::triac_r)
+uint8_t bfmsys85_state::triac_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_triac_latch;
 }
@@ -743,13 +743,13 @@ int bfmsys85_state::b85_find_project_string( )
 }
 
 
-DRIVER_INIT_MEMBER(bfmsys85_state,decode)
+void bfmsys85_state::init_decode()
 {
 	bfm_decode_mainrom(machine(),"maincpu", m_codec_data);
 	b85_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfmsys85_state,nodecode)
+void bfmsys85_state::init_nodecode()
 {
 	b85_find_project_string();
 }

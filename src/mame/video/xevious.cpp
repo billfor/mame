@@ -27,7 +27,7 @@
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(xevious_state,xevious)
+void xevious_state::palette_init_xevious(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -103,7 +103,7 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(xevious_state::get_fg_tile_info)
+void xevious_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_xevious_fg_colorram[tile_index];
 
@@ -119,7 +119,7 @@ TILE_GET_INFO_MEMBER(xevious_state::get_fg_tile_info)
 			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (flip_screen() ? TILE_FLIPX : 0));
 }
 
-TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
+void xevious_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_xevious_bg_videoram[tile_index];
 	uint8_t attr = m_xevious_bg_colorram[tile_index];
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(xevious_state,xevious)
+void xevious_state::video_start_xevious()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xevious_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xevious_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
@@ -162,31 +162,31 @@ VIDEO_START_MEMBER(xevious_state,xevious)
 
 ***************************************************************************/
 
-WRITE8_MEMBER( xevious_state::xevious_fg_videoram_w )
+void xevious_state::xevious_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xevious_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_fg_colorram_w )
+void xevious_state::xevious_fg_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xevious_fg_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_bg_videoram_w )
+void xevious_state::xevious_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xevious_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_bg_colorram_w )
+void xevious_state::xevious_bg_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xevious_bg_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_vh_latch_w )
+void xevious_state::xevious_vh_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int reg;
 	int scroll = data + ((offset&0x01)<<8);   /* A0 -> D8 */
@@ -218,12 +218,12 @@ WRITE8_MEMBER( xevious_state::xevious_vh_latch_w )
 
 
 /* emulation for schematic 9B */
-WRITE8_MEMBER( xevious_state::xevious_bs_w )
+void xevious_state::xevious_bs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xevious_bs[offset & 1] = data;
 }
 
-READ8_MEMBER( xevious_state::xevious_bb_r )
+uint8_t xevious_state::xevious_bb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *rom2a = memregion("gfx4")->base();
 	uint8_t *rom2b = rom2a+0x1000;

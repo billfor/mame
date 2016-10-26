@@ -49,25 +49,25 @@ public:
 		m_rs232_dcd(1)
 	{}
 
-	DECLARE_DRIVER_INIT(cgenie_eu);
-	DECLARE_DRIVER_INIT(cgenie_nz);
+	void init_cgenie_eu();
+	void init_cgenie_nz();
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	// 4-bit color ram
-	DECLARE_READ8_MEMBER(colorram_r);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	uint8_t colorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// control port
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(control_r);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_INPUT_CHANGED_MEMBER(rst_callback);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rst_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	DECLARE_WRITE_LINE_MEMBER(rs232_rx_w);
-	DECLARE_WRITE_LINE_MEMBER(rs232_dcd_w);
+	void rs232_rx_w(int state);
+	void rs232_dcd_w(int state);
 
 protected:
 	virtual void machine_start() override;
@@ -217,7 +217,7 @@ INPUT_PORTS_END
 //  KEYBOARD
 //**************************************************************************
 
-READ8_MEMBER( cgenie_state::keyboard_r )
+uint8_t cgenie_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -228,7 +228,7 @@ READ8_MEMBER( cgenie_state::keyboard_r )
 	return data;
 }
 
-INPUT_CHANGED_MEMBER( cgenie_state::rst_callback )
+void cgenie_state::rst_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval);
 }
@@ -238,7 +238,7 @@ INPUT_CHANGED_MEMBER( cgenie_state::rst_callback )
 //  CONTROL PORT & RS232
 //**************************************************************************
 
-WRITE8_MEMBER( cgenie_state::control_w )
+void cgenie_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// cassette output
 	m_cassette->output(BIT(data, 0) ? -1.0 : 1.0);
@@ -258,7 +258,7 @@ WRITE8_MEMBER( cgenie_state::control_w )
 	m_control = data;
 }
 
-READ8_MEMBER( cgenie_state::control_r )
+uint8_t cgenie_state::control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -269,12 +269,12 @@ READ8_MEMBER( cgenie_state::control_r )
 	return data;
 }
 
-WRITE_LINE_MEMBER( cgenie_state::rs232_rx_w )
+void cgenie_state::rs232_rx_w(int state)
 {
 	m_rs232_rx = state;
 }
 
-WRITE_LINE_MEMBER( cgenie_state::rs232_dcd_w )
+void cgenie_state::rs232_dcd_w(int state)
 {
 	m_rs232_dcd = state;
 }
@@ -284,12 +284,12 @@ WRITE_LINE_MEMBER( cgenie_state::rs232_dcd_w )
 //  DRIVER INIT
 //**************************************************************************
 
-DRIVER_INIT_MEMBER( cgenie_state, cgenie_eu )
+void cgenie_state::init_cgenie_eu()
 {
 	m_palette = &m_palette_eu[0];
 }
 
-DRIVER_INIT_MEMBER( cgenie_state, cgenie_nz )
+void cgenie_state::init_cgenie_nz()
 {
 	m_palette = &m_palette_nz[0];
 }
@@ -309,12 +309,12 @@ void cgenie_state::machine_start()
 //  VIDEO EMULATION
 //**************************************************************************
 
-READ8_MEMBER( cgenie_state::colorram_r )
+uint8_t cgenie_state::colorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_color_ram[offset] | 0xf0;
 }
 
-WRITE8_MEMBER( cgenie_state::colorram_w )
+void cgenie_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color_ram[offset] = data & 0x0f;
 }

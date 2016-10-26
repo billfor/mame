@@ -99,73 +99,73 @@ public:
 	uint16_t    m_pf4_rowscroll[0x1000]; // common
 
 	// common
-	DECLARE_WRITE32_MEMBER(pf1_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(pf2_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(pf3_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(pf4_rowscroll_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	void pf1_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void pf2_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void pf3_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void pf4_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// captaven
-	DECLARE_READ32_MEMBER(_71_r);
-	DECLARE_READ32_MEMBER(captaven_soundcpu_r);
-	DECLARE_WRITE32_MEMBER(nonbuffered_palette_w);
+	uint32_t _71_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t captaven_soundcpu_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void nonbuffered_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// fghthist
-	DECLARE_WRITE32_MEMBER(sound_w);
-	DECLARE_READ32_MEMBER(fghthist_control_r);
-	DECLARE_WRITE32_MEMBER(fghthist_eeprom_w);
-	DECLARE_READ32_MEMBER(fghthist_protection_region_0_146_r);
-	DECLARE_WRITE32_MEMBER(fghthist_protection_region_0_146_w);
+	void sound_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t fghthist_control_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void fghthist_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t fghthist_protection_region_0_146_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void fghthist_protection_region_0_146_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// nslasher
-	DECLARE_WRITE32_MEMBER(nslasher_eeprom_w);
+	void nslasher_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// tattass
-	DECLARE_WRITE32_MEMBER(tattass_control_w);
+	void tattass_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// nslasher and lockload
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_nslasher);
-	DECLARE_READ8_MEMBER(latch_r);
+	void sound_irq_nslasher(int state);
+	uint8_t latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// captaven, dragongun and lockload
-	DECLARE_READ32_MEMBER(irq_controller_r);
-	DECLARE_WRITE32_MEMBER(irq_controller_w);
+	uint32_t irq_controller_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void irq_controller_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// nslasher and tattass
-	DECLARE_READ16_MEMBER(nslasher_protection_region_0_104_r);
-	DECLARE_WRITE16_MEMBER(nslasher_protection_region_0_104_w);
-	DECLARE_READ16_MEMBER(nslasher_debug_r);
-	DECLARE_READ32_MEMBER(spriteram2_r);
-	DECLARE_WRITE32_MEMBER(spriteram2_w);
-	DECLARE_WRITE32_MEMBER(buffer_spriteram2_w);
-	DECLARE_WRITE32_MEMBER(ace_ram_w);
+	uint16_t nslasher_protection_region_0_104_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void nslasher_protection_region_0_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t nslasher_debug_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint32_t spriteram2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void spriteram2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void buffer_spriteram2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ace_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// captaven, fghthist, nslasher and tattass
-	DECLARE_READ32_MEMBER(spriteram_r);
-	DECLARE_WRITE32_MEMBER(spriteram_w);
-	DECLARE_WRITE32_MEMBER(buffer_spriteram_w);
-	DECLARE_WRITE32_MEMBER(pri_w);
+	uint32_t spriteram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void spriteram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void buffer_spriteram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void pri_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// all but captaven
-	DECLARE_WRITE32_MEMBER(buffered_palette_w);
-	DECLARE_WRITE32_MEMBER(palette_dma_w);
+	void buffered_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void palette_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// captaven, dragongun and lockload
-	DECLARE_READ16_MEMBER(dg_protection_region_0_146_r);
-	DECLARE_WRITE16_MEMBER(dg_protection_region_0_146_w);
+	uint16_t dg_protection_region_0_146_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dg_protection_region_0_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(tattass);
-	DECLARE_DRIVER_INIT(nslasher);
-	DECLARE_DRIVER_INIT(captaven);
-	DECLARE_DRIVER_INIT(fghthist);
-	DECLARE_MACHINE_RESET(deco32);
-	DECLARE_VIDEO_START(captaven);
-	DECLARE_VIDEO_START(fghthist);
-	DECLARE_VIDEO_START(nslasher);
+	void init_tattass();
+	void init_nslasher();
+	void init_captaven();
+	void init_fghthist();
+	void machine_reset_deco32();
+	void video_start_captaven();
+	void video_start_fghthist();
+	void video_start_nslasher();
 
-	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
+	void deco32_vbl_interrupt(device_t &device);
+	void interrupt_gen(timer_device &timer, void *ptr, int32_t param);
 
 	uint32_t screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -209,25 +209,25 @@ public:
 	int m_lightgun_port;
 	bitmap_rgb32 m_temp_render_bitmap;
 
-	DECLARE_READ32_MEMBER(lightgun_r);
-	DECLARE_WRITE32_MEMBER(lightgun_w);
-	DECLARE_WRITE32_MEMBER(sprite_control_w);
-	DECLARE_WRITE32_MEMBER(spriteram_dma_w);
-	DECLARE_READ32_MEMBER(unk_video_r);
-	DECLARE_READ32_MEMBER(service_r);
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_READ32_MEMBER(lockload_gun_mirror_r);
+	uint32_t lightgun_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void lightgun_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sprite_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void spriteram_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t unk_video_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t service_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t lockload_gun_mirror_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(dragngun);
-	DECLARE_DRIVER_INIT(dragngunj);
-	DECLARE_DRIVER_INIT(lockload);
-	DECLARE_VIDEO_START(dragngun);
-	DECLARE_VIDEO_START(lockload);
+	void init_dragngun();
+	void init_dragngunj();
+	void init_lockload();
+	void video_start_dragngun();
+	void video_start_lockload();
 	void dragngun_init_common();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vbl_irq);
+	void lockload_vbl_irq(timer_device &timer, void *ptr, int32_t param);
 
 	uint32_t screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

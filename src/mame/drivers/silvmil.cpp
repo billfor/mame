@@ -63,7 +63,7 @@ public:
 	int       m_silvmil_tilebank[4];
 	int     m_whichbank;
 
-	DECLARE_WRITE16_MEMBER(silvmil_tilebank_w)
+	void silvmil_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		m_silvmil_tilebank[m_whichbank] = (data>>8) & 0x1f;
 
@@ -72,45 +72,45 @@ public:
 		m_bg_layer->mark_all_dirty();
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_tilebank1_w)
+	void silvmil_tilebank1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		m_whichbank = (data>>8)&0x3;
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_fg_scrolly_w)
+	void silvmil_fg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		m_fg_layer->set_scrolly(0, data + 8);
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_bg_scrolly_w)
+	void silvmil_bg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		m_bg_layer->set_scrolly(0, data + 8);
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_fg_scrollx_w)
+	void silvmil_fg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		m_fg_layer->set_scrollx(0, data);
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_bg_scrollx_w)
+	void silvmil_bg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		m_bg_layer->set_scrollx(0, data + 4);
 	}
 
 
-	DECLARE_WRITE16_MEMBER(silvmil_fg_videoram_w)
+	void silvmil_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		COMBINE_DATA(&m_fg_videoram[offset]);
 		m_fg_layer->mark_tile_dirty(offset);
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_bg_videoram_w)
+	void silvmil_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		COMBINE_DATA(&m_bg_videoram[offset]);
 		m_bg_layer->mark_tile_dirty(offset);
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_soundcmd_w)
+	void silvmil_soundcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		if (ACCESSING_BITS_0_7)
 		{
@@ -121,10 +121,10 @@ public:
 	}
 
 
-	DECLARE_DRIVER_INIT(silvmil);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
+	void init_silvmil();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index deco16_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -133,7 +133,7 @@ public:
 };
 
 
-TILE_GET_INFO_MEMBER(silvmil_state::get_bg_tile_info)
+void silvmil_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data  = m_bg_videoram[tile_index];
 	int tile  = data & 0x3ff;
@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x20, 0);
 }
 
-TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
+void silvmil_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data  = m_fg_videoram[tile_index];
 	int tile  = data & 0x3ff;
@@ -153,7 +153,7 @@ TILE_GET_INFO_MEMBER(silvmil_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(1, tile + bank, color + 0x10, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(silvmil_state::deco16_scan_rows)
+tilemap_memory_index silvmil_state::deco16_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
@@ -586,7 +586,7 @@ void silvmil_state::tumblepb_gfx1_rearrange()
 	}
 }
 
-DRIVER_INIT_MEMBER(silvmil_state,silvmil)
+void silvmil_state::init_silvmil()
 {
 	tumblepb_gfx1_rearrange();
 }

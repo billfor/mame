@@ -60,29 +60,29 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_lastscroll;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(spd_adpcm_w);
-	DECLARE_READ8_MEMBER(mcu63701_r);
-	DECLARE_WRITE8_MEMBER(mcu63701_w);
-	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_1);
-	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_2);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spd_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu63701_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu63701_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrollx_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spd_adpcm_int_1(int state);
+	void spd_adpcm_int_2(int state);
 
-	TILEMAP_MAPPER_MEMBER(background_scan);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	tilemap_memory_index background_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(spdodgeb);
+	void palette_init_spdodgeb(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu63705_busy_r);
+	void interrupt(timer_device &timer, void *ptr, int32_t param);
+	ioport_value mcu63705_busy_r(ioport_field &field, void *param);
 
 	void mcu63705_update_inputs();
 	void spd_adpcm_int(msm5205_device *device, int chip);

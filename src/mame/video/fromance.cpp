@@ -31,8 +31,8 @@ inline void fromance_state::get_fromance_tile_info( tile_data &tileinfo, int til
 	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(fromance_state::get_fromance_bg_tile_info){ get_fromance_tile_info(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(fromance_state::get_fromance_fg_tile_info){ get_fromance_tile_info(tileinfo, tile_index, 1); }
+void fromance_state::get_fromance_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_fromance_tile_info(tileinfo, tile_index, 0); }
+void fromance_state::get_fromance_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_fromance_tile_info(tileinfo, tile_index, 1); }
 
 
 inline void fromance_state::get_nekkyoku_tile_info( tile_data &tileinfo, int tile_index, int layer )
@@ -44,8 +44,8 @@ inline void fromance_state::get_nekkyoku_tile_info( tile_data &tileinfo, int til
 	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_bg_tile_info){ get_nekkyoku_tile_info(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_fg_tile_info){ get_nekkyoku_tile_info(tileinfo, tile_index, 1); }
+void fromance_state::get_nekkyoku_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_nekkyoku_tile_info(tileinfo, tile_index, 0); }
+void fromance_state::get_nekkyoku_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_nekkyoku_tile_info(tileinfo, tile_index, 1); }
 
 
 
@@ -87,7 +87,7 @@ void fromance_state::init_common(  )
 	save_pointer(NAME(m_local_paletteram.get()), 0x800 * 2);
 }
 
-VIDEO_START_MEMBER(fromance_state,fromance)
+void fromance_state::video_start_fromance()
 {
 	/* allocate tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
@@ -96,7 +96,7 @@ VIDEO_START_MEMBER(fromance_state,fromance)
 	init_common();
 }
 
-VIDEO_START_MEMBER(fromance_state,nekkyoku)
+void fromance_state::video_start_nekkyoku()
 {
 	/* allocate tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
@@ -105,15 +105,15 @@ VIDEO_START_MEMBER(fromance_state,nekkyoku)
 	init_common();
 }
 
-VIDEO_START_MEMBER(fromance_state,pipedrm)
+void fromance_state::video_start_pipedrm()
 {
-	VIDEO_START_CALL_MEMBER(fromance);
+	video_start_fromance();
 	m_scrolly_ofs = 0x00;
 }
 
-VIDEO_START_MEMBER(fromance_state,hatris)
+void fromance_state::video_start_hatris()
 {
-	VIDEO_START_CALL_MEMBER(fromance);
+	video_start_fromance();
 	m_scrollx_ofs = 0xB9;
 	m_scrolly_ofs = 0x00;
 }
@@ -124,7 +124,7 @@ VIDEO_START_MEMBER(fromance_state,hatris)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_gfxreg_w)
+void fromance_state::fromance_gfxreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxreg = data;
 	m_flipscreen = (data & 0x01);
@@ -146,7 +146,7 @@ WRITE8_MEMBER(fromance_state::fromance_gfxreg_w)
  *
  *************************************/
 
-READ8_MEMBER(fromance_state::fromance_paletteram_r)
+uint8_t fromance_state::fromance_paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* adjust for banking and read */
 	offset |= m_selected_paletteram << 11;
@@ -154,7 +154,7 @@ READ8_MEMBER(fromance_state::fromance_paletteram_r)
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_paletteram_w)
+void fromance_state::fromance_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int palword;
 
@@ -175,13 +175,13 @@ WRITE8_MEMBER(fromance_state::fromance_paletteram_w)
  *
  *************************************/
 
-READ8_MEMBER(fromance_state::fromance_videoram_r)
+uint8_t fromance_state::fromance_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_local_videoram[m_selected_videoram][offset];
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_videoram_w)
+void fromance_state::fromance_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_local_videoram[m_selected_videoram][offset] = data;
 	(m_selected_videoram ? m_fg_tilemap : m_bg_tilemap)->mark_tile_dirty(offset & 0x0fff);
@@ -195,7 +195,7 @@ WRITE8_MEMBER(fromance_state::fromance_videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_scroll_w)
+void fromance_state::fromance_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_flipscreen)
 	{
@@ -243,7 +243,7 @@ WRITE8_MEMBER(fromance_state::fromance_scroll_w)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(fromance_state::crtc_interrupt_gen)
+void fromance_state::crtc_interrupt_gen(void *ptr, int32_t param)
 {
 	m_subcpu->set_input_line(0, HOLD_LINE);
 	if (param != 0)
@@ -251,7 +251,7 @@ TIMER_CALLBACK_MEMBER(fromance_state::crtc_interrupt_gen)
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_crtc_data_w)
+void fromance_state::fromance_crtc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_data[m_crtc_register] = data;
 
@@ -269,7 +269,7 @@ WRITE8_MEMBER(fromance_state::fromance_crtc_data_w)
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_crtc_register_w)
+void fromance_state::fromance_crtc_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_register = data;
 }

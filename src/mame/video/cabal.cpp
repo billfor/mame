@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "includes/cabal.h"
 
-TILE_GET_INFO_MEMBER(cabal_state::get_back_tile_info)
+void cabal_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[tile_index];
 	int color = (tile>>12)&0xf;
@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(cabal_state::get_back_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(cabal_state::get_text_tile_info)
+void cabal_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_colorram[tile_index];
 	int color = (tile>>10);
@@ -50,7 +50,7 @@ void cabal_state::video_start()
 
 /**************************************************************************/
 
-WRITE16_MEMBER(cabal_state::flipscreen_w)
+void cabal_state::flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -62,13 +62,13 @@ WRITE16_MEMBER(cabal_state::flipscreen_w)
 	}
 }
 
-WRITE16_MEMBER(cabal_state::background_videoram_w)
+void cabal_state::background_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(cabal_state::text_videoram_w)
+void cabal_state::text_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_colorram[offset]);
 	m_text_layer->mark_tile_dirty(offset);

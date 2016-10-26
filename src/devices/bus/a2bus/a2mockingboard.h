@@ -32,12 +32,12 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
-	DECLARE_WRITE8_MEMBER(via1_out_a);
-	DECLARE_WRITE8_MEMBER(via1_out_b);
-	DECLARE_WRITE8_MEMBER(via2_out_a);
-	DECLARE_WRITE8_MEMBER(via2_out_b);
+	void via1_irq_w(int state);
+	void via2_irq_w(int state);
+	void via1_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via1_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via2_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via2_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;

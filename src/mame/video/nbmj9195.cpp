@@ -17,7 +17,7 @@
 
 ******************************************************************************/
 
-WRITE8_MEMBER(nbmj9195_state::palette_w)
+void nbmj9195_state::palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_ptr[offset] = data;
 
@@ -33,7 +33,7 @@ WRITE8_MEMBER(nbmj9195_state::palette_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj9195_state::nb22090_palette_w)
+void nbmj9195_state::nb22090_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b;
 	int offs_h, offs_l;
@@ -116,7 +116,7 @@ void nbmj9195_state::blitter_w(int offset, int data, int vram)
 	}
 }
 
-WRITE8_MEMBER(nbmj9195_state::clutsel_w)
+void nbmj9195_state::clutsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_clutsel = data;
 }
@@ -126,7 +126,7 @@ void nbmj9195_state::clut_w(int offset, int data, int vram)
 	m_clut[vram][((m_clutsel & 0xff) * 0x10) + (offset & 0x0f)] = data;
 }
 
-WRITE8_MEMBER(nbmj9195_state::gfxflag2_w)
+void nbmj9195_state::gfxflag2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxflag2 = data;
 }
@@ -355,20 +355,20 @@ void nbmj9195_state::gfxdraw(int vram)
 
 
 ******************************************************************************/
-WRITE8_MEMBER(nbmj9195_state::blitter_0_w){ blitter_w(offset, data, 0); }
-WRITE8_MEMBER(nbmj9195_state::blitter_1_w){ blitter_w(offset, data, 1); }
+void nbmj9195_state::blitter_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ blitter_w(offset, data, 0); }
+void nbmj9195_state::blitter_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ blitter_w(offset, data, 1); }
 
-READ8_MEMBER(nbmj9195_state::blitter_0_r){ return blitter_r(offset, 0); }
-READ8_MEMBER(nbmj9195_state::blitter_1_r){ return blitter_r(offset, 1); }
+uint8_t nbmj9195_state::blitter_0_r(address_space &space, offs_t offset, uint8_t mem_mask){ return blitter_r(offset, 0); }
+uint8_t nbmj9195_state::blitter_1_r(address_space &space, offs_t offset, uint8_t mem_mask){ return blitter_r(offset, 1); }
 
-WRITE8_MEMBER(nbmj9195_state::clut_0_w){ clut_w(offset, data, 0); }
-WRITE8_MEMBER(nbmj9195_state::clut_1_w){ clut_w(offset, data, 1); }
+void nbmj9195_state::clut_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ clut_w(offset, data, 0); }
+void nbmj9195_state::clut_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ clut_w(offset, data, 1); }
 
 /******************************************************************************
 
 
 ******************************************************************************/
-VIDEO_START_MEMBER(nbmj9195_state,_1layer)
+void nbmj9195_state::video_start__1layer()
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -457,7 +457,7 @@ void nbmj9195_state::postload()
 	m_screen_refresh = 1;
 }
 
-VIDEO_START_MEMBER(nbmj9195_state,nb22090)
+void nbmj9195_state::video_start_nb22090()
 {
 	nbmj9195_state::video_start();
 

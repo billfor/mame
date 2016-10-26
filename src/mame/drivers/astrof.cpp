@@ -81,7 +81,7 @@
  *
  *************************************/
 
-READ8_MEMBER(astrof_state::irq_clear_r)
+uint8_t astrof_state::irq_clear_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 
@@ -89,7 +89,7 @@ READ8_MEMBER(astrof_state::irq_clear_r)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(astrof_state::irq_callback)
+void astrof_state::irq_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
@@ -102,7 +102,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(astrof_state::irq_callback)
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(astrof_state::coin_inserted)
+void astrof_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -110,20 +110,20 @@ INPUT_CHANGED_MEMBER(astrof_state::coin_inserted)
 }
 
 
-INPUT_CHANGED_MEMBER(astrof_state::service_coin_inserted)
+void astrof_state::service_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* service coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-CUSTOM_INPUT_MEMBER(astrof_state::astrof_p1_controls_r)
+ioport_value astrof_state::astrof_p1_controls_r(ioport_field &field, void *param)
 {
 	return ioport("P1")->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
+ioport_value astrof_state::astrof_p2_controls_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -139,7 +139,7 @@ CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
+ioport_value astrof_state::tomahawk_controls_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -270,21 +270,21 @@ void astrof_state::tomahawk_get_pens( pen_t *pens )
 }
 
 
-WRITE8_MEMBER(astrof_state::astrof_videoram_w)
+void astrof_state::astrof_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_colorram[offset >> 1] = *m_astrof_color & 0x0e;
 }
 
 
-WRITE8_MEMBER(astrof_state::tomahawk_videoram_w)
+void astrof_state::tomahawk_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_colorram[offset >> 1] = (*m_astrof_color & 0x0e) | ((*m_astrof_color & 0x01) << 4);
 }
 
 
-WRITE8_MEMBER(astrof_state::video_control_1_w)
+void astrof_state::video_control_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = ((data >> 0) & 0x01) & ioport("CAB")->read();
 
@@ -312,7 +312,7 @@ void astrof_state::astrof_set_video_control_2( uint8_t data )
 	/* D4-D7 - not connected */
 }
 
-WRITE8_MEMBER(astrof_state::astrof_video_control_2_w)
+void astrof_state::astrof_video_control_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	astrof_set_video_control_2(data);
 	m_screen->update_partial(m_screen->vpos());
@@ -330,7 +330,7 @@ void astrof_state::spfghmk2_set_video_control_2( uint8_t data )
 	/* D3-D7 - not connected */
 }
 
-WRITE8_MEMBER(astrof_state::spfghmk2_video_control_2_w)
+void astrof_state::spfghmk2_video_control_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	spfghmk2_set_video_control_2(data);
 	m_screen->update_partial(m_screen->vpos());
@@ -347,7 +347,7 @@ void astrof_state::tomahawk_set_video_control_2( uint8_t data )
 	m_red_on = (data & 0x08) ? true : false;
 }
 
-WRITE8_MEMBER(astrof_state::tomahawk_video_control_2_w)
+void astrof_state::tomahawk_video_control_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	tomahawk_set_video_control_2(data);
 	m_screen->update_partial(m_screen->vpos());
@@ -429,28 +429,28 @@ uint32_t astrof_state::screen_update_tomahawk(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
-READ8_MEMBER(astrof_state::shoot_r)
+uint8_t astrof_state::shoot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* not really sure about this */
 	return machine().rand() & 8;
 }
 
 
-READ8_MEMBER(astrof_state::abattle_coin_prot_r)
+uint8_t astrof_state::abattle_coin_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_abattle_count = (m_abattle_count + 1) % 0x0101;
 	return m_abattle_count ? 0x07 : 0x00;
 }
 
 
-READ8_MEMBER(astrof_state::afire_coin_prot_r)
+uint8_t astrof_state::afire_coin_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_abattle_count = m_abattle_count ^ 0x01;
 	return m_abattle_count ? 0x07 : 0x00;
 }
 
 
-READ8_MEMBER(astrof_state::tomahawk_protection_r)
+uint8_t astrof_state::tomahawk_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* flip the byte */
 	return BITSWAP8(*m_tomahawk_protection, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -464,7 +464,7 @@ READ8_MEMBER(astrof_state::tomahawk_protection_r)
  *
  *************************************/
 
-MACHINE_START_MEMBER(astrof_state,astrof)
+void astrof_state::machine_start_astrof()
 {
 	/* the 74175 outputs all HI's if not otherwise set */
 	astrof_set_video_control_2(0xff);
@@ -482,16 +482,16 @@ MACHINE_START_MEMBER(astrof_state,astrof)
 }
 
 
-MACHINE_START_MEMBER(astrof_state,abattle)
+void astrof_state::machine_start_abattle()
 {
 	/* register for state saving */
 	save_item(NAME(m_abattle_count));
 
-	MACHINE_START_CALL_MEMBER(astrof);
+	machine_start_astrof();
 }
 
 
-MACHINE_START_MEMBER(astrof_state,spfghmk2)
+void astrof_state::machine_start_spfghmk2()
 {
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(0xff);
@@ -507,7 +507,7 @@ MACHINE_START_MEMBER(astrof_state,spfghmk2)
 }
 
 
-MACHINE_START_MEMBER(astrof_state,tomahawk)
+void astrof_state::machine_start_tomahawk()
 {
 	/* the 74175 outputs all HI's if not otherwise set */
 	tomahawk_set_video_control_2(0xff);
@@ -526,7 +526,7 @@ MACHINE_START_MEMBER(astrof_state,tomahawk)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(astrof_state,abattle)
+void astrof_state::machine_reset_abattle()
 {
 	m_abattle_count = 0;
 }
@@ -1290,7 +1290,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(astrof_state,abattle)
+void astrof_state::init_abattle()
 {
 	/* use the protection PROM to decrypt the ROMs */
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1306,7 +1306,7 @@ DRIVER_INIT_MEMBER(astrof_state,abattle)
 }
 
 
-DRIVER_INIT_MEMBER(astrof_state,afire)
+void astrof_state::init_afire()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i;
@@ -1320,7 +1320,7 @@ DRIVER_INIT_MEMBER(astrof_state,afire)
 }
 
 
-DRIVER_INIT_MEMBER(astrof_state,sstarbtl)
+void astrof_state::init_sstarbtl()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i;
@@ -1333,7 +1333,7 @@ DRIVER_INIT_MEMBER(astrof_state,sstarbtl)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(FUNC(astrof_state::abattle_coin_prot_r),this));
 }
 
-DRIVER_INIT_MEMBER(astrof_state,acombat3)
+void astrof_state::init_acombat3()
 {
 	/* set up protection handlers */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(FUNC(astrof_state::shoot_r),this));

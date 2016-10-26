@@ -23,7 +23,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(pandoras_state, pandoras)
+void pandoras_state::palette_init_pandoras(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -87,7 +87,7 @@ PALETTE_INIT_MEMBER(pandoras_state, pandoras)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(pandoras_state::get_tile_info0)
+void pandoras_state::get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_colorram[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -116,24 +116,24 @@ void pandoras_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(pandoras_state::pandoras_vram_w)
+void pandoras_state::pandoras_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layer0->mark_tile_dirty(offset);
 	m_videoram[offset] = data;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_cram_w)
+void pandoras_state::pandoras_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layer0->mark_tile_dirty(offset);
 	m_colorram[offset] = data;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_scrolly_w)
+void pandoras_state::pandoras_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layer0->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_flipscreen_w)
+void pandoras_state::pandoras_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data;
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);

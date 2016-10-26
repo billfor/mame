@@ -62,7 +62,7 @@ inline int astrocde_state::mame_vpos_to_astrocade_vpos(int scanline)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(astrocde_state, astrocde)
+void astrocde_state::palette_init_astrocde(palette_device &palette)
 {
 	/*
 	    The Astrocade has a 256 color palette: 32 colors with 8 luminance
@@ -111,7 +111,7 @@ PALETTE_INIT_MEMBER(astrocde_state, astrocde)
 }
 
 
-PALETTE_INIT_MEMBER(astrocde_state,profpac)
+void astrocde_state::palette_init_profpac(palette_device &palette)
 {
 	/* Professor Pac-Man uses a more standard 12-bit RGB palette layout */
 	static const int resistances[4] = { 6200, 3000, 1500, 750 };
@@ -179,7 +179,7 @@ void astrocde_state::video_start()
 }
 
 
-VIDEO_START_MEMBER(astrocde_state,profpac)
+void astrocde_state::video_start_profpac()
 {
 	/* allocate timers */
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
@@ -423,7 +423,7 @@ void astrocde_state::astrocade_trigger_lightpen(uint8_t vfeedback, uint8_t hfeed
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
+void astrocde_state::scanline_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 	int astrocade_scanline = mame_vpos_to_astrocade_vpos(scanline);
@@ -469,7 +469,7 @@ TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::astrocade_data_chip_register_r)
+uint8_t astrocde_state::astrocade_data_chip_register_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -542,7 +542,7 @@ READ8_MEMBER(astrocde_state::astrocade_data_chip_register_r)
 }
 
 
-WRITE8_MEMBER(astrocde_state::astrocade_data_chip_register_w)
+void astrocde_state::astrocade_data_chip_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* these are the core registers */
 	switch (offset & 0xff)
@@ -625,7 +625,7 @@ WRITE8_MEMBER(astrocde_state::astrocade_data_chip_register_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::astrocade_funcgen_w)
+void astrocde_state::astrocade_funcgen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t prev_data;
 
@@ -845,7 +845,7 @@ void astrocde_state::execute_blit(address_space &space)
 }
 
 
-WRITE8_MEMBER(astrocde_state::astrocade_pattern_board_w)
+void astrocde_state::astrocade_pattern_board_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -960,7 +960,7 @@ void astrocde_state::init_sparklestar()
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::profpac_page_select_w)
+void astrocde_state::profpac_page_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_profpac_readpage = data & 3;
 	m_profpac_writepage = (data >> 2) & 3;
@@ -968,13 +968,13 @@ WRITE8_MEMBER(astrocde_state::profpac_page_select_w)
 }
 
 
-READ8_MEMBER(astrocde_state::profpac_intercept_r)
+uint8_t astrocde_state::profpac_intercept_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_profpac_intercept;
 }
 
 
-WRITE8_MEMBER(astrocde_state::profpac_screenram_ctrl_w)
+void astrocde_state::profpac_screenram_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1015,7 +1015,7 @@ WRITE8_MEMBER(astrocde_state::profpac_screenram_ctrl_w)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::profpac_videoram_r)
+uint8_t astrocde_state::profpac_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t temp = m_profpac_videoram[m_profpac_readpage * 0x4000 + offset] >> m_profpac_readshift;
 	return ((temp >> 6) & 0xc0) | ((temp >> 4) & 0x30) | ((temp >> 2) & 0x0c) | ((temp >> 0) & 0x03);
@@ -1023,7 +1023,7 @@ READ8_MEMBER(astrocde_state::profpac_videoram_r)
 
 
 /* All this information comes from decoding the PLA at U39 on the screen ram board */
-WRITE8_MEMBER(astrocde_state::profpac_videoram_w)
+void astrocde_state::profpac_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t oldbits = m_profpac_videoram[m_profpac_writepage * 0x4000 + offset];
 	uint16_t newbits, result = 0;

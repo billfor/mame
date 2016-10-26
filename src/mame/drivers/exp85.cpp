@@ -55,12 +55,12 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_CHANGED_MEMBER( exp85_state::trigger_reset )
+void exp85_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( exp85_state::trigger_rst75 )
+void exp85_state::trigger_rst75(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(I8085_RST75_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -74,7 +74,7 @@ INPUT_PORTS_END
 
 /* 8355 Interface */
 
-READ8_MEMBER( exp85_state::i8355_a_r )
+uint8_t exp85_state::i8355_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -94,7 +94,7 @@ READ8_MEMBER( exp85_state::i8355_a_r )
 	return 0x02;
 }
 
-WRITE8_MEMBER( exp85_state::i8355_a_w )
+void exp85_state::i8355_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -120,7 +120,7 @@ WRITE8_MEMBER( exp85_state::i8355_a_w )
 
 /* I8085A Interface */
 
-READ_LINE_MEMBER( exp85_state::sid_r )
+int exp85_state::sid_r()
 {
 	int data = 1;
 
@@ -136,7 +136,7 @@ READ_LINE_MEMBER( exp85_state::sid_r )
 	return data;
 }
 
-WRITE_LINE_MEMBER( exp85_state::sod_w )
+void exp85_state::sod_w(int state)
 {
 	if (m_tape_control)
 	{

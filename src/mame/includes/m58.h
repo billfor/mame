@@ -42,15 +42,15 @@ public:
 	tilemap_t* m_bg_tilemap;
 	bitmap_ind16 m_scroll_panel_bitmap;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(scroll_panel_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_panel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(m58);
+	void palette_init_m58(palette_device &palette);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index tilemap_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );

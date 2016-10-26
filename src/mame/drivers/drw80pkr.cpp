@@ -54,26 +54,26 @@ public:
 	uint8_t m_pkr_io_ram[0x100];
 	uint16_t m_video_ram[0x0400];
 	uint8_t m_color_ram[0x0400];
-	DECLARE_WRITE8_MEMBER(t0_w);
-	DECLARE_WRITE8_MEMBER(t1_w);
-	DECLARE_WRITE8_MEMBER(p0_w);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
-	DECLARE_WRITE8_MEMBER(prog_w);
-	DECLARE_WRITE8_MEMBER(bus_w);
-	DECLARE_WRITE8_MEMBER(drw80pkr_io_w);
-	DECLARE_READ8_MEMBER(t0_r);
-	DECLARE_READ8_MEMBER(t1_r);
-	DECLARE_READ8_MEMBER(p0_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_READ8_MEMBER(bus_r);
-	DECLARE_READ8_MEMBER(drw80pkr_io_r);
-	DECLARE_DRIVER_INIT(drw80pkr);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void t0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void t1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void drw80pkr_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t t0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t drw80pkr_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_drw80pkr();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(drw80pkr);
+	void palette_init_drw80pkr(palette_device &palette);
 	uint32_t screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -93,32 +93,32 @@ void drw80pkr_state::machine_start()
 * Write Handlers *
 ******************/
 
-WRITE8_MEMBER(drw80pkr_state::t0_w)
+void drw80pkr_state::t0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_t0 = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::t1_w)
+void drw80pkr_state::t1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_t1 = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::p0_w)
+void drw80pkr_state::p0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p0 = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::p1_w)
+void drw80pkr_state::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p1 = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::p2_w)
+void drw80pkr_state::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p2 = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::prog_w)
+void drw80pkr_state::prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prog = data;
 
@@ -131,12 +131,12 @@ WRITE8_MEMBER(drw80pkr_state::prog_w)
 	}
 }
 
-WRITE8_MEMBER(drw80pkr_state::bus_w)
+void drw80pkr_state::bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bus = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::drw80pkr_io_w)
+void drw80pkr_state::drw80pkr_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t n_offs;
 
@@ -214,37 +214,37 @@ WRITE8_MEMBER(drw80pkr_state::drw80pkr_io_w)
 * Read Handlers *
 ****************/
 
-READ8_MEMBER(drw80pkr_state::t0_r)
+uint8_t drw80pkr_state::t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_t0;
 }
 
-READ8_MEMBER(drw80pkr_state::t1_r)
+uint8_t drw80pkr_state::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_t1;
 }
 
-READ8_MEMBER(drw80pkr_state::p0_r)
+uint8_t drw80pkr_state::p0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p0;
 }
 
-READ8_MEMBER(drw80pkr_state::p1_r)
+uint8_t drw80pkr_state::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p1;
 }
 
-READ8_MEMBER(drw80pkr_state::p2_r)
+uint8_t drw80pkr_state::p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p2;
 }
 
-READ8_MEMBER(drw80pkr_state::bus_r)
+uint8_t drw80pkr_state::bus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bus;
 }
 
-READ8_MEMBER(drw80pkr_state::drw80pkr_io_r)
+uint8_t drw80pkr_state::drw80pkr_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 	uint16_t kbdin;
@@ -332,7 +332,7 @@ READ8_MEMBER(drw80pkr_state::drw80pkr_io_r)
 * Video/Character functions *
 ****************************/
 
-TILE_GET_INFO_MEMBER(drw80pkr_state::get_bg_tile_info)
+void drw80pkr_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color = m_color_ram[tile_index];
 	int code = m_video_ram[tile_index];
@@ -352,7 +352,7 @@ uint32_t drw80pkr_state::screen_update_drw80pkr(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(drw80pkr_state, drw80pkr)
+void drw80pkr_state::palette_init_drw80pkr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int j;
@@ -410,7 +410,7 @@ GFXDECODE_END
 * Driver Init *
 ***************/
 
-DRIVER_INIT_MEMBER(drw80pkr_state,drw80pkr)
+void drw80pkr_state::init_drw80pkr()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
 }

@@ -37,7 +37,7 @@ public:
 	uint16_t m_inp_mux;                   // multiplexed inputs mask
 
 	uint8_t read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	void reset_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
@@ -52,7 +52,7 @@ public:
 	uint32_t m_display_cache[0x20];       // (internal use)
 	uint8_t m_display_decay[0x20][0x20];  // (internal use)
 
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_decay_tick(timer_device &timer, void *ptr, int32_t param);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);
@@ -160,7 +160,7 @@ void hh_melps4_state::display_update()
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hh_melps4_state::display_decay_tick)
+void hh_melps4_state::display_decay_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
@@ -205,7 +205,7 @@ uint8_t hh_melps4_state::read_inputs(int columns)
 	return ret;
 }
 
-INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
+void hh_melps4_state::reset_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// for when reset button is directly tied to MCU reset pin
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -236,10 +236,10 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_READ16_MEMBER(input_r);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void speaker_w(int state);
+	uint16_t input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 };
 
 // handlers
@@ -251,7 +251,7 @@ void cfrogger_state::prepare_display()
 	display_matrix(16, 12, plate, grid);
 }
 
-WRITE8_MEMBER(cfrogger_state::plate_w)
+void cfrogger_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// F0,F1: input mux
 	if (offset == MELPS4_PORTF)
@@ -264,20 +264,20 @@ WRITE8_MEMBER(cfrogger_state::plate_w)
 	prepare_display();
 }
 
-WRITE16_MEMBER(cfrogger_state::grid_w)
+void cfrogger_state::grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// D0-D11: vfd matrix grid
 	m_grid = data;
 	prepare_display();
 }
 
-WRITE_LINE_MEMBER(cfrogger_state::speaker_w)
+void cfrogger_state::speaker_w(int state)
 {
 	// T: speaker out
 	m_speaker->level_w(state);
 }
 
-READ16_MEMBER(cfrogger_state::input_r)
+uint16_t cfrogger_state::input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// K0,K1: multiplexed inputs
 	// K2: N/C
@@ -352,10 +352,10 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE16_MEMBER(grid_w);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_READ16_MEMBER(input_r);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void speaker_w(int state);
+	uint16_t input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 };
 
 // handlers
@@ -367,7 +367,7 @@ void gjungler_state::prepare_display()
 	display_matrix(18, 12, plate, grid);
 }
 
-WRITE8_MEMBER(gjungler_state::plate_w)
+void gjungler_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// G0,G1: input mux
 	if (offset == MELPS4_PORTG)
@@ -380,20 +380,20 @@ WRITE8_MEMBER(gjungler_state::plate_w)
 	prepare_display();
 }
 
-WRITE16_MEMBER(gjungler_state::grid_w)
+void gjungler_state::grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// D0-D11: vfd matrix grid
 	m_grid = data;
 	prepare_display();
 }
 
-WRITE_LINE_MEMBER(gjungler_state::speaker_w)
+void gjungler_state::speaker_w(int state)
 {
 	// T: speaker out
 	m_speaker->level_w(state);
 }
 
-READ16_MEMBER(gjungler_state::input_r)
+uint16_t gjungler_state::input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// K0,K1: multiplexed inputs
 	// K2,K3: fixed inputs

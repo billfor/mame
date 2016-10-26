@@ -24,13 +24,13 @@ class ti_speech_synthesizer_device : public ti_expansion_card_device
 public:
 	ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override { };
-	DECLARE_WRITE8_MEMBER(cruwrite) override { };
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { };
 
-	DECLARE_WRITE_LINE_MEMBER( speech_ready );
+	void speech_ready(int state);
 
 protected:
 	virtual void            device_start() override;

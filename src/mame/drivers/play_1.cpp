@@ -36,19 +36,19 @@ public:
 		, m_monotone(*this, "monotone")
 	{ }
 
-	DECLARE_READ8_MEMBER(port07_r);
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_WRITE8_MEMBER(port02_w);
-	DECLARE_WRITE8_MEMBER(port03_w);
-	DECLARE_WRITE8_MEMBER(port04_w);
-	DECLARE_WRITE8_MEMBER(port05_w);
-	DECLARE_WRITE8_MEMBER(port06_w);
-	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_READ_LINE_MEMBER(wait_r);
-	DECLARE_READ_LINE_MEMBER(ef2_r);
-	DECLARE_READ_LINE_MEMBER(ef3_r);
-	DECLARE_READ_LINE_MEMBER(ef4_r);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	uint8_t port07_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port03_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port05_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int clear_r();
+	int wait_r();
+	int ef2_r();
+	int ef3_r();
+	int ef4_r();
+	void clock_w(int state);
 
 private:
 	uint16_t m_resetcnt;
@@ -247,7 +247,7 @@ void play_1_state::machine_reset()
 	m_ball = 0;
 }
 
-READ8_MEMBER( play_1_state::port07_r )
+uint8_t play_1_state::port07_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_dips[3]->read() & 0x3f;
 	data |= (m_segment & m_dips[1]->read()) ? 0x40 : 0;
@@ -255,7 +255,7 @@ READ8_MEMBER( play_1_state::port07_r )
 	return data;
 }
 
-WRITE8_MEMBER( play_1_state::port01_w )
+void play_1_state::port01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	// d0-1 via 4013 to match-game board
@@ -280,14 +280,14 @@ WRITE8_MEMBER( play_1_state::port01_w )
 	m_waitcnt = 0;
 }
 
-WRITE8_MEMBER( play_1_state::port02_w )
+void play_1_state::port02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// N1-8, segments and other
 	m_segment = data;
 	m_waitcnt = 0;
 }
 
-WRITE8_MEMBER( play_1_state::port03_w )
+void play_1_state::port03_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	// D1-4, digit select
@@ -378,26 +378,26 @@ WRITE8_MEMBER( play_1_state::port03_w )
 	m_waitcnt = 0;
 }
 
-WRITE8_MEMBER( play_1_state::port04_w )
+void play_1_state::port04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// U1-8
 	m_ball = data;
 	m_waitcnt = 0;
 }
 
-WRITE8_MEMBER( play_1_state::port05_w )
+void play_1_state::port05_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// V1-8
 	m_waitcnt = 0;
 }
 
-WRITE8_MEMBER( play_1_state::port06_w )
+void play_1_state::port06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// W1-8
 	m_waitcnt = 0;
 }
 
-READ_LINE_MEMBER( play_1_state::clear_r )
+int play_1_state::clear_r()
 {
 	// A hack to make the machine reset itself on boot
 	if (m_resetcnt < 0xffff)
@@ -405,7 +405,7 @@ READ_LINE_MEMBER( play_1_state::clear_r )
 	return (m_resetcnt == 0x8000) ? 0 : 1;
 }
 
-READ_LINE_MEMBER( play_1_state::wait_r )
+int play_1_state::wait_r()
 {
 	// Any OUT instruction forces a 60-100msec wait
 	if (m_waitcnt < 0x180)
@@ -417,22 +417,22 @@ READ_LINE_MEMBER( play_1_state::wait_r )
 		return 1;
 }
 
-READ_LINE_MEMBER( play_1_state::ef2_r )
+int play_1_state::ef2_r()
 {
 	return !BIT(m_dips[0]->read(), 0); // 1 or 3 games dip (1=1 game) inverted
 }
 
-READ_LINE_MEMBER( play_1_state::ef3_r )
+int play_1_state::ef3_r()
 {
 	return !BIT(m_dips[0]->read(), 1); // 3 or 5 balls dip (1=5 balls) inverted
 }
 
-READ_LINE_MEMBER( play_1_state::ef4_r )
+int play_1_state::ef4_r()
 {
 	return !BIT(m_dips[0]->read(), 2); // extra ball or game dip (1=extra ball) inverted
 }
 
-WRITE_LINE_MEMBER( play_1_state::clock_w )
+void play_1_state::clock_w(int state)
 {
 	if (state)
 	{

@@ -107,13 +107,13 @@ public:
 	uint8_t m_nmi_enabled;
 	int m_r;
 
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(semaphore_r);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t semaphore_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_INIT(shougi);
+	void palette_init_shougi(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_nmi);
+	void vblank_nmi(device_t &device);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -163,7 +163,7 @@ void shougi_state::machine_reset()
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(shougi_state, shougi)
+void shougi_state::palette_init_shougi(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_b[2]  = { 470, 220 };
@@ -235,7 +235,7 @@ uint32_t shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 // maincpu side
 
-WRITE8_MEMBER(shougi_state::control_w)
+void shougi_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 4800-480f connected to the 74LS259, A3 is data line
 	// so 4800-4807 write 0, and 4808-480f write 1
@@ -293,7 +293,7 @@ ADDRESS_MAP_END
 
 // subcpu side
 
-READ8_MEMBER(shougi_state::semaphore_r)
+uint8_t shougi_state::semaphore_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0: waits for it to be set before handling NMI routine
 	// hmm it must be a signal from maincpu, but what?
@@ -386,7 +386,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
+void shougi_state::vblank_nmi(device_t &device)
 {
 	if (m_nmi_enabled)
 	{

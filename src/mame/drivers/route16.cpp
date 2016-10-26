@@ -89,7 +89,7 @@
 
 
 
-WRITE8_MEMBER(route16_state::route16_sharedram_w)
+void route16_state::route16_sharedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sharedram[offset] = data;
 
@@ -109,7 +109,7 @@ WRITE8_MEMBER(route16_state::route16_sharedram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(route16_state::stratvox_sn76477_w)
+void route16_state::stratvox_sn76477_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/***************************************************************
 	 * AY8910 output bits are connected to...
@@ -141,13 +141,13 @@ WRITE8_MEMBER(route16_state::stratvox_sn76477_w)
 
 
 
-WRITE8_MEMBER(route16_state::ttmahjng_input_port_matrix_w)
+void route16_state::ttmahjng_input_port_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ttmahjng_port_select = data;
 }
 
 
-READ8_MEMBER(route16_state::ttmahjng_input_port_matrix_r)
+uint8_t route16_state::ttmahjng_input_port_matrix_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -174,7 +174,7 @@ READ8_MEMBER(route16_state::ttmahjng_input_port_matrix_r)
   this would then be checking that the sounds are mixed correctly.
 ***************************************************************************/
 
-READ8_MEMBER(route16_state::speakres_in3_r)
+uint8_t route16_state::speakres_in3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bit2=4, bit1=2, bit0=1;
 
@@ -189,7 +189,7 @@ READ8_MEMBER(route16_state::speakres_in3_r)
 	return 0xf8|bit2|bit1|bit0;
 }
 
-WRITE8_MEMBER(route16_state::speakres_out2_w)
+void route16_state::speakres_out2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speakres_vrx=0;
 }
@@ -543,12 +543,12 @@ static INPUT_PORTS_START( ttmahjng )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-MACHINE_START_MEMBER(route16_state, speakres)
+void route16_state::machine_start_speakres()
 {
 	save_item(NAME(m_speakres_vrx));
 }
 
-MACHINE_START_MEMBER(route16_state, ttmahjng)
+void route16_state::machine_start_ttmahjng()
 {
 	save_item(NAME(m_ttmahjng_port_select));
 }
@@ -963,7 +963,7 @@ ROM_END
  *
  *************************************/
 
-READ8_MEMBER(route16_state::routex_prot_read)
+uint8_t route16_state::routex_prot_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.device().safe_pc() == 0x2f) return 0xfb;
 
@@ -979,7 +979,7 @@ READ8_MEMBER(route16_state::routex_prot_read)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(route16_state,route16)
+void route16_state::init_route16()
 {
 	uint8_t *ROM = memregion("cpu1")->base();
 	/* TO DO : Replace these patches with simulation of the protection device */
@@ -993,10 +993,10 @@ DRIVER_INIT_MEMBER(route16_state,route16)
 	ROM[0x072b] = 0x00;
 	ROM[0x072c] = 0x00;
 
-	DRIVER_INIT_CALL(route16c);
+	init_route16c();
 }
 
-DRIVER_INIT_MEMBER(route16_state,route16c)
+void route16_state::init_route16c()
 {
 	uint8_t *ROM = memregion("cpu1")->base();
 	/* Is this actually a bootleg? some of the protection has
@@ -1011,7 +1011,7 @@ DRIVER_INIT_MEMBER(route16_state,route16c)
 }
 
 
-DRIVER_INIT_MEMBER(route16_state,route16a)
+void route16_state::init_route16a()
 {
 	uint8_t *ROM = memregion("cpu1")->base();
 	/* TO DO : Replace these patches with simulation of the protection device */

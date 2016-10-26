@@ -69,20 +69,20 @@ public:
 	uint8_t    m_adpcm_idle;
 	uint8_t    m_adpcm_data;
 	uint8_t    m_trigger;
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(chinsan_port00_w);
-	DECLARE_READ8_MEMBER(chinsan_input_port_0_r);
-	DECLARE_READ8_MEMBER(chinsan_input_port_1_r);
-	DECLARE_WRITE8_MEMBER(ym_port_w1);
-	DECLARE_WRITE8_MEMBER(ym_port_w2);
-	DECLARE_WRITE8_MEMBER(chin_adpcm_w);
-	DECLARE_DRIVER_INIT(chinsan);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chinsan_port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t chinsan_input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t chinsan_input_port_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ym_port_w1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ym_port_w2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chin_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_chinsan();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(chinsan);
+	void palette_init_chinsan(palette_device &palette);
 	uint32_t screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(chin_adpcm_int);
+	void chin_adpcm_int(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -97,7 +97,7 @@ public:
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(chinsan_state, chinsan)
+void chinsan_state::palette_init_chinsan(palette_device &palette)
 {
 	uint8_t *src = memregion( "color_proms" )->base();
 	int i;
@@ -137,24 +137,24 @@ uint32_t chinsan_state::screen_update_chinsan(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-WRITE8_MEMBER(chinsan_state::ctrl_w)
+void chinsan_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data >> 6);
 	membank("bank1d")->set_entry(data >> 6);
 }
 
-WRITE8_MEMBER(chinsan_state::ym_port_w1)
+void chinsan_state::ym_port_w1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("ym_write port 1 %02x\n", data);
 }
 
 
-WRITE8_MEMBER(chinsan_state::ym_port_w2)
+void chinsan_state::ym_port_w2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("ym_write port 2 %02x\n", data);
 }
 
-WRITE8_MEMBER(chinsan_state::chinsan_port00_w)
+void chinsan_state::chinsan_port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_select = data;
 
@@ -170,7 +170,7 @@ WRITE8_MEMBER(chinsan_state::chinsan_port00_w)
 
 }
 
-READ8_MEMBER(chinsan_state::chinsan_input_port_0_r)
+uint8_t chinsan_state::chinsan_input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//return 0xff; // the inputs don't seem to work, so just return ff for now
 
@@ -201,7 +201,7 @@ READ8_MEMBER(chinsan_state::chinsan_input_port_0_r)
 	return machine().rand();
 }
 
-READ8_MEMBER(chinsan_state::chinsan_input_port_1_r)
+uint8_t chinsan_state::chinsan_input_port_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_port_select)
 	{
@@ -230,7 +230,7 @@ READ8_MEMBER(chinsan_state::chinsan_input_port_1_r)
 	return machine().rand();
 }
 
-WRITE8_MEMBER(chinsan_state::chin_adpcm_w)
+void chinsan_state::chin_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_pos = (data & 0xff) * 0x100;
 	m_adpcm_idle = 0;
@@ -538,7 +538,7 @@ GFXDECODE_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(chinsan_state::chin_adpcm_int)
+void chinsan_state::chin_adpcm_int(int state)
 {
 	if (m_adpcm_pos >= 0x10000 || m_adpcm_idle)
 	{
@@ -675,7 +675,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(chinsan_state,chinsan)
+void chinsan_state::init_chinsan()
 {
 	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x18000);
 	mc8123_decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), memregion("user1")->base(), 0x18000);

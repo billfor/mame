@@ -38,7 +38,7 @@
 
 /* check if any keys are pressed, raise IRQ1 if so */
 
-TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
+void mc1502_state::keyb_signal_callback(void *ptr, int32_t param)
 {
 	uint8_t key = 0;
 
@@ -74,7 +74,7 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 	}
 }
 
-WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
+void mc1502_state::mc1502_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
@@ -88,7 +88,7 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 // bit 0: parallel port data transfer direction (default = 0 = out)
 // bits 1-2: CGA_FONT (default = 01)
 // bit 3: i8251 SYNDET pin triggers NMI (default = 1 = no)
-WRITE8_MEMBER(mc1502_state::mc1502_ppi_portc_w)
+void mc1502_state::mc1502_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  DBG_LOG(2,"mc1502_ppi_portc_w",("( %02X )\n", data));
 	m_ppi_portc = data & 15;
@@ -98,7 +98,7 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portc_w)
 // 0x40 -- CASS IN, also loops back T2OUT (gated by CASWR)
 // 0x20 -- T2OUT
 // 0x10 -- SNDOUT
-READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
+uint8_t mc1502_state::mc1502_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 	double tap_val = m_cassette->input();
@@ -112,7 +112,7 @@ READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
 	return data;
 }
 
-READ8_MEMBER(mc1502_state::mc1502_kppi_porta_r)
+uint8_t mc1502_state::mc1502_kppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t key = 0;
 
@@ -133,7 +133,7 @@ READ8_MEMBER(mc1502_state::mc1502_kppi_porta_r)
 	return key;
 }
 
-WRITE8_MEMBER(mc1502_state::mc1502_kppi_portb_w)
+void mc1502_state::mc1502_kppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbd.mask &= ~255;
 	m_kbd.mask |= data ^ 255;
@@ -144,39 +144,39 @@ WRITE8_MEMBER(mc1502_state::mc1502_kppi_portb_w)
 //  DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, m_kbd.mask));
 }
 
-WRITE8_MEMBER(mc1502_state::mc1502_kppi_portc_w)
+void mc1502_state::mc1502_kppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbd.mask &= ~(7 << 8);
 	m_kbd.mask |= ((data ^ 7) & 7) << 8;
 //  DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, m_kbd.mask));
 }
 
-WRITE_LINE_MEMBER(mc1502_state::mc1502_i8251_syndet)
+void mc1502_state::mc1502_i8251_syndet(int state)
 {
 	if (!BIT(m_ppi_portc,3))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out1_changed)
+void mc1502_state::mc1502_pit8253_out1_changed(int state)
 {
 	m_upd8251->write_txc(state);
 	m_upd8251->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out2_changed)
+void mc1502_state::mc1502_pit8253_out2_changed(int state)
 {
 	m_pit_out2 = state;
 	m_speaker->level_w(m_spkrdata & m_pit_out2);
 	m_cassette->output(state ? 1 : -1);
 }
 
-WRITE_LINE_MEMBER(mc1502_state::mc1502_speaker_set_spkrdata)
+void mc1502_state::mc1502_speaker_set_spkrdata(int state)
 {
 	m_spkrdata = state ? 1 : 0;
 	m_speaker->level_w(m_spkrdata & m_pit_out2);
 }
 
-DRIVER_INIT_MEMBER( mc1502_state, mc1502 )
+void mc1502_state::init_mc1502()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -186,7 +186,7 @@ DRIVER_INIT_MEMBER( mc1502_state, mc1502 )
 	membank( "bank10" )->set_base( m_ram->pointer() );
 }
 
-MACHINE_START_MEMBER( mc1502_state, mc1502 )
+void mc1502_state::machine_start_mc1502()
 {
 	DBG_LOG(0,"init",("machine_start()\n"));
 
@@ -202,7 +202,7 @@ MACHINE_START_MEMBER( mc1502_state, mc1502 )
 	m_kbd.keyb_signal_timer->adjust( attotime::from_msec(20), 0, attotime::from_msec(20) );
 }
 
-MACHINE_RESET_MEMBER( mc1502_state, mc1502 )
+void mc1502_state::machine_reset_mc1502()
 {
 	DBG_LOG(0,"init",("machine_reset()\n"));
 

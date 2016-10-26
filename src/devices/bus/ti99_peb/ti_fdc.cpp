@@ -88,14 +88,14 @@ void ti_fdc_device::operate_ready_line()
 /*
  * Callbacks from the FD1771 chip
  */
-WRITE_LINE_MEMBER( ti_fdc_device::fdc_irq_w )
+void ti_fdc_device::fdc_irq_w(int state)
 {
 	m_IRQ = state? ASSERT_LINE : CLEAR_LINE;
 	if (TRACE_SIGNALS) logerror("tifdc: INTRQ callback = %d\n", m_IRQ);
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( ti_fdc_device::fdc_drq_w )
+void ti_fdc_device::fdc_drq_w(int state)
 {
 	m_DRQ = state? ASSERT_LINE : CLEAR_LINE;
 	if (TRACE_SIGNALS) logerror("tifdc: DRQ callback = %d\n", m_DRQ);
@@ -181,7 +181,7 @@ READ8Z_MEMBER(ti_fdc_device::readz)
 	}
 }
 
-WRITE8_MEMBER(ti_fdc_device::write)
+void ti_fdc_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (space.debugger_access()) return;
 
@@ -238,7 +238,7 @@ READ8Z_MEMBER(ti_fdc_device::crureadz)
 	}
 }
 
-WRITE8_MEMBER(ti_fdc_device::cruwrite)
+void ti_fdc_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{

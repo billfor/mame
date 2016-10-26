@@ -13,7 +13,7 @@ Video hardware driver by Uki
 #include "emu.h"
 #include "includes/ikki.h"
 
-PALETTE_INIT_MEMBER(ikki_state, ikki)
+void ikki_state::palette_init_ikki(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -54,7 +54,7 @@ PALETTE_INIT_MEMBER(ikki_state, ikki)
 	}
 }
 
-WRITE8_MEMBER(ikki_state::ikki_scrn_ctrl_w)
+void ikki_state::ikki_scrn_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = (data >> 2) & 1;
 }

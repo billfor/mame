@@ -139,7 +139,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "includes/gaiden.h"
 
-WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
+void gaiden_state::gaiden_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch->write(space, 0, data & 0xff);   /* Ninja Gaiden */
@@ -148,7 +148,7 @@ WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
+void gaiden_state::drgnbowl_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -163,7 +163,7 @@ WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
 /* and reads the answer from 0x07a007. The returned values contain the address of */
 /* a function to jump to. */
 
-WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
+void gaiden_state::wildfang_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -212,7 +212,7 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 	}
 }
 
-READ16_MEMBER(gaiden_state::wildfang_protection_r)
+uint16_t gaiden_state::wildfang_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  logerror("PC %06x: read prot %02x\n", space.device().safe_pc(), m_prot);
 	return m_prot;
@@ -289,7 +289,7 @@ static const int jumppoints_other[0x100] =
 		-1,    -1,    -1,    -1,    -1,    -1,    -1,    -1
 };
 
-MACHINE_RESET_MEMBER(gaiden_state,raiga)
+void gaiden_state::machine_reset_raiga()
 {
 	m_prot = 0;
 	m_jumpcode = 0;
@@ -307,7 +307,7 @@ MACHINE_RESET_MEMBER(gaiden_state,raiga)
 	m_spr_offset_y = 0;
 }
 
-MACHINE_START_MEMBER(gaiden_state,raiga)
+void gaiden_state::machine_start_raiga()
 {
 	save_item(NAME(m_prot));
 	save_item(NAME(m_jumpcode));
@@ -325,7 +325,7 @@ MACHINE_START_MEMBER(gaiden_state,raiga)
 	save_item(NAME(m_spr_offset_y));
 }
 
-WRITE16_MEMBER(gaiden_state::raiga_protection_w)
+void gaiden_state::raiga_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -375,7 +375,7 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 	}
 }
 
-READ16_MEMBER(gaiden_state::raiga_protection_r)
+uint16_t gaiden_state::raiga_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  logerror("PC %06x: read prot %02x\n", space.device().safe_pc(), m_prot);
 	return m_prot;
@@ -1528,14 +1528,14 @@ ROM_START( drgnbowla )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(gaiden_state,shadoww)
+void gaiden_state::init_shadoww()
 {
 	/* sprite size Y = sprite size X */
 	m_sprite_sizey = 0;
 	m_raiga_jumppoints = jumppoints_00;
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,wildfang)
+void gaiden_state::init_wildfang()
 {
 	/* sprite size Y = sprite size X */
 	m_sprite_sizey = 0;
@@ -1547,7 +1547,7 @@ DRIVER_INIT_MEMBER(gaiden_state,wildfang)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::wildfang_protection_w),this));
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,raiga)
+void gaiden_state::init_raiga()
 {
 	/* sprite size Y independent from sprite size X */
 	m_sprite_sizey = 2;
@@ -1599,14 +1599,14 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 	}
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,drgnbowl)
+void gaiden_state::init_drgnbowl()
 {
 	m_raiga_jumppoints = jumppoints_00;
 
 	descramble_drgnbowl(1);
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,drgnbowla)
+void gaiden_state::init_drgnbowla()
 {
 	m_raiga_jumppoints = jumppoints_00;
 
@@ -1651,12 +1651,12 @@ void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 	}
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,mastninj)
+void gaiden_state::init_mastninj()
 {
 	// rearrange the graphic roms into a format that MAME can decode
 	descramble_mastninj_gfx(memregion("gfx2")->base());
 	descramble_mastninj_gfx(memregion("gfx3")->base());
-	DRIVER_INIT_CALL(shadoww);
+	init_shadoww();
 }
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS

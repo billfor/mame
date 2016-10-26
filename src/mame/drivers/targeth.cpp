@@ -31,7 +31,7 @@ static GFXDECODE_START( 0x080000 )
 GFXDECODE_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(targeth_state::interrupt)
+void targeth_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -50,14 +50,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(targeth_state::interrupt)
 	}
 }
 
-WRITE16_MEMBER(targeth_state::OKIM6295_bankswitch_w)
+void targeth_state::OKIM6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7){
 		membank("okibank")->set_entry(data & 0x0f);
 	}
 }
 
-WRITE16_MEMBER(targeth_state::coin_counter_w)
+void targeth_state::coin_counter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
 }

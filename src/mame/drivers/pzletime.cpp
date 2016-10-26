@@ -53,19 +53,19 @@ public:
 
 	/* misc */
 	int            m_ticket;
-	DECLARE_WRITE16_MEMBER(mid_videoram_w);
-	DECLARE_WRITE16_MEMBER(txt_videoram_w);
-	DECLARE_WRITE16_MEMBER(ticket_w);
-	DECLARE_WRITE16_MEMBER(video_regs_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(ticket_status_r);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE16_MEMBER(oki_bank_w);
-	TILE_GET_INFO_MEMBER(get_mid_tile_info);
-	TILE_GET_INFO_MEMBER(get_txt_tile_info);
+	void mid_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void txt_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ticket_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void video_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	ioport_value ticket_status_r(ioport_field &field, void *param);
+	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void get_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_txt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pzletime);
+	void palette_init_pzletime(palette_device &palette);
 	uint32_t screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -76,7 +76,7 @@ public:
 };
 
 
-TILE_GET_INFO_MEMBER(pzletime_state::get_mid_tile_info)
+void pzletime_state::get_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_mid_videoram[tile_index] & 0x0fff;
 	int colour = m_mid_videoram[tile_index] & 0xf000;
@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(pzletime_state::get_mid_tile_info)
 	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
 }
 
-TILE_GET_INFO_MEMBER(pzletime_state::get_txt_tile_info)
+void pzletime_state::get_txt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_txt_videoram[tile_index] & 0x0fff;
 	int colour = m_txt_videoram[tile_index] & 0xf000;
@@ -162,19 +162,19 @@ uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE16_MEMBER(pzletime_state::mid_videoram_w)
+void pzletime_state::mid_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mid_videoram[offset]);
 	m_mid_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(pzletime_state::txt_videoram_w)
+void pzletime_state::txt_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_txt_videoram[offset]);
 	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(pzletime_state::eeprom_w)
+void pzletime_state::eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -184,13 +184,13 @@ WRITE16_MEMBER(pzletime_state::eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(pzletime_state::ticket_w)
+void pzletime_state::ticket_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_ticket = data & 1;
 }
 
-WRITE16_MEMBER(pzletime_state::video_regs_w)
+void pzletime_state::video_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i;
 
@@ -218,12 +218,12 @@ WRITE16_MEMBER(pzletime_state::video_regs_w)
 	}
 }
 
-WRITE16_MEMBER(pzletime_state::oki_bank_w)
+void pzletime_state::oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_oki->set_rom_bank(data & 0x3);
 }
 
-CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
+ioport_value pzletime_state::ticket_status_r(ioport_field &field, void *param)
 {
 	return (m_ticket && !(m_screen->frame_number() % 128));
 }
@@ -304,7 +304,7 @@ static GFXDECODE_START( pzletime )
 	GFXDECODE_ENTRY( "gfx3", 0, layout16x16, 0x000, 0x10 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(pzletime_state, pzletime)
+void pzletime_state::palette_init_pzletime(palette_device &palette)
 {
 	int i;
 

@@ -764,7 +764,7 @@ void i8255_device::set_pc_bit(int bit, int state)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( i8255_device::read )
+uint8_t i8255_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -808,7 +808,7 @@ READ8_MEMBER( i8255_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8255_device::write )
+void i8255_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x03)
 	{
@@ -865,7 +865,7 @@ WRITE8_MEMBER( i8255_device::write )
 //  pa_r -
 //-------------------------------------------------
 
-READ8_MEMBER( i8255_device::pa_r )
+uint8_t i8255_device::pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pa_r();
 }
@@ -892,7 +892,7 @@ uint8_t i8255_device::pa_r()
 //  pb_r -
 //-------------------------------------------------
 
-READ8_MEMBER( i8255_device::pb_r )
+uint8_t i8255_device::pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pb_r();
 }
@@ -919,7 +919,7 @@ uint8_t i8255_device::pb_r()
 //  pc2_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8255_device::pc2_w )
+void i8255_device::pc2_w(int state)
 {
 	if (group_mode(GROUP_B) == 1)
 	{
@@ -956,7 +956,7 @@ WRITE_LINE_MEMBER( i8255_device::pc2_w )
 //  pc4_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8255_device::pc4_w )
+void i8255_device::pc4_w(int state)
 {
 	if ((group_mode(GROUP_A) == 2) || ((group_mode(GROUP_A) == 1) && (port_mode(PORT_A) == MODE_INPUT)))
 	{
@@ -979,7 +979,7 @@ WRITE_LINE_MEMBER( i8255_device::pc4_w )
 //  pc6_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8255_device::pc6_w )
+void i8255_device::pc6_w(int state)
 {
 	if ((group_mode(GROUP_A) == 2) || ((group_mode(GROUP_A) == 1) && (port_mode(PORT_A) == MODE_OUTPUT)))
 	{

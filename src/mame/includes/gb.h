@@ -61,32 +61,32 @@ public:
 
 	bool m_bios_disable;
 
-	DECLARE_WRITE8_MEMBER(gb_io_w);
-	DECLARE_WRITE8_MEMBER(gb_io2_w);
-	DECLARE_WRITE8_MEMBER(sgb_io_w);
-	DECLARE_READ8_MEMBER(gb_ie_r);
-	DECLARE_WRITE8_MEMBER(gb_ie_w);
-	DECLARE_READ8_MEMBER(gb_io_r);
-	DECLARE_WRITE8_MEMBER(gbc_io_w);
-	DECLARE_WRITE8_MEMBER(gbc_io2_w);
-	DECLARE_READ8_MEMBER(gbc_io2_r);
-	DECLARE_PALETTE_INIT(gb);
-	DECLARE_MACHINE_START(sgb);
-	DECLARE_MACHINE_RESET(sgb);
-	DECLARE_PALETTE_INIT(sgb);
-	DECLARE_PALETTE_INIT(gbp);
-	DECLARE_MACHINE_START(gbc);
-	DECLARE_MACHINE_RESET(gbc);
-	DECLARE_PALETTE_INIT(gbc);
-	DECLARE_WRITE8_MEMBER(gb_timer_callback);
+	void gb_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gb_io2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sgb_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gb_ie_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gb_ie_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gb_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gbc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gbc_io2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gbc_io2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palette_init_gb(palette_device &palette);
+	void machine_start_sgb();
+	void machine_reset_sgb();
+	void palette_init_sgb(palette_device &palette);
+	void palette_init_gbp(palette_device &palette);
+	void machine_start_gbc();
+	void machine_reset_gbc();
+	void palette_init_gbc(palette_device &palette);
+	void gb_timer_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(gb_cart_r);
-	DECLARE_READ8_MEMBER(gbc_cart_r);
-	DECLARE_WRITE8_MEMBER(gb_bank_w);
-	DECLARE_READ8_MEMBER(gb_ram_r);
-	DECLARE_WRITE8_MEMBER(gb_ram_w);
-	DECLARE_READ8_MEMBER(gb_echo_r);
-	DECLARE_WRITE8_MEMBER(gb_echo_w);
+	uint8_t gb_cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gbc_cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gb_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gb_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gb_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gb_echo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gb_echo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	optional_device<gb_cart_slot_device> m_cartslot;
 
 protected:
@@ -128,19 +128,19 @@ public:
 		, m_cartslot(*this, "duckslot")
 	{ }
 
-	DECLARE_READ8_MEMBER(megaduck_video_r);
-	DECLARE_WRITE8_MEMBER(megaduck_video_w);
-	DECLARE_WRITE8_MEMBER(megaduck_sound_w1);
-	DECLARE_READ8_MEMBER(megaduck_sound_r1);
-	DECLARE_WRITE8_MEMBER(megaduck_sound_w2);
-	DECLARE_READ8_MEMBER(megaduck_sound_r2);
-	DECLARE_MACHINE_START(megaduck);
-	DECLARE_MACHINE_RESET(megaduck);
-	DECLARE_PALETTE_INIT(megaduck);
+	uint8_t megaduck_video_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void megaduck_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void megaduck_sound_w1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t megaduck_sound_r1(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void megaduck_sound_w2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t megaduck_sound_r2(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void machine_start_megaduck();
+	void machine_reset_megaduck();
+	void palette_init_megaduck(palette_device &palette);
 
-	DECLARE_READ8_MEMBER(cart_r);
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank2_w);
+	uint8_t cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	optional_device<megaduck_cart_slot_device> m_cartslot;
 };
 

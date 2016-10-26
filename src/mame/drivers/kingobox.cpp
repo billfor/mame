@@ -24,23 +24,23 @@ Main CPU:
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
-WRITE8_MEMBER(kingofb_state::video_interrupt_w)
+void kingofb_state::video_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(kingofb_state::sprite_interrupt_w)
+void kingofb_state::sprite_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sprite_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(kingofb_state::scroll_interrupt_w)
+void kingofb_state::scroll_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	sprite_interrupt_w(space, offset, data);
 	*m_scroll_y = data;
 }
 
-WRITE8_MEMBER(kingofb_state::sound_command_w)
+void kingofb_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
@@ -438,7 +438,7 @@ static GFXDECODE_START( rk )
 	GFXDECODE_ENTRY( "gfx4", 0x00000, rk_bglayout,       0, 32 )    /* bg tiles */
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(kingofb_state::kingofb_interrupt)
+void kingofb_state::kingofb_interrupt(device_t &device)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -775,7 +775,7 @@ ROM_START( ringkingw )
 	ROM_LOAD( "prom1.bin",    0x0800, 0x0400, CRC(913f5975) SHA1(3d1e40eeb4d5a3a4bd42ec73d05bfca13b2f1805) ) /* blue component */
 ROM_END
 
-DRIVER_INIT_MEMBER(kingofb_state,ringking3)
+void kingofb_state::init_ringking3()
 {
 	int i;
 	uint8_t *RAM = memregion("proms")->base();
@@ -786,7 +786,7 @@ DRIVER_INIT_MEMBER(kingofb_state,ringking3)
 	m_palette->update();
 }
 
-DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
+void kingofb_state::init_ringkingw()
 {
 	int i,j,k;
 	uint8_t *PROMS = memregion("proms")->base();

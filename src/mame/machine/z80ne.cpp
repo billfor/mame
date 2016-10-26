@@ -36,7 +36,7 @@ cassette_image_device* z80ne_state::cassette_device_image()
 		return m_cassette1;
 }
 
-TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
+void z80ne_state::z80ne_cassette_tc(void *ptr, int32_t param)
 {
 	uint8_t cass_ws = 0;
 	m_cass_data.input.length++;
@@ -72,7 +72,7 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
 }
 
 
-DRIVER_INIT_MEMBER(z80ne_state,z80ne)
+void z80ne_state::init_z80ne()
 {
 	/* first two entries point to rom on reset */
 	uint8_t *RAM = m_region_z80ne->base();
@@ -81,16 +81,16 @@ DRIVER_INIT_MEMBER(z80ne_state,z80ne)
 	m_bank2->configure_entry(0, &RAM[0x14000]); /* ep382 at 0x8000 */
 }
 
-DRIVER_INIT_MEMBER(z80ne_state,z80net)
+void z80ne_state::init_z80net()
 {
-	DRIVER_INIT_CALL(z80ne);
+	init_z80ne();
 }
 
-DRIVER_INIT_MEMBER(z80ne_state,z80netb)
+void z80ne_state::init_z80netb()
 {
 }
 
-DRIVER_INIT_MEMBER(z80ne_state,z80netf)
+void z80ne_state::init_z80netf()
 {
 	/* first two entries point to rom on reset */
 	uint8_t *RAM = m_region_z80ne->base();
@@ -110,7 +110,7 @@ DRIVER_INIT_MEMBER(z80ne_state,z80netf)
 
 }
 
-TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_kbd_scan)
+void z80ne_state::z80ne_kbd_scan(void *ptr, int32_t param)
 {
 	/*
 	 * NE555 is connected to a 74LS93 binary counter
@@ -154,14 +154,14 @@ TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_kbd_scan)
 	}
 }
 
-DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_default)
+offs_t z80ne_state::z80ne_default(direct_read_data &direct, offs_t address)
 {
 	return address;
 }
 /*
  * Handle NMI delay for single step instruction
  */
-DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_nmi_delay_count)
+offs_t z80ne_state::z80ne_nmi_delay_count(direct_read_data &direct, offs_t address)
 {
 	m_nmi_delay_counter--;
 
@@ -177,7 +177,7 @@ DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_nmi_delay_count)
  * Handle delayed ROM/RAM banking at RESET
  * after the first reset_delay_counter bytes have been read from ROM, switch the RAM back in
  */
-DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_reset_delay_count)
+offs_t z80ne_state::z80ne_reset_delay_count(direct_read_data &direct, offs_t address)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/*
@@ -273,7 +273,7 @@ void z80ne_state::reset_lx390_banking()
 	 */
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
+void z80ne_state::machine_reset_z80ne_base()
 {
 	int i;
 
@@ -326,36 +326,36 @@ MACHINE_RESET_MEMBER(z80ne_state,z80ne_base)
 
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80ne)
+void z80ne_state::machine_reset_z80ne()
 {
 	LOG(("In machine_reset z80ne\n"));
 	reset_lx382_banking();
-	MACHINE_RESET_CALL_MEMBER( z80ne_base );
+	machine_reset_z80ne_base();
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80net)
+void z80ne_state::machine_reset_z80net()
 {
 	LOG(("In machine_reset z80net\n"));
-	MACHINE_RESET_CALL_MEMBER( z80ne );
+	machine_reset_z80ne();
 	reset_lx388();
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80netb)
+void z80ne_state::machine_reset_z80netb()
 {
 	LOG(("In machine_reset z80netb\n"));
-	MACHINE_RESET_CALL_MEMBER( z80ne_base );
+	machine_reset_z80ne_base();
 	reset_lx388();
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80netf)
+void z80ne_state::machine_reset_z80netf()
 {
 	LOG(("In machine_reset z80netf\n"));
 	reset_lx390_banking();
-	MACHINE_RESET_CALL_MEMBER( z80ne_base );
+	machine_reset_z80ne_base();
 	reset_lx388();
 }
 
-INPUT_CHANGED_MEMBER(z80ne_state::z80ne_reset)
+void z80ne_state::z80ne_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t rst;
 	rst = m_io_rst->read();
@@ -366,7 +366,7 @@ INPUT_CHANGED_MEMBER(z80ne_state::z80ne_reset)
 	}
 }
 
-INPUT_CHANGED_MEMBER(z80ne_state::z80ne_nmi)
+void z80ne_state::z80ne_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t nmi;
 	nmi = m_io_lx388_brk->read();
@@ -377,7 +377,7 @@ INPUT_CHANGED_MEMBER(z80ne_state::z80ne_nmi)
 	}
 }
 
-MACHINE_START_MEMBER(z80ne_state,z80ne)
+void z80ne_state::machine_start_z80ne()
 {
 	LOG(("In MACHINE_START z80ne\n"));
 	m_lx385_ctrl = 0x1f;
@@ -389,21 +389,21 @@ MACHINE_START_MEMBER(z80ne_state,z80ne)
 	machine().scheduler().timer_pulse( attotime::from_hz(1000), timer_expired_delegate(FUNC(z80ne_state::z80ne_kbd_scan),this));
 }
 
-MACHINE_START_MEMBER(z80ne_state,z80net)
+void z80ne_state::machine_start_z80net()
 {
-	MACHINE_START_CALL_MEMBER( z80ne );
+	machine_start_z80ne();
 	LOG(("In MACHINE_START z80net\n"));
 }
 
-MACHINE_START_MEMBER(z80ne_state,z80netb)
+void z80ne_state::machine_start_z80netb()
 {
-	MACHINE_START_CALL_MEMBER( z80net );
+	machine_start_z80net();
 	LOG(("In MACHINE_START z80netb\n"));
 }
 
-MACHINE_START_MEMBER(z80ne_state,z80netf)
+void z80ne_state::machine_start_z80netf()
 {
-	MACHINE_START_CALL_MEMBER( z80net );
+	machine_start_z80net();
 	LOG(("In MACHINE_START z80netf\n"));
 }
 
@@ -412,7 +412,7 @@ MACHINE_START_MEMBER(z80ne_state,z80netf)
 ******************************************************************************/
 
 /* LX.383 - LX.384 HEX keyboard and display */
-READ8_MEMBER(z80ne_state::lx383_r)
+uint8_t z80ne_state::lx383_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	 * Keyboard scanning
@@ -434,7 +434,7 @@ READ8_MEMBER(z80ne_state::lx383_r)
 	return m_lx383_key[m_lx383_scan_counter];
 }
 
-WRITE8_MEMBER(z80ne_state::lx383_w)
+void z80ne_state::lx383_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	 * First 8 locations (F0-F7) are mapped to a dual-port 8-byte RAM
@@ -515,12 +515,12 @@ WRITE8_MEMBER(z80ne_state::lx383_w)
     data on the positive-edge of the clock pulse.
  *
  */
-READ8_MEMBER(z80ne_state::lx385_data_r)
+uint8_t z80ne_state::lx385_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ay31015->get_received_data();
 }
 
-READ8_MEMBER(z80ne_state::lx385_ctrl_r)
+uint8_t z80ne_state::lx385_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* set unused bits high */
 	uint8_t data = 0xc0;
@@ -537,14 +537,14 @@ READ8_MEMBER(z80ne_state::lx385_ctrl_r)
 	return data;
 }
 
-WRITE8_MEMBER(z80ne_state::lx385_data_w)
+void z80ne_state::lx385_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ay31015->set_transmit_data(data);
 }
 
 #define LX385_CASSETTE_MOTOR_MASK ((1<<3)|(1<<4))
 
-WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
+void z80ne_state::lx385_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Translate data to control signals
 	 *     0 bit1=0, bit0=0   UART Reset pulse
@@ -599,7 +599,7 @@ WRITE8_MEMBER(z80ne_state::lx385_ctrl_w)
 	}
 }
 
-READ8_MEMBER(z80ne_state::lx388_mc6847_videoram_r)
+uint8_t z80ne_state::lx388_mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == ~0) return 0xff;
 
@@ -614,7 +614,7 @@ READ8_MEMBER(z80ne_state::lx388_mc6847_videoram_r)
 	return videoram[offset];
 }
 
-READ8_MEMBER(z80ne_state::lx388_data_r)
+uint8_t z80ne_state::lx388_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -623,7 +623,7 @@ READ8_MEMBER(z80ne_state::lx388_data_r)
 	return data;
 }
 
-READ8_MEMBER(z80ne_state::lx388_read_field_sync)
+uint8_t z80ne_state::lx388_read_field_sync(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vdg->fs_r() << 7;
 }
@@ -637,7 +637,7 @@ READ8_MEMBER(z80ne_state::lx388_read_field_sync)
  *
  */
 
-WRITE8_MEMBER(z80ne_state::lx390_motor_w)
+void z80ne_state::lx390_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Selection of drive and parameters
 	 A write also causes the selected drive motor to turn on for about 3 seconds.
@@ -677,7 +677,7 @@ WRITE8_MEMBER(z80ne_state::lx390_motor_w)
 	}
 }
 
-READ8_MEMBER(z80ne_state::lx390_reset_bank)
+uint8_t z80ne_state::lx390_reset_bank(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offs_t pc;
 
@@ -695,7 +695,7 @@ READ8_MEMBER(z80ne_state::lx390_reset_bank)
 	return 0xff;
 }
 
-READ8_MEMBER(z80ne_state::lx390_fdc_r)
+uint8_t z80ne_state::lx390_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t d;
 
@@ -731,7 +731,7 @@ READ8_MEMBER(z80ne_state::lx390_fdc_r)
 	return d;
 }
 
-WRITE8_MEMBER(z80ne_state::lx390_fdc_w)
+void z80ne_state::lx390_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t d;
 

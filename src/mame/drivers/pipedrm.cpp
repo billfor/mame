@@ -176,18 +176,18 @@ public:
 		: fromance_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_MACHINE_START(pipedrm);
-	DECLARE_MACHINE_RESET(pipedrm);
-	DECLARE_DRIVER_INIT(pipedrm);
-	DECLARE_DRIVER_INIT(hatris);
-	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
-	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
-	TIMER_CALLBACK_MEMBER( delayed_command_w );
-	DECLARE_WRITE8_MEMBER( sound_command_w );
-	DECLARE_WRITE8_MEMBER( sound_command_nonmi_w );
-	DECLARE_WRITE8_MEMBER( pending_command_clear_w );
-	DECLARE_READ8_MEMBER( pending_command_r );
-	DECLARE_READ8_MEMBER( sound_command_r );
+	void machine_start_pipedrm();
+	void machine_reset_pipedrm();
+	void init_pipedrm();
+	void init_hatris();
+	void pipedrm_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void delayed_command_w(void *ptr, int32_t param);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command_nonmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pending_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 
@@ -197,7 +197,7 @@ public:
  *
  *************************************/
 
-WRITE8_MEMBER(pipedrm_state::pipedrm_bankswitch_w )
+void pipedrm_state::pipedrm_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Bit layout:
@@ -219,7 +219,7 @@ WRITE8_MEMBER(pipedrm_state::pipedrm_bankswitch_w )
 }
 
 
-WRITE8_MEMBER(pipedrm_state::sound_bankswitch_w )
+void pipedrm_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(data & 0x01);
 }
@@ -232,7 +232,7 @@ WRITE8_MEMBER(pipedrm_state::sound_bankswitch_w )
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(pipedrm_state::delayed_command_w)
+void pipedrm_state::delayed_command_w(void *ptr, int32_t param)
 {
 	m_sound_command = param & 0xff;
 	m_pending_command = 1;
@@ -245,32 +245,32 @@ TIMER_CALLBACK_MEMBER(pipedrm_state::delayed_command_w)
 }
 
 
-WRITE8_MEMBER(pipedrm_state::sound_command_w )
+void pipedrm_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipedrm_state::delayed_command_w),this), data | 0x100);
 }
 
 
-WRITE8_MEMBER(pipedrm_state::sound_command_nonmi_w )
+void pipedrm_state::sound_command_nonmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipedrm_state::delayed_command_w),this), data);
 }
 
 
-WRITE8_MEMBER(pipedrm_state::pending_command_clear_w )
+void pipedrm_state::pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pending_command = 0;
 	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
-READ8_MEMBER(pipedrm_state::pending_command_r )
+uint8_t pipedrm_state::pending_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pending_command;
 }
 
 
-READ8_MEMBER(pipedrm_state::sound_command_r )
+uint8_t pipedrm_state::sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_command;
 }
@@ -575,7 +575,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(pipedrm_state,pipedrm)
+void pipedrm_state::machine_start_pipedrm()
 {
 	/* initialize main Z80 bank */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
@@ -592,7 +592,7 @@ MACHINE_START_MEMBER(pipedrm_state,pipedrm)
 	/* video-related elements are saved in video_start */
 }
 
-MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
+void pipedrm_state::machine_reset_pipedrm()
 {
 	int i;
 
@@ -901,7 +901,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
+void pipedrm_state::init_pipedrm()
 {
 	const memory_share *share = memshare("palette");
 	/* sprite RAM lives at the end of palette RAM */
@@ -910,7 +910,7 @@ DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
 }
 
 
-DRIVER_INIT_MEMBER(pipedrm_state,hatris)
+void pipedrm_state::init_hatris()
 {
 	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x20, write8_delegate(FUNC(pipedrm_state::sound_command_nonmi_w),this));
 	m_maincpu->space(AS_IO).install_write_handler(0x21, 0x21, write8_delegate(FUNC(pipedrm_state::fromance_gfxreg_w),this));

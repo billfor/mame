@@ -34,7 +34,7 @@ void strnskil_state::machine_start()
 
 /****************************************************************************/
 
-READ8_MEMBER(strnskil_state::strnskil_d800_r)
+uint8_t strnskil_state::strnskil_d800_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* bit0: interrupt type?, bit1: CPU2 busack? */
 
@@ -43,7 +43,7 @@ READ8_MEMBER(strnskil_state::strnskil_d800_r)
 
 /****************************************************************************/
 
-READ8_MEMBER(strnskil_state::pettanp_protection_r)
+uint8_t strnskil_state::pettanp_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res;
 
@@ -62,7 +62,7 @@ READ8_MEMBER(strnskil_state::pettanp_protection_r)
 	return res;
 }
 
-READ8_MEMBER(strnskil_state::banbam_protection_r)
+uint8_t strnskil_state::banbam_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res;
 
@@ -81,7 +81,7 @@ READ8_MEMBER(strnskil_state::banbam_protection_r)
 	return res;
 }
 
-WRITE8_MEMBER(strnskil_state::protection_w)
+void strnskil_state::protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%04x: protection_w %02x\n",space.device().safe_pc(),data);
 }
@@ -326,7 +326,7 @@ static GFXDECODE_START( strnskil )
 GFXDECODE_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(strnskil_state::strnskil_irq)
+void strnskil_state::strnskil_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -524,7 +524,7 @@ ROM_START( banbam )
 	ROM_LOAD( "sun-8212.ic3", 0x000,  0x800, BAD_DUMP CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
 ROM_END
 
-DRIVER_INIT_MEMBER(strnskil_state,pettanp)
+void strnskil_state::init_pettanp()
 {
 //  AM_RANGE(0xd80c, 0xd80c) AM_WRITENOP     /* protection reset? */
 //  AM_RANGE(0xd80d, 0xd80d) AM_WRITE(protection_w) /* protection data write (pettanp) */
@@ -536,7 +536,7 @@ DRIVER_INIT_MEMBER(strnskil_state,pettanp)
 
 }
 
-DRIVER_INIT_MEMBER(strnskil_state,banbam)
+void strnskil_state::init_banbam()
 {
 	/* Fujitsu MB8841 4-Bit MCU */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(strnskil_state::banbam_protection_r),this));

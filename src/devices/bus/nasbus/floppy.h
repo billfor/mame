@@ -28,9 +28,9 @@ public:
 	// construction/destruction
 	nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(select_r);
-	DECLARE_WRITE8_MEMBER(select_w);
-	DECLARE_READ8_MEMBER(status_r);
+	uint8_t select_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -41,7 +41,7 @@ protected:
 	virtual void device_reset_after_children() override;
 
 private:
-	TIMER_CALLBACK_MEMBER(motor_off);
+	void motor_off(void *ptr, int32_t param);
 
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;

@@ -161,7 +161,7 @@ enum
 };
 
 
-WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
+void btime_state::audio_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* for most games, this serves as the NMI enable for the audio CPU; however,
 	   lnc and disco use bit 0 of the first AY-8910's port A instead; many other
@@ -173,7 +173,7 @@ WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 	}
 }
 
-WRITE8_MEMBER(btime_state::ay_audio_nmi_enable_w)
+void btime_state::ay_audio_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port A bit 0, when 1, inhibits the NMI */
 	if (m_audio_nmi_enable_type == AUDIO_ENABLE_AY8910)
@@ -183,7 +183,7 @@ WRITE8_MEMBER(btime_state::ay_audio_nmi_enable_w)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(btime_state::audio_nmi_gen)
+void btime_state::audio_nmi_gen(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	m_audio_nmi_state = scanline & 8;
@@ -347,37 +347,37 @@ static ADDRESS_MAP_START( disco_audio_map, AS_PROGRAM, 8, btime_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(btime_state::coin_inserted_irq_hi)
+void btime_state::coin_inserted_irq_hi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(btime_state::coin_inserted_irq_lo)
+void btime_state::coin_inserted_irq_lo(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!newval)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(btime_state::coin_inserted_nmi_lo)
+void btime_state::coin_inserted_nmi_lo(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(btime_state::audio_command_w)
+void btime_state::audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(btime_state::audio_command_r)
+uint8_t btime_state::audio_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_soundlatch->read(space, offset);
 }
 
-READ8_MEMBER(btime_state::zoar_dsw1_read)
+uint8_t btime_state::zoar_dsw1_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (!m_screen->vblank() << 7) | (ioport("DSW1")->read() & 0x7f);
 }
@@ -1235,7 +1235,7 @@ static DISCRETE_SOUND_START( btime_sound )
 DISCRETE_SOUND_END
 
 
-MACHINE_START_MEMBER(btime_state,btime)
+void btime_state::machine_start_btime()
 {
 	save_item(NAME(m_btime_palette));
 	save_item(NAME(m_bnj_scroll1));
@@ -1245,9 +1245,9 @@ MACHINE_START_MEMBER(btime_state,btime)
 	save_item(NAME(m_audio_nmi_state));
 }
 
-MACHINE_START_MEMBER(btime_state,mmonkey)
+void btime_state::machine_start_mmonkey()
 {
-	MACHINE_START_CALL_MEMBER(btime);
+	machine_start_btime();
 
 	save_item(NAME(m_protection_command));
 	save_item(NAME(m_protection_status));
@@ -1255,7 +1255,7 @@ MACHINE_START_MEMBER(btime_state,mmonkey)
 	save_item(NAME(m_protection_ret));
 }
 
-MACHINE_RESET_MEMBER(btime_state,btime)
+void btime_state::machine_reset_btime()
 {
 	/* by default, the audio NMI is disabled, except for bootlegs which don't use the enable */
 	m_audio_nmi_enabled = (m_audio_nmi_enable_type == AUDIO_ENABLE_NONE);
@@ -1270,16 +1270,16 @@ MACHINE_RESET_MEMBER(btime_state,btime)
 	m_audio_nmi_state = 0;
 }
 
-MACHINE_RESET_MEMBER(btime_state,lnc)
+void btime_state::machine_reset_lnc()
 {
 	*m_lnc_charbank = 1;
 
-	MACHINE_RESET_CALL_MEMBER(btime);
+	machine_reset_btime();
 }
 
-MACHINE_RESET_MEMBER(btime_state,mmonkey)
+void btime_state::machine_reset_mmonkey()
 {
-	MACHINE_RESET_CALL_MEMBER(lnc);
+	machine_reset_lnc();
 
 	m_protection_command = 0;
 	m_protection_status = 0;
@@ -1973,7 +1973,7 @@ ROM_START( sdtennis )
 	ROM_LOAD( "ao_04.10f",   0x1000, 0x1000, CRC(921952af) SHA1(4e9248f3493a5f4651278f27c11f507571242317) )
 ROM_END
 
-READ8_MEMBER(btime_state::wtennis_reset_hack_r)
+uint8_t btime_state::wtennis_reset_hack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
@@ -1986,12 +1986,12 @@ READ8_MEMBER(btime_state::wtennis_reset_hack_r)
 	return RAM[0xc15f];
 }
 
-DRIVER_INIT_MEMBER(btime_state,btime)
+void btime_state::init_btime()
 {
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
-DRIVER_INIT_MEMBER(btime_state,zoar)
+void btime_state::init_zoar()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2004,7 +2004,7 @@ DRIVER_INIT_MEMBER(btime_state,zoar)
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,tisland)
+void btime_state::init_tisland()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2017,36 +2017,36 @@ DRIVER_INIT_MEMBER(btime_state,tisland)
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
-DRIVER_INIT_MEMBER(btime_state,lnc)
+void btime_state::init_lnc()
 {
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,bnj)
+void btime_state::init_bnj()
 {
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
-DRIVER_INIT_MEMBER(btime_state,disco)
+void btime_state::init_disco()
 {
-	DRIVER_INIT_CALL(btime);
+	init_btime();
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,cookrace)
+void btime_state::init_cookrace()
 {
 	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
 	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
-DRIVER_INIT_MEMBER(btime_state,protennb)
+void btime_state::init_protennb()
 {
-	DRIVER_INIT_CALL(btime);
+	init_btime();
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,wtennis)
+void btime_state::init_wtennis()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8_delegate(FUNC(btime_state::wtennis_reset_hack_r),this));
 
@@ -2055,7 +2055,7 @@ DRIVER_INIT_MEMBER(btime_state,wtennis)
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,sdtennis)
+void btime_state::init_sdtennis()
 {
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }

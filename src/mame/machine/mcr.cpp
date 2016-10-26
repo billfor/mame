@@ -99,20 +99,20 @@ const z80_daisy_config mcr_ipu_daisy_chain[] =
  *
  *************************************/
 
-MACHINE_START_MEMBER(mcr_state,mcr)
+void mcr_state::machine_start_mcr()
 {
 	save_item(NAME(mcr_cocktail_flip));
 }
 
 
-MACHINE_START_MEMBER(mcr_state,nflfoot)
+void mcr_state::machine_start_nflfoot()
 {
 	/* allocate a timer for the IPU watchdog */
 	ipu_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcr_state::ipu_watchdog_reset),this));
 }
 
 
-MACHINE_RESET_MEMBER(mcr_state,mcr)
+void mcr_state::machine_reset_mcr()
 {
 	/* reset cocktail flip */
 	mcr_cocktail_flip = 0;
@@ -126,7 +126,7 @@ MACHINE_RESET_MEMBER(mcr_state,mcr)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_interrupt)
+void mcr_state::mcr_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	z80ctc_device *ctc = machine().device<z80ctc_device>("ctc");
 	int scanline = param;
@@ -148,7 +148,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_interrupt)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_ipu_interrupt)
+void mcr_state::mcr_ipu_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	z80ctc_device *ctc = machine().device<z80ctc_device>("ctc");
 	int scanline = param;
@@ -169,12 +169,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_ipu_interrupt)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(mcr_state::sio_txda_w)
+void mcr_state::sio_txda_w(int state)
 {
 	m_sio_txda = !state;
 }
 
-WRITE_LINE_MEMBER(mcr_state::sio_txdb_w)
+void mcr_state::sio_txdb_w(int state)
 {
 	// disc player
 	m_sio_txdb = !state;
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER(mcr_state::sio_txdb_w)
 	m_sio->rxb_w(state);
 }
 
-WRITE8_MEMBER(mcr_state::mcr_ipu_laserdisk_w)
+void mcr_state::mcr_ipu_laserdisk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 3 enables (1) LD video regardless of PIX SW */
 	/* bit 2 enables (1) LD right channel audio */
@@ -193,7 +193,7 @@ WRITE8_MEMBER(mcr_state::mcr_ipu_laserdisk_w)
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr_state::ipu_watchdog_reset)
+void mcr_state::ipu_watchdog_reset(void *ptr, int32_t param)
 {
 	logerror("ipu_watchdog_reset\n");
 	m_ipu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
@@ -204,7 +204,7 @@ TIMER_CALLBACK_MEMBER(mcr_state::ipu_watchdog_reset)
 }
 
 
-READ8_MEMBER(mcr_state::mcr_ipu_watchdog_r)
+uint8_t mcr_state::mcr_ipu_watchdog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* watchdog counter is clocked by 7.3728MHz crystal / 16 */
 	/* watchdog is tripped when 14-bit counter overflows => / 32768 = 14.0625Hz*/
@@ -213,7 +213,7 @@ READ8_MEMBER(mcr_state::mcr_ipu_watchdog_r)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_ipu_watchdog_w)
+void mcr_state::mcr_ipu_watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mcr_ipu_watchdog_r(space,0);
 }

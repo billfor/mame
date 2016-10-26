@@ -4258,7 +4258,7 @@ uint16_t hdc92x4_device::encode_a1_hd()
     Read a byte of data from the controller
     The address (offset) encodes the C/D* line (command and /data)
 */
-READ8_MEMBER( hdc92x4_device::read )
+uint8_t hdc92x4_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t reply;
 	if ((offset & 1) == 0)
@@ -4293,7 +4293,7 @@ READ8_MEMBER( hdc92x4_device::read )
     The operation terminates immediately, and the controller picks up the
     values stored in this phase at a later time.
 */
-WRITE8_MEMBER( hdc92x4_device::write )
+void hdc92x4_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 1) == 0)
 	{
@@ -4691,7 +4691,7 @@ void hdc92x4_device::set_interrupt(line_state intr)
 /*
     DMA acknowledge line.
 */
-WRITE_LINE_MEMBER( hdc92x4_device::dmaack )
+void hdc92x4_device::dmaack(int state)
 {
 	if (state==ASSERT_LINE)
 	{
@@ -4752,7 +4752,7 @@ void hdc92x4_device::device_timer(emu_timer &timer, device_timer_id id, int para
 /*
     Reset the controller. Negative logic, but we use ASSERT_LINE.
 */
-WRITE_LINE_MEMBER( hdc92x4_device::reset )
+void hdc92x4_device::reset(int state)
 {
 	if (state == ASSERT_LINE)
 	{

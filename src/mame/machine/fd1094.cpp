@@ -919,7 +919,7 @@ void fd1094_device::default_state_change(uint8_t state)
 //  (state change)
 //-------------------------------------------------
 
-WRITE32_MEMBER(fd1094_device::cmp_callback)
+void fd1094_device::cmp_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0 && (data & 0x0000ffff) == 0x0000ffff)
 		change_state(data >> 16);
@@ -931,7 +931,7 @@ WRITE32_MEMBER(fd1094_device::cmp_callback)
 //  interrupt code
 //-------------------------------------------------
 
-IRQ_CALLBACK_MEMBER( fd1094_device::irq_callback )
+int fd1094_device::irq_callback(device_t &device, int irqline)
 {
 	change_state(STATE_IRQ);
 	return (0x60 + irqline * 4) / 4; // vector address
@@ -943,7 +943,7 @@ IRQ_CALLBACK_MEMBER( fd1094_device::irq_callback )
 //  is encountered
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(fd1094_device::rte_callback)
+void fd1094_device::rte_callback(int state)
 {
 	change_state(STATE_RTE);
 }

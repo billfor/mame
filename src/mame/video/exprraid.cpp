@@ -4,19 +4,19 @@
 #include "includes/exprraid.h"
 
 
-WRITE8_MEMBER(exprraid_state::exprraid_videoram_w)
+void exprraid_state::exprraid_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_colorram_w)
+void exprraid_state::exprraid_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_flipscreen_w)
+void exprraid_state::exprraid_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (data & 0x01))
 	{
@@ -25,7 +25,7 @@ WRITE8_MEMBER(exprraid_state::exprraid_flipscreen_w)
 	}
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_bgselect_w)
+void exprraid_state::exprraid_bgselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bg_index[offset] != data)
 	{
@@ -34,17 +34,17 @@ WRITE8_MEMBER(exprraid_state::exprraid_bgselect_w)
 	}
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_scrollx_w)
+void exprraid_state::exprraid_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(offset, data);
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_scrolly_w)
+void exprraid_state::exprraid_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-TILE_GET_INFO_MEMBER(exprraid_state::get_bg_tile_info)
+void exprraid_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *tilerom = memregion("gfx4")->base();
 
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(exprraid_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(exprraid_state::get_fg_tile_info)
+void exprraid_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x07) << 8);

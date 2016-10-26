@@ -102,13 +102,13 @@ void suprridr_state::machine_start()
  *
  *************************************/
 
-WRITE8_MEMBER(suprridr_state::nmi_enable_w)
+void suprridr_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data;
 }
 
 
-INTERRUPT_GEN_MEMBER(suprridr_state::main_nmi_gen)
+void suprridr_state::main_nmi_gen(device_t &device)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -122,26 +122,26 @@ INTERRUPT_GEN_MEMBER(suprridr_state::main_nmi_gen)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(suprridr_state::delayed_sound_w)
+void suprridr_state::delayed_sound_w(void *ptr, int32_t param)
 {
 	m_sound_data = param;
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(suprridr_state::sound_data_w)
+void suprridr_state::sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(suprridr_state::delayed_sound_w),this), data);
 }
 
 
-READ8_MEMBER(suprridr_state::sound_data_r)
+uint8_t suprridr_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_data;
 }
 
 
-WRITE8_MEMBER(suprridr_state::sound_irq_ack_w)
+void suprridr_state::sound_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
@@ -154,7 +154,7 @@ WRITE8_MEMBER(suprridr_state::sound_irq_ack_w)
  *
  *************************************/
 
-WRITE8_MEMBER(suprridr_state::coin_lock_w)
+void suprridr_state::coin_lock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* cleared when 9 credits are hit, but never reset! */
 /*  machine().bookkeeping().coin_lockout_global_w(~data & 1); */
@@ -230,7 +230,7 @@ ADDRESS_MAP_END
 #define SUPRRIDR_P1_CONTROL_PORT_TAG    ("CONTP1")
 #define SUPRRIDR_P2_CONTROL_PORT_TAG    ("CONTP2")
 
-CUSTOM_INPUT_MEMBER(suprridr_state::control_r)
+ioport_value suprridr_state::control_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 

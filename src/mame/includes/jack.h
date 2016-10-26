@@ -49,31 +49,31 @@ public:
 	int m_question_rom;
 	int m_remap_address[16];
 
-	DECLARE_WRITE8_MEMBER(jack_sh_command_w);
-	DECLARE_WRITE8_MEMBER(joinem_control_w);
-	DECLARE_WRITE8_MEMBER(joinem_scroll_w);
-	DECLARE_READ8_MEMBER(striv_question_r);
-	DECLARE_WRITE8_MEMBER(jack_videoram_w);
-	DECLARE_WRITE8_MEMBER(jack_colorram_w);
-	DECLARE_READ8_MEMBER(jack_flipscreen_r);
-	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
-	DECLARE_READ8_MEMBER(timer_r);
+	void jack_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void joinem_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void joinem_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t striv_question_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jack_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jack_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t jack_flipscreen_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jack_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t timer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(zzyzzyxx);
-	DECLARE_DRIVER_INIT(striv);
-	DECLARE_DRIVER_INIT(treahunt);
-	DECLARE_DRIVER_INIT(loverboy);
-	DECLARE_DRIVER_INIT(jack);
+	void init_zzyzzyxx();
+	void init_striv();
+	void init_treahunt();
+	void init_loverboy();
+	void init_jack();
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);
-	TILE_GET_INFO_MEMBER(joinem_get_bg_tile_info);
-	DECLARE_VIDEO_START(joinem);
-	DECLARE_PALETTE_INIT(joinem);
-	DECLARE_MACHINE_START(striv);
-	DECLARE_MACHINE_RESET(striv);
-	DECLARE_MACHINE_START(joinem);
-	DECLARE_MACHINE_RESET(joinem);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index tilemap_scan_cols_flipy(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void joinem_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void video_start_joinem();
+	void palette_init_joinem(palette_device &palette);
+	void machine_start_striv();
+	void machine_reset_striv();
+	void machine_start_joinem();
+	void machine_reset_joinem();
 
 	uint32_t screen_update_jack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_striv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -83,7 +83,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	INTERRUPT_GEN_MEMBER(joinem_vblank_irq);
+	void joinem_vblank_irq(device_t &device);
 	void jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void treahunt_decode(  );

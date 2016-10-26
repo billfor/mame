@@ -54,7 +54,7 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(galivan_state, galivan)
+void galivan_state::palette_init_galivan(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -119,7 +119,7 @@ PALETTE_INIT_MEMBER(galivan_state, galivan)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(galivan_state::get_bg_tile_info)
+void galivan_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
@@ -130,7 +130,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(galivan_state::get_tx_tile_info)
+void galivan_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[tile_index + 0x400];
 	int code = m_videoram[tile_index] | ((attr & 0x01) << 8);
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_tx_tile_info)
 	tileinfo.category = attr & 8 ? 0 : 1;   /* seems correct */
 }
 
-TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
+void galivan_state::ninjemak_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_tx_tile_info)
+void galivan_state::ninjemak_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[tile_index + 0x400];
 	int code = m_videoram[tile_index] | ((attr & 0x03) << 8);
@@ -174,7 +174,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(galivan_state,galivan)
+void galivan_state::video_start_galivan()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galivan_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galivan_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
@@ -182,7 +182,7 @@ VIDEO_START_MEMBER(galivan_state,galivan)
 	m_tx_tilemap->set_transparent_pen(15);
 }
 
-VIDEO_START_MEMBER(galivan_state,ninjemak)
+void galivan_state::video_start_ninjemak()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galivan_state::ninjemak_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 512, 32);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galivan_state::ninjemak_get_tx_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
@@ -198,14 +198,14 @@ VIDEO_START_MEMBER(galivan_state,ninjemak)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(galivan_state::galivan_videoram_w)
+void galivan_state::galivan_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 /* Written through port 40 */
-WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
+void galivan_state::galivan_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 1);
@@ -220,7 +220,7 @@ WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
 	/*  logerror("Address: %04X - port 40 = %02x\n", space.device().safe_pc(), data); */
 }
 
-WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)
+void galivan_state::ninjemak_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 1);
@@ -256,7 +256,7 @@ WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)
 
 
 /* Written through port 41-42 */
-WRITE8_MEMBER(galivan_state::galivan_scrollx_w)
+void galivan_state::galivan_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 1)
 	{
@@ -272,7 +272,7 @@ WRITE8_MEMBER(galivan_state::galivan_scrollx_w)
 }
 
 /* Written through port 43-44 */
-WRITE8_MEMBER(galivan_state::galivan_scrolly_w)
+void galivan_state::galivan_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_galivan_scrolly[offset] = data;
 }

@@ -53,24 +53,24 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(rc702);
-	DECLARE_MACHINE_RESET(rc702);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_WRITE8_MEMBER(port14_w);
-	DECLARE_WRITE8_MEMBER(port18_w);
-	DECLARE_WRITE8_MEMBER(port1c_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(zc0_w);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	DECLARE_WRITE_LINE_MEMBER(q_w);
-	DECLARE_WRITE_LINE_MEMBER(qbar_w);
-	DECLARE_WRITE_LINE_MEMBER(dack1_w);
+	void init_rc702();
+	void machine_reset_rc702();
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void crtc_drq_w(int state);
+	void crtc_irq_w(int state);
+	void busreq_w(int state);
+	void clock_w(int state);
+	void zc0_w(int state);
+	void tc_w(int state);
+	void q_w(int state);
+	void qbar_w(int state);
+	void dack1_w(int state);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	uint8_t *m_p_chargen;
@@ -141,7 +141,7 @@ static INPUT_PORTS_START( rc702 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( rc702_state, rc702 )
+void rc702_state::machine_reset_rc702()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -154,7 +154,7 @@ MACHINE_RESET_MEMBER( rc702_state, rc702 )
 	m_maincpu->reset();
 }
 
-WRITE_LINE_MEMBER( rc702_state::q_w )
+void rc702_state::q_w(int state)
 {
 	m_q_state = state;
 
@@ -164,7 +164,7 @@ WRITE_LINE_MEMBER( rc702_state::q_w )
 		m_dma->dreq3_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::qbar_w )
+void rc702_state::qbar_w(int state)
 {
 	m_qbar_state = state;
 
@@ -174,7 +174,7 @@ WRITE_LINE_MEMBER( rc702_state::qbar_w )
 		m_dma->dreq2_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::crtc_drq_w )
+void rc702_state::crtc_drq_w(int state)
 {
 	m_drq_state = state;
 
@@ -189,7 +189,7 @@ WRITE_LINE_MEMBER( rc702_state::crtc_drq_w )
 		m_dma->dreq2_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::tc_w )
+void rc702_state::tc_w(int state)
 {
 	m_tc = state;
 	if ((m_dack == 1) && m_tc)
@@ -201,7 +201,7 @@ WRITE_LINE_MEMBER( rc702_state::tc_w )
 		m_fdc->tc_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::dack1_w )
+void rc702_state::dack1_w(int state)
 {
 	m_dack = 1;
 	if ((m_dack == 1) && m_tc)
@@ -213,19 +213,19 @@ WRITE_LINE_MEMBER( rc702_state::dack1_w )
 		m_fdc->tc_w(0);
 }
 
-WRITE8_MEMBER( rc702_state::port14_w )
+void rc702_state::port14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = m_floppy0->get_device();
 	m_fdc->set_floppy(floppy);
 	floppy->mon_w(!BIT(data, 0));
 }
 
-WRITE8_MEMBER( rc702_state::port18_w )
+void rc702_state::port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(1); // replace roms with ram
 }
 
-WRITE8_MEMBER( rc702_state::port1c_w )
+void rc702_state::port1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		m_beep->set_state(1);
 		m_beepcnt = 0x3000;
@@ -237,7 +237,7 @@ static const rgb_t our_palette[3] = {
 	rgb_t(0xff, 0xb4, 0x00), // on
 };
 
-DRIVER_INIT_MEMBER( rc702_state, rc702 )
+void rc702_state::init_rc702()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -273,7 +273,7 @@ I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
 }
 
 // Baud rate generator. All inputs are 0.614MHz.
-WRITE_LINE_MEMBER( rc702_state::clock_w )
+void rc702_state::clock_w(int state)
 {
 	m_ctc1->trg0(state);
 	m_ctc1->trg1(state);
@@ -283,32 +283,32 @@ WRITE_LINE_MEMBER( rc702_state::clock_w )
 		m_beepcnt--;
 }
 
-WRITE_LINE_MEMBER( rc702_state::zc0_w )
+void rc702_state::zc0_w(int state)
 {
 	m_sio1->txca_w(state);
 	m_sio1->rxca_w(state);
 }
 
-WRITE_LINE_MEMBER( rc702_state::crtc_irq_w )
+void rc702_state::crtc_irq_w(int state)
 {
 	m_7474->clear_w(!state);
 	m_ctc1->trg2(state);
 }
 
-WRITE_LINE_MEMBER( rc702_state::busreq_w )
+void rc702_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
 	m_dma->hack_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER( rc702_state::memory_read_byte )
+uint8_t rc702_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( rc702_state::memory_write_byte )
+void rc702_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
@@ -322,7 +322,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ nullptr }
 };
 
-WRITE8_MEMBER( rc702_state::kbd_put )
+void rc702_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pio->pa_w(space, 0, data);
 	m_pio->strobe_a(0);

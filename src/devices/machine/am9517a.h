@@ -74,17 +74,17 @@ public:
 	template<class _Object> static devcb_base &set_out_dack_2_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_dack_2_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dack_3_callback(device_t &device, _Object object) { return downcast<am9517a_device &>(device).m_out_dack_3_cb.set_callback(object); }
 
-	virtual DECLARE_READ8_MEMBER( read );
-	virtual DECLARE_WRITE8_MEMBER( write );
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( hack_w );
-	DECLARE_WRITE_LINE_MEMBER( ready_w );
-	DECLARE_WRITE_LINE_MEMBER( eop_w );
+	void hack_w(int state);
+	void ready_w(int state);
+	void eop_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( dreq0_w );
-	DECLARE_WRITE_LINE_MEMBER( dreq1_w );
-	DECLARE_WRITE_LINE_MEMBER( dreq2_w );
-	DECLARE_WRITE_LINE_MEMBER( dreq3_w );
+	void dreq0_w(int state);
+	void dreq1_w(int state);
+	void dreq2_w(int state);
+	void dreq3_w(int state);
 
 protected:
 	// device-level overrides
@@ -164,8 +164,8 @@ public:
 	// construction/destruction
 	upd71071_v53_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER( read ) override;
-	virtual DECLARE_WRITE8_MEMBER( write ) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	// device-level overrides

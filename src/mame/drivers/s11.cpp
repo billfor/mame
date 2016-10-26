@@ -159,20 +159,20 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-MACHINE_RESET_MEMBER( s11_state, s11 )
+void s11_state::machine_reset_s11()
 {
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
 }
 
-INPUT_CHANGED_MEMBER( s11_state::main_nmi )
+void s11_state::main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( s11_state::audio_nmi )
+void s11_state::audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
@@ -180,7 +180,7 @@ INPUT_CHANGED_MEMBER( s11_state::audio_nmi )
 			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE_LINE_MEMBER( s11_state::pia_irq )
+void s11_state::pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{
@@ -197,16 +197,16 @@ WRITE_LINE_MEMBER( s11_state::pia_irq )
 	}
 }
 
-WRITE8_MEMBER( s11_state::sol3_w )
+void s11_state::sol3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( s11_state::sound_w )
+void s11_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_data = data;
 }
 
-WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
+void s11_state::pia21_ca2_w(int state)
 {
 // sound ns
 	if(m_pias)
@@ -215,12 +215,12 @@ WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
 		m_pia40->cb2_w(state);
 }
 
-WRITE8_MEMBER( s11_state::lamp0_w )
+void s11_state::lamp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( s11_state::dig0_w )
+void s11_state::dig0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
@@ -231,7 +231,7 @@ WRITE8_MEMBER( s11_state::dig0_w )
 	m_segment2 = 0;
 }
 
-WRITE8_MEMBER( s11_state::dig1_w )
+void s11_state::dig1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_segment2 |= data;
 	m_segment2 |= 0x20000;
@@ -242,7 +242,7 @@ WRITE8_MEMBER( s11_state::dig1_w )
 	}
 }
 
-READ8_MEMBER( s11_state::pia28_w7_r )
+uint8_t s11_state::pia28_w7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x80;
 
@@ -255,7 +255,7 @@ READ8_MEMBER( s11_state::pia28_w7_r )
 	return ret;
 }
 
-WRITE8_MEMBER( s11_state::pia2c_pa_w )
+void s11_state::pia2c_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_segment1 |= (data<<8);
 	m_segment1 |= 0x10000;
@@ -266,7 +266,7 @@ WRITE8_MEMBER( s11_state::pia2c_pa_w )
 	}
 }
 
-WRITE8_MEMBER( s11_state::pia2c_pb_w )
+void s11_state::pia2c_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_segment1 |= data;
 	m_segment1 |= 0x20000;
@@ -277,19 +277,19 @@ WRITE8_MEMBER( s11_state::pia2c_pb_w )
 	}
 }
 
-READ8_MEMBER( s11_state::switch_r )
+uint8_t s11_state::switch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
 	return ~ioport(kbdrow)->read();
 }
 
-WRITE8_MEMBER( s11_state::switch_w )
+void s11_state::switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbdrow = data;
 }
 
-WRITE8_MEMBER( s11_state::pia34_pa_w )
+void s11_state::pia34_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_segment2 |= (data<<8);
 	m_segment2 |= 0x10000;
@@ -300,7 +300,7 @@ WRITE8_MEMBER( s11_state::pia34_pa_w )
 	}
 }
 
-WRITE8_MEMBER( s11_state::pia34_pb_w )
+void s11_state::pia34_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_pia40)
 		m_pia40->portb_w(data);
@@ -308,7 +308,7 @@ WRITE8_MEMBER( s11_state::pia34_pb_w )
 		m_bg->data_w(data);
 }
 
-WRITE_LINE_MEMBER( s11_state::pia34_cb2_w )
+void s11_state::pia34_cb2_w(int state)
 {
 	if(m_pia40)
 		m_pia40->cb1_w(state);  // MCB2 through CPU interface
@@ -316,32 +316,32 @@ WRITE_LINE_MEMBER( s11_state::pia34_cb2_w )
 		m_bg->ctrl_w(state);
 }
 
-WRITE8_MEMBER( s11_state::bank_w )
+void s11_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank0")->set_entry(BIT(data, 1));
 	membank("bank1")->set_entry(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER( s11_state::pias_ca2_w )
+void s11_state::pias_ca2_w(int state)
 {
 // speech clock
 	if(m_hc55516)
 		m_hc55516->clock_w(state);
 }
 
-WRITE_LINE_MEMBER( s11_state::pias_cb2_w )
+void s11_state::pias_cb2_w(int state)
 {
 // speech data
 	if(m_hc55516)
 		m_hc55516->digit_w(state);
 }
 
-READ8_MEMBER( s11_state::sound_r )
+uint8_t s11_state::sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_data;
 }
 
-WRITE_LINE_MEMBER( s11_state::ym2151_irq_w )
+void s11_state::ym2151_irq_w(int state)
 {
 	if(m_pia40)
 	{
@@ -352,17 +352,17 @@ WRITE_LINE_MEMBER( s11_state::ym2151_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( s11_state::pia40_cb2_w )
+void s11_state::pia40_cb2_w(int state)
 {
 	m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
 }
 
-WRITE8_MEMBER( s11_state::pia40_pb_w )
+void s11_state::pia40_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia34->portb_w(data);
 }
 
-DRIVER_INIT_MEMBER( s11_state, s11 )
+void s11_state::init_s11()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 	membank("bank0")->configure_entries(0, 2, &ROM[0x10000], 0x4000);

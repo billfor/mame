@@ -35,9 +35,9 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acia_irq_w(int state);
 
 protected:
 	// device-level overrides

@@ -334,20 +334,20 @@ public:
 	void handle_joystick_cia(uint8_t pra, uint8_t dra);
 	uint16_t handle_joystick_potgor(uint16_t potgor);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
-	DECLARE_CUSTOM_INPUT_MEMBER(cd32_sel_mirror_input);
+	ioport_value cubo_input(ioport_field &field, void *param);
+	ioport_value cd32_sel_mirror_input(ioport_field &field, void *param);
 
-	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
+	void akiko_cia_0_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(cubo);
-	DECLARE_DRIVER_INIT(mgprem11);
-	DECLARE_DRIVER_INIT(odeontw2);
-	DECLARE_DRIVER_INIT(cndypuzl);
-	DECLARE_DRIVER_INIT(haremchl);
-	DECLARE_DRIVER_INIT(mgnumber);
-	DECLARE_DRIVER_INIT(lsrquiz2);
-	DECLARE_DRIVER_INIT(lasstixx);
-	DECLARE_DRIVER_INIT(lsrquiz);
+	void init_cubo();
+	void init_mgprem11();
+	void init_odeontw2();
+	void init_cndypuzl();
+	void init_haremchl();
+	void init_mgnumber();
+	void init_lsrquiz2();
+	void init_lasstixx();
+	void init_lsrquiz();
 
 	optional_ioport_array<2> m_player_ports;
 
@@ -392,7 +392,7 @@ private:
  *************************************/
 
 
-WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
+void cubo_state::akiko_cia_0_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 1 = cd audio mute */
 	m_cdda->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );
@@ -515,12 +515,12 @@ uint16_t cubo_state::handle_joystick_potgor(uint16_t potgor)
 	return potgor;
 }
 
-CUSTOM_INPUT_MEMBER( cubo_state::cubo_input )
+ioport_value cubo_state::cubo_input(ioport_field &field, void *param)
 {
 	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
 
-CUSTOM_INPUT_MEMBER( cubo_state::cd32_sel_mirror_input )
+ioport_value cubo_state::cd32_sel_mirror_input(ioport_field &field, void *param)
 {
 	uint8_t bits = m_player_ports[(int)(uintptr_t)param]->read();
 	return (bits & 0x20)>>5;
@@ -1093,7 +1093,7 @@ ROM_END
 
 /***************************************************************************************************/
 
-DRIVER_INIT_MEMBER( cubo_state, cubo )
+void cubo_state::init_cubo()
 {
 	m_agnus_id = ALICE_PAL_NEW;
 	m_denise_id = LISA;
@@ -1187,9 +1187,9 @@ void cubo_state::cndypuzl_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, cndypuzl )
+void cubo_state::init_cndypuzl()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::cndypuzl_input_hack;
 }
 
@@ -1203,9 +1203,9 @@ void cubo_state::haremchl_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, haremchl )
+void cubo_state::init_haremchl()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::haremchl_input_hack;
 }
 
@@ -1219,9 +1219,9 @@ void cubo_state::lsrquiz_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, lsrquiz )
+void cubo_state::init_lsrquiz()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::lsrquiz_input_hack;
 }
 
@@ -1236,9 +1236,9 @@ void cubo_state::lsrquiz2_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, lsrquiz2 )
+void cubo_state::init_lsrquiz2()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::lsrquiz2_input_hack;
 }
 
@@ -1252,9 +1252,9 @@ void cubo_state::lasstixx_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER(cubo_state, lasstixx)
+void cubo_state::init_lasstixx()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::lasstixx_input_hack;
 }
 
@@ -1267,9 +1267,9 @@ void cubo_state::mgnumber_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, mgnumber )
+void cubo_state::init_mgnumber()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::mgnumber_input_hack;
 }
 
@@ -1282,9 +1282,9 @@ void cubo_state::mgprem11_input_hack()
 	}
 }
 
-DRIVER_INIT_MEMBER( cubo_state, mgprem11 )
+void cubo_state::init_mgprem11()
 {
-	DRIVER_INIT_CALL(cubo);
+	init_cubo();
 	m_input_hack = &cubo_state::mgprem11_input_hack;
 }
 

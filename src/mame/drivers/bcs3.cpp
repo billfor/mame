@@ -68,15 +68,15 @@ public:
 		, m_io_keyboard(*this, "KEY.%u", 0)
 	{ }
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_READ8_MEMBER(zx_r);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_DRIVER_INIT(bcs3a);
-	DECLARE_DRIVER_INIT(bcs3b);
-	DECLARE_DRIVER_INIT(bcs3c);
-	DECLARE_DRIVER_INIT(bcs3d);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t video_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t zx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void init_bcs3a();
+	void init_bcs3b();
+	void init_bcs3c();
+	void init_bcs3d();
 	uint32_t screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -95,7 +95,7 @@ private:
 	required_ioport_array<10> m_io_keyboard;
 };
 
-READ8_MEMBER( bcs3_state::keyboard_r )
+uint8_t bcs3_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t i, data = 0;
 
@@ -112,7 +112,7 @@ READ8_MEMBER( bcs3_state::keyboard_r )
 }
 
 // 00-7F = NUL, 0xE0 = end of line.
-READ8_MEMBER( bcs3_state::video_r )
+uint8_t bcs3_state::video_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_p_videoram[offset];
 	return BIT(data, 7) ? data : 0;
@@ -120,7 +120,7 @@ READ8_MEMBER( bcs3_state::video_r )
 
 // Unsure of how this works.
 // 00-7F = NUL, 0xFF = end of line, 0xF7 = finish.
-READ8_MEMBER( bcs3_state::zx_r )
+uint8_t bcs3_state::zx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xf7;
 }
@@ -319,7 +319,7 @@ static GFXDECODE_START( bcs3 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bcs3_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER( bcs3_state::ctc_z0_w )
+void bcs3_state::ctc_z0_w(int state)
 {
 	m_ctc->trg1(state);
 	if (state)
@@ -329,7 +329,7 @@ WRITE_LINE_MEMBER( bcs3_state::ctc_z0_w )
 	}
 }
 
-WRITE_LINE_MEMBER( bcs3_state::ctc_z1_w )
+void bcs3_state::ctc_z1_w(int state)
 {
 	m_ctc->trg2(state);
 }
@@ -340,7 +340,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ nullptr }
 };
 
-DRIVER_INIT_MEMBER( bcs3_state, bcs3a )
+void bcs3_state::init_bcs3a()
 {
 	s_curs = 0x7a;
 	s_init = 0x80;
@@ -348,7 +348,7 @@ DRIVER_INIT_MEMBER( bcs3_state, bcs3a )
 	s_cols = 29;
 }
 
-DRIVER_INIT_MEMBER( bcs3_state, bcs3b )
+void bcs3_state::init_bcs3b()
 {
 	s_curs = 0x7a;
 	s_init = 0x80;
@@ -356,7 +356,7 @@ DRIVER_INIT_MEMBER( bcs3_state, bcs3b )
 	s_cols = 40;
 }
 
-DRIVER_INIT_MEMBER( bcs3_state, bcs3c )
+void bcs3_state::init_bcs3c()
 {
 	s_curs = 0x08;
 	s_init = 0xa0;
@@ -364,7 +364,7 @@ DRIVER_INIT_MEMBER( bcs3_state, bcs3c )
 	s_cols = 29;
 }
 
-DRIVER_INIT_MEMBER( bcs3_state, bcs3d )
+void bcs3_state::init_bcs3d()
 {
 	s_curs = 0x08;
 	s_init = 0xb4;

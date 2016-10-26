@@ -30,14 +30,14 @@ public:
 	tilemap_t *m_tilemap2;
 	tilemap_t *m_tilemap3;
 
-	DECLARE_WRITE16_MEMBER(videoram_w);
-	DECLARE_WRITE16_MEMBER(videoram2_w);
-	DECLARE_WRITE16_MEMBER(videoram3_w);
+	void videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void videoram3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILEMAP_MAPPER_MEMBER(bg_scan);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_tile2_info);
-	TILE_GET_INFO_MEMBER(get_tile3_info);
+	tilemap_memory_index bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile2_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile3_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 

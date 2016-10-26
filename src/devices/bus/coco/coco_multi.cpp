@@ -85,19 +85,19 @@ static SLOT_INTERFACE_START(coco_cart_slot4)
 	SLOT_INTERFACE("pak", COCO_PAK)
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER(coco_multipak_device::multi_cart_w)
+void coco_multipak_device::multi_cart_w(int state)
 {
 	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(owner());
 	cart->m_cart_callback(state);
 }
 
-WRITE_LINE_MEMBER(coco_multipak_device::multi_nmi_w)
+void coco_multipak_device::multi_nmi_w(int state)
 {
 	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(owner());
 	cart->m_nmi_callback(state);
 }
 
-WRITE_LINE_MEMBER(coco_multipak_device::multi_halt_w)
+void coco_multipak_device::multi_halt_w(int state)
 {
 	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(owner());
 	cart->m_halt_callback(state);
@@ -210,7 +210,7 @@ uint8_t* coco_multipak_device::get_cart_base()
 //  read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_multipak_device::read)
+uint8_t coco_multipak_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return active_scs_slot()->read(space,offset);
 }
@@ -221,7 +221,7 @@ READ8_MEMBER(coco_multipak_device::read)
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_multipak_device::write)
+void coco_multipak_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	active_scs_slot()->write(space,offset,data);
 }
@@ -232,7 +232,7 @@ WRITE8_MEMBER(coco_multipak_device::write)
 //  ff7f_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_multipak_device::ff7f_write)
+void coco_multipak_device::ff7f_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	set_select(data);
 }

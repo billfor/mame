@@ -279,30 +279,30 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	// memm variant interface
-	DECLARE_WRITE16_MEMBER(crypto_switch_w);
-	DECLARE_READ16_MEMBER(range_r);
-	DECLARE_WRITE16_MEMBER(bank_w);
+	void crypto_switch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t range_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// memn variant interface
-	DECLARE_READ16_MEMBER(nand_status_r);
-	DECLARE_WRITE8_MEMBER(nand_address1_w);
-	DECLARE_WRITE8_MEMBER(nand_address2_w);
-	DECLARE_WRITE8_MEMBER(nand_address3_w);
-	DECLARE_WRITE8_MEMBER(nand_address4_w);
-	DECLARE_READ16_MEMBER(nand_data_r);
-	DECLARE_WRITE16_MEMBER(nand_block_w);
-	DECLARE_READ16_MEMBER(nand_block_r);
+	uint16_t nand_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void nand_address1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nand_address2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nand_address3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nand_address4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t nand_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void nand_block_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t nand_block_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER (control_r);
-	DECLARE_WRITE16_MEMBER(control_w);
+	uint16_t control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER (i2c_clock_r);
-	DECLARE_WRITE16_MEMBER(i2c_clock_w);
-	DECLARE_READ16_MEMBER (i2c_data_r);
-	DECLARE_WRITE16_MEMBER(i2c_data_w);
+	uint16_t i2c_clock_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void i2c_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t i2c_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void i2c_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER (sprot_r);
-	DECLARE_WRITE16_MEMBER(sprot_w);
+	uint16_t sprot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sprot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint8_t *nand_base;
 	void nand_copy( uint32_t *dst, uint32_t address, int len );
@@ -331,18 +331,18 @@ private:
 
 	void i2c_update();
 public:
-	DECLARE_DRIVER_INIT(knpuzzle);
-	DECLARE_DRIVER_INIT(panikuru);
-	DECLARE_DRIVER_INIT(mrdrilr2);
-	DECLARE_DRIVER_INIT(startrgn);
-	DECLARE_DRIVER_INIT(gunbalna);
-	DECLARE_DRIVER_INIT(nflclsfb);
-	DECLARE_DRIVER_INIT(gjspace);
-	DECLARE_DRIVER_INIT(gamshara);
-	DECLARE_DRIVER_INIT(mrdrilrg);
-	DECLARE_DRIVER_INIT(chocovdr);
-	DECLARE_DRIVER_INIT(konotako);
-	DECLARE_MACHINE_RESET(namcos10);
+	void init_knpuzzle();
+	void init_panikuru();
+	void init_mrdrilr2();
+	void init_startrgn();
+	void init_gunbalna();
+	void init_nflclsfb();
+	void init_gjspace();
+	void init_gamshara();
+	void init_mrdrilrg();
+	void init_chocovdr();
+	void init_konotako();
+	void machine_reset_namcos10();
 	void memn_driver_init(  );
 	required_device<cpu_device> m_maincpu;
 };
@@ -369,7 +369,7 @@ ADDRESS_MAP_END
 // bios copies 62000-37ffff from the flash to 80012000 in ram through the
 // decryption in range_r then jumps there
 
-WRITE16_MEMBER(namcos10_state::crypto_switch_w)
+void namcos10_state::crypto_switch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	printf("crypto_switch_w: %04x\n", data);
 	if (decrypter == nullptr)
@@ -381,12 +381,12 @@ WRITE16_MEMBER(namcos10_state::crypto_switch_w)
 		decrypter->deactivate();
 }
 
-WRITE16_MEMBER(namcos10_state::bank_w)
+void namcos10_state::bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	bank_base = 0x100000 * offset;
 }
 
-READ16_MEMBER(namcos10_state::range_r)
+uint16_t namcos10_state::range_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = ((const uint16_t *)(memregion("maincpu:rom")->base()))[bank_base+offset];
 
@@ -399,7 +399,7 @@ READ16_MEMBER(namcos10_state::range_r)
 		return data;
 }
 
-READ16_MEMBER(namcos10_state::control_r)
+uint16_t namcos10_state::control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("control_r %d (%x)\n", offset, space.device().safe_pc());
 	if(offset == 2)
@@ -407,12 +407,12 @@ READ16_MEMBER(namcos10_state::control_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos10_state::control_w)
+void namcos10_state::control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("control_w %d, %04x (%x)\n", offset, data, space.device().safe_pc());
 }
 
-WRITE16_MEMBER(namcos10_state::sprot_w)
+void namcos10_state::sprot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("sprot_w %04x (%x)\n", data, space.device().safe_pc());
 	sprot_bit = 7;
@@ -427,7 +427,7 @@ WRITE16_MEMBER(namcos10_state::sprot_w)
 // 800128e0: jal 1649c
 // 800128e8: jal 2c47c
 
-READ16_MEMBER(namcos10_state::sprot_r)
+uint16_t namcos10_state::sprot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// If line 3 has 0x30/0x31 in it, something happens.  That
 	// something currently kills the system though.
@@ -450,7 +450,7 @@ READ16_MEMBER(namcos10_state::sprot_r)
 	return res;
 }
 
-READ16_MEMBER(namcos10_state::i2c_clock_r)
+uint16_t namcos10_state::i2c_clock_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t res = i2c_dev_clock & i2c_host_clock & 1;
 	//  logerror("i2c_clock_r %d (%x)\n", res, space.device().safe_pc());
@@ -458,14 +458,14 @@ READ16_MEMBER(namcos10_state::i2c_clock_r)
 }
 
 
-WRITE16_MEMBER(namcos10_state::i2c_clock_w)
+void namcos10_state::i2c_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&i2c_host_clock);
 	//  logerror("i2c_clock_w %d (%x)\n", data, space.device().safe_pc());
 	i2c_update();
 }
 
-READ16_MEMBER(namcos10_state::i2c_data_r)
+uint16_t namcos10_state::i2c_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t res = i2c_dev_data & i2c_host_data & 1;
 	//  logerror("i2c_data_r %d (%x)\n", res, space.device().safe_pc());
@@ -473,7 +473,7 @@ READ16_MEMBER(namcos10_state::i2c_data_r)
 }
 
 
-WRITE16_MEMBER(namcos10_state::i2c_data_w)
+void namcos10_state::i2c_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&i2c_host_data);
 	//  logerror("i2c_data_w %d (%x)\n", data, space.device().safe_pc());
@@ -548,30 +548,30 @@ ADDRESS_MAP_END
 // Block access to the nand.  Something strange is going on with the
 // status port.  Interaction with the decryption is unclear at best.
 
-READ16_MEMBER(namcos10_state::nand_status_r )
+uint16_t namcos10_state::nand_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(namcos10_state::nand_address1_w )
+void namcos10_state::nand_address1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("nand_a1_w %08x (%08x)\n", data, space.device().safe_pc());
 	//  nand_address = ( nand_address & 0x00ffffff ) | ( data << 24 );
 }
 
-WRITE8_MEMBER( namcos10_state::nand_address2_w )
+void namcos10_state::nand_address2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("nand_a2_w %08x (%08x)\n", data, space.device().safe_pc());
 	nand_address = ( nand_address & 0xffffff00 ) | ( data << 0 );
 }
 
-WRITE8_MEMBER( namcos10_state::nand_address3_w )
+void namcos10_state::nand_address3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("nand_a3_w %08x (%08x)\n", data, space.device().safe_pc());
 	nand_address = ( nand_address & 0xffff00ff ) | ( data <<  8 );
 }
 
-WRITE8_MEMBER( namcos10_state::nand_address4_w )
+void namcos10_state::nand_address4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	nand_address = ( nand_address & 0xff00ffff ) | ( data << 16 );
 	logerror("nand_a4_w %08x (%08x) -> %08x\n", data, space.device().safe_pc(), nand_address*2);
@@ -589,7 +589,7 @@ uint16_t namcos10_state::nand_read2( uint32_t address )
 	return nand_base[ index + 1 ] | ( nand_base[ index ] << 8 );
 }
 
-READ16_MEMBER( namcos10_state::nand_data_r )
+uint16_t namcos10_state::nand_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = nand_read2( nand_address * 2 );
 
@@ -619,12 +619,12 @@ void namcos10_state::nand_copy( uint32_t *dst, uint32_t address, int len )
 	}
 }
 
-WRITE16_MEMBER(namcos10_state::nand_block_w)
+void namcos10_state::nand_block_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &block[offset] );
 }
 
-READ16_MEMBER(namcos10_state::nand_block_r)
+uint16_t namcos10_state::nand_block_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return block[ offset ];
 }
@@ -667,7 +667,7 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 	}
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
+void namcos10_state::init_mrdrilr2()
 {
 	int regSize = machine().root_device().memregion("maincpu:rom")->bytes();
 
@@ -676,7 +676,7 @@ DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
 	decrypter = static_cast<ns10_decrypter_device*>(machine().root_device().subdevice("decrypter"));
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,gjspace)
+void namcos10_state::init_gjspace()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x0, 0x2, 0xe, 0xd, 0xf, 0x6, 0xc, 0x7, 0x5, 0x1, 0x9, 0x8, 0xa, 0x3, 0x4, 0xb);
@@ -685,14 +685,14 @@ DRIVER_INIT_MEMBER(namcos10_state,gjspace)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,mrdrilrg)
+void namcos10_state::init_mrdrilrg()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x4, 0x7, 0x5, 0x2, 0x1, 0x0, 0x3, 0xc, 0xd, 0xe, 0xf, 0x8, 0x9, 0xb, 0xa);
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,knpuzzle)
+void namcos10_state::init_knpuzzle()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa);
@@ -701,7 +701,7 @@ DRIVER_INIT_MEMBER(namcos10_state,knpuzzle)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,startrgn)
+void namcos10_state::init_startrgn()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
@@ -710,7 +710,7 @@ DRIVER_INIT_MEMBER(namcos10_state,startrgn)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,gamshara)
+void namcos10_state::init_gamshara()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb);
@@ -719,14 +719,14 @@ DRIVER_INIT_MEMBER(namcos10_state,gamshara)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,gunbalna)
+void namcos10_state::init_gunbalna()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x9, 0x8, 0xa, 0xb);
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,chocovdr)
+void namcos10_state::init_chocovdr()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x5, 0x4, 0x6, 0x7, 0x1, 0x0, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x8, 0xb, 0xa, 0x9);
@@ -735,14 +735,14 @@ DRIVER_INIT_MEMBER(namcos10_state,chocovdr)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,panikuru)
+void namcos10_state::init_panikuru()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x8400, regSize, 0x6, 0x4, 0x7, 0x5, 0x0, 0x1, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x9, 0x8, 0xb, 0xa);
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,nflclsfb)
+void namcos10_state::init_nflclsfb()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9);
@@ -751,7 +751,7 @@ DRIVER_INIT_MEMBER(namcos10_state,nflclsfb)
 	memn_driver_init();
 }
 
-DRIVER_INIT_MEMBER(namcos10_state,konotako)
+void namcos10_state::init_konotako()
 {
 	int regSize = machine().root_device().memregion("user2")->bytes();
 	decrypt_bios(machine(), "user2", 0x0008400, 0x0029400, 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa);
@@ -761,7 +761,7 @@ DRIVER_INIT_MEMBER(namcos10_state,konotako)
 }
 
 
-MACHINE_RESET_MEMBER(namcos10_state,namcos10)
+void namcos10_state::machine_reset_namcos10()
 {
 	i2c_dev_clock = i2c_dev_data = 1;
 	i2c_host_clock = i2c_host_data = 1;

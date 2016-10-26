@@ -64,21 +64,21 @@ public:
 	emu_timer      *m_dial_timer;
 	emu_timer      *m_frame_timer;
 
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(cursor_load_w);
-	DECLARE_WRITE8_MEMBER(interrupt_ack_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(scanline_r);
+	void misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cursor_load_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void interrupt_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t scanline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(destroyr);
+	void palette_init_destroyr(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(dial_callback);
-	TIMER_CALLBACK_MEMBER(frame_callback);
+	void dial_callback(void *ptr, int32_t param);
+	void frame_callback(void *ptr, int32_t param);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -168,7 +168,7 @@ void destroyr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-TIMER_CALLBACK_MEMBER(destroyr_state::dial_callback)
+void destroyr_state::dial_callback(void *ptr, int32_t param)
 {
 	int dial = param;
 
@@ -188,7 +188,7 @@ TIMER_CALLBACK_MEMBER(destroyr_state::dial_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(destroyr_state::frame_callback)
+void destroyr_state::frame_callback(void *ptr, int32_t param)
 {
 	m_potsense[0] = 0;
 	m_potsense[1] = 0;
@@ -215,7 +215,7 @@ void destroyr_state::machine_reset()
 }
 
 
-WRITE8_MEMBER(destroyr_state::misc_w)
+void destroyr_state::misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 to 2 connect to the sound circuits */
 	m_attract = data & 0x01;
@@ -230,20 +230,20 @@ WRITE8_MEMBER(destroyr_state::misc_w)
 }
 
 
-WRITE8_MEMBER(destroyr_state::cursor_load_w)
+void destroyr_state::cursor_load_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cursor = data;
 	m_watchdog->reset_w(space, offset, data);
 }
 
 
-WRITE8_MEMBER(destroyr_state::interrupt_ack_w)
+void destroyr_state::interrupt_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(destroyr_state::output_w)
+void destroyr_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 8) misc_w(space, 8, data);
 
@@ -277,7 +277,7 @@ WRITE8_MEMBER(destroyr_state::output_w)
 }
 
 
-READ8_MEMBER(destroyr_state::input_r)
+uint8_t destroyr_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -298,7 +298,7 @@ READ8_MEMBER(destroyr_state::input_r)
 }
 
 
-READ8_MEMBER(destroyr_state::scanline_r)
+uint8_t destroyr_state::scanline_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_screen->vpos();
 }
@@ -462,7 +462,7 @@ static GFXDECODE_START( destroyr )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(destroyr_state, destroyr)
+void destroyr_state::palette_init_destroyr(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   /* major objects */
 	palette.set_pen_color(1, rgb_t(0x50, 0x50, 0x50));

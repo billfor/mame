@@ -98,21 +98,21 @@ public:
 	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_sync.set_callback(object); }
 	template<class _Object> static devcb_base &set_byte_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_byte.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( yb_r );
-	DECLARE_WRITE8_MEMBER( yb_w );
+	uint8_t yb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void yb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( test_w );
-	DECLARE_WRITE_LINE_MEMBER( accl_w );
-	DECLARE_WRITE_LINE_MEMBER( ted_w );
-	DECLARE_WRITE_LINE_MEMBER( mtr_w );
-	DECLARE_WRITE_LINE_MEMBER( oe_w );
-	DECLARE_WRITE_LINE_MEMBER( soe_w );
-	DECLARE_WRITE_LINE_MEMBER( atni_w );
-	DECLARE_WRITE_LINE_MEMBER( atna_w );
+	void test_w(int state);
+	void accl_w(int state);
+	void ted_w(int state);
+	void mtr_w(int state);
+	void oe_w(int state);
+	void soe_w(int state);
+	void atni_w(int state);
+	void atna_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( sync_r ) { return checkpoint_live.sync; }
-	DECLARE_READ_LINE_MEMBER( byte_r ) { return checkpoint_live.byte; }
-	DECLARE_READ_LINE_MEMBER( atn_r ) { return m_atni ^ m_atna; }
+	int sync_r() { return checkpoint_live.sync; }
+	int byte_r() { return checkpoint_live.byte; }
+	int atn_r() { return m_atni ^ m_atna; }
 
 	void stp_w(int stp);
 	void ds_w(int ds);

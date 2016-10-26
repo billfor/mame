@@ -10,7 +10,7 @@ Atari Tank 8 video emulation
 #include "includes/tank8.h"
 
 
-PALETTE_INIT_MEMBER(tank8_state, tank8)
+void tank8_state::palette_init_tank8(palette_device &palette)
 {
 	int i;
 
@@ -60,7 +60,7 @@ void tank8_state::set_pens()
 }
 
 
-WRITE8_MEMBER(tank8_state::video_ram_w)
+void tank8_state::video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -68,7 +68,7 @@ WRITE8_MEMBER(tank8_state::video_ram_w)
 
 
 
-TILE_GET_INFO_MEMBER(tank8_state::get_tile_info)
+void tank8_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 

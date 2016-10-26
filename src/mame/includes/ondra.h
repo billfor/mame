@@ -39,16 +39,16 @@ public:
 	uint8_t m_video_enable;
 	uint8_t m_bank1_status;
 	uint8_t m_bank2_status;
-	DECLARE_READ8_MEMBER(ondra_keyboard_r);
-	DECLARE_WRITE8_MEMBER(ondra_port_03_w);
-	DECLARE_WRITE8_MEMBER(ondra_port_09_w);
-	DECLARE_WRITE8_MEMBER(ondra_port_0a_w);
+	uint8_t ondra_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ondra_port_03_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ondra_port_09_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ondra_port_0a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ondra_interrupt);
-	TIMER_CALLBACK_MEMBER(nmi_check_callback);
+	void ondra_interrupt(device_t &device);
+	void nmi_check_callback(void *ptr, int32_t param);
 
 protected:
 	required_device<cpu_device> m_maincpu;

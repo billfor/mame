@@ -260,7 +260,7 @@ void vip_state::update_interrupts()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( vip_state::read )
+uint8_t vip_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int cs = BIT(offset, 15) || m_8000;
 	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
@@ -285,7 +285,7 @@ READ8_MEMBER( vip_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( vip_state::write )
+void vip_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int cs = BIT(offset, 15) || m_8000;
 	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
@@ -304,7 +304,7 @@ WRITE8_MEMBER( vip_state::write )
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( vip_state::io_r )
+uint8_t vip_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_exp->io_r(space, offset);
 
@@ -333,7 +333,7 @@ READ8_MEMBER( vip_state::io_r )
 //  io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( vip_state::io_w )
+void vip_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_exp->io_w(space, offset, data);
 
@@ -394,7 +394,7 @@ ADDRESS_MAP_END
 //  INPUT_PORTS( vip )
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( vip_state::reset_w )
+void vip_state::reset_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_exp->run_w(newval);
 
@@ -404,7 +404,7 @@ INPUT_CHANGED_MEMBER( vip_state::reset_w )
 	}
 }
 
-INPUT_CHANGED_MEMBER( vip_state::beeper_w )
+void vip_state::beeper_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_beeper->set_output_gain(0, newval ? 0.80 : 0);
 }
@@ -447,34 +447,34 @@ INPUT_PORTS_END
 //  COSMAC_INTERFACE( cosmac_intf )
 //-------------------------------------------------
 
-READ_LINE_MEMBER( vip_state::clear_r )
+int vip_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( vip_state::ef1_r )
+int vip_state::ef1_r()
 {
 	return m_vdc_ef1 || m_exp->ef1_r();
 }
 
-READ_LINE_MEMBER( vip_state::ef2_r )
+int vip_state::ef2_r()
 {
 	output().set_led_value(LED_TAPE, m_cassette->input() > 0);
 
 	return (m_cassette->input() < 0) ? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( vip_state::ef3_r )
+int vip_state::ef3_r()
 {
 	return !BIT(m_keypad->read(), m_keylatch) || m_byteio_ef3 || m_exp_ef3;
 }
 
-READ_LINE_MEMBER( vip_state::ef4_r )
+int vip_state::ef4_r()
 {
 	return m_byteio_ef4 || m_exp_ef4;
 }
 
-WRITE_LINE_MEMBER( vip_state::q_w )
+void vip_state::q_w(int state)
 {
 	// sound output
 	m_beeper->write(machine().driver_data()->generic_space(), NODE_01, state);
@@ -489,19 +489,19 @@ WRITE_LINE_MEMBER( vip_state::q_w )
 	m_exp->q_w(state);
 }
 
-READ8_MEMBER( vip_state::dma_r )
+uint8_t vip_state::dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_exp->dma_r(space, offset);
 }
 
-WRITE8_MEMBER( vip_state::dma_w )
+void vip_state::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vdc->dma_w(space, offset, data);
 
 	m_exp->dma_w(space, offset, data);
 }
 
-WRITE8_MEMBER( vip_state::sc_w )
+void vip_state::sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_exp->sc_w(data);
 }
@@ -511,21 +511,21 @@ WRITE8_MEMBER( vip_state::sc_w )
 //  CDP1861_INTERFACE( vdc_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vip_state::vdc_int_w )
+void vip_state::vdc_int_w(int state)
 {
 	m_vdc_int = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( vip_state::vdc_dma_out_w )
+void vip_state::vdc_dma_out_w(int state)
 {
 	m_vdc_dma_out = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( vip_state::vdc_ef1_w )
+void vip_state::vdc_ef1_w(int state)
 {
 	m_vdc_ef1 = state;
 }
@@ -562,7 +562,7 @@ DISCRETE_SOUND_END
 //  VIP_BYTEIO_PORT_INTERFACE( byteio_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vip_state::byteio_inst_w )
+void vip_state::byteio_inst_w(int state)
 {
 	if (!state)
 	{
@@ -575,21 +575,21 @@ WRITE_LINE_MEMBER( vip_state::byteio_inst_w )
 //  VIP_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vip_state::exp_int_w )
+void vip_state::exp_int_w(int state)
 {
 	m_exp_int = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( vip_state::exp_dma_out_w )
+void vip_state::exp_dma_out_w(int state)
 {
 	m_exp_dma_out = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( vip_state::exp_dma_in_w )
+void vip_state::exp_dma_in_w(int state)
 {
 	m_exp_dma_in = state;
 

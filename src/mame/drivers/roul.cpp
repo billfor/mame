@@ -87,13 +87,13 @@ public:
 	std::unique_ptr<uint8_t[]> m_videobuf;
 	uint8_t m_lamp_old;
 
-	DECLARE_READ8_MEMBER(blitter_status_r);
-	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
-	DECLARE_WRITE8_MEMBER(sound_latch_w);
-	DECLARE_WRITE8_MEMBER(ball_w);
+	uint8_t blitter_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void blitter_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ball_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(roul);
+	void palette_init_roul(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -102,7 +102,7 @@ public:
 #define VIDEOBUF_SIZE 256*256
 
 
-PALETTE_INIT_MEMBER(roul_state, roul)
+void roul_state::palette_init_roul(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;
@@ -128,7 +128,7 @@ PALETTE_INIT_MEMBER(roul_state, roul)
 	}
 }
 
-READ8_MEMBER(roul_state::blitter_status_r)
+uint8_t roul_state::blitter_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
 code check bit 6 and bit 7
@@ -140,7 +140,7 @@ bit 6 -> ??? (after unknown blitter command : [80][80][08][02])
 	return machine().rand() & 0x00c0;
 }
 
-WRITE8_MEMBER(roul_state::blitter_cmd_w)
+void roul_state::blitter_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reg[offset] = data;
 	if (offset==2)
@@ -181,13 +181,13 @@ WRITE8_MEMBER(roul_state::blitter_cmd_w)
 
 }
 
-WRITE8_MEMBER(roul_state::sound_latch_w)
+void roul_state::sound_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(roul_state::ball_w)
+void roul_state::ball_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int lamp = data;
 

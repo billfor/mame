@@ -151,7 +151,7 @@ inline void ccastles_state::schedule_next_irq( int curscanline )
 }
 
 
-TIMER_CALLBACK_MEMBER(ccastles_state::clock_irq)
+void ccastles_state::clock_irq(void *ptr, int32_t param)
 {
 	/* assert the IRQ if not already asserted */
 	if (!m_irq_state)
@@ -168,7 +168,7 @@ TIMER_CALLBACK_MEMBER(ccastles_state::clock_irq)
 }
 
 
-CUSTOM_INPUT_MEMBER(ccastles_state::get_vblank)
+ioport_value ccastles_state::get_vblank(ioport_field &field, void *param)
 {
 	int scanline = m_screen->vpos();
 	return m_syncprom[scanline & 0xff] & 1;
@@ -236,7 +236,7 @@ void ccastles_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(ccastles_state::irq_ack_w)
+void ccastles_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_irq_state)
 	{
@@ -246,25 +246,25 @@ WRITE8_MEMBER(ccastles_state::irq_ack_w)
 }
 
 
-WRITE8_MEMBER(ccastles_state::led_w)
+void ccastles_state::led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(offset, ~data & 1);
 }
 
 
-WRITE8_MEMBER(ccastles_state::ccounter_w)
+void ccastles_state::ccounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
 
-WRITE8_MEMBER(ccastles_state::bankswitch_w)
+void ccastles_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 1);
 }
 
 
-READ8_MEMBER(ccastles_state::leta_r)
+uint8_t ccastles_state::leta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 
@@ -279,7 +279,7 @@ READ8_MEMBER(ccastles_state::leta_r)
  *
  *************************************/
 
-WRITE8_MEMBER(ccastles_state::nvram_recall_w)
+void ccastles_state::nvram_recall_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram_4b->recall(0);
 	m_nvram_4b->recall(1);
@@ -290,7 +290,7 @@ WRITE8_MEMBER(ccastles_state::nvram_recall_w)
 }
 
 
-WRITE8_MEMBER(ccastles_state::nvram_store_w)
+void ccastles_state::nvram_store_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram_store[offset] = data & 1;
 	m_nvram_4b->store(~m_nvram_store[0] & m_nvram_store[1]);
@@ -298,13 +298,13 @@ WRITE8_MEMBER(ccastles_state::nvram_store_w)
 }
 
 
-READ8_MEMBER(ccastles_state::nvram_r)
+uint8_t ccastles_state::nvram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_nvram_4b->read(space, offset) & 0x0f) | (m_nvram_4a->read(space, offset) << 4);
 }
 
 
-WRITE8_MEMBER(ccastles_state::nvram_w)
+void ccastles_state::nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram_4b->write(space, offset, data);
 	m_nvram_4a->write(space, offset, data >> 4);

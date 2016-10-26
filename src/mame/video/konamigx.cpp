@@ -894,7 +894,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 
 
 /* Run and Gun 2 / Rushing Heroes */
-TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
+void konamigx_state::get_gx_psac_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, col, flip = 0;
 	if (tile_index&1)
@@ -920,7 +920,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
 }
 
 
-WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
+void konamigx_state::konamigx_type3_psac2_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// other bits are used for something...
 
@@ -939,7 +939,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
 
 
 /* Soccer Superstars (tile and flip bits now TRUSTED) */
-TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
+void konamigx_state::get_gx_psac3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 	{
 	int tileno, colour, flip;
 	uint8_t *tmap = memregion("gfx4")->base();
@@ -960,7 +960,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
 	}
 
-TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
+void konamigx_state::get_gx_psac3_alt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 	{
 	int tileno, colour, flip;
 	uint8_t *tmap = memregion("gfx4")->base()+0x20000;
@@ -985,7 +985,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
 /* PSAC4 */
 /* these tilemaps are weird in both format and content, one of them
    doesn't really look like it should be displayed? - it's height data */
-TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1a_tile_info)
+void konamigx_state::get_gx_psac1a_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, flipx,flipy;
 	int flip;
@@ -1007,7 +1007,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1a_tile_info)
 	SET_TILE_INFO_MEMBER(1, tileno, colour, flip);
 }
 
-TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1b_tile_info)
+void konamigx_state::get_gx_psac1b_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, flipx,flipy;
 	int flip;
@@ -1120,7 +1120,7 @@ void konamigx_state::common_init()
 }
 
 
-VIDEO_START_MEMBER(konamigx_state, konamigx_5bpp)
+void konamigx_state::video_start_konamigx_5bpp()
 {
 	common_init();
 
@@ -1132,7 +1132,7 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_5bpp)
 		konamigx_mixer_primode(4);
 }
 
-VIDEO_START_MEMBER(konamigx_state, dragoonj)
+void konamigx_state::video_start_dragoonj()
 {
 	common_init();
 
@@ -1142,20 +1142,20 @@ VIDEO_START_MEMBER(konamigx_state, dragoonj)
 	m_k056832->set_layer_offs(3,  3+1, 0);
 }
 
-VIDEO_START_MEMBER(konamigx_state, le2)
+void konamigx_state::video_start_le2()
 {
 	common_init();
 
 	konamigx_mixer_primode(-1); // swapped layer B and C priorities?
 }
 
-VIDEO_START_MEMBER(konamigx_state, konamigx_6bpp)
+void konamigx_state::video_start_konamigx_6bpp()
 {
 	common_init();
 	konamigx_mixer_primode(5);
 }
 
-VIDEO_START_MEMBER(konamigx_state, konamigx_type3)
+void konamigx_state::video_start_konamigx_type3()
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -1191,7 +1191,7 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type3)
 	m_konamigx_palformat = 1;
 }
 
-VIDEO_START_MEMBER(konamigx_state, konamigx_type4)
+void konamigx_state::video_start_konamigx_type4()
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -1219,7 +1219,7 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4)
 
 }
 
-VIDEO_START_MEMBER(konamigx_state, konamigx_type4_vsn)
+void konamigx_state::video_start_konamigx_type4_vsn()
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -1246,7 +1246,7 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4_vsn)
 	m_konamigx_palformat = 0;
 }
 
-VIDEO_START_MEMBER(konamigx_state, konamigx_type4_sd2)
+void konamigx_state::video_start_konamigx_type4_sd2()
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -1276,7 +1276,7 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4_sd2)
 
 }
 
-VIDEO_START_MEMBER(konamigx_state, opengolf)
+void konamigx_state::video_start_opengolf()
 {
 	common_init();
 
@@ -1311,7 +1311,7 @@ VIDEO_START_MEMBER(konamigx_state, opengolf)
 
 }
 
-VIDEO_START_MEMBER(konamigx_state, racinfrc)
+void konamigx_state::video_start_racinfrc()
 {
 	common_init();
 
@@ -1563,7 +1563,7 @@ static inline void set_color_555(palette_device &palette, pen_t color, int rshif
 
 #ifdef UNUSED_FUNCTION
 // main monitor for type 3
-WRITE32_MEMBER(konamigx_state::konamigx_555_palette_w)
+void konamigx_state::konamigx_555_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t coldat;
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
@@ -1575,7 +1575,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_555_palette_w)
 }
 
 // sub monitor for type 3
-WRITE32_MEMBER(konamigx_state::konamigx_555_palette2_w)
+void konamigx_state::konamigx_555_palette2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t coldat;
 	COMBINE_DATA(&m_subpaletteram32[offset]);
@@ -1588,7 +1588,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_555_palette2_w)
 }
 #endif
 
-WRITE32_MEMBER(konamigx_state::konamigx_tilebank_w)
+void konamigx_state::konamigx_tilebank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 		m_gx_tilebanks[offset*4] = (data>>24)&0xff;
@@ -1601,7 +1601,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_tilebank_w)
 }
 
 // type 1 RAM-based PSAC tilemap
-WRITE32_MEMBER(konamigx_state::konamigx_t1_psacmap_w)
+void konamigx_state::konamigx_t1_psacmap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_psacram[offset]);
 	m_gx_psac_tilemap->mark_tile_dirty(offset/2);
@@ -1609,7 +1609,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_t1_psacmap_w)
 }
 
 // type 4 RAM-based PSAC tilemap
-WRITE32_MEMBER(konamigx_state::konamigx_t4_psacmap_w)
+void konamigx_state::konamigx_t4_psacmap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_psacram[offset]);
 

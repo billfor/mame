@@ -261,7 +261,7 @@ void kbdc8042_device::at_8042_set_outport(uint8_t data, int initial)
 	}
 }
 
-WRITE_LINE_MEMBER( kbdc8042_device::keyboard_w )
+void kbdc8042_device::keyboard_w(int state)
 {
 	if(state)
 		at_8042_check_keyboard();
@@ -332,7 +332,7 @@ void kbdc8042_device::at_8042_clear_keyboard_received()
  *      0: Keyboard data in
  */
 
-READ8_MEMBER(kbdc8042_device::data_r)
+uint8_t kbdc8042_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -407,7 +407,7 @@ READ8_MEMBER(kbdc8042_device::data_r)
 
 
 
-WRITE8_MEMBER(kbdc8042_device::data_w)
+void kbdc8042_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset) {
 	case 0:
@@ -580,7 +580,7 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 	}
 }
 
-WRITE_LINE_MEMBER(kbdc8042_device::write_out2)
+void kbdc8042_device::write_out2(int state)
 {
 	m_out2 = state;
 }

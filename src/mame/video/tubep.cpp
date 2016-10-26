@@ -133,7 +133,7 @@
 ***************************************************************************/
 
 
-PALETTE_INIT_MEMBER(tubep_state,tubep)
+void tubep_state::palette_init_tubep(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b;
@@ -338,7 +338,7 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 }
 
 
-VIDEO_START_MEMBER(tubep_state,tubep)
+void tubep_state::video_start_tubep()
 {
 	m_spritemap = std::make_unique<uint8_t[]>(256*256*2);
 
@@ -367,7 +367,7 @@ VIDEO_START_MEMBER(tubep_state,tubep)
 }
 
 
-VIDEO_RESET_MEMBER(tubep_state,tubep)
+void tubep_state::video_reset_tubep()
 {
 	memset(m_spritemap.get(),0,256*256*2);
 
@@ -395,31 +395,31 @@ VIDEO_RESET_MEMBER(tubep_state,tubep)
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_textram_w)
+void tubep_state::tubep_textram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_textram[offset] = data;
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_background_romselect_w)
+void tubep_state::tubep_background_romselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_background_romsel = data & 1;
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_colorproms_A4_line_w)
+void tubep_state::tubep_colorproms_A4_line_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color_A4 = (data & 1)<<4;
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_background_a000_w)
+void tubep_state::tubep_background_a000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ls175_b7 = ((data & 0x0f) ^ 0x0f) | 0xf0;
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_background_c000_w)
+void tubep_state::tubep_background_c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ls175_e8 = ((data & 0x0f) ^ 0x0f);
 }
@@ -494,7 +494,7 @@ void tubep_state::draw_sprite()
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_sprite_control_w)
+void tubep_state::tubep_sprite_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 10)
 	{
@@ -674,7 +674,7 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(tubep_state,rjammer)
+void tubep_state::palette_init_rjammer(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -715,13 +715,13 @@ PALETTE_INIT_MEMBER(tubep_state,rjammer)
 }
 
 
-WRITE8_MEMBER(tubep_state::rjammer_background_LS377_w)
+void tubep_state::rjammer_background_LS377_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ls377_data = data & 0xff;
 }
 
 
-WRITE8_MEMBER(tubep_state::rjammer_background_page_w)
+void tubep_state::rjammer_background_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_page = (data & 1) * 0x200;
 }

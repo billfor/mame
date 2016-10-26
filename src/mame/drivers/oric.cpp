@@ -65,15 +65,15 @@ public:
 			m_bank_f800_w(*this, "bank_f800_w"),
 			m_config(*this, "CONFIG") { }
 
-	DECLARE_INPUT_CHANGED_MEMBER(nmi_pressed);
-	DECLARE_WRITE8_MEMBER(via_a_w);
-	DECLARE_WRITE8_MEMBER(via_b_w);
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(ext_irq_w);
-	DECLARE_WRITE8_MEMBER(psg_a_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_tape);
+	void nmi_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void via_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via_ca2_w(int state);
+	void via_cb2_w(int state);
+	void via_irq_w(int state);
+	void ext_irq_w(int state);
+	void psg_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void update_tape(timer_device &timer, void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -126,20 +126,20 @@ public:
 		m_joy2(*this, "JOY2")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(via2_a_w);
-	DECLARE_WRITE8_MEMBER(via2_b_w);
-	DECLARE_WRITE_LINE_MEMBER(via2_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(via2_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
-	DECLARE_WRITE8_MEMBER(port_314_w);
-	DECLARE_READ8_MEMBER(port_314_r);
-	DECLARE_READ8_MEMBER(port_318_r);
+	void via2_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via2_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via2_ca2_w(int state);
+	void via2_cb2_w(int state);
+	void via2_irq_w(int state);
+	void port_314_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_314_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port_318_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
+	void acia_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_hld_w(int state);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -298,19 +298,19 @@ void oric_state::update_irq()
 	m_maincpu->set_input_line(m6502_device::IRQ_LINE, m_via_irq || m_ext_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-INPUT_CHANGED_MEMBER(oric_state::nmi_pressed)
+void oric_state::nmi_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(m6502_device::NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(oric_state::via_a_w)
+void oric_state::via_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_via_a = data;
 	m_cent_data_out->write(space, 0, m_via_a);
 	update_psg(space);
 }
 
-WRITE8_MEMBER(oric_state::via_b_w)
+void oric_state::via_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_via_b = data;
 	update_keyboard();
@@ -320,37 +320,37 @@ WRITE8_MEMBER(oric_state::via_b_w)
 	m_cassette->output(data & 0x80 ? -1.0 : +1.0);
 }
 
-WRITE_LINE_MEMBER(oric_state::via_ca2_w)
+void oric_state::via_ca2_w(int state)
 {
 	m_via_ca2 = state;
 	update_psg(m_maincpu->space(AS_PROGRAM));
 }
 
-WRITE_LINE_MEMBER(oric_state::via_cb2_w)
+void oric_state::via_cb2_w(int state)
 {
 	m_via_cb2 = state;
 	update_psg(m_maincpu->space(AS_PROGRAM));
 }
 
-WRITE_LINE_MEMBER(oric_state::via_irq_w)
+void oric_state::via_irq_w(int state)
 {
 	m_via_irq = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER(oric_state::ext_irq_w)
+void oric_state::ext_irq_w(int state)
 {
 	m_ext_irq = state;
 	update_irq();
 }
 
-WRITE8_MEMBER(oric_state::psg_a_w)
+void oric_state::psg_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_psg_a = data;
 	update_keyboard();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(oric_state::update_tape)
+void oric_state::update_tape(timer_device &timer, void *ptr, int32_t param)
 {
 	if(!m_config->read())
 		m_via->write_cb1(m_cassette->input() > 0.0038);
@@ -426,13 +426,13 @@ void telestrat_state::update_irq()
 								m_acia_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(telestrat_state::via2_a_w)
+void telestrat_state::via2_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_via2_a = data;
 	remap();
 }
 
-WRITE8_MEMBER(telestrat_state::via2_b_w)
+void telestrat_state::via2_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_via2_b = data;
 	uint8_t port = 0xff;
@@ -444,23 +444,23 @@ WRITE8_MEMBER(telestrat_state::via2_b_w)
 	m_via2->write_pb(space, 0, port);
 }
 
-WRITE_LINE_MEMBER(telestrat_state::via2_ca2_w)
+void telestrat_state::via2_ca2_w(int state)
 {
 	m_via2_ca2 = state;
 }
 
-WRITE_LINE_MEMBER(telestrat_state::via2_cb2_w)
+void telestrat_state::via2_cb2_w(int state)
 {
 	m_via2_cb2 = state;
 }
 
-WRITE_LINE_MEMBER(telestrat_state::via2_irq_w)
+void telestrat_state::via2_irq_w(int state)
 {
 	m_via2_irq = state;
 	update_irq();
 }
 
-WRITE8_MEMBER(telestrat_state::port_314_w)
+void telestrat_state::port_314_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_314 = data;
 	floppy_image_device *floppy = m_floppies[(m_port_314 >> 5) & 3];
@@ -473,35 +473,35 @@ WRITE8_MEMBER(telestrat_state::port_314_w)
 	update_irq();
 }
 
-READ8_MEMBER(telestrat_state::port_314_r)
+uint8_t telestrat_state::port_314_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_fdc_irq && (m_port_314 & P_IRQEN)) ? 0x7f : 0xff;
 }
 
-READ8_MEMBER(telestrat_state::port_318_r)
+uint8_t telestrat_state::port_318_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc_drq ? 0x7f : 0xff;
 }
 
 
-WRITE_LINE_MEMBER(telestrat_state::acia_irq_w)
+void telestrat_state::acia_irq_w(int state)
 {
 	m_acia_irq = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER(telestrat_state::fdc_irq_w)
+void telestrat_state::fdc_irq_w(int state)
 {
 	m_fdc_irq = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER(telestrat_state::fdc_drq_w)
+void telestrat_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 }
 
-WRITE_LINE_MEMBER(telestrat_state::fdc_hld_w)
+void telestrat_state::fdc_hld_w(int state)
 {
 	m_fdc_hld = state;
 }

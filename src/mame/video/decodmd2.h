@@ -30,18 +30,18 @@ public:
 	required_device<ram_device> m_ram;
 	memory_region* m_rom;
 
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(crtc_address_w);
-	DECLARE_WRITE8_MEMBER(crtc_register_w);
-	DECLARE_READ8_MEMBER(crtc_status_r);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_READ8_MEMBER(busy_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_READ8_MEMBER(ctrl_r);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(status_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(dmd_firq);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void crtc_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void crtc_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t crtc_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t busy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dmd_firq(timer_device &timer, void *ptr, int32_t param);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	static void static_set_gfxregion(device_t &device, const char *tag);

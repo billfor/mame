@@ -120,22 +120,22 @@ public:
 
 	tilemap_t *m_sc0_tilemap;
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(cram_w);
-	DECLARE_READ8_MEMBER(spool99_io_r);
-	DECLARE_READ8_MEMBER(vcarn_io_r);
-	DECLARE_WRITE8_MEMBER(eeprom_resetline_w);
-	DECLARE_WRITE8_MEMBER(eeprom_clockline_w);
-	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spool99_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vcarn_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void eeprom_resetline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void eeprom_clockline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void eeprom_dataline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(spool99);
+	void init_spool99();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
 
-TILE_GET_INFO_MEMBER(spool99_state::get_tile_info)
+void spool99_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_vram[tile_index*2+1]<<8) | (m_vram[tile_index*2+0]));
 	int color = m_cram[tile_index*2+0];
@@ -157,13 +157,13 @@ uint32_t spool99_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-WRITE8_MEMBER(spool99_state::vram_w)
+void spool99_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(spool99_state::cram_w)
+void spool99_state::cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
@@ -171,7 +171,7 @@ WRITE8_MEMBER(spool99_state::cram_w)
 
 
 
-READ8_MEMBER(spool99_state::spool99_io_r)
+uint8_t spool99_state::spool99_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -204,19 +204,19 @@ READ8_MEMBER(spool99_state::spool99_io_r)
 }
 
 
-WRITE8_MEMBER(spool99_state::eeprom_resetline_w)
+void spool99_state::eeprom_resetline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// reset line asserted: reset.
 	m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE8_MEMBER(spool99_state::eeprom_clockline_w)
+void spool99_state::eeprom_clockline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// clock line asserted: write latch or select next bit to read
 	m_eeprom->clk_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE8_MEMBER(spool99_state::eeprom_dataline_w)
+void spool99_state::eeprom_dataline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// latch the bit
 	m_eeprom->di_write(data & 0x01);
@@ -238,7 +238,7 @@ static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(cram_w) AM_SHARE("cram")
 ADDRESS_MAP_END
 
-READ8_MEMBER(spool99_state::vcarn_io_r)
+uint8_t spool99_state::vcarn_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -451,7 +451,7 @@ ROM_START( vcarn )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(spool99_state,spool99)
+void spool99_state::init_spool99()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 //  vram = std::make_unique<uint8_t[]>(0x2000);

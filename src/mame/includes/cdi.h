@@ -89,7 +89,7 @@ public:
 
 	dmadac_sound_device *m_dmadac[2];
 
-	INTERRUPT_GEN_MEMBER( mcu_frame );
+	void mcu_frame(device_t &device);
 
 	uint8_t m_servo_io_regs[0x20];
 	uint8_t m_slave_io_regs[0x20];
@@ -99,27 +99,27 @@ public:
 
 	bitmap_rgb32 m_lcdbitmap;
 
-	DECLARE_INPUT_CHANGED_MEMBER(mcu_input);
+	void mcu_input(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	virtual void machine_start() override { }
 	virtual void video_start() override;
 
-	DECLARE_MACHINE_RESET(cdimono1);
-	DECLARE_MACHINE_RESET(cdimono2);
-	DECLARE_MACHINE_RESET(quizard12);
-	DECLARE_MACHINE_RESET(quizard17);
-	DECLARE_MACHINE_RESET(quizard18);
-	DECLARE_MACHINE_RESET(quizard22);
-	DECLARE_MACHINE_RESET(quizard23);
-	DECLARE_MACHINE_RESET(quizard32);
-	DECLARE_MACHINE_RESET(quizard34);
-	DECLARE_MACHINE_RESET(quizard4r40);
-	DECLARE_MACHINE_RESET(quizard4r41);
-	DECLARE_MACHINE_RESET(quizard4r42);
-	DECLARE_READ8_MEMBER(servo_io_r);
-	DECLARE_WRITE8_MEMBER(servo_io_w);
-	DECLARE_READ8_MEMBER(slave_io_r);
-	DECLARE_WRITE8_MEMBER(slave_io_w);
+	void machine_reset_cdimono1();
+	void machine_reset_cdimono2();
+	void machine_reset_quizard12();
+	void machine_reset_quizard17();
+	void machine_reset_quizard18();
+	void machine_reset_quizard22();
+	void machine_reset_quizard23();
+	void machine_reset_quizard32();
+	void machine_reset_quizard34();
+	void machine_reset_quizard4r40();
+	void machine_reset_quizard4r41();
+	void machine_reset_quizard4r42();
+	uint8_t servo_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void servo_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t slave_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slave_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

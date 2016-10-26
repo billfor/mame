@@ -57,7 +57,7 @@ needs more color combination to render its graphics.
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(rallyx_state,rallyx)
+void rallyx_state::palette_init_rallyx(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -113,7 +113,7 @@ PALETTE_INIT_MEMBER(rallyx_state,rallyx)
 }
 
 
-PALETTE_INIT_MEMBER(rallyx_state,jungler)
+void rallyx_state::palette_init_jungler(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3]   = { 1000, 470, 220 };
@@ -212,7 +212,7 @@ PALETTE_INIT_MEMBER(rallyx_state,jungler)
 ***************************************************************************/
 
 /* the video RAM has space for 32x32 tiles and is only partially used for the radar */
-TILEMAP_MAPPER_MEMBER(rallyx_state::fg_tilemap_scan)
+tilemap_memory_index rallyx_state::fg_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return col + (row << 5);
 }
@@ -228,12 +228,12 @@ inline void rallyx_state::rallyx_get_tile_info( tile_data &tileinfo, int tile_in
 			TILE_FLIPYX(attr >> 6) ^ TILE_FLIPX);
 }
 
-TILE_GET_INFO_MEMBER(rallyx_state::rallyx_bg_get_tile_info)
+void rallyx_state::rallyx_bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	rallyx_get_tile_info(tileinfo, tile_index, 0x400);
 }
 
-TILE_GET_INFO_MEMBER(rallyx_state::rallyx_fg_get_tile_info)
+void rallyx_state::rallyx_fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	rallyx_get_tile_info(tileinfo, tile_index, 0x000);
 }
@@ -251,12 +251,12 @@ inline void rallyx_state::locomotn_get_tile_info(tile_data &tileinfo,int tile_in
 			(attr & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
-TILE_GET_INFO_MEMBER(rallyx_state::locomotn_bg_get_tile_info)
+void rallyx_state::locomotn_bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	locomotn_get_tile_info(tileinfo, tile_index, 0x400);
 }
 
-TILE_GET_INFO_MEMBER(rallyx_state::locomotn_fg_get_tile_info)
+void rallyx_state::locomotn_fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	locomotn_get_tile_info(tileinfo, tile_index, 0x000);
 }
@@ -329,7 +329,7 @@ void rallyx_state::rallyx_video_start_common(  )
 	m_drawmode_table[3] = DRAWMODE_NONE;
 }
 
-VIDEO_START_MEMBER(rallyx_state,rallyx)
+void rallyx_state::video_start_rallyx()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
@@ -343,7 +343,7 @@ VIDEO_START_MEMBER(rallyx_state,rallyx)
 }
 
 
-VIDEO_START_MEMBER(rallyx_state,jungler)
+void rallyx_state::video_start_jungler()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
@@ -355,7 +355,7 @@ VIDEO_START_MEMBER(rallyx_state,jungler)
 }
 
 
-VIDEO_START_MEMBER(rallyx_state,locomotn)
+void rallyx_state::video_start_locomotn()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
@@ -367,7 +367,7 @@ VIDEO_START_MEMBER(rallyx_state,locomotn)
 }
 
 
-VIDEO_START_MEMBER(rallyx_state,commsega)
+void rallyx_state::video_start_commsega()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
@@ -386,7 +386,7 @@ VIDEO_START_MEMBER(rallyx_state,commsega)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(rallyx_state::rallyx_videoram_w)
+void rallyx_state::rallyx_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	if (offset & 0x400)
@@ -395,17 +395,17 @@ WRITE8_MEMBER(rallyx_state::rallyx_videoram_w)
 		m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(rallyx_state::rallyx_scrollx_w)
+void rallyx_state::rallyx_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(rallyx_state::rallyx_scrolly_w)
+void rallyx_state::rallyx_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(rallyx_state::tactcian_starson_w)
+void rallyx_state::tactcian_starson_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stars_enable = data & 1;
 }

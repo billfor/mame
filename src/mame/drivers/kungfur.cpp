@@ -80,25 +80,25 @@ public:
 	uint32_t m_adpcm_pos[2];
 	uint8_t m_adpcm_data[2];
 	uint8_t m_adpcm_sel[2];
-	DECLARE_WRITE8_MEMBER(kungfur_output_w);
-	DECLARE_WRITE8_MEMBER(kungfur_latch1_w);
-	DECLARE_WRITE8_MEMBER(kungfur_latch2_w);
-	DECLARE_WRITE8_MEMBER(kungfur_latch3_w);
-	DECLARE_WRITE8_MEMBER(kungfur_control_w);
-	DECLARE_WRITE8_MEMBER(kungfur_adpcm1_w);
-	DECLARE_WRITE8_MEMBER(kungfur_adpcm2_w);
+	void kungfur_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kungfur_latch1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kungfur_latch2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kungfur_latch3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kungfur_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kungfur_adpcm1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kungfur_adpcm2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(kungfur_irq);
-	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm1_int);
-	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm2_int);
+	void kungfur_irq(device_t &device);
+	void kfr_adpcm1_int(int state);
+	void kfr_adpcm2_int(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm1;
 	required_device<msm5205_device> m_adpcm2;
 };
 
 
-INTERRUPT_GEN_MEMBER(kungfur_state::kungfur_irq)
+void kungfur_state::kungfur_irq(device_t &device)
 {
 	if (m_control & 0x10)
 		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
@@ -111,7 +111,7 @@ INTERRUPT_GEN_MEMBER(kungfur_state::kungfur_irq)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(kungfur_state::kungfur_output_w)
+void kungfur_state::kungfur_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d2: output led7seg
 	static const int lut_digits[24] =
@@ -146,23 +146,23 @@ WRITE8_MEMBER(kungfur_state::kungfur_output_w)
 
 
 // lamp output latches
-WRITE8_MEMBER(kungfur_state::kungfur_latch1_w)
+void kungfur_state::kungfur_latch1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch[0] = data;
 }
 
-WRITE8_MEMBER(kungfur_state::kungfur_latch2_w)
+void kungfur_state::kungfur_latch2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch[1] = data;
 }
 
-WRITE8_MEMBER(kungfur_state::kungfur_latch3_w)
+void kungfur_state::kungfur_latch3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch[2] = data;
 }
 
 
-WRITE8_MEMBER(kungfur_state::kungfur_control_w)
+void kungfur_state::kungfur_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d3: N/C
 	// d4: irq ack
@@ -188,18 +188,18 @@ WRITE8_MEMBER(kungfur_state::kungfur_control_w)
 }
 
 // adpcm latches
-WRITE8_MEMBER(kungfur_state::kungfur_adpcm1_w)
+void kungfur_state::kungfur_adpcm1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_data[0] = data;
 }
 
-WRITE8_MEMBER(kungfur_state::kungfur_adpcm2_w)
+void kungfur_state::kungfur_adpcm2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_data[1] = data;
 }
 
 // adpcm callbacks
-WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm1_int)
+void kungfur_state::kfr_adpcm1_int(int state)
 {
 	uint8_t *ROM = memregion("adpcm1")->base();
 	uint8_t data = ROM[m_adpcm_pos[0] & 0x1ffff];
@@ -209,7 +209,7 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm1_int)
 	m_adpcm_sel[0] ^= 1;
 }
 
-WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm2_int)
+void kungfur_state::kfr_adpcm2_int(int state)
 {
 	uint8_t *ROM = memregion("adpcm2")->base();
 	uint8_t data = ROM[m_adpcm_pos[1] & 0x3ffff];

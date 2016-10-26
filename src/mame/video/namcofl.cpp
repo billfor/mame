@@ -75,7 +75,7 @@ uint32_t namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind1
 //        groups of sprites.  I am unsure how to differentiate those groups
 //        at this time however.
 
-WRITE32_MEMBER(namcofl_state::namcofl_spritebank_w)
+void namcofl_state::namcofl_spritebank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_sprbank);
 }
@@ -88,7 +88,7 @@ static int FLobjcode2tile( running_machine &machine, int code )
 	return code;
 }
 
-VIDEO_START_MEMBER(namcofl_state,namcofl)
+void namcofl_state::video_start_namcofl()
 {
 	namco_tilemap_init(NAMCOFL_TILEGFX, memregion(NAMCOFL_TILEMASKREGION)->base(), TilemapCB );
 	c355_obj_init(NAMCOFL_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(FLobjcode2tile), &machine()));

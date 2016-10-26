@@ -45,24 +45,24 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	DECLARE_DRIVER_INIT(st_mp200);
-	DECLARE_DRIVER_INIT(st_mp201);
-	DECLARE_DRIVER_INIT(st_mp202);
-	DECLARE_READ8_MEMBER(u10_a_r);
-	DECLARE_WRITE8_MEMBER(u10_a_w);
-	DECLARE_READ8_MEMBER(u10_b_r);
-	DECLARE_WRITE8_MEMBER(u10_b_w);
-	DECLARE_READ8_MEMBER(u11_a_r);
-	DECLARE_WRITE8_MEMBER(u11_a_w);
-	DECLARE_WRITE8_MEMBER(u11_b_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
-	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
+	void init_st_mp200();
+	void init_st_mp201();
+	void init_st_mp202();
+	uint8_t u10_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u10_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t u10_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u10_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t u11_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u11_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void u11_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void u10_ca2_w(int state);
+	void u10_cb2_w(int state);
+	void u11_ca2_w(int state);
+	void u11_cb2_w(int state);
+	void activity_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void timer_x(timer_device &timer, void *ptr, int32_t param);
+	void u11_timer(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -300,25 +300,25 @@ static INPUT_PORTS_START( mp200 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( st_mp200_state::activity_test )
+void st_mp200_state::activity_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( st_mp200_state::self_test )
+void st_mp200_state::self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_pia_u10->ca1_w(newval);
 }
 
-WRITE_LINE_MEMBER( st_mp200_state::u10_ca2_w )
+void st_mp200_state::u10_ca2_w(int state)
 {
 	m_u10_ca2 = state;
 	if (!state)
 		m_counter = 0;
 }
 
-WRITE_LINE_MEMBER( st_mp200_state::u10_cb2_w )
+void st_mp200_state::u10_cb2_w(int state)
 {
 	if (m_s14001a)
 	{
@@ -329,7 +329,7 @@ WRITE_LINE_MEMBER( st_mp200_state::u10_cb2_w )
 	}
 }
 
-WRITE_LINE_MEMBER( st_mp200_state::u11_ca2_w )
+void st_mp200_state::u11_ca2_w(int state)
 {
 	output().set_value("led0", !state);
 
@@ -353,17 +353,17 @@ WRITE_LINE_MEMBER( st_mp200_state::u11_ca2_w )
 	}
 }
 
-WRITE_LINE_MEMBER( st_mp200_state::u11_cb2_w )
+void st_mp200_state::u11_cb2_w(int state)
 {
 	m_u11_cb2 = state;
 }
 
-READ8_MEMBER( st_mp200_state::u10_a_r )
+uint8_t st_mp200_state::u10_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_u10a;
 }
 
-WRITE8_MEMBER( st_mp200_state::u10_a_w )
+void st_mp200_state::u10_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u10a = data;
 
@@ -388,7 +388,7 @@ WRITE8_MEMBER( st_mp200_state::u10_a_w )
 	}
 }
 
-READ8_MEMBER( st_mp200_state::u10_b_r )
+uint8_t st_mp200_state::u10_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -422,17 +422,17 @@ READ8_MEMBER( st_mp200_state::u10_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( st_mp200_state::u10_b_w )
+void st_mp200_state::u10_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u10b = data;
 }
 
-READ8_MEMBER( st_mp200_state::u11_a_r )
+uint8_t st_mp200_state::u11_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_u11a;
 }
 
-WRITE8_MEMBER( st_mp200_state::u11_a_w )
+void st_mp200_state::u11_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u11a = data;
 
@@ -465,7 +465,7 @@ WRITE8_MEMBER( st_mp200_state::u11_a_w )
 	}
 }
 
-WRITE8_MEMBER( st_mp200_state::u11_b_w )
+void st_mp200_state::u11_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u11b = data;
 	if (!m_u11_cb2)
@@ -533,30 +533,30 @@ void st_mp200_state::machine_reset()
 	m_u11b = 0;
 }
 
-DRIVER_INIT_MEMBER( st_mp200_state, st_mp200 )
+void st_mp200_state::init_st_mp200()
 {
 	m_7d = 1;
 }
 
-DRIVER_INIT_MEMBER( st_mp200_state, st_mp201 )
+void st_mp200_state::init_st_mp201()
 {
 	m_7d = 1;
 }
 
-DRIVER_INIT_MEMBER( st_mp200_state, st_mp202 )
+void st_mp200_state::init_st_mp202()
 {
 	m_7d = 0;
 }
 
 // zero-cross detection
-TIMER_DEVICE_CALLBACK_MEMBER( st_mp200_state::timer_x )
+void st_mp200_state::timer_x(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer_x ^= 1;
 	m_pia_u10->cb1_w(m_timer_x);
 }
 
 // 555 timer for display refresh
-TIMER_DEVICE_CALLBACK_MEMBER( st_mp200_state::u11_timer )
+void st_mp200_state::u11_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_u11_timer ^= 1;
 	m_pia_u11->ca1_w(m_u11_timer);

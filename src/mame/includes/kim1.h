@@ -39,10 +39,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6530_device> m_riot2;
 	required_device<cassette_image_device> m_cass;
-	DECLARE_READ8_MEMBER(kim1_u2_read_a);
-	DECLARE_WRITE8_MEMBER(kim1_u2_write_a);
-	DECLARE_READ8_MEMBER(kim1_u2_read_b);
-	DECLARE_WRITE8_MEMBER(kim1_u2_write_b);
+	uint8_t kim1_u2_read_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kim1_u2_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kim1_u2_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kim1_u2_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_u2_port_b;
 	uint8_t m_311_output;
 	uint32_t m_cassette_high_count;
@@ -52,10 +52,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
-	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
-	TIMER_DEVICE_CALLBACK_MEMBER(kim1_update_leds);
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void kim1_cassette_input(timer_device &timer, void *ptr, int32_t param);
+	void kim1_update_leds(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	required_ioport m_row0;

@@ -96,20 +96,20 @@ public:
 	void add_card(device_svi_slot_interface *card);
 
 	// from slot
-	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); };
-	DECLARE_WRITE_LINE_MEMBER( romdis_w ) { m_romdis_handler(state); };
-	DECLARE_WRITE_LINE_MEMBER( ramdis_w ) { m_ramdis_handler(state); };
+	void int_w(int state) { m_int_handler(state); };
+	void romdis_w(int state) { m_romdis_handler(state); };
+	void ramdis_w(int state) { m_ramdis_handler(state); };
 
 	// from host
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_READ8_MEMBER( iorq_r );
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	uint8_t mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( bk21_w );
-	DECLARE_WRITE_LINE_MEMBER( bk22_w );
-	DECLARE_WRITE_LINE_MEMBER( bk31_w );
-	DECLARE_WRITE_LINE_MEMBER( bk32_w );
+	void bk21_w(int state);
+	void bk22_w(int state);
+	void bk31_w(int state);
+	void bk32_w(int state);
 
 private:
 	simple_list<device_svi_slot_interface> m_dev;
@@ -159,15 +159,15 @@ public:
 	device_svi_slot_interface *next() const { return m_next; }
 	device_svi_slot_interface *m_next;
 
-	virtual DECLARE_READ8_MEMBER( mreq_r ) { return 0xff; };
-	virtual DECLARE_WRITE8_MEMBER( mreq_w ) {};
-	virtual DECLARE_READ8_MEMBER( iorq_r ) { return 0xff; };
-	virtual DECLARE_WRITE8_MEMBER( iorq_w ) {};
+	virtual uint8_t mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; };
+	virtual void mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {};
+	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; };
+	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {};
 
-	virtual DECLARE_WRITE_LINE_MEMBER( bk21_w ) {};
-	virtual DECLARE_WRITE_LINE_MEMBER( bk22_w ) {};
-	virtual DECLARE_WRITE_LINE_MEMBER( bk31_w ) {};
-	virtual DECLARE_WRITE_LINE_MEMBER( bk32_w ) {};
+	virtual void bk21_w(int state) {};
+	virtual void bk22_w(int state) {};
+	virtual void bk31_w(int state) {};
+	virtual void bk32_w(int state) {};
 
 protected:
 	svi_slot_bus_device *m_bus;

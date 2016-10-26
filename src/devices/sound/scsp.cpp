@@ -311,7 +311,7 @@ void scsp_device::ResetInterrupts()
 	CheckPendingIRQ();
 }
 
-TIMER_CALLBACK_MEMBER( scsp_device::timerA_cb )
+void scsp_device::timerA_cb(void *ptr, int32_t param)
 {
 	m_TimCnt[0] = 0xFFFF;
 	m_udata.data[0x20/2]|=0x40;
@@ -322,7 +322,7 @@ TIMER_CALLBACK_MEMBER( scsp_device::timerA_cb )
 	MainCheckPendingIRQ(0x40);
 }
 
-TIMER_CALLBACK_MEMBER( scsp_device::timerB_cb )
+void scsp_device::timerB_cb(void *ptr, int32_t param)
 {
 	m_TimCnt[1] = 0xFFFF;
 	m_udata.data[0x20/2]|=0x80;
@@ -332,7 +332,7 @@ TIMER_CALLBACK_MEMBER( scsp_device::timerB_cb )
 	CheckPendingIRQ();
 }
 
-TIMER_CALLBACK_MEMBER( scsp_device::timerC_cb )
+void scsp_device::timerC_cb(void *ptr, int32_t param)
 {
 	m_TimCnt[2] = 0xFFFF;
 	m_udata.data[0x20/2]|=0x100;
@@ -1397,13 +1397,13 @@ void scsp_device::set_ram_base(void *base)
 }
 
 
-READ16_MEMBER( scsp_device::read )
+uint16_t scsp_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_stream->update();
 	return r16(space, offset*2);
 }
 
-WRITE16_MEMBER( scsp_device::write )
+void scsp_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t tmp;
 
@@ -1414,7 +1414,7 @@ WRITE16_MEMBER( scsp_device::write )
 	w16(space,offset*2, tmp);
 }
 
-WRITE16_MEMBER( scsp_device::midi_in )
+void scsp_device::midi_in(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//    printf("scsp_midi_in: %02x\n", data);
 
@@ -1424,7 +1424,7 @@ WRITE16_MEMBER( scsp_device::midi_in )
 	CheckPendingIRQ();
 }
 
-READ16_MEMBER( scsp_device::midi_out_r )
+uint16_t scsp_device::midi_out_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	unsigned char val;
 

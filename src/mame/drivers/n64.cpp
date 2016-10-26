@@ -26,18 +26,18 @@ public:
 		: n64_state(mconfig, type, tag)
 		{ }
 
-	DECLARE_READ32_MEMBER(dd_null_r);
-	DECLARE_MACHINE_START(n64dd);
-	INTERRUPT_GEN_MEMBER(n64_reset_poll);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(n64_cart);
+	uint32_t dd_null_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void machine_start_n64dd();
+	void n64_reset_poll(device_t &device);
+	image_init_result device_image_load_n64_cart(device_image_interface &image);
 	void mempak_format(uint8_t* pak);
 	image_init_result disk_load(device_image_interface &image);
 	void disk_unload(device_image_interface &image);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( n64dd );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( n64dd );
+	image_init_result device_image_load_n64dd(device_image_interface &image);
+	void device_image_unload_n64dd(device_image_interface &image);
 };
 
-READ32_MEMBER(n64_mess_state::dd_null_r)
+uint32_t n64_mess_state::dd_null_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
@@ -292,7 +292,7 @@ void n64_mess_state::mempak_format(uint8_t* pak)
 	memcpy(pak+512, pak_inode_table, 256); // Mirror
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
+image_init_result n64_mess_state::device_image_load_n64_cart(device_image_interface &image)
 {
 	int i, length;
 	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
@@ -367,7 +367,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 	return image_init_result::PASS;
 }
 
-MACHINE_START_MEMBER(n64_mess_state,n64dd)
+void n64_mess_state::machine_start_n64dd()
 {
 	machine_start();
 	machine().device<n64_periphs>("rcp")->dd_present = true;
@@ -386,12 +386,12 @@ MACHINE_START_MEMBER(n64_mess_state,n64dd)
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64dd)
+image_init_result n64_mess_state::device_image_load_n64dd(device_image_interface &image)
 {
 	return disk_load(image);
 }
 
-DEVICE_IMAGE_UNLOAD_MEMBER(n64_mess_state,n64dd)
+void n64_mess_state::device_image_unload_n64dd(device_image_interface &image)
 {
 	disk_unload(image);
 }
@@ -409,7 +409,7 @@ void n64_mess_state::disk_unload(device_image_interface &image)
 	machine().device<n64_periphs>("rcp")->disk_present = false;
 }
 
-INTERRUPT_GEN_MEMBER(n64_mess_state::n64_reset_poll)
+void n64_mess_state::n64_reset_poll(device_t &device)
 {
 	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
 	periphs->poll_reset_button((ioport("RESET")->read() & 1) ? true : false);

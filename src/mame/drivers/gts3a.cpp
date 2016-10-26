@@ -36,17 +36,17 @@ public:
 		, m_switches(*this, "X.%u", 0)
 	{ }
 
-	DECLARE_DRIVER_INIT(gts3a);
-	DECLARE_WRITE8_MEMBER(segbank_w);
-	DECLARE_READ8_MEMBER(u4a_r);
-	DECLARE_READ8_MEMBER(u4b_r);
-	DECLARE_WRITE8_MEMBER(u4b_w);
-	DECLARE_READ8_MEMBER(dmd_r);
-	DECLARE_WRITE8_MEMBER(dmd_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
-	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
+	void init_gts3a();
+	void segbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t u4a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t u4b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u4b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_w(int state);
+	void test_inp(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_PALETTE_INIT(gts3a);
+	void palette_init_gts3a(palette_device &palette);
 	required_device<palette_device> m_palette;
 private:
 	bool m_dispclk;
@@ -212,18 +212,18 @@ static INPUT_PORTS_START( gts3a )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( gts3a_state::test_inp )
+void gts3a_state::test_inp(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_u4->write_ca1(newval);
 }
 
 // This trampoline needed; DEVWRITELINE("maincpu", m65c02_device, nmi_line) does not work
-WRITE_LINE_MEMBER( gts3a_state::nmi_w )
+void gts3a_state::nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
 }
 
-WRITE8_MEMBER( gts3a_state::segbank_w )
+void gts3a_state::segbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 { // this is all wrong
 	uint32_t seg1,seg2;
 	m_segment[offset] = data;
@@ -232,7 +232,7 @@ WRITE8_MEMBER( gts3a_state::segbank_w )
 	output().set_digit_value(m_digit+(BIT(offset, 1) ? 0 : 20), seg2);
 }
 
-WRITE8_MEMBER( gts3a_state::u4b_w )
+void gts3a_state::u4b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u4b = data & 0xe7;
 	bool clk_bit = BIT(data, 6);
@@ -259,7 +259,7 @@ WRITE8_MEMBER( gts3a_state::u4b_w )
 //  printf("B=%s=%X ",machine().describe_context(),data&0xe0);
 }
 
-READ8_MEMBER( gts3a_state::u4a_r )
+uint8_t gts3a_state::u4a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_row < 12)
 		return m_switches[m_row]->read();
@@ -267,7 +267,7 @@ READ8_MEMBER( gts3a_state::u4a_r )
 		return 0xff;
 }
 
-READ8_MEMBER( gts3a_state::u4b_r )
+uint8_t gts3a_state::u4b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_u4b | (ioport("TTS")->read() & 0x18);
 }
@@ -278,25 +278,25 @@ void gts3a_state::machine_reset()
 	m_dispclk = 0;
 }
 
-DRIVER_INIT_MEMBER( gts3a_state, gts3a )
+void gts3a_state::init_gts3a()
 {
 	uint8_t *dmd = memregion("dmdcpu")->base();
 
 	membank("bank1")->configure_entries(0, 32, &dmd[0x0000], 0x4000);
 }
 
-READ8_MEMBER( gts3a_state::dmd_r )
+uint8_t gts3a_state::dmd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( gts3a_state::dmd_w )
+void gts3a_state::dmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dmd = data;
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-PALETTE_INIT_MEMBER( gts3a_state, gts3a )
+void gts3a_state::palette_init_gts3a(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(1, rgb_t(0xf7, 0x00, 0x00));

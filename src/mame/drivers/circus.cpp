@@ -54,7 +54,7 @@ D000      Paddle Position and Interrupt Reset (where applicable)
 #include "crash.lh"
 
 
-READ8_MEMBER(circus_state::circus_paddle_r)
+uint8_t circus_state::circus_paddle_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// also clears irq
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( robotbwl, circus_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(circus_state::crash_scanline)
+void circus_state::crash_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -559,20 +559,20 @@ ROM_START( ripcord )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(circus_state,circus)
+void circus_state::init_circus()
 {
 	m_game_id = 1;
 }
 
-DRIVER_INIT_MEMBER(circus_state,robotbwl)
+void circus_state::init_robotbwl()
 {
 	m_game_id = 2;
 }
-DRIVER_INIT_MEMBER(circus_state,crash)
+void circus_state::init_crash()
 {
 	m_game_id = 3;
 }
-DRIVER_INIT_MEMBER(circus_state,ripcord)
+void circus_state::init_ripcord()
 {
 	m_game_id = 4;
 }

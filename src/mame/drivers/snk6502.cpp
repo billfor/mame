@@ -308,7 +308,7 @@ void snk6502_state::machine_start()
 }
 
 /* binary counter (1.4MHz update) */
-TIMER_DEVICE_CALLBACK_MEMBER(snk6502_state::sasuke_update_counter)
+void snk6502_state::sasuke_update_counter(timer_device &timer, void *ptr, int32_t param)
 {
 	m_sasuke_counter += 0x10;
 }
@@ -325,12 +325,12 @@ void snk6502_state::sasuke_start_counter()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(snk6502_state::snk6502_music0_r)
+ioport_value snk6502_state::snk6502_music0_r(ioport_field &field, void *param)
 {
 	return (m_sound->music0_playing() ? 0x01 : 0x00);
 }
 
-CUSTOM_INPUT_MEMBER(snk6502_state::sasuke_count_r)
+ioport_value snk6502_state::sasuke_count_r(ioport_field &field, void *param)
 {
 	return (m_sasuke_counter >> 4);
 }
@@ -447,7 +447,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(snk6502_state::coin_inserted)
+void snk6502_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -745,13 +745,13 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(snk6502_state::satansat_interrupt)
+void snk6502_state::satansat_interrupt(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE); /* one IRQ per frame */
 }
 
-INTERRUPT_GEN_MEMBER(snk6502_state::snk6502_interrupt)
+void snk6502_state::snk6502_interrupt(device_t &device)
 {
 	device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE); /* one IRQ per frame */
 }
@@ -763,7 +763,7 @@ INTERRUPT_GEN_MEMBER(snk6502_state::snk6502_interrupt)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(snk6502_state,sasuke)
+void snk6502_state::machine_reset_sasuke()
 {
 	m_sound->set_music_clock(M_LN2 * (RES_K(18) + RES_K(1)) * CAP_U(1));
 
@@ -773,7 +773,7 @@ MACHINE_RESET_MEMBER(snk6502_state,sasuke)
 	sasuke_start_counter();
 }
 
-MACHINE_RESET_MEMBER(snk6502_state,satansat)
+void snk6502_state::machine_reset_satansat()
 {
 	// same as sasuke (assumption?)
 	// NOTE: this was set before sasuke was adjusted to a lower freq, please don't modify until measured/confirmed on pcb
@@ -782,13 +782,13 @@ MACHINE_RESET_MEMBER(snk6502_state,satansat)
 	sasuke_start_counter();
 }
 
-MACHINE_RESET_MEMBER(snk6502_state,vanguard)
+void snk6502_state::machine_reset_vanguard()
 {
 	// 41.6 Hz update (measured)
 	m_sound->set_music_clock(1 / 41.6);
 }
 
-MACHINE_RESET_MEMBER(snk6502_state,pballoon)
+void snk6502_state::machine_reset_pballoon()
 {
 	// 40.3 Hz update (measured)
 	m_sound->set_music_clock(1 / 40.3);

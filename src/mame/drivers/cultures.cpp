@@ -64,35 +64,35 @@ public:
 	int      m_irq_enable;
 	int      m_bg1_bank;
 	int      m_bg2_bank;
-	DECLARE_WRITE8_MEMBER(cpu_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(bg0_videoram_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(bg_bank_w);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	void cpu_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg0_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cultures(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(cultures_interrupt);
+	void cultures_interrupt(device_t &device);
 };
 
 
 
-TILE_GET_INFO_MEMBER(cultures_state::get_bg1_tile_info)
+void cultures_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_bg1_rom[0x200000/2 + m_bg1_bank * 0x80000/2 + tile_index];
 	SET_TILE_INFO_MEMBER(1, code, code >> 12, 0);
 }
 
-TILE_GET_INFO_MEMBER(cultures_state::get_bg2_tile_info)
+void cultures_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_bg2_rom[0x200000/2 + m_bg2_bank * 0x80000/2 + tile_index];
 	SET_TILE_INFO_MEMBER(2, code, code >> 12, 0);
 }
 
-TILE_GET_INFO_MEMBER(cultures_state::get_bg0_tile_info)
+void cultures_state::get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_bg0_videoram[tile_index * 2] + (m_bg0_videoram[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO_MEMBER(0, code, code >> 12, 0);
@@ -145,26 +145,26 @@ uint32_t cultures_state::screen_update_cultures(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(cultures_state::cpu_bankswitch_w)
+void cultures_state::cpu_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prgbank->set_entry(data & 0x0f);
 	m_vrambank->set_bank((data & 0x20)>>5);
 }
 
 
-WRITE8_MEMBER(cultures_state::bg0_videoram_w)
+void cultures_state::bg0_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg0_videoram[offset] = data;
 	m_bg0_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(cultures_state::misc_w)
+void cultures_state::misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_okibank->set_entry(data&0x0f);
 	m_irq_enable = data & 0x80;
 }
 
-WRITE8_MEMBER(cultures_state::bg_bank_w)
+void cultures_state::bg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bg1_bank != (data & 3))
 	{
@@ -364,7 +364,7 @@ static GFXDECODE_START( culture )
 	GFXDECODE_ENTRY("bg2", 0, gfxlayout, 0x1000, 8 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(cultures_state::cultures_interrupt)
+void cultures_state::cultures_interrupt(device_t &device)
 {
 	if (m_irq_enable)
 		device.execute().set_input_line(0, HOLD_LINE);

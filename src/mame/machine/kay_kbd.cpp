@@ -280,7 +280,7 @@ static const uint8_t keyboard[8][10][8] = {
 	},
 };
 
-MACHINE_RESET_MEMBER(kaypro_state,kay_kbd)
+void kaypro_state::machine_reset_kay_kbd()
 {
 	kay_kbd_t *kbd = m_kbd = auto_alloc_clear(machine(), <kay_kbd_t>());
 
@@ -301,7 +301,7 @@ MACHINE_RESET_MEMBER(kaypro_state,kay_kbd)
  * also drives keyboard LEDs and
  * and handles autorepeating keys
  ******************************************************/
-INTERRUPT_GEN_MEMBER(kaypro_state::kay_kbd_interrupt)
+void kaypro_state::kay_kbd_interrupt(device_t &device)
 {
 	kay_kbd_t *kbd = m_kbd;
 	int mod, row, col, chg, newval;
@@ -463,7 +463,7 @@ uint8_t kaypro_state::kay_kbd_d_r()
 	return data;
 }
 
-TIMER_CALLBACK_MEMBER( kaypro_state::kay_kbd_beepoff )
+void kaypro_state::kay_kbd_beepoff(void *ptr, int32_t param)
 {
 	kay_kbd_t *kbd = m_kbd;
 	kbd->beeper->set_state(0);

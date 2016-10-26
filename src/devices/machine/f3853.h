@@ -66,13 +66,13 @@ public:
 
 	static void set_interrupt_req_callback(device_t &device, f3853_interrupt_req_delegate callback) { downcast<f3853_device &>(device).m_interrupt_req_cb = callback; }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void set_external_interrupt_in_line(int level);
 	void set_priority_in_line(int level);
 
-	TIMER_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(void *ptr, int32_t param);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

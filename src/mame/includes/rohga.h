@@ -63,15 +63,15 @@ public:
 
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ16_MEMBER(rohga_irq_ack_r);
-	DECLARE_WRITE16_MEMBER(wizdfire_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(rohga_buffer_spriteram16_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(wizdfire);
-	DECLARE_DRIVER_INIT(nitrobal);
-	DECLARE_DRIVER_INIT(schmeisr);
-	DECLARE_DRIVER_INIT(rohga);
-	DECLARE_VIDEO_START(wizdfire);
+	uint16_t rohga_irq_ack_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void wizdfire_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void rohga_buffer_spriteram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_wizdfire();
+	void init_nitrobal();
+	void init_schmeisr();
+	void init_rohga();
+	void video_start_wizdfire();
 	uint32_t screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -81,8 +81,8 @@ public:
 	DECOSPR_COLOUR_CB_MEMBER(rohga_col_callback);
 	DECOSPR_COLOUR_CB_MEMBER(schmeisr_col_callback);
 
-	READ16_MEMBER( nb_protection_region_0_146_r );
-	WRITE16_MEMBER( nb_protection_region_0_146_w );
-	READ16_MEMBER( wf_protection_region_0_104_r );
-	WRITE16_MEMBER( wf_protection_region_0_104_w );
+	uint16_t nb_protection_region_0_146_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void nb_protection_region_0_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t wf_protection_region_0_104_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void wf_protection_region_0_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
 };

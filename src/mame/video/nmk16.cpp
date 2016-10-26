@@ -29,7 +29,7 @@
 #define PAGES_PER_TMAP_X    (0x10)
 #define PAGES_PER_TMAP_Y    (0x02)
 
-TILEMAP_MAPPER_MEMBER(nmk16_state::afega_tilemap_scan_pages)
+tilemap_memory_index nmk16_state::afega_tilemap_scan_pages(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return  (row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y * PAGES_PER_TMAP_X +
 			(row % TILES_PER_PAGE_Y) +
@@ -38,32 +38,32 @@ TILEMAP_MAPPER_MEMBER(nmk16_state::afega_tilemap_scan_pages)
 			(col % TILES_PER_PAGE_X) * TILES_PER_PAGE_Y;
 }
 
-TILE_GET_INFO_MEMBER(nmk16_state::macross_get_bg0_tile_info)
+void nmk16_state::macross_get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_nmk_bgvideoram0[tile_index];
 	SET_TILE_INFO_MEMBER(1,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
 }
 
-TILE_GET_INFO_MEMBER(nmk16_state::macross_get_bg1_tile_info)
+void nmk16_state::macross_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_nmk_bgvideoram1[tile_index];
 	SET_TILE_INFO_MEMBER(1,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
 }
 
-TILE_GET_INFO_MEMBER(nmk16_state::macross_get_bg2_tile_info)
+void nmk16_state::macross_get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_nmk_bgvideoram2[tile_index];
 	SET_TILE_INFO_MEMBER(1,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
 }
 
-TILE_GET_INFO_MEMBER(nmk16_state::macross_get_bg3_tile_info)
+void nmk16_state::macross_get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_nmk_bgvideoram3[tile_index];
 	SET_TILE_INFO_MEMBER(1,(code & 0xfff) + (m_bgbank << 12),code >> 12,0);
 }
 
 
-TILE_GET_INFO_MEMBER(nmk16_state::strahl_get_fg_tile_info)
+void nmk16_state::strahl_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_nmk_fgvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(3,
@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(nmk16_state::strahl_get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(nmk16_state::macross_get_tx_tile_info)
+void nmk16_state::macross_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_nmk_txvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(nmk16_state::macross_get_tx_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(nmk16_state::bjtwin_get_bg_tile_info)
+void nmk16_state::bjtwin_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_nmk_bgvideoram0[tile_index];
 	int bank = (code & 0x800) ? 1 : 0;
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(nmk16_state::bjtwin_get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(nmk16_state::get_tile_info_0_8bit)
+void nmk16_state::get_tile_info_0_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_nmk_bgvideoram0[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -118,7 +118,7 @@ void nmk16_state::nmk16_video_init()
 }
 
 
-VIDEO_START_MEMBER(nmk16_state,bioship)
+void nmk16_state::video_start_bioship()
 {
 	m_bg_tilemap0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::macross_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(nmk16_state::afega_tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::macross_get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,32,32);
@@ -133,7 +133,7 @@ VIDEO_START_MEMBER(nmk16_state,bioship)
 
 }
 
-VIDEO_START_MEMBER(nmk16_state,strahl)
+void nmk16_state::video_start_strahl()
 {
 	m_bg_tilemap0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::macross_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(nmk16_state::afega_tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::strahl_get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(nmk16_state::afega_tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
@@ -147,7 +147,7 @@ VIDEO_START_MEMBER(nmk16_state,strahl)
 	nmk16_video_init();
 }
 
-VIDEO_START_MEMBER(nmk16_state,macross)
+void nmk16_state::video_start_macross()
 {
 	m_bg_tilemap0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::macross_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(nmk16_state::afega_tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::macross_get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,32,32);
@@ -157,7 +157,7 @@ VIDEO_START_MEMBER(nmk16_state,macross)
 	nmk16_video_init();
 }
 
-VIDEO_START_MEMBER(nmk16_state,gunnail)
+void nmk16_state::video_start_gunnail()
 {
 	m_bg_tilemap0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::macross_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(nmk16_state::afega_tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::macross_get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
@@ -171,7 +171,7 @@ VIDEO_START_MEMBER(nmk16_state,gunnail)
 	m_simple_scroll = 0;
 }
 
-VIDEO_START_MEMBER(nmk16_state,macross2)
+void nmk16_state::video_start_macross2()
 {
 	m_bg_tilemap0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::macross_get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(nmk16_state::afega_tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	m_bg_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::macross_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(nmk16_state::afega_tilemap_scan_pages),this),16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
@@ -187,13 +187,13 @@ VIDEO_START_MEMBER(nmk16_state,macross2)
 						/* from the other side of the tilemap (!) */
 }
 
-VIDEO_START_MEMBER(nmk16_state,raphero)
+void nmk16_state::video_start_raphero()
 {
-	VIDEO_START_CALL_MEMBER( macross2 );
+	video_start_macross2();
 	m_simple_scroll = 0;
 }
 
-VIDEO_START_MEMBER(nmk16_state,bjtwin)
+void nmk16_state::video_start_bjtwin()
 {
 	m_bg_tilemap0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmk16_state::bjtwin_get_bg_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,32);
 
@@ -210,44 +210,44 @@ VIDEO_START_MEMBER(nmk16_state,bjtwin)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(nmk16_state::nmk_bgvideoram0_w)
+void nmk16_state::nmk_bgvideoram0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nmk_bgvideoram0[offset]);
 	m_bg_tilemap0->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_bgvideoram1_w)
+void nmk16_state::nmk_bgvideoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nmk_bgvideoram1[offset]);
 	m_bg_tilemap1->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_bgvideoram2_w)
+void nmk16_state::nmk_bgvideoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nmk_bgvideoram2[offset]);
 	m_bg_tilemap2->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_bgvideoram3_w)
+void nmk16_state::nmk_bgvideoram3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nmk_bgvideoram3[offset]);
 	m_bg_tilemap3->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_fgvideoram_w)
+void nmk16_state::nmk_fgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nmk_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_txvideoram_w)
+void nmk16_state::nmk_txvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nmk_txvideoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER(nmk16_state::mustang_scroll_w)
+void nmk16_state::mustang_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  osd_printf_debug("mustang %04x %04x %04x\n",offset,data,mem_mask);
 
@@ -274,7 +274,7 @@ WRITE16_MEMBER(nmk16_state::mustang_scroll_w)
 	m_bg_tilemap0->set_scrollx(0,m_mustang_bg_xscroll - m_videoshift);
 }
 
-WRITE16_MEMBER(nmk16_state::bioshipbg_scroll_w)
+void nmk16_state::bioshipbg_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -287,7 +287,7 @@ WRITE16_MEMBER(nmk16_state::bioshipbg_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_scroll_w)
+void nmk16_state::nmk_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -300,7 +300,7 @@ WRITE16_MEMBER(nmk16_state::nmk_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_scroll_2_w)
+void nmk16_state::nmk_scroll_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -313,7 +313,7 @@ WRITE16_MEMBER(nmk16_state::nmk_scroll_2_w)
 	}
 }
 
-WRITE16_MEMBER(nmk16_state::vandyke_scroll_w)
+void nmk16_state::vandyke_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vscroll[offset] = data;
 
@@ -321,7 +321,7 @@ WRITE16_MEMBER(nmk16_state::vandyke_scroll_w)
 	m_bg_tilemap0->set_scrolly(0,m_vscroll[2] * 256 + (m_vscroll[3] >> 8));
 }
 
-WRITE16_MEMBER(nmk16_state::vandykeb_scroll_w)
+void nmk16_state::vandykeb_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -335,7 +335,7 @@ WRITE16_MEMBER(nmk16_state::vandykeb_scroll_w)
 	m_bg_tilemap0->set_scrolly(0,m_vscroll[2] * 256 + (m_vscroll[3] >> 8));
 }
 
-WRITE16_MEMBER(nmk16_state::manybloc_scroll_w)
+void nmk16_state::manybloc_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gunnail_scrollram[offset]);
 
@@ -343,13 +343,13 @@ WRITE16_MEMBER(nmk16_state::manybloc_scroll_w)
 	m_bg_tilemap0->set_scrolly(0,m_gunnail_scrollram[0xc2/2]);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_flipscreen_w)
+void nmk16_state::nmk_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		flip_screen_set(data & 0x01);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_tilebank_w)
+void nmk16_state::nmk_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -364,13 +364,13 @@ WRITE16_MEMBER(nmk16_state::nmk_tilebank_w)
 	}
 }
 
-WRITE16_MEMBER(nmk16_state::bioship_scroll_w)
+void nmk16_state::bioship_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_bioship_scroll[offset]=data>>8;
 }
 
-WRITE16_MEMBER(nmk16_state::bioship_bank_w)
+void nmk16_state::bioship_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -794,7 +794,7 @@ uint32_t nmk16_state::screen_update_bjtwin(screen_device &screen, bitmap_ind16 &
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(nmk16_state,afega)
+void nmk16_state::video_start_afega()
 {
 	m_spriteram_old = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_spriteram_old2 = make_unique_clear<uint16_t[]>(0x1000/2);
@@ -815,7 +815,7 @@ VIDEO_START_MEMBER(nmk16_state,afega)
 }
 
 
-VIDEO_START_MEMBER(nmk16_state,grdnstrm)
+void nmk16_state::video_start_grdnstrm()
 {
 	m_spriteram_old = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_spriteram_old2 = make_unique_clear<uint16_t[]>(0x1000/2);
@@ -837,7 +837,7 @@ VIDEO_START_MEMBER(nmk16_state,grdnstrm)
 }
 
 
-VIDEO_START_MEMBER(nmk16_state,firehawk)
+void nmk16_state::video_start_firehawk()
 {
 	m_spriteram_old = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_spriteram_old2 = make_unique_clear<uint16_t[]>(0x1000/2);

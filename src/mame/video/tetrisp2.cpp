@@ -46,14 +46,14 @@ To Do:
 ***************************************************************************/
 
 /* BBBBBGGGGGRRRRRx xxxxxxxxxxxxxxxx */
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_palette_w)
+void tetrisp2_state::tetrisp2_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_paletteram[offset]);
 	if ((offset & 1) == 0)
 		m_palette->set_pen_color(offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub_palette_w)
+void tetrisp2_state::rocknms_sub_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_sub_paletteram[offset]);
 	if ((offset & 1) == 0)
@@ -70,7 +70,7 @@ WRITE16_MEMBER(tetrisp2_state::rocknms_sub_palette_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_priority_w)
+void tetrisp2_state::tetrisp2_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_priority[offset] = data;
@@ -78,12 +78,12 @@ WRITE16_MEMBER(tetrisp2_state::tetrisp2_priority_w)
 		m_priority[offset] = data >> 8;
 }
 
-READ16_MEMBER(tetrisp2_state::tetrisp2_priority_r)
+uint16_t tetrisp2_state::tetrisp2_priority_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_priority[offset] | 0xff00;
 }
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub_priority_w)
+void tetrisp2_state::rocknms_sub_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_rocknms_sub_priority[offset] = data;
@@ -111,7 +111,7 @@ WRITE16_MEMBER(tetrisp2_state::rocknms_sub_priority_w)
 #define NX_0  (0x40)
 #define NY_0  (0x40)
 
-TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_bg)
+void tetrisp2_state::get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_vram_bg[ 2 * tile_index + 0];
 	uint16_t code_lo = m_vram_bg[ 2 * tile_index + 1];
@@ -121,7 +121,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_bg)
 			0);
 }
 
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_bg_w)
+void tetrisp2_state::tetrisp2_vram_bg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_bg[offset]);
 	m_tilemap_bg->mark_tile_dirty(offset/2);
@@ -131,7 +131,7 @@ WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_bg_w)
 #define NX_1  (0x40)
 #define NY_1  (0x40)
 
-TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_fg)
+void tetrisp2_state::get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_vram_fg[ 2 * tile_index + 0];
 	uint16_t code_lo = m_vram_fg[ 2 * tile_index + 1];
@@ -141,14 +141,14 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_fg)
 			0);
 }
 
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_fg_w)
+void tetrisp2_state::tetrisp2_vram_fg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_fg[offset]);
 	m_tilemap_fg->mark_tile_dirty(offset/2);
 }
 
 
-TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rot)
+void tetrisp2_state::get_tile_info_rot(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_vram_rot[ 2 * tile_index + 0];
 	uint16_t code_lo = m_vram_rot[ 2 * tile_index + 1];
@@ -158,13 +158,13 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rot)
 			0);
 }
 
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_rot_w)
+void tetrisp2_state::tetrisp2_vram_rot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_rot[offset]);
 	m_tilemap_rot->mark_tile_dirty(offset/2);
 }
 
-TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_bg)
+void tetrisp2_state::get_tile_info_rocknms_sub_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_rocknms_sub_vram_bg[ 2 * tile_index + 0];
 	uint16_t code_lo = m_rocknms_sub_vram_bg[ 2 * tile_index + 1];
@@ -174,14 +174,14 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_bg)
 			0);
 }
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_bg_w)
+void tetrisp2_state::rocknms_sub_vram_bg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rocknms_sub_vram_bg[offset]);
 	m_tilemap_sub_bg->mark_tile_dirty(offset/2);
 }
 
 
-TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_fg)
+void tetrisp2_state::get_tile_info_rocknms_sub_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_rocknms_sub_vram_fg[ 2 * tile_index + 0];
 	uint16_t code_lo = m_rocknms_sub_vram_fg[ 2 * tile_index + 1];
@@ -191,14 +191,14 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_fg)
 			0);
 }
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_fg_w)
+void tetrisp2_state::rocknms_sub_vram_fg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rocknms_sub_vram_fg[offset]);
 	m_tilemap_sub_fg->mark_tile_dirty(offset/2);
 }
 
 
-TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_rot)
+void tetrisp2_state::get_tile_info_rocknms_sub_rot(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_rocknms_sub_vram_rot[ 2 * tile_index + 0];
 	uint16_t code_lo = m_rocknms_sub_vram_rot[ 2 * tile_index + 1];
@@ -208,7 +208,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_rot)
 			0);
 }
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_rot_w)
+void tetrisp2_state::rocknms_sub_vram_rot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rocknms_sub_vram_rot[offset]);
 	m_tilemap_sub_rot->mark_tile_dirty(offset/2);
@@ -216,7 +216,7 @@ WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_rot_w)
 
 
 
-VIDEO_START_MEMBER(tetrisp2_state,tetrisp2)
+void tetrisp2_state::video_start_tetrisp2()
 {
 	m_flipscreen_old = -1;
 
@@ -235,13 +235,13 @@ VIDEO_START_MEMBER(tetrisp2_state,tetrisp2)
 	save_pointer(NAME(m_priority.get()), 0x40000);
 }
 
-VIDEO_START_MEMBER(tetrisp2_state,nndmseal)
+void tetrisp2_state::video_start_nndmseal()
 {
-	VIDEO_START_CALL_MEMBER( tetrisp2 );
+	video_start_tetrisp2();
 	m_tilemap_bg->set_scrolldx(-4,-4);
 }
 
-VIDEO_START_MEMBER(tetrisp2_state,rockntread)
+void tetrisp2_state::video_start_rockntread()
 {
 	m_flipscreen_old = -1;
 
@@ -262,9 +262,9 @@ VIDEO_START_MEMBER(tetrisp2_state,rockntread)
 }
 
 
-VIDEO_START_MEMBER(tetrisp2_state,rocknms)
+void tetrisp2_state::video_start_rocknms()
 {
-	VIDEO_START_CALL_MEMBER( rockntread );
+	video_start_rockntread();
 
 	m_tilemap_sub_bg = &machine().tilemap().create(*m_sub_gfxdecode, tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_bg),this),TILEMAP_SCAN_ROWS,16, 16, 32, 256);   // rockn ms(sub)
 	m_tilemap_sub_fg = &machine().tilemap().create(*m_sub_gfxdecode, tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rocknms_sub_fg),this),TILEMAP_SCAN_ROWS,8, 8, 64, 64);
@@ -708,7 +708,7 @@ uint32_t tetrisp2_state::screen_update_rocknms_right(screen_device &screen, bitm
 
 // Temporary hack for stpestag: unaltered ASCII bytes are written in the most significant byte
 // of code_hi, one of the CPUs probably reads them and writes the actual tile codes somewhere.
-TILE_GET_INFO_MEMBER(tetrisp2_state::stepstag_get_tile_info_fg)
+void tetrisp2_state::stepstag_get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_vram_fg[ 2 * tile_index + 0];
 	uint16_t code_lo = m_vram_fg[ 2 * tile_index + 1];
@@ -724,7 +724,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::stepstag_get_tile_info_fg)
 			0);
 }
 
-VIDEO_START_MEMBER(stepstag_state,stepstag)
+void stepstag_state::video_start_stepstag()
 {
 	m_flipscreen_old = -1;
 
@@ -784,7 +784,7 @@ inline int stepstag_state::mypal(int x)
 //  return (x - 0x80);
 }
 
-WRITE16_MEMBER(stepstag_state::stepstag_palette_w)
+void stepstag_state::stepstag_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_paletteram[offset]);
 //  if ((offset & 1) == 0)

@@ -251,31 +251,31 @@ public:
 	int m_latch_delay;
 	std::vector<uint8_t> m_paletteram;
 
-	DECLARE_WRITE8_MEMBER(bgtile_w);
-	DECLARE_READ8_MEMBER(blitter_status_r);
-	DECLARE_READ8_MEMBER(blitter_r);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_READ8_MEMBER(collision_id_r);
-	DECLARE_READ8_MEMBER(paletteram_r);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_READ8_MEMBER(vector_r);
-	DECLARE_WRITE8_MEMBER(firq_ack_w);
-	DECLARE_WRITE8_MEMBER(soundcommand_w);
-	DECLARE_READ8_MEMBER(coin_lockout_r);
-	DECLARE_READ8_MEMBER(io_mirror_r);
+	void bgtile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t blitter_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t blitter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t collision_id_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vector_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void firq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void soundcommand_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t coin_lockout_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t io_mirror_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void blit(int offset);
-	DECLARE_WRITE8_MEMBER(sndnmi_msk_w);
-	DECLARE_DRIVER_INIT(halley87);
-	DECLARE_DRIVER_INIT(benberob);
-	DECLARE_DRIVER_INIT(halleys);
+	void sndnmi_msk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_halley87();
+	void init_benberob();
+	void init_halleys();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(halleys);
+	void palette_init_halleys(palette_device &palette);
 	uint32_t screen_update_halleys(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_benberob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(blitter_reset);
-	TIMER_DEVICE_CALLBACK_MEMBER(halleys_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(benberob_scanline);
+	void blitter_reset(void *ptr, int32_t param);
+	void halleys_scanline(timer_device &timer, void *ptr, int32_t param);
+	void benberob_scanline(timer_device &timer, void *ptr, int32_t param);
 	void halleys_decode_rgb(uint32_t *r, uint32_t *g, uint32_t *b, int addr, int data);
 	void copy_scroll_op(bitmap_ind16 &bitmap, uint16_t *source, int sx, int sy);
 	void copy_scroll_xp(bitmap_ind16 &bitmap, uint16_t *source, int sx, int sy);
@@ -1007,7 +1007,7 @@ if (0) {
 
 
 // draws Ben Bero Beh's color backdrop(verification required)
-WRITE8_MEMBER(halleys_state::bgtile_w)
+void halleys_state::bgtile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int yskip, xskip, ecx;
 	uint16_t *edi;
@@ -1032,7 +1032,7 @@ WRITE8_MEMBER(halleys_state::bgtile_w)
 }
 
 
-READ8_MEMBER(halleys_state::blitter_status_r)
+uint8_t halleys_state::blitter_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_game_id==GAME_HALLEYS && space.device().safe_pc()==0x8017) return(0x55); // HACK: trick SRAM test on startup
 
@@ -1040,7 +1040,7 @@ READ8_MEMBER(halleys_state::blitter_status_r)
 }
 
 
-READ8_MEMBER(halleys_state::blitter_r)
+uint8_t halleys_state::blitter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int i = offset & 0xf;
 
@@ -1050,13 +1050,13 @@ READ8_MEMBER(halleys_state::blitter_r)
 }
 
 
-TIMER_CALLBACK_MEMBER(halleys_state::blitter_reset)
+void halleys_state::blitter_reset(void *ptr, int32_t param)
 {
 	m_blitter_busy = 0;
 }
 
 
-WRITE8_MEMBER(halleys_state::blitter_w)
+void halleys_state::blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i = offset & 0xf;
 
@@ -1080,7 +1080,7 @@ WRITE8_MEMBER(halleys_state::blitter_w)
 }
 
 
-READ8_MEMBER(halleys_state::collision_id_r)
+uint8_t halleys_state::collision_id_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
     Collision detection abstract:
@@ -1118,7 +1118,7 @@ READ8_MEMBER(halleys_state::collision_id_r)
 //**************************************************************************
 // Video Initializations and Updates
 
-PALETTE_INIT_MEMBER(halleys_state, halleys)
+void halleys_state::palette_init_halleys(palette_device &palette)
 {
 	uint32_t d, r, g, b, i, j, count;
 	// allocate memory for internal palette
@@ -1213,12 +1213,12 @@ void halleys_state::halleys_decode_rgb(uint32_t *r, uint32_t *g, uint32_t *b, in
 	*b = prom_6330[0x40 + (bit0|bit1|bit2|bit3|bit4)];
 }
 
-READ8_MEMBER(halleys_state::paletteram_r)
+uint8_t halleys_state::paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_paletteram[offset];
 }
 
-WRITE8_MEMBER(halleys_state::paletteram_w)
+void halleys_state::paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t d, r, g, b, i, j;
 	uint32_t *pal_ptr = m_internal_palette.get();
@@ -1501,9 +1501,9 @@ uint32_t halleys_state::screen_update_benberob(screen_device &screen, bitmap_ind
 
 #if HALLEYS_DEBUG
 
-READ8_MEMBER(halleys_state::zero_r){ return(0); }
+uint8_t halleys_state::zero_r(address_space &space, offs_t offset, uint8_t mem_mask){ return(0); }
 
-READ8_MEMBER(halleys_state::debug_r)
+uint8_t halleys_state::debug_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return(m_io_ram[offset]);
 }
@@ -1515,7 +1515,7 @@ READ8_MEMBER(halleys_state::debug_r)
 // Interrupt and Hardware Handlers
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::halleys_scanline)
+void halleys_state::halleys_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -1544,7 +1544,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::halleys_scanline)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::benberob_scanline)
+void halleys_state::benberob_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -1567,13 +1567,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::benberob_scanline)
 }
 
 
-READ8_MEMBER(halleys_state::vector_r)
+uint8_t halleys_state::vector_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return(m_cpu1_base[0xffe0 + (offset^(m_mVectorType<<4))]);
 }
 
 
-WRITE8_MEMBER(halleys_state::firq_ack_w)
+void halleys_state::firq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io_ram[0x9c] = data;
 
@@ -1582,13 +1582,13 @@ WRITE8_MEMBER(halleys_state::firq_ack_w)
 }
 
 
-WRITE8_MEMBER(halleys_state::sndnmi_msk_w)
+void halleys_state::sndnmi_msk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sndnmi_mask = data & 1;
 }
 
 
-WRITE8_MEMBER(halleys_state::soundcommand_w)
+void halleys_state::soundcommand_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io_ram[0x8a] = data;
 	m_soundlatch->write(space,offset,data);
@@ -1596,7 +1596,7 @@ WRITE8_MEMBER(halleys_state::soundcommand_w)
 }
 
 
-READ8_MEMBER(halleys_state::coin_lockout_r)
+uint8_t halleys_state::coin_lockout_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// This is a hack, but it lets you coin up when COIN1 or COIN2 are signaled.
 	// See NMI for the twisted logic that is involved in handling coin input :
@@ -1613,7 +1613,7 @@ READ8_MEMBER(halleys_state::coin_lockout_r)
 }
 
 
-READ8_MEMBER(halleys_state::io_mirror_r)
+uint8_t halleys_state::io_mirror_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
@@ -2189,7 +2189,7 @@ void halleys_state::init_common()
 }
 
 
-DRIVER_INIT_MEMBER(halleys_state,benberob)
+void halleys_state::init_benberob()
 {
 	m_game_id = GAME_BENBEROB;
 
@@ -2199,7 +2199,7 @@ DRIVER_INIT_MEMBER(halleys_state,benberob)
 }
 
 
-DRIVER_INIT_MEMBER(halleys_state,halleys)
+void halleys_state::init_halleys()
 {
 	m_game_id = GAME_HALLEYS;
 	m_collision_detection = 0xb114;
@@ -2207,7 +2207,7 @@ DRIVER_INIT_MEMBER(halleys_state,halleys)
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(halleys_state,halley87)
+void halleys_state::init_halley87()
 {
 	m_game_id = GAME_HALLEYS;
 	m_collision_detection = 0xb10d;

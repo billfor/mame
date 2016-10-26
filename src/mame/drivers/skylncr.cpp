@@ -178,35 +178,35 @@ public:
 	uint8_t m_nmi_enable;
 	int m_color;
 	int m_color2;
-	DECLARE_WRITE8_MEMBER(skylncr_videoram_w);
-	DECLARE_WRITE8_MEMBER(skylncr_colorram_w);
-	DECLARE_WRITE8_MEMBER(reeltiles_1_w);
-	DECLARE_WRITE8_MEMBER(reeltiles_2_w);
-	DECLARE_WRITE8_MEMBER(reeltiles_3_w);
-	DECLARE_WRITE8_MEMBER(reeltiles_4_w);
-	DECLARE_WRITE8_MEMBER(reeltileshigh_1_w);
-	DECLARE_WRITE8_MEMBER(reeltileshigh_2_w);
-	DECLARE_WRITE8_MEMBER(reeltileshigh_3_w);
-	DECLARE_WRITE8_MEMBER(reeltileshigh_4_w);
-	DECLARE_WRITE8_MEMBER(reelscroll1_w);
-	DECLARE_WRITE8_MEMBER(reelscroll2_w);
-	DECLARE_WRITE8_MEMBER(reelscroll3_w);
-	DECLARE_WRITE8_MEMBER(reelscroll4_w);
-	DECLARE_WRITE8_MEMBER(skylncr_coin_w);
-	DECLARE_READ8_MEMBER(ret_ff);
-	DECLARE_WRITE8_MEMBER(skylncr_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(mbutrfly_prot_w);
-	READ_LINE_MEMBER(mbutrfly_prot_r);
-	DECLARE_READ8_MEMBER(bdream97_opcode_r);
-	DECLARE_DRIVER_INIT(sonikfig);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel_3_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
+	void skylncr_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void skylncr_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reeltiles_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reeltiles_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reeltiles_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reeltiles_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reeltileshigh_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reeltileshigh_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reeltileshigh_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reeltileshigh_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reelscroll1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reelscroll2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reelscroll3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reelscroll4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void skylncr_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ret_ff(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void skylncr_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mbutrfly_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int mbutrfly_prot_r();
+	uint8_t bdream97_opcode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_sonikfig();
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel_1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel_2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel_3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel_4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
+	void skylncr_vblank_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -219,48 +219,48 @@ public:
 *           Video Hardware            *
 **************************************/
 
-WRITE8_MEMBER(skylncr_state::skylncr_videoram_w)
+void skylncr_state::skylncr_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skylncr_state::skylncr_colorram_w)
+void skylncr_state::skylncr_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(skylncr_state::get_tile_info)
+void skylncr_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(0, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
-TILE_GET_INFO_MEMBER(skylncr_state::get_reel_1_tile_info)
+void skylncr_state::get_reel_1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_reeltiles_1_ram[ tile_index ] + (m_reeltileshigh_1_ram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(1, code&0x7fff, pal^1, TILE_FLIPYX( 0 ));
 }
 
-TILE_GET_INFO_MEMBER(skylncr_state::get_reel_2_tile_info)
+void skylncr_state::get_reel_2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_reeltiles_2_ram[ tile_index ] + (m_reeltileshigh_2_ram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(1, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
-TILE_GET_INFO_MEMBER(skylncr_state::get_reel_3_tile_info)
+void skylncr_state::get_reel_3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_reeltiles_3_ram[ tile_index ] + (m_reeltileshigh_3_ram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(1, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
-TILE_GET_INFO_MEMBER(skylncr_state::get_reel_4_tile_info)
+void skylncr_state::get_reel_4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_reeltiles_4_ram[ tile_index ] + (m_reeltileshigh_4_ram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
@@ -318,70 +318,70 @@ uint32_t skylncr_state::screen_update_skylncr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE8_MEMBER(skylncr_state::reeltiles_1_w)
+void skylncr_state::reeltiles_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reeltiles_1_ram[offset] = data;
 	m_reel_1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skylncr_state::reeltiles_2_w)
+void skylncr_state::reeltiles_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reeltiles_2_ram[offset] = data;
 	m_reel_2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skylncr_state::reeltiles_3_w)
+void skylncr_state::reeltiles_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reeltiles_3_ram[offset] = data;
 	m_reel_3_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skylncr_state::reeltiles_4_w)
+void skylncr_state::reeltiles_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reeltiles_4_ram[offset] = data;
 	m_reel_4_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skylncr_state::reeltileshigh_1_w)
+void skylncr_state::reeltileshigh_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reeltileshigh_1_ram[offset] = data;
 	m_reel_1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skylncr_state::reeltileshigh_2_w)
+void skylncr_state::reeltileshigh_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reeltileshigh_2_ram[offset] = data;
 	m_reel_2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skylncr_state::reeltileshigh_3_w)
+void skylncr_state::reeltileshigh_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reeltileshigh_3_ram[offset] = data;
 	m_reel_3_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skylncr_state::reeltileshigh_4_w)
+void skylncr_state::reeltileshigh_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reeltileshigh_4_ram[offset] = data;
 	m_reel_4_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skylncr_state::reelscroll1_w)
+void skylncr_state::reelscroll1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reelscroll1[offset] = data;
 }
 
-WRITE8_MEMBER(skylncr_state::reelscroll2_w)
+void skylncr_state::reelscroll2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reelscroll2[offset] = data;
 }
 
-WRITE8_MEMBER(skylncr_state::reelscroll3_w)
+void skylncr_state::reelscroll3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reelscroll3[offset] = data;
 }
 
-WRITE8_MEMBER(skylncr_state::reelscroll4_w)
+void skylncr_state::reelscroll4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reelscroll4[offset] = data;
 }
@@ -391,30 +391,30 @@ WRITE8_MEMBER(skylncr_state::reelscroll4_w)
 *         Other Handlers            *
 ************************************/
 
-WRITE8_MEMBER(skylncr_state::skylncr_coin_w)
+void skylncr_state::skylncr_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 	m_hopper->motor_w(data & 0x20);
 }
 
-READ8_MEMBER(skylncr_state::ret_ff)
+uint8_t skylncr_state::ret_ff(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
 #ifdef UNUSED_FUNCTION
-READ8_MEMBER(skylncr_state::ret_00)
+uint8_t skylncr_state::ret_00(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 #endif
 
-WRITE8_MEMBER(skylncr_state::skylncr_nmi_enable_w)
+void skylncr_state::skylncr_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data & 0x10;
 }
 
-WRITE8_MEMBER(skylncr_state::mbutrfly_prot_w)
+void skylncr_state::mbutrfly_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().output().set_lamp_value(1, BIT(data, 0)); // Slot Stop 2
 	machine().output().set_lamp_value(2, BIT(data, 1)); // Slot Stop 1
@@ -426,12 +426,12 @@ WRITE8_MEMBER(skylncr_state::mbutrfly_prot_w)
 	m_mbutrfly_prot = BIT(data, 7);
 }
 
-READ_LINE_MEMBER(skylncr_state::mbutrfly_prot_r)
+int skylncr_state::mbutrfly_prot_r()
 {
 	return m_mbutrfly_prot;
 }
 
-READ8_MEMBER(skylncr_state::bdream97_opcode_r)
+uint8_t skylncr_state::bdream97_opcode_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space_debug_wrapper program(m_maincpu->space(AS_PROGRAM), space.debugger_access());
 	return program.space().read_byte(offset) ^ 0x80;
@@ -1605,7 +1605,7 @@ INPUT_PORTS_END
 
 
 // It runs in IM 0, thus needs an opcode on the data bus
-INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
+void skylncr_state::skylncr_vblank_interrupt(device_t &device)
 {
 	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -1974,7 +1974,7 @@ ROM_END
 *           Driver Init           *
 **********************************/
 
-DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
+void skylncr_state::init_sonikfig()
 /*
   Encryption: For each 8 bytes group,
   swap byte #1 with #4 and #3 with #6.

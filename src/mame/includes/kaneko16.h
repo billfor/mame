@@ -67,36 +67,36 @@ public:
 	int m_VIEW2_2_pri;
 
 
-	DECLARE_WRITE16_MEMBER(kaneko16_coin_lockout_w);
-	DECLARE_WRITE16_MEMBER(kaneko16_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(kaneko16_eeprom_w);
+	void kaneko16_coin_lockout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kaneko16_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kaneko16_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(kaneko16_display_enable);
+	void kaneko16_display_enable(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(kaneko16_ay1_YM2149_r);
-	DECLARE_WRITE16_MEMBER(kaneko16_ay1_YM2149_w);
-	DECLARE_READ16_MEMBER(kaneko16_ay2_YM2149_r);
-	DECLARE_WRITE16_MEMBER(kaneko16_ay2_YM2149_w);
-	DECLARE_WRITE16_MEMBER(bakubrkr_oki_bank_w);
-	DECLARE_WRITE8_MEMBER(wingforc_oki_bank_w);
+	uint16_t kaneko16_ay1_YM2149_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kaneko16_ay1_YM2149_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t kaneko16_ay2_YM2149_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kaneko16_ay2_YM2149_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bakubrkr_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void wingforc_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(eeprom_r);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
+	uint8_t eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(kaneko16);
-	DECLARE_DRIVER_INIT(samplebank);
+	void init_kaneko16();
+	void init_samplebank();
 
 
-	DECLARE_MACHINE_RESET(gtmr);
-	DECLARE_VIDEO_START(kaneko16);
-	DECLARE_MACHINE_RESET(mgcrystl);
+	void machine_reset_gtmr();
+	void video_start_kaneko16();
+	void machine_reset_mgcrystl();
 	uint32_t screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	template<class _BitmapClass>
 	uint32_t screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(shogwarr_interrupt);
+	void kaneko16_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void shogwarr_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	template<class _BitmapClass>
 	void kaneko16_fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect);
@@ -114,17 +114,17 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(bloodwar_oki_0_bank_w);
-	DECLARE_WRITE16_MEMBER(bloodwar_oki_1_bank_w);
-	DECLARE_WRITE16_MEMBER(bonkadv_oki_0_bank_w);
-	DECLARE_WRITE16_MEMBER(bonkadv_oki_1_bank_w);
-	DECLARE_WRITE16_MEMBER(gtmr_oki_0_bank_w);
-	DECLARE_WRITE16_MEMBER(gtmr_oki_1_bank_w);
-	DECLARE_WRITE16_MEMBER(bloodwar_coin_lockout_w);
-	DECLARE_READ16_MEMBER(gtmr_wheel_r);
-	DECLARE_READ16_MEMBER(gtmr2_wheel_r);
-	DECLARE_READ16_MEMBER(gtmr2_IN1_r);
-	DECLARE_DRIVER_INIT(gtmr);
+	void bloodwar_oki_0_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bloodwar_oki_1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bonkadv_oki_0_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bonkadv_oki_1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gtmr_oki_0_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gtmr_oki_1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bloodwar_coin_lockout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t gtmr_wheel_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t gtmr2_wheel_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t gtmr2_IN1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void init_gtmr();
 
 };
 
@@ -150,22 +150,22 @@ public:
 
 	bitmap_ind16 m_bg15_bitmap[32];
 
-	DECLARE_READ16_MEMBER(kaneko16_bg15_select_r);
-	DECLARE_WRITE16_MEMBER(kaneko16_bg15_select_w);
-	DECLARE_READ16_MEMBER(kaneko16_bg15_bright_r);
-	DECLARE_WRITE16_MEMBER(kaneko16_bg15_bright_w);
+	uint16_t kaneko16_bg15_select_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kaneko16_bg15_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t kaneko16_bg15_bright_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kaneko16_bg15_bright_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(berlwall_oki_r);
-	DECLARE_WRITE16_MEMBER(berlwall_oki_w);
+	uint16_t berlwall_oki_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void berlwall_oki_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(berlwall_spriteram_r);
-	DECLARE_WRITE16_MEMBER(berlwall_spriteram_w);
-	DECLARE_READ16_MEMBER(berlwall_spriteregs_r);
-	DECLARE_WRITE16_MEMBER(berlwall_spriteregs_w);
+	uint16_t berlwall_spriteram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void berlwall_spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t berlwall_spriteregs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void berlwall_spriteregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DRIVER_INIT(berlwall);
-	DECLARE_PALETTE_INIT(berlwall);
-	DECLARE_VIDEO_START(berlwall);
+	void init_berlwall();
+	void palette_init_berlwall(palette_device &palette);
+	void video_start_berlwall();
 	uint32_t screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
@@ -181,11 +181,11 @@ public:
 
 	optional_device<kaneko_calc3_device> m_calc3_prot;
 
-	DECLARE_WRITE16_MEMBER(shogwarr_oki_bank_w);
-	DECLARE_WRITE16_MEMBER(brapboys_oki_bank_w);
+	void shogwarr_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void brapboys_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DRIVER_INIT(shogwarr);
-	DECLARE_DRIVER_INIT(brapboys);
+	void init_shogwarr();
+	void init_brapboys();
 };
 
 #endif

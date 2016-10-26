@@ -86,7 +86,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::crureadz)
 /*
     CRU write
 */
-WRITE8_MEMBER(nouspikel_ide_interface_device::cruwrite)
+void nouspikel_ide_interface_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -192,7 +192,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 /*
     Memory write. The controller is 16 bit, so we need to demultiplex again.
 */
-WRITE8_MEMBER(nouspikel_ide_interface_device::write)
+void nouspikel_ide_interface_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (space.debugger_access()) return;
 
@@ -285,7 +285,7 @@ void nouspikel_ide_interface_device::do_inta(int state)
     ti99_ide_interrupt()
     IDE interrupt callback
 */
-WRITE_LINE_MEMBER(nouspikel_ide_interface_device::ide_interrupt_callback)
+void nouspikel_ide_interface_device::ide_interrupt_callback(int state)
 {
 	m_ata_irq = state;
 	if (m_cru_register & cru_reg_int_en)
@@ -296,7 +296,7 @@ WRITE_LINE_MEMBER(nouspikel_ide_interface_device::ide_interrupt_callback)
     clk_interrupt_callback()
     clock interrupt callback
 */
-WRITE_LINE_MEMBER(nouspikel_ide_interface_device::clock_interrupt_callback)
+void nouspikel_ide_interface_device::clock_interrupt_callback(int state)
 {
 	m_clk_irq = (state!=0);
 	m_slot->set_inta(state);

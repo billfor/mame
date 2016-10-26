@@ -159,7 +159,7 @@ READ8Z_MEMBER(mainboard8_device::crureadz)
 /*
     CRU handling. Mofetta is the only chip that bothers to handle it, beside the PEB
 */
-WRITE8_MEMBER(mainboard8_device::cruwrite)
+void mainboard8_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mofetta->cruwrite(space, offset, data);
 	m_peb->cruwrite(space, offset, data);
@@ -167,12 +167,12 @@ WRITE8_MEMBER(mainboard8_device::cruwrite)
 
 // =============== Memory bus access ==================
 
-WRITE_LINE_MEMBER( mainboard8_device::dbin_in )
+void mainboard8_device::dbin_in(int state)
 {
 	m_dbin_level = (line_state)state;
 }
 
-SETOFFSET_MEMBER( mainboard8_device::setoffset )
+void mainboard8_device::setoffset(address_space &space, offs_t offset)
 {
 	if (TRACE_ADDRESS) logerror("set %s %04x\n", (m_dbin_level==ASSERT_LINE)? "R" : "W", offset);
 
@@ -213,12 +213,12 @@ SETOFFSET_MEMBER( mainboard8_device::setoffset )
 	m_ready(m_amigo->cpury_out());
 }
 
-WRITE_LINE_MEMBER( mainboard8_device::reset_console )
+void mainboard8_device::reset_console(int state)
 {
 	m_console_reset(state);
 }
 
-WRITE_LINE_MEMBER( mainboard8_device::hold_cpu )
+void mainboard8_device::hold_cpu(int state)
 {
 	m_hold_line(state);
 }
@@ -226,7 +226,7 @@ WRITE_LINE_MEMBER( mainboard8_device::hold_cpu )
 /*
     HOLD Acknowledge from the CPU
 */
-WRITE_LINE_MEMBER( mainboard8_device::holda_line )
+void mainboard8_device::holda_line(int state)
 {
 	m_amigo->holda_in(state);
 }
@@ -234,7 +234,7 @@ WRITE_LINE_MEMBER( mainboard8_device::holda_line )
 /*
     Clock line from the CPU. Forward to the custom chips.
 */
-WRITE_LINE_MEMBER( mainboard8_device::clock_in )
+void mainboard8_device::clock_in(int state)
 {
 	if (TRACE_CLOCK) logerror("CLKOUT = %d\n", state);
 
@@ -440,7 +440,7 @@ void mainboard8_device::set_paddress(int address)
 	m_peb->setaddress_dbin(*m_space, address, m_dbin_level);
 }
 
-WRITE_LINE_MEMBER( mainboard8_device::msast_in )
+void mainboard8_device::msast_in(int state)
 {
 	if (TRACE_DETAIL) logerror("msast = %d\n", state);
 
@@ -455,7 +455,7 @@ WRITE_LINE_MEMBER( mainboard8_device::msast_in )
 }
 
 
-READ8_MEMBER( mainboard8_device::read )
+uint8_t mainboard8_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 	const char* what;
@@ -648,7 +648,7 @@ void mainboard8_device::cycle_end()
     If the READY line is pulled down due to the mapping process, we must
     store the data bus value until the physical address is available.
 */
-WRITE8_MEMBER( mainboard8_device::write )
+void mainboard8_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latched_data = data;
 	m_pending_write = true;
@@ -698,7 +698,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 /*
     Set 99/4A compatibility mode (CRUS=1)
 */
-WRITE_LINE_MEMBER( mainboard8_device::crus_in )
+void mainboard8_device::crus_in(int state)
 {
 	if (TRACE_CRU) logerror("%s CRUS\n", (state==1)? "Assert" : "Clear");
 	m_vaquerro->crus_in(state);
@@ -709,7 +709,7 @@ WRITE_LINE_MEMBER( mainboard8_device::crus_in )
     Set mapper /PTGEN line ("Pascal and Text-to-speech GROMs enable").
     Note that PTGEN is negative logic.
 */
-WRITE_LINE_MEMBER( mainboard8_device::ptgen_in )
+void mainboard8_device::ptgen_in(int state)
 {
 	if (TRACE_CRU) logerror("%s PTGEN*\n", (state==0)? "Assert" : "Clear");
 	m_vaquerro->crusgl_in((state==0)? ASSERT_LINE : CLEAR_LINE);
@@ -719,43 +719,43 @@ WRITE_LINE_MEMBER( mainboard8_device::ptgen_in )
 /*
     READY lines, to be combined
 */
-WRITE_LINE_MEMBER( mainboard8_device::system_grom_ready )
+void mainboard8_device::system_grom_ready(int state)
 {
 	m_vaquerro->sgmry(state);
 }
 
-WRITE_LINE_MEMBER( mainboard8_device::ptts_grom_ready )
+void mainboard8_device::ptts_grom_ready(int state)
 {
 	m_vaquerro->tsgry(state);
 }
 
-WRITE_LINE_MEMBER( mainboard8_device::p8_grom_ready )
+void mainboard8_device::p8_grom_ready(int state)
 {
 	m_vaquerro->p8gry(state);
 }
 
-WRITE_LINE_MEMBER( mainboard8_device::p3_grom_ready )
+void mainboard8_device::p3_grom_ready(int state)
 {
 	m_vaquerro->p3gry(state);
 }
 
-WRITE_LINE_MEMBER( mainboard8_device::sound_ready )
+void mainboard8_device::sound_ready(int state)
 {
 	m_sound_ready = state;
 }
 
-WRITE_LINE_MEMBER( mainboard8_device::speech_ready )
+void mainboard8_device::speech_ready(int state)
 {
 	// The TMS5200 implementation uses true/false, not ASSERT/CLEAR semantics
 	m_speech_ready = (state==false)? ASSERT_LINE : CLEAR_LINE;
 }
 
-WRITE_LINE_MEMBER( mainboard8_device::pbox_ready )
+void mainboard8_device::pbox_ready(int state)
 {
 	m_pbox_ready = state;
 }
 
-WRITE_LINE_MEMBER( mainboard8_device::ggrdy_in )
+void mainboard8_device::ggrdy_in(int state)
 {
 	m_amigo->srdy_in((state==ASSERT_LINE && m_speech_ready && m_sound_ready && m_pbox_ready)? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1021,17 +1021,17 @@ SETADDRESS_DBIN_MEMBER( vaquerro_device::set_address )
 	}
 }
 
-WRITE_LINE_MEMBER( vaquerro_device::crusgl_in )
+void vaquerro_device::crusgl_in(int state)
 {
 	m_crugl = (state==ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( vaquerro_device::crus_in )
+void vaquerro_device::crus_in(int state)
 {
 	m_crus = (line_state)state;
 }
 
-WRITE_LINE_MEMBER( vaquerro_device::memen_in )
+void vaquerro_device::memen_in(int state)
 {
 	m_memen = (state==ASSERT_LINE);
 }
@@ -1039,7 +1039,7 @@ WRITE_LINE_MEMBER( vaquerro_device::memen_in )
 /*
     Called by Mofetta
 */
-READ_LINE_MEMBER( vaquerro_device::lascsq_out )
+int vaquerro_device::lascsq_out()
 {
 	return (m_lasreq && m_memen)? ASSERT_LINE : CLEAR_LINE;
 }
@@ -1047,25 +1047,25 @@ READ_LINE_MEMBER( vaquerro_device::lascsq_out )
 /*
     Incoming ready lines from the GROM library
 */
-WRITE_LINE_MEMBER( vaquerro_device::sgmry )
+void vaquerro_device::sgmry(int state)
 {
 	if (TRACE_READY) logerror("Incoming SGMRY = %d\n", state);
 	m_sgmws.ready_in((line_state)state);
 }
 
-WRITE_LINE_MEMBER( vaquerro_device::tsgry )
+void vaquerro_device::tsgry(int state)
 {
 	if (TRACE_READY) logerror("Incoming TSGRY = %d\n", state);
 	m_tsgws.ready_in((line_state)state);
 }
 
-WRITE_LINE_MEMBER( vaquerro_device::p8gry )
+void vaquerro_device::p8gry(int state)
 {
 	if (TRACE_READY) logerror("Incoming 8GRY = %d\n", state);
 	m_p8gws.ready_in((line_state)state);
 }
 
-WRITE_LINE_MEMBER( vaquerro_device::p3gry )
+void vaquerro_device::p3gry(int state)
 {
 	if (TRACE_READY) logerror("Incoming P3GRY = %d\n", state);
 	m_p3gws.ready_in((line_state)state);
@@ -1074,7 +1074,7 @@ WRITE_LINE_MEMBER( vaquerro_device::p3gry )
 /*
     Outgoing READY
 */
-READ_LINE_MEMBER( vaquerro_device::ggrdy_out )
+int vaquerro_device::ggrdy_out()
 {
 	if (TRACE_READY) logerror("GGRDY out = %d\n", m_ggrdy);
 	return m_ggrdy;
@@ -1093,32 +1093,32 @@ int vaquerro_device::gromcs_out()
 
 // =========================
 
-READ_LINE_MEMBER( vaquerro_device::vdprd_out )
+int vaquerro_device::vdprd_out()
 {
 	return (m_vdprd && m_memen)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( vaquerro_device::vdpwt_out )
+int vaquerro_device::vdpwt_out()
 {
 	return (m_vdpwt && m_memen)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( vaquerro_device::sprd_out )
+int vaquerro_device::sprd_out()
 {
 	return (m_sprd && m_memen)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( vaquerro_device::spwt_out )
+int vaquerro_device::spwt_out()
 {
 	return (m_spwt && m_memen)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( vaquerro_device::sromcs_out )
+int vaquerro_device::sromcs_out()
 {
 	return (m_sromcs && m_memen)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( vaquerro_device::sccs_out )
+int vaquerro_device::sccs_out()
 {
 	return (m_sccs && m_memen)? ASSERT_LINE : CLEAR_LINE;
 }
@@ -1133,7 +1133,7 @@ READ_LINE_MEMBER( vaquerro_device::sccs_out )
     access occurs, the system READY line will be cleared, triggering wait
     states in the CPU.
 */
-WRITE_LINE_MEMBER( vaquerro_device::clock_in )
+void vaquerro_device::clock_in(int state)
 {
 	line_state level = (line_state)state;
 
@@ -1427,7 +1427,7 @@ SETADDRESS_DBIN_MEMBER( mofetta_device::set_address )
     Mofetta delivers the GROMCLK. In the 99/4A, this clock is produced by the VDP.
     Apart from that, Mofetta does not need the CLKOUT.
 */
-WRITE_LINE_MEMBER( mofetta_device::clock_in )
+void mofetta_device::clock_in(int state)
 {
 	if (state == CLEAR_LINE)    // TODO: Correct edge?
 	{
@@ -1440,37 +1440,37 @@ WRITE_LINE_MEMBER( mofetta_device::clock_in )
 	}
 }
 
-READ_LINE_MEMBER( mofetta_device::alccs_out )
+int mofetta_device::alccs_out()
 {
 	return (m_alccs && m_pmemen)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( mofetta_device::gromclk_out )
+int mofetta_device::gromclk_out()
 {
 	return m_gromclk_up? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( mofetta_device::rom1cs_out )
+int mofetta_device::rom1cs_out()
 {
 	return (m_rom1cs && m_pmemen)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( mofetta_device::rom1am_out )
+int mofetta_device::rom1am_out()
 {
 	return (m_rom1am && m_pmemen)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( mofetta_device::rom1al_out )
+int mofetta_device::rom1al_out()
 {
 	return (m_rom1al && m_pmemen)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( mofetta_device::prcs_out )
+int mofetta_device::prcs_out()
 {
 	return (m_prcs && m_pmemen)? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( mofetta_device::cmas_out )
+int mofetta_device::cmas_out()
 {
 	return (m_cmas && m_pmemen)? ASSERT_LINE : CLEAR_LINE;
 }
@@ -1478,12 +1478,12 @@ READ_LINE_MEMBER( mofetta_device::cmas_out )
 /*
     Asserted when a PEB access occurs
 */
-READ_LINE_MEMBER( mofetta_device::dbc_out )
+int mofetta_device::dbc_out()
 {
 	return (m_lasreq || m_cmas || m_rom1cs || m_skdrcs || !m_pmemen)? CLEAR_LINE : ASSERT_LINE;
 }
 
-WRITE8_MEMBER(mofetta_device::cruwrite)
+void mofetta_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0xff00)==0x2700)
 	{
@@ -1514,7 +1514,7 @@ WRITE8_MEMBER(mofetta_device::cruwrite)
 /*
     Setting or clearing the MSAST line.
 */
-WRITE_LINE_MEMBER( mofetta_device::msast_in )
+void mofetta_device::msast_in(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -1529,17 +1529,17 @@ WRITE_LINE_MEMBER( mofetta_device::msast_in )
 	m_msast = (line_state)state;
 }
 
-WRITE_LINE_MEMBER( mofetta_device::pmemen_in )
+void mofetta_device::pmemen_in(int state)
 {
 	m_pmemen = (state==ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( mofetta_device::lascs_in )
+void mofetta_device::lascs_in(int state)
 {
 	m_lasreq = (state==ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( mofetta_device::skdrcs_in )
+void mofetta_device::skdrcs_in(int state)
 {
 	m_skdrcs = (state==ASSERT_LINE);
 }
@@ -1672,7 +1672,7 @@ enum
 /*
     Incoming READY line (SRDY)
 */
-WRITE_LINE_MEMBER( amigo_device::srdy_in )
+void amigo_device::srdy_in(int state)
 {
 	if (TRACE_READY) logerror("Incoming SRDY = %d\n", state);
 	m_srdy = (line_state)state;
@@ -1685,7 +1685,7 @@ WRITE_LINE_MEMBER( amigo_device::srdy_in )
 	}
 }
 
-WRITE_LINE_MEMBER( amigo_device::memen_in )
+void amigo_device::memen_in(int state)
 {
 	m_memen = (state==ASSERT_LINE);
 }
@@ -1693,7 +1693,7 @@ WRITE_LINE_MEMBER( amigo_device::memen_in )
 /*
     Polled from the mainboard
 */
-READ_LINE_MEMBER( amigo_device::cpury_out )
+int amigo_device::cpury_out()
 {
 	return m_ready_out;
 }
@@ -1701,7 +1701,7 @@ READ_LINE_MEMBER( amigo_device::cpury_out )
 /*
     Polled from the mainboard
 */
-READ_LINE_MEMBER( amigo_device::sramcs_out )
+int amigo_device::sramcs_out()
 {
 	return m_sram_accessed && m_memen? ASSERT_LINE : CLEAR_LINE;
 }
@@ -1712,7 +1712,7 @@ READ_LINE_MEMBER( amigo_device::sramcs_out )
     This is actually more than needed because we only have 64K DRAM (which
     would only need a 16 bit address), and Amigo itself selects it.
 */
-READ_LINE_MEMBER( amigo_device::skdrcs_out )
+int amigo_device::skdrcs_out()
 {
 	return m_dram_accessed && (m_amstate == IDLE) && m_memen? ASSERT_LINE : CLEAR_LINE;
 }
@@ -1720,7 +1720,7 @@ READ_LINE_MEMBER( amigo_device::skdrcs_out )
 /*
     Incoming CRUS line. Needed to set the mapper config addresses.
 */
-WRITE_LINE_MEMBER( amigo_device::crus_in )
+void amigo_device::crus_in(int state)
 {
 	m_crus = (line_state)state;
 }
@@ -1728,7 +1728,7 @@ WRITE_LINE_MEMBER( amigo_device::crus_in )
 /*
     Incoming LASCS line.
 */
-WRITE_LINE_MEMBER( amigo_device::lascs_in )
+void amigo_device::lascs_in(int state)
 {
 	m_logical_space = (state==ASSERT_LINE);
 }
@@ -1744,7 +1744,7 @@ WRITE_LINE_MEMBER( amigo_device::lascs_in )
     3. Set the physical address bus with the second 16 bits of the physical
        address. Clear the MSAST line. Forward any incoming READY=0 to the CPU.
 */
-SETOFFSET_MEMBER( amigo_device::set_address )
+void amigo_device::set_address(address_space &space, offs_t offset)
 {
 	// Check whether the mapper itself is accessed
 	int mapaddr = (m_crus==ASSERT_LINE)? 0x8810 : 0xf870;
@@ -1795,7 +1795,7 @@ SETOFFSET_MEMBER( amigo_device::set_address )
 /*
     Read the mapper status bits
 */
-READ8_MEMBER( amigo_device::read )
+uint8_t amigo_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Read the protection status bits and reset them
 	uint8_t value = m_protflag;
@@ -1806,7 +1806,7 @@ READ8_MEMBER( amigo_device::read )
 /*
     Configure the mapper. This is the only reason to write to the AMIGO.
 */
-WRITE8_MEMBER( amigo_device::write )
+void amigo_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Load or save map file
 	if ((data & 0xf0)==0x00)
@@ -1822,7 +1822,7 @@ WRITE8_MEMBER( amigo_device::write )
 	else logerror("Invalid value written to Amigo: %02x\n", data);
 }
 
-WRITE_LINE_MEMBER( amigo_device::clock_in )
+void amigo_device::clock_in(int state)
 {
 	if (state==CLEAR_LINE)
 	{
@@ -1899,7 +1899,7 @@ void amigo_device::mapper_save()
 	m_mapvalue = m_mapvalue << 8;
 }
 
-WRITE_LINE_MEMBER( amigo_device::holda_in )
+void amigo_device::holda_in(int state)
 {
 	if (TRACE_MAP) logerror("HOLD acknowledged = %d\n", state);
 	m_hold_acknowledged = (state==ASSERT_LINE);
@@ -2007,7 +2007,7 @@ oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
-READ8_MEMBER( oso_device::read )
+uint8_t oso_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int value = 0;
 	offset &= 0x03;
@@ -2037,7 +2037,7 @@ READ8_MEMBER( oso_device::read )
 	return value;
 }
 
-WRITE8_MEMBER( oso_device::write )
+void oso_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x03;
 	switch (offset)

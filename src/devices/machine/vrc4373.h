@@ -76,35 +76,35 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
-	DECLARE_READ32_MEMBER(  pcictrl_r);
-	DECLARE_WRITE32_MEMBER( pcictrl_w);
+	uint32_t pcictrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pcictrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	//cpu bus registers
-	DECLARE_READ32_MEMBER (cpu_if_r);
-	DECLARE_WRITE32_MEMBER(cpu_if_w);
+	uint32_t cpu_if_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cpu_if_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER (master1_r);
-	DECLARE_WRITE32_MEMBER(master1_w);
+	uint32_t master1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void master1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER (master2_r);
-	DECLARE_WRITE32_MEMBER(master2_w);
+	uint32_t master2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void master2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER (master_io_r);
-	DECLARE_WRITE32_MEMBER(master_io_w);
+	uint32_t master_io_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void master_io_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	virtual DECLARE_ADDRESS_MAP(target1_map, 32);
-	DECLARE_READ32_MEMBER (target1_r);
-	DECLARE_WRITE32_MEMBER(target1_w);
+	uint32_t target1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void target1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	virtual DECLARE_ADDRESS_MAP(target2_map, 32);
-	DECLARE_READ32_MEMBER (target2_r);
-	DECLARE_WRITE32_MEMBER(target2_w);
+	uint32_t target2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void target2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	address_space *m_cpu_space;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	TIMER_CALLBACK_MEMBER(dma_transfer);
+	void dma_transfer(void *ptr, int32_t param);
 
 private:
 	mips3_device *m_cpu;

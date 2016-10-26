@@ -92,61 +92,61 @@ public:
 	uint8_t m_out[3];
 	uint16_t m_unk_reg[3][5];
 
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(bg_scroll_w);
-	DECLARE_WRITE8_MEMBER(reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(unk_reg1_lo_w);
-	DECLARE_WRITE8_MEMBER(unk_reg2_lo_w);
-	DECLARE_WRITE8_MEMBER(unk_reg3_lo_w);
-	DECLARE_WRITE8_MEMBER(unk_reg1_hi_w);
-	DECLARE_WRITE8_MEMBER(unk_reg2_hi_w);
-	DECLARE_WRITE8_MEMBER(unk_reg3_hi_w);
-	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_READ8_MEMBER(igs_irqack_r);
-	DECLARE_WRITE8_MEMBER(igs_irqack_w);
-	DECLARE_READ8_MEMBER(expram_r);
+	void fg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unk_reg1_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unk_reg2_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unk_reg3_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unk_reg1_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unk_reg2_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unk_reg3_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_and_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t igs_irqack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void igs_irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t expram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void unk_reg_lo_w( int offset, uint8_t data, int reg );
 	void unk_reg_hi_w( int offset, uint8_t data, int reg );
 	void show_out();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	ioport_value hopper_r(ioport_field &field, void *param);
 
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	DECLARE_DRIVER_INIT(jackie);
+	void init_jackie();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	void irq(timer_device &timer, void *ptr, int32_t param);
 };
 
 
 
 
-TILE_GET_INFO_MEMBER(jackie_state::get_fg_tile_info)
+void jackie_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
 	SET_TILE_INFO_MEMBER(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
-WRITE8_MEMBER(jackie_state::fg_tile_w)
+void jackie_state::fg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jackie_state::fg_color_w)
+void jackie_state::fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -155,19 +155,19 @@ WRITE8_MEMBER(jackie_state::fg_color_w)
 
 
 
-WRITE8_MEMBER(jackie_state::bg_scroll_w)
+void jackie_state::bg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_scroll[offset] = data;
 }
 
 
-WRITE8_MEMBER(jackie_state::reel1_ram_w)
+void jackie_state::reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(jackie_state::get_reel1_tile_info)
+void jackie_state::get_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel1_ram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
@@ -175,26 +175,26 @@ TILE_GET_INFO_MEMBER(jackie_state::get_reel1_tile_info)
 
 
 
-WRITE8_MEMBER(jackie_state::reel2_ram_w)
+void jackie_state::reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel2_ram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(jackie_state::get_reel2_tile_info)
+void jackie_state::get_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel2_ram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
 
-WRITE8_MEMBER(jackie_state::reel3_ram_w)
+void jackie_state::reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(jackie_state::get_reel3_tile_info)
+void jackie_state::get_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel3_ram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
@@ -301,9 +301,9 @@ void jackie_state::unk_reg_lo_w( int offset, uint8_t data, int reg )
 	show_out();
 }
 
-WRITE8_MEMBER(jackie_state::unk_reg1_lo_w){ unk_reg_lo_w( offset, data, 0 ); }
-WRITE8_MEMBER(jackie_state::unk_reg2_lo_w){ unk_reg_lo_w( offset, data, 1 ); }
-WRITE8_MEMBER(jackie_state::unk_reg3_lo_w){ unk_reg_lo_w( offset, data, 2 ); }
+void jackie_state::unk_reg1_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ unk_reg_lo_w( offset, data, 0 ); }
+void jackie_state::unk_reg2_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ unk_reg_lo_w( offset, data, 1 ); }
+void jackie_state::unk_reg3_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ unk_reg_lo_w( offset, data, 2 ); }
 
 void jackie_state::unk_reg_hi_w( int offset, uint8_t data, int reg )
 {
@@ -312,11 +312,11 @@ void jackie_state::unk_reg_hi_w( int offset, uint8_t data, int reg )
 	show_out();
 }
 
-WRITE8_MEMBER(jackie_state::unk_reg1_hi_w){ unk_reg_hi_w( offset, data, 0 ); }
-WRITE8_MEMBER(jackie_state::unk_reg2_hi_w){ unk_reg_hi_w( offset, data, 1 ); }
-WRITE8_MEMBER(jackie_state::unk_reg3_hi_w){ unk_reg_hi_w( offset, data, 2 ); }
+void jackie_state::unk_reg1_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ unk_reg_hi_w( offset, data, 0 ); }
+void jackie_state::unk_reg2_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ unk_reg_hi_w( offset, data, 1 ); }
+void jackie_state::unk_reg3_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ unk_reg_hi_w( offset, data, 2 ); }
 
-WRITE8_MEMBER(jackie_state::nmi_and_coins_w)
+void jackie_state::nmi_and_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0,        data & 0x01);   // coin_a
 	machine().bookkeeping().coin_counter_w(1,        data & 0x04);   // coin_c
@@ -332,7 +332,7 @@ WRITE8_MEMBER(jackie_state::nmi_and_coins_w)
 	show_out();
 }
 
-WRITE8_MEMBER(jackie_state::lamps_w)
+void jackie_state::lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     - Lbits -
@@ -358,20 +358,20 @@ WRITE8_MEMBER(jackie_state::lamps_w)
 	show_out();
 }
 
-READ8_MEMBER(jackie_state::igs_irqack_r)
+uint8_t jackie_state::igs_irqack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_irq_enable = 1;
 	return 0;
 }
 
-WRITE8_MEMBER(jackie_state::igs_irqack_w)
+void jackie_state::igs_irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_out[2] = data;
 	show_out();
 }
 
-READ8_MEMBER(jackie_state::expram_r)
+uint8_t jackie_state::expram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("gfx3")->base();
 
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( jackie_io_map, AS_IO, 8, jackie_state )
 	AM_RANGE(0x8000, 0xffff) AM_READ(expram_r)
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER(jackie_state::hopper_r)
+ioport_value jackie_state::hopper_r(ioport_field &field, void *param)
 {
 	if (m_hopper) return !(m_screen->frame_number()%10);
 	return machine().input().code_pressed(KEYCODE_H);
@@ -563,7 +563,7 @@ static GFXDECODE_START( jackie )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32x6, 0, 16 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(jackie_state,jackie)
+void jackie_state::init_jackie()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -582,7 +582,7 @@ DRIVER_INIT_MEMBER(jackie_state,jackie)
 	rom[0x7e86] = 0xc3;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::irq)
+void jackie_state::irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

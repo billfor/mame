@@ -75,132 +75,132 @@ void taitof2_state::taitof2_core_vh_start (int sprite_type, int hide, int flip_h
 /*    ( spritetype, hide, hideflip, xoffs, yoffs, flipx, flipy, textflipx, textflipy) */
 /**************************************************************************************/
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_default)
+void taitof2_state::video_start_taitof2_default()
 {
 	taitof2_core_vh_start(0, 0, 0);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_megab)/* Megab, Liquidk */
+void taitof2_state::video_start_taitof2_megab()/* Megab, Liquidk */
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_quiz)/* Quiz Crayons, Quiz Jinsei */
+void taitof2_state::video_start_taitof2_quiz()/* Quiz Crayons, Quiz Jinsei */
 {
 	taitof2_core_vh_start(3, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_finalb)
+void taitof2_state::video_start_taitof2_finalb()
 {
 	taitof2_core_vh_start(0, 1, 1);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_ssi)
+void taitof2_state::video_start_taitof2_ssi()
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_growl)
+void taitof2_state::video_start_taitof2_growl()
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_ninjak)
+void taitof2_state::video_start_taitof2_ninjak()
 {
 	taitof2_core_vh_start(0, 0, 0);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_qzchikyu)
+void taitof2_state::video_start_taitof2_qzchikyu()
 {
 	taitof2_core_vh_start(0, 0, 4);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_solfigtr)
+void taitof2_state::video_start_taitof2_solfigtr()
 {
 	taitof2_core_vh_start(0, 3, -3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_koshien)
+void taitof2_state::video_start_taitof2_koshien()
 {
 	taitof2_core_vh_start(0, 1,  - 1);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_gunfront)
+void taitof2_state::video_start_taitof2_gunfront()
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_thundfox)
+void taitof2_state::video_start_taitof2_thundfox()
 {
 	taitof2_core_vh_start(0, 3, -3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_mjnquest)
+void taitof2_state::video_start_taitof2_mjnquest()
 {
 	taitof2_core_vh_start(0, 0, 0);
 
 	m_tc0100scn->set_bg_tilemask(0x7fff);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_footchmp)
+void taitof2_state::video_start_taitof2_footchmp()
 {
 	taitof2_core_vh_start(0, 3, 3);
 
 	m_game = FOOTCHMP;
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_hthero)
+void taitof2_state::video_start_taitof2_hthero()
 {
 	taitof2_core_vh_start(0, 3, 3);
 
 	m_game = FOOTCHMP;
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_deadconx)
+void taitof2_state::video_start_taitof2_deadconx()
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_deadconxj)
+void taitof2_state::video_start_taitof2_deadconxj()
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_metalb)
+void taitof2_state::video_start_taitof2_metalb()
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_yuyugogo)
+void taitof2_state::video_start_taitof2_yuyugogo()
 {
 	taitof2_core_vh_start(1, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_yesnoj)
+void taitof2_state::video_start_taitof2_yesnoj()
 {
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_dinorex)
+void taitof2_state::video_start_taitof2_dinorex()
 {
 	taitof2_core_vh_start(3, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_dondokod)/* dondokod, cameltry */
+void taitof2_state::video_start_taitof2_dondokod()/* dondokod, cameltry */
 {
 	m_pivot_xdisp = -16;
 	m_pivot_ydisp = 0;
 	taitof2_core_vh_start(0, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_pulirula)
+void taitof2_state::video_start_taitof2_pulirula()
 {
 	m_pivot_xdisp = -10;    /* alignment seems correct (see level 2, falling */
 	m_pivot_ydisp = 16; /* block of ice after armour man) */
 	taitof2_core_vh_start(2, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,taitof2_driftout)
+void taitof2_state::video_start_taitof2_driftout()
 {
 	m_pivot_xdisp = -16;
 	m_pivot_ydisp = 16;
@@ -218,7 +218,7 @@ might be for Footchmp. That seems to be the only game
 altering spritebanks of sprites while they're on screen.
 ********************************************************/
 
-WRITE16_MEMBER(taitof2_state::taitof2_sprite_extension_w)
+void taitof2_state::taitof2_sprite_extension_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* areas above 0x1000 cleared in some games, but not used */
 
@@ -229,7 +229,7 @@ WRITE16_MEMBER(taitof2_state::taitof2_sprite_extension_w)
 }
 
 
-WRITE16_MEMBER(taitof2_state::taitof2_spritebank_w)
+void taitof2_state::taitof2_spritebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i = 0;
 	int j = 0;
@@ -258,7 +258,7 @@ WRITE16_MEMBER(taitof2_state::taitof2_spritebank_w)
 
 }
 
-WRITE16_MEMBER(taitof2_state::koshien_spritebank_w)
+void taitof2_state::koshien_spritebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_spritebank_buffered[0] = 0x0000;   /* never changes */
 	m_spritebank_buffered[1] = 0x0400;

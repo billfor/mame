@@ -272,20 +272,20 @@ public:
 	optional_device<decospr_device> m_sprgen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(fg_videoram_w);
-	DECLARE_WRITE16_MEMBER(bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(nmg5_soundlatch_w);
-	DECLARE_READ16_MEMBER(prot_r);
-	DECLARE_WRITE16_MEMBER(prot_w);
-	DECLARE_WRITE16_MEMBER(gfx_bank_w);
-	DECLARE_WRITE16_MEMBER(priority_reg_w);
-	DECLARE_WRITE8_MEMBER(oki_banking_w);
-	DECLARE_DRIVER_INIT(prot_val_00);
-	DECLARE_DRIVER_INIT(prot_val_10);
-	DECLARE_DRIVER_INIT(prot_val_20);
-	DECLARE_DRIVER_INIT(prot_val_40);
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	void fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void nmg5_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gfx_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void priority_reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oki_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_prot_val_00();
+	void init_prot_val_10();
+	void init_prot_val_20();
+	void init_prot_val_40();
+	void fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -295,19 +295,19 @@ public:
 
 
 
-WRITE16_MEMBER(nmg5_state::fg_videoram_w)
+void nmg5_state::fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmg5_state::bg_videoram_w)
+void nmg5_state::bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
+void nmg5_state::nmg5_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -316,17 +316,17 @@ WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
 	}
 }
 
-READ16_MEMBER(nmg5_state::prot_r)
+uint16_t nmg5_state::prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_prot_val | m_input_data;
 }
 
-WRITE16_MEMBER(nmg5_state::prot_w)
+void nmg5_state::prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_input_data = data & 0x0f;
 }
 
-WRITE16_MEMBER(nmg5_state::gfx_bank_w)
+void nmg5_state::gfx_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_gfx_bank != (data & 3))
 	{
@@ -335,7 +335,7 @@ WRITE16_MEMBER(nmg5_state::gfx_bank_w)
 	}
 }
 
-WRITE16_MEMBER(nmg5_state::priority_reg_w)
+void nmg5_state::priority_reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_priority_reg = data & 7;
 
@@ -343,7 +343,7 @@ WRITE16_MEMBER(nmg5_state::priority_reg_w)
 		popmessage("unknown priority_reg value = %d\n", m_priority_reg);
 }
 
-WRITE8_MEMBER(nmg5_state::oki_banking_w)
+void nmg5_state::oki_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank(data & 1);
 }
@@ -827,8 +827,8 @@ static INPUT_PORTS_START( wondstck )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
 
-TILE_GET_INFO_MEMBER(nmg5_state::fg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_fg_videoram[tile_index] | (m_gfx_bank << 16), 0, 0);}
-TILE_GET_INFO_MEMBER(nmg5_state::bg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_bg_videoram[tile_index] | (m_gfx_bank << 16), 1, 0);}
+void nmg5_state::fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ SET_TILE_INFO_MEMBER(0, m_fg_videoram[tile_index] | (m_gfx_bank << 16), 0, 0);}
+void nmg5_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ SET_TILE_INFO_MEMBER(0, m_bg_videoram[tile_index] | (m_gfx_bank << 16), 1, 0);}
 
 void nmg5_state::video_start()
 {
@@ -1558,22 +1558,22 @@ ROM_START( 7ordi )
 	ROM_RELOAD(0x60000,0x20000)
 ROM_END
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_00)
+void nmg5_state::init_prot_val_00()
 {
 	m_prot_val = 0x00;
 }
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_10)
+void nmg5_state::init_prot_val_10()
 {
 	m_prot_val = 0x10;
 }
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_20)
+void nmg5_state::init_prot_val_20()
 {
 	m_prot_val = 0x20;
 }
 
-DRIVER_INIT_MEMBER(nmg5_state,prot_val_40)
+void nmg5_state::init_prot_val_40()
 {
 	m_prot_val = 0x40;
 }

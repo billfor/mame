@@ -72,29 +72,29 @@ public:
 	uint16_t    m_pf2_rowscroll[0x0800/2];
 	uint16_t    m_pf3_rowscroll[0x0800/2];
 	uint16_t    m_pf4_rowscroll[0x0800/2];
-	DECLARE_READ32_MEMBER(backfire_control2_r);
-	DECLARE_WRITE32_MEMBER(backfire_nonbuffered_palette_w);
-	DECLARE_READ32_MEMBER(backfire_pf1_rowscroll_r);
-	DECLARE_READ32_MEMBER(backfire_pf2_rowscroll_r);
-	DECLARE_READ32_MEMBER(backfire_pf3_rowscroll_r);
-	DECLARE_READ32_MEMBER(backfire_pf4_rowscroll_r);
-	DECLARE_WRITE32_MEMBER(backfire_pf1_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(backfire_pf2_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(backfire_pf3_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(backfire_pf4_rowscroll_w);
-	DECLARE_READ32_MEMBER(backfire_spriteram1_r);
-	DECLARE_WRITE32_MEMBER(backfire_spriteram1_w);
-	DECLARE_READ32_MEMBER(backfire_spriteram2_r);
-	DECLARE_WRITE32_MEMBER(backfire_spriteram2_w);
-	DECLARE_READ32_MEMBER(backfire_speedup_r);
-	DECLARE_READ32_MEMBER(backfire_eeprom_r);
-	DECLARE_WRITE32_MEMBER(backfire_eeprom_w);
-	DECLARE_DRIVER_INIT(backfire);
+	uint32_t backfire_control2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void backfire_nonbuffered_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t backfire_pf1_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t backfire_pf2_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t backfire_pf3_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t backfire_pf4_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void backfire_pf1_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void backfire_pf2_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void backfire_pf3_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void backfire_pf4_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t backfire_spriteram1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void backfire_spriteram1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t backfire_spriteram2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void backfire_spriteram2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t backfire_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t backfire_eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void backfire_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void init_backfire();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_backfire_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_backfire_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
+	void deco32_vbl_interrupt(device_t &device);
 	void descramble_sound();
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
@@ -197,7 +197,7 @@ uint32_t backfire_state::screen_update_backfire_right(screen_device &screen, bit
 
 
 
-READ32_MEMBER(backfire_state::backfire_eeprom_r)
+uint32_t backfire_state::backfire_eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* some kind of screen indicator?  checked by backfirea set before it will boot */
 	int backfire_screen = machine().rand() & 1;
@@ -206,14 +206,14 @@ READ32_MEMBER(backfire_state::backfire_eeprom_r)
 			| ((m_io_in3->read() & 0x40) << 16)) ^ (backfire_screen << 26) ;
 }
 
-READ32_MEMBER(backfire_state::backfire_control2_r)
+uint32_t backfire_state::backfire_control2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n", space.device().safe_pc(), offset << 1, mem_mask);
 	return (m_eeprom->do_read() << 24) | m_io_in1->read() | (m_io_in1->read() << 16);
 }
 
 #ifdef UNUSED_FUNCTION
-READ32_MEMBER(backfire_state::backfire_control3_r)
+uint32_t backfire_state::backfire_control3_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n", space.device().safe_pc(), offset << 1, mem_mask);
 	return (m_eeprom->do_read() << 24) | m_io_in2->read() | (m_io_in2->read() << 16);
@@ -221,7 +221,7 @@ READ32_MEMBER(backfire_state::backfire_control3_r)
 #endif
 
 
-WRITE32_MEMBER(backfire_state::backfire_eeprom_w)
+void backfire_state::backfire_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%s:write eprom %08x (%08x) %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
 	if (ACCESSING_BITS_0_7)
@@ -233,7 +233,7 @@ WRITE32_MEMBER(backfire_state::backfire_eeprom_w)
 }
 
 
-WRITE32_MEMBER(backfire_state::backfire_nonbuffered_palette_w)
+void backfire_state::backfire_nonbuffered_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	m_palette->set_pen_color(offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
@@ -241,40 +241,40 @@ WRITE32_MEMBER(backfire_state::backfire_nonbuffered_palette_w)
 
 /* map 32-bit writes to 16-bit */
 
-READ32_MEMBER(backfire_state::backfire_pf1_rowscroll_r){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(backfire_state::backfire_pf2_rowscroll_r){ return m_pf2_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(backfire_state::backfire_pf3_rowscroll_r){ return m_pf3_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(backfire_state::backfire_pf4_rowscroll_r){ return m_pf4_rowscroll[offset] ^ 0xffff0000; }
-WRITE32_MEMBER(backfire_state::backfire_pf1_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
-WRITE32_MEMBER(backfire_state::backfire_pf2_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
-WRITE32_MEMBER(backfire_state::backfire_pf3_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf3_rowscroll[offset]); }
-WRITE32_MEMBER(backfire_state::backfire_pf4_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf4_rowscroll[offset]); }
+uint32_t backfire_state::backfire_pf1_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }
+uint32_t backfire_state::backfire_pf2_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_pf2_rowscroll[offset] ^ 0xffff0000; }
+uint32_t backfire_state::backfire_pf3_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_pf3_rowscroll[offset] ^ 0xffff0000; }
+uint32_t backfire_state::backfire_pf4_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_pf4_rowscroll[offset] ^ 0xffff0000; }
+void backfire_state::backfire_pf1_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
+void backfire_state::backfire_pf2_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
+void backfire_state::backfire_pf3_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf3_rowscroll[offset]); }
+void backfire_state::backfire_pf4_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf4_rowscroll[offset]); }
 
 
 #ifdef UNUSED_FUNCTION
-READ32_MEMBER(backfire_state::backfire_unknown_wheel_r)
+uint32_t backfire_state::backfire_unknown_wheel_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return ioport("PADDLE0")->read();
 }
 
-READ32_MEMBER(backfire_state::backfire_wheel1_r)
+uint32_t backfire_state::backfire_wheel1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand();
 }
 
-READ32_MEMBER(backfire_state::backfire_wheel2_r)
+uint32_t backfire_state::backfire_wheel2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand();
 }
 #endif
 
 
-READ32_MEMBER(backfire_state::backfire_spriteram1_r)
+uint32_t backfire_state::backfire_spriteram1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_spriteram_1[offset] ^ 0xffff0000;
 }
 
-WRITE32_MEMBER(backfire_state::backfire_spriteram1_w)
+void backfire_state::backfire_spriteram1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
@@ -282,12 +282,12 @@ WRITE32_MEMBER(backfire_state::backfire_spriteram1_w)
 	COMBINE_DATA(&m_spriteram_1[offset]);
 }
 
-READ32_MEMBER(backfire_state::backfire_spriteram2_r)
+uint32_t backfire_state::backfire_spriteram2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_spriteram_2[offset] ^ 0xffff0000;
 }
 
-WRITE32_MEMBER(backfire_state::backfire_spriteram2_w)
+void backfire_state::backfire_spriteram2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
@@ -437,7 +437,7 @@ static GFXDECODE_START( backfire )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(backfire_state::deco32_vbl_interrupt)
+void backfire_state::deco32_vbl_interrupt(device_t &device)
 {
 	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
@@ -698,7 +698,7 @@ void backfire_state::descramble_sound()
 	memcpy(rom, &buf1[0], length);
 }
 
-READ32_MEMBER(backfire_state::backfire_speedup_r)
+uint32_t backfire_state::backfire_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//osd_printf_debug( "%08x\n",space.device().safe_pc());
 
@@ -709,7 +709,7 @@ READ32_MEMBER(backfire_state::backfire_speedup_r)
 }
 
 
-DRIVER_INIT_MEMBER(backfire_state,backfire)
+void backfire_state::init_backfire()
 {
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */

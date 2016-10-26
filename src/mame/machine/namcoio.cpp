@@ -478,7 +478,7 @@ void namco58xx_device::customio_run()
 
 
 
-READ8_MEMBER( namcoio_device::read )
+uint8_t namcoio_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// RAM is 4-bit wide; Pac & Pal requires the | 0xf0 otherwise Easter egg doesn't work
 	offset &= 0x3f;
@@ -488,7 +488,7 @@ READ8_MEMBER( namcoio_device::read )
 	return 0xf0 | m_ram[offset];
 }
 
-WRITE8_MEMBER( namcoio_device::write )
+void namcoio_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x3f;
 	data &= 0x0f;   // RAM is 4-bit wide
@@ -498,7 +498,7 @@ WRITE8_MEMBER( namcoio_device::write )
 	m_ram[offset] = data;
 }
 
-WRITE_LINE_MEMBER( namcoio_device::set_reset_line )
+void namcoio_device::set_reset_line(int state)
 {
 	m_reset = (state == ASSERT_LINE) ? 1 : 0;
 	if (state != CLEAR_LINE)
@@ -515,7 +515,7 @@ WRITE_LINE_MEMBER( namcoio_device::set_reset_line )
 	}
 }
 
-READ_LINE_MEMBER( namcoio_device::read_reset_line )
+int namcoio_device::read_reset_line()
 {
 	return m_reset;
 }

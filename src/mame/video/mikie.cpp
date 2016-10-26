@@ -28,7 +28,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(mikie_state, mikie)
+void mikie_state::palette_init_mikie(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
@@ -87,19 +87,19 @@ PALETTE_INIT_MEMBER(mikie_state, mikie)
 	}
 }
 
-WRITE8_MEMBER(mikie_state::mikie_videoram_w)
+void mikie_state::mikie_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mikie_state::mikie_colorram_w)
+void mikie_state::mikie_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mikie_state::mikie_palettebank_w)
+void mikie_state::mikie_palettebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palettebank != (data & 0x07))
 	{
@@ -108,7 +108,7 @@ WRITE8_MEMBER(mikie_state::mikie_palettebank_w)
 	}
 }
 
-WRITE8_MEMBER(mikie_state::mikie_flipscreen_w)
+void mikie_state::mikie_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (data & 0x01))
 	{
@@ -117,7 +117,7 @@ WRITE8_MEMBER(mikie_state::mikie_flipscreen_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(mikie_state::get_bg_tile_info)
+void mikie_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x20) << 3);
 	int color = (m_colorram[tile_index] & 0x0f) + 16 * m_palettebank;

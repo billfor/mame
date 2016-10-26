@@ -12,13 +12,13 @@
 
 /**************************************************************************/
 
-CUSTOM_INPUT_MEMBER(homerun_state::homerun_sprite0_r)
+ioport_value homerun_state::homerun_sprite0_r(ioport_field &field, void *param)
 {
 	// sprite-0 vs background collision status, similar to NES
 	return (m_screen->vpos() > (m_spriteram[0] - 16 + 1)) ? 1 : 0;
 }
 
-WRITE8_MEMBER(homerun_state::homerun_scrollhi_w)
+void homerun_state::homerun_scrollhi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: scroll y high bit
 	// d1: scroll x high bit
@@ -27,17 +27,17 @@ WRITE8_MEMBER(homerun_state::homerun_scrollhi_w)
 	m_scrollx = (m_scrollx & 0xff) | (data << 7 & 0x100);
 }
 
-WRITE8_MEMBER(homerun_state::homerun_scrolly_w)
+void homerun_state::homerun_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrolly = (m_scrolly & 0xff00) | data;
 }
 
-WRITE8_MEMBER(homerun_state::homerun_scrollx_w)
+void homerun_state::homerun_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx = (m_scrollx & 0xff00) | data;
 }
 
-WRITE8_MEMBER(homerun_state::homerun_banking_w)
+void homerun_state::homerun_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// games do mid-screen gfx bank switching
 	int vpos = m_screen->vpos();
@@ -51,13 +51,13 @@ WRITE8_MEMBER(homerun_state::homerun_banking_w)
 	membank("bank1")->set_entry(data >> 5 & 7);
 }
 
-WRITE8_MEMBER(homerun_state::homerun_videoram_w)
+void homerun_state::homerun_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0xfff);
 }
 
-WRITE8_MEMBER(homerun_state::homerun_color_w)
+void homerun_state::homerun_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 
@@ -95,7 +95,7 @@ WRITE8_MEMBER(homerun_state::homerun_color_w)
 
 /**************************************************************************/
 
-TILE_GET_INFO_MEMBER(homerun_state::get_homerun_tile_info)
+void homerun_state::get_homerun_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = (m_videoram[tile_index]) | ((m_videoram[tile_index | 0x1000] & 0x38) << 5) | ((m_gfx_ctrl & 1) << 11);
 	int palno = (m_videoram[tile_index | 0x1000] & 0x07);

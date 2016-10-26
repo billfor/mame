@@ -34,7 +34,7 @@ cedar_magnet_sound_device::cedar_magnet_sound_device(const machine_config &mconf
 }
 
 
-READ8_MEMBER(cedar_magnet_sound_device::soundlatch_r)
+uint8_t cedar_magnet_sound_device::soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_command;
 }
@@ -70,24 +70,24 @@ static ADDRESS_MAP_START( cedar_magnet_sound_io, AS_IO, 8, cedar_magnet_sound_de
 
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(cedar_magnet_sound_device::adpcm_latch_w)
+void cedar_magnet_sound_device::adpcm_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// it writes 8-bits of sample data here, to be fed to the msm 4-bits at a time
 	// probably via other triggers
 	m_adpcm_data = data;
 }
 
-WRITE8_MEMBER(cedar_magnet_sound_device::ay1_porta_w)
+void cedar_magnet_sound_device::ay1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// unknown but used
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc0_z0_w)
+void cedar_magnet_sound_device::ctc0_z0_w(int state)
 {
 //	printf("USED ctc0_z0_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc0_z1_w)
+void cedar_magnet_sound_device::ctc0_z1_w(int state)
 {
 //	printf("USED  ctc0_z1_w %d\n", state);
 }
@@ -95,32 +95,32 @@ WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc0_z1_w)
 
 // I don't think any of the below are used
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc1_z0_w)
+void cedar_magnet_sound_device::ctc1_z0_w(int state)
 {
 	printf("ctc1_z0_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc1_z1_w)
+void cedar_magnet_sound_device::ctc1_z1_w(int state)
 {
 	printf("ctc1_z1_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc1_z2_w)
+void cedar_magnet_sound_device::ctc1_z2_w(int state)
 {
 	printf("ctc1_z2_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc0_z2_w)
+void cedar_magnet_sound_device::ctc0_z2_w(int state)
 {
 	printf("ctc0_z2_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc0_int_w)
+void cedar_magnet_sound_device::ctc0_int_w(int state)
 {
 	//printf("ctc0_int_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc1_int_w)
+void cedar_magnet_sound_device::ctc1_int_w(int state)
 {
 
 }
@@ -135,7 +135,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 #endif
 
-TIMER_CALLBACK_MEMBER(cedar_magnet_sound_device::reset_assert_callback)
+void cedar_magnet_sound_device::reset_assert_callback(void *ptr, int32_t param)
 {
 	cedar_magnet_board_device::reset_assert_callback(ptr,param);
 	// reset lines go to the ctc as well?
@@ -145,7 +145,7 @@ TIMER_CALLBACK_MEMBER(cedar_magnet_sound_device::reset_assert_callback)
 
 
 
-INTERRUPT_GEN_MEMBER(cedar_magnet_sound_device::fake_irq)
+void cedar_magnet_sound_device::fake_irq(device_t &device)
 {
 	// these should be coming from the CTC...
 //	if (m_fake_counter==0) m_cpu->set_input_line_and_vector(0, HOLD_LINE,0xe6);

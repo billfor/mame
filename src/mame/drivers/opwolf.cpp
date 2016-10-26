@@ -282,12 +282,12 @@ register. So what is controlling priority.
 #include "sound/msm5205.h"
 #include "includes/opwolf.h"
 
-READ16_MEMBER(opwolf_state::cchip_r)
+uint16_t opwolf_state::cchip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cchip_ram[offset];
 }
 
-WRITE16_MEMBER(opwolf_state::cchip_w)
+void opwolf_state::cchip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_cchip_ram[offset] = data &0xff;
 }
@@ -299,30 +299,30 @@ WRITE16_MEMBER(opwolf_state::cchip_w)
 #define P1X_PORT_TAG     "P1X"
 #define P1Y_PORT_TAG     "P1Y"
 
-READ16_MEMBER(opwolf_state::opwolf_in_r)
+uint16_t opwolf_state::opwolf_in_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const inname[2] = { "IN0", "IN1" };
 	return ioport(inname[offset])->read();
 }
 
-READ16_MEMBER(opwolf_state::opwolf_dsw_r)
+uint16_t opwolf_state::opwolf_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const dswname[2] = { "DSWA", "DSWB" };
 	return ioport(dswname[offset])->read();
 }
 
-READ16_MEMBER(opwolf_state::opwolf_lightgun_r)
+uint16_t opwolf_state::opwolf_lightgun_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const dswname[2] = { "IN2", "IN3" };
 	return ioport(dswname[offset])->read();
 }
 
-READ8_MEMBER(opwolf_state::z80_input1_r)
+uint8_t opwolf_state::z80_input1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("IN0")->read();   /* irrelevant mirror ? */
 }
 
-READ8_MEMBER(opwolf_state::z80_input2_r)
+uint8_t opwolf_state::z80_input2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("IN0")->read();   /* needed for coins */
 }
@@ -332,7 +332,7 @@ READ8_MEMBER(opwolf_state::z80_input2_r)
                 SOUND
 ******************************************************/
 
-WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
+void opwolf_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("z80bank")->set_entry(data & 0x03);
 }
@@ -444,7 +444,7 @@ void opwolf_state::machine_start()
 	save_item(NAME(m_adpcm_end));
 }
 
-MACHINE_RESET_MEMBER(opwolf_state,opwolf)
+void opwolf_state::machine_reset_opwolf()
 {
 	m_adpcm_b[0] = m_adpcm_b[1] = 0;
 	m_adpcm_c[0] = m_adpcm_c[1] = 0;
@@ -478,16 +478,16 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 		device->data_w(m_adpcm_data[chip] >> 4);
 	}
 }
-WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_1)
+void opwolf_state::opwolf_msm5205_vck_1(int state)
 {
 	opwolf_msm5205_vck(m_msm1, 0);
 }
-WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_2)
+void opwolf_state::opwolf_msm5205_vck_2(int state)
 {
 	opwolf_msm5205_vck(m_msm2, 1);
 }
 
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
+void opwolf_state::opwolf_adpcm_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int start;
 	int end;
@@ -510,7 +510,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 }
 
 
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
+void opwolf_state::opwolf_adpcm_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int start;
 	int end;
@@ -534,12 +534,12 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 }
 
 
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_d_w)
+void opwolf_state::opwolf_adpcm_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //   logerror("CPU #1         d00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
 }
 
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_e_w)
+void opwolf_state::opwolf_adpcm_e_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
 }
@@ -563,14 +563,14 @@ ADDRESS_MAP_END
 ***********************************************************/
 
 
-CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_x_r )
+ioport_value opwolf_state::opwolf_gun_x_r(ioport_field &field, void *param)
 {
 	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
 	int scaled = (ioport(P1X_PORT_TAG)->read() * 320 ) / 256;
 	return (scaled + 0x15 + m_opwolf_gun_xoffs);
 }
 
-CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_y_r )
+ioport_value opwolf_state::opwolf_gun_y_r(ioport_field &field, void *param)
 {
 	return (ioport(P1Y_PORT_TAG)->read() - 0x24 + m_opwolf_gun_yoffs);
 }
@@ -1065,7 +1065,7 @@ ROM_START( opwolfb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(opwolf_state,opwolf)
+void opwolf_state::init_opwolf()
 {
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -1081,7 +1081,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolf)
 }
 
 
-DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
+void opwolf_state::init_opwolfb()
 {
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -1094,7 +1094,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }
 
-DRIVER_INIT_MEMBER(opwolf_state,opwolfp)
+void opwolf_state::init_opwolfp()
 {
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 

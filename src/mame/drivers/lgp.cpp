@@ -86,14 +86,14 @@ public:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
-	DECLARE_READ8_MEMBER(ldp_read);
-	DECLARE_WRITE8_MEMBER(ldp_write);
-	DECLARE_DRIVER_INIT(lgp);
+	uint8_t ldp_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_lgp();
 	virtual void machine_start() override;
 	uint32_t screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
-	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
-	DECLARE_PALETTE_INIT(lgp);
+	void vblank_callback_lgp(device_t &device);
+	void ld_command_strobe_cb(int state);
+	void palette_init_lgp(palette_device &palette);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -138,12 +138,12 @@ uint32_t lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitma
 
 /* MEMORY HANDLERS */
 /* Main Z80 R/W */
-READ8_MEMBER(lgp_state::ldp_read)
+uint8_t lgp_state::ldp_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_laserdisc->status_r();
 }
 
-WRITE8_MEMBER(lgp_state::ldp_write)
+void lgp_state::ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_laserdisc->data_w(data);
 }
@@ -341,7 +341,7 @@ static GFXDECODE_START( lgp )
 	GFXDECODE_ENTRY("gfx4", 0, lgp_gfx_layout_16x32, 0x0, 0x100)
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(lgp_state::vblank_callback_lgp)
+void lgp_state::vblank_callback_lgp(device_t &device)
 {
 	// NMI
 	//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -355,12 +355,12 @@ void lgp_state::machine_start()
 {
 }
 
-WRITE_LINE_MEMBER(lgp_state::ld_command_strobe_cb)
+void lgp_state::ld_command_strobe_cb(int state)
 {
 	//m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-PALETTE_INIT_MEMBER(lgp_state, lgp)
+void lgp_state::palette_init_lgp(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -604,7 +604,7 @@ ROM_START( lgpalt )
 	DISK_IMAGE_READONLY( "lgp", 0, NO_DUMP )
 ROM_END
 
-DRIVER_INIT_MEMBER(lgp_state,lgp)
+void lgp_state::init_lgp()
 {
 }
 

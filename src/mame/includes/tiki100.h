@@ -90,33 +90,33 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( mrq_r );
-	DECLARE_WRITE8_MEMBER( mrq_w );
-	DECLARE_READ8_MEMBER( iorq_r );
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	uint8_t mrq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mrq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( keyboard_w );
-	DECLARE_WRITE8_MEMBER( video_mode_w );
-	DECLARE_WRITE8_MEMBER( palette_w );
-	DECLARE_WRITE8_MEMBER( system_w );
-	DECLARE_WRITE_LINE_MEMBER( bar0_w );
-	DECLARE_WRITE_LINE_MEMBER( bar2_w );
-	DECLARE_WRITE8_MEMBER( video_scroll_w );
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bar0_w(int state);
+	void bar2_w(int state);
+	void video_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( pio_pb_r );
-	DECLARE_WRITE8_MEMBER( pio_pb_w );
+	uint8_t pio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
-	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
+	void ctc_tick(timer_device &timer, void *ptr, int32_t param);
+	void tape_tick(timer_device &timer, void *ptr, int32_t param);
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_ack(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_perror(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( busrq_w );
+	void busrq_w(int state);
 
 	enum
 	{

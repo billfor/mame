@@ -148,7 +148,7 @@ void tms34061_device::update_interrupts()
 }
 
 
-TIMER_CALLBACK_MEMBER( tms34061_device::interrupt )
+void tms34061_device::interrupt(void *ptr, int32_t param)
 {
 	/* set timer for next frame */
 	m_timer->adjust(m_screen->frame_period());
@@ -532,13 +532,13 @@ uint8_t tms34061_device::read(address_space &space, int col, int row, int func)
  *
  *************************************/
 
-READ8_MEMBER( tms34061_device::latch_r )
+uint8_t tms34061_device::latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_latchdata;
 }
 
 
-WRITE8_MEMBER( tms34061_device::latch_w )
+void tms34061_device::latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE) logerror("tms34061_latch = %02X\n", data);
 	m_latchdata = data;

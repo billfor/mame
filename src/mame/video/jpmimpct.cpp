@@ -29,7 +29,7 @@
  *  1 1 0    Command register
  */
 
-WRITE16_MEMBER(jpmimpct_state::jpmimpct_bt477_w)
+void jpmimpct_state::jpmimpct_bt477_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t val = data & 0xff;
 
@@ -75,7 +75,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmimpct_bt477_w)
 	}
 }
 
-READ16_MEMBER(jpmimpct_state::jpmimpct_bt477_r)
+uint16_t jpmimpct_state::jpmimpct_bt477_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	popmessage("Bt477: Unhandled read access (offset:%x)", offset);
 	return 0;
@@ -127,7 +127,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(jpmimpct_state::scanline_update)
  *
  *************************************/
 
-VIDEO_START_MEMBER(jpmimpct_state,jpmimpct)
+void jpmimpct_state::video_start_jpmimpct()
 {
 	memset(&m_bt477, 0, sizeof(m_bt477));
 

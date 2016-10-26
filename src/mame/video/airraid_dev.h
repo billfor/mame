@@ -21,8 +21,8 @@ public:
 	// construction/destruction
 	airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(txram_w);
-	DECLARE_WRITE8_MEMBER(vregs_w);
+	void txram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void layer_enable_w(uint8_t enable);
 
 	uint32_t screen_update_airraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -56,12 +56,12 @@ private:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
 
-	TILEMAP_MAPPER_MEMBER(bg_scan);
-	TILEMAP_MAPPER_MEMBER(fg_scan);
+	tilemap_memory_index bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index fg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_cstx_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_cstx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	// internal variables
 	uint16_t m_hw;

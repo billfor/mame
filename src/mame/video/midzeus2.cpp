@@ -266,13 +266,13 @@ static inline uint8_t get_texel_4bit(const void *base, int y, int x, int width)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(midzeus2_state::int_timer_callback)
+void midzeus2_state::int_timer_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 
-VIDEO_START_MEMBER(midzeus2_state,midzeus2)
+void midzeus2_state::video_start_midzeus2()
 {
 	/* allocate memory for "wave" RAM */
 	waveram[0] = auto_alloc_array(machine(), uint32_t, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
@@ -424,7 +424,7 @@ if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Z
  *
  *************************************/
 
-READ32_MEMBER( midzeus2_state::zeus2_r )
+uint32_t midzeus2_state::zeus2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	bool logit = (offset != 0x00 && offset != 0x01 && offset != 0x54 && offset != 0x48 && offset != 0x49 && offset != 0x58 && offset != 0x59 && offset != 0x5a);
 	uint32_t result = m_zeusbase[offset];
@@ -473,7 +473,7 @@ READ32_MEMBER( midzeus2_state::zeus2_r )
  *
  *************************************/
 
-WRITE32_MEMBER( midzeus2_state::zeus2_w )
+void midzeus2_state::zeus2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	bool logit = (offset != 0x08 &&
 					(offset != 0x20 || data != 0) &&

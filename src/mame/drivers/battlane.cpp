@@ -22,7 +22,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
+void battlane_state::battlane_cpu_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpu_control = data;
 
@@ -79,7 +79,7 @@ WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
 	m_subcpu->set_input_line(M6809_IRQ_LINE, data & 0x02 ? CLEAR_LINE : HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(battlane_state::battlane_cpu1_interrupt)
+void battlane_state::battlane_cpu1_interrupt(device_t &device)
 {
 	/* See note in battlane_cpu_command_w */
 	if (~m_cpu_control & 0x08)

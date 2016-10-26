@@ -473,7 +473,7 @@ int s3c44b0_device::lcd_get_hpos()
 	return delta / m_lcd.pixeltime;
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::lcd_timer_exp )
+void s3c44b0_device::lcd_timer_exp(void *ptr, int32_t param)
 {
 	int vpos = m_lcd.vpos;
 	verboselog( *this, 2, "LCD timer callback (%f)\n", machine().time().as_double());
@@ -528,7 +528,7 @@ uint32_t s3c44b0_device::video_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-READ32_MEMBER( s3c44b0_device::lcd_r )
+uint32_t s3c44b0_device::lcd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_lcd.regs)[offset];
 	switch (offset)
@@ -633,7 +633,7 @@ void s3c44b0_device::lcd_recalc()
 		lcd_stop();
 }
 
-WRITE32_MEMBER( s3c44b0_device::lcd_w )
+void s3c44b0_device::lcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_lcd.regs)[offset];
 //  verboselog( *this, 9, "(LCD) %08X <- %08X\n", S3C44B0_BASE_LCD + (offset << 2), data);
@@ -664,14 +664,14 @@ uint32_t s3c44b0_device::get_mclk()
 	return (uint32_t)((double)((mdiv + 8) * clock()) / (double)((pdiv + 2) * (1 << sdiv)));
 }
 
-READ32_MEMBER( s3c44b0_device::clkpow_r )
+uint32_t s3c44b0_device::clkpow_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_clkpow.regs)[offset];
 	verboselog( *this, 9, "(CLKPOW) %08X -> %08X\n", S3C44B0_BASE_CLKPOW + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( s3c44b0_device::clkpow_w )
+void s3c44b0_device::clkpow_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(CLKPOW) %08X <- %08X\n", S3C44B0_BASE_CLKPOW + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_clkpow.regs)[offset]);
@@ -786,14 +786,14 @@ void s3c44b0_device::request_eint(uint32_t number)
 	}
 }
 
-READ32_MEMBER( s3c44b0_device::irq_r )
+uint32_t s3c44b0_device::irq_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_irq.regs)[offset];
 	verboselog( *this, 9, "(IRQ) %08X -> %08X\n", S3C44B0_BASE_INT + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( s3c44b0_device::irq_w )
+void s3c44b0_device::irq_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(IRQ) %08X <- %08X\n", S3C44B0_BASE_INT + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_irq.regs)[offset]);
@@ -836,7 +836,7 @@ uint16_t s3c44b0_device::pwm_calc_observation(int ch)
 	return cnto;
 }
 
-READ32_MEMBER( s3c44b0_device::pwm_r )
+uint32_t s3c44b0_device::pwm_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_pwm.regs)[offset];
 	switch (offset)
@@ -991,7 +991,7 @@ void s3c44b0_device::pwm_recalc(int timer)
 		pwm_stop(timer);
 }
 
-WRITE32_MEMBER( s3c44b0_device::pwm_w )
+void s3c44b0_device::pwm_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_pwm.regs)[offset];
 	verboselog( *this, 9, "(PWM) %08X <- %08X\n", S3C44B0_BASE_PWM + (offset << 2), data);
@@ -1029,7 +1029,7 @@ WRITE32_MEMBER( s3c44b0_device::pwm_w )
 	}
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::pwm_timer_exp )
+void s3c44b0_device::pwm_timer_exp(void *ptr, int32_t param)
 {
 	int ch = param;
 	const int ch_int[] = { S3C44B0_INT_TIMER0, S3C44B0_INT_TIMER1, S3C44B0_INT_TIMER2, S3C44B0_INT_TIMER3, S3C44B0_INT_TIMER4, S3C44B0_INT_TIMER5 };
@@ -1157,7 +1157,7 @@ void s3c44b0_device::iic_resume()
 	m_iic.timer->adjust(attotime::from_usec( 1), 0);
 }
 
-READ32_MEMBER( s3c44b0_device::iic_r )
+uint32_t s3c44b0_device::iic_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_iic.regs)[offset];
 	switch (offset)
@@ -1172,7 +1172,7 @@ READ32_MEMBER( s3c44b0_device::iic_r )
 	return data;
 }
 
-WRITE32_MEMBER( s3c44b0_device::iic_w )
+void s3c44b0_device::iic_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_iic.regs)[offset];
 	verboselog( *this, 9, "(IIC) %08X <- %08X\n", S3C44B0_BASE_IIC + (offset << 2), data);
@@ -1250,7 +1250,7 @@ WRITE32_MEMBER( s3c44b0_device::iic_w )
 	}
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::iic_timer_exp )
+void s3c44b0_device::iic_timer_exp(void *ptr, int32_t param)
 {
 	int enable_interrupt;
 	verboselog( *this, 2, "IIC timer callback\n");
@@ -1282,7 +1282,7 @@ inline void s3c44b0_device::iface_gpio_port_w(int port, uint32_t data)
 		(m_port_w_cb)(port, data, 0xffff);
 }
 
-READ32_MEMBER( s3c44b0_device::gpio_r )
+uint32_t s3c44b0_device::gpio_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_gpio.regs)[offset];
 	switch (offset)
@@ -1327,7 +1327,7 @@ READ32_MEMBER( s3c44b0_device::gpio_r )
 	return data;
 }
 
-WRITE32_MEMBER( s3c44b0_device::gpio_w )
+void s3c44b0_device::gpio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_gpio.regs)[offset];
 	verboselog( *this, 9, "(GPIO) %08X <- %08X\n", S3C44B0_BASE_GPIO + (offset << 2), data);
@@ -1427,27 +1427,27 @@ void s3c44b0_device::uart_w(int ch, uint32_t offset, uint32_t data, uint32_t mem
 	}
 }
 
-READ32_MEMBER( s3c44b0_device::uart_0_r )
+uint32_t s3c44b0_device::uart_0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = uart_r(0, offset);
 //  verboselog( *this, 9, "(UART 0) %08X -> %08X\n", S3C44B0_BASE_UART_0 + (offset << 2), data);
 	return data;
 }
 
-READ32_MEMBER( s3c44b0_device::uart_1_r )
+uint32_t s3c44b0_device::uart_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = uart_r(1, offset);
 //  verboselog( *this, 9, "(UART 1) %08X -> %08X\n", S3C44B0_BASE_UART_1 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( s3c44b0_device::uart_0_w )
+void s3c44b0_device::uart_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(UART 0) %08X <- %08X (%08X)\n", S3C44B0_BASE_UART_0 + (offset << 2), data, mem_mask);
 	uart_w(0, offset, data, mem_mask);
 }
 
-WRITE32_MEMBER( s3c44b0_device::uart_1_w )
+void s3c44b0_device::uart_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(UART 1) %08X <- %08X (%08X)\n", S3C44B0_BASE_UART_1 + (offset << 2), data, mem_mask);
 	uart_w(1, offset, data, mem_mask);
@@ -1460,7 +1460,7 @@ void s3c44b0_device::uart_fifo_w(int uart, uint8_t data)
 	m_uart[uart].regs.utrstat |= 1; // [bit 0] Receive buffer data ready
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::uart_timer_exp )
+void s3c44b0_device::uart_timer_exp(void *ptr, int32_t param)
 {
 	int ch = param;
 	verboselog( *this, 2, "UART %d timer callback\n", ch);
@@ -1478,7 +1478,7 @@ uint16_t s3c44b0_device::wdt_calc_current_count()
 	return 0;
 }
 
-READ32_MEMBER( s3c44b0_device::wdt_r )
+uint32_t s3c44b0_device::wdt_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_wdt.regs)[offset];
 	switch (offset)
@@ -1526,7 +1526,7 @@ void s3c44b0_device::wdt_recalc()
 		wdt_stop();
 }
 
-WRITE32_MEMBER( s3c44b0_device::wdt_w )
+void s3c44b0_device::wdt_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_wdt.regs)[offset];
 	verboselog( *this, 9, "(WDT) %08X <- %08X\n", S3C44B0_BASE_WDT + (offset << 2), data);
@@ -1544,7 +1544,7 @@ WRITE32_MEMBER( s3c44b0_device::wdt_w )
 	}
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::wdt_timer_exp )
+void s3c44b0_device::wdt_timer_exp(void *ptr, int32_t param)
 {
 	verboselog( *this, 2, "WDT timer callback\n");
 	if ((m_wdt.regs.wtcon & (1 << 2)) != 0)
@@ -1560,14 +1560,14 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::wdt_timer_exp )
 
 /* CPU Wrapper */
 
-READ32_MEMBER( s3c44b0_device::cpuwrap_r )
+uint32_t s3c44b0_device::cpuwrap_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_cpuwrap.regs)[offset];
 	verboselog( *this, 9, "(CPUWRAP) %08X -> %08X\n", S3C44B0_BASE_CPU_WRAPPER + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( s3c44b0_device::cpuwrap_w )
+void s3c44b0_device::cpuwrap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(CPUWRAP) %08X <- %08X\n", S3C44B0_BASE_CPU_WRAPPER + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_cpuwrap.regs)[offset]);
@@ -1575,7 +1575,7 @@ WRITE32_MEMBER( s3c44b0_device::cpuwrap_w )
 
 /* A/D Converter */
 
-READ32_MEMBER( s3c44b0_device::adc_r )
+uint32_t s3c44b0_device::adc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_adc.regs)[offset];
 	verboselog( *this, 9, "(ADC) %08X -> %08X\n", S3C44B0_BASE_ADC + (offset << 2), data);
@@ -1609,7 +1609,7 @@ void s3c44b0_device::adc_recalc()
 		adc_stop();
 }
 
-WRITE32_MEMBER( s3c44b0_device::adc_w )
+void s3c44b0_device::adc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_wdt.regs)[offset];
 	verboselog( *this, 9, "(ADC) %08X <- %08X\n", S3C44B0_BASE_ADC + (offset << 2), data);
@@ -1628,7 +1628,7 @@ WRITE32_MEMBER( s3c44b0_device::adc_w )
 	}
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::adc_timer_exp )
+void s3c44b0_device::adc_timer_exp(void *ptr, int32_t param)
 {
 	verboselog( *this, 2, "ADC timer callback\n");
 	m_adc.regs.adccon |= (1 << 6);
@@ -1637,7 +1637,7 @@ TIMER_CALLBACK_MEMBER( s3c44b0_device::adc_timer_exp )
 
 /* SIO */
 
-READ32_MEMBER( s3c44b0_device::sio_r )
+uint32_t s3c44b0_device::sio_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_sio.regs)[offset];
 	verboselog( *this, 9, "(SIO) %08X -> %08X\n", S3C44B0_BASE_SIO + (offset << 2), data);
@@ -1673,7 +1673,7 @@ void s3c44b0_device::sio_recalc()
 		sio_stop();
 }
 
-WRITE32_MEMBER( s3c44b0_device::sio_w )
+void s3c44b0_device::sio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_sio.regs)[offset];
 	verboselog( *this, 9, "(SIO) %08X <- %08X\n", S3C44B0_BASE_SIO + (offset << 2), data);
@@ -1692,7 +1692,7 @@ WRITE32_MEMBER( s3c44b0_device::sio_w )
 	}
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::sio_timer_exp )
+void s3c44b0_device::sio_timer_exp(void *ptr, int32_t param)
 {
 	verboselog( *this, 2, "SIO timer callback\n");
 
@@ -1733,14 +1733,14 @@ void s3c44b0_device::iis_stop()
 	m_iis.timer->adjust(attotime::never, 0);
 }
 
-READ32_MEMBER( s3c44b0_device::iis_r )
+uint32_t s3c44b0_device::iis_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_iis.regs)[offset];
 	verboselog( *this, 9, "(IIS) %08X -> %08X\n", S3C44B0_BASE_IIS + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( s3c44b0_device::iis_w )
+void s3c44b0_device::iis_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_iis.regs)[offset];
 	verboselog( *this, 9, "(IIS) %08X <- %08X\n", S3C44B0_BASE_IIS + (offset << 2), data);
@@ -1783,7 +1783,7 @@ WRITE32_MEMBER( s3c44b0_device::iis_w )
 	}
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::iis_timer_exp )
+void s3c44b0_device::iis_timer_exp(void *ptr, int32_t param)
 {
 	verboselog( *this, 2, "IIS timer callback\n");
 	if ((m_iis.regs.iiscon & (1 << 5)) != 0)
@@ -1880,33 +1880,33 @@ void s3c44b0_device::zdma_w(int ch, uint32_t offset, uint32_t data, uint32_t mem
 	}
 }
 
-READ32_MEMBER( s3c44b0_device::zdma_0_r )
+uint32_t s3c44b0_device::zdma_0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = zdma_r(0, offset);
 	verboselog( *this, 9, "(ZDMA 0) %08X -> %08X\n", S3C44B0_BASE_ZDMA_0 + (offset << 2), data);
 	return data;
 }
 
-READ32_MEMBER( s3c44b0_device::zdma_1_r )
+uint32_t s3c44b0_device::zdma_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = zdma_r(1, offset);
 	verboselog( *this, 9, "(ZDMA 1) %08X -> %08X\n", S3C44B0_BASE_ZDMA_1 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( s3c44b0_device::zdma_0_w )
+void s3c44b0_device::zdma_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(ZDMA 0) %08X <- %08X (%08X)\n", S3C44B0_BASE_ZDMA_0 + (offset << 2), data, mem_mask);
 	zdma_w(0, offset, data, mem_mask);
 }
 
-WRITE32_MEMBER( s3c44b0_device::zdma_1_w )
+void s3c44b0_device::zdma_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(ZDMA 1) %08X <- %08X (%08X)\n", S3C44B0_BASE_ZDMA_1 + (offset << 2), data, mem_mask);
 	zdma_w(1, offset, data, mem_mask);
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::zdma_timer_exp )
+void s3c44b0_device::zdma_timer_exp(void *ptr, int32_t param)
 {
 	int ch = param;
 	verboselog( *this, 2, "ZDMA %d timer callback\n", ch);
@@ -2020,33 +2020,33 @@ void s3c44b0_device::bdma_w(int ch, uint32_t offset, uint32_t data, uint32_t mem
 	}
 }
 
-READ32_MEMBER( s3c44b0_device::bdma_0_r )
+uint32_t s3c44b0_device::bdma_0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = bdma_r(0, offset);
 	verboselog( *this, 9, "(BDMA 0) %08X -> %08X\n", S3C44B0_BASE_BDMA_0 + (offset << 2), data);
 	return data;
 }
 
-READ32_MEMBER( s3c44b0_device::bdma_1_r )
+uint32_t s3c44b0_device::bdma_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = bdma_r(1, offset);
 	verboselog( *this, 9, "(BDMA 1) %08X -> %08X\n", S3C44B0_BASE_BDMA_1 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( s3c44b0_device::bdma_0_w )
+void s3c44b0_device::bdma_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(BDMA 0) %08X <- %08X (%08X)\n", S3C44B0_BASE_BDMA_0 + (offset << 2), data, mem_mask);
 	bdma_w(0, offset, data, mem_mask);
 }
 
-WRITE32_MEMBER( s3c44b0_device::bdma_1_w )
+void s3c44b0_device::bdma_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(BDMA 1) %08X <- %08X (%08X)\n", S3C44B0_BASE_BDMA_1 + (offset << 2), data, mem_mask);
 	bdma_w(1, offset, data, mem_mask);
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::bdma_timer_exp )
+void s3c44b0_device::bdma_timer_exp(void *ptr, int32_t param)
 {
 	int ch = param;
 	verboselog( *this, 2, "BDMA %d timer callback\n", ch);

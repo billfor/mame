@@ -107,14 +107,14 @@ public:
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
 	uint8_t    m_bg_bank;
-	DECLARE_WRITE8_MEMBER(fg_ram_w);
-	DECLARE_WRITE8_MEMBER(bg_bank_w);
-	DECLARE_WRITE8_MEMBER(calorie_flipscreen_w);
-	DECLARE_READ8_MEMBER(calorie_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(bogus_w);
-	DECLARE_DRIVER_INIT(calorieb);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void fg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void calorie_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t calorie_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bogus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_calorieb();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -133,7 +133,7 @@ public:
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(calorie_state::get_bg_tile_info)
+void calorie_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *src = memregion("user1")->base();
 	int bg_base = (m_bg_bank & 0x0f) * 0x200;
@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(calorie_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flag);
 }
 
-TILE_GET_INFO_MEMBER(calorie_state::get_fg_tile_info)
+void calorie_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code  = ((m_fg_ram[tile_index + 0x400] & 0x30) << 4) | m_fg_ram[tile_index];
 	int color = m_fg_ram[tile_index + 0x400] & 0x0f;
@@ -219,13 +219,13 @@ uint32_t calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-WRITE8_MEMBER(calorie_state::fg_ram_w)
+void calorie_state::fg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(calorie_state::bg_bank_w)
+void calorie_state::bg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((m_bg_bank & ~0x10) != (data & ~0x10))
 		m_bg_tilemap->mark_all_dirty();
@@ -233,19 +233,19 @@ WRITE8_MEMBER(calorie_state::bg_bank_w)
 	m_bg_bank = data;
 }
 
-WRITE8_MEMBER(calorie_state::calorie_flipscreen_w)
+void calorie_state::calorie_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }
 
-READ8_MEMBER(calorie_state::calorie_soundlatch_r)
+uint8_t calorie_state::calorie_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t latch = m_soundlatch->read(space, 0);
 	m_soundlatch->clear_w(space, 0, 0);
 	return latch;
 }
 
-WRITE8_MEMBER(calorie_state::bogus_w)
+void calorie_state::bogus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	popmessage("written to 3rd sound chip: data = %02X port = %02X", data, offset);
 }
@@ -573,7 +573,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(calorie_state,calorieb)
+void calorie_state::init_calorieb()
 {
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x10000, 0x8000);
 }

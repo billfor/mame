@@ -18,7 +18,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(divebomb_state::get_fg_tile_info)
+void divebomb_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t code = m_fgram[tile_index + 0x000];
 	uint32_t attr = m_fgram[tile_index + 0x400];
@@ -58,38 +58,38 @@ K051316_CB_MEMBER(divebomb_state::zoom_callback_2)
  *
  *************************************/
 
-WRITE8_MEMBER(divebomb_state::fgram_w)
+void divebomb_state::fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_wrap1_enable_w)
+void divebomb_state::rozcpu_wrap1_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	roz1_wrap = !(data & 1);
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_enable1_w)
+void divebomb_state::rozcpu_enable1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	roz1_enable = !(data & 1);
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_enable2_w)
+void divebomb_state::rozcpu_enable2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	roz2_enable = !(data & 1);
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_wrap2_enable_w)
+void divebomb_state::rozcpu_wrap2_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	roz2_wrap = !(data & 1);
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_pal_w)
+void divebomb_state::rozcpu_pal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//.... ..xx  K051316 1 palette select
 	//..xx ....  K051316 2 palette select
@@ -143,7 +143,7 @@ void divebomb_state::decode_proms(const uint8_t * rgn, int size, int index, bool
 }
 
 
-PALETTE_INIT_MEMBER(divebomb_state, divebomb)
+void divebomb_state::palette_init_divebomb(palette_device &palette)
 {
 	decode_proms(memregion("spr_proms")->base(), 0x100, 0x400 + 0x400 + 0x400, false);
 	decode_proms(memregion("fg_proms")->base(), 0x400, 0x400 + 0x400, false);
@@ -152,7 +152,7 @@ PALETTE_INIT_MEMBER(divebomb_state, divebomb)
 }
 
 
-VIDEO_START_MEMBER(divebomb_state,divebomb)
+void divebomb_state::video_start_divebomb()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(divebomb_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);

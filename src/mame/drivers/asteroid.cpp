@@ -207,7 +207,7 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
  *
  *************************************/
 
-WRITE8_MEMBER(asteroid_state::astdelux_coin_counter_w)
+void asteroid_state::astdelux_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);
 }
@@ -220,7 +220,7 @@ WRITE8_MEMBER(asteroid_state::astdelux_coin_counter_w)
  *
  *************************************/
 
-WRITE8_MEMBER(asteroid_state::llander_led_w)
+void asteroid_state::llander_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char *const lampname[] =
 	{
@@ -310,7 +310,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(asteroid_state::clock_r)
+ioport_value asteroid_state::clock_r(ioport_field &field, void *param)
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
@@ -1021,14 +1021,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(asteroid_state,asteroidb)
+void asteroid_state::init_asteroidb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2000, 0x2000, "IN0");
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2003, 0x2003, "HS");
 }
 
 
-DRIVER_INIT_MEMBER(asteroid_state,asterock)
+void asteroid_state::init_asterock()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2007, read8_delegate(FUNC(asteroid_state::asterock_IN0_r),this));
 }

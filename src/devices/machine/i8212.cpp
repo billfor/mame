@@ -79,7 +79,7 @@ void i8212_device::device_reset()
 //  read - data latch read
 //-------------------------------------------------
 
-READ8_MEMBER( i8212_device::read )
+uint8_t i8212_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// clear interrupt line
 	m_write_irq(CLEAR_LINE);
@@ -94,7 +94,7 @@ READ8_MEMBER( i8212_device::read )
 //  write - data latch write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8212_device::write )
+void i8212_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// latch data
 	m_data = data;
@@ -108,7 +108,7 @@ WRITE8_MEMBER( i8212_device::write )
 //  md_w - mode write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8212_device::md_w )
+void i8212_device::md_w(int state)
 {
 	if (LOG) logerror("I8212 '%s' Mode: %s\n", tag(), state ? "output" : "input");
 
@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER( i8212_device::md_w )
 //  stb_w - data strobe write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8212_device::stb_w )
+void i8212_device::stb_w(int state)
 {
 	if (LOG) logerror("I8212 '%s' STB: %u\n", tag(), state);
 

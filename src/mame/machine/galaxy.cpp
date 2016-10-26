@@ -17,7 +17,7 @@
   I/O devices
 ***************************************************************************/
 
-READ8_MEMBER(galaxy_state::galaxy_keyboard_r)
+uint8_t galaxy_state::galaxy_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -30,7 +30,7 @@ READ8_MEMBER(galaxy_state::galaxy_keyboard_r)
 	}
 }
 
-WRITE8_MEMBER(galaxy_state::galaxy_latch_w)
+void galaxy_state::galaxy_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
 	m_latch_value = data;
@@ -43,12 +43,12 @@ WRITE8_MEMBER(galaxy_state::galaxy_latch_w)
   Interrupts
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(galaxy_state::galaxy_interrupt)
+void galaxy_state::galaxy_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(galaxy_state::galaxy_irq_callback)
+int galaxy_state::galaxy_irq_callback(device_t &device, int irqline)
 {
 	galaxy_set_timer();
 	m_interrupts_enabled = true;
@@ -148,7 +148,7 @@ SNAPSHOT_LOAD_MEMBER( galaxy_state, galaxy )
   Driver Initialization
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(galaxy_state,galaxy)
+void galaxy_state::init_galaxy()
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
@@ -171,7 +171,7 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxy)
   Machine Initialization
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(galaxy_state,galaxy)
+void galaxy_state::machine_reset_galaxy()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -189,12 +189,12 @@ MACHINE_RESET_MEMBER(galaxy_state,galaxy)
 	m_interrupts_enabled = true;
 }
 
-DRIVER_INIT_MEMBER(galaxy_state,galaxyp)
+void galaxy_state::init_galaxyp()
 {
-	DRIVER_INIT_CALL(galaxy);
+	init_galaxy();
 }
 
-MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
+void galaxy_state::machine_reset_galaxyp()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);

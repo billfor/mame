@@ -50,7 +50,7 @@ void wiping_state::machine_start()
 }
 
 /* input ports are rotated 90 degrees */
-READ8_MEMBER(wiping_state::ports_r)
+uint8_t wiping_state::ports_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int i,res;
 	static const char *const portnames[] = { "P1", "P2", "IN2", "IN3", "IN4", "IN5", "SYSTEM", "DSW" };
@@ -62,17 +62,17 @@ READ8_MEMBER(wiping_state::ports_r)
 	return res;
 }
 
-WRITE8_MEMBER(wiping_state::subcpu_reset_w)
+void wiping_state::subcpu_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(wiping_state::main_irq_mask_w)
+void wiping_state::main_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_main_irq_mask = data & 1;
 }
 
-WRITE8_MEMBER(wiping_state::sound_irq_mask_w)
+void wiping_state::sound_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_irq_mask = data & 1;
 }
@@ -270,13 +270,13 @@ static GFXDECODE_START( wiping )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4, 64 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(wiping_state::vblank_irq)
+void wiping_state::vblank_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(wiping_state::sound_timer_irq)
+void wiping_state::sound_timer_irq(device_t &device)
 {
 	if(m_sound_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

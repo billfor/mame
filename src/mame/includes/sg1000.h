@@ -62,12 +62,12 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( peripheral_r );
-	DECLARE_WRITE8_MEMBER( peripheral_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+	uint8_t peripheral_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void peripheral_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	DECLARE_READ8_MEMBER( omv_r );
-	DECLARE_WRITE8_MEMBER( omv_w );
+	uint8_t omv_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void omv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 class sc3000_state : public sg1000_state
@@ -98,9 +98,9 @@ public:
 	virtual void machine_reset() override;
 
 	int m_centronics_busy;
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	void write_centronics_busy(int state);
+	uint8_t ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };

@@ -198,7 +198,7 @@ static const res_net_info radarscp_grid_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(dkong_state,dkong2b)
+void dkong_state::palette_init_dkong2b(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -227,7 +227,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 }
 
 #ifdef UNUSED_FUNCTION
-PALETTE_INIT_MEMBER(dkong_state,dkong4b)
+void dkong_state::palette_init_dkong4b(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -265,7 +265,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong4b)
 }
 #endif
 
-PALETTE_INIT_MEMBER(dkong_state,radarscp)
+void dkong_state::palette_init_radarscp(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -328,7 +328,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp)
 	m_color_codes = color_prom; /* we'll need it later */
 }
 
-PALETTE_INIT_MEMBER(dkong_state,radarscp1)
+void dkong_state::palette_init_radarscp1(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -427,7 +427,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(dkong_state,dkong3)
+void dkong_state::palette_init_dkong3(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -441,7 +441,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong3)
 	m_color_codes = color_prom; /* we'll need it later */
 }
 
-TILE_GET_INFO_MEMBER(dkong_state::dkong_bg_tile_info)
+void dkong_state::dkong_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_video_ram[tile_index] + 256 * m_gfx_bank;
 	int color = (m_color_codes[tile_index % 32 + 32 * (tile_index / 32 / 4)] & 0x0f) + 0x10 * m_palette_bank;
@@ -449,7 +449,7 @@ TILE_GET_INFO_MEMBER(dkong_state::dkong_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(dkong_state::radarscp1_bg_tile_info)
+void dkong_state::radarscp1_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_video_ram[tile_index] + 256 * m_gfx_bank;
 	int color = (m_color_codes[tile_index % 32] & 0x0f);
@@ -464,7 +464,7 @@ TILE_GET_INFO_MEMBER(dkong_state::radarscp1_bg_tile_info)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(dkong_state::dkong_videoram_w)
+void dkong_state::dkong_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_video_ram[offset] != data)
 	{
@@ -473,7 +473,7 @@ WRITE8_MEMBER(dkong_state::dkong_videoram_w)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::dkongjr_gfxbank_w)
+void dkong_state::dkongjr_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_gfx_bank != (data & 0x01))
 	{
@@ -482,7 +482,7 @@ WRITE8_MEMBER(dkong_state::dkongjr_gfxbank_w)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::dkong3_gfxbank_w)
+void dkong_state::dkong3_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_gfx_bank != (~data & 0x01))
 	{
@@ -491,7 +491,7 @@ WRITE8_MEMBER(dkong_state::dkong3_gfxbank_w)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::dkong_palettebank_w)
+void dkong_state::dkong_palettebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int newbank;
 
@@ -509,23 +509,23 @@ WRITE8_MEMBER(dkong_state::dkong_palettebank_w)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::radarscp_grid_enable_w)
+void dkong_state::radarscp_grid_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_grid_on = data & 0x01;
 }
 
-WRITE8_MEMBER(dkong_state::radarscp_grid_color_w)
+void dkong_state::radarscp_grid_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_grid_col = (data & 0x07) ^ 0x07;
 	/* popmessage("Gridcol: %d", m_grid_col); */
 }
 
-WRITE8_MEMBER(dkong_state::dkong_flipscreen_w)
+void dkong_state::dkong_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flip = ~data & 0x01;
 }
 
-WRITE8_MEMBER(dkong_state::dkong_spritebank_w)
+void dkong_state::dkong_spritebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sprite_bank = data & 0x01;
 }
@@ -868,7 +868,7 @@ void dkong_state::radarscp_scanline(int scanline)
 		m_counter++;
 }
 
-TIMER_CALLBACK_MEMBER(dkong_state::scanline_callback)
+void dkong_state::scanline_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -899,17 +899,17 @@ void dkong_state::check_palette()
 			switch (newset)
 			{
 				case DKONG_RADARSCP_CONVERSION:
-					PALETTE_INIT_NAME(radarscp)(*m_palette);
+					palette_init_radarscp(*m_palette);
 					break;
 				case DKONG_BOARD:
-					PALETTE_INIT_NAME(dkong2b)(*m_palette);
+					palette_init_dkong2b(*m_palette);
 					break;
 			}
 		}
 	}
 }
 
-VIDEO_START_MEMBER(dkong_state,dkong_base)
+void dkong_state::video_start_dkong_base()
 {
 	m_cd4049_b = (log(0.0 - log(cd4049_al)) - log(0.0 - log((1.0-cd4049_al))) ) / log(cd4049_vh/cd4049_vl);
 	m_cd4049_a = log(0.0 - log(cd4049_al)) - m_cd4049_b * log(cd4049_vh);
@@ -949,9 +949,9 @@ VIDEO_START_MEMBER(dkong_state,dkong_base)
 
 }
 
-VIDEO_START_MEMBER(dkong_state,dkong)
+void dkong_state::video_start_dkong()
 {
-	VIDEO_START_CALL_MEMBER(dkong_base);
+	video_start_dkong_base();
 
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dkong_state::scanline_callback),this));
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));

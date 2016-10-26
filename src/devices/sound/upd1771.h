@@ -30,9 +30,9 @@ public:
 
 	template<class _Object> static devcb_base &set_ack_handler(device_t &device, _Object object) { return downcast<upd1771c_device &>(device).m_ack_handler.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	WRITE_LINE_MEMBER( pcm_write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pcm_write(int state);
 
 protected:
 	// device-level overrides
@@ -48,7 +48,7 @@ private:
 	devcb_write_line m_ack_handler;
 	emu_timer *m_timer;
 
-	TIMER_CALLBACK_MEMBER(ack_callback);
+	void ack_callback(void *ptr, int32_t param);
 
 	uint8_t   m_packet[MAX_PACKET_SIZE];
 	uint32_t  m_index;

@@ -51,7 +51,7 @@ void artmagic_state::update_irq_state()
 }
 
 
-WRITE_LINE_MEMBER(artmagic_state::m68k_gen_int)
+void artmagic_state::m68k_gen_int(int state)
 {
 	m_tms_irq = state;
 	update_irq_state();
@@ -92,7 +92,7 @@ void artmagic_state::machine_reset()
  *
  *************************************/
 
-WRITE16_MEMBER(artmagic_state::control_w)
+void artmagic_state::control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control[offset]);
 
@@ -127,7 +127,7 @@ void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-READ16_MEMBER(artmagic_state::ultennis_hack_r)
+uint16_t artmagic_state::ultennis_hack_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* IRQ5 points to: jsr (a5); rte */
 	uint32_t pc = space.device().safe_pc();
@@ -365,13 +365,13 @@ void artmagic_state::stonebal_protection()
 }
 
 
-CUSTOM_INPUT_MEMBER(artmagic_state::prot_r)
+ioport_value artmagic_state::prot_r(ioport_field &field, void *param)
 {
 	return m_prot_output_bit;
 }
 
 
-WRITE16_MEMBER(artmagic_state::protection_bit_w)
+void artmagic_state::protection_bit_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* shift in the new bit based on the offset */
 	m_prot_input[m_prot_input_index] <<= 1;
@@ -438,14 +438,14 @@ static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16, artmagic_state )
 ADDRESS_MAP_END
 
 // TODO: jumps to undefined area at PC=33a0 -> 230000, presumably protection device provides a code snippet
-READ16_MEMBER(artmagic_state::shtstar_unk_r)
+uint16_t artmagic_state::shtstar_unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// bits 7-4 should be 0
 	// bit 2 and 0 are status ready related.
 	return 4 | 1; //machine().rand();
 }
 
-READ16_MEMBER(artmagic_state::shtstar_unk_2_r)
+uint16_t artmagic_state::shtstar_unk_2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 1;
 }
@@ -1135,7 +1135,7 @@ void artmagic_state::decrypt_cheesech()
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,ultennis)
+void artmagic_state::init_ultennis()
 {
 	decrypt_ultennis();
 	m_is_stoneball = 0;
@@ -1146,7 +1146,7 @@ DRIVER_INIT_MEMBER(artmagic_state,ultennis)
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,cheesech)
+void artmagic_state::init_cheesech()
 {
 	decrypt_cheesech();
 	m_is_stoneball = 0;
@@ -1154,14 +1154,14 @@ DRIVER_INIT_MEMBER(artmagic_state,cheesech)
 }
 
 
-DRIVER_INIT_MEMBER(artmagic_state,stonebal)
+void artmagic_state::init_stonebal()
 {
 	decrypt_ultennis();
 	m_is_stoneball = 1; /* blits 1 line high are NOT encrypted, also different first pixel decrypt */
 	m_protection_handler = &artmagic_state::stonebal_protection;
 }
 
-DRIVER_INIT_MEMBER(artmagic_state,shtstar)
+void artmagic_state::init_shtstar()
 {
 	/* wrong */
 	decrypt_ultennis();

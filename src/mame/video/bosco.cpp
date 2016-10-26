@@ -17,7 +17,7 @@
 #define STARS_COLOR_BASE (64*4+64*4+4)
 #define VIDEO_RAM_SIZE 0x400
 
-PALETTE_INIT_MEMBER(bosco_state,bosco)
+void bosco_state::palette_init_bosco(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -87,7 +87,7 @@ PALETTE_INIT_MEMBER(bosco_state,bosco)
 ***************************************************************************/
 
 /* the video RAM has space for 32x32 tiles and is only partially used for the radar */
-TILEMAP_MAPPER_MEMBER(bosco_state::fg_tilemap_scan )
+tilemap_memory_index bosco_state::fg_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return col + (row << 5);
 }
@@ -104,12 +104,12 @@ inline void bosco_state::get_tile_info_bosco(tile_data &tileinfo,int tile_index,
 			TILE_FLIPYX(attr >> 6) ^ TILE_FLIPX);
 }
 
-TILE_GET_INFO_MEMBER(bosco_state::bg_get_tile_info )
+void bosco_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info_bosco(tileinfo,tile_index,0x400);
 }
 
-TILE_GET_INFO_MEMBER(bosco_state::fg_get_tile_info )
+void bosco_state::fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info_bosco(tileinfo,tile_index,0x000);
 }
@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(bosco_state::fg_get_tile_info )
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(bosco_state,bosco)
+void bosco_state::video_start_bosco()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bosco_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bosco_state::fg_get_tile_info),this),tilemap_mapper_delegate(FUNC(bosco_state::fg_tilemap_scan),this),  8,8, 8,32);
@@ -150,7 +150,7 @@ VIDEO_START_MEMBER(bosco_state,bosco)
 
 ***************************************************************************/
 
-WRITE8_MEMBER( bosco_state::bosco_videoram_w )
+void bosco_state::bosco_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	if (offset & 0x400)
@@ -159,17 +159,17 @@ WRITE8_MEMBER( bosco_state::bosco_videoram_w )
 		m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER( bosco_state::bosco_scrollx_w )
+void bosco_state::bosco_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0,data);
 }
 
-WRITE8_MEMBER( bosco_state::bosco_scrolly_w )
+void bosco_state::bosco_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0,data);
 }
 
-WRITE8_MEMBER( bosco_state::bosco_starclr_w )
+void bosco_state::bosco_starclr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

@@ -43,12 +43,12 @@ public:
 	uint8_t m_port60;
 	uint8_t m_port70;
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(port70_w);
-	DECLARE_WRITE8_MEMBER(port60_w);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(quizo);
-	DECLARE_PALETTE_INIT(quizo);
+	void init_quizo();
+	void palette_init_quizo(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -60,7 +60,7 @@ public:
 
 static const uint8_t rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
 
-PALETTE_INIT_MEMBER(quizo_state, quizo)
+void quizo_state::palette_init_quizo(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -118,18 +118,18 @@ uint32_t quizo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-WRITE8_MEMBER(quizo_state::vram_w)
+void quizo_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank=(m_port70&8)?1:0;
 	m_videoram[offset+bank*0x4000]=data;
 }
 
-WRITE8_MEMBER(quizo_state::port70_w)
+void quizo_state::port70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port70=data;
 }
 
-WRITE8_MEMBER(quizo_state::port60_w)
+void quizo_state::port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data>9)
 	{
@@ -266,7 +266,7 @@ ROM_START( quizoa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(quizo_state,quizo)
+void quizo_state::init_quizo()
 {
 	m_videoram=std::make_unique<uint8_t[]>(0x4000*2);
 	membank("bank1")->configure_entries(0, 6, memregion("user1")->base(), 0x4000);

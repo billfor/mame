@@ -542,7 +542,7 @@ static ADDRESS_MAP_START ( msx_memory_map, AS_PROGRAM, 8, msx_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(msx_state::msx_ay8910_w)
+void msx_state::msx_ay8910_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( offset & 1 )
 		m_ay8910->data_w( space, offset, data );
@@ -1229,7 +1229,7 @@ INPUT_PORTS_END
 
 
 // Some MSX2+ can switch the z80 clock between 3.5 and 5.3 MHz
-WRITE_LINE_MEMBER(msx_state::turbo_w)
+void msx_state::turbo_w(int state)
 {
 	// 0 - 5.369317 MHz
 	// 1 - 3.579545 MHz

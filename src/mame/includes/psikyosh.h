@@ -59,18 +59,18 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE32_MEMBER(psikyosh_irqctrl_w);
-	DECLARE_WRITE32_MEMBER(psikyosh_vidregs_w);
-	DECLARE_READ32_MEMBER(mjgtaste_input_r);
-	DECLARE_WRITE32_MEMBER(psh_eeprom_w);
-	DECLARE_READ32_MEMBER(psh_eeprom_r);
-	DECLARE_DRIVER_INIT(ps3);
-	DECLARE_DRIVER_INIT(ps5);
-	DECLARE_DRIVER_INIT(mjgtaste);
+	void psikyosh_irqctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void psikyosh_vidregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t mjgtaste_input_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void psh_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t psh_eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void init_ps3();
+	void init_ps5();
+	void init_mjgtaste();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_psikyosh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(psikyosh_interrupt);
+	void psikyosh_interrupt(device_t &device);
 	void draw_scanline32_alpha(bitmap_rgb32 &bitmap, int32_t destx, int32_t desty, int32_t length, const uint32_t *srcptr, int alpha);
 	void draw_scanline32_argb(bitmap_rgb32 &bitmap, int32_t destx, int32_t desty, int32_t length, const uint32_t *srcptr);
 	void draw_scanline32_transpen(bitmap_rgb32 &bitmap, int32_t destx, int32_t desty, int32_t length, const uint32_t *srcptr);

@@ -25,13 +25,13 @@ public:
 	int m_gfxbank;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_READ8_MEMBER(dsw1_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
+	uint8_t dsw1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 

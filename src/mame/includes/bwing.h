@@ -59,27 +59,27 @@ public:
 	int m_bwp3_nmimask;
 	int m_bwp3_u8F_d;
 
-	DECLARE_WRITE8_MEMBER(bwp3_u8F_w);
-	DECLARE_WRITE8_MEMBER(bwp3_nmimask_w);
-	DECLARE_WRITE8_MEMBER(bwp3_nmiack_w);
-	DECLARE_WRITE8_MEMBER(bwp1_ctrl_w);
-	DECLARE_WRITE8_MEMBER(bwp2_ctrl_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(fgscrollram_w);
-	DECLARE_WRITE8_MEMBER(bgscrollram_w);
-	DECLARE_WRITE8_MEMBER(gfxram_w);
-	DECLARE_WRITE8_MEMBER(scrollreg_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
+	void bwp3_u8F_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bwp3_nmimask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bwp3_nmiack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bwp1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bwp2_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgscrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgscrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gfxram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrollreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(tilt_pressed);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void tilt_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	TILE_GET_INFO_MEMBER(get_fgtileinfo);
-	TILE_GET_INFO_MEMBER(get_bgtileinfo);
-	TILE_GET_INFO_MEMBER(get_charinfo);
-	TILEMAP_MAPPER_MEMBER(scan_cols);
+	void get_fgtileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bgtileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_charinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
-	DECLARE_DRIVER_INIT(bwing);
+	void init_bwing();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -88,5 +88,5 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, uint8_t *ram, int pri );
 
-	INTERRUPT_GEN_MEMBER(bwp3_interrupt);
+	void bwp3_interrupt(device_t &device);
 };

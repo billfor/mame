@@ -18,7 +18,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(badlands_state::get_playfield_tile_info)
+void badlands_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = (data & 0x1fff) + ((data & 0x1000) ? (m_playfield_tile_bank << 12) : 0);
@@ -68,7 +68,7 @@ const atari_motion_objects_config badlands_state::s_mob_config =
 	0,                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(badlands_state,badlands)
+void badlands_state::video_start_badlands()
 {
 	/* save states */
 	save_item(NAME(m_playfield_tile_bank));
@@ -82,7 +82,7 @@ VIDEO_START_MEMBER(badlands_state,badlands)
  *
  *************************************/
 
-WRITE16_MEMBER( badlands_state::badlands_pf_bank_w )
+void badlands_state::badlands_pf_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		if (m_playfield_tile_bank != (data & 1))

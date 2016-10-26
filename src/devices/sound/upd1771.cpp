@@ -294,7 +294,7 @@ void upd1771c_device::device_reset()
 
 
 
-READ8_MEMBER( upd1771c_device::read )
+uint8_t upd1771c_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x80; // TODO
 }
@@ -361,7 +361,7 @@ Byte8: 0b???VVVVV  Low Freq1 volume
 Byte9: 0b???VVVVV  Low Freq2 volume
 */
 
-WRITE8_MEMBER( upd1771c_device::write )
+void upd1771c_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//if (LOG)
 	//  logerror( "upd1771_w: received byte 0x%02x\n", data );
@@ -452,7 +452,7 @@ WRITE8_MEMBER( upd1771c_device::write )
 }
 
 
-WRITE_LINE_MEMBER( upd1771c_device::pcm_write )
+void upd1771c_device::pcm_write(int state)
 {
 	//RESET upon HIGH
 	if (state != m_pc3)
@@ -466,7 +466,7 @@ WRITE_LINE_MEMBER( upd1771c_device::pcm_write )
 }
 
 
-TIMER_CALLBACK_MEMBER( upd1771c_device::ack_callback )
+void upd1771c_device::ack_callback(void *ptr, int32_t param)
 {
 	m_ack_handler(1);
 }

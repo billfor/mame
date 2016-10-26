@@ -84,8 +84,8 @@ public:
 	template<class _Object> static devcb_base &set_out_sc2_func(device_t &device, _Object object) { return downcast<m6800_cpu_device &>(device).m_out_sc2_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_sertx_func(device_t &device, _Object object) { return downcast<m6800_cpu_device &>(device).m_out_sertx_func.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( m6801_io_r );
-	DECLARE_WRITE8_MEMBER( m6801_io_w );
+	uint8_t m6801_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m6801_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -195,7 +195,7 @@ protected:
 	int m6800_rx();
 	void serial_transmit();
 	void serial_receive();
-	TIMER_CALLBACK_MEMBER( sci_tick );
+	void sci_tick(void *ptr, int32_t param);
 	void set_os3(int state);
 
 	void aba();

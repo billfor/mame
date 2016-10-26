@@ -33,7 +33,7 @@
 const device_type C64_MAGIC_FORMEL = &device_creator<c64_magic_formel_cartridge_device>;
 
 
-WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
+void c64_magic_formel_cartridge_device::pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -55,7 +55,7 @@ WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
 	m_ram_oe = BIT(data, 4);
 }
 
-WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pb_w )
+void c64_magic_formel_cartridge_device::pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -82,7 +82,7 @@ WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pb_w )
 	m_pb7 = BIT(data, 7);
 }
 
-WRITE_LINE_MEMBER( c64_magic_formel_cartridge_device::pia_cb2_w )
+void c64_magic_formel_cartridge_device::pia_cb2_w(int state)
 {
 	if (!state)
 	{
@@ -115,10 +115,10 @@ machine_config_constructor c64_magic_formel_cartridge_device::device_mconfig_add
 
 
 //-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( freeze )
+//  void freeze(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( c64_magic_formel_cartridge_device::freeze )
+void c64_magic_formel_cartridge_device::freeze(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval && (!m_u9a && !m_u9b))
 	{

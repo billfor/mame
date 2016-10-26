@@ -39,7 +39,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(timeplt_state, timeplt)
+void timeplt_state::palette_init_timeplt(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	rgb_t palette_val[32];
@@ -92,7 +92,7 @@ PALETTE_INIT_MEMBER(timeplt_state, timeplt)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(timeplt_state::get_tile_info)
+void timeplt_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + 8 * (attr & 0x20);
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(timeplt_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
+void timeplt_state::get_chkun_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x60) << 3);
@@ -130,13 +130,13 @@ void timeplt_state::video_start()
 	save_item(NAME(m_video_enable));
 }
 
-VIDEO_START_MEMBER(timeplt_state,psurge)
+void timeplt_state::video_start_psurge()
 {
 	video_start();
 	m_video_enable = 1; //psurge doesn't seem to have the video enable
 }
 
-VIDEO_START_MEMBER(timeplt_state,chkun)
+void timeplt_state::video_start_chkun()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(timeplt_state::get_chkun_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_video_enable = 0;
@@ -152,31 +152,31 @@ VIDEO_START_MEMBER(timeplt_state,chkun)
  *
  *************************************/
 
-WRITE8_MEMBER(timeplt_state::videoram_w)
+void timeplt_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(timeplt_state::colorram_w)
+void timeplt_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(timeplt_state::flipscreen_w)
+void timeplt_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 1);
 }
 
-WRITE8_MEMBER(timeplt_state::video_enable_w)
+void timeplt_state::video_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_enable = data & 1;
 }
 
-READ8_MEMBER(timeplt_state::scanline_r)
+uint8_t timeplt_state::scanline_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_screen->vpos();
 }

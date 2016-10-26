@@ -40,7 +40,7 @@ void batman_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(batman_state,batman)
+void batman_state::machine_start_batman()
 {
 	atarigen_state::machine_start();
 
@@ -49,7 +49,7 @@ MACHINE_START_MEMBER(batman_state,batman)
 }
 
 
-MACHINE_RESET_MEMBER(batman_state,batman)
+void batman_state::machine_reset_batman()
 {
 	atarigen_state::machine_reset();
 }
@@ -62,7 +62,7 @@ MACHINE_RESET_MEMBER(batman_state,batman)
  *
  *************************************/
 
-WRITE16_MEMBER(batman_state::latch_w)
+void batman_state::latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword = m_latch_data;
 	COMBINE_DATA(&m_latch_data);

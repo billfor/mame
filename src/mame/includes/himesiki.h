@@ -42,12 +42,12 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(himesiki_rombank_w);
-	DECLARE_WRITE8_MEMBER(himesiki_sound_w);
-	DECLARE_WRITE8_MEMBER(himesiki_bg_ram_w);
-	DECLARE_WRITE8_MEMBER(himesiki_scrollx_w);
-	DECLARE_WRITE8_MEMBER(himesiki_scrolly_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void himesiki_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void himesiki_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void himesiki_bg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void himesiki_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void himesiki_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

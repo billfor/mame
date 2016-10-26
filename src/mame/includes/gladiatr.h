@@ -55,51 +55,51 @@ public:
 	int m_bg_tile_bank;
 
 	// common
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(textram_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_WRITE8_MEMBER(spritebuffer_w);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void textram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spritebuffer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// gladiator specific
-	DECLARE_READ8_MEMBER(gladiator_dsw1_r);
-	DECLARE_READ8_MEMBER(gladiator_dsw2_r);
-	DECLARE_READ8_MEMBER(gladiator_controls_r);
-	DECLARE_READ8_MEMBER(gladiator_button3_r);
-	DECLARE_WRITE8_MEMBER(gladiatr_spritebank_w);
-	DECLARE_WRITE8_MEMBER(gladiatr_video_registers_w);
-	DECLARE_WRITE8_MEMBER(gladiatr_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(gladiator_cpu_sound_command_w);
-	DECLARE_READ8_MEMBER(gladiator_cpu_sound_command_r);
-	DECLARE_WRITE8_MEMBER(gladiatr_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(gladiatr_irq_patch_w);
-	DECLARE_WRITE8_MEMBER(gladiator_int_control_w);
-	DECLARE_WRITE8_MEMBER(gladiator_adpcm_w);
-	DECLARE_WRITE_LINE_MEMBER(gladiator_ym_irq);
+	uint8_t gladiator_dsw1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gladiator_dsw2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gladiator_controls_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gladiator_button3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gladiatr_spritebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gladiatr_video_registers_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gladiatr_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gladiator_cpu_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gladiator_cpu_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gladiatr_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gladiatr_irq_patch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gladiator_int_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gladiator_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gladiator_ym_irq(int state);
 
 	// ppking specific
-	DECLARE_READ8_MEMBER(ppking_f1_r);
-	DECLARE_READ8_MEMBER(ppking_f6a3_r);
-	DECLARE_WRITE8_MEMBER(ppking_qx0_w);
-	DECLARE_WRITE8_MEMBER(ppking_qx1_w);
-	DECLARE_WRITE8_MEMBER(ppking_qx2_w);
-	DECLARE_WRITE8_MEMBER(ppking_qx3_w);
-	DECLARE_READ8_MEMBER(ppking_qx2_r);
-	DECLARE_READ8_MEMBER(ppking_qx3_r);
-	DECLARE_READ8_MEMBER(ppking_qx0_r);
-	DECLARE_READ8_MEMBER(ppking_qx1_r);
-	DECLARE_WRITE8_MEMBER(ppking_video_registers_w);
+	uint8_t ppking_f1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ppking_f6a3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppking_qx0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppking_qx1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppking_qx2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppking_qx3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppking_qx2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ppking_qx3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ppking_qx0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ppking_qx1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppking_video_registers_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(gladiatr);
-	DECLARE_DRIVER_INIT(ppking);
+	void init_gladiatr();
+	void init_ppking();
 
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	DECLARE_MACHINE_RESET(ppking);
-	DECLARE_VIDEO_START(ppking);
-	DECLARE_MACHINE_RESET(gladiator);
-	DECLARE_VIDEO_START(gladiatr);
+	void machine_reset_ppking();
+	void video_start_ppking();
+	void machine_reset_gladiator();
+	void video_start_gladiatr();
 
 	uint32_t screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

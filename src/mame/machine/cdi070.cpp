@@ -244,7 +244,7 @@ void cdi68070_device::set_quizard_mcu_value(uint16_t value)
 	m_mcu_value = value;
 }
 
-TIMER_CALLBACK_MEMBER( cdi68070_device::timer0_callback )
+void cdi68070_device::timer0_callback(void *ptr, int32_t param)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
@@ -317,7 +317,7 @@ void cdi68070_device::uart_tx(uint8_t data)
 	uart_tx_check();
 }
 
-TIMER_CALLBACK_MEMBER( cdi68070_device::rx_callback )
+void cdi68070_device::rx_callback(void *ptr, int32_t param)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
@@ -529,7 +529,7 @@ void cdi68070_device::quizard_handle_byte_tx()
 	}
 }
 
-TIMER_CALLBACK_MEMBER( cdi68070_device::tx_callback )
+void cdi68070_device::tx_callback(void *ptr, int32_t param)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
@@ -570,7 +570,7 @@ TIMER_CALLBACK_MEMBER( cdi68070_device::tx_callback )
 	uart_tx_check();
 }
 
-READ16_MEMBER( cdi68070_device::periphs_r )
+uint16_t cdi68070_device::periphs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
@@ -860,7 +860,7 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 	return 0;
 }
 
-WRITE16_MEMBER( cdi68070_device::periphs_w )
+void cdi68070_device::periphs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
@@ -1172,7 +1172,7 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 }
 
 #if ENABLE_UART_PRINTING
-READ16_MEMBER( cdi68070_device::uart_loopback_enable )
+uint16_t cdi68070_device::uart_loopback_enable(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x1234;
 }

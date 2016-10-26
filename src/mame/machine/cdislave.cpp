@@ -52,7 +52,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 //  MEMBER FUNCTIONS
 //**************************************************************************
 
-TIMER_CALLBACK_MEMBER( cdislave_device::trigger_readback_int )
+void cdislave_device::trigger_readback_int(void *ptr, int32_t param)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
@@ -117,12 +117,12 @@ void cdislave_device::perform_mouse_update()
 	}
 }
 
-INPUT_CHANGED_MEMBER( cdislave_device::mouse_update )
+void cdislave_device::mouse_update(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	perform_mouse_update();
 }
 
-READ16_MEMBER( cdislave_device::slave_r )
+uint16_t cdislave_device::slave_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
@@ -177,7 +177,7 @@ void cdislave_device::set_mouse_position()
 	}
 }
 
-WRITE16_MEMBER( cdislave_device::slave_w )
+void cdislave_device::slave_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 

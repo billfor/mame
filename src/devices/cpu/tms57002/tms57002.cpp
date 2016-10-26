@@ -30,7 +30,7 @@ tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag,
 }
 
 
-WRITE_LINE_MEMBER(tms57002_device::pload_w)
+void tms57002_device::pload_w(int state)
 {
 	uint8_t olds = sti;
 	if(state)
@@ -45,7 +45,7 @@ WRITE_LINE_MEMBER(tms57002_device::pload_w)
 	}
 }
 
-WRITE_LINE_MEMBER(tms57002_device::cload_w)
+void tms57002_device::cload_w(int state)
 {
 	uint8_t olds = sti;
 	if(state)
@@ -80,7 +80,7 @@ void tms57002_device::device_reset()
 	cache_flush();
 }
 
-WRITE8_MEMBER(tms57002_device::data_w)
+void tms57002_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(sti & (IN_PLOAD|IN_CLOAD)) {
 	case 0:
@@ -135,7 +135,7 @@ WRITE8_MEMBER(tms57002_device::data_w)
 	};
 }
 
-READ8_MEMBER(tms57002_device::data_r)
+uint8_t tms57002_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 	if(!(sti & S_HOST))
@@ -151,22 +151,22 @@ READ8_MEMBER(tms57002_device::data_r)
 	return res;
 }
 
-READ_LINE_MEMBER(tms57002_device::empty_r)
+int tms57002_device::empty_r()
 {
 	return 1;
 }
 
-READ_LINE_MEMBER(tms57002_device::dready_r)
+int tms57002_device::dready_r()
 {
 	return sti & S_HOST ? 0 : 1;
 }
 
-READ_LINE_MEMBER(tms57002_device::pc0_r)
+int tms57002_device::pc0_r()
 {
 	return pc == 0 ? 0 : 1;
 }
 
-WRITE_LINE_MEMBER(tms57002_device::sync_w)
+void tms57002_device::sync_w(int state)
 {
 	if(sti & (IN_PLOAD | IN_CLOAD))
 		return;

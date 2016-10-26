@@ -33,19 +33,19 @@ public:
 
 	virtual void update_interrupts() override;
 
-	DECLARE_WRITE16_MEMBER(interrupt_scan_w);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_WRITE16_MEMBER(intensity_w);
-	DECLARE_WRITE16_MEMBER(xscroll_w);
-	DECLARE_WRITE16_MEMBER(yscroll_w);
-	DECLARE_WRITE16_MEMBER(slip_w);
+	void interrupt_scan_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void intensity_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void xscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void yscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void slip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	void get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	DECLARE_MACHINE_START(toobin);
-	DECLARE_MACHINE_RESET(toobin);
-	DECLARE_VIDEO_START(toobin);
+	void machine_start_toobin();
+	void machine_reset_toobin();
+	void video_start_toobin();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

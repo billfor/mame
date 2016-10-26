@@ -95,12 +95,12 @@ TODO:
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(champbas_state::watchdog_bit2)
+ioport_value champbas_state::watchdog_bit2(ioport_field &field, void *param)
 {
 	return (0x10 - m_watchdog->get_vblank_counter()) >> 2 & 1;
 }
 
-WRITE8_MEMBER(champbas_state::irq_enable_w)
+void champbas_state::irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 
@@ -108,7 +108,7 @@ WRITE8_MEMBER(champbas_state::irq_enable_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(champbas_state::exctsccr_sound_irq)
+void champbas_state::exctsccr_sound_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
@@ -121,19 +121,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(champbas_state::exctsccr_sound_irq)
  *
  *************************************/
 
-WRITE8_MEMBER(champbas_state::mcu_switch_w)
+void champbas_state::mcu_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// switch shared RAM between CPU and MCU bus
 	m_alpha_8201->bus_dir_w(data & 1);
 }
 
-WRITE8_MEMBER(champbas_state::mcu_start_w)
+void champbas_state::mcu_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_alpha_8201->mcu_start_w(data & 1);
 }
 
 /* champbja another protection */
-READ8_MEMBER(champbas_state::champbja_protection_r)
+uint8_t champbas_state::champbja_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	/*
@@ -511,7 +511,7 @@ void champbas_state::machine_reset()
 		m_maincpu->space(AS_PROGRAM).write_byte(0xa000 + i, 0);
 }
 
-INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
+void champbas_state::vblank_irq(device_t &device)
 {
 	if (m_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
@@ -1190,7 +1190,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(champbas_state,champbas)
+void champbas_state::init_champbas()
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
 	uint8_t *rom1 = memregion("gfx1")->base();
@@ -1206,7 +1206,7 @@ DRIVER_INIT_MEMBER(champbas_state,champbas)
 }
 
 
-DRIVER_INIT_MEMBER(champbas_state,exctsccr)
+void champbas_state::init_exctsccr()
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
 	uint8_t *rom1 = memregion("gfx1")->base();

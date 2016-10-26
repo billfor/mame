@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/taito_b.h"
 
-WRITE16_MEMBER(taitob_state::hitice_pixelram_w)
+void taitob_state::hitice_pixelram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int sy = offset >> 9;
 	int sx = offset & 0x1ff;
@@ -18,7 +18,7 @@ WRITE16_MEMBER(taitob_state::hitice_pixelram_w)
 	}
 }
 
-WRITE16_MEMBER(taitob_state::hitice_pixel_scroll_w)
+void taitob_state::hitice_pixel_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pixel_scroll[offset]);
 }
@@ -32,12 +32,12 @@ void taitob_state::hitice_clear_pixel_bitmap(  )
 		hitice_pixelram_w(space, i, 0, 0xffff);
 }
 
-WRITE16_MEMBER(taitob_state::realpunc_video_ctrl_w)
+void taitob_state::realpunc_video_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_realpunc_video_ctrl);
 }
 
-VIDEO_START_MEMBER(taitob_state,taitob_core)
+void taitob_state::video_start_taitob_core()
 {
 	m_framebuffer[0] = std::make_unique<bitmap_ind16>(512, 256);
 	m_framebuffer[1] = std::make_unique<bitmap_ind16>(512, 256);
@@ -49,7 +49,7 @@ VIDEO_START_MEMBER(taitob_state,taitob_core)
 	save_item(NAME(*m_framebuffer[1]));
 }
 
-VIDEO_START_MEMBER(taitob_state,taitob_color_order0)
+void taitob_state::video_start_taitob_color_order0()
 {
 	/*graphics are shared, only that they use different palette*/
 	/*this is the basic layout used in: Nastar, Ashura Blaster, Hit the Ice, Rambo3, Tetris*/
@@ -60,29 +60,29 @@ VIDEO_START_MEMBER(taitob_state,taitob_color_order0)
 
 	/* bg, fg, tx color_base are set in the tc0180vcu interface */
 
-	VIDEO_START_CALL_MEMBER(taitob_core);
+	video_start_taitob_core();
 }
 
-VIDEO_START_MEMBER(taitob_state,taitob_color_order1)
+void taitob_state::video_start_taitob_color_order1()
 {
 	/* this is the reversed layout used in: Crime City, Puzzle Bobble */
 	m_b_sp_color_base = 0x80 * 16;
 
-	VIDEO_START_CALL_MEMBER(taitob_core);
+	video_start_taitob_core();
 }
 
-VIDEO_START_MEMBER(taitob_state,taitob_color_order2)
+void taitob_state::video_start_taitob_color_order2()
 {
 	/*this is used in: rambo3a, masterw, silentd, selfeena, ryujin */
 	m_b_sp_color_base = 0x10 * 16;
 
-	VIDEO_START_CALL_MEMBER(taitob_core);
+	video_start_taitob_core();
 }
 
 
-VIDEO_START_MEMBER(taitob_state,hitice)
+void taitob_state::video_start_hitice()
 {
-	VIDEO_START_CALL_MEMBER(taitob_color_order0);
+	video_start_taitob_color_order0();
 
 	m_b_fg_color_base = 0x80;       /* hitice also uses this for the pixel_bitmap */
 
@@ -91,22 +91,22 @@ VIDEO_START_MEMBER(taitob_state,hitice)
 	save_item(NAME(*m_pixel_bitmap));
 }
 
-VIDEO_RESET_MEMBER(taitob_state,hitice)
+void taitob_state::video_reset_hitice()
 {
 	/* kludge: clear the bitmap on startup */
 	hitice_clear_pixel_bitmap();
 }
 
 
-VIDEO_START_MEMBER(taitob_state,realpunc)
+void taitob_state::video_start_realpunc()
 {
 	m_realpunc_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 
-	VIDEO_START_CALL_MEMBER(taitob_color_order0);
+	video_start_taitob_color_order0();
 }
 
 
-READ16_MEMBER(taitob_state::tc0180vcu_framebuffer_word_r)
+uint16_t taitob_state::tc0180vcu_framebuffer_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int sy = offset >> 8;
 	int sx = 2 * (offset & 0xff);
@@ -114,7 +114,7 @@ READ16_MEMBER(taitob_state::tc0180vcu_framebuffer_word_r)
 	return (m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) << 8) | m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1);
 }
 
-WRITE16_MEMBER(taitob_state::tc0180vcu_framebuffer_word_w)
+void taitob_state::tc0180vcu_framebuffer_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int sy = offset >> 8;
 	int sx = 2 * (offset & 0xff);

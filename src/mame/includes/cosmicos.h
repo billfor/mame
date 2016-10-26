@@ -71,38 +71,38 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( video_off_r );
-	DECLARE_READ8_MEMBER( video_on_r );
-	DECLARE_WRITE8_MEMBER( audio_latch_w );
-	DECLARE_READ8_MEMBER( hex_keyboard_r );
-	DECLARE_WRITE8_MEMBER( hex_keylatch_w );
-	DECLARE_READ8_MEMBER( reset_counter_r );
-	DECLARE_WRITE8_MEMBER( segment_w );
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( display_w );
-	DECLARE_WRITE_LINE_MEMBER( dmaout_w );
-	DECLARE_WRITE_LINE_MEMBER( efx_w );
-	DECLARE_READ_LINE_MEMBER( wait_r );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef1_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( sc_w );
-	DECLARE_INPUT_CHANGED_MEMBER( data );
-	DECLARE_INPUT_CHANGED_MEMBER( enter );
-	DECLARE_INPUT_CHANGED_MEMBER( single_step );
-	DECLARE_INPUT_CHANGED_MEMBER( run );
-	DECLARE_INPUT_CHANGED_MEMBER( load );
-	DECLARE_INPUT_CHANGED_MEMBER( cosmicos_pause );
-	DECLARE_INPUT_CHANGED_MEMBER( reset );
-	DECLARE_INPUT_CHANGED_MEMBER( clear_data );
-	DECLARE_INPUT_CHANGED_MEMBER( memory_protect );
-	DECLARE_INPUT_CHANGED_MEMBER( memory_disable );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t video_off_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t video_on_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void audio_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hex_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hex_keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t reset_counter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dmaout_w(int state);
+	void efx_w(int state);
+	int wait_r();
+	int clear_r();
+	int ef1_r();
+	int ef2_r();
+	int ef3_r();
+	int ef4_r();
+	void q_w(int state);
+	uint8_t dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void data(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void enter(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void single_step(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void run(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void load(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void cosmicos_pause(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void clear_data(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void memory_protect(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void memory_disable(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cosmicos );
 
@@ -132,9 +132,9 @@ public:
 	int m_efx;
 	int m_video_on;
 
-	DECLARE_DRIVER_INIT(cosmicos);
-	TIMER_DEVICE_CALLBACK_MEMBER(digit_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
+	void init_cosmicos();
+	void digit_tick(timer_device &timer, void *ptr, int32_t param);
+	void int_tick(timer_device &timer, void *ptr, int32_t param);
 };
 
 #endif

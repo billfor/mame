@@ -58,15 +58,15 @@ public:
 
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER( cdp1869_w );
-	DECLARE_WRITE8_MEMBER( destryer_out1_w );
-	DECLARE_WRITE8_MEMBER( altair_out1_w );
+	void cdp1869_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void destryer_out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void altair_out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ_LINE_MEMBER( clear_r );
+	int clear_r();
 
-	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE_LINE_MEMBER( prd_w );
-	DECLARE_READ_LINE_MEMBER( cdp1869_pcb_r );
+	void q_w(int state);
+	void prd_w(int state);
+	int cdp1869_pcb_r();
 
 	CDP1869_CHAR_RAM_READ_MEMBER(cidelsa_charram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(cidelsa_charram_w);
@@ -99,13 +99,13 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( sound_in_r );
-	DECLARE_READ8_MEMBER( psg_r );
-	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
-	DECLARE_WRITE8_MEMBER( sound_g_w );
-	DECLARE_WRITE8_MEMBER( psg_w );
-	DECLARE_WRITE8_MEMBER( out1_w );
-	DECLARE_WRITE8_MEMBER( psg_pb_w );
+	uint8_t sound_in_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t psg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void psg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void psg_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	CDP1869_CHAR_RAM_READ_MEMBER(draco_charram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(draco_charram_w);

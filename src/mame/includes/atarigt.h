@@ -60,31 +60,31 @@ public:
 
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_READ32_MEMBER(special_port2_r);
-	DECLARE_READ32_MEMBER(special_port3_r);
-	DECLARE_READ32_MEMBER(analog_port0_r);
-	DECLARE_READ32_MEMBER(analog_port1_r);
-	DECLARE_WRITE32_MEMBER(latch_w);
-	DECLARE_WRITE32_MEMBER(mo_command_w);
-	DECLARE_WRITE32_MEMBER(led_w);
-	DECLARE_READ32_MEMBER(sound_data_r);
-	DECLARE_WRITE32_MEMBER(sound_data_w);
-	DECLARE_READ32_MEMBER(colorram_protection_r);
-	DECLARE_WRITE32_MEMBER(colorram_protection_w);
-	DECLARE_WRITE32_MEMBER(tmek_pf_w);
+	uint32_t special_port2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t special_port3_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t analog_port0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t analog_port1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void latch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void mo_command_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void led_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sound_data_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sound_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t colorram_protection_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void colorram_protection_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void tmek_pf_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE8_MEMBER(cage_irq_callback);
+	void cage_irq_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void atarigt_colorram_w(offs_t address, uint16_t data, uint16_t mem_mask);
 	uint16_t atarigt_colorram_r(offs_t address);
-	DECLARE_DRIVER_INIT(primrage);
-	DECLARE_DRIVER_INIT(tmek);
-	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	TILEMAP_MAPPER_MEMBER(atarigt_playfield_scan);
-	DECLARE_MACHINE_START(atarigt);
-	DECLARE_MACHINE_RESET(atarigt);
-	DECLARE_VIDEO_START(atarigt);
+	void init_primrage();
+	void init_tmek();
+	void get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index atarigt_playfield_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void machine_start_atarigt();
+	void machine_reset_atarigt();
+	void video_start_atarigt();
 	uint32_t screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 private:
 	void tmek_update_mode(offs_t offset);

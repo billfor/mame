@@ -48,10 +48,10 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(ti630_io_w);
-	DECLARE_READ8_MEMBER(ti630_io_r);
-	DECLARE_DRIVER_INIT(ti630);
-	DECLARE_PALETTE_INIT(ti630);
+	void ti630_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ti630_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_ti630();
+	void palette_init_ti630(palette_device &palette);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -65,7 +65,7 @@ static ADDRESS_MAP_START(i80c31_prg, AS_PROGRAM, 8, ti630_state)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-DRIVER_INIT_MEMBER( ti630_state, ti630 )
+void ti630_state::init_ti630()
 {
 }
 
@@ -86,7 +86,7 @@ void ti630_state::machine_reset()
 {
 }
 
-READ8_MEMBER(ti630_state::ti630_io_r)
+uint8_t ti630_state::ti630_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -106,7 +106,7 @@ READ8_MEMBER(ti630_state::ti630_io_r)
 	}
 }
 
-WRITE8_MEMBER(ti630_state::ti630_io_w)
+void ti630_state::ti630_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static uint8_t p0=0, p1=0, p2=0, p3=0;
 	switch (offset)
@@ -158,7 +158,7 @@ WRITE8_MEMBER(ti630_state::ti630_io_w)
 	}
 }
 
-PALETTE_INIT_MEMBER(ti630_state, ti630)
+void ti630_state::palette_init_ti630(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

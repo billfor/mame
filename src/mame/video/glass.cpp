@@ -33,7 +33,7 @@
       1  | xxxxxxxx -------- | not used
 */
 
-TILE_GET_INFO_MEMBER(glass_state::get_tile_info_screen0)
+void glass_state::get_tile_info_screen0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[tile_index << 1];
 	int data2 = m_videoram[(tile_index << 1) + 1];
@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(glass_state::get_tile_info_screen0)
 }
 
 
-TILE_GET_INFO_MEMBER(glass_state::get_tile_info_screen1)
+void glass_state::get_tile_info_screen1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[(0x1000 / 2) + (tile_index << 1)];
 	int data2 = m_videoram[(0x1000 / 2) + (tile_index << 1) + 1];
@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(glass_state::get_tile_info_screen1)
     B2B1B0 selects the picture (there are 8 pictures in each half of the ROM)
 */
 
-WRITE16_MEMBER(glass_state::blitter_w)
+void glass_state::blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_blitter_serial_buffer[m_current_bit] = data & 0x01;
 	m_current_bit++;
@@ -112,7 +112,7 @@ WRITE16_MEMBER(glass_state::blitter_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(glass_state::vram_w)
+void glass_state::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_pant[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);

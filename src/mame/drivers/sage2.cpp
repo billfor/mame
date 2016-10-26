@@ -35,7 +35,7 @@
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( sage2_state::read )
+uint8_t sage2_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -56,7 +56,7 @@ READ8_MEMBER( sage2_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( sage2_state::write )
+void sage2_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x080000)
 	{
@@ -204,7 +204,7 @@ INPUT_PORTS_END
 //  I8255A INTERFACE( ppi0_intf )
 //-------------------------------------------------
 
-WRITE8_MEMBER( sage2_state::ppi0_pc_w )
+void sage2_state::ppi0_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -251,7 +251,7 @@ WRITE8_MEMBER( sage2_state::ppi0_pc_w )
 //  I8255A INTERFACE( ppi1_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(sage2_state::write_centronics_ack)
+void sage2_state::write_centronics_ack(int state)
 {
 	if (!state)
 	{
@@ -259,27 +259,27 @@ WRITE_LINE_MEMBER(sage2_state::write_centronics_ack)
 	}
 }
 
-WRITE_LINE_MEMBER(sage2_state::write_centronics_busy)
+void sage2_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(sage2_state::write_centronics_perror)
+void sage2_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
 
-WRITE_LINE_MEMBER(sage2_state::write_centronics_select)
+void sage2_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
 
-WRITE_LINE_MEMBER(sage2_state::write_centronics_fault)
+void sage2_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER( sage2_state::ppi1_pb_r )
+uint8_t sage2_state::ppi1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -317,7 +317,7 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( sage2_state::ppi1_pc_w )
+void sage2_state::ppi1_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -363,13 +363,13 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 	}
 }
 
-WRITE_LINE_MEMBER( sage2_state::br1_w )
+void sage2_state::br1_w(int state)
 {
 	m_usart0->write_txc(state);
 	m_usart0->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( sage2_state::br2_w )
+void sage2_state::br2_w(int state)
 {
 	m_usart1->write_txc(state);
 	m_usart1->write_rxc(state);
@@ -388,7 +388,7 @@ void sage2_state::update_fdc_int()
 	m_maincpu->set_input_line(M68K_IRQ_6, m_fdie && m_fdc_int);
 }
 
-WRITE_LINE_MEMBER( sage2_state::fdc_irq )
+void sage2_state::fdc_irq(int state)
 {
 	m_fdc_int = state;
 	update_fdc_int();
@@ -544,7 +544,7 @@ ROM_END
 //  DRIVER_INIT( sage2 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER(sage2_state::sage2_direct_update_handler)
+offs_t sage2_state::sage2_direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (m_reset && address >= 0xfe0000)
 	{
@@ -554,7 +554,7 @@ DIRECT_UPDATE_MEMBER(sage2_state::sage2_direct_update_handler)
 	return address;
 }
 
-DRIVER_INIT_MEMBER(sage2_state,sage2)
+void sage2_state::init_sage2()
 {
 	address_space &program = machine().device<cpu_device>(M68000_TAG)->space(AS_PROGRAM);
 	program.set_direct_update_handler(direct_update_delegate(FUNC(sage2_state::sage2_direct_update_handler), this));

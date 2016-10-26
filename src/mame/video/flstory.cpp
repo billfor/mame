@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "includes/flstory.h"
 
-TILE_GET_INFO_MEMBER(flstory_state::get_tile_info)
+void flstory_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index * 2];
 	int attr = m_videoram[tile_index * 2 + 1];
@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(flstory_state::get_tile_info)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(flstory_state::victnine_get_tile_info)
+void flstory_state::victnine_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index * 2];
 	int attr = m_videoram[tile_index * 2 + 1];
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(flstory_state::victnine_get_tile_info)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(flstory_state::get_rumba_tile_info)
+void flstory_state::get_rumba_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index * 2];
 	int attr = m_videoram[tile_index * 2 + 1];
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(flstory_state::get_rumba_tile_info)
 			0);
 }
 
-VIDEO_START_MEMBER(flstory_state,flstory)
+void flstory_state::video_start_flstory()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  m_bg_tilemap->set_transparent_pen(15);
@@ -70,7 +70,7 @@ VIDEO_START_MEMBER(flstory_state,flstory)
 	save_item(NAME(m_paletteram_ext));
 }
 
-VIDEO_START_MEMBER(flstory_state,rumba)
+void flstory_state::video_start_rumba()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::get_rumba_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  m_bg_tilemap->set_transparent_pen(15);
@@ -87,7 +87,7 @@ VIDEO_START_MEMBER(flstory_state,rumba)
 	save_item(NAME(m_paletteram_ext));
 }
 
-VIDEO_START_MEMBER(flstory_state,victnine)
+void flstory_state::video_start_victnine()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::victnine_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
@@ -101,13 +101,13 @@ VIDEO_START_MEMBER(flstory_state,victnine)
 	save_item(NAME(m_paletteram_ext));
 }
 
-WRITE8_MEMBER(flstory_state::flstory_videoram_w)
+void flstory_state::flstory_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(flstory_state::flstory_palette_w)
+void flstory_state::flstory_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x100)
 		m_palette->write_ext(space, (offset & 0xff) + (m_palette_bank << 8), data);
@@ -115,7 +115,7 @@ WRITE8_MEMBER(flstory_state::flstory_palette_w)
 		m_palette->write(space, (offset & 0xff) + (m_palette_bank << 8), data);
 }
 
-READ8_MEMBER(flstory_state::flstory_palette_r)
+uint8_t flstory_state::flstory_palette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 0x100)
 		return m_paletteram_ext[(offset & 0xff) + (m_palette_bank << 8)];
@@ -123,7 +123,7 @@ READ8_MEMBER(flstory_state::flstory_palette_r)
 		return m_paletteram[(offset & 0xff) + (m_palette_bank << 8)];
 }
 
-WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
+void flstory_state::flstory_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxctrl = data;
 
@@ -139,12 +139,12 @@ WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
 
 }
 
-READ8_MEMBER(flstory_state::victnine_gfxctrl_r)
+uint8_t flstory_state::victnine_gfxctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_gfxctrl;
 }
 
-WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
+void flstory_state::victnine_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxctrl = data;
 
@@ -157,7 +157,7 @@ WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
 
 }
 
-WRITE8_MEMBER(flstory_state::flstory_scrlram_w)
+void flstory_state::flstory_scrlram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrlram[offset] = data;
 	m_bg_tilemap->set_scrolly(offset, data);

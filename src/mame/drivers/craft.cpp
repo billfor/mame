@@ -58,9 +58,9 @@ public:
 
 	required_device<avr8_device> m_maincpu;
 
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_DRIVER_INIT(craft);
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_craft();
 	virtual void machine_reset() override;
 	uint32_t screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
@@ -86,7 +86,7 @@ void craft_state::machine_start()
 {
 }
 
-READ8_MEMBER(craft_state::port_r)
+uint8_t craft_state::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( offset )
 	{
@@ -101,7 +101,7 @@ READ8_MEMBER(craft_state::port_r)
 	return 0;
 }
 
-WRITE8_MEMBER(craft_state::port_w)
+void craft_state::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset )
 	{
@@ -225,7 +225,7 @@ uint32_t craft_state::screen_update_craft(screen_device &screen, bitmap_rgb32 &b
 * Machine definition                                 *
 \****************************************************/
 
-DRIVER_INIT_MEMBER(craft_state,craft)
+void craft_state::init_craft()
 {
 }
 

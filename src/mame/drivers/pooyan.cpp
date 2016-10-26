@@ -28,14 +28,14 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(pooyan_state::interrupt)
+void pooyan_state::interrupt(device_t &device)
 {
 	if (m_irq_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(pooyan_state::irq_enable_w)
+void pooyan_state::irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_enable = data & 1;
 	if (!m_irq_enable)

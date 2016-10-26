@@ -189,7 +189,7 @@ TODO!
 #include "sound/okim6295.h"
 #include "includes/taito_b.h"
 
-WRITE8_MEMBER(taitob_state::bankswitch_w)
+void taitob_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 3);
 }
@@ -237,67 +237,67 @@ void taitob_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-INTERRUPT_GEN_MEMBER(taitob_state::rastansaga2_interrupt)
+void taitob_state::rastansaga2_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), RSAGA2_INTERRUPT2);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::crimec_interrupt)
+void taitob_state::crimec_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), CRIMEC_INTERRUPT3);
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::hitice_interrupt)
+void taitob_state::hitice_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), HITICE_INTERRUPT6);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::rambo3_interrupt)
+void taitob_state::rambo3_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), RAMBO3_INTERRUPT1);
 	device.execute().set_input_line(6, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::pbobble_interrupt)
+void taitob_state::pbobble_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), PBOBBLE_INTERRUPT5);
 	device.execute().set_input_line(3, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::viofight_interrupt)
+void taitob_state::viofight_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), VIOFIGHT_INTERRUPT1);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::masterw_interrupt)
+void taitob_state::masterw_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), MASTERW_INTERRUPT4);
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::silentd_interrupt)
+void taitob_state::silentd_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), SILENTD_INTERRUPT4);
 	device.execute().set_input_line(6, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::selfeena_interrupt)
+void taitob_state::selfeena_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), SELFEENA_INTERRUPT4);
 	device.execute().set_input_line(6, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::sbm_interrupt)//5
+void taitob_state::sbm_interrupt(device_t &device)//5
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), SBM_INTERRUPT5);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::realpunc_interrupt)//2
+void taitob_state::realpunc_interrupt(device_t &device)//2
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), REALPUNC_INTERRUPT3);
 	device.execute().set_input_line(2, HOLD_LINE);
@@ -305,48 +305,48 @@ INTERRUPT_GEN_MEMBER(taitob_state::realpunc_interrupt)//2
 
 
 
-READ16_MEMBER(taitob_state::tracky1_hi_r)
+uint16_t taitob_state::tracky1_hi_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("TRACKX1")->read();
 }
 
-READ16_MEMBER(taitob_state::tracky1_lo_r)
+uint16_t taitob_state::tracky1_lo_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("TRACKX1")->read() & 0xff) << 8;
 }
 
-READ16_MEMBER(taitob_state::trackx1_hi_r)
+uint16_t taitob_state::trackx1_hi_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("TRACKY1")->read();
 }
 
-READ16_MEMBER(taitob_state::trackx1_lo_r)
+uint16_t taitob_state::trackx1_lo_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("TRACKY1")->read() & 0xff) << 8;
 }
 
-READ16_MEMBER(taitob_state::tracky2_hi_r)
+uint16_t taitob_state::tracky2_hi_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("TRACKX2")->read();
 }
 
-READ16_MEMBER(taitob_state::tracky2_lo_r)
+uint16_t taitob_state::tracky2_lo_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("TRACKX2")->read() & 0xff) << 8;
 }
 
-READ16_MEMBER(taitob_state::trackx2_hi_r)
+uint16_t taitob_state::trackx2_hi_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("TRACKY2")->read();
 }
 
-READ16_MEMBER(taitob_state::trackx2_lo_r)
+uint16_t taitob_state::trackx2_lo_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("TRACKY2")->read() & 0xff) << 8;
 }
 
 
-WRITE16_MEMBER(taitob_state::gain_control_w)
+void taitob_state::gain_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -363,7 +363,7 @@ WRITE16_MEMBER(taitob_state::gain_control_w)
 	}
 }
 
-INPUT_CHANGED_MEMBER(taitob_state::realpunc_sensor)
+void taitob_state::realpunc_sensor(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE);
 }
@@ -374,12 +374,12 @@ INPUT_CHANGED_MEMBER(taitob_state::realpunc_sensor)
 
 ***************************************************************************/
 
-READ16_MEMBER(taitob_state::eep_latch_r)
+uint16_t taitob_state::eep_latch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_eep_latch;
 }
 
-WRITE16_MEMBER(taitob_state::eeprom_w)
+void taitob_state::eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_eep_latch);
 
@@ -412,12 +412,12 @@ WRITE16_MEMBER(taitob_state::eeprom_w)
 *************************************************************************/
 
 
-READ16_MEMBER(taitob_state::player_34_coin_ctrl_r)
+uint16_t taitob_state::player_34_coin_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_coin_word;
 }
 
-WRITE16_MEMBER(taitob_state::player_34_coin_ctrl_w)
+void taitob_state::player_34_coin_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_coin_word);
 
@@ -428,7 +428,7 @@ WRITE16_MEMBER(taitob_state::player_34_coin_ctrl_w)
 	machine().bookkeeping().coin_counter_w(3,  data & 0x0800);
 }
 
-READ16_MEMBER(taitob_state::pbobble_input_bypass_r)
+uint16_t taitob_state::pbobble_input_bypass_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -440,7 +440,7 @@ READ16_MEMBER(taitob_state::pbobble_input_bypass_r)
 	}
 }
 
-WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
+void taitob_state::spacedxo_tc0220ioc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_tc0220ioc->write(space, offset, data & 0xff);
@@ -451,7 +451,7 @@ WRITE16_MEMBER(taitob_state::spacedxo_tc0220ioc_w)
 	}
 }
 
-WRITE16_MEMBER(taitob_state::realpunc_output_w)
+void taitob_state::realpunc_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
    15 = Camera Enable?
@@ -1882,7 +1882,7 @@ GFXDECODE_END
     Both ym2610 and ym2610b generate 3 (PSG like) + 2 (fm left,right) channels.
     I use mixer_set_volume() to emulate the effect.
 */
-WRITE8_MEMBER(taitob_state::mb87078_gain_changed)
+void taitob_state::mb87078_gain_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 1)
 	{
@@ -3678,7 +3678,7 @@ ROM_START( realpunc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(taitob_state,taito_b)
+void taitob_state::init_taito_b()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 }

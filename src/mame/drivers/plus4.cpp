@@ -99,28 +99,28 @@ public:
 	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);
 	uint8_t read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( ted_videoram_r );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ted_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
+	uint8_t cpu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cpu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( ted_irq_w );
-	DECLARE_READ8_MEMBER( ted_k_r );
+	void ted_irq_w(int state);
+	uint8_t ted_k_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_kb0 ) { if (state) m_kb |= 1; else m_kb &= ~1; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb1 ) { if (state) m_kb |= 2; else m_kb &= ~2; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb2 ) { if (state) m_kb |= 4; else m_kb &= ~4; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb3 ) { if (state) m_kb |= 8; else m_kb &= ~8; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb4 ) { if (state) m_kb |= 16; else m_kb &= ~16; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb5 ) { if (state) m_kb |= 32; else m_kb &= ~32; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb6 ) { if (state) m_kb |= 64; else m_kb &= ~64; }
-	DECLARE_WRITE_LINE_MEMBER( write_kb7 ) { if (state) m_kb |= 128; else m_kb &= ~128; }
+	void write_kb0(int state) { if (state) m_kb |= 1; else m_kb &= ~1; }
+	void write_kb1(int state) { if (state) m_kb |= 2; else m_kb &= ~2; }
+	void write_kb2(int state) { if (state) m_kb |= 4; else m_kb &= ~4; }
+	void write_kb3(int state) { if (state) m_kb |= 8; else m_kb &= ~8; }
+	void write_kb4(int state) { if (state) m_kb |= 16; else m_kb &= ~16; }
+	void write_kb5(int state) { if (state) m_kb |= 32; else m_kb &= ~32; }
+	void write_kb6(int state) { if (state) m_kb |= 64; else m_kb &= ~64; }
+	void write_kb7(int state) { if (state) m_kb |= 128; else m_kb &= ~128; }
 
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+	void acia_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
+	void exp_irq_w(int state);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c16 );
 
@@ -160,7 +160,7 @@ public:
 		: plus4_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( cpu_r );
+	uint8_t cpu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 
@@ -388,7 +388,7 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::read )
+uint8_t plus4_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int phi0 = 1, mux = 0, ras = 0, ba = 1;
 	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
@@ -403,7 +403,7 @@ READ8_MEMBER( plus4_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( plus4_state::write )
+void plus4_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
 	int phi0 = 1, mux = 0, ras = 0, ba = 1;
@@ -448,7 +448,7 @@ WRITE8_MEMBER( plus4_state::write )
 //  ted_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::ted_videoram_r )
+uint8_t plus4_state::ted_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int phi0 = 1, mux = 0, ras = 1, ba = 0;
 	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
@@ -611,7 +611,7 @@ INPUT_PORTS_END
 //  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::cpu_r )
+uint8_t plus4_state::cpu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -642,7 +642,7 @@ READ8_MEMBER( plus4_state::cpu_r )
 	return data;
 }
 
-READ8_MEMBER( c16_state::cpu_r )
+uint8_t c16_state::cpu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -673,7 +673,7 @@ READ8_MEMBER( c16_state::cpu_r )
 	return data;
 }
 
-WRITE8_MEMBER( plus4_state::cpu_w )
+void plus4_state::cpu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -713,14 +713,14 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 //  ted7360_interface ted_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( plus4_state::ted_irq_w )
+void plus4_state::ted_irq_w(int state)
 {
 	m_ted_irq = state;
 
 	check_interrupts();
 }
 
-READ8_MEMBER( plus4_state::ted_k_r )
+uint8_t plus4_state::ted_k_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -775,7 +775,7 @@ READ8_MEMBER( plus4_state::ted_k_r )
 //  MOS6551_INTERFACE( acia_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( plus4_state::acia_irq_w )
+void plus4_state::acia_irq_w(int state)
 {
 	m_acia_irq = state;
 
@@ -787,7 +787,7 @@ WRITE_LINE_MEMBER( plus4_state::acia_irq_w )
 //  PLUS4_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( plus4_state::exp_irq_w )
+void plus4_state::exp_irq_w(int state)
 {
 	m_exp_irq = state;
 

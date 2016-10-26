@@ -72,13 +72,13 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "includes/pbaction.h"
 
 
-WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)
+void pbaction_state::pbaction_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x00);
 }
 
-WRITE8_MEMBER(pbaction_state::nmi_mask_w)
+void pbaction_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }
@@ -254,7 +254,7 @@ static GFXDECODE_START( pbaction )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(pbaction_state::pbaction_interrupt)
+void pbaction_state::pbaction_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x02); /* the CPU is in Interrupt Mode 2 */
 }
@@ -272,7 +272,7 @@ void pbaction_state::machine_reset()
 	m_scroll = 0;
 }
 
-INTERRUPT_GEN_MEMBER(pbaction_state::vblank_irq)
+void pbaction_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -474,7 +474,7 @@ ROM_START( pbaction5 )
 	ROM_LOAD( "p13.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
 ROM_END
 
-READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
+uint8_t pbaction_state::pbactio3_prot_kludge_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* on startup, the game expect this location to NOT act as RAM */
 	if (space.device().safe_pc() == 0xab80)
@@ -483,7 +483,7 @@ READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 	return m_work_ram[0];
 }
 
-DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
+void pbaction_state::init_pbactio3()
 {
 	int i;
 	uint8_t *rom = memregion("maincpu")->base();

@@ -52,23 +52,23 @@ public:
 	required_device<upd765a_device> m_fdc;
 	required_device<pc_keyboard_device> m_keyboard;
 
-	DECLARE_WRITE_LINE_MEMBER(out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
+	void out2_changed(int state);
+	void keyb_interrupt(int state);
 
-	DECLARE_WRITE8_MEMBER(pc_nmi_enable_w);
-	DECLARE_READ8_MEMBER(pcjr_nmi_enable_r);
-	DECLARE_WRITE_LINE_MEMBER(pic8259_set_int_line);
+	void pc_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pcjr_nmi_enable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pic8259_set_int_line(int state);
 
-	DECLARE_WRITE8_MEMBER(pcjr_ppi_portb_w);
-	DECLARE_READ8_MEMBER(pcjr_ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(pcjr_fdc_dor_w);
-	DECLARE_READ8_MEMBER(pcjx_port_1ff_r);
-	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
+	void pcjr_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pcjr_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pcjr_fdc_dor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pcjx_port_1ff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pcjx_port_1ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart1) { return load_cart(image, m_cart1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart2) { return load_cart(image, m_cart2); }
+	image_init_result device_image_load_pcjr_cart1(device_image_interface &image) { return load_cart(image, m_cart1); }
+	image_init_result device_image_load_pcjr_cart2(device_image_interface &image) { return load_cart(image, m_cart2); }
 	void pc_speaker_set_spkrdata(uint8_t data);
 
 	uint8_t m_pc_spkrdata;
@@ -101,7 +101,7 @@ public:
 	};
 
 	void machine_reset() override;
-	DECLARE_DRIVER_INIT(pcjr);
+	void init_pcjr();
 };
 
 static INPUT_PORTS_START( ibmpcjr )
@@ -113,7 +113,7 @@ static INPUT_PORTS_START( ibmpcjr )
 	PORT_BIT ( 0x07, 0x07,   IPT_UNUSED )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(pcjr_state, pcjr)
+void pcjr_state::init_pcjr()
 {
 	m_pc_int_delay_timer = timer_alloc(TIMER_IRQ_DELAY);
 	m_pcjr_watchdog = timer_alloc(TIMER_WATCHDOG);
@@ -184,7 +184,7 @@ void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER(pcjr_state::pic8259_set_int_line)
+void pcjr_state::pic8259_set_int_line(int state)
 {
 	uint32_t pc = m_maincpu->pc();
 	if ( (pc == 0xF0453) || (pc == 0xFF196) )
@@ -208,7 +208,7 @@ void pcjr_state::pc_speaker_set_spkrdata(uint8_t data)
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
-WRITE_LINE_MEMBER(pcjr_state::out2_changed)
+void pcjr_state::out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
@@ -252,7 +252,7 @@ WRITE_LINE_MEMBER(pcjr_state::out2_changed)
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
+void pcjr_state::keyb_interrupt(int state)
 {
 	int data;
 
@@ -296,20 +296,20 @@ WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 	}
 }
 
-READ8_MEMBER(pcjr_state::pcjr_nmi_enable_r)
+uint8_t pcjr_state::pcjr_nmi_enable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_latch = 0;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_nmi_enabled;
 }
 
-WRITE8_MEMBER(pcjr_state::pc_nmi_enable_w)
+void pcjr_state::pc_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enabled = data & 0x80;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, m_nmi_enabled && m_latch);
 }
 
-WRITE8_MEMBER(pcjr_state::pcjr_ppi_portb_w)
+void pcjr_state::pcjr_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* KB controller port B */
 	m_ppi_portb = data;
@@ -331,7 +331,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_ppi_portb_w)
  * PC6 - KYBD IN
  * PC7 - (keyboard) CABLE CONNECTED
  */
-READ8_MEMBER(pcjr_state::pcjr_ppi_portc_r)
+uint8_t pcjr_state::pcjr_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data=0xff;
 
@@ -366,7 +366,7 @@ READ8_MEMBER(pcjr_state::pcjr_ppi_portc_r)
 	return data;
 }
 
-WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
+void pcjr_state::pcjr_fdc_dor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("fdc: dor = %02x\n", data);
 	uint8_t pdor = m_pcjr_dor;
@@ -408,7 +408,7 @@ void pcjr_state::pcjx_set_bank(int unk1, int unk2, int unk3)
 	logerror("pcjx: 0x1ff 0:%02x 1:%02x 2:%02x\n", unk1, unk2, unk3);
 }
 
-WRITE8_MEMBER(pcjr_state::pcjx_port_1ff_w)
+void pcjr_state::pcjx_port_1ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(m_pcjx_1ff_count) {
 	case 0:
@@ -427,7 +427,7 @@ WRITE8_MEMBER(pcjr_state::pcjx_port_1ff_w)
 	}
 }
 
-READ8_MEMBER(pcjr_state::pcjx_port_1ff_r)
+uint8_t pcjr_state::pcjx_port_1ff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_pcjx_1ff_count == 2)
 		pcjx_set_bank(m_pcjx_1ff_bankval, m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][0], m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][1]);

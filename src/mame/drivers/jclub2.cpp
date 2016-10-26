@@ -134,31 +134,31 @@ public:
 	required_device<cpu_device> m_gamecpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
-	DECLARE_WRITE32_MEMBER(darkhors_tmapram_w);
-	DECLARE_WRITE32_MEMBER(darkhors_tmapram2_w);
-	DECLARE_WRITE32_MEMBER(darkhors_input_sel_w);
-	DECLARE_READ32_MEMBER(darkhors_input_sel_r);
-	DECLARE_READ32_MEMBER(p_4e0000);
-	DECLARE_READ32_MEMBER(p_580004);
-	DECLARE_WRITE32_MEMBER(jclub2_input_sel_w_p2);
-	DECLARE_WRITE32_MEMBER(jclub2_input_sel_w_p1);
-	DECLARE_WRITE32_MEMBER(darkhors_unk1_w);
-	DECLARE_WRITE32_MEMBER(darkhors_eeprom_w);
-	DECLARE_WRITE32_MEMBER(jclub2o_eeprom_w);
-	DECLARE_DRIVER_INIT(darkhors);
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	DECLARE_VIDEO_START(darkhors);
-	DECLARE_VIDEO_START(jclub2);
-	DECLARE_VIDEO_START(jclub2o);
+	void darkhors_tmapram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void darkhors_tmapram2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void darkhors_input_sel_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t darkhors_input_sel_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t p_4e0000(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t p_580004(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void jclub2_input_sel_w_p2(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void jclub2_input_sel_w_p1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void darkhors_unk1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void darkhors_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void jclub2o_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void init_darkhors();
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void video_start_darkhors();
+	void video_start_jclub2();
+	void video_start_jclub2o();
 	uint32_t screen_update_darkhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(darkhors_irq);
+	void darkhors_irq(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	optional_device<gfxdecode_device> m_gfxdecode;
 
-	WRITE8_MEMBER(st0016_rom_bank_w); // temp?
+	void st0016_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask); // temp?
 };
 
 
@@ -176,26 +176,26 @@ public:
 
 
 
-TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_0)
+void darkhors_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile     =   m_tmapram[tile_index] >> 16;
 	uint16_t color    =   m_tmapram[tile_index] & 0xffff;
 	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
-TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_1)
+void darkhors_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile     =   m_tmapram2[tile_index] >> 16;
 	uint16_t color    =   m_tmapram2[tile_index] & 0xffff;
 	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
-WRITE32_MEMBER(darkhors_state::darkhors_tmapram_w)
+void darkhors_state::darkhors_tmapram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tmapram[offset]);
 	m_tmap->mark_tile_dirty(offset);
 }
-WRITE32_MEMBER(darkhors_state::darkhors_tmapram2_w)
+void darkhors_state::darkhors_tmapram2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tmapram2[offset]);
 	m_tmap2->mark_tile_dirty(offset);
@@ -235,7 +235,7 @@ void darkhors_state::draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-VIDEO_START_MEMBER(darkhors_state,darkhors)
+void darkhors_state::video_start_darkhors()
 {
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
 	m_tmap2= &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
@@ -296,7 +296,7 @@ uint32_t darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_in
 ***************************************************************************/
 
 
-WRITE32_MEMBER(darkhors_state::jclub2o_eeprom_w)        //seiko s-2929 is used on old style pcb
+void darkhors_state::jclub2o_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)        //seiko s-2929 is used on old style pcb
 {
 	if (data & ~0xff000000)
 		logerror("%s: Unknown EEPROM bit written %08X\n",machine().describe_context(),data);
@@ -314,7 +314,7 @@ WRITE32_MEMBER(darkhors_state::jclub2o_eeprom_w)        //seiko s-2929 is used o
 	}
 }
 
-WRITE32_MEMBER(darkhors_state::darkhors_eeprom_w)
+void darkhors_state::darkhors_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (data & ~0xff000000)
 		logerror("%s: Unknown EEPROM bit written %08X\n",machine().describe_context(),data);
@@ -333,7 +333,7 @@ WRITE32_MEMBER(darkhors_state::darkhors_eeprom_w)
 }
 
 
-WRITE32_MEMBER(darkhors_state::darkhors_input_sel_w)
+void darkhors_state::darkhors_input_sel_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_input_sel);
 //  if (ACCESSING_BITS_16_31)    popmessage("%04X",data >> 16);
@@ -355,7 +355,7 @@ static int mask_to_bit( int mask )
 	}
 }
 
-READ32_MEMBER(darkhors_state::darkhors_input_sel_r)
+uint32_t darkhors_state::darkhors_input_sel_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	// from bit mask to bit number
 	int bit_p1 = mask_to_bit((m_input_sel & 0x00ff0000) >> 16);
@@ -368,7 +368,7 @@ READ32_MEMBER(darkhors_state::darkhors_input_sel_r)
 
 
 
-READ32_MEMBER(darkhors_state::p_580004)
+uint32_t darkhors_state::p_580004(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 uint32_t ret = ioport("580004")->read()& 0x00ffffff;
 switch (m_input_sel_jc_2p){
@@ -386,7 +386,7 @@ switch (m_input_sel_jc_2p){
 }
 
 
-READ32_MEMBER(darkhors_state::p_4e0000)
+uint32_t darkhors_state::p_4e0000(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 uint32_t ret = ioport("4E0000")->read()& 0x00ffffff;
 switch (m_input_sel_jc_2p){
@@ -403,7 +403,7 @@ switch (m_input_sel_jc_2p){
 	return  ret;
 }
 
-WRITE32_MEMBER(darkhors_state::jclub2_input_sel_w_p1)
+void darkhors_state::jclub2_input_sel_w_p1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//sometimes 0x80000000 bit is set!!!
 	COMBINE_DATA(&m_input_sel);
@@ -411,14 +411,14 @@ WRITE32_MEMBER(darkhors_state::jclub2_input_sel_w_p1)
 }
 
 
-WRITE32_MEMBER(darkhors_state::jclub2_input_sel_w_p2)
+void darkhors_state::jclub2_input_sel_w_p2(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_input_sel);
 	m_input_sel_jc_2p = (m_input_sel & 0x00ff0000) >> 16;
 }
 
 
-WRITE32_MEMBER(darkhors_state::darkhors_unk1_w)
+void darkhors_state::darkhors_unk1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// 0x1000 lockout
 //  if (ACCESSING_BITS_16_31)    popmessage("%04X",data >> 16);
@@ -947,7 +947,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(darkhors_state::darkhors_irq)
+void darkhors_state::darkhors_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -992,7 +992,7 @@ MACHINE_CONFIG_END
 
 
 
-VIDEO_START_MEMBER(darkhors_state,jclub2)
+void darkhors_state::video_start_jclub2()
 {
 }
 
@@ -1045,7 +1045,7 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, darkhors_state )
 ADDRESS_MAP_END
 
 // common rombank? should go in machine/st0016 with larger address space exposed?
-WRITE8_MEMBER(darkhors_state::st0016_rom_bank_w)
+void darkhors_state::st0016_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000));
 }
@@ -1063,7 +1063,7 @@ static ADDRESS_MAP_START( st0016_io, AS_IO, 8, darkhors_state )
 ADDRESS_MAP_END
 
 
-VIDEO_START_MEMBER(darkhors_state,jclub2o)
+void darkhors_state::video_start_jclub2o()
 {
 }
 
@@ -1295,7 +1295,7 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(darkhors_state,darkhors)
+void darkhors_state::init_darkhors()
 {
 	// the dumped eeprom bytes are in a different order to how MAME expects them to be
 	// (offset 0x00, 0x40, 0x01, 0x41, 0x02, 0x42 ..... )

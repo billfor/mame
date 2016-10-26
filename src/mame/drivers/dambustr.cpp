@@ -68,14 +68,14 @@ public:
 	required_device<galaxian_sound_device> m_custom;
 
 	int m_noise_data;
-	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
-	DECLARE_DRIVER_INIT(dambustr);
+	void dambustr_noise_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_dambustr();
 };
 
 
 
 /* FIXME: Really needed? - Should be handled by either interface */
-WRITE8_MEMBER(dambustr_state::dambustr_noise_enable_w)
+void dambustr_state::dambustr_noise_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != m_noise_data) {
 		m_noise_data = data;
@@ -209,7 +209,7 @@ static GFXDECODE_START( dambustr )
 GFXDECODE_END
 
 
-DRIVER_INIT_MEMBER(dambustr_state,dambustr)
+void dambustr_state::init_dambustr()
 {
 	int i, j, tmp;
 	int tmpram[16];

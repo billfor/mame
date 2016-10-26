@@ -178,28 +178,28 @@ public:
 	required_shared_ptr<uint8_t> m_mainram;
 	required_device<k1ge_device> m_k1ge;
 
-	DECLARE_READ8_MEMBER( ngp_io_r );
-	DECLARE_WRITE8_MEMBER( ngp_io_w );
+	uint8_t ngp_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ngp_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void flash_w( int which, offs_t offset, uint8_t data );
-	DECLARE_WRITE8_MEMBER( flash0_w );
-	DECLARE_WRITE8_MEMBER( flash1_w );
+	void flash0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flash1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( ngp_z80_comm_r );
-	DECLARE_WRITE8_MEMBER( ngp_z80_comm_w );
-	DECLARE_WRITE8_MEMBER( ngp_z80_signal_main_w );
+	uint8_t ngp_z80_comm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ngp_z80_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ngp_z80_signal_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( ngp_z80_clear_irq );
+	void ngp_z80_clear_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( ngp_vblank_pin_w );
-	DECLARE_WRITE_LINE_MEMBER( ngp_hblank_pin_w );
-	DECLARE_WRITE8_MEMBER( ngp_tlcs900_porta );
+	void ngp_vblank_pin_w(int state);
+	void ngp_hblank_pin_w(int state);
+	void ngp_tlcs900_porta(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
-	TIMER_CALLBACK_MEMBER(ngp_seconds_callback);
+	void power_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void ngp_seconds_callback(void *ptr, int32_t param);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ngp_cart);
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ngp_cart );
+	image_init_result device_image_load_ngp_cart(device_image_interface &image);
+	void device_image_unload_ngp_cart(device_image_interface &image);
 
 protected:
 	bool m_nvram_loaded;
@@ -213,7 +213,7 @@ protected:
 };
 
 
-TIMER_CALLBACK_MEMBER(ngp_state::ngp_seconds_callback)
+void ngp_state::ngp_seconds_callback(void *ptr, int32_t param)
 {
 	m_io_reg[0x16] += 1;
 	if ( ( m_io_reg[0x16] & 0x0f ) == 0x0a )
@@ -246,7 +246,7 @@ TIMER_CALLBACK_MEMBER(ngp_state::ngp_seconds_callback)
 }
 
 
-READ8_MEMBER( ngp_state::ngp_io_r )
+uint8_t ngp_state::ngp_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_io_reg[offset];
 
@@ -265,7 +265,7 @@ READ8_MEMBER( ngp_state::ngp_io_r )
 }
 
 
-WRITE8_MEMBER( ngp_state::ngp_io_w )
+void ngp_state::ngp_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset )
 	{
@@ -533,13 +533,13 @@ void ngp_state::flash_w( int which, offs_t offset, uint8_t data )
 }
 
 
-WRITE8_MEMBER( ngp_state::flash0_w )
+void ngp_state::flash0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flash_w( 0, offset, data );
 }
 
 
-WRITE8_MEMBER( ngp_state::flash1_w )
+void ngp_state::flash1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flash_w( 1, offset, data );
 }
@@ -556,19 +556,19 @@ static ADDRESS_MAP_START( ngp_mem, AS_PROGRAM, 8, ngp_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER( ngp_state::ngp_z80_comm_r )
+uint8_t ngp_state::ngp_z80_comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_io_reg[0x3c];
 }
 
 
-WRITE8_MEMBER( ngp_state::ngp_z80_comm_w )
+void ngp_state::ngp_z80_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io_reg[0x3c] = data;
 }
 
 
-WRITE8_MEMBER( ngp_state::ngp_z80_signal_main_w )
+void ngp_state::ngp_z80_signal_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tlcs900->set_input_line(TLCS900_INT5, ASSERT_LINE );
 }
@@ -582,7 +582,7 @@ static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, ngp_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER( ngp_state::ngp_z80_clear_irq )
+void ngp_state::ngp_z80_clear_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80->set_input_line(0, CLEAR_LINE );
 
@@ -596,7 +596,7 @@ static ADDRESS_MAP_START( z80_io, AS_IO, 8, ngp_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(ngp_state::power_callback)
+void ngp_state::power_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if ( m_io_reg[0x33] & 0x04 )
 	{
@@ -621,19 +621,19 @@ static INPUT_PORTS_START( ngp )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER( ngp_state::ngp_vblank_pin_w )
+void ngp_state::ngp_vblank_pin_w(int state)
 {
 	m_tlcs900->set_input_line(TLCS900_INT4, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
-WRITE_LINE_MEMBER( ngp_state::ngp_hblank_pin_w )
+void ngp_state::ngp_hblank_pin_w(int state)
 {
 	m_tlcs900->set_input_line(TLCS900_TIO, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
-WRITE8_MEMBER( ngp_state::ngp_tlcs900_porta )
+void ngp_state::ngp_tlcs900_porta(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int to3 = BIT(data,3);
 	if ( to3 && ! m_old_to3 )
@@ -739,7 +739,7 @@ uint32_t ngp_state::screen_update_ngp(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( ngp_state, ngp_cart )
+image_init_result ngp_state::device_image_load_ngp_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -786,7 +786,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ngp_state, ngp_cart )
 }
 
 
-DEVICE_IMAGE_UNLOAD_MEMBER( ngp_state, ngp_cart )
+void ngp_state::device_image_unload_ngp_cart(device_image_interface &image)
 {
 	m_flash_chip[0].present = 0;
 	m_flash_chip[0].state = F_READ;

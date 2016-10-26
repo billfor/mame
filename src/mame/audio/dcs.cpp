@@ -662,7 +662,7 @@ void dcs_audio_device::dcs_boot()
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
+void dcs_audio_device::dcs_reset(void *ptr, int32_t param)
 {
 	if (LOG_DCS_IO)
 		logerror("dcs_reset\n");
@@ -1027,14 +1027,14 @@ void dcs_audio_device::set_auto_ack(int state)
  *
  *************************************/
 
-READ16_MEMBER( dcs_audio_device::dcs_dataram_r )
+uint16_t dcs_audio_device::dcs_dataram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	assert(m_external_program_ram != nullptr);
 	return m_external_program_ram[offset] >> 8;
 }
 
 
-WRITE16_MEMBER( dcs_audio_device::dcs_dataram_w )
+void dcs_audio_device::dcs_dataram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	assert(m_external_program_ram != nullptr);
 	uint16_t val = m_external_program_ram[offset] >> 8;
@@ -1043,7 +1043,7 @@ WRITE16_MEMBER( dcs_audio_device::dcs_dataram_w )
 }
 
 
-WRITE16_MEMBER( dcs_audio_device::dcs_data_bank_select_w )
+void dcs_audio_device::dcs_data_bank_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_rev != 15)
 		m_sounddata_bank = data & 0x7ff;
@@ -1059,7 +1059,7 @@ WRITE16_MEMBER( dcs_audio_device::dcs_data_bank_select_w )
 #endif
 }
 
-WRITE16_MEMBER( dcs_audio_device::dcs_data_bank_select2_w )
+void dcs_audio_device::dcs_data_bank_select2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_sounddata_bank = (m_sounddata_bank & 0x00ff) | ((data & 0x01) << 8) | ((data & 0xfc) << 7);
 
@@ -1176,7 +1176,7 @@ void dcs_audio_device::sdrc_reset()
  *
  *************************************/
 
-READ16_MEMBER( dcs_audio_device::sdrc_r )
+uint16_t dcs_audio_device::sdrc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	sdrc_state &sdrc = m_sdrc;
 	uint16_t result = sdrc.reg[offset];
@@ -1225,7 +1225,7 @@ READ16_MEMBER( dcs_audio_device::sdrc_r )
 }
 
 
-WRITE16_MEMBER( dcs_audio_device::sdrc_w )
+void dcs_audio_device::sdrc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sdrc_state &sdrc = m_sdrc;
 	uint16_t diff = sdrc.reg[offset] ^ data;
@@ -1306,7 +1306,7 @@ void dcs_audio_device::dsio_reset()
 }
 
 
-READ16_MEMBER( dcs_audio_device::dsio_r )
+uint16_t dcs_audio_device::dsio_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	dsio_state &dsio = m_dsio;
 	uint16_t result = dsio.reg[offset];
@@ -1321,7 +1321,7 @@ READ16_MEMBER( dcs_audio_device::dsio_r )
 }
 
 
-WRITE16_MEMBER( dcs_audio_device::dsio_w )
+void dcs_audio_device::dsio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	dsio_state &dsio = m_dsio;
 
@@ -1361,7 +1361,7 @@ void dcs_audio_device::denver_reset()
 }
 
 
-READ16_MEMBER( dcs_audio_device::denver_r )
+uint16_t dcs_audio_device::denver_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = m_dsio.reg[offset];
 
@@ -1374,7 +1374,7 @@ READ16_MEMBER( dcs_audio_device::denver_r )
 }
 
 
-WRITE16_MEMBER( dcs_audio_device::denver_w )
+void dcs_audio_device::denver_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	dsio_state &dsio = m_dsio;
 	int enable, channels, chan;
@@ -1427,7 +1427,7 @@ WRITE16_MEMBER( dcs_audio_device::denver_w )
  *
  *************************************/
 
-WRITE32_MEMBER( dcs_audio_device::dsio_idma_addr_w )
+void dcs_audio_device::dsio_idma_addr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	dsio_state &dsio = m_dsio;
 	if (LOG_DCS_TRANSFERS)
@@ -1438,7 +1438,7 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_addr_w )
 }
 
 
-WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
+void dcs_audio_device::dsio_idma_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	dsio_state &dsio = m_dsio;
 	uint32_t pc = space.device().safe_pc();
@@ -1462,7 +1462,7 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 }
 
 
-READ32_MEMBER( dcs_audio_device::dsio_idma_data_r )
+uint32_t dcs_audio_device::dsio_idma_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result;
 	result = downcast<adsp2181_device *>(m_cpu)->idma_data_r();
@@ -1487,7 +1487,7 @@ void dcs_audio_device::dmovlay_remap_memory()
 		logerror("%s dmovlay_remap_memory: Switching data ram location bankSel = %i\n", machine().describe_context(), bankSel);
 }
 
-WRITE32_MEMBER(dcs_audio_device::dmovlay_callback)
+void dcs_audio_device::dmovlay_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Do some checking first
 	if (data < 0 || data > 1) {
@@ -1547,7 +1547,7 @@ void dcs_audio_device::reset_w(int state)
 }
 
 
-READ16_MEMBER( dcs_audio_device::latch_status_r )
+uint16_t dcs_audio_device::latch_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = 0;
 	if (IS_INPUT_FULL())
@@ -1562,7 +1562,7 @@ READ16_MEMBER( dcs_audio_device::latch_status_r )
 }
 
 
-READ16_MEMBER( dcs_audio_device::fifo_input_r )
+uint16_t dcs_audio_device::fifo_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!m_fifo_data_r.isnull())
 		return m_fifo_data_r(space,0, 0xffff);
@@ -1597,7 +1597,7 @@ void dcs_audio_device::dcs_delayed_data_w(uint16_t data)
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_delayed_data_w_callback )
+void dcs_audio_device::dcs_delayed_data_w_callback(void *ptr, int32_t param)
 {
 	dcs_delayed_data_w(param);
 }
@@ -1617,7 +1617,7 @@ void dcs_audio_device::data_w(uint16_t data)
 }
 
 
-WRITE16_MEMBER( dcs_audio_device::input_latch_ack_w )
+void dcs_audio_device::input_latch_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_last_input_empty && !m_input_empty_cb.isnull())
 		m_input_empty_cb(m_last_input_empty = 1);
@@ -1626,7 +1626,7 @@ WRITE16_MEMBER( dcs_audio_device::input_latch_ack_w )
 }
 
 
-READ16_MEMBER( dcs_audio_device::input_latch_r )
+uint16_t dcs_audio_device::input_latch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_auto_ack)
 		input_latch_ack_w(space,0,0,0xffff);
@@ -1635,7 +1635,7 @@ READ16_MEMBER( dcs_audio_device::input_latch_r )
 	return m_input_data;
 }
 
-READ32_MEMBER( dcs_audio_device::input_latch32_r )
+uint32_t dcs_audio_device::input_latch32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_auto_ack)
 		input_latch_ack_w(space,0,0,0xffff);
@@ -1648,7 +1648,7 @@ READ32_MEMBER( dcs_audio_device::input_latch32_r )
     OUTPUT LATCH (data from DCS to host)
 ****************************************************************************/
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::latch_delayed_w )
+void dcs_audio_device::latch_delayed_w(void *ptr, int32_t param)
 {
 	if (!m_last_output_full && !m_output_full_cb.isnull())
 		m_output_full_cb(m_last_output_full = 1);
@@ -1657,7 +1657,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::latch_delayed_w )
 }
 
 
-WRITE16_MEMBER( dcs_audio_device::output_latch_w )
+void dcs_audio_device::output_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_pre_output_data = data;
 	if (LOG_DCS_IO)
@@ -1666,7 +1666,7 @@ WRITE16_MEMBER( dcs_audio_device::output_latch_w )
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::latch_delayed_w),this), data>>8);
 }
 
-WRITE32_MEMBER( dcs_audio_device::output_latch32_w )
+void dcs_audio_device::output_latch32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_pre_output_data = data >> 8;
 	if (LOG_DCS_IO)
@@ -1682,7 +1682,7 @@ void dcs_audio_device::delayed_ack_w()
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::delayed_ack_w_callback )
+void dcs_audio_device::delayed_ack_w_callback(void *ptr, int32_t param)
 {
 	delayed_ack_w();
 }
@@ -1713,7 +1713,7 @@ uint16_t dcs_audio_device::data_r()
     OUTPUT CONTROL BITS (has 3 additional lines to the host)
 ****************************************************************************/
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::output_control_delayed_w )
+void dcs_audio_device::output_control_delayed_w(void *ptr, int32_t param)
 {
 	if (LOG_DCS_IO)
 		logerror("output_control = %04X\n", param);
@@ -1722,7 +1722,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::output_control_delayed_w )
 }
 
 
-WRITE16_MEMBER( dcs_audio_device::output_control_w )
+void dcs_audio_device::output_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG_DCS_IO)
 		logerror("%04X:output_control = %04X\n", space.device().safe_pc(), data);
@@ -1730,7 +1730,7 @@ WRITE16_MEMBER( dcs_audio_device::output_control_w )
 }
 
 
-READ16_MEMBER( dcs_audio_device::output_control_r )
+uint16_t dcs_audio_device::output_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_output_control_cycles = m_cpu->total_cycles();
 	return m_output_control;
@@ -1779,7 +1779,7 @@ void dcs_audio_device::update_timer_count()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::internal_timer_callback )
+void dcs_audio_device::internal_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	int64_t target_cycles;
 
@@ -1831,7 +1831,7 @@ void dcs_audio_device::reset_timer()
 }
 
 
-WRITE_LINE_MEMBER(dcs_audio_device::timer_enable_callback)
+void dcs_audio_device::timer_enable_callback(int state)
 {
 	m_timer_enable = state;
 	m_timer_ignore = 0;
@@ -1872,7 +1872,7 @@ WRITE_LINE_MEMBER(dcs_audio_device::timer_enable_callback)
     0x3c00-0x3fff = Memory Mapped control registers & reserved.
 */
 
-READ16_MEMBER( dcs_audio_device::adsp_control_r )
+uint16_t dcs_audio_device::adsp_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = 0xffff;
 
@@ -1902,7 +1902,7 @@ READ16_MEMBER( dcs_audio_device::adsp_control_r )
 }
 
 
-WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
+void dcs_audio_device:: adsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_control_regs[offset] = data;
 
@@ -1978,7 +1978,7 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
     DCS IRQ GENERATION CALLBACKS
 ****************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
+void dcs_audio_device::dcs_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	/* get the index register */
 	int reg = m_cpu->state_int(ADSP2100_I0 + m_ireg);
@@ -2015,7 +2015,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::sport0_irq )
+void dcs_audio_device::sport0_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	/* this latches internally, so we just pulse */
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
@@ -2049,7 +2049,7 @@ void dcs_audio_device::recompute_sample_rate()
 	}
 }
 
-WRITE32_MEMBER(dcs_audio_device::sound_tx_callback)
+void dcs_audio_device::sound_tx_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* check if it's for SPORT1 */
 	if (offset != 1)
@@ -2106,7 +2106,7 @@ WRITE32_MEMBER(dcs_audio_device::sound_tx_callback)
     VERY BASIC & SAFE OPTIMIZATIONS
 ****************************************************************************/
 
-READ16_MEMBER( dcs_audio_device::dcs_polling_r )
+uint16_t dcs_audio_device::dcs_polling_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_polling_count++ > 5)
 		space.device().execute().eat_cycles(10000);
@@ -2114,7 +2114,7 @@ READ16_MEMBER( dcs_audio_device::dcs_polling_r )
 }
 
 
-WRITE16_MEMBER( dcs_audio_device::dcs_polling_w )
+void dcs_audio_device::dcs_polling_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_polling_count = 0;
 	COMBINE_DATA(m_polling_base);
@@ -2147,7 +2147,7 @@ void dcs_audio_device::fifo_notify(int count, int max)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::transfer_watchdog_callback )
+void dcs_audio_device::transfer_watchdog_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	hle_transfer_state &transfer = m_transfer;
 	int starting_writes_left = param;
@@ -2162,7 +2162,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::transfer_watchdog_callback )
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback2 )
+void dcs_audio_device::s1_ack_callback2(void *ptr, int32_t param)
 {
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
@@ -2174,7 +2174,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback2 )
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback1 )
+void dcs_audio_device::s1_ack_callback1(void *ptr, int32_t param)
 {
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
@@ -2312,7 +2312,7 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::s2_ack_callback )
+void dcs_audio_device::s2_ack_callback(void *ptr, int32_t param)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
 

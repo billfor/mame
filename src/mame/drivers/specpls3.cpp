@@ -174,13 +174,13 @@ static const int spectrum_plus3_memory_selections[]=
 		4,7,6,3
 };
 
-WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_w )
+void spectrum_state::spectrum_plus3_port_3ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_floppy==1)
 		m_upd765->fifo_w(space, 0, data, 0xff);
 }
 
-READ8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_r )
+uint8_t spectrum_state::spectrum_plus3_port_3ffd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_floppy==0)
 		return 0xff;
@@ -189,7 +189,7 @@ READ8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_r )
 }
 
 
-READ8_MEMBER( spectrum_state::spectrum_plus3_port_2ffd_r )
+uint8_t spectrum_state::spectrum_plus3_port_2ffd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_floppy==0)
 		return 0xff;
@@ -270,7 +270,7 @@ void spectrum_state::spectrum_plus3_update_memory()
 
 
 
-WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_7ffd_w )
+void spectrum_state::spectrum_plus3_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		/* D0-D2: RAM page located at 0x0c000-0x0ffff */
 		/* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
@@ -288,7 +288,7 @@ WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_7ffd_w )
 	spectrum_plus3_update_memory();
 }
 
-WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_1ffd_w )
+void spectrum_state::spectrum_plus3_port_1ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* D0-D1: ROM/RAM paging */
 	/* D2: Affects if d0-d1 work on ram/rom */
@@ -322,12 +322,12 @@ static ADDRESS_MAP_START (spectrum_plus3_io, AS_IO, 8, spectrum_state )
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(spectrum_plus3_port_3ffd_r,spectrum_plus3_port_3ffd_w) AM_MIRROR(0x0ffd)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
+void spectrum_state::machine_reset_spectrum_plus3()
 {
 	uint8_t *messram = m_ram->pointer();
 	memset(messram,0,128*1024);
 
-	MACHINE_RESET_CALL_MEMBER(spectrum);
+	machine_reset_spectrum();
 
 	/* Initial configuration */
 	m_port_7ffd_data = 0;
@@ -335,12 +335,12 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 	spectrum_plus3_update_memory();
 }
 
-DRIVER_INIT_MEMBER(spectrum_state,plus3)
+void spectrum_state::init_plus3()
 {
 	m_floppy = 1;
 }
 
-DRIVER_INIT_MEMBER(spectrum_state,plus2)
+void spectrum_state::init_plus2()
 {
 	m_floppy = 0;
 }

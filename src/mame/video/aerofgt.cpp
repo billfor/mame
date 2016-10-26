@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(aerofgt_state::get_pspikes_tile_info)
+void aerofgt_state::get_pspikes_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg1videoram[tile_index];
 	int bank = (code & 0x1000) >> 12;
@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::get_pspikes_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg1_tile_info)
+void aerofgt_state::karatblz_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg1videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg1_tile_info)
 }
 
 /* also spinlbrk */
-TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg2_tile_info)
+void aerofgt_state::karatblz_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg2videoram[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg2_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(aerofgt_state::spinlbrk_bg1_tile_info)
+void aerofgt_state::spinlbrk_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg1videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::spinlbrk_bg1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(aerofgt_state::get_bg1_tile_info)
+void aerofgt_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg1videoram[tile_index];
 	int bank = (code & 0x1800) >> 11;
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::get_bg1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(aerofgt_state::get_bg2_tile_info)
+void aerofgt_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg2videoram[tile_index];
 	int bank = 4 + ((code & 0x1800) >> 11);
@@ -88,7 +88,7 @@ void aerofgt_state::aerofgt_register_state_globals(  )
 	save_item(NAME(m_spritepalettebank));
 }
 
-VIDEO_START_MEMBER(aerofgt_state,pspikes)
+void aerofgt_state::video_start_pspikes()
 {
 	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::get_pspikes_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 	/* no bg2 in this game */
@@ -100,7 +100,7 @@ VIDEO_START_MEMBER(aerofgt_state,pspikes)
 }
 
 
-VIDEO_START_MEMBER(aerofgt_state,karatblz)
+void aerofgt_state::video_start_karatblz()
 {
 	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg1_tile_info),this),TILEMAP_SCAN_ROWS,     8,8,64,64);
 	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -112,7 +112,7 @@ VIDEO_START_MEMBER(aerofgt_state,karatblz)
 	aerofgt_register_state_globals();
 }
 
-VIDEO_START_MEMBER(aerofgt_state,spinlbrk)
+void aerofgt_state::video_start_spinlbrk()
 {
 	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::spinlbrk_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -130,7 +130,7 @@ VIDEO_START_MEMBER(aerofgt_state,spinlbrk)
 	aerofgt_register_state_globals();
 }
 
-VIDEO_START_MEMBER(aerofgt_state,turbofrc)
+void aerofgt_state::video_start_turbofrc()
 {
 	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -172,13 +172,13 @@ uint32_t aerofgt_state::aerofgt_ol2_tile_callback( uint32_t code )
 
 ***************************************************************************/
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_bg1videoram_w)
+void aerofgt_state::aerofgt_bg1videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg1videoram[offset]);
 	m_bg1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_bg2videoram_w)
+void aerofgt_state::aerofgt_bg2videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2videoram[offset]);
 	m_bg2_tilemap->mark_tile_dirty(offset);
@@ -194,7 +194,7 @@ void aerofgt_state::setbank( tilemap_t *tmap, int num, int bank )
 	}
 }
 
-WRITE16_MEMBER(aerofgt_state::pspikes_gfxbank_w)
+void aerofgt_state::pspikes_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -204,7 +204,7 @@ WRITE16_MEMBER(aerofgt_state::pspikes_gfxbank_w)
 }
 
 
-WRITE16_MEMBER(aerofgt_state::karatblz_gfxbank_w)
+void aerofgt_state::karatblz_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -213,7 +213,7 @@ WRITE16_MEMBER(aerofgt_state::karatblz_gfxbank_w)
 	}
 }
 
-WRITE16_MEMBER(aerofgt_state::spinlbrk_gfxbank_w)
+void aerofgt_state::spinlbrk_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -222,7 +222,7 @@ WRITE16_MEMBER(aerofgt_state::spinlbrk_gfxbank_w)
 	}
 }
 
-WRITE16_MEMBER(aerofgt_state::turbofrc_gfxbank_w)
+void aerofgt_state::turbofrc_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	tilemap_t *tmap = (offset == 0) ? m_bg1_tilemap : m_bg2_tilemap;
 
@@ -234,7 +234,7 @@ WRITE16_MEMBER(aerofgt_state::turbofrc_gfxbank_w)
 	setbank(tmap, 4 * offset + 3, (data >> 12) & 0x0f);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_gfxbank_w)
+void aerofgt_state::aerofgt_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	tilemap_t *tmap = (offset < 2) ? m_bg1_tilemap : m_bg2_tilemap;
 
@@ -244,27 +244,27 @@ WRITE16_MEMBER(aerofgt_state::aerofgt_gfxbank_w)
 	setbank(tmap, 2 * offset + 1, (data >> 0) & 0xff);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_bg1scrollx_w)
+void aerofgt_state::aerofgt_bg1scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg1scrollx);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_bg1scrolly_w)
+void aerofgt_state::aerofgt_bg1scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg1scrolly);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_bg2scrollx_w)
+void aerofgt_state::aerofgt_bg2scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2scrollx);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_bg2scrolly_w)
+void aerofgt_state::aerofgt_bg2scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2scrolly);
 }
 
-WRITE16_MEMBER(aerofgt_state::pspikes_palette_bank_w)
+void aerofgt_state::pspikes_palette_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -407,7 +407,7 @@ uint32_t aerofgt_state::screen_update_aerofgt(screen_device &screen, bitmap_ind1
 ***************************************************************************/
 
 // BOOTLEG
-VIDEO_START_MEMBER(aerofgt_state,wbbc97)
+void aerofgt_state::video_start_wbbc97()
 {
 	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::get_pspikes_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	/* no bg2 in this game */
@@ -422,7 +422,7 @@ VIDEO_START_MEMBER(aerofgt_state,wbbc97)
 }
 
 // BOOTLEG
-WRITE16_MEMBER(aerofgt_state::pspikesb_gfxbank_w)
+void aerofgt_state::pspikesb_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rasterram[0x200 / 2]);
 
@@ -431,13 +431,13 @@ WRITE16_MEMBER(aerofgt_state::pspikesb_gfxbank_w)
 }
 
 // BOOTLEG
-WRITE16_MEMBER(aerofgt_state::spikes91_lookup_w)
+void aerofgt_state::spikes91_lookup_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_spikes91_lookup = data & 1;
 }
 
 // BOOTLEG
-WRITE16_MEMBER(aerofgt_state::wbbc97_bitmap_enable_w)
+void aerofgt_state::wbbc97_bitmap_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_wbbc97_bitmap_enable);
 }

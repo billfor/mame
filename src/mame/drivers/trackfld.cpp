@@ -199,12 +199,12 @@ MAIN BOARD:
 #define VLM_CLOCK             XTAL_3_579545MHz
 
 
-WRITE8_MEMBER(trackfld_state::coin_w)
+void trackfld_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
-WRITE8_MEMBER(trackfld_state::questions_bank_w)
+void trackfld_state::questions_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -218,7 +218,7 @@ WRITE8_MEMBER(trackfld_state::questions_bank_w)
 	}
 }
 
-WRITE8_MEMBER(trackfld_state::irq_mask_w)
+void trackfld_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }
@@ -251,12 +251,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(trackfld_state::yieartf_nmi_mask_w)
+void trackfld_state::yieartf_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_yieartf_nmi_mask = data & 1;
 }
 
-READ8_MEMBER(trackfld_state::trackfld_speech_r)
+uint8_t trackfld_state::trackfld_speech_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_vlm->bsy())
 		return 1;
@@ -264,7 +264,7 @@ READ8_MEMBER(trackfld_state::trackfld_speech_r)
 		return 0;
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_VLM5030_control_w)
+void trackfld_state::trackfld_VLM5030_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 is latch direction */
 	m_vlm->st((data >> 1) & 1);
@@ -394,7 +394,7 @@ static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8, trackfld_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(trackfld_state::trackfld_SN76496_r)
+uint8_t trackfld_state::trackfld_SN76496_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	konami_SN76496_w(space, 0, 0);
 	return 0xff; // ?
@@ -867,7 +867,7 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(trackfld_state,trackfld)
+void trackfld_state::machine_start_trackfld()
 {
 	/* video */
 	save_item(NAME(m_bg_bank));
@@ -876,7 +876,7 @@ MACHINE_START_MEMBER(trackfld_state,trackfld)
 	save_item(NAME(m_old_gfx_bank));
 }
 
-MACHINE_RESET_MEMBER(trackfld_state,trackfld)
+void trackfld_state::machine_reset_trackfld()
 {
 	m_bg_bank = 0;
 	m_sprite_bank1 = 0;
@@ -884,13 +884,13 @@ MACHINE_RESET_MEMBER(trackfld_state,trackfld)
 	m_old_gfx_bank = 0;
 }
 
-INTERRUPT_GEN_MEMBER(trackfld_state::vblank_irq)
+void trackfld_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(trackfld_state::vblank_nmi)
+void trackfld_state::vblank_nmi(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -947,7 +947,7 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 MACHINE_CONFIG_END
 
 
-INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
+void trackfld_state::yieartf_timer_irq(device_t &device)
 {
 	if (m_yieartf_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -1540,11 +1540,11 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(trackfld_state,trackfld)
+void trackfld_state::init_trackfld()
 {
 }
 
-DRIVER_INIT_MEMBER(trackfld_state, trackfldnz)
+void trackfld_state::init_trackfldnz()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
@@ -1554,7 +1554,7 @@ DRIVER_INIT_MEMBER(trackfld_state, trackfldnz)
 		ROM[i] = BITSWAP8(ROM[i], 6, 7, 5, 4, 3, 2, 1, 0);
 }
 
-DRIVER_INIT_MEMBER(trackfld_state,atlantol)
+void trackfld_state::init_atlantol()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1575,7 +1575,7 @@ DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 	membank("bank13")->set_base(&rom[0x4000]);
 }
 
-DRIVER_INIT_MEMBER(trackfld_state,mastkin)
+void trackfld_state::init_mastkin()
 {
 	uint8_t *prom = memregion("proms")->base();
 	int i;
@@ -1597,7 +1597,7 @@ DRIVER_INIT_MEMBER(trackfld_state,mastkin)
 	m_palette->update();
 }
 
-DRIVER_INIT_MEMBER(trackfld_state,wizzquiz)
+void trackfld_state::init_wizzquiz()
 {
 	uint8_t *ROM = memregion("maincpu")->base() + 0xe000;
 	int i;

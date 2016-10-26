@@ -34,7 +34,7 @@ Atari Orbit Driver
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(orbit_state::nmi_32v)
+void orbit_state::nmi_32v(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	int nmistate = (scanline & 32) && (m_misc_flags & 4);
@@ -42,13 +42,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(orbit_state::nmi_32v)
 }
 
 
-TIMER_CALLBACK_MEMBER(orbit_state::irq_off)
+void orbit_state::irq_off(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-INTERRUPT_GEN_MEMBER(orbit_state::orbit_interrupt)
+void orbit_state::orbit_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 	machine().scheduler().timer_set(m_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(orbit_state::irq_off),this));
@@ -85,7 +85,7 @@ void orbit_state::update_misc_flags(address_space &space, uint8_t val)
 }
 
 
-WRITE8_MEMBER(orbit_state::orbit_misc_w)
+void orbit_state::orbit_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bit = offset >> 1;
 

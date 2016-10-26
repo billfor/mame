@@ -48,9 +48,9 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen")  { }
 
-	DECLARE_READ8_MEMBER(vsync_r);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_WRITE8_MEMBER(video_w);
+	uint8_t vsync_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t video_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	int m_line;
 	int m_charline;
 	int m_shift;
@@ -95,12 +95,12 @@ public:
 		} d;
 	} m_reg;
 	std::unique_ptr<bitmap_ind16> m_bitmap;
-	DECLARE_DRIVER_INIT(arcadia);
+	void init_arcadia();
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(arcadia);
+	void palette_init_arcadia(palette_device &palette);
 	uint32_t screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(video_line);
+	void video_line(device_t &device);
 
 protected:
 	required_device<arcadia_sound_device> m_custom;

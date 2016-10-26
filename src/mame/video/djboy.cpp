@@ -9,17 +9,17 @@
 #include "video/kan_pand.h"
 #include "includes/djboy.h"
 
-WRITE8_MEMBER(djboy_state::djboy_scrollx_w)
+void djboy_state::djboy_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx = data;
 }
 
-WRITE8_MEMBER(djboy_state::djboy_scrolly_w)
+void djboy_state::djboy_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrolly = data;
 }
 
-TILE_GET_INFO_MEMBER(djboy_state::get_bg_tile_info)
+void djboy_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_videoram[tile_index + 0x800];
 	int code = m_videoram[tile_index] + (attr & 0xf) * 256;
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(djboy_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, 0);    /* no flip */
 }
 
-WRITE8_MEMBER(djboy_state::djboy_videoram_w)
+void djboy_state::djboy_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_background->mark_tile_dirty(offset & 0x7ff);
@@ -42,7 +42,7 @@ void djboy_state::video_start()
 	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(djboy_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 }
 
-WRITE8_MEMBER(djboy_state::djboy_paletteram_w)
+void djboy_state::djboy_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int val;
 

@@ -34,7 +34,7 @@ Namco System 86 Video Hardware
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(namcos86_state, namcos86)
+void namcos86_state::palette_init_namcos86(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -104,22 +104,22 @@ inline void namcos86_state::get_tile_info(tile_data &tileinfo,int tile_index,int
 			0);
 }
 
-TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info0)
+void namcos86_state::get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,0,&m_rthunder_videoram1[0x0000]);
 }
 
-TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info1)
+void namcos86_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,1,&m_rthunder_videoram1[0x1000]);
 }
 
-TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info2)
+void namcos86_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,2,&m_rthunder_videoram2[0x0000]);
 }
 
-TILE_GET_INFO_MEMBER(namcos86_state::get_tile_info3)
+void namcos86_state::get_tile_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,3,&m_rthunder_videoram2[0x1000]);
 }
@@ -164,19 +164,19 @@ void namcos86_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(namcos86_state::videoram1_w)
+void namcos86_state::videoram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rthunder_videoram1[offset] = data;
 	m_bg_tilemap[offset/0x1000]->mark_tile_dirty((offset & 0xfff)/2);
 }
 
-WRITE8_MEMBER(namcos86_state::videoram2_w)
+void namcos86_state::videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rthunder_videoram2[offset] = data;
 	m_bg_tilemap[2+offset/0x1000]->mark_tile_dirty((offset & 0xfff)/2);
 }
 
-WRITE8_MEMBER(namcos86_state::tilebank_select_w)
+void namcos86_state::tilebank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = BIT(offset,10);
 	if (m_tilebank != bit)
@@ -203,30 +203,30 @@ void namcos86_state::scroll_w(address_space &space, int offset, int data, int la
 	}
 }
 
-WRITE8_MEMBER(namcos86_state::scroll0_w)
+void namcos86_state::scroll0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	scroll_w(space,offset,data,0);
 }
-WRITE8_MEMBER(namcos86_state::scroll1_w)
+void namcos86_state::scroll1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	scroll_w(space,offset,data,1);
 }
-WRITE8_MEMBER(namcos86_state::scroll2_w)
+void namcos86_state::scroll2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	scroll_w(space,offset,data,2);
 }
-WRITE8_MEMBER(namcos86_state::scroll3_w)
+void namcos86_state::scroll3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	scroll_w(space,offset,data,3);
 }
 
-WRITE8_MEMBER(namcos86_state::backcolor_w)
+void namcos86_state::backcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_backcolor = data;
 }
 
 
-WRITE8_MEMBER(namcos86_state::spriteram_w)
+void namcos86_state::spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rthunder_spriteram[offset] = data;
 

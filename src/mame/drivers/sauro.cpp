@@ -130,37 +130,37 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "machine/watchdog.h"
 
 
-WRITE8_MEMBER(sauro_state::sauro_sound_command_w)
+void sauro_state::sauro_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data |= 0x80;
 	m_soundlatch->write(space, offset, data);
 }
 
-READ8_MEMBER(sauro_state::sauro_sound_command_r)
+uint8_t sauro_state::sauro_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ret = m_soundlatch->read(space, offset);
 	m_soundlatch->clear_w(space, offset, 0);
 	return ret;
 }
 
-WRITE8_MEMBER(sauro_state::coin1_w)
+void sauro_state::coin1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data);
 	machine().bookkeeping().coin_counter_w(0, 0); // to get the coin counter working in sauro, as it doesn't write 0
 }
 
-WRITE8_MEMBER(sauro_state::coin2_w)
+void sauro_state::coin2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(1, data);
 	machine().bookkeeping().coin_counter_w(1, 0); // to get the coin counter working in sauro, as it doesn't write 0
 }
 
-WRITE8_MEMBER(sauro_state::flip_screen_w)
+void sauro_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data);
 }
 
-WRITE8_MEMBER(sauro_state::adpcm_w)
+void sauro_state::adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sp0256->ald_w(space, 0, data);
 }
@@ -711,7 +711,7 @@ ROM_START( trckydoca )
 	ROM_LOAD( "tdprm.prm",    0x0000, 0x0200,  CRC(5261bc11) SHA1(1cc7a9a7376e65f4587b75ef9382049458656372) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sauro_state,tecfri)
+void sauro_state::init_tecfri()
 {
 	/* This game doesn't like all memory to be initialized to zero, it won't
 	   initialize the high scores */

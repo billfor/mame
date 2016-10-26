@@ -9,21 +9,21 @@
 #include "emu.h"
 #include "includes/zerozone.h"
 
-WRITE16_MEMBER( zerozone_state::tilemap_w )
+void zerozone_state::tilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 	m_zz_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER( zerozone_state::tilebank_w )
+void zerozone_state::tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  popmessage ("Data %04x",data);
 	m_tilebank = data & 0x07;
 	m_zz_tilemap->mark_all_dirty();
 }
 
-TILE_GET_INFO_MEMBER(zerozone_state::get_zerozone_tile_info)
+void zerozone_state::get_zerozone_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_vram[tile_index] & 0x07ff;
 	int colour = m_vram[tile_index] & 0xf000;

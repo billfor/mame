@@ -26,23 +26,23 @@ public:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_irq_source;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(strnskil_irq);
+	void strnskil_irq(timer_device &timer, void *ptr, int32_t param);
 
-	DECLARE_READ8_MEMBER(strnskil_d800_r);
-	DECLARE_READ8_MEMBER(pettanp_protection_r);
-	DECLARE_READ8_MEMBER(banbam_protection_r);
-	DECLARE_WRITE8_MEMBER(protection_w);
-	DECLARE_WRITE8_MEMBER(strnskil_videoram_w);
-	DECLARE_WRITE8_MEMBER(strnskil_scrl_ctrl_w);
+	uint8_t strnskil_d800_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pettanp_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t banbam_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void strnskil_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void strnskil_scrl_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(banbam);
-	DECLARE_DRIVER_INIT(pettanp);
+	void init_banbam();
+	void init_pettanp();
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(strnskil);
+	void palette_init_strnskil(palette_device &palette);
 	uint32_t screen_update_strnskil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

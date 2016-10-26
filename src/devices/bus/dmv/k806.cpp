@@ -153,7 +153,7 @@ void dmv_k806_device::io_write(address_space &space, int ifsel, offs_t offset, u
 	}
 }
 
-READ8_MEMBER( dmv_k806_device::port1_r )
+uint8_t dmv_k806_device::port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// ---- ---x   Left button
 	// ---- --x-   Middle button
@@ -174,12 +174,12 @@ READ8_MEMBER( dmv_k806_device::port1_r )
 	return data;
 }
 
-READ8_MEMBER( dmv_k806_device::portt1_r )
+uint8_t dmv_k806_device::portt1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return BIT(m_jumpers->read(), 7) ? 0 : 1;
 }
 
-WRITE8_MEMBER( dmv_k806_device::port2_w )
+void dmv_k806_device::port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bus->m_out_int_cb((data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -209,7 +209,7 @@ WRITE8_MEMBER( dmv_k806_device::port2_w )
 
 -------------------------------------------------------------------*/
 
-TIMER_DEVICE_CALLBACK_MEMBER(dmv_k806_device::mouse_timer)
+void dmv_k806_device::mouse_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	switch(m_mouse.phase)
 	{

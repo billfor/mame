@@ -249,7 +249,7 @@
  * The rate should be at about 1 Hz
  *************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::lazercmd_timer)
+void lazercmd_state::lazercmd_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -264,7 +264,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::lazercmd_timer)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::bbonk_timer)
+void lazercmd_state::bbonk_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -282,30 +282,30 @@ TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::bbonk_timer)
  *************************************************************/
 
 /* triggered by WRTC,r opcode */
-WRITE8_MEMBER(lazercmd_state::lazercmd_ctrl_port_w)
+void lazercmd_state::lazercmd_ctrl_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 /* triggered by REDC,r opcode */
-READ8_MEMBER(lazercmd_state::lazercmd_ctrl_port_r)
+uint8_t lazercmd_state::lazercmd_ctrl_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	return data;
 }
 
 /* triggered by WRTD,r opcode */
-WRITE8_MEMBER(lazercmd_state::lazercmd_data_port_w)
+void lazercmd_state::lazercmd_data_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 /* triggered by REDD,r opcode */
-READ8_MEMBER(lazercmd_state::lazercmd_data_port_r)
+uint8_t lazercmd_state::lazercmd_data_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("DSW")->read() & 0x0f;
 	return data;
 }
 
-WRITE8_MEMBER(lazercmd_state::lazercmd_hardware_w)
+void lazercmd_state::lazercmd_hardware_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -327,7 +327,7 @@ WRITE8_MEMBER(lazercmd_state::lazercmd_hardware_w)
 	}
 }
 
-WRITE8_MEMBER(lazercmd_state::medlanes_hardware_w)
+void lazercmd_state::medlanes_hardware_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -350,7 +350,7 @@ WRITE8_MEMBER(lazercmd_state::medlanes_hardware_w)
 	}
 }
 
-WRITE8_MEMBER(lazercmd_state::bbonk_hardware_w)
+void lazercmd_state::bbonk_hardware_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -367,7 +367,7 @@ WRITE8_MEMBER(lazercmd_state::bbonk_hardware_w)
 	}
 }
 
-READ8_MEMBER(lazercmd_state::lazercmd_hardware_r)
+uint8_t lazercmd_state::lazercmd_hardware_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -589,7 +589,7 @@ static GFXDECODE_START( lazercmd )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(lazercmd_state, lazercmd)
+void lazercmd_state::palette_init_lazercmd(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0xb0, 0xb0, 0xb0)); /* white */
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); /* black */
@@ -777,7 +777,7 @@ ROM_START( bbonk )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
+void lazercmd_state::init_lazercmd()
 {
 	int i, y;
 	uint8_t *gfx = memregion("gfx1")->base();

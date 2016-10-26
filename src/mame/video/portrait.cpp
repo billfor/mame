@@ -11,13 +11,13 @@
 #include "includes/portrait.h"
 
 
-WRITE8_MEMBER(portrait_state::bgvideo_write)
+void portrait_state::bgvideo_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_background->mark_tile_dirty(offset/2);
 	m_bgvideoram[offset] = data;
 }
 
-WRITE8_MEMBER(portrait_state::fgvideo_write)
+void portrait_state::fgvideo_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_foreground->mark_tile_dirty(offset/2);
 	m_fgvideoram[offset] = data;
@@ -54,12 +54,12 @@ inline void portrait_state::get_tile_info( tile_data &tileinfo, int tile_index, 
 	SET_TILE_INFO_MEMBER(0, tilenum, color, flags );
 }
 
-TILE_GET_INFO_MEMBER(portrait_state::get_bg_tile_info)
+void portrait_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo, tile_index, m_bgvideoram );
 }
 
-TILE_GET_INFO_MEMBER(portrait_state::get_fg_tile_info)
+void portrait_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo, tile_index, m_fgvideoram );
 }
@@ -76,7 +76,7 @@ void portrait_state::video_start()
 
 
 
-PALETTE_INIT_MEMBER(portrait_state, portrait)
+void portrait_state::palette_init_portrait(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

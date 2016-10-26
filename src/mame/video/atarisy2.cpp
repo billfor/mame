@@ -19,7 +19,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
+void atarisy2_state::get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(atarisy2_state::get_playfield_tile_info)
+void atarisy2_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = m_playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
@@ -79,7 +79,7 @@ const atari_motion_objects_config atarisy2_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(atarisy2_state,atarisy2)
+void atarisy2_state::video_start_atarisy2()
 {
 	/* initialize banked memory */
 	m_alpha_tilemap->basemem().set(&m_vram[0x0000], 0x2000, 16, ENDIANNESS_NATIVE, 2);
@@ -104,7 +104,7 @@ VIDEO_START_MEMBER(atarisy2_state,atarisy2)
  *
  *************************************/
 
-WRITE16_MEMBER( atarisy2_state::xscroll_w )
+void atarisy2_state::xscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_xscroll;
 	uint16_t newscroll = oldscroll;
@@ -129,13 +129,13 @@ WRITE16_MEMBER( atarisy2_state::xscroll_w )
 }
 
 
-TIMER_CALLBACK_MEMBER(atarisy2_state::reset_yscroll_callback)
+void atarisy2_state::reset_yscroll_callback(void *ptr, int32_t param)
 {
 	m_playfield_tilemap->set_scrolly(0, param);
 }
 
 
-WRITE16_MEMBER( atarisy2_state::yscroll_w )
+void atarisy2_state::yscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_yscroll;
 	uint16_t newscroll = oldscroll;
@@ -170,7 +170,7 @@ WRITE16_MEMBER( atarisy2_state::yscroll_w )
  *
  *************************************/
 
-PALETTE_DECODER_MEMBER( atarisy2_state, RRRRGGGGBBBBIIII )
+rgb_t atarisy2_state::RRRRGGGGBBBBIIII_decoder(uint32_t raw)
 {
 	static const int ZB = 115, Z3 = 78, Z2 = 37, Z1 = 17, Z0 = 9;
 
@@ -201,7 +201,7 @@ PALETTE_DECODER_MEMBER( atarisy2_state, RRRRGGGGBBBBIIII )
  *
  *************************************/
 
-READ16_MEMBER( atarisy2_state::slapstic_r )
+uint16_t atarisy2_state::slapstic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = m_slapstic_base[offset];
 	m_slapstic->slapstic_tweak(space, offset);
@@ -212,7 +212,7 @@ READ16_MEMBER( atarisy2_state::slapstic_r )
 }
 
 
-WRITE16_MEMBER( atarisy2_state::slapstic_w )
+void atarisy2_state::slapstic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_slapstic->slapstic_tweak(space, offset);
 
@@ -228,14 +228,14 @@ WRITE16_MEMBER( atarisy2_state::slapstic_w )
  *
  *************************************/
 
-READ16_MEMBER( atarisy2_state::videoram_r )
+uint16_t atarisy2_state::videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int offs = offset | m_videobank;
 	return m_vram[offs];
 }
 
 
-WRITE16_MEMBER( atarisy2_state::videoram_w )
+void atarisy2_state::videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int offs = offset | m_videobank;
 

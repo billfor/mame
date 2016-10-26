@@ -36,24 +36,24 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
-	DECLARE_WRITE8_MEMBER( pa_w );
-	DECLARE_WRITE8_MEMBER( pb_w );
-	DECLARE_WRITE8_MEMBER( pc_w );
-	DECLARE_READ8_MEMBER( pd_r );
+	void pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { if (state) m_data |= 0x01; else m_data &= ~0x01; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) override { if (state) m_data |= 0x02; else m_data &= ~0x02; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) override { if (state) m_data |= 0x04; else m_data &= ~0x04; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) override { if (state) m_data |= 0x08; else m_data &= ~0x08; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) override { if (state) m_data |= 0x10; else m_data &= ~0x10; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) override { if (state) m_data |= 0x20; else m_data &= ~0x20; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) override { if (state) m_data |= 0x40; else m_data &= ~0x40; }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { if (state) m_data |= 0x80; else m_data &= ~0x80; }
+	virtual void input_data0(int state) override { if (state) m_data |= 0x01; else m_data &= ~0x01; }
+	virtual void input_data1(int state) override { if (state) m_data |= 0x02; else m_data &= ~0x02; }
+	virtual void input_data2(int state) override { if (state) m_data |= 0x04; else m_data &= ~0x04; }
+	virtual void input_data3(int state) override { if (state) m_data |= 0x08; else m_data &= ~0x08; }
+	virtual void input_data4(int state) override { if (state) m_data |= 0x10; else m_data &= ~0x10; }
+	virtual void input_data5(int state) override { if (state) m_data |= 0x20; else m_data &= ~0x20; }
+	virtual void input_data6(int state) override { if (state) m_data |= 0x40; else m_data &= ~0x40; }
+	virtual void input_data7(int state) override { if (state) m_data |= 0x80; else m_data &= ~0x80; }
 
 private:
 	required_memory_region m_plotter;

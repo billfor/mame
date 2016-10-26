@@ -68,22 +68,22 @@ public:
 	uint8_t m_scrambler;
 	tilemap_t *m_tilemap;
 
-	DECLARE_WRITE8_MEMBER(aquarius_videoram_w);
-	DECLARE_WRITE8_MEMBER(aquarius_colorram_w);
-	DECLARE_READ8_MEMBER(cassette_r);
-	DECLARE_WRITE8_MEMBER(cassette_w);
-	DECLARE_READ8_MEMBER(vsync_r);
-	DECLARE_WRITE8_MEMBER(mapper_w);
-	DECLARE_READ8_MEMBER(printer_r);
-	DECLARE_WRITE8_MEMBER(printer_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(scrambler_w);
-	DECLARE_READ8_MEMBER(cartridge_r);
-	DECLARE_DRIVER_INIT(aquarius);
-	TILE_GET_INFO_MEMBER(aquarius_gettileinfo);
+	void aquarius_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void aquarius_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cassette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vsync_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t printer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scrambler_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cartridge_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_aquarius();
+	void aquarius_gettileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(aquarius);
+	void palette_init_aquarius(palette_device &palette);
 	uint32_t screen_update_aquarius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(aquarius_reset);
+	void aquarius_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 #endif /* AQUARIUS_H_ */

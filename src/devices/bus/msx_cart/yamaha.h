@@ -23,13 +23,13 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual uint8_t read_cart(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(ym2148_irq_w);
+	void ym2151_irq_w(int state);
+	void ym2148_irq_w(int state);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	int irq_callback(device_t &device, int irqline);
 
 private:
 	required_memory_region m_region_sfg;

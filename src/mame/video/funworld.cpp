@@ -50,7 +50,7 @@
 #include "includes/funworld.h"
 
 
-PALETTE_INIT_MEMBER(funworld_state,funworld)
+void funworld_state::palette_init_funworld(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -88,13 +88,13 @@ PALETTE_INIT_MEMBER(funworld_state,funworld)
 }
 
 
-WRITE8_MEMBER(funworld_state::funworld_videoram_w)
+void funworld_state::funworld_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(funworld_state::funworld_colorram_w)
+void funworld_state::funworld_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -109,7 +109,7 @@ WRITE8_MEMBER(funworld_state::funworld_colorram_w)
     xxxx -xxx   tiles color (background).
 */
 
-TILE_GET_INFO_MEMBER(funworld_state::get_bg_tile_info)
+void funworld_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -125,17 +125,17 @@ TILE_GET_INFO_MEMBER(funworld_state::get_bg_tile_info)
 }
 
 
-VIDEO_START_MEMBER(funworld_state, funworld)
+void funworld_state::video_start_funworld()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
 }
 
-VIDEO_START_MEMBER(funworld_state, magicrd2)
+void funworld_state::video_start_magicrd2()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 112, 34);
 }
 
-VIDEO_START_MEMBER(funworld_state, chinatow)
+void funworld_state::video_start_chinatow()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 31);
 }

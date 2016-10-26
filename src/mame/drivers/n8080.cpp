@@ -19,17 +19,17 @@
 #define MASTER_CLOCK    XTAL_20_16MHz
 
 
-WRITE8_MEMBER(n8080_state::n8080_shift_bits_w)
+void n8080_state::n8080_shift_bits_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shift_bits = data & 7;
 }
-WRITE8_MEMBER(n8080_state::n8080_shift_data_w)
+void n8080_state::n8080_shift_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shift_data = (m_shift_data >> 8) | (data << 8);
 }
 
 
-READ8_MEMBER(n8080_state::n8080_shift_r)
+uint8_t n8080_state::n8080_shift_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_shift_data >> (8 - m_shift_bits);
 }
@@ -430,7 +430,7 @@ INPUT_PORTS_END
 
 /* Interrupts */
 
-TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst1_tick)
+void n8080_state::rst1_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
 
@@ -438,7 +438,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst1_tick)
 	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
+void n8080_state::rst2_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
 
@@ -446,12 +446,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
 	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7);
 }
 
-WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
+void n8080_state::n8080_inte_callback(int state)
 {
 	m_inte = state;
 }
 
-WRITE8_MEMBER(n8080_state::n8080_status_callback)
+void n8080_state::n8080_status_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & I8085_STATUS_INTA)
 	{
@@ -467,32 +467,32 @@ void n8080_state::machine_start()
 	save_item(NAME(m_inte));
 }
 
-MACHINE_RESET_MEMBER(n8080_state,n8080)
+void n8080_state::machine_reset_n8080()
 {
 	m_shift_data = 0;
 	m_shift_bits = 0;
 	m_inte = 0;
 }
 
-MACHINE_RESET_MEMBER(n8080_state,spacefev)
+void n8080_state::machine_reset_spacefev()
 {
-	MACHINE_RESET_CALL_MEMBER(n8080);
+	machine_reset_n8080();
 
 	m_spacefev_red_screen = 0;
 	m_spacefev_red_cannon = 0;
 }
 
-MACHINE_RESET_MEMBER(n8080_state,sheriff)
+void n8080_state::machine_reset_sheriff()
 {
-	MACHINE_RESET_CALL_MEMBER(n8080);
+	machine_reset_n8080();
 
 	m_sheriff_color_mode = 0;
 	m_sheriff_color_data = 0;
 }
 
-MACHINE_RESET_MEMBER(n8080_state,helifire)
+void n8080_state::machine_reset_helifire()
 {
-	MACHINE_RESET_CALL_MEMBER(n8080);
+	machine_reset_n8080();
 
 	m_helifire_mv = 0;
 	m_helifire_sc = 0;

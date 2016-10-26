@@ -47,23 +47,23 @@ public:
 	tilemap_t *m_foreground_layer;
 	tilemap_t *m_text_layer;
 
-	DECLARE_WRITE16_MEMBER(tokib_soundcommand_w);
-	DECLARE_READ16_MEMBER(pip_r);
-	DECLARE_WRITE16_MEMBER(toki_control_w);
-	DECLARE_WRITE16_MEMBER(foreground_videoram_w);
-	DECLARE_WRITE16_MEMBER(background1_videoram_w);
-	DECLARE_WRITE16_MEMBER(background2_videoram_w);
-	DECLARE_WRITE8_MEMBER(tokib_adpcm_control_w);
-	DECLARE_WRITE8_MEMBER(tokib_adpcm_data_w);
-	DECLARE_WRITE_LINE_MEMBER(tokib_adpcm_int);
+	void tokib_soundcommand_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pip_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void toki_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void foreground_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void background1_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void background2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tokib_adpcm_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tokib_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tokib_adpcm_int(int state);
 
-	DECLARE_DRIVER_INIT(tokib);
-	DECLARE_DRIVER_INIT(jujuba);
-	DECLARE_DRIVER_INIT(toki);
+	void init_tokib();
+	void init_jujuba();
+	void init_toki();
 
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	TILE_GET_INFO_MEMBER(get_back_tile_info);
-	TILE_GET_INFO_MEMBER(get_fore_tile_info);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 

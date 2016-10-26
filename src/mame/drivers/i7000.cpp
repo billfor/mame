@@ -74,22 +74,22 @@ public:
 	uint8_t m_row;
 	tilemap_t *m_bg_tilemap;
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	DECLARE_DRIVER_INIT(i7000);
-	DECLARE_PALETTE_INIT(i7000);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
+	void init_i7000();
+	void palette_init_i7000(palette_device &palette);
+	image_init_result device_image_load_i7000_card(device_image_interface &image);
 
-	DECLARE_READ8_MEMBER(i7000_kbd_r);
-	DECLARE_WRITE8_MEMBER(i7000_scanlines_w);
+	uint8_t i7000_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i7000_scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
-WRITE8_MEMBER( i7000_state::i7000_scanlines_w )
+void i7000_state::i7000_scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_row = data;
 }
 
-READ8_MEMBER( i7000_state::i7000_kbd_r )
+uint8_t i7000_state::i7000_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -215,7 +215,7 @@ static INPUT_PORTS_START( i7000 )
 		PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(i7000_state, i7000)
+void i7000_state::init_i7000()
 {
 }
 
@@ -230,7 +230,7 @@ void i7000_state::machine_start()
 	}
 }
 
-PALETTE_INIT_MEMBER(i7000_state, i7000)
+void i7000_state::palette_init_i7000(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x33, 0x33, 0x33));
 	palette.set_pen_color(1, rgb_t(0xBB, 0xBB, 0xBB));
@@ -275,7 +275,7 @@ static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
 //  AM_RANGE(0xbb, 0xbb) AM_WRITE(i7000_io_?_w) //may be related to page-swapping...
 ADDRESS_MAP_END
 
-DEVICE_IMAGE_LOAD_MEMBER( i7000_state, i7000_card )
+image_init_result i7000_state::device_image_load_i7000_card(device_image_interface &image)
 {
 	uint32_t size = m_card->common_get_size("rom");
 
@@ -306,7 +306,7 @@ GFXDECODE_END
 * Video/Character functions *
 ****************************/
 
-TILE_GET_INFO_MEMBER(i7000_state::get_bg_tile_info)
+void i7000_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, /*code:*/ m_videoram[tile_index], /*color:*/ 0, 0);
 }

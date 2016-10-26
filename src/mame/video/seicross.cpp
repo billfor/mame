@@ -27,7 +27,7 @@
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(seicross_state, seicross)
+void seicross_state::palette_init_seicross(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -56,13 +56,13 @@ PALETTE_INIT_MEMBER(seicross_state, seicross)
 	}
 }
 
-WRITE8_MEMBER(seicross_state::videoram_w)
+void seicross_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(seicross_state::colorram_w)
+void seicross_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 5 of the address is not used for color memory. There is just */
 	/* 512k of memory; every two consecutive rows share the same memory */
@@ -77,7 +77,7 @@ WRITE8_MEMBER(seicross_state::colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset + 0x20);
 }
 
-TILE_GET_INFO_MEMBER(seicross_state::get_bg_tile_info)
+void seicross_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x10) << 4);
 	int color = m_colorram[tile_index] & 0x0f;

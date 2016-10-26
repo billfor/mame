@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(vulgus_state, vulgus)
+void vulgus_state::palette_init_vulgus(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(vulgus_state, vulgus)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(vulgus_state::get_fg_tile_info)
+void vulgus_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 
@@ -90,7 +90,7 @@ TILE_GET_INFO_MEMBER(vulgus_state::get_fg_tile_info)
 	tileinfo.group = color & 0x3f;
 }
 
-TILE_GET_INFO_MEMBER(vulgus_state::get_bg_tile_info)
+void vulgus_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 
@@ -126,20 +126,20 @@ void vulgus_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(vulgus_state::fgvideoram_w)
+void vulgus_state::fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(vulgus_state::bgvideoram_w)
+void vulgus_state::bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(vulgus_state::c804_w)
+void vulgus_state::c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -150,7 +150,7 @@ WRITE8_MEMBER(vulgus_state::c804_w)
 }
 
 
-WRITE8_MEMBER(vulgus_state::palette_bank_w)
+void vulgus_state::palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palette_bank != (data & 3))
 	{

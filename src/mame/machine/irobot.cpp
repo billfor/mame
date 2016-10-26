@@ -29,7 +29,7 @@
 			"%s, scanline: %d\n", machine().describe_context(), m_screen->vpos())
 
 
-READ8_MEMBER(irobot_state::irobot_sharedmem_r)
+uint8_t irobot_state::irobot_sharedmem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_outx == 3)
 		return m_mbRAM[BYTE_XOR_BE(offset)];
@@ -47,7 +47,7 @@ READ8_MEMBER(irobot_state::irobot_sharedmem_r)
 }
 
 /* Comment out the mbRAM =, comRAM2 = or comRAM1 = and it will start working */
-WRITE8_MEMBER(irobot_state::irobot_sharedmem_w)
+void irobot_state::irobot_sharedmem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_outx == 3)
 		m_mbRAM[BYTE_XOR_BE(offset)] = data;
@@ -56,13 +56,13 @@ WRITE8_MEMBER(irobot_state::irobot_sharedmem_w)
 		m_combase[BYTE_XOR_BE(offset & 0xFFF)] = data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(irobot_state::irobot_irvg_done_callback)
+void irobot_state::irobot_irvg_done_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	logerror("vg done. ");
 	m_irvg_running = 0;
 }
 
-WRITE8_MEMBER(irobot_state::irobot_statwr_w)
+void irobot_state::irobot_statwr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("write %2x ", data);
 	IR_CPU_STATE();
@@ -93,7 +93,7 @@ WRITE8_MEMBER(irobot_state::irobot_statwr_w)
 	m_statwr = data;
 }
 
-WRITE8_MEMBER(irobot_state::irobot_out0_w)
+void irobot_state::irobot_out0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
@@ -115,7 +115,7 @@ WRITE8_MEMBER(irobot_state::irobot_out0_w)
 	m_alphamap = (data & 0x80);
 }
 
-WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
+void irobot_state::irobot_rom_banksel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
@@ -144,7 +144,7 @@ WRITE8_MEMBER(irobot_state::irobot_rom_banksel_w)
 	output().set_led_value(1,data & 0x20);
 }
 
-TIMER_CALLBACK_MEMBER(irobot_state::scanline_callback)
+void irobot_state::scanline_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -186,12 +186,12 @@ void irobot_state::machine_reset()
 	m_outx = 0;
 }
 
-WRITE8_MEMBER(irobot_state::irobot_control_w)
+void irobot_state::irobot_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_control_num = offset & 0x03;
 }
 
-READ8_MEMBER(irobot_state::irobot_control_r)
+uint8_t irobot_state::irobot_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_control_num == 0)
 		return ioport("AN0")->read();
@@ -203,7 +203,7 @@ READ8_MEMBER(irobot_state::irobot_control_r)
 
 /*  we allow irmb_running and irvg_running to appear running before clearing
     them to simulate the mathbox and vector generator running in real time */
-READ8_MEMBER(irobot_state::irobot_status_r)
+uint8_t irobot_state::irobot_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int d=0;
 
@@ -391,7 +391,7 @@ void irobot_state::load_oproms()
 
 
 /* Init mathbox (only called once) */
-DRIVER_INIT_MEMBER(irobot_state,irobot)
+void irobot_state::init_irobot()
 {
 	int i;
 	for (i = 0; i < 16; i++)
@@ -403,7 +403,7 @@ DRIVER_INIT_MEMBER(irobot_state,irobot)
 	load_oproms();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(irobot_state::irobot_irmb_done_callback)
+void irobot_state::irobot_irmb_done_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	logerror("mb done. ");
 	m_irmb_running = 0;

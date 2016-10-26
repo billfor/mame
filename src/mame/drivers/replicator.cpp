@@ -179,18 +179,18 @@ public:
 	required_device<hd44780_device> m_lcdc;
 	required_device<dac_bit_interface> m_dac;
 
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_DRIVER_INIT(replicator);
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_replicator();
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(replicator);
+	void palette_init_replicator(palette_device &palette);
 };
 
 void replicator_state::machine_start()
 {
 }
 
-READ8_MEMBER(replicator_state::port_r)
+uint8_t replicator_state::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( offset )
 	{
@@ -275,7 +275,7 @@ READ8_MEMBER(replicator_state::port_r)
 	return 0;
 }
 
-WRITE8_MEMBER(replicator_state::port_w)
+void replicator_state::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset )
 	{
@@ -555,7 +555,7 @@ INPUT_PORTS_END
 * Machine definition                                 *
 \****************************************************/
 
-DRIVER_INIT_MEMBER(replicator_state, replicator)
+void replicator_state::init_replicator()
 {
 }
 
@@ -575,7 +575,7 @@ void replicator_state::machine_reset()
 	m_port_l = 0;
 }
 
-PALETTE_INIT_MEMBER(replicator_state, replicator)
+void replicator_state::palette_init_replicator(palette_device &palette)
 {
 //These colors were picked with the color picker in Inkscape, based on a photo of the LCD used in the Replicator 1 3d printer:
 	palette.set_pen_color(0, rgb_t(0xCA, 0xE7, 0xEB));

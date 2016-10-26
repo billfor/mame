@@ -91,17 +91,17 @@ public:
 	int m_rsxoffs;
 	int m_rsyoffs;
 
-	DECLARE_WRITE32_MEMBER(galastrm_palette_w);
-	DECLARE_WRITE32_MEMBER(galastrm_tc0610_0_w);
-	DECLARE_WRITE32_MEMBER(galastrm_tc0610_1_w);
-	DECLARE_WRITE32_MEMBER(galastrm_input_w);
-	DECLARE_READ32_MEMBER(galastrm_adstick_ctrl_r);
-	DECLARE_WRITE32_MEMBER(galastrm_adstick_ctrl_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
+	void galastrm_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void galastrm_tc0610_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void galastrm_tc0610_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void galastrm_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t galastrm_adstick_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void galastrm_adstick_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	ioport_value frame_counter_r(ioport_field &field, void *param);
+	ioport_value coin_word_r(ioport_field &field, void *param);
 	virtual void video_start() override;
 	uint32_t screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(galastrm_interrupt);
+	void galastrm_interrupt(device_t &device);
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
 

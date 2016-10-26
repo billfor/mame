@@ -114,21 +114,21 @@ public:
 
 	uint8_t m_last_misc;
 	uint8_t m_laserdisc_data;
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(dleuro_misc_w);
-	DECLARE_WRITE8_MEMBER(led_den1_w);
-	DECLARE_WRITE8_MEMBER(led_den2_w);
-	DECLARE_READ8_MEMBER(laserdisc_r);
-	DECLARE_WRITE8_MEMBER(laserdisc_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_status_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_command_r);
-	DECLARE_DRIVER_INIT(fixed);
-	DECLARE_DRIVER_INIT(variable);
-	DECLARE_MACHINE_START(dlair);
-	DECLARE_MACHINE_RESET(dlair);
-	DECLARE_PALETTE_INIT(dleuro);
+	void misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dleuro_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void led_den1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void led_den2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t laserdisc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void laserdisc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value laserdisc_status_r(ioport_field &field, void *param);
+	ioport_value laserdisc_command_r(ioport_field &field, void *param);
+	void init_fixed();
+	void init_variable();
+	void machine_start_dlair();
+	void machine_reset_dlair();
+	void palette_init_dleuro(palette_device &palette);
 	uint32_t screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(write_speaker);
+	void write_speaker(int state);
 };
 
 
@@ -164,7 +164,7 @@ static const uint8_t led_map[16] =
  *
  *************************************/
 
-WRITE_LINE_MEMBER(dlair_state::write_speaker)
+void dlair_state::write_speaker(int state)
 {
 	m_speaker->level_w(state);
 }
@@ -185,7 +185,7 @@ static const z80_daisy_config dleuro_daisy_chain[] =
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(dlair_state,dleuro)
+void dlair_state::palette_init_dleuro(palette_device &palette)
 {
 	int i;
 
@@ -229,12 +229,12 @@ uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_ind16 &
  *
  *************************************/
 
-MACHINE_START_MEMBER(dlair_state,dlair)
+void dlair_state::machine_start_dlair()
 {
 }
 
 
-MACHINE_RESET_MEMBER(dlair_state,dlair)
+void dlair_state::machine_reset_dlair()
 {
 #if 0
 
@@ -255,7 +255,7 @@ MACHINE_RESET_MEMBER(dlair_state,dlair)
  *
  *************************************/
 
-WRITE8_MEMBER(dlair_state::misc_w)
+void dlair_state::misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    D0-D3 = B0-B3
@@ -278,7 +278,7 @@ WRITE8_MEMBER(dlair_state::misc_w)
 }
 
 
-WRITE8_MEMBER(dlair_state::dleuro_misc_w)
+void dlair_state::dleuro_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	       D0 = CHAR GEN ON+
@@ -305,13 +305,13 @@ WRITE8_MEMBER(dlair_state::dleuro_misc_w)
 }
 
 
-WRITE8_MEMBER(dlair_state::led_den1_w)
+void dlair_state::led_den1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(0 + (offset & 7), led_map[data & 0x0f]);
 }
 
 
-WRITE8_MEMBER(dlair_state::led_den2_w)
+void dlair_state::led_den2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(8 + (offset & 7), led_map[data & 0x0f]);
 }
@@ -324,19 +324,19 @@ WRITE8_MEMBER(dlair_state::led_den2_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(dlair_state::laserdisc_status_r)
+ioport_value dlair_state::laserdisc_status_r(ioport_field &field, void *param)
 {
 	return laserdisc_status_r();
 }
 
 
-CUSTOM_INPUT_MEMBER(dlair_state::laserdisc_command_r)
+ioport_value dlair_state::laserdisc_command_r(ioport_field &field, void *param)
 {
 	return (laserdisc_ready_r() == ASSERT_LINE) ? 0 : 1;
 }
 
 
-READ8_MEMBER(dlair_state::laserdisc_r)
+uint8_t dlair_state::laserdisc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = laserdisc_data_r();
 	osd_printf_debug("laserdisc_r = %02X\n", result);
@@ -344,7 +344,7 @@ READ8_MEMBER(dlair_state::laserdisc_r)
 }
 
 
-WRITE8_MEMBER(dlair_state::laserdisc_w)
+void dlair_state::laserdisc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_laserdisc_data = data;
 }
@@ -1002,13 +1002,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(dlair_state,fixed)
+void dlair_state::init_fixed()
 {
 //  m_laserdisc_type = LASERDISC_TYPE_FIXED;
 }
 
 
-DRIVER_INIT_MEMBER(dlair_state,variable)
+void dlair_state::init_variable()
 {
 //  m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
 }

@@ -49,10 +49,10 @@ public:
 	optional_device<beep_device> m_beeper;
 	optional_ioport_array<8> m_inp_matrix;
 
-	DECLARE_WRITE8_MEMBER(supercon_1e_w);
-	DECLARE_WRITE8_MEMBER(supercon_1f_w);
-	DECLARE_READ8_MEMBER(supercon_1e_r);
-	DECLARE_READ8_MEMBER(supercon_1f_r);
+	void supercon_1e_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void supercon_1f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t supercon_1e_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t supercon_1f_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// misc common
 	uint16_t m_inp_mux;                   // multiplexed keypad mask
@@ -71,7 +71,7 @@ public:
 	uint32_t m_display_cache[0x20];       // (internal use)
 	uint8_t m_display_decay[0x20][0x20];  // (internal use)
 
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_decay_tick(timer_device &timer, void *ptr, int32_t param);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
 	void set_display_segmask(uint32_t digits, uint32_t mask);
@@ -180,7 +180,7 @@ void novag6502_state::display_update()
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(novag6502_state::display_decay_tick)
+void novag6502_state::display_decay_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
@@ -246,14 +246,14 @@ uint16_t novag6502_state::read_inputs(int columns)
 
 // TTL
 
-WRITE8_MEMBER(novag6502_state::supercon_1e_w)
+void novag6502_state::supercon_1e_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = m_led_data = data;
 	display_matrix(8, 3, m_led_data, m_led_select);
 }
 
-WRITE8_MEMBER(novag6502_state::supercon_1f_w)
+void novag6502_state::supercon_1f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d3: ?
 	// d4-d6: select led row
@@ -264,14 +264,14 @@ WRITE8_MEMBER(novag6502_state::supercon_1f_w)
 	m_beeper->set_state(data >> 7 & 1);
 }
 
-READ8_MEMBER(novag6502_state::supercon_1e_r)
+uint8_t novag6502_state::supercon_1e_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0-d5: ?
 	// d6,d7: multiplexed inputs (side panel)
 	return (read_inputs(8) >> 2 & 0xc0) ^ 0xff;
 }
 
-READ8_MEMBER(novag6502_state::supercon_1f_r)
+uint8_t novag6502_state::supercon_1f_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0-d7: multiplexed inputs (chessboard squares)
 	return ~read_inputs(8) & 0xff;

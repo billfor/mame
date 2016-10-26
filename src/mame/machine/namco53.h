@@ -40,13 +40,13 @@ public:
 	template<class _Object> static devcb_base &set_k_port_callback(device_t &device, _Object object) { return downcast<namco_53xx_device &>(device).m_k.set_callback(object); }
 	template<class _Object> static devcb_base &set_p_port_callback(device_t &device, _Object object) { return downcast<namco_53xx_device &>(device).m_p.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( K_r );
-	DECLARE_READ8_MEMBER( Rx_r );
-	DECLARE_WRITE8_MEMBER( O_w );
-	DECLARE_WRITE8_MEMBER( P_w );
+	uint8_t K_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t Rx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void O_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void P_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(read_request);
-	DECLARE_READ8_MEMBER( read );
+	void read_request(int state);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -54,7 +54,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	TIMER_CALLBACK_MEMBER( irq_clear );
+	void irq_clear(void *ptr, int32_t param);
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;

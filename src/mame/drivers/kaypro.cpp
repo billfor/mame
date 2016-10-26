@@ -46,7 +46,7 @@
 #include "formats/kaypro_dsk.h"
 #include "softlist.h"
 
-READ8_MEMBER( kaypro_state::kaypro2x_87_r ) { return 0x7f; }    /* to bypass unemulated HD controller */
+uint8_t kaypro_state::kaypro2x_87_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x7f; }    /* to bypass unemulated HD controller */
 
 /***********************************************************
 
@@ -327,7 +327,7 @@ static MACHINE_CONFIG_DERIVED( omni2, kaypro4 )
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_omni2)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER( kaypro_state, kaypro )
+void kaypro_state::init_kaypro()
 {
 	uint8_t *main = memregion("roms")->base();
 	uint8_t *ram = memregion("rambank")->base();

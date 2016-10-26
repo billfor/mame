@@ -61,7 +61,7 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fantland_state::fantland_nmi_enable_w)
+void fantland_state::fantland_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data;
 
@@ -69,19 +69,19 @@ WRITE8_MEMBER(fantland_state::fantland_nmi_enable_w)
 		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", space.device().safe_pc(), data);
 }
 
-WRITE16_MEMBER(fantland_state::fantland_nmi_enable_16_w)
+void fantland_state::fantland_nmi_enable_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		fantland_nmi_enable_w(space, offset * 2, data);
 }
 
-WRITE8_MEMBER(fantland_state::fantland_soundlatch_w)
+void fantland_state::fantland_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE16_MEMBER(fantland_state::fantland_soundlatch_16_w)
+void fantland_state::fantland_soundlatch_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		fantland_soundlatch_w(space, offset * 2, data);
@@ -91,19 +91,19 @@ WRITE16_MEMBER(fantland_state::fantland_soundlatch_16_w)
                                 Fantasy Land
 ***************************************************************************/
 
-READ16_MEMBER(fantland_state::spriteram_16_r)
+uint16_t fantland_state::spriteram_16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t *spriteram = m_spriteram;
 	return spriteram[2 * offset + 0] | (spriteram[2 * offset + 1] << 8);
 }
 
-READ16_MEMBER(fantland_state::spriteram2_16_r)
+uint16_t fantland_state::spriteram2_16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t *spriteram_2 = m_spriteram2;
 	return spriteram_2[2 * offset + 0] | (spriteram_2[2 * offset + 1] << 8);
 }
 
-WRITE16_MEMBER(fantland_state::spriteram_16_w)
+void fantland_state::spriteram_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t *spriteram = m_spriteram;
 	if (ACCESSING_BITS_0_7)
@@ -112,7 +112,7 @@ WRITE16_MEMBER(fantland_state::spriteram_16_w)
 		spriteram[2 * offset + 1] = data >> 8;
 }
 
-WRITE16_MEMBER(fantland_state::spriteram2_16_w)
+void fantland_state::spriteram2_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t *spriteram_2 = m_spriteram2;
 	if (ACCESSING_BITS_0_7)
@@ -164,7 +164,7 @@ ADDRESS_MAP_END
                            Born To Fight
 ***************************************************************************/
 
-WRITE8_MEMBER(fantland_state::borntofi_nmi_enable_w)
+void fantland_state::borntofi_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data;
 
@@ -177,7 +177,7 @@ WRITE8_MEMBER(fantland_state::borntofi_nmi_enable_w)
 }
 
 // Trackball doesn't work correctly
-READ8_MEMBER(fantland_state::borntofi_inputs_r)
+uint8_t fantland_state::borntofi_inputs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int x, y, f;
 
@@ -323,7 +323,7 @@ void fantland_state::borntofi_adpcm_stop( msm5205_device *device, int voice )
 	m_adpcm_playing[voice] = 0;
 }
 
-WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
+void fantland_state::borntofi_msm5205_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int voice = offset / 8;
 	int reg = offset % 8;
@@ -391,10 +391,10 @@ void fantland_state::borntofi_adpcm_int( msm5205_device *device, int voice )
 	}
 }
 
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_0) { borntofi_adpcm_int(m_msm1, 0); }
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_1) { borntofi_adpcm_int(m_msm2, 1); }
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_2) { borntofi_adpcm_int(m_msm3, 2); }
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_3) { borntofi_adpcm_int(m_msm4, 3); }
+void fantland_state::borntofi_adpcm_int_0(int state) { borntofi_adpcm_int(m_msm1, 0); }
+void fantland_state::borntofi_adpcm_int_1(int state) { borntofi_adpcm_int(m_msm2, 1); }
+void fantland_state::borntofi_adpcm_int_2(int state) { borntofi_adpcm_int(m_msm3, 2); }
+void fantland_state::borntofi_adpcm_int_3(int state) { borntofi_adpcm_int(m_msm4, 3); }
 
 
 static ADDRESS_MAP_START( borntofi_sound_map, AS_PROGRAM, 8, fantland_state )
@@ -717,7 +717,7 @@ INPUT_PORTS_END
                            Wheels Runner
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(fantland_state::wheelrun_wheel_r)
+ioport_value fantland_state::wheelrun_wheel_r(ioport_field &field, void *param)
 {
 	int player = (uintptr_t)param;
 	int delta = ioport(player ? "WHEEL1" : "WHEEL0")->read();
@@ -815,23 +815,23 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(fantland_state,fantland)
+void fantland_state::machine_start_fantland()
 {
 	save_item(NAME(m_nmi_enable));
 }
 
-MACHINE_RESET_MEMBER(fantland_state,fantland)
+void fantland_state::machine_reset_fantland()
 {
 	m_nmi_enable = 0;
 }
 
-INTERRUPT_GEN_MEMBER(fantland_state::fantland_irq)
+void fantland_state::fantland_irq(device_t &device)
 {
 	if (m_nmi_enable & 8)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
+void fantland_state::fantland_sound_irq(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80 / 4);
 }
@@ -882,7 +882,7 @@ static MACHINE_CONFIG_START( fantland, fantland_state )
 MACHINE_CONFIG_END
 
 
-WRITE_LINE_MEMBER(fantland_state::galaxygn_sound_irq)
+void fantland_state::galaxygn_sound_irq(int state)
 {
 	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
@@ -927,9 +927,9 @@ static MACHINE_CONFIG_START( galaxygn, fantland_state )
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER(fantland_state,borntofi)
+void fantland_state::machine_start_borntofi()
 {
-	MACHINE_START_CALL_MEMBER(fantland);
+	machine_start_fantland();
 
 	save_item(NAME(m_old_x));
 	save_item(NAME(m_old_y));
@@ -941,11 +941,11 @@ MACHINE_START_MEMBER(fantland_state,borntofi)
 	save_item(NAME(m_adpcm_nibble));
 }
 
-MACHINE_RESET_MEMBER(fantland_state,borntofi)
+void fantland_state::machine_reset_borntofi()
 {
 	int i;
 
-	MACHINE_RESET_CALL_MEMBER(fantland);
+	machine_reset_fantland();
 
 	for (i = 0; i < 2; i++)
 	{

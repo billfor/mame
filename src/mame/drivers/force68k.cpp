@@ -142,25 +142,25 @@ public:
 	{
 	}
 
-	DECLARE_READ16_MEMBER (bootvect_r);
-	DECLARE_READ16_MEMBER (vme_a24_r);
-	DECLARE_WRITE16_MEMBER (vme_a24_w);
-	DECLARE_READ16_MEMBER (vme_a16_r);
-	DECLARE_WRITE16_MEMBER (vme_a16_w);
+	uint16_t bootvect_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t vme_a24_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void machine_start () override;
 	// clocks
-	DECLARE_WRITE_LINE_MEMBER (write_aciahost_clock);
-	DECLARE_WRITE_LINE_MEMBER (write_aciaterm_clock);
-	DECLARE_WRITE_LINE_MEMBER (write_aciaremt_clock);
+	void write_aciahost_clock(int state);
+	void write_aciaterm_clock(int state);
+	void write_aciaremt_clock(int state);
 	// centronics printer interface
-	DECLARE_WRITE_LINE_MEMBER (centronics_ack_w);
-	DECLARE_WRITE_LINE_MEMBER (centronics_busy_w);
-	DECLARE_WRITE_LINE_MEMBER (centronics_perror_w);
-	DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
+	void centronics_ack_w(int state);
+	void centronics_busy_w(int state);
+	void centronics_perror_w(int state);
+	void centronics_select_w(int state);
 	// User EPROM/SRAM slot(s)
 	image_init_result force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
-	DECLARE_READ16_MEMBER (read16_rom);
+	image_init_result device_image_load_exp1_load(device_image_interface &image) { return force68k_load_cart(image, m_cart); }
+	uint16_t read16_rom(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -248,7 +248,7 @@ INPUT_PORTS_END
 /* Centronics ACK handler
  * The centronics ack signal is expected by the ROM to arrive at H1 input line
  */
-WRITE_LINE_MEMBER (force68k_state::centronics_ack_w)
+void force68k_state::centronics_ack_w(int state)
 {
 //      LOG (logerror ("centronics_ack_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
 		m_centronics_ack = state;
@@ -258,7 +258,7 @@ WRITE_LINE_MEMBER (force68k_state::centronics_ack_w)
 /* Centronics BUSY handler
  * The centronics busy signal is not used by the ROM driver afaik
  */
-WRITE_LINE_MEMBER (force68k_state::centronics_busy_w){
+void force68k_state::centronics_busy_w(int state){
 //      LOG (logerror ("centronics_busy_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
 		m_centronics_busy = state;
 }
@@ -266,7 +266,7 @@ WRITE_LINE_MEMBER (force68k_state::centronics_busy_w){
 /* Centronics PERROR handler
  * The centronics perror signal is not used by the ROM driver afaik
  */
-WRITE_LINE_MEMBER (force68k_state::centronics_perror_w){
+void force68k_state::centronics_perror_w(int state){
 //      LOG (logerror ("centronics_perror_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
 		m_centronics_perror = state;
 }
@@ -274,7 +274,7 @@ WRITE_LINE_MEMBER (force68k_state::centronics_perror_w){
 /* Centronics SELECT handler
  * The centronics select signal is expected by the ROM on Port B bit 0
  */
-WRITE_LINE_MEMBER (force68k_state::centronics_select_w){
+void force68k_state::centronics_select_w(int state){
 //      LOG (logerror ("centronics_select_w(%d) %lld\n", state, m_maincpu->total_cycles ()));
 		m_centronics_select = state;
 		m_pit->portb_setbit (0, state);
@@ -306,13 +306,13 @@ void force68k_state::machine_start ()
 }
 
 /* A very ineffecient User cart emulation of two 8 bit sockets (odd and even) */
-READ16_MEMBER (force68k_state::read16_rom){
+uint16_t force68k_state::read16_rom(address_space &space, offs_t offset, uint16_t mem_mask){
 	offset = offset % m_cart->common_get_size("rom"); // Don't read outside buffer...
 	return ((m_usrrom [offset] << 8) & 0xff00) | ((m_usrrom [offset] >> 8) & 0x00ff);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
-READ16_MEMBER (force68k_state::bootvect_r){
+uint16_t force68k_state::bootvect_r(address_space &space, offs_t offset, uint16_t mem_mask){
 		return m_sysrom [offset];
 }
 
@@ -335,38 +335,38 @@ READ16_MEMBER (force68k_state::bootvect_r){
  */
 
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (force68k_state::vme_a24_r){
+uint16_t force68k_state::vme_a24_r(address_space &space, offs_t offset, uint16_t mem_mask){
 		LOG (logerror ("vme_a24_r\n"));
 		return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a24_w){
+void force68k_state::vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 		LOG (logerror ("vme_a24_w\n"));
 }
 
-READ16_MEMBER (force68k_state::vme_a16_r){
+uint16_t force68k_state::vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask){
 		LOG (logerror ("vme_16_r\n"));
 		return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a16_w){
+void force68k_state::vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 		LOG (logerror ("vme_a16_w\n"));
 }
 
 /*
  * Serial port clock sources can all be driven by different outputs of the 14411
  */
-WRITE_LINE_MEMBER (force68k_state::write_aciahost_clock){
+void force68k_state::write_aciahost_clock(int state){
 		m_aciahost->write_txc (state);
 		m_aciahost->write_rxc (state);
 }
 
-WRITE_LINE_MEMBER (force68k_state::write_aciaterm_clock){
+void force68k_state::write_aciaterm_clock(int state){
 		m_aciaterm->write_txc (state);
 		m_aciaterm->write_rxc (state);
 }
 
-WRITE_LINE_MEMBER (force68k_state::write_aciaremt_clock){
+void force68k_state::write_aciaremt_clock(int state){
 		m_aciaremt->write_txc (state);
 		m_aciaremt->write_rxc (state);
 }

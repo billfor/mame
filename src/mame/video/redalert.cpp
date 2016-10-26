@@ -24,7 +24,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(redalert_state::redalert_bitmap_videoram_w)
+void redalert_state::redalert_bitmap_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bitmap_videoram[offset     ] = data;
 	m_bitmap_colorram[offset >> 3] = *m_bitmap_color & 0x07;
@@ -162,7 +162,7 @@ void redalert_state::get_panther_pens(pen_t *pens)
  *
  *************************************/
 
-VIDEO_START_MEMBER(redalert_state,redalert)
+void redalert_state::video_start_redalert()
 {
 	m_bitmap_colorram = std::make_unique<uint8_t[]>(0x0400);
 
@@ -171,9 +171,9 @@ VIDEO_START_MEMBER(redalert_state,redalert)
 	m_control_xor = 0x00;
 }
 
-VIDEO_START_MEMBER(redalert_state,ww3)
+void redalert_state::video_start_ww3()
 {
-	VIDEO_START_CALL_MEMBER( redalert );
+	video_start_redalert();
 
 	m_control_xor = 0x04;
 }

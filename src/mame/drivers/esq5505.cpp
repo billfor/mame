@@ -190,16 +190,16 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(lower_r);
-	DECLARE_WRITE16_MEMBER(lower_w);
+	uint16_t lower_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lower_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(analog_r);
-	DECLARE_WRITE16_MEMBER(analog_w);
+	uint16_t analog_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void analog_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_irq_handler(int state);
+	void duart_tx_a(int state);
+	void duart_tx_b(int state);
+	void duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	int m_system_type;
 	uint8_t m_duart_io;
@@ -218,19 +218,19 @@ private:
 	uint16_t m_analog_values[8];
 
 public:
-	DECLARE_DRIVER_INIT(eps);
-	DECLARE_DRIVER_INIT(common);
-	DECLARE_DRIVER_INIT(sq1);
-	DECLARE_DRIVER_INIT(denib);
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
-	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
+	void init_eps();
+	void init_common();
+	void init_sq1();
+	void init_denib();
+	void key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	int maincpu_irq_acknowledge_callback(device_t &device, int irqline);
+	void esq5505_otis_irq(int state);
 
 	//dmac
-	DECLARE_WRITE8_MEMBER(dma_end);
-	DECLARE_WRITE8_MEMBER(dma_error);
-	DECLARE_READ8_MEMBER(fdc_read_byte);
-	DECLARE_WRITE8_MEMBER(fdc_write_byte);
+	void dma_end(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma_error(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
@@ -241,7 +241,7 @@ static SLOT_INTERFACE_START( ensoniq_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
+int esq5505_state::maincpu_irq_acknowledge_callback(device_t &device, int irqline)
 {
 	switch(irqline) {
 	case 1:
@@ -325,7 +325,7 @@ void esq5505_state::update_irq_to_maincpu() {
 	}
 }
 
-READ16_MEMBER(esq5505_state::lower_r)
+uint16_t esq5505_state::lower_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= 0x7fff;
 
@@ -346,7 +346,7 @@ READ16_MEMBER(esq5505_state::lower_r)
 	}
 }
 
-WRITE16_MEMBER(esq5505_state::lower_w)
+void esq5505_state::lower_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x7fff;
 
@@ -408,24 +408,24 @@ static ADDRESS_MAP_START( sq1_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER(esq5505_state::esq5505_otis_irq)
+void esq5505_state::esq5505_otis_irq(int state)
 {
 	otis_irq_state = (state != 0);
 	update_irq_to_maincpu();
 }
 
-WRITE16_MEMBER(esq5505_state::analog_w)
+void esq5505_state::analog_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x7;
 	m_analog_values[offset] = data;
 }
 
-READ16_MEMBER(esq5505_state::analog_r)
+uint16_t esq5505_state::analog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_analog_values[m_duart_io & 7];
 }
 
-WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
+void esq5505_state::duart_irq_handler(int state)
 {
 //    printf("\nDUART IRQ: state %d vector %d\n", state, vector);
 	if (state == ASSERT_LINE)
@@ -440,7 +440,7 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 	update_irq_to_maincpu();
 }
 
-WRITE8_MEMBER(esq5505_state::duart_output)
+void esq5505_state::duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : nullptr;
@@ -492,17 +492,17 @@ WRITE8_MEMBER(esq5505_state::duart_output)
 }
 
 // MIDI send
-WRITE_LINE_MEMBER(esq5505_state::duart_tx_a)
+void esq5505_state::duart_tx_a(int state)
 {
 	m_mdout->write_txd(state);
 }
 
-WRITE_LINE_MEMBER(esq5505_state::duart_tx_b)
+void esq5505_state::duart_tx_b(int state)
 {
 	m_panel->rx_w(state);
 }
 
-WRITE8_MEMBER(esq5505_state::dma_end)
+void esq5505_state::dma_end(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != 0)
 	{
@@ -519,7 +519,7 @@ WRITE8_MEMBER(esq5505_state::dma_end)
 	update_irq_to_maincpu();
 }
 
-WRITE8_MEMBER(esq5505_state::dma_error)
+void esq5505_state::dma_error(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data != 0)
 	{
@@ -535,18 +535,18 @@ WRITE8_MEMBER(esq5505_state::dma_error)
 	update_irq_to_maincpu();
 }
 
-READ8_MEMBER(esq5505_state::fdc_read_byte)
+uint8_t esq5505_state::fdc_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->data_r();
 }
 
-WRITE8_MEMBER(esq5505_state::fdc_write_byte)
+void esq5505_state::fdc_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->data_w(data & 0xff);
 }
 
 #if KEYBOARD_HACK
-INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
+void esq5505_state::key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int val = (uint8_t)(uintptr_t)param;
 	int cmp = 0x60;
@@ -943,7 +943,7 @@ ROM_START( eps16p )
 	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esq5505_state,common)
+void esq5505_state::init_common()
 {
 	m_system_type = GENERIC;
 	m_duart_io = 0;
@@ -957,28 +957,28 @@ DRIVER_INIT_MEMBER(esq5505_state,common)
 	}
 }
 
-DRIVER_INIT_MEMBER(esq5505_state,eps)
+void esq5505_state::init_eps()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 	m_system_type = EPS;
 }
 
-DRIVER_INIT_MEMBER(esq5505_state,sq1)
+void esq5505_state::init_sq1()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 	m_system_type = SQ1;
 #if KEYBOARD_HACK
 	shift = 60;
 #endif
 }
 
-DRIVER_INIT_MEMBER(esq5505_state,denib)
+void esq5505_state::init_denib()
 {
 	uint8_t *pNibbles = (uint8_t *)memregion("nibbles")->base();
 	uint8_t *pBS0L = (uint8_t *)memregion("waverom")->base();
 	uint8_t *pBS0H = pBS0L + 0x100000;
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 
 	// create the 12 bit samples by patching in the nibbles from the nibble ROM
 	// low nibbles go with the lower ROM, high nibbles with the upper ROM

@@ -101,7 +101,7 @@ void ticket_dispenser_device::static_set_senses(device_t &device, uint8_t motor_
 //  (legacy method)
 //-------------------------------------------------
 
-READ8_MEMBER( ticket_dispenser_device::read )
+uint8_t ticket_dispenser_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("%s: Ticket Status Read = %02X\n", machine().describe_context(), m_status));
 	return m_status;
@@ -112,7 +112,7 @@ READ8_MEMBER( ticket_dispenser_device::read )
 //  line_r - read the status line as a proper line
 //-------------------------------------------------
 
-READ_LINE_MEMBER( ticket_dispenser_device::line_r )
+int ticket_dispenser_device::line_r()
 {
 	return m_status ? 1 : 0;
 }
@@ -123,7 +123,7 @@ READ_LINE_MEMBER( ticket_dispenser_device::line_r )
 //  bit (legacy method)
 //-------------------------------------------------
 
-WRITE8_MEMBER( ticket_dispenser_device::write )
+void ticket_dispenser_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// On an activate signal, start dispensing!
 	if ((data & m_active_bit) == m_motoron)
@@ -153,7 +153,7 @@ WRITE8_MEMBER( ticket_dispenser_device::write )
 //  line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ticket_dispenser_device::motor_w )
+void ticket_dispenser_device::motor_w(int state)
 {
 	write(machine().driver_data()->generic_space(), 0, state ? m_active_bit : 0);
 }

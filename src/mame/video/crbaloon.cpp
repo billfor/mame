@@ -25,7 +25,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(crbaloon_state, crbaloon)
+void crbaloon_state::palette_init_crbaloon(palette_device &palette)
 {
 	int i;
 
@@ -49,19 +49,19 @@ PALETTE_INIT_MEMBER(crbaloon_state, crbaloon)
 }
 
 
-WRITE8_MEMBER(crbaloon_state::crbaloon_videoram_w)
+void crbaloon_state::crbaloon_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(crbaloon_state::crbaloon_colorram_w)
+void crbaloon_state::crbaloon_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(crbaloon_state::get_bg_tile_info)
+void crbaloon_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;

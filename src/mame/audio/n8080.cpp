@@ -97,7 +97,7 @@ void n8080_state::stop_mono_flop( int n )
 }
 
 
-TIMER_CALLBACK_MEMBER( n8080_state::stop_mono_flop_callback )
+void n8080_state::stop_mono_flop_callback(void *ptr, int32_t param)
 {
 	stop_mono_flop(param);
 }
@@ -218,7 +218,7 @@ void n8080_state::delayed_sound_1( int data )
 }
 
 
-TIMER_CALLBACK_MEMBER( n8080_state::delayed_sound_1_callback )
+void n8080_state::delayed_sound_1_callback(void *ptr, int32_t param)
 {
 	delayed_sound_1(param);
 }
@@ -250,24 +250,24 @@ void n8080_state::delayed_sound_2( int data )
 }
 
 
-TIMER_CALLBACK_MEMBER( n8080_state::delayed_sound_2_callback )
+void n8080_state::delayed_sound_2_callback(void *ptr, int32_t param)
 {
 	delayed_sound_2(param);
 }
 
 
-WRITE8_MEMBER(n8080_state::n8080_sound_1_w)
+void n8080_state::n8080_sound_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(n8080_state::delayed_sound_1_callback), this), data); /* force CPUs to sync */
 }
 
-WRITE8_MEMBER(n8080_state::n8080_sound_2_w)
+void n8080_state::n8080_sound_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(n8080_state::delayed_sound_2_callback), this), data); /* force CPUs to sync */
 }
 
 
-READ8_MEMBER(n8080_state::n8080_8035_p1_r)
+uint8_t n8080_state::n8080_8035_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0;
 
@@ -284,27 +284,27 @@ READ8_MEMBER(n8080_state::n8080_8035_p1_r)
 }
 
 
-READ8_MEMBER(n8080_state::n8080_8035_t0_r)
+uint8_t n8080_state::n8080_8035_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_curr_sound_pins >> 0x7) & 1;
 }
-READ8_MEMBER(n8080_state::n8080_8035_t1_r)
+uint8_t n8080_state::n8080_8035_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_curr_sound_pins >> 0xc) & 1;
 }
 
 
-READ8_MEMBER(n8080_state::helifire_8035_t0_r)
+uint8_t n8080_state::helifire_8035_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_curr_sound_pins >> 0x3) & 1;
 }
-READ8_MEMBER(n8080_state::helifire_8035_t1_r)
+uint8_t n8080_state::helifire_8035_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_curr_sound_pins >> 0x4) & 1;
 }
 
 
-READ8_MEMBER(n8080_state::helifire_8035_external_ram_r)
+uint8_t n8080_state::helifire_8035_external_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0;
 
@@ -317,19 +317,19 @@ READ8_MEMBER(n8080_state::helifire_8035_external_ram_r)
 }
 
 
-READ8_MEMBER(n8080_state::helifire_8035_p2_r)
+uint8_t n8080_state::helifire_8035_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_curr_sound_pins >> 0xc) & 1) ? 0x10 : 0x00; /* not used */
 }
 
 
-WRITE8_MEMBER(n8080_state::n8080_dac_w)
+void n8080_state::n8080_dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_n8080_dac->write(BIT(data, 7));
 }
 
 
-WRITE8_MEMBER(n8080_state::helifire_sound_ctrl_w)
+void n8080_state::helifire_sound_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_helifire_dac_phase = data & 0x80;
 
@@ -349,7 +349,7 @@ WRITE8_MEMBER(n8080_state::helifire_sound_ctrl_w)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::spacefev_vco_voltage_timer)
+void n8080_state::spacefev_vco_voltage_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	double voltage = 0;
 
@@ -362,7 +362,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::spacefev_vco_voltage_timer)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::helifire_dac_volume_timer)
+void n8080_state::helifire_dac_volume_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	double t = m_helifire_dac_timing - machine().time().as_double();
 
@@ -379,7 +379,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::helifire_dac_volume_timer)
 }
 
 
-SOUND_START_MEMBER(n8080_state,spacefev)
+void n8080_state::sound_start_spacefev()
 {
 	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
 	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
@@ -392,7 +392,7 @@ SOUND_START_MEMBER(n8080_state,spacefev)
 	save_item(NAME(m_mono_flop));
 }
 
-SOUND_RESET_MEMBER(n8080_state,spacefev)
+void n8080_state::sound_reset_spacefev()
 {
 	m_n8080_hardware = 1;
 
@@ -408,7 +408,7 @@ SOUND_RESET_MEMBER(n8080_state,spacefev)
 }
 
 
-SOUND_START_MEMBER(n8080_state,sheriff)
+void n8080_state::sound_start_sheriff()
 {
 	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
 	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
@@ -420,7 +420,7 @@ SOUND_START_MEMBER(n8080_state,sheriff)
 	save_item(NAME(m_mono_flop));
 }
 
-SOUND_RESET_MEMBER(n8080_state,sheriff)
+void n8080_state::sound_reset_sheriff()
 {
 	m_n8080_hardware = 2;
 
@@ -435,7 +435,7 @@ SOUND_RESET_MEMBER(n8080_state,sheriff)
 }
 
 
-SOUND_START_MEMBER(n8080_state,helifire)
+void n8080_state::sound_start_helifire()
 {
 	save_item(NAME(m_prev_snd_data));
 	save_item(NAME(m_prev_sound_pins));
@@ -446,7 +446,7 @@ SOUND_START_MEMBER(n8080_state,helifire)
 	save_item(NAME(m_helifire_dac_phase));
 }
 
-SOUND_RESET_MEMBER(n8080_state,helifire)
+void n8080_state::sound_reset_helifire()
 {
 	m_n8080_hardware = 3;
 

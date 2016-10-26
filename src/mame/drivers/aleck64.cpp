@@ -187,11 +187,11 @@ public:
 			m_e90_pal(*this,"e90pal"),
 			m_dip_read_offset(0) { }
 
-	DECLARE_DRIVER_INIT(aleck64);
-	DECLARE_WRITE32_MEMBER(aleck_dips_w);
-	DECLARE_READ32_MEMBER(aleck_dips_r);
-	DECLARE_READ16_MEMBER(e90_prot_r);
-	DECLARE_WRITE16_MEMBER(e90_prot_w);
+	void init_aleck64();
+	void aleck_dips_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t aleck_dips_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t e90_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void e90_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint32_t screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -204,7 +204,7 @@ private:
 };
 
 
-WRITE32_MEMBER(aleck64_state::aleck_dips_w)
+void aleck64_state::aleck_dips_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	    mtetrisc uses offset 0x1c and 0x03 a good bit in conjunction with reading INMJ.
@@ -224,7 +224,7 @@ WRITE32_MEMBER(aleck64_state::aleck_dips_w)
 	}
 }
 
-READ32_MEMBER(aleck64_state::aleck_dips_r)
+uint32_t aleck64_state::aleck_dips_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	// srmvs uses 0x40, communications?
 
@@ -332,13 +332,13 @@ ADDRESS_MAP_END
  E90 protection handlers
 */
 
-READ16_MEMBER(aleck64_state::e90_prot_r)
+uint16_t aleck64_state::e90_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 // offset 0 $800 = status ready, active high
 	return 0;
 }
 
-WRITE16_MEMBER(aleck64_state::e90_prot_w)
+void aleck64_state::e90_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset*2)
 	{
@@ -930,7 +930,7 @@ static MACHINE_CONFIG_DERIVED( a64_e90, aleck64 )
 	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_e90)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(aleck64_state,aleck64)
+void aleck64_state::init_aleck64()
 {
 	uint8_t *rom = memregion("user2")->base();
 

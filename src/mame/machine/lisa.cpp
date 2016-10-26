@@ -303,7 +303,7 @@ void lisa_state::scan_keyboard()
 
 /* handle mouse moves */
 /* shamelessly stolen from machine/mac.c :-) */
-TIMER_CALLBACK_MEMBER(lisa_state::handle_mouse)
+void lisa_state::handle_mouse(void *ptr, int32_t param)
 {
 	int diff_x = 0, diff_y = 0;
 	int new_mx, new_my;
@@ -384,7 +384,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::handle_mouse)
 }
 
 /* read command from the VIA port A */
-TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
+void lisa_state::read_COPS_command(void *ptr, int32_t param)
 {
 	int command;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -558,7 +558,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
 }
 
 /* this timer callback raises the COPS Ready line, which tells the COPS is about to read a command */
-TIMER_CALLBACK_MEMBER(lisa_state::set_COPS_ready)
+void lisa_state::set_COPS_ready(void *ptr, int32_t param)
 {
 	m_COPS_Ready = 1;
 	m_via0->write_pb6(m_COPS_Ready);
@@ -639,13 +639,13 @@ void lisa_state::init_COPS()
     CA1 (I) : COPS sending valid data
     CA2 (O) : VIA -> COPS handshake
 */
-WRITE8_MEMBER(lisa_state::COPS_via_out_a)
+void lisa_state::COPS_via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    printf("VIA A = %02x\n", data);
 	m_COPS_command = data;
 }
 
-WRITE_LINE_MEMBER(lisa_state::COPS_via_out_ca2)
+void lisa_state::COPS_via_out_ca2(int state)
 {
 	m_hold_COPS_data = state;
 
@@ -670,7 +670,7 @@ WRITE_LINE_MEMBER(lisa_state::COPS_via_out_ca2)
     CB2 (O) : sound output
 */
 
-WRITE8_MEMBER(lisa_state::COPS_via_out_b)
+void lisa_state::COPS_via_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* pull-up */
 	data |= (~ m_via0->read(space, via6522_device::VIA_DDRA)) & 0x01;
@@ -694,7 +694,7 @@ WRITE8_MEMBER(lisa_state::COPS_via_out_b)
 	}
 }
 
-WRITE_LINE_MEMBER(lisa_state::COPS_via_out_cb2)
+void lisa_state::COPS_via_out_cb2(int state)
 {
 	m_speaker->level_w(state);
 }
@@ -899,7 +899,7 @@ void lisa_state::init_lisa1(void)
 }
 #endif
 
-DRIVER_INIT_MEMBER(lisa_state,lisa2)
+void lisa_state::init_lisa2()
 {
 	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
 	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
@@ -912,7 +912,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa2)
 	m_bad_parity_table = std::make_unique<uint8_t[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
-DRIVER_INIT_MEMBER(lisa_state,lisa210)
+void lisa_state::init_lisa210()
 {
 	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
 	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
@@ -925,7 +925,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa210)
 	m_bad_parity_table = std::make_unique<uint8_t[]>(0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
-DRIVER_INIT_MEMBER(lisa_state,mac_xl)
+void lisa_state::init_mac_xl()
 {
 	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
 	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
@@ -1008,7 +1008,7 @@ void lisa_state::machine_reset()
 	m_maincpu->reset();
 }
 
-INTERRUPT_GEN_MEMBER(lisa_state::lisa_interrupt)
+void lisa_state::lisa_interrupt(device_t &device)
 {
 	if ((++m_frame_count) == 6)
 	{   /* increment clock every 1/10s */
@@ -1166,7 +1166,7 @@ void lisa_state::lisa_fdc_ttl_glue_access(offs_t offset)
 	}
 }
 
-READ8_MEMBER(lisa_state::lisa_fdc_io_r)
+uint8_t lisa_state::lisa_fdc_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int answer=0;
 
@@ -1193,7 +1193,7 @@ READ8_MEMBER(lisa_state::lisa_fdc_io_r)
 	return answer;
 }
 
-WRITE8_MEMBER(lisa_state::lisa_fdc_io_w)
+void lisa_state::lisa_fdc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ((offset & 0x0030) >> 4)
 	{
@@ -1221,7 +1221,7 @@ WRITE8_MEMBER(lisa_state::lisa_fdc_io_w)
 	}
 }
 
-READ16_MEMBER(lisa_state::lisa_r)
+uint16_t lisa_state::lisa_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int answer=0;
 
@@ -1394,7 +1394,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 	return answer;
 }
 
-WRITE16_MEMBER(lisa_state::lisa_w)
+void lisa_state::lisa_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* segment register set */
 	int the_seg = m_seg;
@@ -1661,7 +1661,7 @@ void lisa_state::cpu_board_control_access(offs_t offset)
 	}
 }
 
-READ16_MEMBER(lisa_state::lisa_IO_r)
+uint16_t lisa_state::lisa_IO_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int answer=0;
 
@@ -1786,7 +1786,7 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 	return answer;
 }
 
-WRITE16_MEMBER(lisa_state::lisa_IO_w)
+void lisa_state::lisa_IO_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch ((offset & 0x7000) >> 12)
 	{

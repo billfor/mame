@@ -49,12 +49,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ8_MEMBER(pa_r);
-	DECLARE_READ8_MEMBER(pb_r);
-	DECLARE_WRITE8_MEMBER(pa_w);
-	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
+	uint8_t pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
@@ -130,12 +130,12 @@ static INPUT_PORTS_START( mkit09 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mkit09_state, trigger_nmi, 0)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( mkit09_state::trigger_reset )
+void mkit09_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( mkit09_state::trigger_nmi )
+void mkit09_state::trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -147,7 +147,7 @@ void mkit09_state::machine_reset()
 }
 
 // read keyboard
-READ8_MEMBER( mkit09_state::pa_r )
+uint8_t mkit09_state::pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_keydata < 4)
 	{
@@ -160,13 +160,13 @@ READ8_MEMBER( mkit09_state::pa_r )
 }
 
 // read cassette
-READ8_MEMBER( mkit09_state::pb_r )
+uint8_t mkit09_state::pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_keydata | ((m_cass->input() > +0.03) ? 0x80 : 0);
 }
 
 // write display segments
-WRITE8_MEMBER( mkit09_state::pa_w )
+void mkit09_state::pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data ^= 0xff;
 	if (m_keydata > 3)
@@ -179,7 +179,7 @@ WRITE8_MEMBER( mkit09_state::pa_w )
 }
 
 // write cassette, select keyboard row, select a digit
-WRITE8_MEMBER( mkit09_state::pb_w )
+void mkit09_state::pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cass->output(BIT(data, 6) ? -1.0 : +1.0);
 	m_keydata = data & 15;

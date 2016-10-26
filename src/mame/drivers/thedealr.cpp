@@ -53,23 +53,23 @@ public:
 	required_device<palette_device> m_palette;
 
 	// IOX
-	DECLARE_READ8_MEMBER(iox_r);
-	DECLARE_WRITE8_MEMBER(iox_w);
-	DECLARE_READ8_MEMBER(iox_status_r);
+	uint8_t iox_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void iox_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t iox_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t m_iox_cmd, m_iox_ret, m_iox_status, m_iox_leds, m_iox_coins;
 	void iox_reset();
 
 	// memory map
-	DECLARE_READ8_MEMBER(irq_ack_r);
-	DECLARE_WRITE8_MEMBER(unk_w);
+	uint8_t irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// machine
-	DECLARE_MACHINE_START(thedealr);
-	DECLARE_MACHINE_RESET(thedealr);
-	TIMER_DEVICE_CALLBACK_MEMBER(thedealr_interrupt);
+	void machine_start_thedealr();
+	void machine_reset_thedealr();
+	void thedealr_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	// video
-	DECLARE_PALETTE_INIT(thedealr);
+	void palette_init_thedealr(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 };
@@ -80,7 +80,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(thedealr_state,thedealr)
+void thedealr_state::palette_init_thedealr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -128,13 +128,13 @@ void thedealr_state::iox_reset()
 	m_iox_coins     =   0x00;
 }
 
-MACHINE_RESET_MEMBER(thedealr_state,thedealr)
+void thedealr_state::machine_reset_thedealr()
 {
 	iox_reset();
 }
 
 // 3400
-READ8_MEMBER(thedealr_state::iox_r)
+uint8_t thedealr_state::iox_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_iox_ret;
 	m_iox_status &= ~IOX_OUT_FULL;
@@ -142,7 +142,7 @@ READ8_MEMBER(thedealr_state::iox_r)
 	logerror("%s: IOX read %02X\n", machine().describe_context(), ret);
 	return ret;
 }
-WRITE8_MEMBER(thedealr_state::iox_w)
+void thedealr_state::iox_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_iox_status & IOX_WAITDATA)
 	{
@@ -237,7 +237,7 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 }
 
 // 3401
-READ8_MEMBER(thedealr_state::iox_status_r)
+uint8_t thedealr_state::iox_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// bit 0 - Out buff full?
 	// bit 1 - In  buff full?
@@ -251,13 +251,13 @@ READ8_MEMBER(thedealr_state::iox_status_r)
 
 ***************************************************************************/
 
-READ8_MEMBER(thedealr_state::irq_ack_r)
+uint8_t thedealr_state::irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return 0;
 }
 
-WRITE8_MEMBER(thedealr_state::unk_w)
+void thedealr_state::unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 1 - ? 1 during game
 	// bit 2 - ? 0 during game
@@ -497,7 +497,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(thedealr_state,thedealr)
+void thedealr_state::machine_start_thedealr()
 {
 	save_item(NAME(m_iox_status));
 	save_item(NAME(m_iox_ret));
@@ -512,7 +512,7 @@ MACHINE_START_MEMBER(thedealr_state,thedealr)
     Hence we generate more IRQs than that in a frame. Besides, with a single VBLANK IRQ,
     the two 65C02 fail to sync properly on boot with error $26 and/or $27 (commram[0]) !?
 */
-TIMER_DEVICE_CALLBACK_MEMBER(thedealr_state::thedealr_interrupt)
+void thedealr_state::thedealr_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -12,7 +12,7 @@
 #include "includes/kchamp.h"
 
 
-PALETTE_INIT_MEMBER(kchamp_state, kchamp)
+void kchamp_state::palette_init_kchamp(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, red, green, blue;
@@ -27,24 +27,24 @@ PALETTE_INIT_MEMBER(kchamp_state, kchamp)
 	}
 }
 
-WRITE8_MEMBER(kchamp_state::kchamp_videoram_w)
+void kchamp_state::kchamp_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kchamp_state::kchamp_colorram_w)
+void kchamp_state::kchamp_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kchamp_state::kchamp_flipscreen_w)
+void kchamp_state::kchamp_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 }
 
-TILE_GET_INFO_MEMBER(kchamp_state::get_bg_tile_info)
+void kchamp_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 7) << 8);
 	int color = (m_colorram[tile_index] >> 3) & 0x1f;

@@ -36,7 +36,7 @@
 #include "includes/pgm.h"
 #include "machine/pgmprot_igs027a_type2.h"
 
-READ32_MEMBER(pgm_arm_type2_state::arm7_latch_arm_r )
+uint32_t pgm_arm_type2_state::arm7_latch_arm_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_prot->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE ); // guess
 
@@ -45,7 +45,7 @@ READ32_MEMBER(pgm_arm_type2_state::arm7_latch_arm_r )
 	return m_kov2_latchdata_68k_w;
 }
 
-WRITE32_MEMBER(pgm_arm_type2_state::arm7_latch_arm_w )
+void pgm_arm_type2_state::arm7_latch_arm_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, space.device().safe_pc());
@@ -53,28 +53,28 @@ WRITE32_MEMBER(pgm_arm_type2_state::arm7_latch_arm_w )
 	COMBINE_DATA(&m_kov2_latchdata_arm_w);
 }
 
-READ32_MEMBER(pgm_arm_type2_state::arm7_shareram_r )
+uint32_t pgm_arm_type2_state::arm7_shareram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) (%06x)\n", offset << 2, m_arm7_shareram[offset], mem_mask, space.device().safe_pc());
 	return m_arm7_shareram[offset];
 }
 
-WRITE32_MEMBER(pgm_arm_type2_state::arm7_shareram_w )
+void pgm_arm_type2_state::arm7_shareram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) (%06x)\n", offset << 2, data, mem_mask, space.device().safe_pc());
 	COMBINE_DATA(&m_arm7_shareram[offset]);
 }
 
-READ16_MEMBER(pgm_arm_type2_state::arm7_latch_68k_r )
+uint16_t pgm_arm_type2_state::arm7_latch_68k_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("M68K: Latch read: %04x (%04x) (%06x)\n", m_kov2_latchdata_arm_w & 0x0000ffff, mem_mask, space.device().safe_pc());
 	return m_kov2_latchdata_arm_w;
 }
 
-WRITE16_MEMBER(pgm_arm_type2_state::arm7_latch_68k_w )
+void pgm_arm_type2_state::arm7_latch_68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, space.device().safe_pc());
@@ -83,7 +83,7 @@ WRITE16_MEMBER(pgm_arm_type2_state::arm7_latch_68k_w )
 	m_prot->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE ); // guess
 }
 
-READ16_MEMBER(pgm_arm_type2_state::arm7_ram_r )
+uint16_t pgm_arm_type2_state::arm7_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
@@ -92,7 +92,7 @@ READ16_MEMBER(pgm_arm_type2_state::arm7_ram_r )
 	return share16[BYTE_XOR_LE(offset)];
 }
 
-WRITE16_MEMBER(pgm_arm_type2_state::arm7_ram_w )
+void pgm_arm_type2_state::arm7_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *share16 = reinterpret_cast<uint16_t *>(m_arm7_shareram.target());
 
@@ -122,9 +122,9 @@ static ADDRESS_MAP_START( 55857F_arm7_map, AS_PROGRAM, 32, pgm_arm_type2_state )
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM
 ADDRESS_MAP_END
 
-MACHINE_START_MEMBER(pgm_arm_type2_state,pgm_arm_type2)
+void pgm_arm_type2_state::machine_start_pgm_arm_type2()
 {
-	MACHINE_START_CALL_MEMBER(pgm);
+	machine_start_pgm();
 	/* register type specific Save State stuff here */
 }
 
@@ -155,7 +155,7 @@ void pgm_arm_type2_state::kov2_latch_init()
 	save_item(NAME(m_kov2_latchdata_arm_w));
 }
 
-WRITE32_MEMBER(pgm_arm_type2_state::kov2_arm_region_w )
+void pgm_arm_type2_state::kov2_arm_region_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int regionhack = ioport("RegionHack")->read();
@@ -163,7 +163,7 @@ WRITE32_MEMBER(pgm_arm_type2_state::kov2_arm_region_w )
 	COMBINE_DATA(&m_arm7_shareram[0x138/4]);
 }
 
-WRITE32_MEMBER(pgm_arm_type2_state::kov2p_arm_region_w )
+void pgm_arm_type2_state::kov2p_arm_region_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int regionhack = ioport("RegionHack")->read();
@@ -173,7 +173,7 @@ WRITE32_MEMBER(pgm_arm_type2_state::kov2p_arm_region_w )
 }
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2)
+void pgm_arm_type2_state::init_kov2()
 {
 	pgm_basic_init();
 	pgm_kov2_decrypt(machine());
@@ -184,7 +184,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2)
 }
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2p)
+void pgm_arm_type2_state::init_kov2p()
 {
 	// this hacks the identification of the kov2 rom to return the string required for kov2p
 	// this isn't guaranteed to work properly (and definitely wouldn't on real hardware due to the internal
@@ -197,7 +197,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,kov2p)
 	machine().device("prot")->memory().space(AS_PROGRAM).install_write_handler(0x48000138, 0x4800013b, write32_delegate(FUNC(pgm_arm_type2_state::kov2p_arm_region_w),this));
 }
 
-WRITE32_MEMBER(pgm_arm_type2_state::martmast_arm_region_w )
+void pgm_arm_type2_state::martmast_arm_region_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int regionhack = ioport("RegionHack")->read();
@@ -206,7 +206,7 @@ WRITE32_MEMBER(pgm_arm_type2_state::martmast_arm_region_w )
 }
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type2_state,martmast)
+void pgm_arm_type2_state::init_martmast()
 {
 	pgm_basic_init();
 	pgm_mm_decrypt(machine());
@@ -219,7 +219,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,martmast)
 
 
 
-READ32_MEMBER(pgm_arm_type2_state::ddp2_speedup_r )
+uint32_t pgm_arm_type2_state::ddp2_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	uint32_t data = m_arm_ram[0x300c/4];
@@ -240,7 +240,7 @@ READ32_MEMBER(pgm_arm_type2_state::ddp2_speedup_r )
 	return data;
 }
 
-READ16_MEMBER(pgm_arm_type2_state::ddp2_main_speedup_r )
+uint16_t pgm_arm_type2_state::ddp2_main_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_mainram[0x0ee54/2];
 	int pc = space.device().safe_pc();
@@ -252,7 +252,7 @@ READ16_MEMBER(pgm_arm_type2_state::ddp2_main_speedup_r )
 
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type2_state,ddp2)
+void pgm_arm_type2_state::init_ddp2()
 {
 	pgm_basic_init();
 	pgm_ddp2_decrypt(machine());
@@ -263,14 +263,14 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,ddp2)
 }
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type2_state,dw2001)
+void pgm_arm_type2_state::init_dw2001()
 {
 	pgm_basic_init();
 	kov2_latch_init();
 	pgm_mm_decrypt(machine()); // encryption is the same as martial masters
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type2_state,dwpc)
+void pgm_arm_type2_state::init_dwpc()
 {
 	pgm_basic_init();
 	kov2_latch_init();

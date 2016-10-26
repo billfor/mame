@@ -65,23 +65,23 @@ public:
 	bitmap_ind16 m_helper3;
 	emu_timer *m_collision_timer;
 
-	DECLARE_READ8_MEMBER(collision_r);
-	DECLARE_WRITE8_MEMBER(lockout_w);
-	DECLARE_WRITE8_MEMBER(int_reset_w);
-	DECLARE_WRITE8_MEMBER(video_ram_w);
-	DECLARE_WRITE8_MEMBER(crash_w);
-	DECLARE_WRITE8_MEMBER(explosion_w);
-	DECLARE_WRITE8_MEMBER(bugle_w);
-	DECLARE_WRITE8_MEMBER(bug_w);
-	DECLARE_WRITE8_MEMBER(attract_w);
-	DECLARE_WRITE8_MEMBER(motor_w);
+	uint8_t collision_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void int_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void crash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void explosion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bugle_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void attract_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	DECLARE_DRIVER_INIT(decode);
+	void init_decode();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tank8);
+	void palette_init_tank8(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);

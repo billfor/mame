@@ -58,42 +58,42 @@ public:
 	uint16_t *m_buffered_spriteram;
 	uint16_t m_pri;
 
-	DECLARE_WRITE16_MEMBER(dec0_control_w);
-	DECLARE_WRITE16_MEMBER(slyspy_control_w);
-	DECLARE_WRITE16_MEMBER(midres_sound_w);
-	DECLARE_READ16_MEMBER(slyspy_controls_r);
-	DECLARE_READ16_MEMBER(slyspy_protection_r);
-	DECLARE_WRITE16_MEMBER(slyspy_state_w);
-	DECLARE_READ16_MEMBER(slyspy_state_r);
-	DECLARE_READ16_MEMBER(dec0_controls_r);
-	DECLARE_READ16_MEMBER(dec0_rotary_r);
-	DECLARE_READ16_MEMBER(midres_controls_r);
-	DECLARE_READ8_MEMBER(hippodrm_prot_r);
-	DECLARE_WRITE8_MEMBER(hippodrm_prot_w);
-	DECLARE_READ8_MEMBER(dec0_mcu_port_r);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port_w);
-	DECLARE_READ16_MEMBER(hippodrm_68000_share_r);
-	DECLARE_WRITE16_MEMBER(hippodrm_68000_share_w);
-	DECLARE_WRITE16_MEMBER(sprite_mirror_w);
-	DECLARE_READ16_MEMBER(robocop_68000_share_r);
-	DECLARE_WRITE16_MEMBER(robocop_68000_share_w);
-	DECLARE_WRITE16_MEMBER(dec0_update_sprites_w);
-	DECLARE_WRITE16_MEMBER(dec0_priority_w);
-	DECLARE_READ16_MEMBER(ffantasybl_242024_r);
+	void dec0_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void slyspy_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void midres_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t slyspy_controls_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t slyspy_protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void slyspy_state_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t slyspy_state_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dec0_controls_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dec0_rotary_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t midres_controls_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t hippodrm_prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hippodrm_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dec0_mcu_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dec0_mcu_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t hippodrm_68000_share_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void hippodrm_68000_share_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprite_mirror_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t robocop_68000_share_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void robocop_68000_share_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dec0_update_sprites_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dec0_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ffantasybl_242024_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DRIVER_INIT(robocop);
-	DECLARE_DRIVER_INIT(hippodrm);
-	DECLARE_DRIVER_INIT(hbarrel);
-	DECLARE_DRIVER_INIT(slyspy);
-	DECLARE_DRIVER_INIT(birdtry);
-	DECLARE_DRIVER_INIT(baddudes);
-	DECLARE_DRIVER_INIT(midresb);
-	DECLARE_DRIVER_INIT(ffantasybl);
+	void init_robocop();
+	void init_hippodrm();
+	void init_hbarrel();
+	void init_slyspy();
+	void init_birdtry();
+	void init_baddudes();
+	void init_midresb();
+	void init_ffantasybl();
 
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(slyspy);
-	DECLARE_VIDEO_START(dec0);
-	DECLARE_VIDEO_START(dec0_nodma);
+	void machine_reset_slyspy();
+	void video_start_dec0();
+	void video_start_dec0_nodma();
 
 	uint32_t screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -122,15 +122,15 @@ public:
 	int m_automat_msm5205_vclk_toggle;
 	uint16_t m_automat_scroll_regs[4];
 
-	DECLARE_WRITE16_MEMBER(automat_control_w);
-	DECLARE_WRITE8_MEMBER(automat_adpcm_w);
-	DECLARE_READ16_MEMBER( automat_palette_r );
-	DECLARE_WRITE16_MEMBER( automat_palette_w );
-	DECLARE_WRITE16_MEMBER( automat_scroll_w )
+	void automat_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void automat_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t automat_palette_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void automat_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void automat_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		COMBINE_DATA(&m_automat_scroll_regs[offset]);
 	}
-	DECLARE_WRITE_LINE_MEMBER(automat_vclk_cb);
+	void automat_vclk_cb(int state);
 
 	virtual void machine_start() override;
 

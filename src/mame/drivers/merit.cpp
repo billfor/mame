@@ -105,28 +105,28 @@ public:
 	int m_question_address;
 	int m_decryption_key;
 	optional_shared_ptr<uint8_t> m_backup_ram;
-	DECLARE_READ8_MEMBER(questions_r);
-	DECLARE_WRITE8_MEMBER(low_offset_w);
-	DECLARE_WRITE8_MEMBER(med_offset_w);
-	DECLARE_WRITE8_MEMBER(high_offset_w);
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(casino5_bank_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(rndbit_r);
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE8_MEMBER(led1_w);
-	DECLARE_WRITE8_MEMBER(led2_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(misc_couple_w);
-	DECLARE_DRIVER_INIT(couple);
-	DECLARE_DRIVER_INIT(key_5);
-	DECLARE_DRIVER_INIT(key_4);
-	DECLARE_DRIVER_INIT(key_7);
-	DECLARE_DRIVER_INIT(key_0);
-	DECLARE_DRIVER_INIT(key_2);
-	DECLARE_DRIVER_INIT(dtrvwz5);
+	uint8_t questions_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void low_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void med_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void high_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t palette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void casino5_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value rndbit_r(ioport_field &field, void *param);
+	void hsync_changed(int state);
+	void led1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void led2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void misc_couple_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_couple();
+	void init_key_5();
+	void init_key_4();
+	void init_key_7();
+	void init_key_0();
+	void init_key_2();
+	void init_dtrvwz5();
 	virtual void machine_start() override;
-	DECLARE_MACHINE_START(casino5);
+	void machine_start_casino5();
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	required_device<cpu_device> m_maincpu;
@@ -147,7 +147,7 @@ void merit_state::machine_start()
 }
 
 
-READ8_MEMBER(merit_state::questions_r)
+uint8_t merit_state::questions_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *questions = memregion("user1")->base();
 	int address;
@@ -199,27 +199,27 @@ READ8_MEMBER(merit_state::questions_r)
 	return questions[address];
 }
 
-WRITE8_MEMBER(merit_state::low_offset_w)
+void merit_state::low_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset = (offset & 0xf0) | ((offset - m_decryption_key) & 0x0f);
 	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
 	m_question_address = (m_question_address & 0xffff00) | offset;
 }
 
-WRITE8_MEMBER(merit_state::med_offset_w)
+void merit_state::med_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset = (offset & 0xf0) | ((offset - m_decryption_key) & 0x0f);
 	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
 	m_question_address = (m_question_address & 0xff00ff) | (offset << 8);
 }
 
-WRITE8_MEMBER(merit_state::high_offset_w)
+void merit_state::high_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
 	m_question_address = (m_question_address & 0x00ffff) | (offset << 16);
 }
 
-READ8_MEMBER(merit_state::palette_r)
+uint8_t merit_state::palette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int co;
 
@@ -227,7 +227,7 @@ READ8_MEMBER(merit_state::palette_r)
 	return m_ram_palette[co];
 }
 
-WRITE8_MEMBER(merit_state::palette_w)
+void merit_state::palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int co;
 
@@ -302,14 +302,14 @@ MC6845_UPDATE_ROW( merit_state::crtc_update_row )
 }
 
 
-WRITE_LINE_MEMBER(merit_state::hsync_changed)
+void merit_state::hsync_changed(int state)
 {
 	/* update any video up to the current scanline */
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE8_MEMBER(merit_state::led1_w)
+void merit_state::led1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 5 button lamps player 1 */
 	output().set_led_value(0,~data & 0x01);
@@ -319,7 +319,7 @@ WRITE8_MEMBER(merit_state::led1_w)
 	output().set_led_value(4,~data & 0x10);
 }
 
-WRITE8_MEMBER(merit_state::led2_w)
+void merit_state::led2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 5 button lamps player 2 */
 	output().set_led_value(5,~data & 0x01);
@@ -332,7 +332,7 @@ WRITE8_MEMBER(merit_state::led2_w)
 	machine().bookkeeping().coin_counter_w(0,0x80-(data & 0x80));
 }
 
-WRITE8_MEMBER(merit_state::misc_w)
+void merit_state::misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 0x10);
 	m_extra_video_bank_bit = (data & 2) << 8;
@@ -341,7 +341,7 @@ WRITE8_MEMBER(merit_state::misc_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(merit_state::misc_couple_w)
+void merit_state::misc_couple_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 0x10);
 	m_extra_video_bank_bit = (data & 2) << 8;
@@ -353,7 +353,7 @@ WRITE8_MEMBER(merit_state::misc_couple_w)
 	m_backup_ram[0x1011] = 0xc9; //ret
 }
 
-WRITE8_MEMBER(merit_state::casino5_bank_w)
+void merit_state::casino5_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( data == 0 )
 	{
@@ -371,7 +371,7 @@ WRITE8_MEMBER(merit_state::casino5_bank_w)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(merit_state::rndbit_r)
+ioport_value merit_state::rndbit_r(ioport_field &field, void *param)
 {
 	return machine().rand();
 }
@@ -1346,7 +1346,7 @@ void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 	reinterpret_cast<uint8_t *>(base)[0x1040] = 0xc9; /* ret */
 }
 
-MACHINE_START_MEMBER(merit_state,casino5)
+void merit_state::machine_start_casino5()
 {
 	merit_state::machine_start();
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x2000);
@@ -2355,32 +2355,32 @@ ROM_START( couplei )
 	ROM_LOAD( "7.7a",  0x00000, 0x0800, CRC(6c36361e) SHA1(7a018eecf3d8b7cf8845dcfcf8067feb292933b2) )  /*video timing?*/
 ROM_END
 
-DRIVER_INIT_MEMBER(merit_state,key_0)
+void merit_state::init_key_0()
 {
 	m_decryption_key = 0;
 }
 
-DRIVER_INIT_MEMBER(merit_state,key_2)
+void merit_state::init_key_2()
 {
 	m_decryption_key = 2;
 }
 
-DRIVER_INIT_MEMBER(merit_state,key_4)
+void merit_state::init_key_4()
 {
 	m_decryption_key = 4;
 }
 
-DRIVER_INIT_MEMBER(merit_state,key_5)
+void merit_state::init_key_5()
 {
 	m_decryption_key = 5;
 }
 
-DRIVER_INIT_MEMBER(merit_state,key_7)
+void merit_state::init_key_7()
 {
 	m_decryption_key = 7;
 }
 
-DRIVER_INIT_MEMBER(merit_state,couple)
+void merit_state::init_couple()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -2405,7 +2405,7 @@ DRIVER_INIT_MEMBER(merit_state,couple)
 	membank("bank1")->set_base(ROM + 0x10000 + (0x2000 * 2));
 }
 
-DRIVER_INIT_MEMBER(merit_state,dtrvwz5)
+void merit_state::init_dtrvwz5()
 {
 	int i;
 	uint8_t *ROM = memregion("maincpu")->base();

@@ -352,13 +352,13 @@ public:
 	required_device<segaxbd_state> m_mainpcb;
 
 	// game-specific driver init
-	DECLARE_DRIVER_INIT(generic);
-	DECLARE_DRIVER_INIT(aburner2);
-	DECLARE_DRIVER_INIT(lastsurv);
-	DECLARE_DRIVER_INIT(loffire);
-	DECLARE_DRIVER_INIT(smgp);
-	DECLARE_DRIVER_INIT(rascot);
-	DECLARE_DRIVER_INIT(gprider);
+	void init_generic();
+	void init_aburner2();
+	void init_lastsurv();
+	void init_loffire();
+	void init_smgp();
+	void init_rascot();
+	void init_gprider();
 
 };
 
@@ -379,14 +379,14 @@ public:
 
 	required_device<segaxbd_state> m_subpcb;
 
-	DECLARE_READ16_MEMBER(shareram1_r) {
+	uint16_t shareram1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) {
 		if (offset < 0x10) {
 			int address = (rampage1 << 4) + offset;
 			return shareram[address];
 		}
 		return 0xffff;
 	}
-	DECLARE_WRITE16_MEMBER(shareram1_w) {
+	void shareram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) {
 		if (offset < 0x10) {
 			int address = (rampage1 << 4) + offset;
 			COMBINE_DATA(&shareram[address]);
@@ -394,14 +394,14 @@ public:
 			rampage1 = data & 0x00FF;
 		}
 	}
-	DECLARE_READ16_MEMBER(shareram2_r) {
+	uint16_t shareram2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) {
 		if (offset < 0x10) {
 			int address = (rampage2 << 4) + offset;
 			return shareram[address];
 		}
 		return 0xffff;
 	}
-	DECLARE_WRITE16_MEMBER(shareram2_w) {
+	void shareram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) {
 		if (offset < 0x10) {
 			int address = (rampage2 << 4) + offset;
 			COMBINE_DATA(&shareram[address]);
@@ -410,7 +410,7 @@ public:
 		}
 	}
 
-	DECLARE_DRIVER_INIT(gprider_double);
+	void init_gprider_double();
 
 	uint16_t shareram[0x800];
 	uint16_t rampage1;
@@ -462,7 +462,7 @@ void segaxbd_state::sound_data_w(uint8_t data)
 //  adc_w - handle reads from the ADC
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::adc_r )
+uint16_t segaxbd_state::adc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// on the write, latch the selected input port and stash the value
 	int which = (m_iochip_regs[0][2] >> 2) & 7;
@@ -481,7 +481,7 @@ READ16_MEMBER( segaxbd_state::adc_r )
 //  adc_w - handle writes to the ADC
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::adc_w )
+void segaxbd_state::adc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
@@ -529,7 +529,7 @@ inline uint16_t segaxbd_state::iochip_r(int which, int port, int inputval)
 //  chip
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::iochip_0_r )
+uint16_t segaxbd_state::iochip_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -567,7 +567,7 @@ READ16_MEMBER( segaxbd_state::iochip_0_r )
 //  chip
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::iochip_0_w )
+void segaxbd_state::iochip_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// access is via the low 8 bits
 	if (!ACCESSING_BITS_0_7)
@@ -624,7 +624,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_0_w )
 //  chip
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::iochip_1_r )
+uint16_t segaxbd_state::iochip_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -659,7 +659,7 @@ READ16_MEMBER( segaxbd_state::iochip_1_r )
 //  chip
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::iochip_1_w )
+void segaxbd_state::iochip_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// access is via the low 8 bits
 	if (!ACCESSING_BITS_0_7)
@@ -681,7 +681,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_1_w )
 //  port
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::iocontrol_w )
+void segaxbd_state::iocontrol_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -702,7 +702,7 @@ WRITE16_MEMBER( segaxbd_state::iocontrol_w )
 //  writes to this address for Line of Fire
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::loffire_sync0_w )
+void segaxbd_state::loffire_sync0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_loffire_sync[offset]);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
@@ -713,7 +713,7 @@ WRITE16_MEMBER( segaxbd_state::loffire_sync0_w )
 //  rascot_excs_r - /EXCS region reads for Rascot
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::rascot_excs_r )
+uint16_t segaxbd_state::rascot_excs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//logerror("%06X:rascot_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
 
@@ -728,7 +728,7 @@ READ16_MEMBER( segaxbd_state::rascot_excs_r )
 //  rascot_excs_w - /EXCS region writes for Rascot
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::rascot_excs_w )
+void segaxbd_state::rascot_excs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%06X:rascot_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
@@ -739,7 +739,7 @@ WRITE16_MEMBER( segaxbd_state::rascot_excs_w )
 //  Super Monaco GP
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::smgp_excs_r )
+uint16_t segaxbd_state::smgp_excs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//logerror("%06X:smgp_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
 	return 0xffff;
@@ -751,7 +751,7 @@ READ16_MEMBER( segaxbd_state::smgp_excs_r )
 //  Super Monaco GP
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::smgp_excs_w )
+void segaxbd_state::smgp_excs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
@@ -766,7 +766,7 @@ WRITE16_MEMBER( segaxbd_state::smgp_excs_w )
 //  sound_data_r - read latched sound data
 //-------------------------------------------------
 
-READ8_MEMBER( segaxbd_state::sound_data_r )
+uint8_t segaxbd_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read(space, 0);
@@ -985,7 +985,7 @@ void segaxbd_state::update_main_irqs()
 //  main 68000 is reset
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(segaxbd_state::m68k_reset_callback)
+void segaxbd_state::m68k_reset_callback(int state)
 {
 	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
@@ -1051,7 +1051,7 @@ void segaxbd_state::palette_init()
 //  paletteram_w - handle writes to palette RAM
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::paletteram_w )
+void segaxbd_state::paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// compute the number of entries
 	if (m_palette_entries == 0)
@@ -4740,7 +4740,7 @@ void segaxbd_state::install_aburner2(void)
 	m_iochip_custom_io_w[0][1] = iowrite_delegate(FUNC(segaxbd_state::aburner2_iochip0_motor_w), this);
 }
 
-DRIVER_INIT_MEMBER(segaxbd_new_state,aburner2)
+void segaxbd_new_state::init_aburner2()
 {
 	m_mainpcb->install_aburner2();
 }
@@ -4751,7 +4751,7 @@ void segaxbd_state::install_lastsurv(void)
 	m_iochip_custom_io_w[0][3] = iowrite_delegate(FUNC(segaxbd_state::lastsurv_iochip0_muxer_w), this);
 }
 
-DRIVER_INIT_MEMBER(segaxbd_new_state,lastsurv)
+void segaxbd_new_state::init_lastsurv()
 {
 	m_mainpcb->install_lastsurv();
 }
@@ -4766,7 +4766,7 @@ void segaxbd_state::install_loffire(void)
 }
 
 
-DRIVER_INIT_MEMBER(segaxbd_new_state,loffire)
+void segaxbd_new_state::init_loffire()
 {
 	m_mainpcb->install_loffire();
 }
@@ -4780,12 +4780,12 @@ void segaxbd_state::install_smgp(void)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2f0000, 0x2f3fff, read16_delegate(FUNC(segaxbd_state::smgp_excs_r), this), write16_delegate(FUNC(segaxbd_state::smgp_excs_w), this));
 }
 
-DRIVER_INIT_MEMBER(segaxbd_new_state,smgp)
+void segaxbd_new_state::init_smgp()
 {
 	m_mainpcb->install_smgp();
 }
 
-DRIVER_INIT_MEMBER(segaxbd_new_state,rascot)
+void segaxbd_new_state::init_rascot()
 {
 	// patch out bootup link test
 	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("mainpcb:subcpu")->base());
@@ -4804,13 +4804,13 @@ void segaxbd_state::install_gprider(void)
 
 }
 
-DRIVER_INIT_MEMBER(segaxbd_new_state,gprider)
+void segaxbd_new_state::init_gprider()
 {
 	m_mainpcb->install_gprider();
 }
 
 
-DRIVER_INIT_MEMBER(segaxbd_new_state_double,gprider_double)
+void segaxbd_new_state_double::init_gprider_double()
 {
 	m_mainpcb->install_gprider();
 	m_subpcb->install_gprider();

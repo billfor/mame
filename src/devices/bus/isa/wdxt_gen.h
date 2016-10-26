@@ -46,18 +46,18 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// not really public
-	DECLARE_WRITE_LINE_MEMBER( irq5_w );
-	DECLARE_WRITE_LINE_MEMBER( drq3_w );
-	DECLARE_WRITE_LINE_MEMBER( mr_w );
-	DECLARE_READ8_MEMBER( rd322_r );
-	DECLARE_READ8_MEMBER( ram_r );
-	DECLARE_WRITE8_MEMBER( ram_w );
-	DECLARE_READ8_MEMBER( wd1015_t0_r );
-	DECLARE_READ8_MEMBER( wd1015_t1_r );
-	DECLARE_READ8_MEMBER( wd1015_p1_r );
-	DECLARE_WRITE8_MEMBER( wd1015_p1_w );
-	DECLARE_READ8_MEMBER( wd1015_p2_r );
-	DECLARE_WRITE8_MEMBER( wd1015_p2_w );
+	void irq5_w(int state);
+	void drq3_w(int state);
+	void mr_w(int state);
+	uint8_t rd322_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t wd1015_t0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t wd1015_t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t wd1015_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wd1015_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t wd1015_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wd1015_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

@@ -218,12 +218,12 @@ Stephh's notes (based on the games M6502 code and some tests) :
 /* Emulate DECO 291 protection (for original express raider, code is cracked on the bootleg)*/
 /*****************************************************************************************/
 
-READ8_MEMBER(exprraid_state::exprraid_prot_data_r)
+uint8_t exprraid_state::exprraid_prot_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_prot_value;
 }
 
-READ8_MEMBER(exprraid_state::exprraid_prot_status_r)
+uint8_t exprraid_state::exprraid_prot_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    76543210
@@ -235,7 +235,7 @@ READ8_MEMBER(exprraid_state::exprraid_prot_status_r)
 	return 0x02;
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_prot_data_w)
+void exprraid_state::exprraid_prot_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -260,24 +260,24 @@ WRITE8_MEMBER(exprraid_state::exprraid_prot_data_w)
 	}
 }
 
-READ8_MEMBER(exprraid_state::sound_cpu_command_r)
+uint8_t exprraid_state::sound_cpu_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_slave->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read(space, 0);
 }
 
-WRITE8_MEMBER(exprraid_state::sound_cpu_command_w)
+void exprraid_state::sound_cpu_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_slave->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_int_clear_w)
+void exprraid_state::exprraid_int_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
 }
 
-READ8_MEMBER(exprraid_state::vblank_r)
+uint8_t exprraid_state::vblank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("IN0")->read();
 }
@@ -318,13 +318,13 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, exprraid_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_deco16)
+void exprraid_state::coin_inserted_deco16(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval && !newval)
 		m_maincpu->set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_nmi)
+void exprraid_state::coin_inserted_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, oldval ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -476,7 +476,7 @@ GFXDECODE_END
 
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(exprraid_state::irqhandler)
+void exprraid_state::irqhandler(int state)
 {
 	m_slave->set_input_line_and_vector(0, state, 0xff);
 }
@@ -835,7 +835,7 @@ void exprraid_state::exprraid_gfx_expand()
 	}
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,wexpressb)
+void exprraid_state::init_wexpressb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -852,18 +852,18 @@ DRIVER_INIT_MEMBER(exprraid_state,wexpressb)
 	exprraid_gfx_expand();
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,exprraid)
+void exprraid_state::init_exprraid()
 {
 	exprraid_gfx_expand();
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,wexpressb2)
+void exprraid_state::init_wexpressb2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(exprraid_state::vblank_r),this));
 	exprraid_gfx_expand();
 }
 
-DRIVER_INIT_MEMBER(exprraid_state,wexpressb3)
+void exprraid_state::init_wexpressb3()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xFFC0, 0xFFC0, read8_delegate(FUNC(exprraid_state::vblank_r),this));
 	exprraid_gfx_expand();

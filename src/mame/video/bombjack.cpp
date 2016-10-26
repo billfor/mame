@@ -11,19 +11,19 @@
 #include "emu.h"
 #include "includes/bombjack.h"
 
-WRITE8_MEMBER(bombjack_state::bombjack_videoram_w)
+void bombjack_state::bombjack_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bombjack_state::bombjack_colorram_w)
+void bombjack_state::bombjack_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bombjack_state::bombjack_background_w)
+void bombjack_state::bombjack_background_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_background_image != data)
 	{
@@ -32,7 +32,7 @@ WRITE8_MEMBER(bombjack_state::bombjack_background_w)
 	}
 }
 
-WRITE8_MEMBER(bombjack_state::bombjack_flipscreen_w)
+void bombjack_state::bombjack_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (data & 0x01))
 	{
@@ -41,7 +41,7 @@ WRITE8_MEMBER(bombjack_state::bombjack_flipscreen_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(bombjack_state::get_bg_tile_info)
+void bombjack_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *tilerom = memregion("gfx4")->base();
 
@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(bombjack_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(bombjack_state::get_fg_tile_info)
+void bombjack_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 16 * (m_colorram[tile_index] & 0x10);
 	int color = m_colorram[tile_index] & 0x0f;

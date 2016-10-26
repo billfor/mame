@@ -75,47 +75,47 @@ public:
 
 	tilemap_t *m_alpha_tilemap;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(spyhuntertec_paletteram_w);
-	DECLARE_DRIVER_INIT(spyhuntertec);
-//  DECLARE_VIDEO_START(spyhuntertec);
+	void spyhuntertec_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_spyhuntertec();
+//  void video_start_spyhuntertec();
 //  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
-	DECLARE_WRITE8_MEMBER(spyhuntertec_fd00_w);
-	DECLARE_WRITE8_MEMBER(spyhuntertec_portf0_w);
+	void spyhuntertec_port04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spyhuntertec_fd00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spyhuntertec_portf0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(spyhunt_videoram_w);
-	DECLARE_WRITE8_MEMBER(spyhunt_alpharam_w);
-	DECLARE_WRITE8_MEMBER(spyhunt_scroll_value_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack);
+	void spyhunt_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spyhunt_alpharam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spyhunt_scroll_value_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_irq_ack(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 
-	DECLARE_WRITE8_MEMBER(ay1_porta_w);
-	DECLARE_READ8_MEMBER(ay1_porta_r);
+	void ay1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ay1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(ay2_porta_w);
-	DECLARE_READ8_MEMBER(ay2_porta_r);
+	void ay2_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ay2_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(spyhuntertec_in2_r);
-	DECLARE_READ8_MEMBER(spyhuntertec_in3_r);
+	uint8_t spyhuntertec_in2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spyhuntertec_in3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	TILEMAP_MAPPER_MEMBER(spyhunt_bg_scan);
-	TILE_GET_INFO_MEMBER(spyhunt_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(spyhunt_get_alpha_tile_info);
+	tilemap_memory_index spyhunt_bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void spyhunt_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void spyhunt_get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(analog_count_callback);
+	void analog_count_callback(timer_device &timer, void *ptr, int32_t param);
 	void reset_analog_timer();
 
 	uint8_t m_analog_select;
 	uint8_t m_analog_count;
 };
 
-WRITE8_MEMBER(spyhuntertec_state::ay1_porta_w)
+void spyhuntertec_state::ay1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("ay1_porta_w %02x\n", data);
 }
 
-READ8_MEMBER(spyhuntertec_state::ay1_porta_r)
+uint8_t spyhuntertec_state::ay1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("ay1_porta_r\n");
 	return 0;
@@ -127,14 +127,14 @@ void spyhuntertec_state::reset_analog_timer()
 	m_analog_timer->adjust(attotime::from_nsec(9400));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(spyhuntertec_state::analog_count_callback)
+void spyhuntertec_state::analog_count_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_analog_count != 0)
 		m_analog_count--;
 	reset_analog_timer();
 }
 
-WRITE8_MEMBER(spyhuntertec_state::ay2_porta_w)
+void spyhuntertec_state::ay2_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d7: latch analog counter on falling edge, d0 selects which one
 	if (~data & m_analog_select & 0x80)
@@ -146,7 +146,7 @@ WRITE8_MEMBER(spyhuntertec_state::ay2_porta_w)
 	m_analog_select = data;
 }
 
-READ8_MEMBER(spyhuntertec_state::ay2_porta_r)
+uint8_t spyhuntertec_state::ay2_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // read often, even if port is set to output mode
 // maybe latches something?
@@ -154,7 +154,7 @@ READ8_MEMBER(spyhuntertec_state::ay2_porta_r)
 	return 0x00; // not sure value matters
 }
 
-WRITE8_MEMBER(spyhuntertec_state::spyhunt_videoram_w)
+void spyhuntertec_state::spyhunt_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -162,14 +162,14 @@ WRITE8_MEMBER(spyhuntertec_state::spyhunt_videoram_w)
 }
 
 
-WRITE8_MEMBER(spyhuntertec_state::spyhunt_alpharam_w)
+void spyhuntertec_state::spyhunt_alpharam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spyhunt_alpharam[offset] = data;
 	m_alpha_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(spyhuntertec_state::spyhunt_scroll_value_w)
+void spyhuntertec_state::spyhunt_scroll_value_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -192,7 +192,7 @@ WRITE8_MEMBER(spyhuntertec_state::spyhunt_scroll_value_w)
 }
 
 
-WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_paletteram_w)
+void spyhuntertec_state::spyhuntertec_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 	offset = (offset & 0x0f) | (offset & 0x60) >> 1;
@@ -205,14 +205,14 @@ WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_paletteram_w)
 }
 
 
-TILEMAP_MAPPER_MEMBER(spyhuntertec_state::spyhunt_bg_scan)
+tilemap_memory_index spyhuntertec_state::spyhunt_bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) | ((col & 0x3f) << 4) | ((row & 0x10) << 6);
 }
 
 
-TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_bg_tile_info)
+void spyhuntertec_state::spyhunt_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -221,7 +221,7 @@ TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_alpha_tile_info)
+void spyhuntertec_state::spyhunt_get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(2, m_spyhunt_alpharam[tile_index], 0, 0);
 }
@@ -334,14 +334,14 @@ uint32_t spyhuntertec_state::screen_update_spyhuntertec(screen_device &screen, b
 
 
 
-WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_fd00_w)
+void spyhuntertec_state::spyhuntertec_fd00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%04x spyhuntertec_fd00_w %02x\n", space.device().safe_pc(), data);
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
+uint8_t spyhuntertec_state::spyhuntertec_in2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// it writes 04 / 14 to the sound latch (spyhuntertec_fd00_w) before
 	// reading bit 6 here a minimum of 32 times.
@@ -416,7 +416,7 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 	return (ioport("IN2")->read() & ~0x40) | ((m_analog_count == 0) ? 0x40 : 0x00);
 }
 
-READ8_MEMBER(spyhuntertec_state::spyhuntertec_in3_r)
+uint8_t spyhuntertec_state::spyhuntertec_in3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = ioport("IN3")->read();
 //  printf("%04x spyhuntertec_in3_r\n", space.device().safe_pc());
@@ -446,11 +446,11 @@ static ADDRESS_MAP_START( spyhuntertec_map, AS_PROGRAM, 8, spyhuntertec_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram2") // actual spriteram for this hw??
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_port04_w)
+void spyhuntertec_state::spyhuntertec_port04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(spyhuntertec_state::spyhuntertec_portf0_w)
+void spyhuntertec_state::spyhuntertec_portf0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 0x08 on startup, then 0x03, probably CTC leftovers from the original.
 	if ((data != 0x03) && (data != 0x08)) printf("spyhuntertec_portf0_w %02x\n", data);
@@ -475,7 +475,7 @@ static ADDRESS_MAP_START( spyhuntertec_sound_map, AS_PROGRAM, 8, spyhuntertec_st
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(spyhuntertec_state::sound_irq_ack)
+void spyhuntertec_state::sound_irq_ack(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
@@ -805,7 +805,7 @@ ROM_START( spyhuntpr )
 	ROM_LOAD( "14.bin",  0x00000, 0x1000, CRC(87a4c130) SHA1(7792afdc36b0f3bd51c387d04d38f60c85fd2e93) )
 ROM_END
 
-DRIVER_INIT_MEMBER(spyhuntertec_state,spyhuntertec)
+void spyhuntertec_state::init_spyhuntertec()
 {
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;

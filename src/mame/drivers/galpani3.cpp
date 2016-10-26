@@ -109,16 +109,16 @@ public:
 	uint32_t m_spriteram32[0x4000/4];
 	uint32_t m_spc_regs[0x40/4];
 
-	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32_w);
-	DECLARE_WRITE16_MEMBER(galpani3_suprnova_sprite32regs_w);
-	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrollx_w);
-	DECLARE_WRITE16_MEMBER(galpani3_priority_buffer_scrolly_w);
+	void galpani3_suprnova_sprite32_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galpani3_suprnova_sprite32regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galpani3_priority_buffer_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galpani3_priority_buffer_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 
 	virtual void video_start() override;
 
 	uint32_t screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
+	void galpani3_vblank(timer_device &timer, void *ptr, int32_t param);
 	int gp3_is_alpha_pen(int pen);
 };
 
@@ -131,7 +131,7 @@ public:
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(galpani3_state::galpani3_vblank)// 2, 3, 5 ?
+void galpani3_state::galpani3_vblank(timer_device &timer, void *ptr, int32_t param)// 2, 3, 5 ?
 {
 	int scanline = param;
 
@@ -431,26 +431,26 @@ static INPUT_PORTS_START( galpani3 )
 INPUT_PORTS_END
 
 
-WRITE16_MEMBER(galpani3_state::galpani3_suprnova_sprite32_w)
+void galpani3_state::galpani3_suprnova_sprite32_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 	offset>>=1;
 	m_spriteram32[offset]=(m_spriteram[offset*2+1]<<16) | (m_spriteram[offset*2]);
 }
 
-WRITE16_MEMBER(galpani3_state::galpani3_suprnova_sprite32regs_w)
+void galpani3_state::galpani3_suprnova_sprite32regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sprregs[offset]);
 	offset>>=1;
 	m_spc_regs[offset]=(m_sprregs[offset*2+1]<<16) | (m_sprregs[offset*2]);
 }
 
-WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrollx_w)
+void galpani3_state::galpani3_priority_buffer_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_priority_buffer_scrollx = data;
 }
 
-WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrolly_w)
+void galpani3_state::galpani3_priority_buffer_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_priority_buffer_scrolly = data;
 }

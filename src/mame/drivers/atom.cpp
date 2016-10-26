@@ -181,7 +181,7 @@ QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
      eprom_r - EPROM slot select read
 -------------------------------------------------*/
 
-READ8_MEMBER( atomeb_state::eprom_r )
+uint8_t atomeb_state::eprom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_eprom;
 }
@@ -190,7 +190,7 @@ READ8_MEMBER( atomeb_state::eprom_r )
      eprom_w - EPROM slot select write
 -------------------------------------------------*/
 
-WRITE8_MEMBER( atomeb_state::eprom_w )
+void atomeb_state::eprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER( atomeb_state::eprom_w )
  ext_r - read external roms at 0xa000
  -------------------------------------------------*/
 
-READ8_MEMBER( atomeb_state::ext_r )
+uint8_t atomeb_state::ext_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_ext[m_eprom & 0x0f]->exists())
 		return m_ext[m_eprom & 0x0f]->read_rom(space, offset);
@@ -227,7 +227,7 @@ READ8_MEMBER( atomeb_state::ext_r )
  dor_r - read DOS roms at 0xe000
  -------------------------------------------------*/
 
-READ8_MEMBER( atomeb_state::dos_r )
+uint8_t atomeb_state::dos_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_e0->exists() && !BIT(m_eprom, 7))
 		return m_e0->read_rom(space, offset);
@@ -307,10 +307,10 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    INPUT_CHANGED_MEMBER( trigger_reset )
+    void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 -------------------------------------------------*/
 
-INPUT_CHANGED_MEMBER( atom_state::trigger_reset )
+void atom_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -448,7 +448,7 @@ INPUT_PORTS_END
     I8255 interface
 -------------------------------------------------*/
 
-WRITE8_MEMBER( atom_state::ppi_pa_w )
+void atom_state::ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -475,7 +475,7 @@ WRITE8_MEMBER( atom_state::ppi_pa_w )
 	m_vdg->gm2_w(BIT(data, 7));
 }
 
-READ8_MEMBER( atom_state::ppi_pb_r )
+uint8_t atom_state::ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -513,7 +513,7 @@ READ8_MEMBER( atom_state::ppi_pb_r )
 	return data;
 }
 
-READ8_MEMBER( atom_state::ppi_pc_r )
+uint8_t atom_state::ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -547,7 +547,7 @@ READ8_MEMBER( atom_state::ppi_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( atom_state::ppi_pc_w )
+void atom_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -579,7 +579,7 @@ WRITE8_MEMBER( atom_state::ppi_pc_w )
     i8271 interface
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
+void atom_state::atom_8271_interrupt_callback(int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
@@ -600,7 +600,7 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 	m_previous_i8271_int_state = state;
 }
 
-WRITE_LINE_MEMBER( atom_state::motor_w )
+void atom_state::motor_w(int state)
 {
 	for (int i=0; i != 2; i++) {
 		char devname[1];
@@ -612,7 +612,7 @@ WRITE_LINE_MEMBER( atom_state::motor_w )
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(atom_state::cassette_output_tick)
+void atom_state::cassette_output_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	int level = !(!(!m_hz2400 && m_pc1) && m_pc0);
 
@@ -625,7 +625,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atom_state::cassette_output_tick)
     mc6847 interface
 -------------------------------------------------*/
 
-READ8_MEMBER( atom_state::vdg_videoram_r )
+uint8_t atom_state::vdg_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == ~0) return 0xff;
 
@@ -951,7 +951,7 @@ ROM_END
 //  ROM_LOAD( "atommc2-2.9-a000.rom", 0x2000, 0x1000, CRC(ba73e36c) SHA1(ea9739e96f3283c90b5306288c796fc01144b771) )
 //ROM_END
 
-DRIVER_INIT_MEMBER(atomeb_state, atomeb)
+void atomeb_state::init_atomeb()
 {
 	// these have to be set here, so that we can pass m_ext[*] to device_image_load!
 	char str[8];

@@ -73,7 +73,7 @@ void hd63450_device::device_reset()
 	m_drq_state[0] = m_drq_state[1] = m_drq_state[2] = m_drq_state[3] = 0;
 }
 
-READ16_MEMBER(hd63450_device::read)
+uint16_t hd63450_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int channel,reg;
 
@@ -122,7 +122,7 @@ READ16_MEMBER(hd63450_device::read)
 	return 0xff;
 }
 
-WRITE16_MEMBER(hd63450_device::write)
+void hd63450_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int channel,reg;
 
@@ -274,7 +274,7 @@ void hd63450_device::set_timer(int channel, const attotime &tm)
 		m_timer[channel]->adjust(attotime::zero, channel, m_our_clock[channel]);
 }
 
-TIMER_CALLBACK_MEMBER(hd63450_device::dma_transfer_timer)
+void hd63450_device::dma_transfer_timer(void *ptr, int32_t param)
 {
 	if(((m_reg[param].ocr & 3) == 2) && !m_drq_state[param])
 		return;
@@ -487,7 +487,7 @@ void hd63450_device::single_transfer(int x)
 		}
 }
 
-WRITE_LINE_MEMBER(hd63450_device::drq0_w)
+void hd63450_device::drq0_w(int state)
 {
 	bool ostate = m_drq_state[0];
 	m_drq_state[0] = state;
@@ -502,7 +502,7 @@ WRITE_LINE_MEMBER(hd63450_device::drq0_w)
 		m_timer[0]->adjust(attotime::never);
 }
 
-WRITE_LINE_MEMBER(hd63450_device::drq1_w)
+void hd63450_device::drq1_w(int state)
 {
 	bool ostate = m_drq_state[1];
 	m_drq_state[1] = state;
@@ -516,7 +516,7 @@ WRITE_LINE_MEMBER(hd63450_device::drq1_w)
 		m_timer[1]->adjust(attotime::never);
 }
 
-WRITE_LINE_MEMBER(hd63450_device::drq2_w)
+void hd63450_device::drq2_w(int state)
 {
 	bool ostate = m_drq_state[2];
 	m_drq_state[2] = state;
@@ -530,7 +530,7 @@ WRITE_LINE_MEMBER(hd63450_device::drq2_w)
 		m_timer[2]->adjust(attotime::never);
 }
 
-WRITE_LINE_MEMBER(hd63450_device::drq3_w)
+void hd63450_device::drq3_w(int state)
 {
 	bool ostate = m_drq_state[3];
 	m_drq_state[3] = state;

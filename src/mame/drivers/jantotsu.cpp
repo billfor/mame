@@ -124,19 +124,19 @@ public:
 	uint8_t    m_col_bank;
 	uint8_t    m_display_on;
 	uint8_t    m_bitmap[0x8000];
-	DECLARE_READ8_MEMBER(jantotsu_bitmap_r);
-	DECLARE_WRITE8_MEMBER(jantotsu_bitmap_w);
-	DECLARE_WRITE8_MEMBER(bankaddr_w);
-	DECLARE_READ8_MEMBER(jantotsu_mux_r);
-	DECLARE_WRITE8_MEMBER(jantotsu_mux_w);
-	DECLARE_READ8_MEMBER(jantotsu_dsw2_r);
-	DECLARE_WRITE8_MEMBER(jan_adpcm_w);
+	uint8_t jantotsu_bitmap_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jantotsu_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankaddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t jantotsu_mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jantotsu_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t jantotsu_dsw2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jan_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jantotsu);
+	void palette_init_jantotsu(palette_device &palette);
 	uint32_t screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(jan_adpcm_int);
+	void jan_adpcm_int(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
 	required_device<palette_device> m_palette;
@@ -188,17 +188,17 @@ uint32_t jantotsu_state::screen_update_jantotsu(screen_device &screen, bitmap_rg
 }
 
 /* banked vram */
-READ8_MEMBER(jantotsu_state::jantotsu_bitmap_r)
+uint8_t jantotsu_state::jantotsu_bitmap_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bitmap[offset + ((m_vram_bank & 3) * 0x2000)];
 }
 
-WRITE8_MEMBER(jantotsu_state::jantotsu_bitmap_w)
+void jantotsu_state::jantotsu_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bitmap[offset + ((m_vram_bank & 3) * 0x2000)] = data;
 }
 
-WRITE8_MEMBER(jantotsu_state::bankaddr_w)
+void jantotsu_state::bankaddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_bank = ((data & 0xc0) >> 6);
 
@@ -209,7 +209,7 @@ WRITE8_MEMBER(jantotsu_state::bankaddr_w)
 		logerror("I/O port $07 write trips %02x\n",data);
 }
 
-PALETTE_INIT_MEMBER(jantotsu_state, jantotsu)
+void jantotsu_state::palette_init_jantotsu(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2, r, g, b;
@@ -242,7 +242,7 @@ PALETTE_INIT_MEMBER(jantotsu_state, jantotsu)
  *************************************/
 
 /*Multiplexer is mapped as 6-bits reads,bits 6 & 7 are always connected to the coin mechs.*/
-READ8_MEMBER(jantotsu_state::jantotsu_mux_r)
+uint8_t jantotsu_state::jantotsu_mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const char *const portnames[] = { "PL1_1", "PL1_2", "PL1_3", "PL1_4",
 										"PL2_1", "PL2_2", "PL2_3", "PL2_4" };
@@ -260,7 +260,7 @@ READ8_MEMBER(jantotsu_state::jantotsu_mux_r)
 	return res;
 }
 
-WRITE8_MEMBER(jantotsu_state::jantotsu_mux_w)
+void jantotsu_state::jantotsu_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = data;
 }
@@ -269,12 +269,12 @@ WRITE8_MEMBER(jantotsu_state::jantotsu_mux_w)
   so I'm guessing that these bits can't be read by the z80 at all but directly
   hard-wired to the video chip. However I need the schematics / pcb snaps and/or
   a side-by-side test (to know if the background colors really works) to be sure. */
-READ8_MEMBER(jantotsu_state::jantotsu_dsw2_r)
+uint8_t jantotsu_state::jantotsu_dsw2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW2")->read() & 0x3f) | 0x80;
 }
 
-WRITE8_MEMBER(jantotsu_state::jan_adpcm_w)
+void jantotsu_state::jan_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -297,7 +297,7 @@ WRITE8_MEMBER(jantotsu_state::jan_adpcm_w)
 	}
 }
 
-WRITE_LINE_MEMBER(jantotsu_state::jan_adpcm_int)
+void jantotsu_state::jan_adpcm_int(int state)
 {
 	if (m_adpcm_pos >= 0x10000 || m_adpcm_idle)
 	{

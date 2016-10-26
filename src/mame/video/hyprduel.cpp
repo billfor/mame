@@ -63,7 +63,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
                             Palette GGGGGRRRRRBBBBBx
 ***************************************************************************/
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_paletteram_w)
+void hyprduel_state::hyprduel_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_paletteram[offset]);
 	m_palette->set_pen_color(offset, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
@@ -249,39 +249,39 @@ inline void hyprduel_state::hyprduel_vram_w( offs_t offset, uint16_t data, uint1
 
 
 
-TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_0_8bit)
+void hyprduel_state::get_tile_info_0_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info_8bit(tileinfo, tile_index, 0, m_vram_0);
 }
 
-TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_1_8bit)
+void hyprduel_state::get_tile_info_1_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info_8bit(tileinfo, tile_index, 1, m_vram_1);
 }
 
-TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_2_8bit)
+void hyprduel_state::get_tile_info_2_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info_8bit(tileinfo, tile_index, 2, m_vram_2);
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_vram_0_w)
+void hyprduel_state::hyprduel_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	hyprduel_vram_w(offset, data, mem_mask, 0, m_vram_0);
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_vram_1_w)
+void hyprduel_state::hyprduel_vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	hyprduel_vram_w(offset, data, mem_mask, 1, m_vram_1);
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_vram_2_w)
+void hyprduel_state::hyprduel_vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	hyprduel_vram_w(offset, data, mem_mask, 2, m_vram_2);
 }
 
 
 /* Dirty the relevant tilemap when its window changes */
-WRITE16_MEMBER(hyprduel_state::hyprduel_window_w)
+void hyprduel_state::hyprduel_window_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t olddata = m_window[offset];
 	uint16_t newdata = COMBINE_DATA(&m_window[offset]);
@@ -343,7 +343,7 @@ void hyprduel_state::expand_gfx1(hyprduel_state &state)
 	}
 }
 
-VIDEO_START_MEMBER(hyprduel_state,common_14220)
+void hyprduel_state::video_start_common_14220()
 {
 	expand_gfx1(*this);
 	alloc_empty_tiles();
@@ -376,18 +376,18 @@ VIDEO_START_MEMBER(hyprduel_state,common_14220)
 	machine().save().register_postload(save_prepost_delegate(FUNC(hyprduel_state::hyprduel_postload), this));
 }
 
-VIDEO_START_MEMBER(hyprduel_state,hyprduel_14220)
+void hyprduel_state::video_start_hyprduel_14220()
 {
 	m_sprite_yoffs_sub = 2;
 
-	VIDEO_START_CALL_MEMBER(common_14220);
+	video_start_common_14220();
 }
 
-VIDEO_START_MEMBER(hyprduel_state,magerror_14220)
+void hyprduel_state::video_start_magerror_14220()
 {
 	m_sprite_yoffs_sub = 0;
 
-	VIDEO_START_CALL_MEMBER(common_14220);
+	video_start_common_14220();
 }
 
 /***************************************************************************
@@ -587,7 +587,7 @@ void hyprduel_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
                                 Screen Drawing
 ***************************************************************************/
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_scrollreg_w)
+void hyprduel_state::hyprduel_scrollreg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t window = m_window[offset];
 
@@ -599,7 +599,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_scrollreg_w)
 		m_bg_tilemap[offset / 2]->set_scrolly(0, m_scroll[offset] - window - (window & 7));
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_scrollreg_init_w)
+void hyprduel_state::hyprduel_scrollreg_init_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i;
 

@@ -63,10 +63,10 @@ public:
 	  structure (e.g. TILE_FLIPX)
 	*/
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( rom_r );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,uint32_t priority);
 	void wraparound_enable(int status);
 
@@ -92,7 +92,7 @@ private:
 	int m_layermask;
 	k051316_cb_delegate m_k051316_cb;
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
 
 extern const device_type K051316;

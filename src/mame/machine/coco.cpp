@@ -303,7 +303,7 @@ uint8_t coco_state::floating_bus_read(void)
 //  ff00_write
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::ff00_read )
+uint8_t coco_state::ff00_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pia_0->read(space, offset, mem_mask);
 }
@@ -314,7 +314,7 @@ READ8_MEMBER( coco_state::ff00_read )
 //  ff00_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::ff00_write )
+void coco_state::ff00_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia_0->write(space, offset, data, mem_mask);
 }
@@ -325,7 +325,7 @@ WRITE8_MEMBER( coco_state::ff00_write )
 //  pia0_pa_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::pia0_pa_w )
+void coco_state::pia0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	poll_keyboard();
 }
@@ -336,7 +336,7 @@ WRITE8_MEMBER( coco_state::pia0_pa_w )
 //  pia0_pb_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::pia0_pb_w )
+void coco_state::pia0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	poll_keyboard();
 }
@@ -347,7 +347,7 @@ WRITE8_MEMBER( coco_state::pia0_pb_w )
 //  pia0_ca2_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia0_ca2_w )
+void coco_state::pia0_ca2_w(int state)
 {
 	update_sound();     // analog mux SEL1 is tied to PIA0 CA2
 	poll_keyboard();
@@ -359,7 +359,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_ca2_w )
 //  pia0_cb2_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia0_cb2_w )
+void coco_state::pia0_cb2_w(int state)
 {
 	update_sound();     // analog mux SEL2 is tied to PIA0 CB2
 	poll_keyboard();
@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_cb2_w )
 //  pia0_irq_a
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia0_irq_a )
+void coco_state::pia0_irq_a(int state)
 {
 	recalculate_irq();
 }
@@ -382,7 +382,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_irq_a )
 //  pia0_irq_b
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
+void coco_state::pia0_irq_b(int state)
 {
 	recalculate_irq();
 }
@@ -413,7 +413,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
 //  ff20_read
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::ff20_read )
+uint8_t coco_state::ff20_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pia_1->read(space, offset, mem_mask);
 }
@@ -424,7 +424,7 @@ READ8_MEMBER( coco_state::ff20_read )
 //  ff20_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::ff20_write )
+void coco_state::ff20_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* write to the PIA */
 	m_pia_1->write(space, offset, data, mem_mask);
@@ -439,7 +439,7 @@ WRITE8_MEMBER( coco_state::ff20_write )
 //  pia1_pa_r
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::pia1_pa_r )
+uint8_t coco_state::pia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Port A: we need to specify the values of all the lines, regardless of whether
 	// they are in input or output mode in the DDR
@@ -455,7 +455,7 @@ READ8_MEMBER( coco_state::pia1_pa_r )
 //  serial-in (PB0)
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::pia1_pb_r )
+uint8_t coco_state::pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Port B: lines in output mode are handled automatically by the PIA object.
 	// We only need to specify the input lines here
@@ -484,7 +484,7 @@ READ8_MEMBER( coco_state::pia1_pb_r )
 //  pia1_pa_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::pia1_pa_w )
+void coco_state::pia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pia1_pa_changed(data);
 }
@@ -495,7 +495,7 @@ WRITE8_MEMBER( coco_state::pia1_pa_w )
 //  pia1_pb_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::pia1_pb_w )
+void coco_state::pia1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pia1_pb_changed(data);
 }
@@ -506,7 +506,7 @@ WRITE8_MEMBER( coco_state::pia1_pb_w )
 //  pia1_ca2_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia1_ca2_w )
+void coco_state::pia1_ca2_w(int state)
 {
 	m_cassette->change_state(
 		state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
@@ -519,7 +519,7 @@ WRITE_LINE_MEMBER( coco_state::pia1_ca2_w )
 //  pia1_cb2_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia1_cb2_w )
+void coco_state::pia1_cb2_w(int state)
 {
 	update_sound();     // SOUND_ENABLE is connected to PIA1 CB2
 }
@@ -530,7 +530,7 @@ WRITE_LINE_MEMBER( coco_state::pia1_cb2_w )
 //  pia1_firq_a
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia1_firq_a )
+void coco_state::pia1_firq_a(int state)
 {
 	recalculate_firq();
 }
@@ -541,7 +541,7 @@ WRITE_LINE_MEMBER( coco_state::pia1_firq_a )
 //  pia1_firq_b
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia1_firq_b )
+void coco_state::pia1_firq_b(int state)
 {
 	recalculate_firq();
 }
@@ -1008,7 +1008,7 @@ void coco_state::pia1_pb_changed(uint8_t data)
 //  keyboard_changed
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER(coco_state::keyboard_changed)
+void coco_state::keyboard_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	poll_keyboard();
 }
@@ -1019,7 +1019,7 @@ INPUT_CHANGED_MEMBER(coco_state::keyboard_changed)
 //  joystick_mode_changed
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER(coco_state::joystick_mode_changed)
+void coco_state::joystick_mode_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	poll_keyboard();
 }
@@ -1118,7 +1118,7 @@ coco_vhd_image_device *coco_state::current_vhd(void)
 //  ff60_read
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::ff60_read )
+uint8_t coco_state::ff60_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result;
 
@@ -1140,7 +1140,7 @@ READ8_MEMBER( coco_state::ff60_read )
 //  ff60_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::ff60_write )
+void coco_state::ff60_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((current_vhd() != nullptr) && (offset >= 32) && (offset <= 37))
 	{
@@ -1163,7 +1163,7 @@ WRITE8_MEMBER( coco_state::ff60_write )
 //  ff40_read
 //-------------------------------------------------
 
-READ8_MEMBER( coco_state::ff40_read )
+uint8_t coco_state::ff40_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 1 && offset <= 2 && m_beckerportconfig.read_safe(0) == 1)
 	{
@@ -1179,7 +1179,7 @@ READ8_MEMBER( coco_state::ff40_read )
 //  ff40_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( coco_state::ff40_write )
+void coco_state::ff40_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 1 && offset <= 2 && m_beckerportconfig.read_safe(0) == 1)
 	{

@@ -60,11 +60,11 @@ public:
 
 	/* misc */
 	int      m_ay_data;
-	DECLARE_WRITE8_MEMBER(dynadice_videoram_w);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
-	DECLARE_DRIVER_INIT(dynadice);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void dynadice_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_dynadice();
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -74,19 +74,19 @@ public:
 };
 
 
-WRITE8_MEMBER(dynadice_state::dynadice_videoram_w)
+void dynadice_state::dynadice_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_top_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(dynadice_state::sound_data_w)
+void dynadice_state::sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ay_data = data;
 }
 
-WRITE8_MEMBER(dynadice_state::sound_control_w)
+void dynadice_state::sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 /*
@@ -203,7 +203,7 @@ static GFXDECODE_START( dynadice )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  0, 1 ) /* 3bpp */
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER(dynadice_state::get_tile_info)
+void dynadice_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
@@ -289,7 +289,7 @@ ROM_START( dynadice )
 	ROM_LOAD( "dy_5.bin",     0x0000, 0x0800, CRC(e4799462) SHA1(5cd0f003572540522d72706bc5a8fa6588553031) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dynadice_state,dynadice)
+void dynadice_state::init_dynadice()
 {
 	int i, j;
 	uint8_t *usr1 = memregion("user1")->base();

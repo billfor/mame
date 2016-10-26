@@ -47,24 +47,24 @@ public:
 		, m_bank3(*this, "bank3")
 	{ }
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(serial_dsr_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(serial_rx_r);
-	DECLARE_WRITE8_MEMBER(display_ctrl_w);
-	DECLARE_WRITE8_MEMBER(port80_w);
-	DECLARE_WRITE8_MEMBER(serial_tx_w);
-	DECLARE_WRITE8_MEMBER(serial_dtr_w);
-	DECLARE_WRITE8_MEMBER(serial_rts_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(irqctrl_w);
-	DECLARE_WRITE8_MEMBER(memmap_w);
-	DECLARE_PALETTE_INIT(hunter2);
-	DECLARE_DRIVER_INIT(hunter2);
-	DECLARE_WRITE_LINE_MEMBER(timer0_out);
-	DECLARE_WRITE_LINE_MEMBER(timer1_out);
-	DECLARE_WRITE_LINE_MEMBER(cts_w);
-	DECLARE_WRITE_LINE_MEMBER(rxd_w);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t serial_dsr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t serial_rx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void display_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void serial_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void serial_dtr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void serial_rts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irqctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void memmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_init_hunter2(palette_device &palette);
+	void init_hunter2();
+	void timer0_out(int state);
+	void timer1_out(int state);
+	void cts_w(int state);
+	void rxd_w(int state);
 
 private:
 	uint8_t m_keydata;
@@ -187,7 +187,7 @@ static INPUT_PORTS_START( hunter2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
 INPUT_PORTS_END
 
-READ8_MEMBER( hunter2_state::keyboard_r )
+uint8_t hunter2_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t i,data = 0xff;
 	for (i = 0; i < 7; i++)
@@ -202,7 +202,7 @@ READ8_MEMBER( hunter2_state::keyboard_r )
 	return data;
 }
 
-READ8_MEMBER( hunter2_state::serial_dsr_r )
+uint8_t hunter2_state::serial_dsr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0x00;
 
@@ -212,13 +212,13 @@ READ8_MEMBER( hunter2_state::serial_dsr_r )
 	return res;
 }
 
-WRITE8_MEMBER( hunter2_state::keyboard_w )
+void hunter2_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keydata = data;
 	//logerror("Key row select %02x\n",data);
 }
 
-READ8_MEMBER( hunter2_state::serial_rx_r )
+uint8_t hunter2_state::serial_rx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0x28;
 
@@ -230,7 +230,7 @@ READ8_MEMBER( hunter2_state::serial_rx_r )
 	return res;
 }
 
-WRITE8_MEMBER( hunter2_state::display_ctrl_w )
+void hunter2_state::display_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* according to the website,
 Bit 2: Backlight toggle
@@ -239,29 +239,29 @@ Bits 1,0,7,6: Contrast level.
 */
 }
 
-WRITE8_MEMBER( hunter2_state::port80_w )
+void hunter2_state::port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( hunter2_state::serial_tx_w )
+void hunter2_state::serial_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rs232->write_txd(data & 0x01);
 //  logerror("TXD write %02x\n",data);
 }
 
-WRITE8_MEMBER( hunter2_state::serial_dtr_w )
+void hunter2_state::serial_dtr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rs232->write_dtr(data & 0x01);
 //  logerror("DTR write %02x\n",data);
 }
 
-WRITE8_MEMBER( hunter2_state::serial_rts_w )
+void hunter2_state::serial_rts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rs232->write_rts(data & 0x01);
 //  logerror("RTS write %02x\n",data);
 }
 
-WRITE8_MEMBER( hunter2_state::speaker_w )
+void hunter2_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 0));
 }
@@ -272,7 +272,7 @@ Bit 1 = Enable RSTC interrupts
 Bit 2 = Enable RSTB interrupts
 Bit 3 = Enable RSTA interrupts
 */
-WRITE8_MEMBER( hunter2_state::irqctrl_w )
+void hunter2_state::irqctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data;
 	if(!(data & 0x08))
@@ -294,7 +294,7 @@ data   bank0    bank1    bank2
 ....
 8F     61       62       63
 */
-WRITE8_MEMBER( hunter2_state::memmap_w )
+void hunter2_state::memmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data < 0x0a)
 	{
@@ -322,32 +322,32 @@ void hunter2_state::machine_reset()
 }
 
 // it is presumed that writing to rom will go nowhere
-DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
+void hunter2_state::init_hunter2()
 {
 	uint8_t *ram = m_ram->base();
 
 	m_nvram->set_base(ram,m_ram->bytes());
 }
 
-PALETTE_INIT_MEMBER(hunter2_state, hunter2)
+void hunter2_state::palette_init_hunter2(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-WRITE_LINE_MEMBER(hunter2_state::timer0_out)
+void hunter2_state::timer0_out(int state)
 {
 	if(state == ASSERT_LINE)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE_LINE_MEMBER(hunter2_state::timer1_out)
+void hunter2_state::timer1_out(int state)
 {
 	if(m_irq_mask & 0x08)
 		m_maincpu->set_input_line(NSC800_RSTA, state);
 }
 
-WRITE_LINE_MEMBER(hunter2_state::cts_w)
+void hunter2_state::cts_w(int state)
 {
 	if(BIT(m_irq_mask, 1))
 	{
@@ -356,7 +356,7 @@ WRITE_LINE_MEMBER(hunter2_state::cts_w)
 	}
 }
 
-WRITE_LINE_MEMBER(hunter2_state::rxd_w)
+void hunter2_state::rxd_w(int state)
 {
 	if(BIT(m_irq_mask, 2))
 		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);

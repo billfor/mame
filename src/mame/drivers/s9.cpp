@@ -55,27 +55,27 @@ public:
 		, m_pia30(*this, "pia30")
 	{ }
 
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w) { };
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w) { }; // solenoids 0-7
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	DECLARE_MACHINE_RESET(s9);
-	DECLARE_DRIVER_INIT(s9);
+	uint8_t sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dig0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dig1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void sol2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // solenoids 8-15
+	void sol3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // solenoids 0-7
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int pia21_ca1_r();
+	void pia21_ca2_w(int state);
+	void pia21_cb2_w(int state) { }; // enable solenoids
+	void pia24_cb2_w(int state) { }; // dummy to stop error log filling up
+	void pia28_ca2_w(int state) { }; // comma3&4
+	void pia28_cb2_w(int state) { }; // comma1&2
+	void pia_irq(int state);
+	void main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void machine_reset_s9();
+	void init_s9();
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -192,38 +192,38 @@ static INPUT_PORTS_START( s9 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( s9_state::main_nmi )
+void s9_state::main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( s9_state::audio_nmi )
+void s9_state::audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER( s9_state::sound_w )
+void s9_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_data = data;
 }
 
-READ_LINE_MEMBER( s9_state::pia21_ca1_r )
+int s9_state::pia21_ca1_r()
 {
 // sound busy
 	return 1;
 }
 
-WRITE_LINE_MEMBER( s9_state::pia21_ca2_w )
+void s9_state::pia21_ca2_w(int state)
 {
 // sound ns
 	m_pias->ca1_w(state);
 }
 
-WRITE8_MEMBER( s9_state::dig0_w )
+void s9_state::dig0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
@@ -232,7 +232,7 @@ WRITE8_MEMBER( s9_state::dig0_w )
 	output().set_digit_value(60, patterns[data>>4]); // diag digit
 }
 
-WRITE8_MEMBER( s9_state::dig1_w )
+void s9_state::dig1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
@@ -243,24 +243,24 @@ WRITE8_MEMBER( s9_state::dig1_w )
 	m_data_ok = false;
 }
 
-READ8_MEMBER( s9_state::switch_r )
+uint8_t s9_state::switch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
 	return ioport(kbdrow)->read() ^ 0xff;
 }
 
-WRITE8_MEMBER( s9_state::switch_w )
+void s9_state::switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbdrow = data;
 }
 
-READ8_MEMBER( s9_state::sound_r )
+uint8_t s9_state::sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_data;
 }
 
-WRITE_LINE_MEMBER( s9_state::pia_irq )
+void s9_state::pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{
@@ -298,11 +298,11 @@ void s9_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 	}
 }
 
-MACHINE_RESET_MEMBER( s9_state, s9 )
+void s9_state::machine_reset_s9()
 {
 }
 
-DRIVER_INIT_MEMBER( s9_state, s9 )
+void s9_state::init_s9()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);

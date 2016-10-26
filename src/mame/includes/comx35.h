@@ -69,19 +69,19 @@ public:
 
 	void check_interrupt();
 
-	DECLARE_READ8_MEMBER( mem_r );
-	DECLARE_WRITE8_MEMBER( mem_w );
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
-	DECLARE_WRITE8_MEMBER( cdp1869_w );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE8_MEMBER( sc_w );
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( prd_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	uint8_t mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cdp1869_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int clear_r();
+	int ef2_r();
+	int ef4_r();
+	void q_w(int state);
+	void sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_w(int state);
+	void prd_w(int state);
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( comx35_comx );
 	void image_fread_memory(device_image_interface &image, uint16_t addr, uint32_t count);
 	CDP1869_CHAR_RAM_READ_MEMBER(comx35_charram_r);

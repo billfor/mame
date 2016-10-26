@@ -68,22 +68,22 @@ inline void m72_state::m82_m84_get_tile_info(tile_data &tileinfo,int tile_index,
 }
 
 
-TILE_GET_INFO_MEMBER(m72_state::get_bg_tile_info)
+void m72_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	m72_m81_get_tile_info(tileinfo,tile_index,m_videoram2,m_bg_source);
 }
 
-TILE_GET_INFO_MEMBER(m72_state::get_fg_tile_info)
+void m72_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	m72_m81_get_tile_info(tileinfo,tile_index,m_videoram1,m_fg_source);
 }
 
-TILE_GET_INFO_MEMBER(m72_state::rtype2_get_bg_tile_info)
+void m72_state::rtype2_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	m82_m84_get_tile_info(tileinfo,tile_index,m_videoram2,1);
 }
 
-TILE_GET_INFO_MEMBER(m72_state::rtype2_get_fg_tile_info)
+void m72_state::rtype2_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	m82_m84_get_tile_info(tileinfo,tile_index,m_videoram1,1);
 }
@@ -109,7 +109,7 @@ void m72_state::register_savestate()
 }
 
 
-VIDEO_START_MEMBER(m72_state,m72)
+void m72_state::video_start_m72()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -143,9 +143,9 @@ VIDEO_START_MEMBER(m72_state,m72)
 	register_savestate();
 }
 
-VIDEO_START_MEMBER(m72_state,xmultipl)
+void m72_state::video_start_xmultipl()
 {
-	VIDEO_START_CALL_MEMBER(m72);
+	video_start_m72();
 
 	m_fg_tilemap->set_scrolldx(4,64);
 	m_fg_tilemap->set_scrolldy(-128, 0);
@@ -156,9 +156,9 @@ VIDEO_START_MEMBER(m72_state,xmultipl)
 }
 
 
-VIDEO_START_MEMBER(m72_state,hharry)
+void m72_state::video_start_hharry()
 {
-	VIDEO_START_CALL_MEMBER(m72);
+	video_start_m72();
 
 	m_bg_tilemap->set_transmask(2,0x0001,0xfffe); // ? maybe the standard logic is ok.
 
@@ -174,13 +174,13 @@ VIDEO_START_MEMBER(m72_state,hharry)
 
 /* Major Title has a larger background RAM, and rowscroll */
 // the Air Duel conversion on the same PCB does not, is it jumper selectable, or a register, or a different RAM chip?
-TILEMAP_MAPPER_MEMBER(m72_state::m82_scan_rows)
+tilemap_memory_index m72_state::m82_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return row*256 + col;
 }
 
-VIDEO_START_MEMBER(m72_state,m82)
+void m72_state::video_start_m82()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -219,7 +219,7 @@ VIDEO_START_MEMBER(m72_state,m82)
 
 
 // M84
-VIDEO_START_MEMBER(m72_state,rtype2)
+void m72_state::video_start_rtype2()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -246,9 +246,9 @@ VIDEO_START_MEMBER(m72_state,rtype2)
 }
 
 
-VIDEO_START_MEMBER(m72_state,hharryu)
+void m72_state::video_start_hharryu()
 {
-	VIDEO_START_CALL_MEMBER(rtype2);
+	video_start_rtype2();
 
 	m_fg_tilemap->set_scrolldx(4,3);
 	m_bg_tilemap->set_scrolldx(6,0);
@@ -257,9 +257,9 @@ VIDEO_START_MEMBER(m72_state,hharryu)
 }
 
 // m85
-VIDEO_START_MEMBER(m72_state,poundfor)
+void m72_state::video_start_poundfor()
 {
-	VIDEO_START_CALL_MEMBER(rtype2);
+	video_start_rtype2();
 
 	m_fg_tilemap->set_scrolldx(6,0);
 	m_bg_tilemap->set_scrolldx(6,0);
@@ -278,7 +278,7 @@ VIDEO_START_MEMBER(m72_state,poundfor)
 
 ***************************************************************************/
 
-READ16_MEMBER(m72_state::palette1_r)
+uint16_t m72_state::palette1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
@@ -286,7 +286,7 @@ READ16_MEMBER(m72_state::palette1_r)
 	return m_generic_paletteram_16[offset] | 0xffe0;    /* only D0-D4 are connected */
 }
 
-READ16_MEMBER(m72_state::palette2_r)
+uint16_t m72_state::palette2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
@@ -299,7 +299,7 @@ inline void m72_state::changecolor(int color,int r,int g,int b)
 	m_palette->set_pen_color(color,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
-WRITE16_MEMBER(m72_state::palette1_w)
+void m72_state::palette1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
@@ -312,7 +312,7 @@ WRITE16_MEMBER(m72_state::palette1_w)
 			m_generic_paletteram_16[offset + 0x400]);
 }
 
-WRITE16_MEMBER(m72_state::palette2_w)
+void m72_state::palette2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
@@ -325,13 +325,13 @@ WRITE16_MEMBER(m72_state::palette2_w)
 			m_generic_paletteram2_16[offset + 0x400]);
 }
 
-WRITE16_MEMBER(m72_state::videoram1_w)
+void m72_state::videoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(m72_state::videoram2_w)
+void m72_state::videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset/2);
@@ -342,44 +342,44 @@ WRITE16_MEMBER(m72_state::videoram2_w)
 
 }
 
-WRITE16_MEMBER(m72_state::irq_line_w)
+void m72_state::irq_line_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_raster_irq_position);
 //  printf("m_raster_irq_position %04x\n", m_raster_irq_position);
 }
 
-WRITE16_MEMBER(m72_state::scrollx1_w)
+void m72_state::scrollx1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrollx1);
 }
 
-WRITE16_MEMBER(m72_state::scrollx2_w)
+void m72_state::scrollx2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrollx2);
 }
 
-WRITE16_MEMBER(m72_state::scrolly1_w)
+void m72_state::scrolly1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrolly1);
 }
 
-WRITE16_MEMBER(m72_state::scrolly2_w)
+void m72_state::scrolly2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrolly2);
 }
 
-WRITE16_MEMBER(m72_state::dmaon_w)
+void m72_state::dmaon_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
 }
 
 
-WRITE16_MEMBER(m72_state::port02_w)
+void m72_state::port02_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -405,7 +405,7 @@ WRITE16_MEMBER(m72_state::port02_w)
 	}
 }
 
-WRITE16_MEMBER(m72_state::rtype2_port02_w)
+void m72_state::rtype2_port02_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -428,7 +428,7 @@ WRITE16_MEMBER(m72_state::rtype2_port02_w)
 
 
 /* the following is mostly a kludge. This register seems to be used for something else */
-WRITE16_MEMBER(m72_state::m82_gfx_ctrl_w)
+void m72_state::m82_gfx_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -439,7 +439,7 @@ WRITE16_MEMBER(m72_state::m82_gfx_ctrl_w)
 
 }
 
-WRITE16_MEMBER(m72_state::m82_tm_ctrl_w)
+void m72_state::m82_tm_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_m82_tmcontrol);
 //  printf("tmcontrol %04x\n", m_m82_tmcontrol);

@@ -16,7 +16,7 @@ Knuckle Joe - (c) 1985 Taito Corporation
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(kncljoe_state, kncljoe)
+void kncljoe_state::palette_init_kncljoe(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -80,7 +80,7 @@ PALETTE_INIT_MEMBER(kncljoe_state, kncljoe)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(kncljoe_state::get_bg_tile_info)
+void kncljoe_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[2 * tile_index + 1];
 	int code = m_videoram[2 * tile_index] + ((attr & 0xc0) << 2) + (m_tile_bank << 10);
@@ -114,13 +114,13 @@ void kncljoe_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(kncljoe_state::kncljoe_videoram_w)
+void kncljoe_state::kncljoe_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(kncljoe_state::kncljoe_control_w)
+void kncljoe_state::kncljoe_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	/*
@@ -154,7 +154,7 @@ WRITE8_MEMBER(kncljoe_state::kncljoe_control_w)
 	}
 }
 
-WRITE8_MEMBER(kncljoe_state::kncljoe_scroll_w)
+void kncljoe_state::kncljoe_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int scrollx;
 

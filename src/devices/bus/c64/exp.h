@@ -118,12 +118,12 @@ public:
 	int exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 
 	// cartridge interface
-	DECLARE_READ8_MEMBER( dma_cd_r ) { return m_read_dma_cd(offset); }
-	DECLARE_WRITE8_MEMBER( dma_cd_w ) { m_write_dma_cd(offset, data); }
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
-	DECLARE_WRITE_LINE_MEMBER( dma_w ) { m_write_dma(state); }
-	DECLARE_WRITE_LINE_MEMBER( reset_w ) { m_write_reset(state); }
+	uint8_t dma_cd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_read_dma_cd(offset); }
+	void dma_cd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_write_dma_cd(offset, data); }
+	void irq_w(int state) { m_write_irq(state); }
+	void nmi_w(int state) { m_write_nmi(state); }
+	void dma_w(int state) { m_write_dma(state); }
+	void reset_w(int state) { m_write_reset(state); }
 	int phi2() { return clock(); }
 	int dotclock() { return phi2() * 8; }
 	int hiram() { return m_hiram; }

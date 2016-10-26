@@ -23,7 +23,7 @@ In debug build press 'w' for spotlight and 'e' for lightning
 
 
 
-TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
+void pitnrun_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
 		0);
 }
 
-TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info2)
+void pitnrun_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -41,19 +41,19 @@ TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info2)
 		0);
 }
 
-WRITE8_MEMBER(pitnrun_state::videoram_w)
+void pitnrun_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg ->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pitnrun_state::videoram2_w)
+void pitnrun_state::videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_bg ->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pitnrun_state::char_bank_select)
+void pitnrun_state::char_bank_select(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_char_bank!=data)
 	{
@@ -63,28 +63,28 @@ WRITE8_MEMBER(pitnrun_state::char_bank_select)
 }
 
 
-WRITE8_MEMBER(pitnrun_state::scroll_w)
+void pitnrun_state::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll = (m_scroll & (0xff<<((offset)?0:8))) |( data<<((offset)?8:0));
 	m_bg->set_scrollx(0, m_scroll);
 }
 
-WRITE8_MEMBER(pitnrun_state::ha_w)
+void pitnrun_state::ha_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ha=data;
 }
 
-WRITE8_MEMBER(pitnrun_state::h_heed_w)
+void pitnrun_state::h_heed_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_h_heed=data;
 }
 
-WRITE8_MEMBER(pitnrun_state::v_heed_w)
+void pitnrun_state::v_heed_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_v_heed=data;
 }
 
-WRITE8_MEMBER(pitnrun_state::color_select_w)
+void pitnrun_state::color_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color_select=data;
 	machine().tilemap().mark_all_dirty();
@@ -108,7 +108,7 @@ void pitnrun_state::spotlights()
 }
 
 
-PALETTE_INIT_MEMBER(pitnrun_state, pitnrun)
+void pitnrun_state::palette_init_pitnrun(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

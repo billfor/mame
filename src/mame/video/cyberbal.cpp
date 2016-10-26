@@ -21,7 +21,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha_tile_info)
+void cyberbal_state::get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0xfff;
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield_tile_info)
+void cyberbal_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x1fff;
@@ -102,7 +102,7 @@ void cyberbal_state::video_start_common(int screens)
 }
 
 
-VIDEO_START_MEMBER(cyberbal_state,cyberbal)
+void cyberbal_state::video_start_cyberbal()
 {
 	video_start_common(2);
 
@@ -112,7 +112,7 @@ VIDEO_START_MEMBER(cyberbal_state,cyberbal)
 }
 
 
-VIDEO_START_MEMBER(cyberbal_state,cyberbal2p)
+void cyberbal_state::video_start_cyberbal2p()
 {
 	video_start_common(1);
 

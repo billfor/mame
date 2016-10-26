@@ -112,7 +112,7 @@ NETLIST_END()
 
 
 
-INTERRUPT_GEN_MEMBER(popeye_state::popeye_interrupt)
+void popeye_state::popeye_interrupt(device_t &device)
 {
 	m_field ^= 1;
 	/* NMIs are enabled by the I register?? How can that be? */
@@ -124,7 +124,7 @@ INTERRUPT_GEN_MEMBER(popeye_state::popeye_interrupt)
 /* the protection device simply returns the last two values written shifted left */
 /* by a variable amount. */
 
-READ8_MEMBER(popeye_state::protection_r)
+uint8_t popeye_state::protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -137,7 +137,7 @@ READ8_MEMBER(popeye_state::protection_r)
 	}
 }
 
-WRITE8_MEMBER(popeye_state::protection_w)
+void popeye_state::protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( popeye_io_map, AS_IO, 8, popeye_state )
 ADDRESS_MAP_END
 
 
-CUSTOM_INPUT_MEMBER(popeye_state::dsw1_read)
+ioport_value popeye_state::dsw1_read(ioport_field &field, void *param)
 {
 	return ioport("DSW1")->read() >> m_dswbit;
 }
@@ -294,7 +294,7 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-CUSTOM_INPUT_MEMBER( popeye_state::pop_field_r )
+ioport_value popeye_state::pop_field_r(ioport_field &field, void *param)
 {
 	return m_field ^ 1;
 }
@@ -440,7 +440,7 @@ GFXDECODE_END
 
 
 
-WRITE8_MEMBER(popeye_state::popeye_portB_w)
+void popeye_state::popeye_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 flips screen */
 	flip_screen_set(data & 1);
@@ -718,7 +718,7 @@ ROM_START( popeyej )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(popeye_state,skyskipr)
+void popeye_state::init_skyskipr()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
@@ -737,7 +737,7 @@ DRIVER_INIT_MEMBER(popeye_state,skyskipr)
 	save_item(NAME(m_prot_shift));
 }
 
-DRIVER_INIT_MEMBER(popeye_state,popeye)
+void popeye_state::init_popeye()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();

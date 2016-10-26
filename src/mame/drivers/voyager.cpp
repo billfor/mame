@@ -36,8 +36,8 @@ public:
 	uint8_t m_piix4_config_reg[4][256];
 
 	uint32_t m_idle_skip_ram;
-	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_DRIVER_INIT(voyager);
+	void bios_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void init_voyager();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
@@ -208,7 +208,7 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 	}
 }
 
-WRITE32_MEMBER(voyager_state::bios_ram_w)
+void voyager_state::bios_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//if (m_mtxc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
 			if (m_mtxc_config_reg[0x63] & 0x50)
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( voyager, voyager_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(voyager_state,voyager)
+void voyager_state::init_voyager()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
 

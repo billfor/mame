@@ -44,7 +44,7 @@ cosmicg - board can operate in b&w mode if there is no PROM, in this case
 
 /* Schematics show 12 triggers for discrete sound circuits */
 
-WRITE8_MEMBER(cosmic_state::panic_sound_output_w)
+void cosmic_state::panic_sound_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Sound Enable / Disable */
 	if (offset == 11)
@@ -110,7 +110,7 @@ WRITE8_MEMBER(cosmic_state::panic_sound_output_w)
 	#endif
 }
 
-WRITE8_MEMBER(cosmic_state::panic_sound_output2_w)
+void cosmic_state::panic_sound_output2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_sound_enabled)
 	{
@@ -126,7 +126,7 @@ WRITE8_MEMBER(cosmic_state::panic_sound_output2_w)
 #endif
 }
 
-WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
+void cosmic_state::cosmicg_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Sound Enable / Disable */
 	if (offset == 12)
@@ -188,7 +188,7 @@ WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
 }
 
 
-WRITE8_MEMBER(cosmic_state::cosmica_sound_output_w)
+void cosmic_state::cosmica_sound_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Sound Enable / Disable */
 	if (offset == 11)
@@ -325,23 +325,23 @@ WRITE8_MEMBER(cosmic_state::cosmica_sound_output_w)
 	#endif
 }
 
-WRITE8_MEMBER(cosmic_state::dac_w)
+void cosmic_state::dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(BIT(data, 7));
 }
 
-READ8_MEMBER(cosmic_state::cosmica_pixel_clock_r)
+uint8_t cosmic_state::cosmica_pixel_clock_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_screen->vpos() >> 2) & 0x3f;
 }
 
-READ8_MEMBER(cosmic_state::cosmicg_port_0_r)
+uint8_t cosmic_state::cosmicg_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
 	return (m_in_ports[0]->read() & 0xf0) | ((m_screen->vpos() & 0xf0) >> 4);
 }
 
-READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
+uint8_t cosmic_state::magspot_coinage_dip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_dsw.read_safe(0) & (1 << (7 - offset))) ? 0 : 1;
 }
@@ -349,7 +349,7 @@ READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
 
 /* Has 8 way joystick, remap combinations to missing directions */
 
-READ8_MEMBER(cosmic_state::nomnlnd_port_0_1_r)
+uint8_t cosmic_state::nomnlnd_port_0_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int control = m_in_ports[offset]->read();
 	int fire = m_in_ports[3]->read();
@@ -368,7 +368,7 @@ READ8_MEMBER(cosmic_state::nomnlnd_port_0_1_r)
 
 
 
-WRITE8_MEMBER(cosmic_state::flip_screen_w)
+void cosmic_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x80);
 }
@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER(cosmic_state::panic_coin_inserted)
+void cosmic_state::panic_coin_inserted(int state)
 {
 	if (m_sound_enabled && !state) m_samples->start(0, 10);   /* Coin - Not triggered by software */
 
@@ -496,7 +496,7 @@ static INPUT_PORTS_START( panic )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, cosmic_state, panic_coin_inserted)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(cosmic_state::cosmica_coin_inserted)
+void cosmic_state::cosmica_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -551,7 +551,7 @@ INPUT_PORTS_END
 
 /* Offsets are in BYTES, so bits 0-7 are at offset 0 etc.   */
 
-INPUT_CHANGED_MEMBER(cosmic_state::cosmicg_coin_inserted)
+void cosmic_state::cosmicg_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INT_9980A_LEVEL4, newval? ASSERT_LINE : CLEAR_LINE);
 }
@@ -598,12 +598,12 @@ static INPUT_PORTS_START( cosmicg )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW:6" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(cosmic_state::coin_inserted_irq0)
+void cosmic_state::coin_inserted_irq0(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(0, newval ? HOLD_LINE : CLEAR_LINE);
 }
 
-INPUT_CHANGED_MEMBER(cosmic_state::coin_inserted_nmi)
+void cosmic_state::coin_inserted_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -966,7 +966,7 @@ static const char *const cosmicg_sample_names[] =
 };
 
 
-MACHINE_START_MEMBER(cosmic_state,cosmic)
+void cosmic_state::machine_start_cosmic()
 {
 	save_item(NAME(m_sound_enabled));
 	save_item(NAME(m_march_select));
@@ -978,7 +978,7 @@ MACHINE_START_MEMBER(cosmic_state,cosmic)
 	save_item(NAME(m_color_registers));
 }
 
-MACHINE_RESET_MEMBER(cosmic_state,cosmic)
+void cosmic_state::machine_reset_cosmic()
 {
 	m_pixel_clock = 0;
 	m_background_enable = 0;
@@ -987,7 +987,7 @@ MACHINE_RESET_MEMBER(cosmic_state,cosmic)
 	m_color_registers[2] = 0;
 }
 
-MACHINE_RESET_MEMBER(cosmic_state,cosmicg)
+void cosmic_state::machine_reset_cosmicg()
 {
 	m_pixel_clock = 0;
 	m_background_enable = 0;
@@ -1014,7 +1014,7 @@ static MACHINE_CONFIG_START( cosmic, cosmic_state )
 	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
+void cosmic_state::panic_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -1542,7 +1542,7 @@ ROM_START( nomnlndg )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cosmic_state,cosmicg)
+void cosmic_state::init_cosmicg()
 {
 	/* Program ROMs have data pins connected different from normal */
 	offs_t offs, len;
@@ -1567,20 +1567,20 @@ DRIVER_INIT_MEMBER(cosmic_state,cosmicg)
 }
 
 
-DRIVER_INIT_MEMBER(cosmic_state,cosmica)
+void cosmic_state::init_cosmica()
 {
 	m_sound_enabled = 1;
 	m_dive_bomb_b_select = 0;
 }
 
 
-DRIVER_INIT_MEMBER(cosmic_state,devzone)
+void cosmic_state::init_devzone()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807,write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(cosmic_state,nomnlnd)
+void cosmic_state::init_nomnlnd()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x4800, 0x4800);
@@ -1588,7 +1588,7 @@ DRIVER_INIT_MEMBER(cosmic_state,nomnlnd)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(cosmic_state::dac_w), this));
 }
 
-DRIVER_INIT_MEMBER(cosmic_state,panic)
+void cosmic_state::init_panic()
 {
 	m_sound_enabled = 1;
 }

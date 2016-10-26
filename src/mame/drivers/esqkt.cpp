@@ -115,18 +115,18 @@ public:
 
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_irq_handler(int state);
+	void duart_tx_a(int state);
+	void duart_tx_b(int state);
+	void duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_duart_io;
 	bool  m_bCalibSecondByte;
 
 public:
-	DECLARE_DRIVER_INIT(kt);
-	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
-	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	void init_kt();
+	void esq5506_otto_irq(int state);
+	uint16_t esq5506_read_adc(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 };
 
 void esqkt_state::machine_reset()
@@ -143,14 +143,14 @@ static ADDRESS_MAP_START( kt_map, AS_PROGRAM, 32, esqkt_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER(esqkt_state::esq5506_otto_irq)
+void esqkt_state::esq5506_otto_irq(int state)
 {
 	#if 0   // 5505/06 IRQ generation needs (more) work
 	m_maincpu->set_input_line(1, state);
 	#endif
 }
 
-READ16_MEMBER(esqkt_state::esq5506_read_adc)
+uint16_t esqkt_state::esq5506_read_adc(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch ((m_duart_io & 7) ^ 7)
 	{
@@ -174,24 +174,24 @@ READ16_MEMBER(esqkt_state::esq5506_read_adc)
 	}
 }
 
-WRITE_LINE_MEMBER(esqkt_state::duart_irq_handler)
+void esqkt_state::duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
 
-WRITE8_MEMBER(esqkt_state::duart_output)
+void esqkt_state::duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_duart_io = data;
 
 //    printf("DUART output: %02x (PC=%x)\n", data, m_maincpu->pc());
 }
 
-WRITE_LINE_MEMBER(esqkt_state::duart_tx_a)
+void esqkt_state::duart_tx_a(int state)
 {
 	m_mdout->write_txd(state);
 }
 
-WRITE_LINE_MEMBER(esqkt_state::duart_tx_b)
+void esqkt_state::duart_tx_b(int state)
 {
 	m_sq1panel->rx_w(state);
 }
@@ -260,7 +260,7 @@ ROM_START( kt76 )
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esqkt_state, kt)
+void esqkt_state::init_kt()
 {
 	m_duart_io = 0;
 }

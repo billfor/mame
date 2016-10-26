@@ -35,19 +35,19 @@
 /*
     TODO: Check interrupt timing from CRT config. Probably different between games.
 */
-TIMER_CALLBACK_MEMBER(tx1_state::interrupt_callback)
+void tx1_state::interrupt_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 
-READ16_MEMBER(tx1_state::tx1_crtc_r)
+uint16_t tx1_state::tx1_crtc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_crtc_w)
+void tx1_state::tx1_crtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 if (PRINT_CRTC_DATA)
 {
@@ -113,7 +113,7 @@ enum
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(tx1_state,tx1)
+void tx1_state::palette_init_tx1(palette_device &palette)
 {
 	const uint8_t *const color_prom = &m_proms[0];
 	int i;
@@ -147,7 +147,7 @@ PALETTE_INIT_MEMBER(tx1_state,tx1)
  *
  *************************************/
 
-WRITE16_MEMBER(tx1_state::tx1_bankcs_w)
+void tx1_state::tx1_bankcs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	vregs_t &tx1_vregs = m_vregs;
 
@@ -200,7 +200,7 @@ WRITE16_MEMBER(tx1_state::tx1_bankcs_w)
 	}
 }
 
-WRITE16_MEMBER(tx1_state::tx1_slincs_w)
+void tx1_state::tx1_slincs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 1)
 		m_vregs.slin_inc = data;
@@ -208,17 +208,17 @@ WRITE16_MEMBER(tx1_state::tx1_slincs_w)
 		m_vregs.slin_inc = m_vregs.slin_val = 0;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_slock_w)
+void tx1_state::tx1_slock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vregs.slock = data & 1;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_scolst_w)
+void tx1_state::tx1_scolst_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vregs.scol = data & 0x0707;
 }
 
-WRITE16_MEMBER(tx1_state::tx1_flgcs_w)
+void tx1_state::tx1_flgcs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vregs.flags = data & 0xff;
 }
@@ -1096,7 +1096,7 @@ void tx1_state::tx1_draw_objects(uint8_t *bitmap)
  *
  *************************************/
 
-VIDEO_START_MEMBER(tx1_state,tx1)
+void tx1_state::video_start_tx1()
 {
 	/* Allocate a large bitmap that covers the three screens */
 	m_bitmap = std::make_unique<bitmap_ind16>(768, 256);
@@ -1252,7 +1252,7 @@ uint32_t tx1_state::screen_update_tx1_right(screen_device &screen, bitmap_ind16 
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(tx1_state,buggyboy)
+void tx1_state::palette_init_buggyboy(palette_device &palette)
 {
 	const uint8_t *const color_prom = &m_proms[0];
 	int i;
@@ -2832,7 +2832,7 @@ void tx1_state::buggyboy_draw_objs(uint8_t *bitmap, bool wide)
     /WASET  = 24A0-F, 24B0-F
     /FLAGS  = 24E0-F, 24F0-F
 */
-WRITE16_MEMBER(tx1_state::buggyboy_gas_w)
+void tx1_state::buggyboy_gas_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	vregs_t &vregs = m_vregs;
 	offset <<= 1;
@@ -2905,12 +2905,12 @@ WRITE16_MEMBER(tx1_state::buggyboy_gas_w)
 	vregs.gas = data;
 }
 
-WRITE16_MEMBER(tx1_state::buggyboy_sky_w)
+void tx1_state::buggyboy_sky_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vregs.sky = data;
 }
 
-WRITE16_MEMBER(tx1_state::buggyboy_scolst_w)
+void tx1_state::buggyboy_scolst_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vregs.scol = data;
 }
@@ -2989,7 +2989,7 @@ void tx1_state::bb_combine_layers(bitmap_ind16 &bitmap, int screen)
 	}
 }
 
-VIDEO_START_MEMBER(tx1_state,buggyboy)
+void tx1_state::video_start_buggyboy()
 {
 	/* Allocate some bitmaps */
 	m_chr_bmp = std::make_unique<uint8_t[]>(3 * 256 * 240);
@@ -3003,7 +3003,7 @@ VIDEO_START_MEMBER(tx1_state,buggyboy)
 	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
-VIDEO_START_MEMBER(tx1_state,buggybjr)
+void tx1_state::video_start_buggybjr()
 {
 	/* Allocate some bitmaps */
 	m_chr_bmp = std::make_unique<uint8_t[]>(256 * 240);

@@ -64,22 +64,22 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
+	void apple2_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(tk2000);
+	void palette_init_tk2000(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_WRITE8_MEMBER(c000_w);
-	DECLARE_READ8_MEMBER(c080_r);
-	DECLARE_WRITE8_MEMBER(c080_w);
-	DECLARE_READ8_MEMBER(c100_r);
-	DECLARE_WRITE8_MEMBER(c100_w);
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t c000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t c080_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c080_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t c100_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	int m_speaker_state;
@@ -133,7 +133,7 @@ void tk2000_state::machine_reset()
     VIDEO
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(tk2000_state::apple2_interrupt)
+void tk2000_state::apple2_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -147,7 +147,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tk2000_state::apple2_interrupt)
 	}
 }
 
-PALETTE_INIT_MEMBER(tk2000_state, tk2000)
+void tk2000_state::palette_init_tk2000(palette_device &palette)
 {
 	m_video->palette_init_apple2(palette);
 }
@@ -214,7 +214,7 @@ void tk2000_state::do_io(address_space &space, int offset)
 	}
 }
 
-READ8_MEMBER(tk2000_state::c000_r)
+uint8_t tk2000_state::c000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -236,7 +236,7 @@ READ8_MEMBER(tk2000_state::c000_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(tk2000_state::c000_w)
+void tk2000_state::c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -267,21 +267,21 @@ WRITE8_MEMBER(tk2000_state::c000_w)
 	}
 }
 
-READ8_MEMBER(tk2000_state::c080_r)
+uint8_t tk2000_state::c080_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(tk2000_state::c080_w)
+void tk2000_state::c080_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(tk2000_state::c100_r)
+uint8_t tk2000_state::c100_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram_ptr[offset + 0xc100];
 }
 
-WRITE8_MEMBER(tk2000_state::c100_w)
+void tk2000_state::c100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_ptr[offset + 0xc100] = data;
 }
@@ -420,7 +420,7 @@ uint8_t tk2000_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-READ8_MEMBER(tk2000_state::ram_r)
+uint8_t tk2000_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < m_ram_size)
 	{
@@ -430,7 +430,7 @@ READ8_MEMBER(tk2000_state::ram_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(tk2000_state::ram_w)
+void tk2000_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < m_ram_size)
 	{

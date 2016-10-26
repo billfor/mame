@@ -32,16 +32,16 @@ public:
 
 	/* game id */
 	int m_game_id;
-	DECLARE_READ8_MEMBER(circus_paddle_r);
-	DECLARE_WRITE8_MEMBER(circus_videoram_w);
-	DECLARE_WRITE8_MEMBER(circus_clown_x_w);
-	DECLARE_WRITE8_MEMBER(circus_clown_y_w);
-	DECLARE_WRITE8_MEMBER(circus_clown_z_w);
-	DECLARE_DRIVER_INIT(ripcord);
-	DECLARE_DRIVER_INIT(circus);
-	DECLARE_DRIVER_INIT(robotbwl);
-	DECLARE_DRIVER_INIT(crash);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	uint8_t circus_paddle_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void circus_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void circus_clown_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void circus_clown_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void circus_clown_z_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_ripcord();
+	void init_circus();
+	void init_robotbwl();
+	void init_crash();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -49,7 +49,7 @@ public:
 	uint32_t screen_update_robotbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_crash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ripcord(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(crash_scanline);
+	void crash_scanline(timer_device &timer, void *ptr, int32_t param);
 	void draw_line( bitmap_ind16 &bitmap, const rectangle &cliprect, int x1, int y1, int x2, int y2, int dotted );
 	void draw_sprite_collision( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void circus_draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect );

@@ -137,21 +137,21 @@ public:
 	required_ioport_array<4> m_p2_keys;
 
 	uint32_t m_bnstars1_mahjong_select;
-	DECLARE_WRITE32_MEMBER(ms32_tx0_ram_w);
-	DECLARE_WRITE32_MEMBER(ms32_tx1_ram_w);
-	DECLARE_WRITE32_MEMBER(ms32_bg0_ram_w);
-	DECLARE_WRITE32_MEMBER(ms32_bg1_ram_w);
-	DECLARE_WRITE32_MEMBER(ms32_roz0_ram_w);
-	DECLARE_WRITE32_MEMBER(ms32_roz1_ram_w);
-	DECLARE_WRITE32_MEMBER(bnstars1_mahjong_select_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
-	DECLARE_DRIVER_INIT(bnstars);
-	TILE_GET_INFO_MEMBER(get_ms32_tx0_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_tx1_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_roz0_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_roz1_tile_info);
+	void ms32_tx0_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ms32_tx1_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ms32_bg0_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ms32_bg1_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ms32_roz0_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ms32_roz1_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void bnstars1_mahjong_select_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	ioport_value mahjong_ctrl_r(ioport_field &field, void *param);
+	void init_bnstars();
+	void get_ms32_tx0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ms32_tx1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ms32_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ms32_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ms32_roz0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ms32_roz1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -162,7 +162,7 @@ public:
 
 
 
-TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx0_tile_info)
+void bnstars_state::get_ms32_tx0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour;
 
@@ -172,7 +172,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx0_tile_info)
 	SET_TILE_INFO_MEMBER(3,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx1_tile_info)
+void bnstars_state::get_ms32_tx1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour;
 
@@ -182,13 +182,13 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx1_tile_info)
 	SET_TILE_INFO_MEMBER(6,tileno,colour,0);
 }
 
-WRITE32_MEMBER(bnstars_state::ms32_tx0_ram_w)
+void bnstars_state::ms32_tx0_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ms32_tx0_ram[offset]);
 	m_ms32_tx_tilemap[0]->mark_tile_dirty(offset/2);
 }
 
-WRITE32_MEMBER(bnstars_state::ms32_tx1_ram_w)
+void bnstars_state::ms32_tx1_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ms32_tx1_ram[offset]);
 	m_ms32_tx_tilemap[1]->mark_tile_dirty(offset/2);
@@ -196,7 +196,7 @@ WRITE32_MEMBER(bnstars_state::ms32_tx1_ram_w)
 
 /* BG Layers */
 
-TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg0_tile_info)
+void bnstars_state::get_ms32_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -206,7 +206,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg0_tile_info)
 	SET_TILE_INFO_MEMBER(2,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg1_tile_info)
+void bnstars_state::get_ms32_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -216,13 +216,13 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg1_tile_info)
 	SET_TILE_INFO_MEMBER(5,tileno,colour,0);
 }
 
-WRITE32_MEMBER(bnstars_state::ms32_bg0_ram_w)
+void bnstars_state::ms32_bg0_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ms32_bg0_ram[offset]);
 	m_ms32_bg_tilemap[0]->mark_tile_dirty(offset/2);
 }
 
-WRITE32_MEMBER(bnstars_state::ms32_bg1_ram_w)
+void bnstars_state::ms32_bg1_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ms32_bg1_ram[offset]);
 	m_ms32_bg_tilemap[1]->mark_tile_dirty(offset/2);
@@ -315,7 +315,7 @@ void bnstars_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const 
 }
 
 
-TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz0_tile_info)
+void bnstars_state::get_ms32_roz0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -325,7 +325,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz0_tile_info)
 	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz1_tile_info)
+void bnstars_state::get_ms32_roz1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -335,13 +335,13 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz1_tile_info)
 	SET_TILE_INFO_MEMBER(4,tileno,colour,0);
 }
 
-WRITE32_MEMBER(bnstars_state::ms32_roz0_ram_w)
+void bnstars_state::ms32_roz0_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ms32_roz0_ram[offset]);
 	m_ms32_roz_tilemap[0]->mark_tile_dirty(offset/2);
 }
 
-WRITE32_MEMBER(bnstars_state::ms32_roz1_ram_w)
+void bnstars_state::ms32_roz1_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ms32_roz1_ram[offset]);
 	m_ms32_roz_tilemap[1]->mark_tile_dirty(offset/2);
@@ -706,7 +706,7 @@ static GFXDECODE_START( bnstars )
 	GFXDECODE_ENTRY( "gfx7", 0, txlayout,     0x6000, 0x10 ) /* Tx scr2 */
 GFXDECODE_END
 
-CUSTOM_INPUT_MEMBER(bnstars_state::mahjong_ctrl_r)
+ioport_value bnstars_state::mahjong_ctrl_r(ioport_field &field, void *param)
 {
 	required_ioport_array<4> &keys = (((int)(uintptr_t)param) == 0) ? m_p1_keys : m_p2_keys;
 
@@ -730,7 +730,7 @@ CUSTOM_INPUT_MEMBER(bnstars_state::mahjong_ctrl_r)
 	}
 }
 
-WRITE32_MEMBER(bnstars_state::bnstars1_mahjong_select_w)
+void bnstars_state::bnstars1_mahjong_select_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_bnstars1_mahjong_select = data;
 //  printf("%08x\n",m_bnstars1_mahjong_select);
@@ -919,7 +919,7 @@ ROM_END
 
 
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi1 */
-DRIVER_INIT_MEMBER(bnstars_state,bnstars)
+void bnstars_state::init_bnstars()
 {
 	ms32_rearrange_sprites(machine(), "gfx1");
 

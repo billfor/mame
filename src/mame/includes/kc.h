@@ -79,18 +79,18 @@ public:
 	virtual void machine_reset() override;
 
 	// modules read/write
-	DECLARE_READ8_MEMBER ( expansion_read );
-	DECLARE_WRITE8_MEMBER( expansion_write );
-	DECLARE_READ8_MEMBER ( expansion_4000_r );
-	DECLARE_WRITE8_MEMBER( expansion_4000_w );
-	DECLARE_READ8_MEMBER ( expansion_8000_r );
-	DECLARE_WRITE8_MEMBER( expansion_8000_w );
-	DECLARE_READ8_MEMBER ( expansion_c000_r );
-	DECLARE_WRITE8_MEMBER( expansion_c000_w );
-	DECLARE_READ8_MEMBER ( expansion_e000_r );
-	DECLARE_WRITE8_MEMBER( expansion_e000_w );
-	DECLARE_READ8_MEMBER ( expansion_io_read );
-	DECLARE_WRITE8_MEMBER( expansion_io_write );
+	uint8_t expansion_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void expansion_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t expansion_4000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void expansion_4000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t expansion_8000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void expansion_8000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t expansion_c000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void expansion_c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t expansion_e000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void expansion_e000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t expansion_io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void expansion_io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// bankswitch
 	virtual void update_0x00000();
@@ -100,19 +100,19 @@ public:
 	virtual void update_0x0e000();
 
 	// PIO callback
-	DECLARE_READ8_MEMBER( pio_porta_r );
-	DECLARE_READ8_MEMBER( pio_portb_r );
-	DECLARE_WRITE_LINE_MEMBER( pio_ardy_cb);
-	DECLARE_WRITE_LINE_MEMBER( pio_brdy_cb);
-	DECLARE_WRITE8_MEMBER( pio_porta_w );
-	DECLARE_WRITE8_MEMBER( pio_portb_w );
+	uint8_t pio_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pio_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio_ardy_cb(int state);
+	void pio_brdy_cb(int state);
+	void pio_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// CTC callback
-	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );
-	DECLARE_WRITE_LINE_MEMBER( ctc_zc1_callback );
+	void ctc_zc0_callback(int state);
+	void ctc_zc1_callback(int state);
 
 	// keyboard
-	DECLARE_WRITE_LINE_MEMBER( keyboard_cb );
+	void keyboard_cb(int state);
 
 	// cassette
 	void update_cassette(int state);
@@ -124,7 +124,7 @@ public:
 	// defined in video/kc.c
 	virtual void video_start() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER( video_toggle_blink_state );
+	void video_toggle_blink_state(int state);
 	void video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t colour_byte, uint8_t gfx_byte);
 
 	// driver state
@@ -146,10 +146,10 @@ public:
 	int                 m_cassette_in;
 
 	kcexp_slot_device * m_expansions[3];
-	DECLARE_PALETTE_INIT(kc85);
-	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
-	TIMER_CALLBACK_MEMBER(kc_cassette_timer_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(kc_scanline);
+	void palette_init_kc85(palette_device &palette);
+	void kc_cassette_oneshot_timer(void *ptr, int32_t param);
+	void kc_cassette_timer_callback(void *ptr, int32_t param);
+	void kc_scanline(timer_device &timer, void *ptr, int32_t param);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( kc );
 };
@@ -169,10 +169,10 @@ public:
 	virtual void update_0x08000() override;
 	virtual void update_0x0c000() override;
 
-	DECLARE_READ8_MEMBER( kc85_4_86_r );
-	DECLARE_READ8_MEMBER( kc85_4_84_r );
-	DECLARE_WRITE8_MEMBER( kc85_4_86_w );
-	DECLARE_WRITE8_MEMBER( kc85_4_84_w );
+	uint8_t kc85_4_86_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kc85_4_84_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kc85_4_86_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kc85_4_84_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// defined in video/kc.c
 	virtual void video_start() override;

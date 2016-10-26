@@ -431,8 +431,8 @@ public:
 		for (int n = 0; n < 16; n++)
 			persistvertexattr.attribute[n].fv[3] = 1;
 	}
-	DECLARE_READ32_MEMBER(geforce_r);
-	DECLARE_WRITE32_MEMBER(geforce_w);
+	uint32_t geforce_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void geforce_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void vblank_callback(screen_device &screen, bool state);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bool update_interrupts();
@@ -495,7 +495,7 @@ public:
 	void clear_render_target(int what, uint32_t value);
 	void clear_depth_buffer(int what, uint32_t value);
 	inline uint8_t *direct_access_ptr(offs_t address);
-	TIMER_CALLBACK_MEMBER(puller_timer_work);
+	void puller_timer_work(void *ptr, int32_t param);
 
 	struct {
 		uint32_t regs[0x80 / 4];

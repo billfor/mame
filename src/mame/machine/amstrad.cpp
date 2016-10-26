@@ -200,13 +200,13 @@ static const rgb_t amstrad_green_palette[32] =
 *******************************************************************/
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc)
+void amstrad_state::palette_init_amstrad_cpc(palette_device &palette)
 {
 	palette.set_pen_colors(0, amstrad_palette, ARRAY_LENGTH(amstrad_palette));
 }
 
 
-PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc_green)
+void amstrad_state::palette_init_amstrad_cpc_green(palette_device &palette)
 {
 	palette.set_pen_colors(0, amstrad_green_palette, ARRAY_LENGTH(amstrad_green_palette));
 }
@@ -214,7 +214,7 @@ PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc_green)
 
 /* Some games set the 8255 to mode 1 and expect a strobe signal */
 /* on PC2. Apparently PC2 is always low on the CPC. ?!? */
-TIMER_CALLBACK_MEMBER(amstrad_state::amstrad_pc2_low)
+void amstrad_state::amstrad_pc2_low(void *ptr, int32_t param)
 {
 	m_ppi->pc2_w(0);
 }
@@ -288,7 +288,7 @@ unsigned char amstrad_state::kccomp_get_colour_element(int colour_value)
 /* the colour rom has the same 32 bytes repeated, but it might be possible to put a new rom in
 with different data and be able to select the other entries - not tested on a real kc compact yet
 and not supported by this driver */
-PALETTE_INIT_MEMBER(amstrad_state,kccomp)
+void amstrad_state::palette_init_kccomp(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -311,7 +311,7 @@ Amstrad Plus
 The Amstrad Plus has a 4096 colour palette
 *********************************************/
 
-PALETTE_INIT_MEMBER(amstrad_state,amstrad_plus)
+void amstrad_state::palette_init_amstrad_plus(palette_device &palette)
 {
 	int i;
 
@@ -333,7 +333,7 @@ PALETTE_INIT_MEMBER(amstrad_state,amstrad_plus)
 }
 
 
-PALETTE_INIT_MEMBER(amstrad_state,aleste)
+void amstrad_state::palette_init_aleste(palette_device &palette)
 {
 	int i;
 
@@ -586,7 +586,7 @@ void amstrad_state::amstrad_plus_handle_dma()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(amstrad_state::amstrad_video_update_timer)
+void amstrad_state::amstrad_video_update_timer(void *ptr, int32_t param)
 {
 	if(param == 1)
 	{
@@ -855,7 +855,7 @@ void amstrad_state::amstrad_plus_update_video_sprites()
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_hsync_changed)
+void amstrad_state::amstrad_hsync_changed(int state)
 {
 	amstrad_update_video();
 
@@ -899,7 +899,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_hsync_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_hsync_changed)
+void amstrad_state::amstrad_plus_hsync_changed(int state)
 {
 	amstrad_plus_update_video();
 
@@ -974,7 +974,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_hsync_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_vsync_changed)
+void amstrad_state::amstrad_vsync_changed(int state)
 {
 	amstrad_update_video();
 
@@ -995,7 +995,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_vsync_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_vsync_changed)
+void amstrad_state::amstrad_plus_vsync_changed(int state)
 {
 	amstrad_plus_update_video();
 
@@ -1016,7 +1016,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_vsync_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_de_changed)
+void amstrad_state::amstrad_de_changed(int state)
 {
 	amstrad_update_video();
 
@@ -1039,7 +1039,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_de_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_de_changed)
+void amstrad_state::amstrad_plus_de_changed(int state)
 {
 	amstrad_plus_update_video();
 
@@ -1084,7 +1084,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_de_changed)
 }
 
 
-VIDEO_START_MEMBER(amstrad_state,amstrad)
+void amstrad_state::video_start_amstrad()
 {
 	amstrad_init_lookups();
 
@@ -1131,7 +1131,7 @@ static device_t* get_expansion_device(running_machine &machine, const char* tag)
 	return nullptr;
 }
 
-WRITE_LINE_MEMBER(amstrad_state::cpc_romdis)
+void amstrad_state::cpc_romdis(int state)
 {
 	m_gate_array.romdis = state;
 	amstrad_rethinkMemory();
@@ -1399,7 +1399,7 @@ void amstrad_state::AmstradCPC_GA_SetRamConfiguration()
 
  */
 
-WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_4000_w)
+void amstrad_state::amstrad_plus_asic_4000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("ASIC: Write to register at &%04x\n",offset+0x4000);
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
@@ -1412,7 +1412,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_4000_w)
 }
 
 
-WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
+void amstrad_state::amstrad_plus_asic_6000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
 	{
@@ -1515,7 +1515,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
 }
 
 
-READ8_MEMBER(amstrad_state::amstrad_plus_asic_4000_r)
+uint8_t amstrad_state::amstrad_plus_asic_4000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("RAM: read from &%04x\n",offset+0x4000);
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
@@ -1528,7 +1528,7 @@ READ8_MEMBER(amstrad_state::amstrad_plus_asic_4000_r)
 }
 
 
-READ8_MEMBER(amstrad_state::amstrad_plus_asic_6000_r)
+uint8_t amstrad_state::amstrad_plus_asic_6000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("RAM: read from &%04x\n",offset+0x6000);
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
@@ -1727,7 +1727,7 @@ In the 464+ and 6128+ this function is performed by the ASIC or a memory expansi
 }
 
 
-WRITE8_MEMBER(amstrad_state::aleste_msx_mapper)
+void amstrad_state::aleste_msx_mapper(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int page = (offset & 0x0300) >> 8;
 	int ramptr = (data & 0x3f) * 0x4000;
@@ -1853,7 +1853,7 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 
 */
 
-READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
+uint8_t amstrad_state::amstrad_cpc_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	unsigned char data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
@@ -2009,7 +2009,7 @@ void amstrad_state::amstrad_plus_seqcheck(int data)
 	m_prev_data = data;
 }
 
-WRITE8_MEMBER(amstrad_state::rom_select)
+void amstrad_state::rom_select(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gate_array.upper_bank = data;
 	// expansion devices know the selected ROM by monitoring I/O writes to DFxx
@@ -2037,7 +2037,7 @@ WRITE8_MEMBER(amstrad_state::rom_select)
 }
 
 /* Offset handler for write */
-WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
+void amstrad_state::amstrad_cpc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	cpc_multiface2_device* mface2;
 
@@ -2561,14 +2561,14 @@ void amstrad_state::update_psg()
 
 
 /* Read/Write 8255 PPI port A (connected to AY-3-8912 databus) */
-READ8_MEMBER(amstrad_state::amstrad_ppi_porta_r)
+uint8_t amstrad_state::amstrad_ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	update_psg();
 	return m_ppi_port_inputs[amstrad_ppi_PortA];
 }
 
 
-WRITE8_MEMBER(amstrad_state::amstrad_ppi_porta_w)
+void amstrad_state::amstrad_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi_port_outputs[amstrad_ppi_PortA] = data;
 	update_psg();
@@ -2600,12 +2600,12 @@ Note:
   On the CPC this can be used by a expansion device to report it's presence. "1" = device connected, "0" = device not connected. This is not always used by all expansion devices.
 */
 
-WRITE_LINE_MEMBER(amstrad_state::write_centronics_busy)
+void amstrad_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER(amstrad_state::amstrad_ppi_portb_r)
+uint8_t amstrad_state::amstrad_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0;
 /* Set b7 with cassette tape input */
@@ -2657,7 +2657,7 @@ Bit Description  Usage
 
 /* previous_ppi_portc_w value */
 
-WRITE8_MEMBER(amstrad_state::amstrad_ppi_portc_w)
+void amstrad_state::amstrad_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int changed_data;
 
@@ -2706,7 +2706,7 @@ When port B is defined as input (bit 7 of register 7 is set to "0"), a read of t
 */
 
 /* read PSG port A */
-READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
+uint8_t amstrad_state::amstrad_psg_porta_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Read CPC Keyboard
 	If keyboard matrix line 11-15 are selected, the byte is always &ff.
@@ -2745,7 +2745,7 @@ READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
 /* called when cpu acknowledges int */
 /* reset top bit of interrupt line counter */
 /* this ensures that the next interrupt is no closer than 32 lines */
-IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
+int amstrad_state::amstrad_cpu_acknowledge_int(device_t &device, int irqline)
 {
 	// DMA interrupts can be automatically cleared if bit 0 of &6805 is set to 0
 	if( m_asic.enabled && m_plus_irq_cause != 0x06 && m_asic.dma_clear & 0x01)
@@ -3081,7 +3081,7 @@ void amstrad_state::amstrad_common_init()
 	/* Juergen is a cool dude! */
 }
 
-TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
+void amstrad_state::cb_set_resolution(void *ptr, int32_t param)
 {
 	rectangle visarea;
 	attoseconds_t refresh;
@@ -3104,14 +3104,14 @@ TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
 }
 
 
-MACHINE_START_MEMBER(amstrad_state,amstrad)
+void amstrad_state::machine_start_amstrad()
 {
 	m_system_type = SYSTEM_CPC;
 	m_centronics->write_data7(0);
 }
 
 
-MACHINE_RESET_MEMBER(amstrad_state,amstrad)
+void amstrad_state::machine_reset_amstrad()
 {
 	amstrad_common_init();
 	amstrad_reset_machine();
@@ -3126,7 +3126,7 @@ MACHINE_RESET_MEMBER(amstrad_state,amstrad)
 }
 
 
-MACHINE_START_MEMBER(amstrad_state,plus)
+void amstrad_state::machine_start_plus()
 {
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_PLUS;
@@ -3141,7 +3141,7 @@ MACHINE_START_MEMBER(amstrad_state,plus)
 }
 
 
-MACHINE_RESET_MEMBER(amstrad_state,plus)
+void amstrad_state::machine_reset_plus()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -3173,7 +3173,7 @@ MACHINE_RESET_MEMBER(amstrad_state,plus)
 	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
 }
 
-MACHINE_START_MEMBER(amstrad_state,gx4000)
+void amstrad_state::machine_start_gx4000()
 {
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_GX4000;
@@ -3184,7 +3184,7 @@ MACHINE_START_MEMBER(amstrad_state,gx4000)
 		m_region_cart = memregion("maincpu");
 }
 
-MACHINE_RESET_MEMBER(amstrad_state,gx4000)
+void amstrad_state::machine_reset_gx4000()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -3215,7 +3215,7 @@ MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
 }
 
-MACHINE_START_MEMBER(amstrad_state,kccomp)
+void amstrad_state::machine_start_kccomp()
 {
 	m_system_type = SYSTEM_CPC;
 	m_centronics->write_data7(0);
@@ -3229,7 +3229,7 @@ MACHINE_START_MEMBER(amstrad_state,kccomp)
 }
 
 
-MACHINE_RESET_MEMBER(amstrad_state,kccomp)
+void amstrad_state::machine_reset_kccomp()
 {
 	amstrad_common_init();
 	kccomp_reset_machine();
@@ -3244,13 +3244,13 @@ MACHINE_RESET_MEMBER(amstrad_state,kccomp)
 }
 
 
-MACHINE_START_MEMBER(amstrad_state,aleste)
+void amstrad_state::machine_start_aleste()
 {
 	m_system_type = SYSTEM_ALESTE;
 	m_centronics->write_data7(0);
 }
 
-MACHINE_RESET_MEMBER(amstrad_state,aleste)
+void amstrad_state::machine_reset_aleste()
 {
 	amstrad_common_init();
 	amstrad_reset_machine();
@@ -3283,7 +3283,7 @@ SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
+image_init_result amstrad_state::device_image_load_amstrad_plus_cartridge(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 	unsigned char header[12];

@@ -41,15 +41,15 @@ public:
 	uint16_t m_spim_data;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
-	DECLARE_INPUT_CHANGED_MEMBER(button_check);
-	DECLARE_WRITE8_MEMBER(palm_port_f_out);
-	DECLARE_READ8_MEMBER(palm_port_c_in);
-	DECLARE_READ8_MEMBER(palm_port_f_in);
-	DECLARE_WRITE16_MEMBER(palm_spim_out);
-	DECLARE_READ16_MEMBER(palm_spim_in);
-	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
-	DECLARE_PALETTE_INIT(palm);
+	void pen_check(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void button_check(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void palm_port_f_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t palm_port_c_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t palm_port_f_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palm_spim_out(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t palm_spim_in(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void palm_spim_exchange(int state);
+	void palette_init_palm(palette_device &palette);
 
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
@@ -64,7 +64,7 @@ public:
     MACHINE HARDWARE
 ***************************************************************************/
 
-INPUT_CHANGED_MEMBER(palm_state::pen_check)
+void palm_state::pen_check(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t button = m_io_penb->read();
 
@@ -74,38 +74,38 @@ INPUT_CHANGED_MEMBER(palm_state::pen_check)
 		m_lsi->set_penirq_line(0);
 }
 
-INPUT_CHANGED_MEMBER(palm_state::button_check)
+void palm_state::button_check(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t button_state = m_io_portd->read();
 	m_lsi->set_port_d_lines(button_state, (int)(uintptr_t)param);
 }
 
-WRITE8_MEMBER(palm_state::palm_port_f_out)
+void palm_state::palm_port_f_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_f_latch = data;
 }
 
-READ8_MEMBER(palm_state::palm_port_c_in)
+uint8_t palm_state::palm_port_c_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x10;
 }
 
-READ8_MEMBER(palm_state::palm_port_f_in)
+uint8_t palm_state::palm_port_f_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port_f_latch;
 }
 
-WRITE16_MEMBER(palm_state::palm_spim_out)
+void palm_state::palm_spim_out(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_spim_data = data;
 }
 
-READ16_MEMBER(palm_state::palm_spim_in)
+uint16_t palm_state::palm_spim_in(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spim_data;
 }
 
-WRITE_LINE_MEMBER(palm_state::palm_spim_exchange)
+void palm_state::palm_spim_exchange(int state)
 {
 	uint8_t x = m_io_penx->read();
 	uint8_t y = m_io_peny->read();
@@ -144,7 +144,7 @@ void palm_state::machine_reset()
 }
 
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
-PALETTE_INIT_MEMBER(palm_state, palm)
+void palm_state::palette_init_palm(palette_device &palette)
 {
 	palette.set_pen_color(0, 0x7b, 0x8c, 0x5a);
 	palette.set_pen_color(1, 0x00, 0x00, 0x00);

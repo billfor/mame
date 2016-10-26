@@ -116,7 +116,7 @@ void snug_bwg_device::operate_ready_line()
 /*
     Callbacks from the WD1773 chip
 */
-WRITE_LINE_MEMBER( snug_bwg_device::fdc_irq_w )
+void snug_bwg_device::fdc_irq_w(int state)
 {
 	if (TRACE_SIGNALS) logerror("bwg: set intrq = %d\n", state);
 	m_IRQ = (line_state)state;
@@ -125,7 +125,7 @@ WRITE_LINE_MEMBER( snug_bwg_device::fdc_irq_w )
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( snug_bwg_device::fdc_drq_w )
+void snug_bwg_device::fdc_drq_w(int state)
 {
 	if (TRACE_SIGNALS) logerror("bwg: set drq = %d\n", state);
 	m_DRQ = (line_state)state;
@@ -284,7 +284,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
     5c00 - 5fdf: RAM
     5fe0 - 5fff: Clock (even addr)
 */
-WRITE8_MEMBER(snug_bwg_device::write)
+void snug_bwg_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 	{
@@ -372,7 +372,7 @@ READ8Z_MEMBER(snug_bwg_device::crureadz)
 	}
 }
 
-WRITE8_MEMBER(snug_bwg_device::cruwrite)
+void snug_bwg_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  int drive, drivebit;
 

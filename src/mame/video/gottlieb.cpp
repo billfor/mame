@@ -16,7 +16,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_paletteram_w)
+void gottlieb_state::gottlieb_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b, a, val;
 
@@ -44,7 +44,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_paletteram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_video_control_w)
+void gottlieb_state::gottlieb_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 controls foreground/background priority */
 	if (m_background_priority != (data & 0x01))
@@ -59,7 +59,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_video_control_w)
 }
 
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_laserdisc_video_control_w)
+void gottlieb_state::gottlieb_laserdisc_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 works like the other games */
 	gottlieb_video_control_w(space, offset, data & 0x01);
@@ -85,7 +85,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_laserdisc_video_control_w)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_videoram_w)
+void gottlieb_state::gottlieb_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -93,7 +93,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_videoram_w)
 }
 
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_charram_w)
+void gottlieb_state::gottlieb_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charram[offset] != data)
 	{
@@ -110,7 +110,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_charram_w)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
+void gottlieb_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index];
@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
 		SET_TILE_INFO_MEMBER(m_gfxcharhi, code, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
+void gottlieb_state::get_screwloo_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index];
@@ -156,7 +156,7 @@ void gottlieb_state::video_start()
 	save_item(NAME(m_transparent0));
 }
 
-VIDEO_START_MEMBER(gottlieb_state,screwloo)
+void gottlieb_state::video_start_screwloo()
 {
 	static const int resistances[4] = { 2000, 1000, 470, 240 };
 

@@ -153,49 +153,49 @@ public:
 
 	bool m_needs_update;
 
-	DECLARE_READ16_MEMBER(tx1_math_r);
-	DECLARE_WRITE16_MEMBER(tx1_math_w);
-	DECLARE_READ16_MEMBER(tx1_spcs_rom_r);
-	DECLARE_READ16_MEMBER(tx1_spcs_ram_r);
-	DECLARE_WRITE16_MEMBER(tx1_spcs_ram_w);
-	DECLARE_READ16_MEMBER(buggyboy_math_r);
-	DECLARE_WRITE16_MEMBER(buggyboy_math_w);
-	DECLARE_READ16_MEMBER(buggyboy_spcs_rom_r);
-	DECLARE_WRITE16_MEMBER(buggyboy_spcs_ram_w);
-	DECLARE_READ16_MEMBER(buggyboy_spcs_ram_r);
-	DECLARE_READ16_MEMBER(tx1_crtc_r);
-	DECLARE_WRITE16_MEMBER(tx1_crtc_w);
-	DECLARE_WRITE16_MEMBER(tx1_bankcs_w);
-	DECLARE_WRITE16_MEMBER(tx1_slincs_w);
-	DECLARE_WRITE16_MEMBER(tx1_slock_w);
-	DECLARE_WRITE16_MEMBER(tx1_scolst_w);
-	DECLARE_WRITE16_MEMBER(tx1_flgcs_w);
-	DECLARE_WRITE16_MEMBER(buggyboy_gas_w);
-	DECLARE_WRITE16_MEMBER(buggyboy_sky_w);
-	DECLARE_WRITE16_MEMBER(buggyboy_scolst_w);
-	DECLARE_WRITE16_MEMBER(z80_busreq_w);
-	DECLARE_WRITE16_MEMBER(resume_math_w);
-	DECLARE_WRITE16_MEMBER(halt_math_w);
-	DECLARE_WRITE8_MEMBER(z80_intreq_w);
-	DECLARE_READ16_MEMBER(z80_shared_r);
-	DECLARE_WRITE16_MEMBER(z80_shared_w);
-	DECLARE_READ16_MEMBER(dipswitches_r);
-	DECLARE_WRITE8_MEMBER(ts_w);
-	DECLARE_READ8_MEMBER(ts_r);
-	DECLARE_WRITE8_MEMBER(tx1_ppi_latch_w);
-	DECLARE_READ8_MEMBER(bb_analog_r);
-	DECLARE_READ8_MEMBER(bbjr_analog_r);
-	DECLARE_WRITE8_MEMBER(tx1_coin_cnt_w);
-	DECLARE_WRITE8_MEMBER(bb_coin_cnt_w);
-	DECLARE_READ8_MEMBER(tx1_ppi_porta_r);
-	DECLARE_READ8_MEMBER(tx1_ppi_portb_r);
-	DECLARE_MACHINE_RESET(tx1);
-	DECLARE_VIDEO_START(tx1);
-	DECLARE_PALETTE_INIT(tx1);
-	DECLARE_MACHINE_RESET(buggyboy);
-	DECLARE_VIDEO_START(buggyboy);
-	DECLARE_PALETTE_INIT(buggyboy);
-	DECLARE_VIDEO_START(buggybjr);
+	uint16_t tx1_math_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tx1_math_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tx1_spcs_rom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t tx1_spcs_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tx1_spcs_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t buggyboy_math_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void buggyboy_math_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t buggyboy_spcs_rom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void buggyboy_spcs_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t buggyboy_spcs_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t tx1_crtc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tx1_crtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tx1_bankcs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tx1_slincs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tx1_slock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tx1_scolst_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tx1_flgcs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void buggyboy_gas_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void buggyboy_sky_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void buggyboy_scolst_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void z80_busreq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void resume_math_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void halt_math_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void z80_intreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t z80_shared_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void z80_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dipswitches_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ts_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tx1_ppi_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bb_analog_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bbjr_analog_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tx1_coin_cnt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bb_coin_cnt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tx1_ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t tx1_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void machine_reset_tx1();
+	void video_start_tx1();
+	void palette_init_tx1(palette_device &palette);
+	void machine_reset_buggyboy();
+	void video_start_buggyboy();
+	void palette_init_buggyboy(palette_device &palette);
+	void video_start_buggybjr();
 
 	void tx1_draw_char(uint8_t *bitmap);
 	void tx1_draw_road_pixel(int screen, uint8_t *bmpaddr,
@@ -225,8 +225,8 @@ public:
 	uint32_t screen_update_buggybjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_tx1(screen_device &screen, bool state);
 	void screen_eof_buggyboy(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(z80_irq);
-	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	void z80_irq(device_t &device);
+	void interrupt_callback(void *ptr, int32_t param);
 };
 
 /*----------- defined in audio/tx1.c -----------*/
@@ -259,10 +259,10 @@ public:
 	tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~tx1_sound_device() {}
 
-	DECLARE_READ8_MEMBER( pit8253_r );
-	DECLARE_WRITE8_MEMBER( pit8253_w );
-	DECLARE_WRITE8_MEMBER( ay8910_a_w );
-	DECLARE_WRITE8_MEMBER( ay8910_b_w );
+	uint8_t pit8253_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pit8253_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -314,9 +314,9 @@ class buggyboy_sound_device : public tx1_sound_device
 public:
 	buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( ym1_a_w );
-	DECLARE_WRITE8_MEMBER( ym2_a_w );
-	DECLARE_WRITE8_MEMBER( ym2_b_w );
+	void ym1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ym2_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ym2_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

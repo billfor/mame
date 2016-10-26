@@ -43,13 +43,13 @@ public:
 
 	void set_info(const char *intc_tag, int vect);
 
-	DECLARE_READ8_MEMBER(addr8_r);
-	DECLARE_READ16_MEMBER(addr16_r);
-	DECLARE_READ8_MEMBER(adcsr_r);
-	DECLARE_READ8_MEMBER(adcr_r);
-	DECLARE_WRITE8_MEMBER(adcsr_w);
-	DECLARE_WRITE8_MEMBER(adcr_w);
-	DECLARE_WRITE_LINE_MEMBER(adtrg_w);
+	uint8_t addr8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t addr16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t adcsr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t adcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adcsr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adtrg_w(int state);
 
 	void set_suspend(bool suspend);
 	uint64_t internal_update(uint64_t current_time);

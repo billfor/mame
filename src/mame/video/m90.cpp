@@ -74,20 +74,20 @@ inline void m90_state::dynablsb_get_tile_info(tile_data &tileinfo,int tile_index
 			tileinfo.category = (color & 0x30) ? 1 : 0;
 }
 
-TILE_GET_INFO_MEMBER(m90_state::get_pf1_tile_info){ get_tile_info(tileinfo,tile_index,0,0x3); }
-TILE_GET_INFO_MEMBER(m90_state::get_pf1w_tile_info){ get_tile_info(tileinfo,tile_index,0,0x2); }
-TILE_GET_INFO_MEMBER(m90_state::get_pf2_tile_info){ get_tile_info(tileinfo,tile_index,1,0x3); }
-TILE_GET_INFO_MEMBER(m90_state::get_pf2w_tile_info){ get_tile_info(tileinfo,tile_index,1,0x2); }
+void m90_state::get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo,tile_index,0,0x3); }
+void m90_state::get_pf1w_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo,tile_index,0,0x2); }
+void m90_state::get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo,tile_index,1,0x3); }
+void m90_state::get_pf2w_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo,tile_index,1,0x2); }
 
-TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf1_tile_info){ bomblord_get_tile_info(tileinfo,tile_index,0); }
-TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf1w_tile_info){ bomblord_get_tile_info(tileinfo,tile_index,0); }
-TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf2_tile_info){ bomblord_get_tile_info(tileinfo,tile_index,2); }
-TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf2w_tile_info){ bomblord_get_tile_info(tileinfo,tile_index,2); }
+void m90_state::bomblord_get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ bomblord_get_tile_info(tileinfo,tile_index,0); }
+void m90_state::bomblord_get_pf1w_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ bomblord_get_tile_info(tileinfo,tile_index,0); }
+void m90_state::bomblord_get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ bomblord_get_tile_info(tileinfo,tile_index,2); }
+void m90_state::bomblord_get_pf2w_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ bomblord_get_tile_info(tileinfo,tile_index,2); }
 
-TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf1_tile_info){ dynablsb_get_tile_info(tileinfo,tile_index,0); }
-TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf1w_tile_info){ dynablsb_get_tile_info(tileinfo,tile_index,0); }
-TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf2_tile_info){ dynablsb_get_tile_info(tileinfo,tile_index,2); }
-TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf2w_tile_info){ dynablsb_get_tile_info(tileinfo,tile_index,2); }
+void m90_state::dynablsb_get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ dynablsb_get_tile_info(tileinfo,tile_index,0); }
+void m90_state::dynablsb_get_pf1w_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ dynablsb_get_tile_info(tileinfo,tile_index,0); }
+void m90_state::dynablsb_get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ dynablsb_get_tile_info(tileinfo,tile_index,2); }
+void m90_state::dynablsb_get_pf2w_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ dynablsb_get_tile_info(tileinfo,tile_index,2); }
 
 void m90_state::video_start()
 {
@@ -104,7 +104,7 @@ void m90_state::video_start()
 	save_item(NAME(m_last_pf2));
 }
 
-VIDEO_START_MEMBER(m90_state,bomblord)
+void m90_state::video_start_bomblord()
 {
 	m_pf1_layer =      &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::bomblord_get_pf1_tile_info),this), TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_pf1_wide_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::bomblord_get_pf1w_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
@@ -119,7 +119,7 @@ VIDEO_START_MEMBER(m90_state,bomblord)
 	save_item(NAME(m_video_control_data));
 }
 
-VIDEO_START_MEMBER(m90_state,dynablsb)
+void m90_state::video_start_dynablsb()
 {
 	m_pf1_layer =      &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::dynablsb_get_pf1_tile_info),this), TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_pf1_wide_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::dynablsb_get_pf1w_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
@@ -262,7 +262,7 @@ void m90_state::dynablsb_draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 	}
 }
 
-WRITE16_MEMBER(m90_state::m90_video_control_w)
+void m90_state::m90_video_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_control_data[offset]);
 }
@@ -275,7 +275,7 @@ void m90_state::markdirty(tilemap_t *tmap,int page,offs_t offset)
 		tmap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(m90_state::m90_video_w)
+void m90_state::m90_video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_data[offset]);
 

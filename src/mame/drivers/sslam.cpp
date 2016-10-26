@@ -214,7 +214,7 @@ static const uint8_t sslam_snd_loop[8][19] =
 
 
 
-TIMER_CALLBACK_MEMBER(sslam_state::music_playback)
+void sslam_state::music_playback(void *ptr, int32_t param)
 {
 	int pattern = 0;
 	if ((m_oki->read_status() & 0x08) == 0)
@@ -290,7 +290,7 @@ void sslam_state::sslam_play(int track, int data)
 	}
 }
 
-WRITE8_MEMBER(sslam_state::sslam_snd_w)
+void sslam_state::sslam_snd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s Writing %04x to Sound CPU\n",machine().describe_context(),data);
 	if (data >= 0x40) {
@@ -362,7 +362,7 @@ WRITE8_MEMBER(sslam_state::sslam_snd_w)
 
 
 
-WRITE16_MEMBER(sslam_state::powerbls_sound_w)
+void sslam_state::powerbls_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(MCS51_INT1_LINE, HOLD_LINE);
@@ -418,7 +418,7 @@ ADDRESS_MAP_END
     Sound MCU mapping
 */
 
-READ8_MEMBER(sslam_state::playmark_snd_command_r)
+uint8_t sslam_state::playmark_snd_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -432,12 +432,12 @@ READ8_MEMBER(sslam_state::playmark_snd_command_r)
 	return data;
 }
 
-WRITE8_MEMBER(sslam_state::playmark_oki_w)
+void sslam_state::playmark_oki_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki_command = data;
 }
 
-WRITE8_MEMBER(sslam_state::playmark_snd_control_w)
+void sslam_state::playmark_snd_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki_control = data;
 
@@ -911,7 +911,7 @@ ROM_START( powerbals )
 	ROM_COPY( "oki", 0x00000,0x80000, 0x20000)
 ROM_END
 
-DRIVER_INIT_MEMBER(sslam_state,sslam)
+void sslam_state::init_sslam()
 {
 	m_track = 0;
 	m_melody = 0;
@@ -925,7 +925,7 @@ DRIVER_INIT_MEMBER(sslam_state,sslam)
 	m_music_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sslam_state::music_playback),this));
 }
 
-DRIVER_INIT_MEMBER(sslam_state,powerbls)
+void sslam_state::init_powerbls()
 {
 	save_item(NAME(m_oki_control));
 	save_item(NAME(m_oki_command));

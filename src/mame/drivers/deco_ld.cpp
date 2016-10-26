@@ -153,14 +153,14 @@ public:
 
 	uint8_t m_laserdisc_data;
 	int m_nmimask;
-	DECLARE_READ8_MEMBER(acia_status_hack_r);
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(decold_sound_cmd_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	uint8_t acia_status_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void decold_sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value begas_vblank_r(ioport_field &field, void *param);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	virtual void machine_start() override;
 	uint32_t screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_interrupt);
+	void sound_interrupt(device_t &device);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
 };
 
@@ -247,20 +247,20 @@ uint32_t deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_ind
 }
 
 
-WRITE8_MEMBER(deco_ld_state::decold_sound_cmd_w)
+void deco_ld_state::decold_sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 /* unknown, but certainly related to audiocpu somehow */
-READ8_MEMBER(deco_ld_state::sound_status_r)
+uint8_t deco_ld_state::sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff ^ 0x40;
 }
 
 // TODO: needs LD BIOS dumped
-READ8_MEMBER(deco_ld_state::acia_status_hack_r)
+uint8_t deco_ld_state::acia_status_hack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -291,13 +291,13 @@ ADDRESS_MAP_END
 /* sound arrangement is pratically identical to Zero Target. */
 
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(deco_ld_state::nmimask_w)
+void deco_ld_state::nmimask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmimask = data & 0x80;
 }
 #endif
 
-INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
+void deco_ld_state::sound_interrupt(device_t &device)
 {
 	if (!m_nmimask) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -313,12 +313,12 @@ static ADDRESS_MAP_START( rblaster_sound_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER( deco_ld_state::begas_vblank_r )
+ioport_value deco_ld_state::begas_vblank_r(ioport_field &field, void *param)
 {
 	return m_screen->vpos() >= 240*2;
 }
 
-INPUT_CHANGED_MEMBER(deco_ld_state::coin_inserted)
+void deco_ld_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

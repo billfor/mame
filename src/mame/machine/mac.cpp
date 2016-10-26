@@ -237,7 +237,7 @@ void mac_state::field_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER(mac_state::set_scc_interrupt)
+void mac_state::set_scc_interrupt(int state)
 {
 	m_scc_interrupt = state;
 	this->field_interrupts();
@@ -256,7 +256,7 @@ void mac_state::set_via2_interrupt(int value)
 	this->field_interrupts();
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_asc_irq)
+void mac_state::mac_asc_irq(int state)
 {
 	if (INTS_RBV)
 	{
@@ -282,7 +282,7 @@ WRITE_LINE_MEMBER(mac_state::mac_asc_irq)
 	}
 }
 
-WRITE16_MEMBER ( mac_state::mac_autovector_w )
+void mac_state::mac_autovector_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG_GENERAL)
 		logerror("mac_autovector_w: offset=0x%08x data=0x%04x\n", offset, data);
@@ -292,7 +292,7 @@ WRITE16_MEMBER ( mac_state::mac_autovector_w )
 	/* Not yet implemented */
 }
 
-READ16_MEMBER ( mac_state::mac_autovector_r )
+uint16_t mac_state::mac_autovector_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (LOG_GENERAL)
 		logerror("mac_autovector_r: offset=0x%08x\n", offset);
@@ -487,7 +487,7 @@ void mac_state::set_memory_overlay(int overlay)
 	}
 }
 
-READ32_MEMBER(mac_state::rom_switch_r)
+uint32_t mac_state::rom_switch_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offs_t ROM_size = memregion("bootrom")->bytes();
 	uint32_t *ROM_data = (uint32_t *)memregion("bootrom")->base();
@@ -663,13 +663,13 @@ void mac_state::keyboard_init()
 
 #ifdef MAC_USE_EMULATED_KBD
 
-WRITE_LINE_MEMBER(mac_state::mac_kbd_clk_in)
+void mac_state::mac_kbd_clk_in(int state)
 {
 	printf("CLK: %d\n", state^1);
 	m_via1->write_cb1(state ? 0 : 1);
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
+void mac_state::mac_via_out_cb2(int state)
 {
 	printf("Sending %d to kbd (PC=%x)\n", data, m_maincpu->pc());
 	m_mackbd->data_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
@@ -677,7 +677,7 @@ WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
 
 #else   // keyboard HLE
 
-TIMER_CALLBACK_MEMBER(mac_state::kbd_clock)
+void mac_state::kbd_clock(void *ptr, int32_t param)
 {
 	int i;
 
@@ -715,7 +715,7 @@ void mac_state::kbd_shift_out(int data)
 	}
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
+void mac_state::mac_via_out_cb2(int state)
 {
 	if (m_kbd_comm == false && state == 0)
 	{
@@ -734,7 +734,7 @@ WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
 /*
     called when inquiry times out (1/4s)
 */
-TIMER_CALLBACK_MEMBER(mac_state::inquiry_timeout_func)
+void mac_state::inquiry_timeout_func(void *ptr, int32_t param)
 {
 	if (LOG_KEYBOARD)
 		logerror("keyboard enquiry timeout\n");
@@ -943,7 +943,7 @@ Note:  Asserting the DACK signal applies only to write operations to
   scsiRd+sRESET       $580070    Reset Parity/Interrupt
              */
 
-READ16_MEMBER ( mac_state::macplus_scsi_r )
+uint16_t mac_state::macplus_scsi_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -957,7 +957,7 @@ READ16_MEMBER ( mac_state::macplus_scsi_r )
 	return m_ncr5380->ncr5380_read_reg(reg)<<8;
 }
 
-READ32_MEMBER (mac_state::macii_scsi_drq_r)
+uint32_t mac_state::macii_scsi_drq_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -977,7 +977,7 @@ READ32_MEMBER (mac_state::macii_scsi_drq_r)
 	return 0;
 }
 
-WRITE32_MEMBER (mac_state::macii_scsi_drq_w)
+void mac_state::macii_scsi_drq_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -1003,7 +1003,7 @@ WRITE32_MEMBER (mac_state::macii_scsi_drq_w)
 	}
 }
 
-WRITE16_MEMBER ( mac_state::macplus_scsi_w )
+void mac_state::macplus_scsi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -1017,7 +1017,7 @@ WRITE16_MEMBER ( mac_state::macplus_scsi_w )
 	m_ncr5380->ncr5380_write_reg(reg, data);
 }
 
-WRITE16_MEMBER ( mac_state::macii_scsi_w )
+void mac_state::macii_scsi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -1031,7 +1031,7 @@ WRITE16_MEMBER ( mac_state::macii_scsi_w )
 	m_ncr5380->ncr5380_write_reg(reg, data>>8);
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
+void mac_state::mac_scsi_irq(int state)
 {
 /*  mac_state *mac = machine.driver_data<mac_state>();
 
@@ -1042,7 +1042,7 @@ WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
     }*/
 }
 
-WRITE_LINE_MEMBER(mac_state::irq_539x_1_w)
+void mac_state::irq_539x_1_w(int state)
 {
 	if (state)  // make sure a CB1 transition occurs
 	{
@@ -1051,7 +1051,7 @@ WRITE_LINE_MEMBER(mac_state::irq_539x_1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(mac_state::drq_539x_1_w)
+void mac_state::drq_539x_1_w(int state)
 {
 	m_dafb_scsi1_drq = state;
 }
@@ -1164,7 +1164,7 @@ void mac_state::scc_mouse_irq(int x, int y)
 
 
 
-READ16_MEMBER ( mac_state::mac_scc_r )
+uint16_t mac_state::mac_scc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
 	uint16_t result;
@@ -1175,13 +1175,13 @@ READ16_MEMBER ( mac_state::mac_scc_r )
 
 
 
-WRITE16_MEMBER ( mac_state::mac_scc_w )
+void mac_state::mac_scc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
 	scc->reg_w(space, offset, data);
 }
 
-WRITE16_MEMBER ( mac_state::mac_scc_2_w )
+void mac_state::mac_scc_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
 	scc->reg_w(space, offset, data >> 8);
@@ -1191,7 +1191,7 @@ WRITE16_MEMBER ( mac_state::mac_scc_2_w )
  * IWM Code specific to the Mac Plus  *
  * ********************************** */
 
-READ16_MEMBER ( mac_state::mac_iwm_r )
+uint16_t mac_state::mac_iwm_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* The first time this is called is in a floppy test, which goes from
 	 * $400104 to $400126.  After that, all access to the floppy goes through
@@ -1212,7 +1212,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	return (result << 8) | result;
 }
 
-WRITE16_MEMBER ( mac_state::mac_iwm_w )
+void mac_state::mac_iwm_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
 
@@ -1225,7 +1225,7 @@ WRITE16_MEMBER ( mac_state::mac_iwm_w )
 		fdc->write((offset >> 8), data>>8);
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
+void mac_state::mac_adb_via_out_cb2(int state)
 {
 //        printf("VIA OUT CB2 = %x\n", state);
 	if (ADB_IS_EGRET)
@@ -1281,7 +1281,7 @@ WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 #define PA2 0x04
 #define PA1 0x02
 
-READ8_MEMBER(mac_state::mac_via_in_a)
+uint8_t mac_state::mac_via_in_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("VIA1 IN_A (PC %x)\n", m_maincpu->safe_pc());
 
@@ -1336,7 +1336,7 @@ READ8_MEMBER(mac_state::mac_via_in_a)
 	}
 }
 
-READ8_MEMBER(mac_state::mac_via_in_a_pmu)
+uint8_t mac_state::mac_via_in_a_pmu(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("VIA1 IN_A (PC %x)\n", m_maincpu->safe_pc());
 
@@ -1346,7 +1346,7 @@ READ8_MEMBER(mac_state::mac_via_in_a_pmu)
 	return m_pm_data_recv;
 }
 
-READ8_MEMBER(mac_state::mac_via_in_b)
+uint8_t mac_state::mac_via_in_b(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = 0;
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
@@ -1392,7 +1392,7 @@ READ8_MEMBER(mac_state::mac_via_in_b)
 	return val;
 }
 
-READ8_MEMBER(mac_state::mac_via_in_b_via2pmu)
+uint8_t mac_state::mac_via_in_b_via2pmu(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = 0;
 	// TODO: is this valid for VIA2 PMU machines?
@@ -1408,7 +1408,7 @@ READ8_MEMBER(mac_state::mac_via_in_b_via2pmu)
 	return val;
 }
 
-READ8_MEMBER(mac_state::mac_via_in_b_pmu)
+uint8_t mac_state::mac_via_in_b_pmu(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = 0;
 //  printf("Read VIA B: PM_ACK %x\n", m_pm_ack);
@@ -1419,7 +1419,7 @@ READ8_MEMBER(mac_state::mac_via_in_b_pmu)
 	return val;
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_a)
+void mac_state::mac_via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_t *fdc = machine().device("fdc");
 //  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
@@ -1452,7 +1452,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
+void mac_state::mac_via_out_a_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1463,7 +1463,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
 	return;
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b)
+void mac_state::mac_via_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1498,7 +1498,7 @@ void mac_state::update_volume(void)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
+void mac_state::mac_via_out_b_bbadb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1528,7 +1528,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
 	m_rtc->clk_w((data >> 1) & 0x01);
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
+void mac_state::mac_via_out_b_egadb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1539,7 +1539,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
 	m_egret->set_sys_session((data&0x20) ? 1 : 0);
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_cdadb)
+void mac_state::mac_via_out_b_cdadb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1550,12 +1550,12 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_cdadb)
 	m_cuda->set_tip((data&0x20) ? 1 : 0);
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_via2pmu)
+void mac_state::mac_via_out_b_via2pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_pmu)
+void mac_state::mac_via_out_b_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1620,13 +1620,13 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_pmu)
 	m_pm_req = data & 1;
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_via_irq)
+void mac_state::mac_via_irq(int state)
 {
 	/* interrupt the 68k (level 1) */
 	set_via_interrupt(state);
 }
 
-READ16_MEMBER ( mac_state::mac_via_r )
+uint16_t mac_state::mac_via_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -1642,7 +1642,7 @@ READ16_MEMBER ( mac_state::mac_via_r )
 	return (data & 0xff) | (data << 8);
 }
 
-WRITE16_MEMBER ( mac_state::mac_via_w )
+void mac_state::mac_via_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1662,12 +1662,12 @@ WRITE16_MEMBER ( mac_state::mac_via_w )
  * VIA 2 (on Mac IIs, PowerBooks > 100, and PowerMacs)
  * *************************************************************************/
 
-WRITE_LINE_MEMBER(mac_state::mac_via2_irq)
+void mac_state::mac_via2_irq(int state)
 {
 	set_via2_interrupt(state);
 }
 
-READ16_MEMBER ( mac_state::mac_via2_r )
+uint16_t mac_state::mac_via2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int data;
 
@@ -1682,7 +1682,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 	return (data & 0xff) | (data << 8);
 }
 
-WRITE16_MEMBER ( mac_state::mac_via2_w )
+void mac_state::mac_via2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1697,7 +1697,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 }
 
 
-READ8_MEMBER(mac_state::mac_via2_in_a)
+uint8_t mac_state::mac_via2_in_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result;
 
@@ -1713,12 +1713,12 @@ READ8_MEMBER(mac_state::mac_via2_in_a)
 	return result;
 }
 
-READ8_MEMBER(mac_state::mac_via2_in_a_pmu)
+uint8_t mac_state::mac_via2_in_a_pmu(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pm_data_recv;
 }
 
-READ8_MEMBER(mac_state::mac_via2_in_b)
+uint8_t mac_state::mac_via2_in_b(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("VIA2 IN B (PC %x)\n", m_maincpu->safe_pc());
 
@@ -1735,7 +1735,7 @@ READ8_MEMBER(mac_state::mac_via2_in_b)
 	return 0xcf;        // indicate no NuBus transaction error
 }
 
-READ8_MEMBER(mac_state::mac_via2_in_b_pmu)
+uint8_t mac_state::mac_via2_in_b_pmu(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("VIA2 IN B (PC %x)\n", m_maincpu->safe_pc());
 
@@ -1749,18 +1749,18 @@ READ8_MEMBER(mac_state::mac_via2_in_b_pmu)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via2_out_a)
+void mac_state::mac_via2_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("VIA2 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 }
 
-WRITE8_MEMBER(mac_state::mac_via2_out_a_pmu)
+void mac_state::mac_via2_out_a_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("VIA2 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 	m_pm_data_send = data;
 }
 
-WRITE8_MEMBER(mac_state::mac_via2_out_b)
+void mac_state::mac_via2_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("VIA2 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1774,7 +1774,7 @@ WRITE8_MEMBER(mac_state::mac_via2_out_b)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via2_out_b_pmu)
+void mac_state::mac_via2_out_b_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("VIA2 OUT B PMU: %02x (PC %x)\n", data, m_maincpu->pc());
 
@@ -1835,7 +1835,7 @@ WRITE8_MEMBER(mac_state::mac_via2_out_b_pmu)
 }
 
 // This signal is generated internally on RBV, V8, Sonora, VASP, Eagle, etc.
-TIMER_CALLBACK_MEMBER(mac_state::mac_6015_tick)
+void mac_state::mac_6015_tick(void *ptr, int32_t param)
 {
 	m_via1->write_ca1(0);
 	m_via1->write_ca1(1);
@@ -2013,7 +2013,7 @@ void mac_state::machine_reset()
 	m_last_taken_interrupt = 0;
 }
 
-WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
+void mac_state::cuda_reset_w(int state)
 {
 	if ((state == ASSERT_LINE) && (m_model < MODEL_MAC_POWERMAC_6100))
 	{
@@ -2036,7 +2036,7 @@ void mac_state::mac_state_load()
 }
 
 
-TIMER_CALLBACK_MEMBER(mac_state::overlay_timeout_func)
+void mac_state::overlay_timeout_func(void *ptr, int32_t param)
 {
 	if (m_overlay != -1)
 	{
@@ -2047,7 +2047,7 @@ TIMER_CALLBACK_MEMBER(mac_state::overlay_timeout_func)
 	m_overlay_timeout->adjust(attotime::never);
 }
 
-READ32_MEMBER(mac_state::mac_read_id)
+uint32_t mac_state::mac_read_id(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //    printf("Mac read ID reg @ PC=%x\n", m_maincpu->pc());
 
@@ -2157,42 +2157,36 @@ void mac_state::mac_driver_init(model_t model)
 	machine().save().register_postload(save_prepost_delegate(FUNC(mac_state::mac_state_load), this));
 }
 
-#define MAC_DRIVER_INIT(label, model)   \
-DRIVER_INIT_MEMBER(mac_state,label)     \
-{   \
-	mac_driver_init(model); \
-}
-
-MAC_DRIVER_INIT(mac128k512k, MODEL_MAC_128K512K)
-MAC_DRIVER_INIT(mac512ke, MODEL_MAC_512KE)
-MAC_DRIVER_INIT(macplus, MODEL_MAC_PLUS)
-MAC_DRIVER_INIT(macse, MODEL_MAC_SE)
-MAC_DRIVER_INIT(macclassic, MODEL_MAC_CLASSIC)
-MAC_DRIVER_INIT(maclc, MODEL_MAC_LC)
-MAC_DRIVER_INIT(maclc2, MODEL_MAC_LC_II)
-MAC_DRIVER_INIT(maclc3, MODEL_MAC_LC_III)
-MAC_DRIVER_INIT(maclc3plus, MODEL_MAC_LC_III_PLUS)
-MAC_DRIVER_INIT(maciici, MODEL_MAC_IICI)
-MAC_DRIVER_INIT(maciisi, MODEL_MAC_IISI)
-MAC_DRIVER_INIT(macii, MODEL_MAC_II)
-MAC_DRIVER_INIT(macse30, MODEL_MAC_SE30)
-MAC_DRIVER_INIT(macclassic2, MODEL_MAC_CLASSIC_II)
-MAC_DRIVER_INIT(maclrcclassic, MODEL_MAC_COLOR_CLASSIC)
-MAC_DRIVER_INIT(macpm6100, MODEL_MAC_POWERMAC_6100)
-MAC_DRIVER_INIT(macpm7100, MODEL_MAC_POWERMAC_7100)
-MAC_DRIVER_INIT(macpm8100, MODEL_MAC_POWERMAC_8100)
-MAC_DRIVER_INIT(macprtb, MODEL_MAC_PORTABLE)
-MAC_DRIVER_INIT(macpb100, MODEL_MAC_PB100)
-MAC_DRIVER_INIT(macpb140, MODEL_MAC_PB140)
-MAC_DRIVER_INIT(macpb160, MODEL_MAC_PB160)
-MAC_DRIVER_INIT(maciivx, MODEL_MAC_IIVX)
-MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
-MAC_DRIVER_INIT(macpd210, MODEL_MAC_PBDUO_210)
-MAC_DRIVER_INIT(macquadra700, MODEL_MAC_QUADRA_700)
-MAC_DRIVER_INIT(maciicx, MODEL_MAC_IICX)
-MAC_DRIVER_INIT(maciifdhd, MODEL_MAC_II_FDHD)
-MAC_DRIVER_INIT(maciix, MODEL_MAC_IIX)
-MAC_DRIVER_INIT(maclc520, MODEL_MAC_LC_520)
+void mac_state::init_mac128k512k() { mac_driver_init(MODEL_MAC_128K512K); }
+void mac_state::init_mac512ke() { mac_driver_init(MODEL_MAC_512KE); }
+void mac_state::init_macplus() { mac_driver_init(MODEL_MAC_PLUS); }
+void mac_state::init_macse() { mac_driver_init(MODEL_MAC_SE); }
+void mac_state::init_macclassic() { mac_driver_init(MODEL_MAC_CLASSIC); }
+void mac_state::init_maclc() { mac_driver_init(MODEL_MAC_LC); }
+void mac_state::init_maclc2() { mac_driver_init(MODEL_MAC_LC_II); }
+void mac_state::init_maclc3() { mac_driver_init(MODEL_MAC_LC_III); }
+void mac_state::init_maclc3plus() { mac_driver_init(MODEL_MAC_LC_III_PLUS); }
+void mac_state::init_maciici() { mac_driver_init(MODEL_MAC_IICI); }
+void mac_state::init_maciisi() { mac_driver_init(MODEL_MAC_IISI); }
+void mac_state::init_macii() { mac_driver_init(MODEL_MAC_II); }
+void mac_state::init_macse30() { mac_driver_init(MODEL_MAC_SE30); }
+void mac_state::init_macclassic2() { mac_driver_init(MODEL_MAC_CLASSIC_II); }
+void mac_state::init_maclrcclassic() { mac_driver_init(MODEL_MAC_COLOR_CLASSIC); }
+void mac_state::init_macpm6100() { mac_driver_init(MODEL_MAC_POWERMAC_6100); }
+void mac_state::init_macpm7100() { mac_driver_init(MODEL_MAC_POWERMAC_7100); }
+void mac_state::init_macpm8100() { mac_driver_init(MODEL_MAC_POWERMAC_8100); }
+void mac_state::init_macprtb() { mac_driver_init(MODEL_MAC_PORTABLE); }
+void mac_state::init_macpb100() { mac_driver_init(MODEL_MAC_PB100); }
+void mac_state::init_macpb140() { mac_driver_init(MODEL_MAC_PB140); }
+void mac_state::init_macpb160() { mac_driver_init(MODEL_MAC_PB160); }
+void mac_state::init_maciivx() { mac_driver_init(MODEL_MAC_IIVX); }
+void mac_state::init_maciifx() { mac_driver_init(MODEL_MAC_IIFX); }
+void mac_state::init_macpd210() { mac_driver_init(MODEL_MAC_PBDUO_210); }
+void mac_state::init_macquadra700() { mac_driver_init(MODEL_MAC_QUADRA_700); }
+void mac_state::init_maciicx() { mac_driver_init(MODEL_MAC_IICX); }
+void mac_state::init_maciifdhd() { mac_driver_init(MODEL_MAC_II_FDHD); }
+void mac_state::init_maciix() { mac_driver_init(MODEL_MAC_IIX); }
+void mac_state::init_maclc520() { mac_driver_init(MODEL_MAC_LC_520); }
 
 void mac_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
 {
@@ -2299,7 +2293,7 @@ void mac_state::vblank_irq()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
+void mac_state::mac_scanline_tick(void *ptr, int32_t param)
 {
 	int scanline;
 
@@ -2328,32 +2322,32 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 	m_scanline_timer->adjust(machine().first_screen()->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
 }
 
-WRITE_LINE_MEMBER(mac_state::nubus_irq_9_w)
+void mac_state::nubus_irq_9_w(int state)
 {
 	nubus_slot_interrupt(9, state);
 }
 
-WRITE_LINE_MEMBER(mac_state::nubus_irq_a_w)
+void mac_state::nubus_irq_a_w(int state)
 {
 	nubus_slot_interrupt(0xa, state);
 }
 
-WRITE_LINE_MEMBER(mac_state::nubus_irq_b_w)
+void mac_state::nubus_irq_b_w(int state)
 {
 	nubus_slot_interrupt(0xb, state);
 }
 
-WRITE_LINE_MEMBER(mac_state::nubus_irq_c_w)
+void mac_state::nubus_irq_c_w(int state)
 {
 	nubus_slot_interrupt(0xc, state);
 }
 
-WRITE_LINE_MEMBER(mac_state::nubus_irq_d_w)
+void mac_state::nubus_irq_d_w(int state)
 {
 	nubus_slot_interrupt(0xd, state);
 }
 
-WRITE_LINE_MEMBER(mac_state::nubus_irq_e_w)
+void mac_state::nubus_irq_e_w(int state)
 {
 	nubus_slot_interrupt(0xe, state);
 }

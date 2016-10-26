@@ -24,17 +24,17 @@
  *
  *************************************/
 
-WRITE8_MEMBER(compgolf_state::compgolf_scrollx_lo_w)
+void compgolf_state::compgolf_scrollx_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx_lo = data;
 }
 
-WRITE8_MEMBER(compgolf_state::compgolf_scrolly_lo_w)
+void compgolf_state::compgolf_scrolly_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrolly_lo = data;
 }
 
-WRITE8_MEMBER(compgolf_state::compgolf_ctrl_w)
+void compgolf_state::compgolf_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 4 and 6 are always set */
 
@@ -329,7 +329,7 @@ void compgolf_state::compgolf_expand_bg()
 	}
 }
 
-DRIVER_INIT_MEMBER(compgolf_state,compgolf)
+void compgolf_state::init_compgolf()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
 	compgolf_expand_bg();

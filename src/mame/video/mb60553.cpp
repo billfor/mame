@@ -114,7 +114,7 @@ index is in the MSB. gstriker uses 5 bits for banking, but the chips could be ab
 
 
 
-TILE_GET_INFO_MEMBER(mb60553_zooming_tilemap_device::get_tile_info)
+void mb60553_zooming_tilemap_device::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data, bankno;
 	int tileno, pal;
@@ -175,7 +175,7 @@ void mb60553_zooming_tilemap_device::reg_written( int num_reg)
 }
 
 /* twc94 has the tilemap made of 2 pages .. it needs this */
-TILEMAP_MAPPER_MEMBER(mb60553_zooming_tilemap_device::twc94_scan)
+tilemap_memory_index mb60553_zooming_tilemap_device::twc94_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row*64) + (col&63) + ((col&64)<<6);
@@ -303,7 +303,7 @@ tilemap_t* mb60553_zooming_tilemap_device::get_tilemap()
 }
 
 
-WRITE16_MEMBER(mb60553_zooming_tilemap_device::regs_w)
+void mb60553_zooming_tilemap_device::regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldreg = m_regs[offset];
 
@@ -313,30 +313,30 @@ WRITE16_MEMBER(mb60553_zooming_tilemap_device::regs_w)
 		reg_written(offset);
 }
 
-WRITE16_MEMBER(mb60553_zooming_tilemap_device::vram_w)
+void mb60553_zooming_tilemap_device::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 
 	m_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(mb60553_zooming_tilemap_device::line_w)
+void mb60553_zooming_tilemap_device::line_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_lineram[offset]);
 }
 
 
-READ16_MEMBER(mb60553_zooming_tilemap_device::regs_r)
+uint16_t mb60553_zooming_tilemap_device::regs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_regs[offset];
 }
 
-READ16_MEMBER(mb60553_zooming_tilemap_device::vram_r)
+uint16_t mb60553_zooming_tilemap_device::vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_vram[offset];
 }
 
-READ16_MEMBER(mb60553_zooming_tilemap_device::line_r)
+uint16_t mb60553_zooming_tilemap_device::line_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_lineram[offset];
 }

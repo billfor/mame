@@ -76,12 +76,12 @@ static ADDRESS_MAP_START(kim1_map, AS_PROGRAM, 8, kim1_state)
 ADDRESS_MAP_END
 
 // RS and ST key input
-INPUT_CHANGED_MEMBER(kim1_state::trigger_reset)
+void kim1_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 		m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER(kim1_state::trigger_nmi)
+void kim1_state::trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 		m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -135,7 +135,7 @@ static INPUT_PORTS_START( kim1 )
 INPUT_PORTS_END
 
 // Read from keyboard
-READ8_MEMBER( kim1_state::kim1_u2_read_a )
+uint8_t kim1_state::kim1_u2_read_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -155,7 +155,7 @@ READ8_MEMBER( kim1_state::kim1_u2_read_a )
 }
 
 // Write to 7-Segment LEDs
-WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
+void kim1_state::kim1_u2_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t idx = ( m_u2_port_b >> 1 ) & 0x0f;
 
@@ -170,7 +170,7 @@ WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
 }
 
 // Load from cassette
-READ8_MEMBER( kim1_state::kim1_u2_read_b )
+uint8_t kim1_state::kim1_u2_read_b(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( m_riot2->portb_out_get() & 0x20 )
 		return 0xFF;
@@ -179,7 +179,7 @@ READ8_MEMBER( kim1_state::kim1_u2_read_b )
 }
 
 // Save to cassette
-WRITE8_MEMBER( kim1_state::kim1_u2_write_b )
+void kim1_state::kim1_u2_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u2_port_b = data;
 
@@ -190,7 +190,7 @@ WRITE8_MEMBER( kim1_state::kim1_u2_write_b )
 	/* Set IRQ when bit 7 is cleared */
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_cassette_input)
+void kim1_state::kim1_cassette_input(timer_device &timer, void *ptr, int32_t param)
 {
 	double tap_val = m_cass->input();
 
@@ -208,7 +208,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_cassette_input)
 }
 
 // Blank LEDs during cassette operations
-TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_update_leds)
+void kim1_state::kim1_update_leds(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t i;
 

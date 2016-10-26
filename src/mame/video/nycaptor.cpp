@@ -25,7 +25,7 @@ int nycaptor_state::nycaptor_spot(  )
 		return 0;
 }
 
-TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
+void nycaptor_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int pal = m_videoram[tile_index * 2 + 1] & 0x0f;
 	tileinfo.category = (m_videoram[tile_index * 2 + 1] & 0x30) >> 4;
@@ -77,13 +77,13 @@ void nycaptor_state::video_start()
 	save_item(NAME(m_paletteram_ext));
 }
 
-WRITE8_MEMBER(nycaptor_state::nycaptor_videoram_w)
+void nycaptor_state::nycaptor_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(nycaptor_state::nycaptor_palette_w)
+void nycaptor_state::nycaptor_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_gametype == 2) //colt
 		return;
@@ -94,7 +94,7 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_palette_w)
 		m_palette->write(space, (offset & 0xff) + (m_palette_bank << 8), data);
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_palette_r)
+uint8_t nycaptor_state::nycaptor_palette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 0x100)
 		return m_paletteram_ext[(offset & 0xff) + (m_palette_bank << 8)];
@@ -102,7 +102,7 @@ READ8_MEMBER(nycaptor_state::nycaptor_palette_r)
 		return m_paletteram[(offset & 0xff) + (m_palette_bank << 8)];
 }
 
-WRITE8_MEMBER(nycaptor_state::nycaptor_gfxctrl_w)
+void nycaptor_state::nycaptor_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxctrl = data;
 
@@ -116,12 +116,12 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_gfxctrl_w)
 
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_gfxctrl_r)
+uint8_t nycaptor_state::nycaptor_gfxctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_gfxctrl;
 }
 
-WRITE8_MEMBER(nycaptor_state::nycaptor_scrlram_w)
+void nycaptor_state::nycaptor_scrlram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrlram[offset] = data;
 	m_bg_tilemap->set_scrolly(offset, data);

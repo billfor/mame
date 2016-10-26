@@ -80,19 +80,19 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(ccs2810);
-	DECLARE_DRIVER_INIT(ccs2422);
-	DECLARE_MACHINE_RESET(ccs);
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_READ8_MEMBER(port20_r);
-	DECLARE_READ8_MEMBER(port25_r);
-	DECLARE_READ8_MEMBER(port26_r);
-	DECLARE_READ8_MEMBER(port34_r);
-	DECLARE_WRITE8_MEMBER(port04_w);
-	DECLARE_WRITE8_MEMBER(port20_w);
-	DECLARE_WRITE8_MEMBER(port34_w);
-	DECLARE_WRITE8_MEMBER(port40_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void init_ccs2810();
+	void init_ccs2422();
+	void machine_reset_ccs();
+	uint8_t port04_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port20_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port25_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port26_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port34_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port34_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	uint8_t m_term_data;
 	uint8_t m_26_count;
@@ -144,30 +144,30 @@ INPUT_PORTS_END
 //  Keyboard
 //
 //*************************************
-READ8_MEMBER( ccs_state::port20_r )
+uint8_t ccs_state::port20_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( ccs_state::port25_r )
+uint8_t ccs_state::port25_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 0x21 : 0x20;
 }
 
-READ8_MEMBER( ccs_state::port26_r )
+uint8_t ccs_state::port26_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_26_count) m_26_count--;
 	return m_26_count;
 }
 
-WRITE8_MEMBER( ccs_state::port20_w )
+void ccs_state::port20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_terminal->write(space, 0, data & 0x7f);
 }
 
-WRITE8_MEMBER( ccs_state::kbd_put )
+void ccs_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }
@@ -201,7 +201,7 @@ d6 : autoboot (1=go to monitor)
 d7 : drq
 */
 
-READ8_MEMBER( ccs_state::port34_r )
+uint8_t ccs_state::port34_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//return (uint8_t)m_drq | (m_ds << 1) | ((uint8_t)fdc->hld_r() << 5) | 0x40 | ((uint8_t)m_intrq << 7);
 	return (uint8_t)m_fdc->drq_r() | (m_ds << 1) | 0x20 | 0x40 | ((uint8_t)m_fdc->intrq_r() << 7); // hld_r doesn't do anything
@@ -218,7 +218,7 @@ d6 : double (0 = a double-sided 20cm disk is in the drive)
 d7 : drq
 */
 
-READ8_MEMBER( ccs_state::port04_r )
+uint8_t ccs_state::port04_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	bool trk00=1,wprt=0,dside=1;
 	int idx=1;
@@ -244,7 +244,7 @@ d6 : dden
 d7 : autowait (0=ignore drq)
 */
 
-WRITE8_MEMBER( ccs_state::port34_w )
+void ccs_state::port34_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ds = data & 15;
 	m_dsize = BIT(data, 4);
@@ -269,7 +269,7 @@ d7 : rom enable (1=firmware enabled)
 other bits not used
 */
 
-WRITE8_MEMBER( ccs_state::port04_w )
+void ccs_state::port04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ss = BIT(data, 6);
 	if (m_floppy)
@@ -282,12 +282,12 @@ WRITE8_MEMBER( ccs_state::port04_w )
 //  Machine
 //
 //*************************************
-WRITE8_MEMBER( ccs_state::port40_w )
+void ccs_state::port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry( (data) ? 1 : 0);
 }
 
-MACHINE_RESET_MEMBER( ccs_state, ccs )
+void ccs_state::machine_reset_ccs()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -295,7 +295,7 @@ MACHINE_RESET_MEMBER( ccs_state, ccs )
 	m_maincpu->set_state_int(Z80_PC, 0xf000);
 }
 
-DRIVER_INIT_MEMBER( ccs_state, ccs2810 )
+void ccs_state::init_ccs2810()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -304,7 +304,7 @@ DRIVER_INIT_MEMBER( ccs_state, ccs2810 )
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-DRIVER_INIT_MEMBER( ccs_state, ccs2422 )
+void ccs_state::init_ccs2422()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

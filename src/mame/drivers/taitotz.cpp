@@ -556,14 +556,14 @@ public:
 	required_device<ata_interface_device> m_ata;
 	required_device<screen_device> m_screen;
 
-	DECLARE_READ64_MEMBER(ppc_common_r);
-	DECLARE_WRITE64_MEMBER(ppc_common_w);
-	DECLARE_READ64_MEMBER(ieee1394_r);
-	DECLARE_WRITE64_MEMBER(ieee1394_w);
-	DECLARE_READ64_MEMBER(video_chip_r);
-	DECLARE_WRITE64_MEMBER(video_chip_w);
-	DECLARE_READ64_MEMBER(video_fifo_r);
-	DECLARE_WRITE64_MEMBER(video_fifo_w);
+	uint64_t ppc_common_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void ppc_common_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t ieee1394_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void ieee1394_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t video_chip_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void video_chip_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t video_fifo_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void video_fifo_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 
 	std::unique_ptr<uint32_t[]> m_screen_ram;
 	std::unique_ptr<uint32_t[]> m_frame_ram;
@@ -581,10 +581,10 @@ public:
 
 	const char *m_hdd_serial_number;
 
-	DECLARE_READ8_MEMBER(tlcs_common_r);
-	DECLARE_WRITE8_MEMBER(tlcs_common_w);
-	DECLARE_READ8_MEMBER(tlcs_rtc_r);
-	DECLARE_WRITE8_MEMBER(tlcs_rtc_w);
+	uint8_t tlcs_common_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tlcs_common_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tlcs_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tlcs_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_rtcdata[8];
 
@@ -593,22 +593,22 @@ public:
 	int m_count;
 
 	std::unique_ptr<taitotz_renderer> m_renderer;
-	DECLARE_DRIVER_INIT(batlgr2a);
-	DECLARE_DRIVER_INIT(batlgr2);
-	DECLARE_DRIVER_INIT(pwrshovl);
-	DECLARE_DRIVER_INIT(batlgear);
-	DECLARE_DRIVER_INIT(landhigh);
-	DECLARE_DRIVER_INIT(raizpin);
-	DECLARE_DRIVER_INIT(raizpinj);
-	DECLARE_DRIVER_INIT(styphp);
+	void init_batlgr2a();
+	void init_batlgr2();
+	void init_pwrshovl();
+	void init_batlgear();
+	void init_landhigh();
+	void init_raizpin();
+	void init_raizpinj();
+	void init_styphp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(taitotz_vbi);
-	DECLARE_READ16_MEMBER(tlcs_ide0_r);
-	DECLARE_READ16_MEMBER(tlcs_ide1_r);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void taitotz_vbi(device_t &device);
+	uint16_t tlcs_ide0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t tlcs_ide1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ide_interrupt(int state);
 	void draw_tile(uint32_t pos, uint32_t tile);
 	uint32_t video_mem_r(uint32_t address);
 	void video_mem_w(uint32_t address, uint32_t data);
@@ -1637,7 +1637,7 @@ void taitotz_state::video_reg_w(uint32_t reg, uint32_t data)
 	}
 }
 
-READ64_MEMBER(taitotz_state::video_chip_r)
+uint64_t taitotz_state::video_chip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 	uint32_t reg = offset * 8;
@@ -1686,7 +1686,7 @@ READ64_MEMBER(taitotz_state::video_chip_r)
 	return r;
 }
 
-WRITE64_MEMBER(taitotz_state::video_chip_w)
+void taitotz_state::video_chip_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	uint32_t reg = offset * 8;
 	uint32_t regdata;
@@ -1761,7 +1761,7 @@ WRITE64_MEMBER(taitotz_state::video_chip_w)
 	}
 }
 
-READ64_MEMBER(taitotz_state::video_fifo_r)
+uint64_t taitotz_state::video_fifo_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 	if (ACCESSING_BITS_32_63)
@@ -1778,7 +1778,7 @@ READ64_MEMBER(taitotz_state::video_fifo_r)
 	return r;
 }
 
-WRITE64_MEMBER(taitotz_state::video_fifo_w)
+void taitotz_state::video_fifo_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int command = (m_video_reg >> 28) & 0xf;
 	if (command == 0xb)
@@ -1871,7 +1871,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 	//COMBINE_DATA(m_video_fifo_mem + offset);
 }
 
-READ64_MEMBER(taitotz_state::ieee1394_r)
+uint64_t taitotz_state::ieee1394_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	if (offset == 4)
 	{
@@ -1882,7 +1882,7 @@ READ64_MEMBER(taitotz_state::ieee1394_r)
 	return 0;
 }
 
-WRITE64_MEMBER(taitotz_state::ieee1394_w)
+void taitotz_state::ieee1394_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	//logerror("ieee1394_w: %08X, %08X%08X, %08X%08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 	if (ACCESSING_BITS_32_63)
@@ -1893,7 +1893,7 @@ WRITE64_MEMBER(taitotz_state::ieee1394_w)
 	}
 }
 
-READ64_MEMBER(taitotz_state::ppc_common_r)
+uint64_t taitotz_state::ppc_common_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t res = 0;
 
@@ -1909,7 +1909,7 @@ READ64_MEMBER(taitotz_state::ppc_common_r)
 	return res;
 }
 
-WRITE64_MEMBER(taitotz_state::ppc_common_w)
+void taitotz_state::ppc_common_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 	{
@@ -2068,7 +2068,7 @@ ADDRESS_MAP_END
 
 
 
-READ8_MEMBER(taitotz_state::tlcs_common_r)
+uint8_t taitotz_state::tlcs_common_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -2080,7 +2080,7 @@ READ8_MEMBER(taitotz_state::tlcs_common_r)
 	}
 }
 
-WRITE8_MEMBER(taitotz_state::tlcs_common_w)
+void taitotz_state::tlcs_common_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -2128,7 +2128,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_common_w)
 }
 
 // RTC could be Epson RTC-64613, same as taitopjc.c
-READ8_MEMBER(taitotz_state::tlcs_rtc_r)
+uint8_t taitotz_state::tlcs_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -2152,7 +2152,7 @@ READ8_MEMBER(taitotz_state::tlcs_rtc_r)
 	return 0;
 }
 
-WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
+void taitotz_state::tlcs_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -2173,7 +2173,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 	}
 }
 
-READ16_MEMBER(taitotz_state::tlcs_ide0_r)
+uint16_t taitotz_state::tlcs_ide0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t d = m_ata->read_cs0(space, offset, mem_mask);
 	if (offset == 7)
@@ -2182,7 +2182,7 @@ READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 	return d;
 }
 
-READ16_MEMBER(taitotz_state::tlcs_ide1_r)
+uint16_t taitotz_state::tlcs_ide1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t d = m_ata->read_cs1(space, offset, mem_mask);
 	if (offset == 6)
@@ -2546,12 +2546,12 @@ void taitotz_state::machine_start()
 }
 
 
-INTERRUPT_GEN_MEMBER(taitotz_state::taitotz_vbi)
+void taitotz_state::taitotz_vbi(device_t &device)
 {
 	m_iocpu->set_input_line(TLCS900_INT3, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
+void taitotz_state::ide_interrupt(int state)
 {
 	m_iocpu->set_input_line(TLCS900_INT2, state);
 }
@@ -2643,7 +2643,7 @@ static const char RAIZPINJ_HDD_SERIAL[] =           // "824915745143        "
 static const char STYPHP_HDD_SERIAL[] =             // "            05872160"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x38, 0x37, 0x32, 0x31, 0x36, 0x30 };
 
-DRIVER_INIT_MEMBER(taitotz_state,landhigh)
+void taitotz_state::init_landhigh()
 {
 	init_taitotz_152();
 
@@ -2652,7 +2652,7 @@ DRIVER_INIT_MEMBER(taitotz_state,landhigh)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,batlgear)
+void taitotz_state::init_batlgear()
 {
 	init_taitotz_111a();
 
@@ -2662,7 +2662,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgear)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,batlgr2)
+void taitotz_state::init_batlgr2()
 {
 	init_taitotz_152();
 
@@ -2671,7 +2671,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgr2)
 	m_scr_base = 0x1e0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,batlgr2a)
+void taitotz_state::init_batlgr2a()
 {
 	init_taitotz_152();
 
@@ -2680,7 +2680,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgr2a)
 	m_scr_base = 0x1e0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
+void taitotz_state::init_pwrshovl()
 {
 	init_taitotz_111a();
 
@@ -2690,7 +2690,7 @@ DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,raizpin)
+void taitotz_state::init_raizpin()
 {
 	init_taitotz_152();
 
@@ -2699,7 +2699,7 @@ DRIVER_INIT_MEMBER(taitotz_state,raizpin)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,raizpinj)
+void taitotz_state::init_raizpinj()
 {
 	init_taitotz_152();
 
@@ -2708,7 +2708,7 @@ DRIVER_INIT_MEMBER(taitotz_state,raizpinj)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,styphp)
+void taitotz_state::init_styphp()
 {
 	init_taitotz_152();
 

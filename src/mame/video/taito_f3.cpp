@@ -416,48 +416,48 @@ inline void taito_f3_state::get_tile_info(tile_data &tileinfo, int tile_index, u
 	tileinfo.pen_mask = (extra_planes << 4) | 0x0f;
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info1)
+void taito_f3_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_1);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info2)
+void taito_f3_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_2);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info3)
+void taito_f3_state::get_tile_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_3);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info4)
+void taito_f3_state::get_tile_info4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_4);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info5)
+void taito_f3_state::get_tile_info5(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_5);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info6)
+void taito_f3_state::get_tile_info6(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_6);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info7)
+void taito_f3_state::get_tile_info7(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_7);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info8)
+void taito_f3_state::get_tile_info8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_8);
 }
 
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_vram)
+void taito_f3_state::get_tile_info_vram(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int vram_tile;
 	int flags=0;
@@ -473,7 +473,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_vram)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
+void taito_f3_state::get_tile_info_pixel(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int vram_tile,col_off;
 	int flags=0;
@@ -522,7 +522,7 @@ void taito_f3_state::screen_eof_f3(screen_device &screen, bool state)
 	}
 }
 
-VIDEO_START_MEMBER(taito_f3_state,f3)
+void taito_f3_state::video_start_f3()
 {
 	const struct F3config *pCFG=&f3_config_table[0];
 	int i;
@@ -718,12 +718,12 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 
 /******************************************************************************/
 
-READ16_MEMBER(taito_f3_state::f3_pf_data_r)
+uint16_t taito_f3_state::f3_pf_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_f3_pf_data[offset];
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_pf_data_w)
+void taito_f3_state::f3_pf_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_f3_pf_data[offset]);
 
@@ -744,32 +744,32 @@ WRITE16_MEMBER(taito_f3_state::f3_pf_data_w)
 	}
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_control_0_w)
+void taito_f3_state::f3_control_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_f3_control_0[offset]);
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_control_1_w)
+void taito_f3_state::f3_control_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_f3_control_1[offset]);
 }
 
-READ16_MEMBER(taito_f3_state::f3_spriteram_r)
+uint16_t taito_f3_state::f3_spriteram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_spriteram_w)
+void taito_f3_state::f3_spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-READ16_MEMBER(taito_f3_state::f3_videoram_r)
+uint16_t taito_f3_state::f3_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_videoram[offset];
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_videoram_w)
+void taito_f3_state::f3_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int tile,col_off;
 	COMBINE_DATA(&m_videoram[offset]);
@@ -787,34 +787,34 @@ WRITE16_MEMBER(taito_f3_state::f3_videoram_w)
 }
 
 
-READ16_MEMBER(taito_f3_state::f3_vram_r)
+uint16_t taito_f3_state::f3_vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_f3_vram[offset];
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_vram_w)
+void taito_f3_state::f3_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_f3_vram[offset]);
 	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
 }
 
-READ16_MEMBER(taito_f3_state::f3_pivot_r)
+uint16_t taito_f3_state::f3_pivot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_f3_pivot_ram[offset];
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_pivot_w)
+void taito_f3_state::f3_pivot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_f3_pivot_ram[offset]);
 	m_gfxdecode->gfx(3)->mark_dirty(offset/16);
 }
 
-READ16_MEMBER(taito_f3_state::f3_lineram_r)
+uint16_t taito_f3_state::f3_lineram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_f3_line_ram[offset];
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_lineram_w)
+void taito_f3_state::f3_lineram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* DariusGX has an interesting bug at the start of Round D - the clearing of lineram
 	(0xa000->0x0xa7ff) overflows into priority RAM (0xb000) and creates garbage priority
@@ -834,7 +834,7 @@ WRITE16_MEMBER(taito_f3_state::f3_lineram_w)
 	COMBINE_DATA(&m_f3_line_ram[offset]);
 }
 
-WRITE32_MEMBER(taito_f3_state::f3_palette_24bit_w)
+void taito_f3_state::f3_palette_24bit_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r,g,b;
 

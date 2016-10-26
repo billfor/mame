@@ -94,12 +94,12 @@ public:
 	required_shared_ptr<uint32_t> m_mainram2;
 	required_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_spriteram;
-	DECLARE_READ32_MEMBER(in0_r);
-	DECLARE_WRITE32_MEMBER(output_w);
-	DECLARE_DRIVER_INIT(feversoc);
+	uint32_t in0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void output_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void init_feversoc();
 	virtual void video_start() override;
 	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(feversoc_irq);
+	void feversoc_irq(device_t &device);
 	required_device<sh2_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -146,14 +146,14 @@ uint32_t feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_in
 
 
 
-READ32_MEMBER(feversoc_state::in0_r)
+uint32_t feversoc_state::in0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t io0 = (ioport("IN1")->read()&0xffff) << 16;
 	uint32_t io1 = (ioport("IN0")->read()&0xffff) << 0;
 	return io0 | io1;
 }
 
-WRITE32_MEMBER(feversoc_state::output_w)
+void feversoc_state::output_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_16_31)
 	{
@@ -259,7 +259,7 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(feversoc_state::feversoc_irq)
+void feversoc_state::feversoc_irq(device_t &device)
 {
 	m_maincpu->set_input_line(8, HOLD_LINE );
 }
@@ -319,7 +319,7 @@ ROM_START( feversoc )
 	ROM_LOAD( "pcm.u0743", 0x00000, 0x80000, CRC(20b0c0e3) SHA1(dcf2f620a8fe695688057dbaf5c431a32a832440) )
 ROM_END
 
-DRIVER_INIT_MEMBER(feversoc_state,feversoc)
+void feversoc_state::init_feversoc()
 {
 	uint32_t *rom = (uint32_t *)memregion("maincpu")->base();
 

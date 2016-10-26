@@ -24,7 +24,7 @@ Notes:
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(snk68_state::get_pow_tile_info)
+void snk68_state::get_pow_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_fg_tile_offset + (m_pow_fg_videoram[2*tile_index] & 0xff);
 	int color = m_pow_fg_videoram[2*tile_index+1] & 0x07;
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(snk68_state::get_pow_tile_info)
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(snk68_state::get_searchar_tile_info)
+void snk68_state::get_searchar_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_pow_fg_videoram[2*tile_index];
 	int tile = data & 0x7ff;
@@ -66,7 +66,7 @@ void snk68_state::video_start()
 	save_item(NAME(m_fg_tile_offset));
 }
 
-VIDEO_START_MEMBER(snk68_state,searchar)
+void snk68_state::video_start_searchar()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk68_state::get_searchar_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
@@ -79,27 +79,27 @@ VIDEO_START_MEMBER(snk68_state,searchar)
 
 ***************************************************************************/
 
-READ16_MEMBER(snk68_state::pow_fg_videoram_r)
+uint16_t snk68_state::pow_fg_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// RAM is only 8-bit
 	return m_pow_fg_videoram[offset] | 0xff00;
 }
 
-WRITE16_MEMBER(snk68_state::pow_fg_videoram_w)
+void snk68_state::pow_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data |= 0xff00;
 	COMBINE_DATA(&m_pow_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(snk68_state::searchar_fg_videoram_w)
+void snk68_state::searchar_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// RAM is full 16-bit, though only half of it is used by the hardware
 	COMBINE_DATA(&m_pow_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(snk68_state::pow_flipscreen_w)
+void snk68_state::pow_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -115,7 +115,7 @@ WRITE16_MEMBER(snk68_state::pow_flipscreen_w)
 	}
 }
 
-WRITE16_MEMBER(snk68_state::searchar_flipscreen_w)
+void snk68_state::searchar_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

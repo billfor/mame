@@ -5,7 +5,7 @@
 #include "includes/spdodgeb.h"
 
 
-PALETTE_INIT_MEMBER(spdodgeb_state, spdodgeb)
+void spdodgeb_state::palette_init_spdodgeb(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -45,13 +45,13 @@ PALETTE_INIT_MEMBER(spdodgeb_state, spdodgeb)
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(spdodgeb_state::background_scan)
+tilemap_memory_index spdodgeb_state::background_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5);
 }
 
-TILE_GET_INFO_MEMBER(spdodgeb_state::get_bg_tile_info)
+void spdodgeb_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_videoram[tile_index];
 	uint8_t attr = m_videoram[tile_index + 0x800];
@@ -87,7 +87,7 @@ void spdodgeb_state::video_start()
 ***************************************************************************/
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_state::interrupt)
+void spdodgeb_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -103,12 +103,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_state::interrupt)
 	}
 }
 
-WRITE8_MEMBER(spdodgeb_state::scrollx_lo_w)
+void spdodgeb_state::scrollx_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lastscroll = (m_lastscroll & 0x100) | data;
 }
 
-WRITE8_MEMBER(spdodgeb_state::ctrl_w)
+void spdodgeb_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = flip screen */
 	flip_screen_set(data & 0x01);
@@ -130,7 +130,7 @@ WRITE8_MEMBER(spdodgeb_state::ctrl_w)
 	m_sprite_palbank = (data & 0xc0) >> 6;
 }
 
-WRITE8_MEMBER(spdodgeb_state::videoram_w)
+void spdodgeb_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);

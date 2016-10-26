@@ -136,7 +136,7 @@ Notes:
  *
  *************************************/
 
-WRITE8_MEMBER(midyunit_state::yawdim_oki_bank_w)
+void midyunit_state::yawdim_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 4)
 		m_oki->set_rom_bank(data & 3);
@@ -150,19 +150,19 @@ WRITE8_MEMBER(midyunit_state::yawdim_oki_bank_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(midyunit_state::narc_talkback_strobe_r)
+ioport_value midyunit_state::narc_talkback_strobe_r(ioport_field &field, void *param)
 {
 	return (m_narc_sound->read(machine().driver_data()->generic_space(), 0) >> 8) & 1;
 }
 
 
-CUSTOM_INPUT_MEMBER(midyunit_state::narc_talkback_data_r)
+ioport_value midyunit_state::narc_talkback_data_r(ioport_field &field, void *param)
 {
 	return m_narc_sound->read(machine().driver_data()->generic_space(), 0) & 0xff;
 }
 
 
-CUSTOM_INPUT_MEMBER(midyunit_state::adpcm_irq_state_r)
+ioport_value midyunit_state::adpcm_irq_state_r(ioport_field &field, void *param)
 {
 	return m_adpcm_sound->irq_read() & 1;
 }

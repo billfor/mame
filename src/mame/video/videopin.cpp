@@ -13,13 +13,13 @@
 
 
 
-TILEMAP_MAPPER_MEMBER(videopin_state::get_memory_offset)
+tilemap_memory_index videopin_state::get_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return num_rows * ((col + 16) % 48) + row;
 }
 
 
-TILE_GET_INFO_MEMBER(videopin_state::get_tile_info)
+void videopin_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 
@@ -89,14 +89,14 @@ uint32_t videopin_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-WRITE8_MEMBER(videopin_state::ball_w)
+void videopin_state::ball_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ball_x = data & 15;
 	m_ball_y = data >> 4;
 }
 
 
-WRITE8_MEMBER(videopin_state::video_ram_w)
+void videopin_state::video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

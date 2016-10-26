@@ -70,16 +70,16 @@ public:
 		, m_buzzer(*this, "buzzer")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(mb8421_intl);
-	DECLARE_WRITE_LINE_MEMBER(mb8421_intr);
-	DECLARE_WRITE_LINE_MEMBER(GPI_w);
-	DECLARE_WRITE_LINE_MEMBER(external_monitor_w);
+	void mb8421_intl(int state);
+	void mb8421_intr(int state);
+	void GPI_w(int state);
+	void external_monitor_w(int state);
 
-	DECLARE_WRITE8_MEMBER(io_expander_w);
-	DECLARE_READ8_MEMBER(io_expander_r);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
-	DECLARE_DRIVER_INIT(pve500);
+	void io_expander_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_expander_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_pve500();
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -90,12 +90,12 @@ private:
 	uint8_t io_SEL, io_LD, io_LE, io_SC, io_KY;
 };
 
-WRITE_LINE_MEMBER( pve500_state::GPI_w )
+void pve500_state::GPI_w(int state)
 {
 	/* TODO: Implement-me */
 }
 
-WRITE_LINE_MEMBER( pve500_state::external_monitor_w )
+void pve500_state::external_monitor_w(int state)
 {
 	/* TODO: Implement-me */
 }
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START(subcpu_prg, AS_PROGRAM, 8, pve500_state)
 	AM_RANGE (0xC000, 0xC7FF) AM_MIRROR(0x3800) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
 ADDRESS_MAP_END
 
-DRIVER_INIT_MEMBER( pve500_state, pve500 )
+void pve500_state::init_pve500()
 {
 }
 
@@ -236,31 +236,31 @@ void pve500_state::machine_reset()
 	m_buzzer->set_state(0);
 }
 
-WRITE_LINE_MEMBER(pve500_state::mb8421_intl)
+void pve500_state::mb8421_intl(int state)
 {
 	// shared ram interrupt request from subcpu side
 	m_maincpu->trg1(state);
 }
 
-WRITE_LINE_MEMBER(pve500_state::mb8421_intr)
+void pve500_state::mb8421_intr(int state)
 {
 	// shared ram interrupt request from maincpu side
 	m_subcpu->trg1(state);
 }
 
-READ8_MEMBER(pve500_state::eeprom_r)
+uint8_t pve500_state::eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_eeprom->ready_read() << 1) | m_eeprom->do_read();
 }
 
-WRITE8_MEMBER(pve500_state::eeprom_w)
+void pve500_state::eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_eeprom->di_write( (data & (1 << 2)) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->clk_write( (data & (1 << 3)) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->cs_write( (data & (1 << 4)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(pve500_state::io_expander_r)
+uint8_t pve500_state::io_expander_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("READ IO_EXPANDER_PORT%c\n", 'A'+offset);
 	switch (offset){
@@ -291,7 +291,7 @@ READ8_MEMBER(pve500_state::io_expander_r)
 	}
 }
 
-WRITE8_MEMBER(pve500_state::io_expander_w)
+void pve500_state::io_expander_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static int LD_data[4];
 	int swap[4] = {2,1,0,3};

@@ -110,7 +110,7 @@ void dooyong_rom_tilemap_device::static_set_primella_code_bits(device_t &device,
 	tilemap_device.m_primella_color_shift = bits;
 }
 
-WRITE8_MEMBER(dooyong_rom_tilemap_device::ctrl_w)
+void dooyong_rom_tilemap_device::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x07U;
 	uint8_t const old = m_registers[offset];
@@ -169,7 +169,7 @@ void dooyong_rom_tilemap_device::device_start()
 	save_item(NAME(m_palette_bank));
 }
 
-TILE_GET_INFO_MEMBER(dooyong_rom_tilemap_device::tile_info)
+void dooyong_rom_tilemap_device::tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	unsigned const attr = m_tilerom[m_tilerom_offset + adjust_tile_index(tile_index)];
 	unsigned code, color, flags;
@@ -233,7 +233,7 @@ void rshark_rom_tilemap_device::device_start()
 		m_colorrom_offset = m_colorrom.length() + m_colorrom_offset;
 }
 
-TILE_GET_INFO_MEMBER(rshark_rom_tilemap_device::tile_info)
+void rshark_rom_tilemap_device::tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	dooyong_rom_tilemap_device::tile_info(tilemap, tileinfo, tile_index);
 
@@ -248,7 +248,7 @@ dooyong_ram_tilemap_device::dooyong_ram_tilemap_device(machine_config const &mco
 {
 }
 
-WRITE16_MEMBER(dooyong_ram_tilemap_device::tileram_w)
+void dooyong_ram_tilemap_device::tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= (64U * 32U) - 1U;
 	uint16_t value(m_tileram[offset]);
@@ -283,7 +283,7 @@ void dooyong_ram_tilemap_device::device_start()
 	save_item(NAME(m_palette_bank));
 }
 
-TILE_GET_INFO_MEMBER(dooyong_ram_tilemap_device::tile_info)
+void dooyong_ram_tilemap_device::tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	// Each tile takes one word of memory:
 	// MSB             LSB
@@ -295,25 +295,25 @@ TILE_GET_INFO_MEMBER(dooyong_ram_tilemap_device::tile_info)
 }
 
 
-READ8_MEMBER(dooyong_z80_state::lastday_tx_r)
+uint8_t dooyong_z80_state::lastday_tx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	bool const lane(BIT(offset, 11));
 	return m_tx->tileram_r(space, offset & 0x07ffU) >> (lane ? 8 : 0);
 }
 
-WRITE8_MEMBER(dooyong_z80_state::lastday_tx_w)
+void dooyong_z80_state::lastday_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bool const lane(BIT(offset, 11));
 	m_tx->tileram_w(space, offset & 0x07ffU, uint16_t(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
 }
 
-READ8_MEMBER(dooyong_z80_state::bluehawk_tx_r)
+uint8_t dooyong_z80_state::bluehawk_tx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	bool const lane(BIT(offset, 0));
 	return m_tx->tileram_r(space, offset >> 1) >> (lane ? 8 : 0);
 }
 
-WRITE8_MEMBER(dooyong_z80_state::bluehawk_tx_w)
+void dooyong_z80_state::bluehawk_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bool const lane(BIT(offset, 0));
 	m_tx->tileram_w(space, offset >> 1, uint16_t(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
@@ -322,7 +322,7 @@ WRITE8_MEMBER(dooyong_z80_state::bluehawk_tx_w)
 
 /* Control registers seem to be different on every game */
 
-WRITE8_MEMBER(dooyong_z80_ym2203_state::lastday_ctrl_w)
+void dooyong_z80_ym2203_state::lastday_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -337,7 +337,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::lastday_ctrl_w)
 	flip_screen_set(data & 0x40);
 }
 
-WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
+void dooyong_z80_ym2203_state::pollux_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("pollux_ctrl_w %02x\n", data);
 
@@ -365,7 +365,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 
 
 
-WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
+void dooyong_z80_state::primella_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry(data & 0x07);
@@ -381,7 +381,7 @@ WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 //  logerror("%04x: bankswitch = %02x\n",space.device().safe_pc(),data&0xe0);
 }
 
-READ8_MEMBER(dooyong_z80_state::paletteram_flytiger_r)
+uint8_t dooyong_z80_state::paletteram_flytiger_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_palette_bank) offset |= 0x800;
 
@@ -389,7 +389,7 @@ READ8_MEMBER(dooyong_z80_state::paletteram_flytiger_r)
 }
 
 
-WRITE8_MEMBER(dooyong_z80_state::paletteram_flytiger_w)
+void dooyong_z80_state::paletteram_flytiger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palette_bank) offset |= 0x800;
 
@@ -399,7 +399,7 @@ WRITE8_MEMBER(dooyong_z80_state::paletteram_flytiger_w)
 
 }
 
-WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)
+void dooyong_z80_state::flytiger_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 is flip screen */
 	flip_screen_set(data & 0x01);
@@ -608,7 +608,7 @@ uint32_t dooyong_z80_state::screen_update_primella(screen_device &screen, bitmap
 
 
 
-VIDEO_START_MEMBER(dooyong_z80_ym2203_state, lastday)
+void dooyong_z80_ym2203_state::video_start_lastday()
 {
 	/* Register for save/restore */
 	save_item(NAME(m_sprites_disabled));
@@ -616,7 +616,7 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, lastday)
 	save_item(NAME(m_interrupt_line_2));
 }
 
-VIDEO_START_MEMBER(dooyong_z80_ym2203_state, gulfstrm)
+void dooyong_z80_ym2203_state::video_start_gulfstrm()
 {
 	m_palette_bank = 0;
 
@@ -626,7 +626,7 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, gulfstrm)
 	save_item(NAME(m_interrupt_line_2));
 }
 
-VIDEO_START_MEMBER(dooyong_z80_ym2203_state, pollux)
+void dooyong_z80_ym2203_state::video_start_pollux()
 {
 	m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
 	save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
@@ -639,11 +639,11 @@ VIDEO_START_MEMBER(dooyong_z80_ym2203_state, pollux)
 	save_item(NAME(m_interrupt_line_2));
 }
 
-VIDEO_START_MEMBER(dooyong_z80_state, bluehawk)
+void dooyong_z80_state::video_start_bluehawk()
 {
 }
 
-VIDEO_START_MEMBER(dooyong_z80_state, flytiger)
+void dooyong_z80_state::video_start_flytiger()
 {
 	m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
 	save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
@@ -655,14 +655,14 @@ VIDEO_START_MEMBER(dooyong_z80_state, flytiger)
 	save_item(NAME(m_flytiger_pri));
 }
 
-VIDEO_START_MEMBER(dooyong_z80_state, primella)
+void dooyong_z80_state::video_start_primella()
 {
 	/* Register for save/restore */
 	save_item(NAME(m_tx_pri));
 }
 
 
-WRITE16_MEMBER(dooyong_68k_state::ctrl_w)
+void dooyong_68k_state::ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -757,7 +757,7 @@ uint32_t rshark_state::screen_update_rshark(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-VIDEO_START_MEMBER(rshark_state, rshark)
+void rshark_state::video_start_rshark()
 {
 	/* Register for save/restore */
 	save_item(NAME(m_bg2_priority));
@@ -789,7 +789,7 @@ uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_in
 	return 0;
 }
 
-VIDEO_START_MEMBER(popbingo_state, popbingo)
+void popbingo_state::video_start_popbingo()
 {
 	m_screen->register_screen_bitmap(m_bg_bitmap);
 	m_screen->register_screen_bitmap(m_bg2_bitmap);

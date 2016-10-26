@@ -30,14 +30,14 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
-	DECLARE_DIRECT_UPDATE_MEMBER(pentagon_direct);
-	DECLARE_WRITE8_MEMBER(pentagon_port_7ffd_w);
-	DECLARE_WRITE8_MEMBER(pentagon_scr_w);
-	DECLARE_WRITE8_MEMBER(pentagon_scr2_w);
-	DECLARE_MACHINE_RESET(pentagon);
-	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
-	TIMER_CALLBACK_MEMBER(irq_on);
-	TIMER_CALLBACK_MEMBER(irq_off);
+	offs_t pentagon_direct(direct_read_data &direct, offs_t address);
+	void pentagon_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pentagon_scr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pentagon_scr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void machine_reset_pentagon();
+	void pentagon_interrupt(device_t &device);
+	void irq_on(void *ptr, int32_t param);
+	void irq_off(void *ptr, int32_t param);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -50,7 +50,7 @@ private:
 	void pentagon_update_memory();
 };
 
-DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
+offs_t pentagon_state::pentagon_direct(direct_read_data &direct, offs_t address)
 {
 	uint16_t pc = m_maincpu->pcbase();
 
@@ -121,7 +121,7 @@ void pentagon_state::pentagon_update_memory()
 	m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
 }
 
-WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
+void pentagon_state::pentagon_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* disable paging */
 	if (m_port_7ffd_data & 0x20)
@@ -137,14 +137,14 @@ WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
 	pentagon_update_memory();
 }
 
-WRITE8_MEMBER(pentagon_state::pentagon_scr_w)
+void pentagon_state::pentagon_scr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	spectrum_UpdateScreenBitmap();
 
 	*((uint8_t*)m_bank2->base() + offset) = data;
 }
 
-WRITE8_MEMBER(pentagon_state::pentagon_scr2_w)
+void pentagon_state::pentagon_scr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_port_7ffd_data & 0x0f) == 0x0f || (m_port_7ffd_data & 0x0f) == 5)
 		spectrum_UpdateScreenBitmap();
@@ -167,18 +167,18 @@ void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pentagon_state::irq_on)
+void pentagon_state::irq_on(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
 	timer_set(attotime::from_ticks(32, XTAL_14MHz / 4), TIMER_IRQ_OFF, 0);
 }
 
-TIMER_CALLBACK_MEMBER(pentagon_state::irq_off)
+void pentagon_state::irq_off(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
+void pentagon_state::pentagon_interrupt(device_t &device)
 {
 	timer_set(attotime::from_ticks(179, XTAL_14MHz / 4), TIMER_IRQ_ON, 0);
 }
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(pentagon_state,pentagon)
+void pentagon_state::machine_reset_pentagon()
 {
 	uint8_t *messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);

@@ -154,7 +154,7 @@ Notes:
 #define MASTER_CLOCK    XTAL_24MHz
 
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)
+void lsasquad_state::lsasquad_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry(data & 0x07);
@@ -539,11 +539,11 @@ static GFXDECODE_START( lsasquad )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(lsasquad_state::unk)
+void lsasquad_state::unk(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-MACHINE_START_MEMBER(lsasquad_state,lsasquad)
+void lsasquad_state::machine_start_lsasquad()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -567,7 +567,7 @@ MACHINE_START_MEMBER(lsasquad_state,lsasquad)
 	save_item(NAME(m_sound_result));
 }
 
-MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
+void lsasquad_state::machine_reset_lsasquad()
 {
 	m_sound_pending = 0;
 	m_sound_nmi_enable = 0;

@@ -67,16 +67,16 @@ public:
 		m_beep(*this, "beeper")
 	{ }
 
-	DECLARE_READ8_MEMBER(portf0_r);
-	DECLARE_WRITE8_MEMBER(portf0_w);
-	DECLARE_WRITE8_MEMBER(portf1_w);
-	DECLARE_WRITE8_MEMBER(h8_status_callback);
-	DECLARE_WRITE_LINE_MEMBER(h8_inte_callback);
-	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_WRITE_LINE_MEMBER(write_cassette_clock);
-	TIMER_DEVICE_CALLBACK_MEMBER(h8_irq_pulse);
-	TIMER_DEVICE_CALLBACK_MEMBER(h8_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(h8_p);
+	uint8_t portf0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portf0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portf1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void h8_status_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void h8_inte_callback(int state);
+	void txdata_callback(int state);
+	void write_cassette_clock(int state);
+	void h8_irq_pulse(timer_device &timer, void *ptr, int32_t param);
+	void h8_c(timer_device &timer, void *ptr, int32_t param);
+	void h8_p(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_digit;
 	uint8_t m_segment;
@@ -98,13 +98,13 @@ private:
 #define H8_IRQ_PULSE (H8_BEEP_FRQ / 2)
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
+void h8_state::h8_irq_pulse(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_irq_ctl & 1)
 		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
 }
 
-READ8_MEMBER( h8_state::portf0_r )
+uint8_t h8_state::portf0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// reads the keyboard
 
@@ -134,7 +134,7 @@ READ8_MEMBER( h8_state::portf0_r )
 	return data;
 }
 
-WRITE8_MEMBER( h8_state::portf0_w )
+void h8_state::portf0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// this will always turn off int10 that was set by the timer
 	// d0-d3 = digit select
@@ -155,7 +155,7 @@ WRITE8_MEMBER( h8_state::portf0_w )
 	if (!BIT(data, 4)) m_irq_ctl |= 2;
 }
 
-WRITE8_MEMBER( h8_state::portf1_w )
+void h8_state::portf1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//d7 segment dot
 	//d6 segment f
@@ -225,14 +225,14 @@ void h8_state::machine_reset()
 	m_ff_b = 1;
 }
 
-WRITE_LINE_MEMBER( h8_state::h8_inte_callback )
+void h8_state::h8_inte_callback(int state)
 {
 		// operate the ION LED
 	output().set_value("ion_led", !state);
 	m_irq_ctl &= 0x7f | ((state) ? 0 : 0x80);
 }
 
-WRITE8_MEMBER( h8_state::h8_status_callback )
+void h8_state::h8_status_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* This is rather messy, but basically there are 2 D flipflops, one drives the other,
 the data is /INTE while the clock is /M1. If the system is in Single Instruction mode,
@@ -263,18 +263,18 @@ But, all of this can only occur if bit 5 of port F0 is low. */
 	output().set_value("run_led", state);
 }
 
-WRITE_LINE_MEMBER( h8_state::txdata_callback )
+void h8_state::txdata_callback(int state)
 {
 	m_cass_state = state;
 }
 
-WRITE_LINE_MEMBER( h8_state::write_cassette_clock )
+void h8_state::write_cassette_clock(int state)
 {
 	m_uart->write_txc(state);
 	m_uart->write_rxc(state);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_c)
+void h8_state::h8_c(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[3]++;
 
@@ -290,7 +290,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_c)
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
+void h8_state::h8_p(timer_device &timer, void *ptr, int32_t param)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;

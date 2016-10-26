@@ -65,22 +65,22 @@ public:
 	uint32_t m_bios_last_address;
 	int m_bios_protected;
 
-	DIRECT_UPDATE_MEMBER(gba_direct);
-	DECLARE_READ32_MEMBER(gba_io_r);
-	DECLARE_WRITE32_MEMBER(gba_io_w);
-	DECLARE_READ32_MEMBER(gba_bios_r);
-	DECLARE_READ32_MEMBER(gba_10000000_r);
-	DECLARE_DRIVER_INIT(gbadv);
-	DECLARE_WRITE_LINE_MEMBER(int_hblank_callback);
-	DECLARE_WRITE_LINE_MEMBER(int_vblank_callback);
-	DECLARE_WRITE_LINE_MEMBER(int_vcount_callback);
-	DECLARE_WRITE_LINE_MEMBER(dma_hblank_callback);
-	DECLARE_WRITE_LINE_MEMBER(dma_vblank_callback);
+	offs_t gba_direct(direct_read_data &direct, offs_t address);
+	uint32_t gba_io_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void gba_io_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gba_bios_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t gba_10000000_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void init_gbadv();
+	void int_hblank_callback(int state);
+	void int_vblank_callback(int state);
+	void int_vcount_callback(int state);
+	void dma_hblank_callback(int state);
+	void dma_vblank_callback(int state);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(dma_complete);
-	TIMER_CALLBACK_MEMBER(timer_expire);
-	TIMER_CALLBACK_MEMBER(handle_irq);
+	void dma_complete(void *ptr, int32_t param);
+	void timer_expire(void *ptr, int32_t param);
+	void handle_irq(void *ptr, int32_t param);
 
 protected:
 	required_region_ptr<uint32_t> m_region_maincpu;

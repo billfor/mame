@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(gunsmoke_state, gunsmoke)
+void gunsmoke_state::palette_init_gunsmoke(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -58,19 +58,19 @@ PALETTE_INIT_MEMBER(gunsmoke_state, gunsmoke)
 	}
 }
 
-WRITE8_MEMBER(gunsmoke_state::gunsmoke_videoram_w)
+void gunsmoke_state::gunsmoke_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gunsmoke_state::gunsmoke_colorram_w)
+void gunsmoke_state::gunsmoke_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gunsmoke_state::gunsmoke_c804_w)
+void gunsmoke_state::gunsmoke_c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 are for coin counters */
 	machine().bookkeeping().coin_counter_w(1, data & 0x01);
@@ -88,7 +88,7 @@ WRITE8_MEMBER(gunsmoke_state::gunsmoke_c804_w)
 	m_chon = data & 0x80;
 }
 
-WRITE8_MEMBER(gunsmoke_state::gunsmoke_d806_w)
+void gunsmoke_state::gunsmoke_d806_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-2 select the sprite 3 bank */
 	m_sprite3bank = data & 0x07;
@@ -100,7 +100,7 @@ WRITE8_MEMBER(gunsmoke_state::gunsmoke_d806_w)
 	m_objon = data & 0x20;
 }
 
-TILE_GET_INFO_MEMBER(gunsmoke_state::get_bg_tile_info)
+void gunsmoke_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *tilerom = memregion("gfx4")->base();
 
@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(gunsmoke_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(gunsmoke_state::get_fg_tile_info)
+void gunsmoke_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0xe0) << 2);

@@ -20,7 +20,7 @@ Notes:
 #include "includes/ohmygod.h"
 
 
-WRITE16_MEMBER(ohmygod_state::ohmygod_ctrl_w)
+void ohmygod_state::ohmygod_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -385,12 +385,12 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(ohmygod_state,ohmygod)
+void ohmygod_state::init_ohmygod()
 {
 	m_adpcm_bank_shift = 4;
 }
 
-DRIVER_INIT_MEMBER(ohmygod_state,naname)
+void ohmygod_state::init_naname()
 {
 	m_adpcm_bank_shift = 0;
 }

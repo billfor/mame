@@ -68,22 +68,22 @@
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( coleco_state::paddle_1_r )
+uint8_t coleco_state::paddle_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_joy_d7_state[0] | coleco_paddle_read(0, m_joy_mode, m_joy_analog_state[0]);
 }
 
-READ8_MEMBER( coleco_state::paddle_2_r )
+uint8_t coleco_state::paddle_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_joy_d7_state[1] | coleco_paddle_read(1, m_joy_mode, m_joy_analog_state[1]);
 }
 
-WRITE8_MEMBER( coleco_state::paddle_off_w )
+void coleco_state::paddle_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_joy_mode = 0;
 }
 
-WRITE8_MEMBER( coleco_state::paddle_on_w )
+void coleco_state::paddle_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_joy_mode = 1;
 }
@@ -160,7 +160,7 @@ INPUT_PORTS_END
 
 /* Interrupts */
 
-WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
+void coleco_state::coleco_vdp_interrupt(int state)
 {
 	// NMI on rising edge
 	if (state && !m_last_nmi_state)
@@ -169,13 +169,13 @@ WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
 	m_last_nmi_state = state;
 }
 
-TIMER_CALLBACK_MEMBER(coleco_state::paddle_d7reset_callback)
+void coleco_state::paddle_d7reset_callback(void *ptr, int32_t param)
 {
 	m_joy_d7_state[param] = 0;
 	m_joy_analog_state[param] = 0;
 }
 
-TIMER_CALLBACK_MEMBER(coleco_state::paddle_irqreset_callback)
+void coleco_state::paddle_irqreset_callback(void *ptr, int32_t param)
 {
 	m_joy_irq_state[param] = 0;
 
@@ -183,7 +183,7 @@ TIMER_CALLBACK_MEMBER(coleco_state::paddle_irqreset_callback)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(coleco_state::paddle_pulse_callback)
+void coleco_state::paddle_pulse_callback(void *ptr, int32_t param)
 {
 	if (m_joy_analog_reload[param])
 	{
@@ -203,7 +203,7 @@ TIMER_CALLBACK_MEMBER(coleco_state::paddle_pulse_callback)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
+void coleco_state::paddle_update_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	// arbitrary timer for reading analog controls
 	coleco_scan_paddles(&m_joy_analog_reload[0], &m_joy_analog_reload[1]);
@@ -224,7 +224,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 	}
 }
 
-READ8_MEMBER( coleco_state::cart_r )
+uint8_t coleco_state::cart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cart->bd_r(space, offset & 0x7fff, 0, 0, 0, 0, 0);
 }

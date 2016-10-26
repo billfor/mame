@@ -16,7 +16,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gladiatr_state::bg_get_tile_info)
+void gladiatr_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_colorram[tile_index];
 
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(gladiatr_state::bg_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(gladiatr_state::fg_get_tile_info)
+void gladiatr_state::fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0,
 			m_textram[tile_index] + (m_fg_tile_bank << 8),
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(gladiatr_state::fg_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(gladiatr_state,ppking)
+void gladiatr_state::video_start_ppking()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
@@ -59,7 +59,7 @@ VIDEO_START_MEMBER(gladiatr_state,ppking)
 	save_item(NAME(m_fg_tile_bank));
 }
 
-VIDEO_START_MEMBER(gladiatr_state,gladiatr)
+void gladiatr_state::video_start_gladiatr()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
@@ -90,25 +90,25 @@ VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gladiatr_state::videoram_w)
+void gladiatr_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state::colorram_w)
+void gladiatr_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state::textram_w)
+void gladiatr_state::textram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_textram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gladiatr_state::paletteram_w)
+void gladiatr_state::paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r,g,b;
 
@@ -127,18 +127,18 @@ WRITE8_MEMBER(gladiatr_state::paletteram_w)
 }
 
 
-WRITE8_MEMBER(gladiatr_state::spritebuffer_w)
+void gladiatr_state::spritebuffer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sprite_buffer = data & 1;
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_spritebank_w)
+void gladiatr_state::gladiatr_spritebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sprite_bank = (data & 1) ? 4 : 2;
 }
 
 
-WRITE8_MEMBER(gladiatr_state::ppking_video_registers_w)
+void gladiatr_state::ppking_video_registers_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x300)
 	{
@@ -164,7 +164,7 @@ WRITE8_MEMBER(gladiatr_state::ppking_video_registers_w)
 //popmessage("%02x %02x",m_fg_scrolly, m_video_attributes);
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_video_registers_w)
+void gladiatr_state::gladiatr_video_registers_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

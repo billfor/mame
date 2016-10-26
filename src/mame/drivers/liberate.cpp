@@ -29,7 +29,7 @@
  *
  *************************************/
 
-READ8_MEMBER(liberate_state::deco16_bank_r)
+uint8_t liberate_state::deco16_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const uint8_t *ROM = memregion("user1")->base();
 
@@ -56,7 +56,7 @@ READ8_MEMBER(liberate_state::deco16_bank_r)
 	return 0;
 }
 
-READ8_MEMBER(liberate_state::deco16_io_r)
+uint8_t liberate_state::deco16_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0) return ioport("IN1")->read(); /* Player 1 controls */
 	if (offset == 1) return ioport("IN2")->read(); /* Player 2 controls */
@@ -68,7 +68,7 @@ READ8_MEMBER(liberate_state::deco16_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(liberate_state::deco16_bank_w)
+void liberate_state::deco16_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank = data;
 
@@ -78,7 +78,7 @@ WRITE8_MEMBER(liberate_state::deco16_bank_w)
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0x800f, "bank1");
 }
 
-READ8_MEMBER(liberate_state::prosoccr_bank_r)
+uint8_t liberate_state::prosoccr_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const uint8_t *ROM = memregion("user1")->base();
 
@@ -107,7 +107,7 @@ READ8_MEMBER(liberate_state::prosoccr_bank_r)
 	return 0;
 }
 
-READ8_MEMBER(liberate_state::prosoccr_charram_r)
+uint8_t liberate_state::prosoccr_charram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *SRC_GFX = memregion("shared_gfx")->base();
 
@@ -128,7 +128,7 @@ READ8_MEMBER(liberate_state::prosoccr_charram_r)
 	return m_charram[offset + m_gfx_rom_readback * 0x1800];
 }
 
-WRITE8_MEMBER(liberate_state::prosoccr_charram_w)
+void liberate_state::prosoccr_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bank)
 	{
@@ -163,7 +163,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_charram_w)
 //  m_gfxdecode->gfx(0)->mark_dirty((offset | 0x1800) >> 3);
 }
 
-WRITE8_MEMBER(liberate_state::prosoccr_char_bank_w)
+void liberate_state::prosoccr_char_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx_rom_readback = data & 1; //enable GFX rom read-back
 
@@ -171,7 +171,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_char_bank_w)
 		printf("%02x\n", data);
 }
 
-WRITE8_MEMBER(liberate_state::prosoccr_io_bank_w)
+void liberate_state::prosoccr_io_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank = data & 1;
 
@@ -182,7 +182,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_bank_w)
 
 }
 
-READ8_MEMBER(liberate_state::prosport_charram_r)
+uint8_t liberate_state::prosport_charram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *FG_GFX = memregion("progolf_fg_gfx")->base();
 
@@ -202,7 +202,7 @@ READ8_MEMBER(liberate_state::prosport_charram_r)
 	return 0;
 }
 
-WRITE8_MEMBER(liberate_state::prosport_charram_w)
+void liberate_state::prosport_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *FG_GFX = memregion("progolf_fg_gfx")->base();
 
@@ -673,7 +673,7 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(liberate_state::deco16_interrupt)
+void liberate_state::deco16_interrupt(device_t &device)
 {
 	int p = ~ioport("IN3")->read();
 	if ((p & 0x43) && !m_latch)
@@ -689,7 +689,7 @@ INTERRUPT_GEN_MEMBER(liberate_state::deco16_interrupt)
 }
 
 #if 0
-INTERRUPT_GEN_MEMBER(liberate_state::prosport_interrupt)
+void liberate_state::prosport_interrupt(device_t &device)
 {
 	/* ??? */
 	device.execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
@@ -702,7 +702,7 @@ INTERRUPT_GEN_MEMBER(liberate_state::prosport_interrupt)
  *
  *************************************/
 
-MACHINE_START_MEMBER(liberate_state,liberate)
+void liberate_state::machine_start_liberate()
 {
 	save_item(NAME(m_background_disable));
 	save_item(NAME(m_background_color));
@@ -713,7 +713,7 @@ MACHINE_START_MEMBER(liberate_state,liberate)
 	save_item(NAME(m_io_ram));
 }
 
-MACHINE_RESET_MEMBER(liberate_state,liberate)
+void liberate_state::machine_reset_liberate()
 {
 	memset(m_io_ram, 0, ARRAY_LENGTH(m_io_ram));
 
@@ -1263,7 +1263,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(liberate_state,prosport)
+void liberate_state::init_prosport()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	int i;
@@ -1274,14 +1274,14 @@ DRIVER_INIT_MEMBER(liberate_state,prosport)
 
 }
 
-DRIVER_INIT_MEMBER(liberate_state,yellowcb)
+void liberate_state::init_yellowcb()
 {
-	DRIVER_INIT_CALL(prosport);
+	init_prosport();
 
 	m_maincpu->space(AS_PROGRAM).install_read_port(0xa000, 0xa000, "IN0");
 }
 
-DRIVER_INIT_MEMBER(liberate_state,liberate)
+void liberate_state::init_liberate()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 

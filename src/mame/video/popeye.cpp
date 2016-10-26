@@ -199,21 +199,21 @@ void popeye_state::convert_color_prom(const uint8_t *color_prom)
 #endif
 }
 
-PALETTE_INIT_MEMBER(popeye_state, popeye)
+void popeye_state::palette_init_popeye(palette_device &palette)
 {
 	m_invertmask = (USE_NEW_COLOR) ? 0x00 : 0xff;
 
 	convert_color_prom(m_color_prom);
 }
 
-PALETTE_INIT_MEMBER(popeye_state,popeyebl)
+void popeye_state::palette_init_popeyebl(palette_device &palette)
 {
 	m_invertmask = (USE_NEW_COLOR) ? 0xff : 0x00;
 
 	convert_color_prom(m_color_prom);
 }
 
-PALETTE_INIT_MEMBER(popeye_state, skyskipr)
+void popeye_state::palette_init_skyskipr(palette_device &palette)
 {
 	/* Two of the PROM address pins are tied together and one is not connected... */
 	for (int i = 0;i < 0x100;i++)
@@ -280,19 +280,19 @@ void popeye_state::set_background_palette(int bank)
 #endif
 }
 
-WRITE8_MEMBER(popeye_state::popeye_videoram_w)
+void popeye_state::popeye_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(popeye_state::popeye_colorram_w)
+void popeye_state::popeye_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(popeye_state::popeye_bitmap_w)
+void popeye_state::popeye_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sx,sy,x,y,colour;
 
@@ -334,7 +334,7 @@ WRITE8_MEMBER(popeye_state::popeye_bitmap_w)
 	}
 }
 
-WRITE8_MEMBER(popeye_state::skyskipr_bitmap_w)
+void popeye_state::skyskipr_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset = ((offset & 0xfc0) << 1) | (offset & 0x03f);
 	if (data & 0x80)
@@ -343,7 +343,7 @@ WRITE8_MEMBER(popeye_state::skyskipr_bitmap_w)
 	popeye_bitmap_w(space,offset,data);
 }
 
-TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
+void popeye_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
@@ -370,7 +370,7 @@ void popeye_state::video_start()
 	save_pointer(NAME(m_bitmapram.get()), popeye_bitmapram_size);
 }
 
-VIDEO_START_MEMBER(popeye_state,popeye)
+void popeye_state::video_start_popeye()
 {
 	m_bitmapram = std::make_unique<uint8_t[]>(popeye_bitmapram_size);
 	m_tmpbitmap2 = std::make_unique<bitmap_ind16>(512,512);

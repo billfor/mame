@@ -50,13 +50,13 @@
 #include "includes/battlex.h"
 
 
-INTERRUPT_GEN_MEMBER(battlex_state::battlex_interrupt)
+void battlex_state::battlex_interrupt(device_t &device)
 {
 	m_in0_b4 = 1;
 	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(battlex_state::battlex_in0_b4_r)
+ioport_value battlex_state::battlex_in0_b4_r(ioport_field &field, void *param)
 {
 	uint32_t ret = m_in0_b4;
 	if (m_in0_b4)
@@ -297,7 +297,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(battlex_state,battlex)
+void battlex_state::init_battlex()
 {
 	uint8_t *colormask = memregion("user1")->base();
 	uint8_t *gfxdata = memregion("user2")->base();

@@ -227,17 +227,17 @@ public:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
-	//DECLARE_WRITE8_MEMBER(debug_w);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_DRIVER_INIT(bus);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void tmspoker_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	//void debug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_bus();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tmspoker);
+	void palette_init_tmspoker(palette_device &palette);
 	uint32_t screen_update_tmspoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(tmspoker_interrupt);
+	void tmspoker_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -247,14 +247,14 @@ public:
 *     Video Hardware     *
 *************************/
 
-WRITE8_MEMBER(tmspoker_state::tmspoker_videoram_w)
+void tmspoker_state::tmspoker_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(tmspoker_state::get_bg_tile_info)
+void tmspoker_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -278,7 +278,7 @@ uint32_t tmspoker_state::screen_update_tmspoker(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(tmspoker_state, tmspoker)
+void tmspoker_state::palette_init_tmspoker(palette_device &palette)
 {
 }
 
@@ -287,12 +287,12 @@ PALETTE_INIT_MEMBER(tmspoker_state, tmspoker)
 *  Read / Write Handlers  *
 **************************/
 
-//WRITE8_MEMBER(tmspoker_state::debug_w)
+//void tmspoker_state::debug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 //{
 //  popmessage("written : %02X", data);
 //}
 
-INTERRUPT_GEN_MEMBER(tmspoker_state::tmspoker_interrupt)
+void tmspoker_state::tmspoker_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(INT_9980A_LEVEL1, ASSERT_LINE); //_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
 	m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);  // MZ: do we need this?
@@ -335,7 +335,7 @@ static ADDRESS_MAP_START( tmspoker_map, AS_PROGRAM, 8, tmspoker_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(tmspoker_state::unk_r)
+uint8_t tmspoker_state::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("%x\n",offset);
 	return 0;//0xff;//mame_rand(machine);
@@ -600,7 +600,7 @@ ROM_END
 *       Driver Init        *
 ***************************/
 
-DRIVER_INIT_MEMBER(tmspoker_state,bus)
+void tmspoker_state::init_bus()
 {
 	/* decode the TMS9980 ROMs */
 

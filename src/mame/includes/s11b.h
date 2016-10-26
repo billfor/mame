@@ -20,18 +20,18 @@ public:
 
 	{ }
 
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
-	DECLARE_WRITE8_MEMBER(pia34_pa_w);
-	DECLARE_WRITE_LINE_MEMBER(pia40_ca2_w);
+	void dig1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia2c_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia2c_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia34_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia40_ca2_w(int state);
 
-	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
-	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
+	void bg_speech_clock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_speech_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_MACHINE_RESET(s11b);
-	DECLARE_DRIVER_INIT(s11b);
-	DECLARE_DRIVER_INIT(s11b_invert);
+	void machine_reset_s11b();
+	void init_s11b();
+	void init_s11b_invert();
 
 protected:
 	optional_device<hc55516_device> m_bg_hc55516;

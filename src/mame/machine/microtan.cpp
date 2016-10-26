@@ -157,36 +157,36 @@ void microtan_state::microtan_set_irq_line()
 /**************************************************************
  * VIA callback functions for VIA #0
  **************************************************************/
-READ8_MEMBER(microtan_state::via_0_in_a)
+uint8_t microtan_state::via_0_in_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = ioport("JOY")->read();
 	LOG(("microtan_via_0_in_a %02X\n", data));
 	return data;
 }
 
-WRITE8_MEMBER(microtan_state::via_0_out_a)
+void microtan_state::via_0_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("microtan_via_0_out_a %02X\n", data));
 }
 
-WRITE8_MEMBER(microtan_state::via_0_out_b)
+void microtan_state::via_0_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("microtan_via_0_out_b %02X\n", data));
 	/* bit #7 is the cassette output signal */
 	m_cassette->output(data & 0x80 ? +1.0 : -1.0);
 }
 
-WRITE_LINE_MEMBER(microtan_state::via_0_out_ca2)
+void microtan_state::via_0_out_ca2(int state)
 {
 	LOG(("microtan_via_0_out_ca2 %d\n", state));
 }
 
-WRITE_LINE_MEMBER(microtan_state::via_0_out_cb2)
+void microtan_state::via_0_out_cb2(int state)
 {
 	LOG(("microtan_via_0_out_cb2 %d\n", state));
 }
 
-WRITE_LINE_MEMBER(microtan_state::via_0_irq)
+void microtan_state::via_0_irq(int state)
 {
 	LOG(("microtan_via_0_irq %d\n", state));
 	m_via_0_irq_line = state;
@@ -197,27 +197,27 @@ WRITE_LINE_MEMBER(microtan_state::via_0_irq)
  * VIA callback functions for VIA #1
  **************************************************************/
 
-WRITE8_MEMBER(microtan_state::via_1_out_a)
+void microtan_state::via_1_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("microtan_via_1_out_a %02X\n", data));
 }
 
-WRITE8_MEMBER(microtan_state::via_1_out_b)
+void microtan_state::via_1_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("microtan_via_1_out_b %02X\n", data));
 }
 
-WRITE_LINE_MEMBER(microtan_state::via_1_out_ca2)
+void microtan_state::via_1_out_ca2(int state)
 {
 	LOG(("microtan_via_1_out_ca2 %d\n", state));
 }
 
-WRITE_LINE_MEMBER(microtan_state::via_1_out_cb2)
+void microtan_state::via_1_out_cb2(int state)
 {
 	LOG(("microtan_via_1_out_cb2 %d\n", state));
 }
 
-WRITE_LINE_MEMBER(microtan_state::via_1_irq)
+void microtan_state::via_1_irq(int state)
 {
 	LOG(("microtan_via_1_irq %d\n", state));
 	m_via_1_irq_line = state;
@@ -240,7 +240,7 @@ void microtan_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-TIMER_CALLBACK_MEMBER(microtan_state::microtan_read_cassette)
+void microtan_state::microtan_read_cassette(void *ptr, int32_t param)
 {
 	double level = m_cassette->input();
 
@@ -251,20 +251,20 @@ TIMER_CALLBACK_MEMBER(microtan_state::microtan_read_cassette)
 		m_via6522_0->write_cb2(1);
 }
 
-READ8_MEMBER(microtan_state::microtan_sound_r)
+uint8_t microtan_state::microtan_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 	LOG(("microtan_sound_r: -> %02x\n", data));
 	return data;
 }
 
-WRITE8_MEMBER(microtan_state::microtan_sound_w)
+void microtan_state::microtan_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("microtan_sound_w: <- %02x\n", data));
 }
 
 
-READ8_MEMBER(microtan_state::microtan_bffx_r)
+uint8_t microtan_state::microtan_bffx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 	switch( offset & 3 )
@@ -288,12 +288,12 @@ READ8_MEMBER(microtan_state::microtan_bffx_r)
 
 
 /* This callback is called one clock cycle after BFF2 is written (delayed nmi) */
-TIMER_CALLBACK_MEMBER(microtan_state::microtan_pulse_nmi)
+void microtan_state::microtan_pulse_nmi(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(microtan_state::microtan_bffx_w)
+void microtan_state::microtan_bffx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset & 3 )
 	{
@@ -326,7 +326,7 @@ void microtan_state::store_key(int key)
 	microtan_set_irq_line();
 }
 
-INTERRUPT_GEN_MEMBER(microtan_state::microtan_interrupt)
+void microtan_state::microtan_interrupt(device_t &device)
 {
 	int mod, row, col, chg, newvar;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
@@ -415,7 +415,7 @@ INTERRUPT_GEN_MEMBER(microtan_state::microtan_interrupt)
 	}
 }
 
-DRIVER_INIT_MEMBER(microtan_state,microtan)
+void microtan_state::init_microtan()
 {
 	uint8_t *dst = memregion("gfx2")->base();
 	int i;

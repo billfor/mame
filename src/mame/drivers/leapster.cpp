@@ -226,15 +226,15 @@ public:
 	virtual void machine_reset() override;
 
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
-	DECLARE_DRIVER_INIT(leapster);
+	image_init_result device_image_load_leapster_cart(device_image_interface &image);
+	void init_leapster();
 
-	DECLARE_READ32_MEMBER(leapster_random_r)
+	uint32_t leapster_random_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff)
 	{
 		return rand() | (rand()<<16); // there is a loop checking that this is above a certain value
 	}
 
-	DECLARE_WRITE32_MEMBER(leapster_aux004b_w)
+	void leapster_aux004b_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff)
 	{
 		printf("leapster_aux004b_w %04x\n", data);
 	}
@@ -259,7 +259,7 @@ uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( leapster_state, leapster_cart )
+image_init_result leapster_state::device_image_load_leapster_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -332,7 +332,7 @@ ROM_START(leapstertv)
 	ROM_LOAD( "am29pl160cb-90sf.bin", 0x00000, 0x200000, CRC(194cc724) SHA1(000a79d75c19f2e43532ce0b31f0dca0bed49eab) )
 ROM_END
 
-DRIVER_INIT_MEMBER(leapster_state,leapster)
+void leapster_state::init_leapster()
 {
 }
 

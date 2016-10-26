@@ -52,17 +52,17 @@ CPU/Video Board Parts:
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
-WRITE8_MEMBER(sbasketb_state::sbasketb_sh_irqtrigger_w)
+void sbasketb_state::sbasketb_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(sbasketb_state::sbasketb_coin_counter_w)
+void sbasketb_state::sbasketb_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
-WRITE8_MEMBER(sbasketb_state::irq_mask_w)
+void sbasketb_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }
@@ -177,7 +177,7 @@ static GFXDECODE_START( sbasketb )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16*16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(sbasketb_state::vblank_irq)
+void sbasketb_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -408,7 +408,7 @@ ROM_START( sbaskete )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(sbasketb_state,sbasketb)
+void sbasketb_state::init_sbasketb()
 {
 }
 

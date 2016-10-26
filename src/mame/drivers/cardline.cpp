@@ -49,22 +49,22 @@ public:
 	uint8_t m_video;
 	uint8_t m_hsync_q;
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(attr_w);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_READ8_MEMBER(hsync_r);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hsync_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(asic_r);
-	DECLARE_WRITE8_MEMBER(asic_w);
-	DECLARE_WRITE8_MEMBER(a3003_w);
+	uint8_t asic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void asic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void a3003_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_INIT(cardline);
+	void palette_init_cardline(palette_device &palette);
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void hsync_changed(int state);
+	void vsync_changed(int state);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -135,7 +135,7 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 }
 
 
-WRITE_LINE_MEMBER(cardline_state::hsync_changed)
+void cardline_state::hsync_changed(int state)
 {
 	/* update any video up to the current scanline */
 	m_hsync_q = (state ? 0x00 : 0x10);
@@ -143,23 +143,23 @@ WRITE_LINE_MEMBER(cardline_state::hsync_changed)
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE_LINE_MEMBER(cardline_state::vsync_changed)
+void cardline_state::vsync_changed(int state)
 {
 	//m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(cardline_state::a3003_w)
+void cardline_state::a3003_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* seems a generate a signal when address is written to */
 }
 
-WRITE8_MEMBER(cardline_state::vram_w)
+void cardline_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset+=0x1000*((m_video&2)>>1);
 	m_videoram[offset]=data;
 }
 
-READ8_MEMBER(cardline_state::asic_r)
+uint8_t cardline_state::asic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static int t=0;
 	//printf("asic read %02x\n", offset);
@@ -170,30 +170,30 @@ READ8_MEMBER(cardline_state::asic_r)
 		return 0xaa;
 }
 
-WRITE8_MEMBER(cardline_state::asic_w)
+void cardline_state::asic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("asic write %02x %02x\n", offset, data);
 }
 
 
-WRITE8_MEMBER(cardline_state::attr_w)
+void cardline_state::attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset+=0x1000*((m_video&2)>>1);
 	m_colorram[offset]=data;
 }
 
-WRITE8_MEMBER(cardline_state::video_w)
+void cardline_state::video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video=data;
 	//printf("m_video %x\n", m_video);
 }
 
-READ8_MEMBER(cardline_state::hsync_r)
+uint8_t cardline_state::hsync_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_hsync_q;
 }
 
-WRITE8_MEMBER(cardline_state::lamps_w)
+void cardline_state::lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* button lamps 1-8 (collect, card 1-5, bet, start) */
 	output().set_lamp_value(5,(data >> 0) & 1);
@@ -283,7 +283,7 @@ static GFXDECODE_START( cardline )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 2 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(cardline_state, cardline)
+void cardline_state::palette_init_cardline(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,data;

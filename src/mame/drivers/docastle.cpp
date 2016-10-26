@@ -161,7 +161,7 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 
 
 /* Read/Write Handlers */
-WRITE_LINE_MEMBER(docastle_state::docastle_tint)
+void docastle_state::docastle_tint(int state)
 {
 	if (state)
 	{
@@ -172,7 +172,7 @@ WRITE_LINE_MEMBER(docastle_state::docastle_tint)
 	}
 }
 
-WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
+void docastle_state::idsoccer_adpcm_int(int state)
 {
 	if (m_adpcm_pos >= memregion("adpcm")->bytes())
 	{
@@ -191,14 +191,14 @@ WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 	}
 }
 
-READ8_MEMBER(docastle_state::idsoccer_adpcm_status_r)
+uint8_t docastle_state::idsoccer_adpcm_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// this is wrong, but the samples work anyway!!
 	m_adpcm_status ^= 0x80;
 	return m_adpcm_status;
 }
 
-WRITE8_MEMBER(docastle_state::idsoccer_adpcm_w)
+void docastle_state::idsoccer_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x80)
 	{

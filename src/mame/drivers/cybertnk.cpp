@@ -215,21 +215,21 @@ public:
 	tilemap_t *m_tilemap1_tilemap;
 	tilemap_t *m_tilemap2_tilemap;
 
-	DECLARE_WRITE16_MEMBER(tilemap0_vram_w);
-	DECLARE_WRITE16_MEMBER(tilemap1_vram_w);
-	DECLARE_WRITE16_MEMBER(tilemap2_vram_w);
+	void tilemap0_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tilemap1_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tilemap2_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint8_t m_mux_data;
-	DECLARE_WRITE8_MEMBER(cybertnk_sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(cybertnk_mux_w);
-	DECLARE_READ8_MEMBER(cybertnk_io_rdy_r);
-	DECLARE_READ8_MEMBER(cybertnk_mux_r);
-	DECLARE_WRITE8_MEMBER(cybertnk_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(cybertnk_cnt_w);
-	DECLARE_DRIVER_INIT(cybertnk);
-	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
-	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
-	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
+	void cybertnk_sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cybertnk_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cybertnk_io_rdy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cybertnk_mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cybertnk_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cybertnk_cnt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_cybertnk();
+	void get_tilemap0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tilemap1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tilemap2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
@@ -249,7 +249,7 @@ public:
 
 */
 
-TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap0_tile_info)
+void cybertnk_state::get_tilemap0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tilemap0_vram[tile_index];
 	int pal = (code & 0xe000) >> 13;
@@ -261,7 +261,7 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap0_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap1_tile_info)
+void cybertnk_state::get_tilemap1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tilemap1_vram[tile_index];
 	int pal = (code & 0xe000) >> 13;
@@ -273,7 +273,7 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap2_tile_info)
+void cybertnk_state::get_tilemap2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tilemap2_vram[tile_index];
 	int pal = (code & 0xe000) >> 13;
@@ -511,19 +511,19 @@ uint32_t cybertnk_state::screen_update_cybertnk_left(screen_device &screen, bitm
 uint32_t cybertnk_state::screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, -256); }
 
 
-WRITE16_MEMBER(cybertnk_state::tilemap0_vram_w)
+void cybertnk_state::tilemap0_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap0_vram[offset]);
 	m_tilemap0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(cybertnk_state::tilemap1_vram_w)
+void cybertnk_state::tilemap1_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap1_vram[offset]);
 	m_tilemap1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(cybertnk_state::tilemap2_vram_w)
+void cybertnk_state::tilemap2_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap2_vram[offset]);
 	m_tilemap2_tilemap->mark_tile_dirty(offset);
@@ -531,7 +531,7 @@ WRITE16_MEMBER(cybertnk_state::tilemap2_vram_w)
 
 
 
-WRITE8_MEMBER( cybertnk_state::cybertnk_sound_cmd_w )
+void cybertnk_state::cybertnk_sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -545,7 +545,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_sound_cmd_w )
 }
 
 
-WRITE8_MEMBER( cybertnk_state::cybertnk_mux_w )
+void cybertnk_state::cybertnk_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -559,20 +559,20 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_mux_w )
 	}
 }
 
-READ8_MEMBER( cybertnk_state::cybertnk_io_rdy_r )
+uint8_t cybertnk_state::cybertnk_io_rdy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// bit 0: i/o controller busy?
 	return 0;
 }
 
-READ8_MEMBER( cybertnk_state::cybertnk_mux_r )
+uint8_t cybertnk_state::cybertnk_mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const char *const innames[] = { "TRAVERSE", "ELEVATE", "ACCEL", "HANDLE" };
 	return ioport(innames[(m_mux_data & 0x60) >> 5])->read();
 }
 
 /* Amusingly the data written here is pretty weird, it seems suited for an unused protection device (attract = coin count, in-game = return status of some inputs) */
-WRITE8_MEMBER( cybertnk_state::cybertnk_irq_ack_w )
+void cybertnk_state::cybertnk_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -585,7 +585,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_irq_ack_w )
 	}
 }
 
-WRITE8_MEMBER( cybertnk_state::cybertnk_cnt_w )
+void cybertnk_state::cybertnk_cnt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -971,7 +971,7 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(cybertnk_state,cybertnk)
+void cybertnk_state::init_cybertnk()
 {
 	uint32_t *spr = (uint32_t*)memregion("spr_gfx")->base();
 

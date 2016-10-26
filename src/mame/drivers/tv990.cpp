@@ -77,24 +77,24 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(tvi1111_r);
-	DECLARE_WRITE16_MEMBER(tvi1111_w);
-	DECLARE_READ8_MEMBER(kbdc_r);
-	DECLARE_WRITE8_MEMBER(kbdc_w);
+	uint16_t tvi1111_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tvi1111_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t kbdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(uart0_irq);
-	DECLARE_WRITE_LINE_MEMBER(uart1_irq);
-	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
+	void uart0_irq(int state);
+	void uart1_irq(int state);
+	void lpt_irq(int state);
 
-	INTERRUPT_GEN_MEMBER(vblank);
-	DECLARE_INPUT_CHANGED_MEMBER(color);
+	void vblank(device_t &device);
+	void color(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 private:
 	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
 	int m_rowh, m_width, m_height;
 };
 
-INTERRUPT_GEN_MEMBER(tv990_state::vblank)
+void tv990_state::vblank(device_t &device)
 {
 	m_rowtimer->adjust(m_screen->time_until_pos(m_rowh));
 	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
@@ -118,22 +118,22 @@ void tv990_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	m_screen->update_now();
 }
 
-WRITE_LINE_MEMBER(tv990_state::uart0_irq)
+void tv990_state::uart0_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_5, state);
 }
 
-WRITE_LINE_MEMBER(tv990_state::uart1_irq)
+void tv990_state::uart1_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, state);
 }
 
-WRITE_LINE_MEMBER(tv990_state::lpt_irq)
+void tv990_state::lpt_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
 
-READ16_MEMBER(tv990_state::tvi1111_r)
+uint16_t tv990_state::tvi1111_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == (0x32/2))
 	{
@@ -147,7 +147,7 @@ READ16_MEMBER(tv990_state::tvi1111_r)
 	return tvi1111_regs[offset];
 }
 
-WRITE16_MEMBER(tv990_state::tvi1111_w)
+void tv990_state::tvi1111_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #if 0
 	//if ((offset != 0x50) && (offset != 0x68) && (offset != 0x1d) && (offset != 0x1e) && (offset != 0x17) && (offset != 0x1c))
@@ -286,7 +286,7 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-READ8_MEMBER(tv990_state::kbdc_r)
+uint8_t tv990_state::kbdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset)
 		return m_kbdc->data_r(space, 4);
@@ -294,7 +294,7 @@ READ8_MEMBER(tv990_state::kbdc_r)
 		return m_kbdc->data_r(space, 0);
 }
 
-WRITE8_MEMBER(tv990_state::kbdc_w)
+void tv990_state::kbdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset)
 		m_kbdc->data_w(space, 4, data);
@@ -324,7 +324,7 @@ static INPUT_PORTS_START( tv990 )
 	PORT_CONFSETTING(    0x20, "White") PORT_CHANGED_MEMBER(DEVICE_SELF, tv990_state, color, nullptr)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(tv990_state::color)
+void tv990_state::color(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	rgb_t color;
 	if(newval == oldval)

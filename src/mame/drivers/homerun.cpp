@@ -64,7 +64,7 @@ Notes:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(homerun_state::homerun_control_w)
+void homerun_state::homerun_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0, d1: somehow related to port $40?
 
@@ -93,7 +93,7 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 	m_control = data;
 }
 
-WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
+void homerun_state::homerun_d7756_sample_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sample = data;
 
@@ -122,17 +122,17 @@ static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
 ADDRESS_MAP_END
 
 
-CUSTOM_INPUT_MEMBER(homerun_state::homerun_d7756_busy_r)
+ioport_value homerun_state::homerun_d7756_busy_r(ioport_field &field, void *param)
 {
 	return m_samples->playing(0) ? 0 : 1;
 }
 
-CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_d7756_busy_r)
+ioport_value homerun_state::ganjaja_d7756_busy_r(ioport_field &field, void *param)
 {
 	return m_d7756->busy_r();
 }
 
-CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)
+ioport_value homerun_state::ganjaja_hopper_status_r(ioport_field &field, void *param)
 {
 	// gives hopper error if not 0
 	return 0;

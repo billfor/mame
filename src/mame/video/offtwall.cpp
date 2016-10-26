@@ -17,7 +17,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(offtwall_state::get_playfield_tile_info)
+void offtwall_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data1 = tilemap.basemem_read(tile_index);
 	uint16_t data2 = tilemap.extmem_read(tile_index) >> 8;
@@ -69,7 +69,7 @@ const atari_motion_objects_config offtwall_state::s_mob_config =
 };
 
 
-VIDEO_START_MEMBER(offtwall_state,offtwall)
+void offtwall_state::video_start_offtwall()
 {
 }
 

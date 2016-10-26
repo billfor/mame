@@ -79,15 +79,15 @@ public:
 	uint8_t m_port_last;
 	uint8_t m_port_last2;
 
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_bank_w);
-	DECLARE_WRITE8_MEMBER(safarir_audio_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void safarir_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(safarir);
+	void palette_init_safarir(palette_device &palette);
 	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -98,7 +98,7 @@ public:
  *
  *************************************/
 
-WRITE8_MEMBER(safarir_state::ram_w)
+void safarir_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ram_bank)
 		m_ram_2[offset] = data;
@@ -109,13 +109,13 @@ WRITE8_MEMBER(safarir_state::ram_w)
 }
 
 
-READ8_MEMBER(safarir_state::ram_r)
+uint8_t safarir_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram_bank ? m_ram_2[offset] : m_ram_1[offset];
 }
 
 
-WRITE8_MEMBER(safarir_state::ram_bank_w)
+void safarir_state::ram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_bank = data & 0x01;
 
@@ -148,7 +148,7 @@ static GFXDECODE_START( safarir )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(safarir_state, safarir)
+void safarir_state::palette_init_safarir(palette_device &palette)
 {
 	int i;
 
@@ -159,7 +159,7 @@ PALETTE_INIT_MEMBER(safarir_state, safarir)
 	}
 }
 
-TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
+void safarir_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(safarir_state::get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(safarir_state::get_fg_tile_info)
+void safarir_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color, flags;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -243,7 +243,7 @@ uint32_t safarir_state::screen_update_safarir(screen_device &screen, bitmap_ind1
 #define CHANNEL_SOUND6      5
 
 
-WRITE8_MEMBER(safarir_state::safarir_audio_w)
+void safarir_state::safarir_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t rising_bits = data & ~m_port_last;
 

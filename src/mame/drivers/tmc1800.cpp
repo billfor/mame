@@ -118,17 +118,17 @@ Notes:
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER( tmc1800_state::keylatch_w )
+void tmc1800_state::keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data;
 }
 
-WRITE8_MEMBER( osc1000b_state::keylatch_w )
+void osc1000b_state::keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data;
 }
 
-WRITE8_MEMBER( tmc2000_state::keylatch_w )
+void tmc2000_state::keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -148,7 +148,7 @@ WRITE8_MEMBER( tmc2000_state::keylatch_w )
 	m_keylatch = data & 0x3f;
 }
 
-WRITE8_MEMBER( nano_state::keylatch_w )
+void nano_state::keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -211,7 +211,7 @@ void tmc2000_state::bankswitch()
 	}
 }
 
-WRITE8_MEMBER( tmc2000_state::bankswitch_w )
+void tmc2000_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_roc = 0;
 	m_rac = BIT(data, 0);
@@ -220,7 +220,7 @@ WRITE8_MEMBER( tmc2000_state::bankswitch_w )
 	m_cti->tone_latch_w(space, 0, data);
 }
 
-WRITE8_MEMBER( nano_state::bankswitch_w )
+void nano_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* enable RAM */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -231,7 +231,7 @@ WRITE8_MEMBER( nano_state::bankswitch_w )
 	m_cti->tone_latch_w(space, 0, data);
 }
 
-READ8_MEMBER( tmc1800_state::dispon_r )
+uint8_t tmc1800_state::dispon_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_vdc->disp_on_w(1);
 	m_vdc->disp_on_w(0);
@@ -239,7 +239,7 @@ READ8_MEMBER( tmc1800_state::dispon_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( tmc1800_state::dispoff_w )
+void tmc1800_state::dispoff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vdc->disp_off_w(1);
 	m_vdc->disp_off_w(0);
@@ -325,7 +325,7 @@ static INPUT_PORTS_START( tmc1800 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( tmc2000_state::run_pressed )
+void tmc2000_state::run_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval && !newval)
 	{
@@ -418,7 +418,7 @@ static INPUT_PORTS_START( tmc2000 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( nano_state::run_pressed )
+void nano_state::run_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval && !newval)
 	{
@@ -426,7 +426,7 @@ INPUT_CHANGED_MEMBER( nano_state::run_pressed )
 	}
 }
 
-INPUT_CHANGED_MEMBER( nano_state::monitor_pressed )
+void nano_state::monitor_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval && !newval)
 	{
@@ -474,68 +474,68 @@ INPUT_PORTS_END
 
 // Telmac 1800
 
-READ_LINE_MEMBER( tmc1800_state::clear_r )
+int tmc1800_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( tmc1800_state::ef2_r )
+int tmc1800_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( tmc1800_state::ef3_r )
+int tmc1800_state::ef3_r()
 {
 	return CLEAR_LINE; // TODO
 }
 
-WRITE_LINE_MEMBER( tmc1800_state::q_w )
+void tmc1800_state::q_w(int state)
 {
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
 // Oscom 1000B
 
-READ_LINE_MEMBER( osc1000b_state::clear_r )
+int osc1000b_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( osc1000b_state::ef2_r )
+int osc1000b_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( osc1000b_state::ef3_r )
+int osc1000b_state::ef3_r()
 {
 	return CLEAR_LINE; // TODO
 }
 
-WRITE_LINE_MEMBER( osc1000b_state::q_w )
+void osc1000b_state::q_w(int state)
 {
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
 // Telmac 2000
 
-READ_LINE_MEMBER( tmc2000_state::clear_r )
+int tmc2000_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( tmc2000_state::ef2_r )
+int tmc2000_state::ef2_r()
 {
 	return (m_cassette)->input() < 0;
 }
 
-READ_LINE_MEMBER( tmc2000_state::ef3_r )
+int tmc2000_state::ef3_r()
 {
 	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
 
 	return BIT(data, m_keylatch % 8);
 }
 
-WRITE_LINE_MEMBER( tmc2000_state::q_w )
+void tmc2000_state::q_w(int state)
 {
 	/* CDP1864 audio output enable */
 	m_cti->aoe_w(state);
@@ -547,7 +547,7 @@ WRITE_LINE_MEMBER( tmc2000_state::q_w )
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
-WRITE8_MEMBER( tmc2000_state::dma_w )
+void tmc2000_state::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color = ~(m_colorram[offset & 0x1ff]) & 0x07;
 
@@ -557,7 +557,7 @@ WRITE8_MEMBER( tmc2000_state::dma_w )
 
 // OSCOM Nano
 
-READ_LINE_MEMBER( nano_state::clear_r )
+int nano_state::clear_r()
 {
 	int run = BIT(m_run->read(), 0);
 	int monitor = BIT(m_monitor->read(), 0);
@@ -565,12 +565,12 @@ READ_LINE_MEMBER( nano_state::clear_r )
 	return run && monitor;
 }
 
-READ_LINE_MEMBER( nano_state::ef2_r )
+int nano_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( nano_state::ef3_r )
+int nano_state::ef3_r()
 {
 	uint8_t data = 0xff;
 
@@ -580,7 +580,7 @@ READ_LINE_MEMBER( nano_state::ef3_r )
 	return !BIT(data, m_keylatch & 0x07);
 }
 
-WRITE_LINE_MEMBER( nano_state::q_w )
+void nano_state::q_w(int state)
 {
 	/* CDP1864 audio output enable */
 	m_cti->aoe_w(state);
@@ -860,7 +860,7 @@ void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-DRIVER_INIT_MEMBER(tmc1800_state,tmc1800)
+void tmc1800_state::init_tmc1800()
 {
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 }

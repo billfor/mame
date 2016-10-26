@@ -65,18 +65,18 @@ void gunbustr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
+void gunbustr_state::gunbustr_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), TIMER_GUNBUSTR_INTERRUPT5);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(gunbustr_state::coin_word_r)
+ioport_value gunbustr_state::coin_word_r(ioport_field &field, void *param)
 {
 	return m_coin_word;
 }
 
-WRITE32_MEMBER(gunbustr_state::gunbustr_input_w)
+void gunbustr_state::gunbustr_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -118,7 +118,7 @@ WRITE32_MEMBER(gunbustr_state::gunbustr_input_w)
 	}
 }
 
-WRITE32_MEMBER(gunbustr_state::motor_control_w)
+void gunbustr_state::motor_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Standard value poked into MSW is 0x3c00
 	// (0x2000 and zero are written at startup)
@@ -129,13 +129,13 @@ WRITE32_MEMBER(gunbustr_state::motor_control_w)
 
 
 
-READ32_MEMBER(gunbustr_state::gunbustr_gun_r)
+uint32_t gunbustr_state::gunbustr_gun_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return ( ioport("LIGHT0_X")->read() << 24) | (ioport("LIGHT0_Y")->read() << 16) |
 			( ioport("LIGHT1_X")->read() << 8)  |  ioport("LIGHT1_Y")->read();
 }
 
-WRITE32_MEMBER(gunbustr_state::gunbustr_gun_w)
+void gunbustr_state::gunbustr_gun_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* 10000 cycle delay is arbitrary */
 	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_GUNBUSTR_INTERRUPT5);
@@ -414,7 +414,7 @@ ROM_START( gunbustrj )
 	ROM_LOAD16_WORD( "eeprom-gunbustr.bin", 0x0000, 0x0080, CRC(ef3685a1) SHA1(899b4b6dd2fd78be3a2ce00a2ef1840de9f122c3) )
 ROM_END
 
-READ32_MEMBER(gunbustr_state::main_cycle_r)
+uint32_t gunbustr_state::main_cycle_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (space.device().safe_pc()==0x55a && (m_ram[0x3acc/4]&0xff000000)==0)
 		space.device().execute().spin_until_interrupt();
@@ -422,15 +422,15 @@ READ32_MEMBER(gunbustr_state::main_cycle_r)
 	return m_ram[0x3acc/4];
 }
 
-DRIVER_INIT_MEMBER(gunbustr_state,gunbustr)
+void gunbustr_state::init_gunbustr()
 {
 	/* Speedup handler */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32_delegate(FUNC(gunbustr_state::main_cycle_r),this));
 }
 
-DRIVER_INIT_MEMBER(gunbustr_state,gunbustrj)
+void gunbustr_state::init_gunbustrj()
 {
-	DRIVER_INIT_CALL(gunbustr);
+	init_gunbustr();
 
 	// no coin lockout, perhaps this was a prototype version without proper coin handling?
 	m_coin_lockout = false;

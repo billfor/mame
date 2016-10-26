@@ -77,29 +77,29 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( vic_videoram_r );
+	uint8_t vic_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_light_pen );
-	DECLARE_WRITE_LINE_MEMBER( write_user_joy0 );
-	DECLARE_WRITE_LINE_MEMBER( write_user_joy1 );
-	DECLARE_WRITE_LINE_MEMBER( write_user_joy2 );
-	DECLARE_WRITE_LINE_MEMBER( write_user_light_pen );
-	DECLARE_WRITE_LINE_MEMBER( write_user_cassette_switch );
+	void write_light_pen(int state);
+	void write_user_joy0(int state);
+	void write_user_joy1(int state);
+	void write_user_joy2(int state);
+	void write_user_light_pen(int state);
+	void write_user_cassette_switch(int state);
 
-	DECLARE_READ8_MEMBER( via1_pa_r );
-	DECLARE_WRITE8_MEMBER( via1_pa_w );
-	DECLARE_WRITE8_MEMBER( via1_pb_w );
+	uint8_t via1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( via2_pa_r );
-	DECLARE_READ8_MEMBER( via2_pb_r );
-	DECLARE_WRITE8_MEMBER( via2_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( via2_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( via2_cb2_w );
+	uint8_t via2_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t via2_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via2_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via2_ca2_w(int state);
+	void via2_cb2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
+	void exp_reset_w(int state);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_vc20 );
 	// keyboard state
@@ -160,7 +160,7 @@ QUICKLOAD_LOAD_MEMBER( vic20_state, cbm_vc20 )
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( vic20_state::read )
+uint8_t vic20_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_vic->bus_r();
 
@@ -241,7 +241,7 @@ READ8_MEMBER( vic20_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( vic20_state::write )
+void vic20_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ram1 = 1, ram2 = 1, ram3 = 1;
 	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
@@ -308,7 +308,7 @@ WRITE8_MEMBER( vic20_state::write )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( vic20_state::vic_videoram_r )
+uint8_t vic20_state::vic_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ram1 = 1, ram2 = 1, ram3 = 1;
 	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
@@ -519,7 +519,7 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-READ8_MEMBER( vic20_state::via1_pa_r )
+uint8_t vic20_state::via1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -558,7 +558,7 @@ READ8_MEMBER( vic20_state::via1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( vic20_state::via1_pa_w )
+void vic20_state::via1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -584,7 +584,7 @@ WRITE8_MEMBER( vic20_state::via1_pa_w )
 	m_iec->atn_w(!BIT(data, 7));
 }
 
-WRITE8_MEMBER( vic20_state::via1_pb_w )
+void vic20_state::via1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_user->write_c((data>>0)&1);
 	m_user->write_d((data>>1)&1);
@@ -596,7 +596,7 @@ WRITE8_MEMBER( vic20_state::via1_pb_w )
 	m_user->write_l((data>>7)&1);
 }
 
-READ8_MEMBER( vic20_state::via2_pa_r )
+uint8_t vic20_state::via2_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -623,7 +623,7 @@ READ8_MEMBER( vic20_state::via2_pa_r )
 	return data;
 }
 
-READ8_MEMBER( vic20_state::via2_pb_r )
+uint8_t vic20_state::via2_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -650,7 +650,7 @@ READ8_MEMBER( vic20_state::via2_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( vic20_state::via2_pb_w )
+void vic20_state::via2_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -674,13 +674,13 @@ WRITE8_MEMBER( vic20_state::via2_pb_w )
 	m_key_col = data;
 }
 
-WRITE_LINE_MEMBER( vic20_state::via2_ca2_w )
+void vic20_state::via2_ca2_w(int state)
 {
 	// serial clock out
 	m_iec->clk_w(!state);
 }
 
-WRITE_LINE_MEMBER( vic20_state::via2_cb2_w )
+void vic20_state::via2_cb2_w(int state)
 {
 	// serial data out
 	m_iec->data_w(!state);
@@ -691,7 +691,7 @@ WRITE_LINE_MEMBER( vic20_state::via2_cb2_w )
 //  VIC20_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vic20_state::exp_reset_w )
+void vic20_state::exp_reset_w(int state)
 {
 	if (!state)
 	{
@@ -745,34 +745,34 @@ void vic20_state::machine_reset()
 	m_user->write_3(1);
 }
 
-WRITE_LINE_MEMBER(vic20_state::write_user_joy0)
+void vic20_state::write_user_joy0(int state)
 {
 	m_user_joy0 = state;
 }
 
-WRITE_LINE_MEMBER(vic20_state::write_user_joy1)
+void vic20_state::write_user_joy1(int state)
 {
 	m_user_joy1 = state;
 }
 
-WRITE_LINE_MEMBER(vic20_state::write_user_joy2)
+void vic20_state::write_user_joy2(int state)
 {
 	m_user_joy2 = state;
 }
 
-WRITE_LINE_MEMBER(vic20_state::write_light_pen)
+void vic20_state::write_light_pen(int state)
 {
 	m_light_pen = state;
 	m_vic->lp_w(m_light_pen && m_user_light_pen);
 }
 
-WRITE_LINE_MEMBER(vic20_state::write_user_light_pen)
+void vic20_state::write_user_light_pen(int state)
 {
 	m_user_light_pen = state;
 	m_vic->lp_w(m_light_pen && m_user_light_pen);
 }
 
-WRITE_LINE_MEMBER(vic20_state::write_user_cassette_switch)
+void vic20_state::write_user_cassette_switch(int state)
 {
 	m_user_cassette_switch = state;
 }

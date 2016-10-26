@@ -74,7 +74,7 @@ sprites.
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(dec8_state,ghostb)
+void dec8_state::palette_init_ghostb(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -103,37 +103,37 @@ PALETTE_INIT_MEMBER(dec8_state,ghostb)
 	}
 }
 
-WRITE8_MEMBER(dec8_state::dec8_bg_data_w)
+void dec8_state::dec8_bg_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_data[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-READ8_MEMBER(dec8_state::dec8_bg_data_r)
+uint8_t dec8_state::dec8_bg_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bg_data[offset];
 }
 
 
-WRITE8_MEMBER(dec8_state::dec8_videoram_w)
+void dec8_state::dec8_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(dec8_state::srdarwin_videoram_w)
+void dec8_state::srdarwin_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(dec8_state::dec8_scroll2_w)
+void dec8_state::dec8_scroll2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll2[offset] = data;
 }
 
-WRITE8_MEMBER(dec8_state::srdarwin_control_w)
+void dec8_state::srdarwin_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -148,7 +148,7 @@ WRITE8_MEMBER(dec8_state::srdarwin_control_w)
 	}
 }
 
-WRITE8_MEMBER(dec8_state::lastmisn_control_w)
+void dec8_state::lastmisn_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Bit 0x0f - ROM bank switch.
@@ -168,7 +168,7 @@ WRITE8_MEMBER(dec8_state::lastmisn_control_w)
 		m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(dec8_state::shackled_control_w)
+void dec8_state::shackled_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Bottom 4 bits - bank switch, Bits 4 & 5 - Scroll MSBs */
 	membank("bank1")->set_entry(data & 0x0f);
@@ -177,17 +177,17 @@ WRITE8_MEMBER(dec8_state::shackled_control_w)
 	m_scroll2[2] = (data >> 6) & 1;
 }
 
-WRITE8_MEMBER(dec8_state::lastmisn_scrollx_w)
+void dec8_state::lastmisn_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll2[1] = data;
 }
 
-WRITE8_MEMBER(dec8_state::lastmisn_scrolly_w)
+void dec8_state::lastmisn_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll2[3] = data;
 }
 
-WRITE8_MEMBER(dec8_state::gondo_scroll_w)
+void dec8_state::gondo_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -273,7 +273,7 @@ uint32_t dec8_state::screen_update_cobracom(screen_device &screen, bitmap_ind16 
 /******************************************************************************/
 
 
-TILE_GET_INFO_MEMBER(dec8_state::get_cobracom_fix_tile_info)
+void dec8_state::get_cobracom_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index << 1;
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
@@ -285,7 +285,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_cobracom_fix_tile_info)
 			0);
 }
 
-VIDEO_START_MEMBER(dec8_state,cobracom)
+void dec8_state::video_start_cobracom()
 {
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_cobracom_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -306,7 +306,7 @@ uint32_t dec8_state::screen_update_ghostb(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-TILE_GET_INFO_MEMBER(dec8_state::get_ghostb_fix_tile_info)
+void dec8_state::get_ghostb_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index << 1;
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
@@ -318,7 +318,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_ghostb_fix_tile_info)
 			0);
 }
 
-VIDEO_START_MEMBER(dec8_state,ghostb)
+void dec8_state::video_start_ghostb()
 {
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_ghostb_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fix_tilemap->set_transparent_pen(0);
@@ -341,7 +341,7 @@ uint32_t dec8_state::screen_update_oscar(screen_device &screen, bitmap_ind16 &bi
 	return 0;
 }
 
-TILE_GET_INFO_MEMBER(dec8_state::get_oscar_fix_tile_info)
+void dec8_state::get_oscar_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index << 1;
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
@@ -353,7 +353,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_oscar_fix_tile_info)
 			0);
 }
 
-VIDEO_START_MEMBER(dec8_state,oscar)
+void dec8_state::video_start_oscar()
 {
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_oscar_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -390,13 +390,13 @@ uint32_t dec8_state::screen_update_shackled(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-TILEMAP_MAPPER_MEMBER(dec8_state::lastmisn_scan_rows)
+tilemap_memory_index dec8_state::lastmisn_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return ((col & 0x0f) + ((row & 0x0f) << 4)) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_tile_info)
+void dec8_state::get_lastmisn_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int tile = m_bg_data[offs + 1] + (m_bg_data[offs] << 8);
@@ -413,7 +413,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_fix_tile_info)
+void dec8_state::get_lastmisn_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index << 1;
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
@@ -425,7 +425,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_fix_tile_info)
 			0);
 }
 
-VIDEO_START_MEMBER(dec8_state,lastmisn)
+void dec8_state::video_start_lastmisn()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),this), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),this), 16, 16, 32, 32);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -434,7 +434,7 @@ VIDEO_START_MEMBER(dec8_state,lastmisn)
 	m_game_uses_priority = 0;
 }
 
-VIDEO_START_MEMBER(dec8_state,shackled)
+void dec8_state::video_start_shackled()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_tile_info),this), tilemap_mapper_delegate(FUNC(dec8_state::lastmisn_scan_rows),this), 16, 16, 32, 32);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_lastmisn_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -458,7 +458,7 @@ uint32_t dec8_state::screen_update_srdarwin(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_fix_tile_info)
+void dec8_state::get_srdarwin_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[tile_index];
 	int color = 0; /* ? */
@@ -471,7 +471,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_fix_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_tile_info)
+void dec8_state::get_srdarwin_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_bg_data[2 * tile_index + 1] + (m_bg_data[2 * tile_index] << 8);
 	int color = tile >> 12 & 3;
@@ -487,7 +487,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_tile_info)
 	tileinfo.group = color;
 }
 
-VIDEO_START_MEMBER(dec8_state,srdarwin)
+void dec8_state::video_start_srdarwin()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_srdarwin_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -526,7 +526,7 @@ uint32_t dec8_state::screen_update_garyoret(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-TILE_GET_INFO_MEMBER(dec8_state::get_gondo_fix_tile_info)
+void dec8_state::get_gondo_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int tile = m_videoram[offs + 1] + (m_videoram[offs] << 8);
@@ -538,7 +538,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_gondo_fix_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(dec8_state::get_gondo_tile_info)
+void dec8_state::get_gondo_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int tile = m_bg_data[offs + 1] + (m_bg_data[offs] << 8);
@@ -555,7 +555,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_gondo_tile_info)
 			0);
 }
 
-VIDEO_START_MEMBER(dec8_state,gondo)
+void dec8_state::video_start_gondo()
 {
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -565,7 +565,7 @@ VIDEO_START_MEMBER(dec8_state,gondo)
 	m_game_uses_priority = 0;
 }
 
-VIDEO_START_MEMBER(dec8_state,garyoret)
+void dec8_state::video_start_garyoret()
 {
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_fix_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dec8_state::get_gondo_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);

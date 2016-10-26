@@ -79,7 +79,7 @@
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mm1_state::read )
+uint8_t mm1_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	uint8_t mmu = m_mmu_rom->base()[(m_a8 << 8) | (offset >> 8)];
@@ -149,7 +149,7 @@ READ8_MEMBER( mm1_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mm1_state::write )
+void mm1_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t mmu = m_mmu_rom->base()[(m_a8 << 8) | (offset >> 8)];
 
@@ -207,7 +207,7 @@ WRITE8_MEMBER( mm1_state::write )
 //  ls259_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mm1_state::ls259_w )
+void mm1_state::ls259_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int d = BIT(data, 0);
 
@@ -307,7 +307,7 @@ void mm1_state::update_tc()
 	}
 }
 
-WRITE_LINE_MEMBER( mm1_state::dma_hrq_w )
+void mm1_state::dma_hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -315,7 +315,7 @@ WRITE_LINE_MEMBER( mm1_state::dma_hrq_w )
 	m_dmac->hack_w(state);
 }
 
-READ8_MEMBER( mm1_state::mpsc_dack_r )
+uint8_t mm1_state::mpsc_dack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// clear data request
 	m_dmac->dreq2_w(CLEAR_LINE);
@@ -323,7 +323,7 @@ READ8_MEMBER( mm1_state::mpsc_dack_r )
 	return 1;//m_mpsc->dtra_r();
 }
 
-WRITE8_MEMBER( mm1_state::mpsc_dack_w )
+void mm1_state::mpsc_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//m_mpsc->hai_w(data);
 
@@ -331,7 +331,7 @@ WRITE8_MEMBER( mm1_state::mpsc_dack_w )
 	m_dmac->dreq1_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( mm1_state::dma_eop_w )
+void mm1_state::dma_eop_w(int state)
 {
 	m_maincpu->set_input_line(I8085_RST75_LINE, state);
 
@@ -339,13 +339,13 @@ WRITE_LINE_MEMBER( mm1_state::dma_eop_w )
 	update_tc();
 }
 
-WRITE_LINE_MEMBER( mm1_state::dack3_w )
+void mm1_state::dack3_w(int state)
 {
 	m_dack3 = state;
 	update_tc();
 }
 
-WRITE_LINE_MEMBER( mm1_state::itxc_w )
+void mm1_state::itxc_w(int state)
 {
 	if (!m_intc)
 	{
@@ -353,7 +353,7 @@ WRITE_LINE_MEMBER( mm1_state::itxc_w )
 	}
 }
 
-WRITE_LINE_MEMBER( mm1_state::irxc_w )
+void mm1_state::irxc_w(int state)
 {
 	if (!m_intc)
 	{
@@ -361,7 +361,7 @@ WRITE_LINE_MEMBER( mm1_state::irxc_w )
 	}
 }
 
-WRITE_LINE_MEMBER( mm1_state::auxc_w )
+void mm1_state::auxc_w(int state)
 {
 	m_mpsc->txcb_w(state);
 	m_mpsc->rxcb_w(state);
@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER( mm1_state::auxc_w )
 //  UPD7201
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mm1_state::drq2_w )
+void mm1_state::drq2_w(int state)
 {
 	if (state)
 	{
@@ -379,7 +379,7 @@ WRITE_LINE_MEMBER( mm1_state::drq2_w )
 	}
 }
 
-WRITE_LINE_MEMBER( mm1_state::drq1_w )
+void mm1_state::drq1_w(int state)
 {
 	if (state)
 	{
@@ -387,7 +387,7 @@ WRITE_LINE_MEMBER( mm1_state::drq1_w )
 	}
 }
 
-READ_LINE_MEMBER( mm1_state::dsra_r )
+int mm1_state::dsra_r()
 {
 	return 1;
 }

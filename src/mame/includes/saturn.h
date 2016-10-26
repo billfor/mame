@@ -178,56 +178,56 @@ public:
 	optional_device<saturn_control_port_device> m_ctrl2;
 
 	bitmap_rgb32 m_tmpbitmap;
-	DECLARE_VIDEO_START(stv_vdp2);
+	void video_start_stv_vdp2();
 	uint32_t screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
+	void saturn_scanline(timer_device &timer, void *ptr, int32_t param);
+	void saturn_slave_scanline(timer_device &timer, void *ptr, int32_t param);
 
 	void scu_do_transfer(uint8_t event);
 	void scu_test_pending_irq();
-	DECLARE_READ32_MEMBER(saturn_scu_r);
-	DECLARE_WRITE32_MEMBER(saturn_scu_w);
-	TIMER_CALLBACK_MEMBER(dma_lv0_ended);
-	TIMER_CALLBACK_MEMBER(dma_lv1_ended);
-	TIMER_CALLBACK_MEMBER(dma_lv2_ended);
-	TIMER_CALLBACK_MEMBER(vdp1_draw_end);
+	uint32_t saturn_scu_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void saturn_scu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void dma_lv0_ended(void *ptr, int32_t param);
+	void dma_lv1_ended(void *ptr, int32_t param);
+	void dma_lv2_ended(void *ptr, int32_t param);
+	void vdp1_draw_end(void *ptr, int32_t param);
 	void scu_single_transfer(address_space &space, uint32_t src, uint32_t dst,uint8_t *src_shift);
 	void scu_dma_direct(address_space &space, uint8_t dma_ch);
 	void scu_dma_indirect(address_space &space,uint8_t dma_ch);
-	DECLARE_WRITE16_MEMBER(saturn_soundram_w);
-	DECLARE_READ16_MEMBER(saturn_soundram_r);
-	DECLARE_WRITE32_MEMBER(minit_w);
-	DECLARE_WRITE32_MEMBER(sinit_w);
-	DECLARE_WRITE32_MEMBER(saturn_minit_w);
-	DECLARE_WRITE32_MEMBER(saturn_sinit_w);
-	DECLARE_READ8_MEMBER(saturn_backupram_r);
-	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
-	TIMER_CALLBACK_MEMBER(stv_rtc_increment);
-	DECLARE_WRITE_LINE_MEMBER(scsp_to_main_irq);
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void saturn_soundram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t saturn_soundram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void minit_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sinit_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void saturn_minit_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void saturn_sinit_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t saturn_backupram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void saturn_backupram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stv_rtc_increment(void *ptr, int32_t param);
+	void scsp_to_main_irq(int state);
+	void scsp_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	int m_scsp_last_line;
 
 	uint8_t smpc_direct_mode(uint8_t pad_n);
 	uint8_t smpc_th_control_mode(uint8_t pad_n);
-	TIMER_CALLBACK_MEMBER( smpc_audio_reset_line_pulse );
-	DECLARE_READ8_MEMBER( saturn_SMPC_r );
-	DECLARE_WRITE8_MEMBER( saturn_SMPC_w );
+	void smpc_audio_reset_line_pulse(void *ptr, int32_t param);
+	uint8_t saturn_SMPC_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void saturn_SMPC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ16_MEMBER ( saturn_vdp1_regs_r );
-	DECLARE_READ32_MEMBER ( saturn_vdp1_vram_r );
-	DECLARE_READ32_MEMBER ( saturn_vdp1_framebuffer0_r );
+	uint16_t saturn_vdp1_regs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint32_t saturn_vdp1_vram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t saturn_vdp1_framebuffer0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE16_MEMBER ( saturn_vdp1_regs_w );
-	DECLARE_WRITE32_MEMBER ( saturn_vdp1_vram_w );
-	DECLARE_WRITE32_MEMBER ( saturn_vdp1_framebuffer0_w );
+	void saturn_vdp1_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void saturn_vdp1_vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void saturn_vdp1_framebuffer0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER ( saturn_vdp2_vram_r );
-	DECLARE_READ32_MEMBER ( saturn_vdp2_cram_r );
-	DECLARE_READ16_MEMBER ( saturn_vdp2_regs_r );
+	uint32_t saturn_vdp2_vram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t saturn_vdp2_cram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t saturn_vdp2_regs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE32_MEMBER ( saturn_vdp2_vram_w );
-	DECLARE_WRITE32_MEMBER ( saturn_vdp2_cram_w );
-	DECLARE_WRITE16_MEMBER ( saturn_vdp2_regs_w );
+	void saturn_vdp2_vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void saturn_vdp2_cram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void saturn_vdp2_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 
 	/* VDP1 */
@@ -497,11 +497,11 @@ public:
 	} stv_rbg_cache_data;
 
 	/* stvcd */
-	DECLARE_READ32_MEMBER( stvcd_r );
-	DECLARE_WRITE32_MEMBER( stvcd_w );
+	uint32_t stvcd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void stvcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( stv_sector_cb );
-	TIMER_DEVICE_CALLBACK_MEMBER( stv_sh1_sim );
+	void stv_sector_cb(timer_device &timer, void *ptr, int32_t param);
+	void stv_sh1_sim(timer_device &timer, void *ptr, int32_t param);
 
 	struct direntryT
 	{
@@ -662,32 +662,32 @@ public:
 	int numfiles;            // # of entries in current directory
 	int firstfile;           // first non-directory file
 
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+	void m68k_reset_callback(int state);
 	int DectoBCD(int num);
 
-	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
-	DECLARE_READ16_MEMBER(scudsp_dma_r);
-	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
+	void scudsp_end_w(int state);
+	uint16_t scudsp_dma_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scudsp_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// FROM smpc.c
 	void stv_select_game(int gameno);
 	void smpc_master_on();
-	TIMER_CALLBACK_MEMBER( smpc_slave_enable );
-	TIMER_CALLBACK_MEMBER( smpc_sound_enable );
-	TIMER_CALLBACK_MEMBER( smpc_cd_enable );
+	void smpc_slave_enable(void *ptr, int32_t param);
+	void smpc_sound_enable(void *ptr, int32_t param);
+	void smpc_cd_enable(void *ptr, int32_t param);
 	void smpc_system_reset();
-	TIMER_CALLBACK_MEMBER( smpc_change_clock );
-	TIMER_CALLBACK_MEMBER( stv_intback_peripheral );
-	TIMER_CALLBACK_MEMBER( stv_smpc_intback );
-	TIMER_CALLBACK_MEMBER( intback_peripheral );
-	TIMER_CALLBACK_MEMBER( saturn_smpc_intback );
+	void smpc_change_clock(void *ptr, int32_t param);
+	void stv_intback_peripheral(void *ptr, int32_t param);
+	void stv_smpc_intback(void *ptr, int32_t param);
+	void intback_peripheral(void *ptr, int32_t param);
+	void saturn_smpc_intback(void *ptr, int32_t param);
 	void smpc_rtc_write();
 	void smpc_memory_setting();
 	void smpc_nmi_req();
-	TIMER_CALLBACK_MEMBER( smpc_nmi_set );
+	void smpc_nmi_set(void *ptr, int32_t param);
 	void smpc_comreg_exec(address_space &space, uint8_t data, uint8_t is_stv);
-	DECLARE_READ8_MEMBER( stv_SMPC_r );
-	DECLARE_WRITE8_MEMBER( stv_SMPC_w );
+	uint8_t stv_SMPC_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void stv_SMPC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void debug_scudma_command(int ref, int params, const char **param);
 	void debug_scuirq_command(int ref, int params, const char **param);

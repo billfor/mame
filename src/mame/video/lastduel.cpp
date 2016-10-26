@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(lastduel_state::ld_get_bg_tile_info)
+void lastduel_state::ld_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_scroll2[2 * tile_index] & 0x1fff;
 	int color = m_scroll2[2 * tile_index + 1];
@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::ld_get_bg_tile_info)
 			TILE_FLIPYX((color & 0x60) >> 5));
 }
 
-TILE_GET_INFO_MEMBER(lastduel_state::ld_get_fg_tile_info)
+void lastduel_state::ld_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_scroll1[2 * tile_index] & 0x1fff;
 	int color = m_scroll1[2 * tile_index + 1];
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::ld_get_fg_tile_info)
 	tileinfo.group = (color & 0x80) >> 7;
 }
 
-TILE_GET_INFO_MEMBER(lastduel_state::get_bg_tile_info)
+void lastduel_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_scroll2[tile_index] & 0x1fff;
 	int color = m_scroll2[tile_index + 0x0800];
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_bg_tile_info)
 			TILE_FLIPYX((color & 0x60) >> 5));
 }
 
-TILE_GET_INFO_MEMBER(lastduel_state::get_fg_tile_info)
+void lastduel_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_scroll1[tile_index] & 0x1fff;
 	int color = m_scroll1[tile_index + 0x0800];
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fg_tile_info)
 	tileinfo.group = (color & 0x10) >> 4;
 }
 
-TILE_GET_INFO_MEMBER(lastduel_state::get_fix_info)
+void lastduel_state::get_fix_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_vram[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fix_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(lastduel_state,lastduel)
+void lastduel_state::video_start_lastduel()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
@@ -91,7 +91,7 @@ VIDEO_START_MEMBER(lastduel_state,lastduel)
 	m_tilemap_priority = 0;
 }
 
-VIDEO_START_MEMBER(lastduel_state,madgear)
+void lastduel_state::video_start_madgear()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
@@ -114,7 +114,7 @@ VIDEO_START_MEMBER(lastduel_state,madgear)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(lastduel_state::lastduel_flip_w)
+void lastduel_state::lastduel_flip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -127,7 +127,7 @@ WRITE16_MEMBER(lastduel_state::lastduel_flip_w)
 	}
 }
 
-WRITE16_MEMBER(lastduel_state::lastduel_scroll_w)
+void lastduel_state::lastduel_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 	switch (offset)
@@ -143,37 +143,37 @@ WRITE16_MEMBER(lastduel_state::lastduel_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(lastduel_state::lastduel_scroll1_w)
+void lastduel_state::lastduel_scroll1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll1[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(lastduel_state::lastduel_scroll2_w)
+void lastduel_state::lastduel_scroll2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(lastduel_state::lastduel_vram_w)
+void lastduel_state::lastduel_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(lastduel_state::madgear_scroll1_w)
+void lastduel_state::madgear_scroll1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll1[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_MEMBER(lastduel_state::madgear_scroll2_w)
+void lastduel_state::madgear_scroll2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_MEMBER(lastduel_state::lastduel_palette_word_w)
+void lastduel_state::lastduel_palette_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int red, green, blue, bright;
 	data = COMBINE_DATA(&m_paletteram[offset]);

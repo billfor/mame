@@ -59,24 +59,24 @@ public:
 	}
 
 	// control ports
-	DECLARE_WRITE8_MEMBER(ct_io_w);
-	DECLARE_READ8_MEMBER(rrowx_r);
+	void ct_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rrowx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(laserbat);
-	INTERRUPT_GEN_MEMBER(laserbat_interrupt);
+	void init_laserbat();
+	void laserbat_interrupt(device_t &device);
 
 	// video memory and control ports
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(wcoh_w);
-	DECLARE_WRITE8_MEMBER(wcov_w);
-	DECLARE_WRITE8_MEMBER(cnt_eff_w);
-	DECLARE_WRITE8_MEMBER(cnt_nav_w);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wcoh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wcov_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cnt_eff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cnt_nav_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// sound control ports
-	virtual DECLARE_READ8_MEMBER(rhsc_r);
-	virtual DECLARE_WRITE8_MEMBER(whsc_w);
-	virtual DECLARE_WRITE8_MEMBER(csound1_w);
-	virtual DECLARE_WRITE8_MEMBER(csound2_w);
+	virtual uint8_t rhsc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void whsc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void csound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void csound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// running the video
 	virtual void video_start() override;
@@ -88,7 +88,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// video functions
-	TIMER_CALLBACK_MEMBER(video_line);
+	void video_line(void *ptr, int32_t param);
 
 	// input lines
 	required_ioport_array<4> m_mux_ports;
@@ -158,10 +158,10 @@ public:
 	}
 
 	// video initialisation
-	DECLARE_PALETTE_INIT(laserbat);
+	void palette_init_laserbat(palette_device &palette);
 
 	// sound control ports
-	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
+	virtual void csound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 
@@ -188,11 +188,11 @@ public:
 	}
 
 	// video initialisation
-	DECLARE_PALETTE_INIT(catnmous);
+	void palette_init_catnmous(palette_device &palette);
 
 	// sound control ports
-	virtual DECLARE_WRITE8_MEMBER(csound1_w) override;
-	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
+	virtual void csound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual void csound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	required_device<zac1b11107_audio_device>    m_audiopcb;

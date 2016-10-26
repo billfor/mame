@@ -19,14 +19,14 @@
 #include "includes/labyrunr.h"
 
 
-INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_vblank_interrupt)
+void labyrunr_state::labyrunr_vblank_interrupt(device_t &device)
 {
 	address_space &space = generic_space();
 	if (m_k007121->ctrlram_r(space, 7) & 0x02)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_timer_interrupt)
+void labyrunr_state::labyrunr_timer_interrupt(device_t &device)
 {
 	address_space &space = generic_space();
 	if (m_k007121->ctrlram_r(space, 7) & 0x01)
@@ -34,7 +34,7 @@ INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_timer_interrupt)
 }
 
 
-WRITE8_MEMBER(labyrunr_state::labyrunr_bankswitch_w)
+void labyrunr_state::labyrunr_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0xe0) popmessage("bankswitch %02x", data);
 

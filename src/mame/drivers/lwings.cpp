@@ -65,17 +65,17 @@ Notes:
  * a code reflecting the direction (8 angles) from one point to the other.
  */
 
-WRITE8_MEMBER(lwings_state::avengers_adpcm_w)
+void lwings_state::avengers_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm = data;
 }
 
-READ8_MEMBER(lwings_state::avengers_adpcm_r)
+uint8_t lwings_state::avengers_adpcm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_adpcm;
 }
 
-WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
+void lwings_state::lwings_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  if (data & 0xe0) printf("bankswitch_w %02x\n", data);
 //  Fireball writes 0x20 on startup, maybe reset soundcpu?
@@ -95,20 +95,20 @@ WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
-INTERRUPT_GEN_MEMBER(lwings_state::lwings_interrupt)
+void lwings_state::lwings_interrupt(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
-INTERRUPT_GEN_MEMBER(lwings_state::avengers_interrupt)
+void lwings_state::avengers_interrupt(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-WRITE8_MEMBER(lwings_state::avengers_protection_w)
+void lwings_state::avengers_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 
@@ -135,7 +135,7 @@ WRITE8_MEMBER(lwings_state::avengers_protection_w)
 	}
 }
 
-WRITE8_MEMBER(lwings_state::avengers_prot_bank_w)
+void lwings_state::avengers_prot_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_pen = data * 64;
 }
@@ -231,7 +231,7 @@ int lwings_state::avengers_fetch_paldata(  )
 	return result;
 }
 
-READ8_MEMBER(lwings_state::avengers_protection_r)
+uint8_t lwings_state::avengers_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const int xpos[8] = { 10, 7,  0, -7, -10, -7,   0,  7 };
 	static const int ypos[8] = {  0, 7, 10,  7,   0, -7, -10, -7 };
@@ -267,14 +267,14 @@ READ8_MEMBER(lwings_state::avengers_protection_r)
 	return best_dir << 5;
 }
 
-READ8_MEMBER(lwings_state::avengers_soundlatch2_r)
+uint8_t lwings_state::avengers_soundlatch2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = *m_soundlatch2 | m_soundstate;
 	m_soundstate = 0;
 	return(data);
 }
 
-WRITE8_MEMBER(lwings_state::msm5205_w)
+void lwings_state::msm5205_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(BIT(data, 7));
 	m_msm->data_w(data);
@@ -389,7 +389,7 @@ ADDRESS_MAP_END
 
 
 
-WRITE8_MEMBER(lwings_state::fball_oki_bank_w)
+void lwings_state::fball_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("fball_oki_bank_w %02x\n", data);
 	membank("samplebank")->set_entry((data >> 1) & 0x7);
@@ -1724,7 +1724,7 @@ ROM_START( buraikenb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(lwings_state, avengersb)
+void lwings_state::init_avengersb()
 {
 	/* set up protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch));

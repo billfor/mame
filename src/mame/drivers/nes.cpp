@@ -17,7 +17,7 @@
 #include "cpu/m6502/n2a03.h"
 #include "softlist.h"
 
-WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
+void nes_state::nes_vh_sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppu->spriteram_dma(space, data);
 }
@@ -179,7 +179,7 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 }
 
 
-MACHINE_START_MEMBER( nes_state, fds )
+void nes_state::machine_start_fds()
 {
 	m_ciram = std::make_unique<uint8_t[]>(0x800);
 	m_io_disksel = ioport("FLIPDISK");
@@ -190,7 +190,7 @@ MACHINE_START_MEMBER( nes_state, fds )
 	save_pointer(NAME(m_ciram.get()), 0x800);
 }
 
-MACHINE_RESET_MEMBER( nes_state, fds )
+void nes_state::machine_reset_fds()
 {
 	// Reset the mapper variables
 	m_disk->pcb_reset();
@@ -211,7 +211,7 @@ static MACHINE_CONFIG_DERIVED( fds, famicom )
 MACHINE_CONFIG_END
 
 
-MACHINE_START_MEMBER( nes_state, famitwin )
+void nes_state::machine_start_famitwin()
 {
 	// start the base nes stuff
 	machine_start();
@@ -227,7 +227,7 @@ MACHINE_START_MEMBER( nes_state, famitwin )
 	}
 }
 
-MACHINE_RESET_MEMBER( nes_state, famitwin )
+void nes_state::machine_reset_famitwin()
 {
 	// Reset the mapper variables. Will also mark the char-gen ram as dirty
 	m_cartslot->pcb_reset();

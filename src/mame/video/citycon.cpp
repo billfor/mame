@@ -18,13 +18,13 @@
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(citycon_state::citycon_scan)
+tilemap_memory_index citycon_state::citycon_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
 }
 
-TILE_GET_INFO_MEMBER(citycon_state::get_fg_tile_info)
+void citycon_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0,
 			m_videoram[tile_index],
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(citycon_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(citycon_state::get_bg_tile_info)
+void citycon_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *rom = memregion("gfx4")->base();
 	int code = rom[0x1000 * m_bg_image + tile_index];
@@ -67,20 +67,20 @@ void citycon_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(citycon_state::citycon_videoram_w)
+void citycon_state::citycon_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(citycon_state::citycon_linecolor_w)
+void citycon_state::citycon_linecolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_linecolor[offset] = data;
 }
 
 
-WRITE8_MEMBER(citycon_state::citycon_background_w)
+void citycon_state::citycon_background_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 4-7 control the background image */
 	if (m_bg_image != (data >> 4))

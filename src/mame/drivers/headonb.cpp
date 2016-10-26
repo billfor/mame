@@ -48,13 +48,13 @@ public:
 
 	tilemap_t *m_tilemap;
 
-	DECLARE_WRITE8_MEMBER(video_ram_w);
+	void video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
 
 
@@ -64,7 +64,7 @@ public:
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(headonb_state::get_tile_info)
+void headonb_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
@@ -88,7 +88,7 @@ uint32_t headonb_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 ***************************************************************************/
 
-WRITE8_MEMBER(headonb_state::video_ram_w)
+void headonb_state::video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);

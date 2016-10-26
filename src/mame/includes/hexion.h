@@ -24,19 +24,19 @@ public:
 	int m_gfxrom_select;
 	tilemap_t *m_bg_tilemap[2];
 
-	DECLARE_WRITE8_MEMBER(coincntr_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(bankedram_r);
-	DECLARE_WRITE8_MEMBER(bankedram_w);
-	DECLARE_WRITE8_MEMBER(bankctrl_w);
-	DECLARE_WRITE8_MEMBER(gfxrom_select_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_ack_w);
+	void coincntr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bankedram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bankedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gfxrom_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_ack_w(int state);
+	void nmi_ack_w(int state);
 
-	TILE_GET_INFO_MEMBER(get_tile_info0);
-	TILE_GET_INFO_MEMBER(get_tile_info1);
+	void get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 
 	virtual void video_start() override;
 

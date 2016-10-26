@@ -196,7 +196,7 @@ void newbrain_eim_t::iorq_w(address_space &space, offs_t offset, uint8_t data, b
 //  anout_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_eim_t::anout_r )
+uint8_t newbrain_eim_t::anout_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -206,7 +206,7 @@ READ8_MEMBER( newbrain_eim_t::anout_r )
 //  anout_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_eim_t::anout_w )
+void newbrain_eim_t::anout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER( newbrain_eim_t::anout_w )
 //  anin_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_eim_t::anin_r )
+uint8_t newbrain_eim_t::anin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -225,7 +225,7 @@ READ8_MEMBER( newbrain_eim_t::anin_r )
 //  anio_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_eim_t::anio_w )
+void newbrain_eim_t::anio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -234,7 +234,7 @@ WRITE8_MEMBER( newbrain_eim_t::anio_w )
 //  adc_eoc_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( newbrain_eim_t::adc_eoc_w )
+void newbrain_eim_t::adc_eoc_w(int state)
 {
 	m_anint = state;
 }
@@ -274,7 +274,7 @@ ADC0808_ANALOG_READ_CB( newbrain_eim_t::adc_input_r )
 //  acia_interrupt -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( newbrain_eim_t::acia_interrupt )
+void newbrain_eim_t::acia_interrupt(int state)
 {
 	m_aciaint = state;
 }
@@ -284,7 +284,7 @@ WRITE_LINE_MEMBER( newbrain_eim_t::acia_interrupt )
 //  ctc_z2_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( newbrain_eim_t::ctc_z2_w )
+void newbrain_eim_t::ctc_z2_w(int state)
 {
 	// connected to CTC channel 0/1 clock inputs
 	m_ctc->trg0(state);
@@ -296,7 +296,7 @@ WRITE_LINE_MEMBER( newbrain_eim_t::ctc_z2_w )
 //  adc_input_r -
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER(newbrain_eim_t::ctc_c2_tick)
+void newbrain_eim_t::ctc_c2_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ctc->trg2(1);
 	m_ctc->trg2(0);

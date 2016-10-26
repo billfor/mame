@@ -39,7 +39,7 @@ void vindictr_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(vindictr_state,vindictr)
+void vindictr_state::machine_reset_vindictr()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -53,7 +53,7 @@ MACHINE_RESET_MEMBER(vindictr_state,vindictr)
  *
  *************************************/
 
-READ16_MEMBER(vindictr_state::port1_r)
+uint16_t vindictr_state::port1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = ioport("260010")->read();
 	result ^= 0x0010;
@@ -531,7 +531,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(vindictr_state,vindictr)
+void vindictr_state::init_vindictr()
 {
 }
 

@@ -42,10 +42,10 @@ public:
 	// inline configuration helpers
 	static void static_set_offsets(device_t &device, int sx, int sy);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( cs2_w );
+	void cs2_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -55,11 +55,11 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( control_w );
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	inline void count_up_or_down();
 

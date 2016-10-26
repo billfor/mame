@@ -19,7 +19,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(blstroid_state::get_playfield_tile_info)
+void blstroid_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x1fff;
@@ -69,7 +69,7 @@ const atari_motion_objects_config blstroid_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(blstroid_state,blstroid)
+void blstroid_state::video_start_blstroid()
 {
 }
 

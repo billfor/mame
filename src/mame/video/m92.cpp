@@ -61,7 +61,7 @@ void m92_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 }
 
 
-WRITE16_MEMBER(m92_state::m92_spritecontrol_w)
+void m92_state::m92_spritecontrol_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spritecontrol[offset]);
 	// offset0: sprite list size (negative)
@@ -96,7 +96,7 @@ WRITE16_MEMBER(m92_state::m92_spritecontrol_w)
 //  logerror("%04x: m92_spritecontrol_w %08x %08x\n",space.device().safe_pc(),offset,data);
 }
 
-WRITE16_MEMBER(m92_state::m92_videocontrol_w)
+void m92_state::m92_videocontrol_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videocontrol);
 	/*
@@ -133,19 +133,19 @@ WRITE16_MEMBER(m92_state::m92_videocontrol_w)
 //  logerror("%04x: m92_videocontrol_w %d = %02x\n",space.device().safe_pc(),offset,data);
 }
 
-READ16_MEMBER(m92_state::m92_paletteram_r)
+uint16_t m92_state::m92_paletteram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_paletteram[offset + 0x400 * m_palette_bank];
 }
 
-WRITE16_MEMBER(m92_state::m92_paletteram_w)
+void m92_state::m92_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_palette->write(space, offset + 0x400 * m_palette_bank, data, mem_mask);
 }
 
 /*****************************************************************************/
 
-TILE_GET_INFO_MEMBER(m92_state::get_pf_tile_info)
+void m92_state::get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	M92_pf_layer_info *layer = (M92_pf_layer_info *)tilemap.user_data();
 	int tile, attrib;
@@ -165,7 +165,7 @@ TILE_GET_INFO_MEMBER(m92_state::get_pf_tile_info)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m92_state::m92_vram_w)
+void m92_state::m92_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int laynum;
 
@@ -185,22 +185,22 @@ WRITE16_MEMBER(m92_state::m92_vram_w)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m92_state::m92_pf1_control_w)
+void m92_state::m92_pf1_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf_layer[0].control[offset]);
 }
 
-WRITE16_MEMBER(m92_state::m92_pf2_control_w)
+void m92_state::m92_pf2_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf_layer[1].control[offset]);
 }
 
-WRITE16_MEMBER(m92_state::m92_pf3_control_w)
+void m92_state::m92_pf3_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf_layer[2].control[offset]);
 }
 
-WRITE16_MEMBER(m92_state::m92_master_control_w)
+void m92_state::m92_master_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_pf_master_control[offset];
 	M92_pf_layer_info *layer;
@@ -245,7 +245,7 @@ WRITE16_MEMBER(m92_state::m92_master_control_w)
 
 /*****************************************************************************/
 
-VIDEO_START_MEMBER(m92_state,m92)
+void m92_state::video_start_m92()
 {
 	int laynum;
 
@@ -299,11 +299,11 @@ VIDEO_START_MEMBER(m92_state,m92)
 	save_item(NAME(m_paletteram));
 }
 
-VIDEO_START_MEMBER(m92_state,ppan)
+void m92_state::video_start_ppan()
 {
 	int laynum;
 
-	VIDEO_START_CALL_MEMBER(m92);
+	video_start_m92();
 
 	for (laynum = 0; laynum < 3; laynum++)
 	{

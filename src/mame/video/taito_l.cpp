@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(taitol_state::get_bg18_tile_info)
+void taitol_state::get_bg18_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_rambanks[2 * tile_index + 0x8000 + 1];
 	int code = m_rambanks[2 * tile_index + 0x8000]
@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_bg18_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(taitol_state::get_bg19_tile_info)
+void taitol_state::get_bg19_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_rambanks[2 * tile_index + 0x9000 + 1];
 	int code = m_rambanks[2 * tile_index + 0x9000]
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_bg19_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(taitol_state::get_ch1a_tile_info)
+void taitol_state::get_ch1a_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_rambanks[2 * tile_index + 0xa000 + 1];
 	int code = m_rambanks[2 * tile_index + 0xa000] | ((attr & 0x01) << 8) | ((attr & 0x04) << 7);
@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_ch1a_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(taitol_state,taitol)
+void taitol_state::video_start_taitol()
 {
 	int i;
 
@@ -83,7 +83,7 @@ VIDEO_START_MEMBER(taitol_state,taitol)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(taitol_state::horshoes_bankg_w)
+void taitol_state::horshoes_bankg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_horshoes_gfxbank != data)
 	{
@@ -94,7 +94,7 @@ WRITE8_MEMBER(taitol_state::horshoes_bankg_w)
 	}
 }
 
-WRITE8_MEMBER(taitol_state::taitol_bankc_w)
+void taitol_state::taitol_bankc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bankc[offset] != data)
 	{
@@ -106,13 +106,13 @@ WRITE8_MEMBER(taitol_state::taitol_bankc_w)
 	}
 }
 
-READ8_MEMBER(taitol_state::taitol_bankc_r)
+uint8_t taitol_state::taitol_bankc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bankc[offset];
 }
 
 
-WRITE8_MEMBER(taitol_state::taitol_control_w)
+void taitol_state::taitol_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("Control Write %02x (%04x)\n", data, space.device().safe_pc());
 
@@ -132,7 +132,7 @@ WRITE8_MEMBER(taitol_state::taitol_control_w)
 	/* bit 5 display enable - handled in vh_screenrefresh() */
 }
 
-READ8_MEMBER(taitol_state::taitol_control_r)
+uint8_t taitol_state::taitol_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("Control Read %02x (%04x)\n", cur_ctrl, space.device().safe_pc());
 	return m_cur_ctrl;

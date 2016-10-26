@@ -27,7 +27,7 @@
     mtx_strobe_r - centronics strobe
 -------------------------------------------------*/
 
-READ8_MEMBER(mtx_state::mtx_strobe_r)
+uint8_t mtx_state::mtx_strobe_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* set STROBE low */
 	m_centronics->write_strobe(false);
@@ -103,7 +103,7 @@ void mtx_state::bankswitch(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(mtx_state::mtx_bankswitch_w)
+void mtx_state::mtx_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bankswitch(data);
 }
@@ -112,7 +112,7 @@ WRITE8_MEMBER(mtx_state::mtx_bankswitch_w)
     mtx_sound_strobe_r - sound strobe
 -------------------------------------------------*/
 
-READ8_MEMBER(mtx_state::mtx_sound_strobe_r)
+uint8_t mtx_state::mtx_sound_strobe_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sn->write(space, 0, m_sound_latch);
 	return 0xff;
@@ -122,7 +122,7 @@ READ8_MEMBER(mtx_state::mtx_sound_strobe_r)
     mtx_sound_latch_w - sound latch write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::mtx_sound_latch_w)
+void mtx_state::mtx_sound_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_latch = data;
 }
@@ -131,7 +131,7 @@ WRITE8_MEMBER(mtx_state::mtx_sound_latch_w)
     mtx_cst_w - cassette write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::mtx_cst_w)
+void mtx_state::mtx_cst_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cassette->output( BIT(data, 0) ? -1 : 1);
 }
@@ -140,27 +140,27 @@ WRITE8_MEMBER(mtx_state::mtx_cst_w)
     mtx_prt_r - centronics status
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(mtx_state::write_centronics_busy)
+void mtx_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(mtx_state::write_centronics_fault)
+void mtx_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-WRITE_LINE_MEMBER(mtx_state::write_centronics_perror)
+void mtx_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
 
-WRITE_LINE_MEMBER(mtx_state::write_centronics_select)
+void mtx_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
 
-READ8_MEMBER(mtx_state::mtx_prt_r)
+uint8_t mtx_state::mtx_prt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -194,7 +194,7 @@ READ8_MEMBER(mtx_state::mtx_prt_r)
     mtx_sense_w - keyboard sense write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::mtx_sense_w)
+void mtx_state::mtx_sense_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_key_sense = data;
 }
@@ -203,7 +203,7 @@ WRITE8_MEMBER(mtx_state::mtx_sense_w)
     mtx_key_lo_r - keyboard low read
 -------------------------------------------------*/
 
-READ8_MEMBER(mtx_state::mtx_key_lo_r)
+uint8_t mtx_state::mtx_key_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -223,7 +223,7 @@ READ8_MEMBER(mtx_state::mtx_key_lo_r)
     mtx_key_lo_r - keyboard high read
 -------------------------------------------------*/
 
-READ8_MEMBER(mtx_state::mtx_key_hi_r)
+uint8_t mtx_state::mtx_key_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("country_code")->read();
 
@@ -243,7 +243,7 @@ READ8_MEMBER(mtx_state::mtx_key_hi_r)
     hrx_address_w - HRX video RAM address
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::hrx_address_w)
+void mtx_state::hrx_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 	{
@@ -285,7 +285,7 @@ WRITE8_MEMBER(mtx_state::hrx_address_w)
     hrx_data_r - HRX data read
 -------------------------------------------------*/
 
-READ8_MEMBER(mtx_state::hrx_data_r)
+uint8_t mtx_state::hrx_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -294,7 +294,7 @@ READ8_MEMBER(mtx_state::hrx_data_r)
     hrx_data_w - HRX data write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::hrx_data_w)
+void mtx_state::hrx_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -302,7 +302,7 @@ WRITE8_MEMBER(mtx_state::hrx_data_w)
     hrx_attr_r - HRX attribute read
 -------------------------------------------------*/
 
-READ8_MEMBER(mtx_state::hrx_attr_r)
+uint8_t mtx_state::hrx_attr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -311,7 +311,7 @@ READ8_MEMBER(mtx_state::hrx_attr_r)
     hrx_attr_r - HRX attribute write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(mtx_state::hrx_attr_w)
+void mtx_state::hrx_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -396,7 +396,7 @@ SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
     MACHINE_START( mtx512 )
 -------------------------------------------------*/
 
-MACHINE_START_MEMBER(mtx_state,mtx512)
+void mtx_state::machine_start_mtx512()
 {
 	ram_device *messram = m_ram;
 
@@ -407,7 +407,7 @@ MACHINE_START_MEMBER(mtx_state,mtx512)
 	membank("bank4")->configure_entries(0, messram->size()/0x4000/2, messram->pointer() + messram->size()/2, 0x4000);
 }
 
-MACHINE_RESET_MEMBER(mtx_state,mtx512)
+void mtx_state::machine_reset_mtx512()
 {
 	/* bank switching */
 	bankswitch(0);

@@ -227,7 +227,7 @@ inline void mc6846_device::timer_launch()
 
 /******************* timer callbacks *********************************/
 
-TIMER_CALLBACK_MEMBER( mc6846_device::timer_expire )
+void mc6846_device::timer_expire(void *ptr, int32_t param)
 {
 	int delay = FACTOR * (m_latch+1);
 
@@ -270,7 +270,7 @@ TIMER_CALLBACK_MEMBER( mc6846_device::timer_expire )
 
 
 
-TIMER_CALLBACK_MEMBER( mc6846_device::timer_one_shot )
+void mc6846_device::timer_one_shot(void *ptr, int32_t param)
 {
 	LOG (( "%f: mc6846 timer one shot called\n", machine().time().as_double() ));
 
@@ -284,7 +284,7 @@ TIMER_CALLBACK_MEMBER( mc6846_device::timer_one_shot )
 /************************** CPU interface ****************************/
 
 
-READ8_MEMBER(mc6846_device::read)
+uint8_t mc6846_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch ( offset )
 	{
@@ -353,7 +353,7 @@ READ8_MEMBER(mc6846_device::read)
 
 
 
-WRITE8_MEMBER(mc6846_device::write)
+void mc6846_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( offset )
 	{

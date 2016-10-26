@@ -453,17 +453,17 @@ void a2bus_pcxporter_device::write_c800(address_space &space, uint16_t offset, u
 	}
 }
 
-READ16_MEMBER(a2bus_pcxporter_device::pc_bios_r)
+uint16_t a2bus_pcxporter_device::pc_bios_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ram[offset+0xa0000] | (m_ram[offset+0xa0001]<<8);
 }
 
-READ8_MEMBER( a2bus_pcxporter_device::kbd_6502_r )
+uint8_t a2bus_pcxporter_device::kbd_6502_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_c800_ram[offset+0x60];
 }
 
-WRITE8_MEMBER( a2bus_pcxporter_device::kbd_6502_w )
+void a2bus_pcxporter_device::kbd_6502_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_c800_ram[offset+0x60] = data;
 }
@@ -474,7 +474,7 @@ WRITE8_MEMBER( a2bus_pcxporter_device::kbd_6502_w )
  *
  *************************************************************************/
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_page_w)
+void a2bus_pcxporter_device::pc_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset % 4)
 	{
@@ -491,7 +491,7 @@ WRITE8_MEMBER( a2bus_pcxporter_device::pc_page_w)
 }
 
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dma_hrq_changed )
+void a2bus_pcxporter_device::pc_dma_hrq_changed(int state)
 {
 	m_v30->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -500,7 +500,7 @@ WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dma_hrq_changed )
 }
 
 
-READ8_MEMBER( a2bus_pcxporter_device::pc_dma_read_byte )
+uint8_t a2bus_pcxporter_device::pc_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_dma_channel == -1)
 		return 0xff;
@@ -510,7 +510,7 @@ READ8_MEMBER( a2bus_pcxporter_device::pc_dma_read_byte )
 }
 
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma_write_byte )
+void a2bus_pcxporter_device::pc_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_dma_channel == -1)
 		return;
@@ -521,48 +521,48 @@ WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma_write_byte )
 }
 
 
-READ8_MEMBER( a2bus_pcxporter_device::pc_dma8237_1_dack_r )
+uint8_t a2bus_pcxporter_device::pc_dma8237_1_dack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_isabus->dack_r(1);
 }
 
-READ8_MEMBER( a2bus_pcxporter_device::pc_dma8237_2_dack_r )
+uint8_t a2bus_pcxporter_device::pc_dma8237_2_dack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_isabus->dack_r(2);
 }
 
 
-READ8_MEMBER( a2bus_pcxporter_device::pc_dma8237_3_dack_r )
+uint8_t a2bus_pcxporter_device::pc_dma8237_3_dack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_isabus->dack_r(3);
 }
 
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma8237_1_dack_w )
+void a2bus_pcxporter_device::pc_dma8237_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_isabus->dack_w(1,data);
 }
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma8237_2_dack_w )
+void a2bus_pcxporter_device::pc_dma8237_2_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_isabus->dack_w(2,data);
 }
 
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma8237_3_dack_w )
+void a2bus_pcxporter_device::pc_dma8237_3_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_isabus->dack_w(3,data);
 }
 
 
-WRITE8_MEMBER( a2bus_pcxporter_device::pc_dma8237_0_dack_w )
+void a2bus_pcxporter_device::pc_dma8237_0_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u73_q2 = 0;
 	m_dma8237->dreq0_w( m_u73_q2 );
 }
 
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dma8237_out_eop )
+void a2bus_pcxporter_device::pc_dma8237_out_eop(int state)
 {
 	m_cur_eop = state == ASSERT_LINE;
 	if(m_dma_channel != -1 && m_cur_eop)
@@ -583,10 +583,10 @@ void a2bus_pcxporter_device::pc_select_dma_channel(int channel, bool state)
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dack0_w ) { pc_select_dma_channel(0, state); }
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dack1_w ) { pc_select_dma_channel(1, state); }
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dack2_w ) { pc_select_dma_channel(2, state); }
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dack3_w ) { pc_select_dma_channel(3, state); }
+void a2bus_pcxporter_device::pc_dack0_w(int state) { pc_select_dma_channel(0, state); }
+void a2bus_pcxporter_device::pc_dack1_w(int state) { pc_select_dma_channel(1, state); }
+void a2bus_pcxporter_device::pc_dack2_w(int state) { pc_select_dma_channel(2, state); }
+void a2bus_pcxporter_device::pc_dack3_w(int state) { pc_select_dma_channel(3, state); }
 
 /*************************************************************
  *
@@ -594,7 +594,7 @@ WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_dack3_w ) { pc_select_dma_channel(
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER(a2bus_pcxporter_device::pc_speaker_set_spkrdata)
+void a2bus_pcxporter_device::pc_speaker_set_spkrdata(int state)
 {
 	m_pc_spkrdata = state ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
@@ -607,7 +607,7 @@ WRITE_LINE_MEMBER(a2bus_pcxporter_device::pc_speaker_set_spkrdata)
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_pit8253_out1_changed )
+void a2bus_pcxporter_device::pc_pit8253_out1_changed(int state)
 {
 	/* Trigger DMA channel #0 */
 	if ( m_out1 == 0 && state == 1 && m_u73_q2 == 0 )
@@ -619,19 +619,19 @@ WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_pit8253_out1_changed )
 }
 
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::pc_pit8253_out2_changed )
+void a2bus_pcxporter_device::pc_pit8253_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::keyboard_clock_w )
+void a2bus_pcxporter_device::keyboard_clock_w(int state)
 {
 }
 
 
-WRITE_LINE_MEMBER( a2bus_pcxporter_device::keyboard_data_w )
+void a2bus_pcxporter_device::keyboard_data_w(int state)
 {
 }
 
@@ -641,7 +641,7 @@ WRITE_LINE_MEMBER( a2bus_pcxporter_device::keyboard_data_w )
  *
  **********************************************************/
 
-WRITE8_MEMBER( a2bus_pcxporter_device::nmi_enable_w )
+void a2bus_pcxporter_device::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enabled = BIT(data,7);
 	m_isabus->set_nmi_state(m_nmi_enabled);

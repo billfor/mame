@@ -74,12 +74,12 @@
  * upper 8 bits define the offset in the row,
  * data bits define data to write
  */
-WRITE8_MEMBER(einstein_state::einstein_80col_ram_w)
+void einstein_state::einstein_80col_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_ram[((offset & 0x07) << 8) | ((offset >> 8) & 0xff)] = data;
 }
 
-READ8_MEMBER(einstein_state::einstein_80col_ram_r)
+uint8_t einstein_state::einstein_80col_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_crtc_ram[((offset & 0x07) << 8) | ((offset >> 8) & 0xff)];
 }
@@ -115,7 +115,7 @@ MC6845_UPDATE_ROW( einstein_state::crtc_update_row )
 	}
 }
 
-WRITE_LINE_MEMBER(einstein_state::einstein_6845_de_changed)
+void einstein_state::einstein_6845_de_changed(int state)
 {
 	m_de=state;
 }
@@ -125,7 +125,7 @@ WRITE_LINE_MEMBER(einstein_state::einstein_6845_de_changed)
  * bit 2 - Jumper M002 0 = 50Hz, 1 = 60Hz
  * bit 3 - Jumper M001 0 = ???, 1=??? perminently wired high on both the boards I have seen - PHS.
  */
-READ8_MEMBER(einstein_state::einstein_80col_state_r)
+uint8_t einstein_state::einstein_80col_state_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -169,7 +169,7 @@ void einstein_state::einstein_scan_keyboard()
 	m_keyboard_data = data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_keyboard_timer_callback)
+void einstein_state::einstein_keyboard_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	/* re-scan keyboard */
 	einstein_scan_keyboard();
@@ -188,7 +188,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_keyboard_timer_callback)
 	}
 }
 
-WRITE8_MEMBER(einstein_state::einstein_keyboard_line_write)
+void einstein_state::einstein_keyboard_line_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE_KEYBOARD)
 		logerror("einstein_keyboard_line_write: %02x\n", data);
@@ -199,7 +199,7 @@ WRITE8_MEMBER(einstein_state::einstein_keyboard_line_write)
 	einstein_scan_keyboard();
 }
 
-READ8_MEMBER(einstein_state::einstein_keyboard_data_read)
+uint8_t einstein_state::einstein_keyboard_data_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* re-scan the keyboard */
 	einstein_scan_keyboard();
@@ -215,7 +215,7 @@ READ8_MEMBER(einstein_state::einstein_keyboard_data_read)
     FLOPPY DRIVES
 ***************************************************************************/
 
-WRITE8_MEMBER(einstein_state::einstein_drsel_w)
+void einstein_state::einstein_drsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(VERBOSE_DISK)
 		logerror("%s: einstein_drsel_w %02x\n", machine().describe_context(), data);
@@ -247,7 +247,7 @@ WRITE8_MEMBER(einstein_state::einstein_drsel_w)
 ***************************************************************************/
 
 /* channel 0 and 1 have a 2 MHz input clock for triggering */
-TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_ctc_trigger_callback)
+void einstein_state::einstein_ctc_trigger_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	/* toggle line status */
 	m_ctc_trigger ^= 1;
@@ -261,12 +261,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_ctc_trigger_callback)
     UART
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(einstein_state::einstein_serial_transmit_clock)
+void einstein_state::einstein_serial_transmit_clock(int state)
 {
 	m_uart->write_txc(state);
 }
 
-WRITE_LINE_MEMBER(einstein_state::einstein_serial_receive_clock)
+void einstein_state::einstein_serial_receive_clock(int state)
 {
 	m_uart->write_rxc(state);
 }
@@ -282,7 +282,7 @@ void einstein_state::einstein_page_rom()
 }
 
 /* writing to this port is a simple trigger, and switches between RAM and ROM */
-WRITE8_MEMBER(einstein_state::einstein_rom_w)
+void einstein_state::einstein_rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rom_enabled ^= 1;
 	einstein_page_rom();
@@ -293,22 +293,22 @@ WRITE8_MEMBER(einstein_state::einstein_rom_w)
     INTERRUPTS
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(einstein_state::write_centronics_busy)
+void einstein_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(einstein_state::write_centronics_perror)
+void einstein_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
 
-WRITE_LINE_MEMBER(einstein_state::write_centronics_fault)
+void einstein_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER(einstein_state::einstein_kybintmsk_r)
+uint8_t einstein_state::einstein_kybintmsk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -332,7 +332,7 @@ READ8_MEMBER(einstein_state::einstein_kybintmsk_r)
 	return data;
 }
 
-WRITE8_MEMBER(einstein_state::einstein_kybintmsk_w)
+void einstein_state::einstein_kybintmsk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: einstein_kybintmsk_w %02x\n", machine().describe_context(), data);
 
@@ -351,7 +351,7 @@ WRITE8_MEMBER(einstein_state::einstein_kybintmsk_w)
 
 /* writing to this I/O port sets the state of the mask; D0 is used */
 /* writing 0 enables the /ADC interrupt */
-WRITE8_MEMBER(einstein_state::einstein_adcintmsk_w)
+void einstein_state::einstein_adcintmsk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: einstein_adcintmsk_w %02x\n", machine().describe_context(), data);
 
@@ -369,7 +369,7 @@ WRITE8_MEMBER(einstein_state::einstein_adcintmsk_w)
 
 /* writing to this I/O port sets the state of the mask; D0 is used */
 /* writing 0 enables the /FIRE interrupt */
-WRITE8_MEMBER(einstein_state::einstein_fire_int_w)
+void einstein_state::einstein_fire_int_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: einstein_fire_int_w %02x\n", machine().describe_context(), data);
 
@@ -425,7 +425,7 @@ void einstein_state::machine_reset()
     floppy_drive_set_geometry(floppy, config & 0x08 ? type_80 : type_40);*/
 }
 
-MACHINE_RESET_MEMBER(einstein_state,einstein2)
+void einstein_state::machine_reset_einstein2()
 {
 	/* call standard initialization first */
 	einstein_state::machine_reset();
@@ -435,7 +435,7 @@ MACHINE_RESET_MEMBER(einstein_state,einstein2)
 	m_palette->set_pen_color(TMS9928A_PALETTE_SIZE + 1, rgb_t(0, 224, 0));
 }
 
-MACHINE_START_MEMBER(einstein_state,einstein2)
+void einstein_state::machine_start_einstein2()
 {
 	m_crtc_ram = std::make_unique<uint8_t[]>(2048);
 	memset(m_crtc_ram.get(), 0, sizeof(uint8_t) * 2048);

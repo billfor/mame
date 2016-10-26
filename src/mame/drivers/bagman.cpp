@@ -74,13 +74,13 @@ void bagman_state::machine_start()
 	save_item(NAME(m_columnvalue));
 }
 
-MACHINE_START_MEMBER(bagman_state, bagman)
+void bagman_state::machine_start_bagman()
 {
 	bagman_state::machine_start();
 	save_item(NAME(m_ls259_buf));
 }
 
-MACHINE_START_MEMBER(bagman_state, squaitsa)
+void bagman_state::machine_start_squaitsa()
 {
 	bagman_state::machine_start();
 	save_item(NAME(m_p1_res));
@@ -90,7 +90,7 @@ MACHINE_START_MEMBER(bagman_state, squaitsa)
 }
 
 
-WRITE8_MEMBER(bagman_state::ls259_w)
+void bagman_state::ls259_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pal16r6_w(space, offset,data); /*this is just a simulation*/
 
@@ -118,12 +118,12 @@ WRITE8_MEMBER(bagman_state::ls259_w)
 	}
 }
 
-WRITE8_MEMBER(bagman_state::coincounter_w)
+void bagman_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);
 }
 
-WRITE8_MEMBER(bagman_state::irq_mask_w)
+void bagman_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }
@@ -412,7 +412,7 @@ GFXDECODE_END
 
 /* squaitsa doesn't map the dial directly, instead it polls the results of the dial through an external circuitry.
    I don't know if the following is correct, there can possibly be multiple solutions for the same problem. */
-READ8_MEMBER(bagman_state::dial_input_p1_r)
+uint8_t bagman_state::dial_input_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t dial_val;
 
@@ -432,7 +432,7 @@ READ8_MEMBER(bagman_state::dial_input_p1_r)
 	return (ioport("P1")->read() & 0x9f) | (m_p1_res);
 }
 
-READ8_MEMBER(bagman_state::dial_input_p2_r)
+uint8_t bagman_state::dial_input_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t dial_val;
 
@@ -452,7 +452,7 @@ READ8_MEMBER(bagman_state::dial_input_p2_r)
 	return (ioport("P2")->read() & 0x9f) | (m_p2_res);
 }
 
-INTERRUPT_GEN_MEMBER(bagman_state::vblank_irq)
+void bagman_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -984,7 +984,7 @@ ROM_START( squaitsa )
 	ROM_LOAD( "mmi6331.3r",    0x0020, 0x0020,CRC(86c1e7db) SHA1(5c974b51d770a555ddab5c23f03a666c6f286cbf) )
 ROM_END
 
-DRIVER_INIT_MEMBER(bagman_state,bagman)
+void bagman_state::init_bagman()
 {
 	/* Unmap video enable register, not available on earlier hardware revision(s)
 	   Bagman is supposed to have glitches during screen transitions */

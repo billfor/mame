@@ -142,7 +142,7 @@ void rpunch_state::machine_start()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(rpunch_state::ym2151_irq_gen)
+void rpunch_state::ym2151_irq_gen(int state)
 {
 	m_ym2151_irq = state;
 	m_audiocpu->set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
@@ -163,7 +163,7 @@ void rpunch_state::machine_reset()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(rpunch_state::hi_bits_r)
+ioport_value rpunch_state::hi_bits_r(ioport_field &field, void *param)
 {
 	return ioport("SERVICE")->read();
 }
@@ -175,7 +175,7 @@ CUSTOM_INPUT_MEMBER(rpunch_state::hi_bits_r)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(rpunch_state::sound_command_w_callback)
+void rpunch_state::sound_command_w_callback(void *ptr, int32_t param)
 {
 	m_sound_busy = 1;
 	m_sound_data = param;
@@ -183,14 +183,14 @@ TIMER_CALLBACK_MEMBER(rpunch_state::sound_command_w_callback)
 }
 
 
-WRITE16_MEMBER(rpunch_state::sound_command_w)
+void rpunch_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(rpunch_state::sound_command_w_callback),this), data & 0xff);
 }
 
 
-READ8_MEMBER(rpunch_state::sound_command_r)
+uint8_t rpunch_state::sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sound_busy = 0;
 	m_audiocpu->set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
@@ -198,7 +198,7 @@ READ8_MEMBER(rpunch_state::sound_command_r)
 }
 
 
-READ16_MEMBER(rpunch_state::sound_busy_r)
+uint16_t rpunch_state::sound_busy_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sound_busy;
 }
@@ -211,7 +211,7 @@ READ16_MEMBER(rpunch_state::sound_busy_r)
  *
  *************************************/
 
-WRITE8_MEMBER(rpunch_state::upd_control_w)
+void rpunch_state::upd_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 1) != m_upd_rom_bank)
 	{
@@ -223,7 +223,7 @@ WRITE8_MEMBER(rpunch_state::upd_control_w)
 }
 
 
-WRITE8_MEMBER(rpunch_state::upd_data_w)
+void rpunch_state::upd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->port_w(space, 0, data);
 	m_upd7759->start_w(0);
@@ -811,13 +811,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(rpunch_state,rabiolep)
+void rpunch_state::init_rabiolep()
 {
 	m_sprite_palette = 0x300;
 }
 
 
-DRIVER_INIT_MEMBER(rpunch_state,svolley)
+void rpunch_state::init_svolley()
 {
 	/* the main differences between Super Volleyball and Rabbit Punch are */
 	/* the lack of direct-mapped bitmap and a different palette base for sprites */

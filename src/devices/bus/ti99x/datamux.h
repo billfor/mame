@@ -31,15 +31,15 @@ class ti99_datamux_device : public device_t
 {
 public:
 	ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_SETOFFSET_MEMBER( setoffset );
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void setoffset(address_space &space, offs_t offset);
 
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
-	DECLARE_WRITE_LINE_MEMBER( dbin_in );
-	DECLARE_WRITE_LINE_MEMBER( ready_line );
+	void clock_in(int state);
+	void dbin_in(int state);
+	void ready_line(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( gromclk_in );
+	void gromclk_in(int state);
 
 	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object)
 	{

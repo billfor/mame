@@ -34,18 +34,18 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	ip6_regs_t m_ip6_regs;
-	DECLARE_READ32_MEMBER(ip6_unk1_r);
-	DECLARE_WRITE32_MEMBER(ip6_unk1_w);
-	DECLARE_READ32_MEMBER(ip6_unk2_r);
-	DECLARE_WRITE32_MEMBER(ip6_unk2_w);
-	DECLARE_READ32_MEMBER(ip6_unk3_r);
-	DECLARE_WRITE32_MEMBER(ip6_unk3_w);
-	DECLARE_DRIVER_INIT(sgi_ip6);
+	uint32_t ip6_unk1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ip6_unk1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ip6_unk2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ip6_unk2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ip6_unk3_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ip6_unk3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void init_sgi_ip6();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_sgi_ip6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sgi_ip6_vbl);
+	void sgi_ip6_vbl(device_t &device);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	required_device<cpu_device> m_maincpu;
 };
@@ -88,7 +88,7 @@ uint32_t sgi_ip6_state::screen_update_sgi_ip6(screen_device &screen, bitmap_rgb3
 ***************************************************************************/
 
 
-READ32_MEMBER(sgi_ip6_state::ip6_unk1_r)
+uint32_t sgi_ip6_state::ip6_unk1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch(offset)
@@ -111,7 +111,7 @@ READ32_MEMBER(sgi_ip6_state::ip6_unk1_r)
 	return ret;
 }
 
-WRITE32_MEMBER(sgi_ip6_state::ip6_unk1_w)
+void sgi_ip6_state::ip6_unk1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -132,7 +132,7 @@ WRITE32_MEMBER(sgi_ip6_state::ip6_unk1_w)
 	}
 }
 
-READ32_MEMBER(sgi_ip6_state::ip6_unk2_r)
+uint32_t sgi_ip6_state::ip6_unk2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	switch(offset)
@@ -155,7 +155,7 @@ READ32_MEMBER(sgi_ip6_state::ip6_unk2_r)
 	return ret;
 }
 
-WRITE32_MEMBER(sgi_ip6_state::ip6_unk2_w)
+void sgi_ip6_state::ip6_unk2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -176,7 +176,7 @@ WRITE32_MEMBER(sgi_ip6_state::ip6_unk2_w)
 	}
 }
 
-READ32_MEMBER(sgi_ip6_state::ip6_unk3_r)
+uint32_t sgi_ip6_state::ip6_unk3_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 	if(ACCESSING_BITS_16_23)
@@ -191,12 +191,12 @@ READ32_MEMBER(sgi_ip6_state::ip6_unk3_r)
 	return ret;
 }
 
-WRITE32_MEMBER(sgi_ip6_state::ip6_unk3_w)
+void sgi_ip6_state::ip6_unk3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(0, "ip6_unk3_w: Unknown address: %08x = %08x & %08x\n", 0x1fb00000 + (offset << 2), data, mem_mask );
 }
 
-INTERRUPT_GEN_MEMBER(sgi_ip6_state::sgi_ip6_vbl)
+void sgi_ip6_state::sgi_ip6_vbl(device_t &device)
 {
 }
 
@@ -249,7 +249,7 @@ static INPUT_PORTS_START( sgi_ip6 )
 	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(sgi_ip6_state,sgi_ip6)
+void sgi_ip6_state::init_sgi_ip6()
 {
 }
 

@@ -335,27 +335,27 @@ void tc0480scp_device::common_get_tc0480tx_tile_info( tile_data &tileinfo, int t
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-TILE_GET_INFO_MEMBER(tc0480scp_device::get_bg0_tile_info)
+void tc0480scp_device::get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_tc0480bg_tile_info(tileinfo, tile_index, m_bg_ram[0], m_gfxnum );
 }
 
-TILE_GET_INFO_MEMBER(tc0480scp_device::get_bg1_tile_info)
+void tc0480scp_device::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_tc0480bg_tile_info(tileinfo, tile_index, m_bg_ram[1], m_gfxnum);
 }
 
-TILE_GET_INFO_MEMBER(tc0480scp_device::get_bg2_tile_info)
+void tc0480scp_device::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_tc0480bg_tile_info(tileinfo, tile_index, m_bg_ram[2], m_gfxnum);
 }
 
-TILE_GET_INFO_MEMBER(tc0480scp_device::get_bg3_tile_info)
+void tc0480scp_device::get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_tc0480bg_tile_info(tileinfo, tile_index, m_bg_ram[3], m_gfxnum);
 }
 
-TILE_GET_INFO_MEMBER(tc0480scp_device::get_tx_tile_info)
+void tc0480scp_device::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_tc0480tx_tile_info(tileinfo, tile_index, m_tx_ram, m_txnum);
 }
@@ -408,12 +408,12 @@ void tc0480scp_device::set_layer_ptrs()
 	}
 }
 
-READ16_MEMBER( tc0480scp_device::word_r )
+uint16_t tc0480scp_device::word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( tc0480scp_device::word_w )
+void tc0480scp_device::word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 
@@ -455,12 +455,12 @@ WRITE16_MEMBER( tc0480scp_device::word_w )
 	}
 }
 
-READ16_MEMBER( tc0480scp_device::ctrl_word_r )
+uint16_t tc0480scp_device::ctrl_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ctrl[offset];
 }
 
-WRITE16_MEMBER( tc0480scp_device::ctrl_word_w )
+void tc0480scp_device::ctrl_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int flip = m_pri_reg & 0x40;
 
@@ -578,14 +578,14 @@ WRITE16_MEMBER( tc0480scp_device::ctrl_word_w )
 }
 
 
-READ32_MEMBER( tc0480scp_device::ctrl_long_r )
+uint32_t tc0480scp_device::ctrl_long_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (ctrl_word_r(space, offset * 2, 0xffff) << 16) | ctrl_word_r(space, offset * 2 + 1, 0xffff);
 }
 
 /* TODO: byte access ? */
 
-WRITE32_MEMBER( tc0480scp_device::ctrl_long_w )
+void tc0480scp_device::ctrl_long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 		ctrl_word_w(space, offset * 2, data >> 16, mem_mask >> 16);
@@ -593,12 +593,12 @@ WRITE32_MEMBER( tc0480scp_device::ctrl_long_w )
 		ctrl_word_w(space, (offset * 2) + 1, data & 0xffff, mem_mask & 0xffff);
 }
 
-READ32_MEMBER( tc0480scp_device::long_r )
+uint32_t tc0480scp_device::long_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (word_r(space, offset * 2, 0xffff) << 16) | word_r(space, offset * 2 + 1, 0xffff);
 }
 
-WRITE32_MEMBER( tc0480scp_device::long_w )
+void tc0480scp_device::long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -969,7 +969,7 @@ int tc0480scp_device::get_bg_priority()
 }
 
 // undrfire.c also needs to directly access the priority reg
-READ8_MEMBER( tc0480scp_device::pri_reg_r )
+uint8_t tc0480scp_device::pri_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pri_reg;
 }

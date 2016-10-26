@@ -180,23 +180,23 @@ public:
 	std::unique_ptr<uint8_t[]> m_bitmap_vram;
 	uint16_t sh7021_regs[0x100];
 	int m_gfx_index;
-	DECLARE_DRIVER_INIT(casloopy);
+	void init_casloopy();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ16_MEMBER(vregs_r);
-	DECLARE_WRITE16_MEMBER(vregs_w);
-	DECLARE_READ16_MEMBER(pal_r);
-	DECLARE_WRITE16_MEMBER(pal_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ32_MEMBER(cart_r);
-	DECLARE_READ16_MEMBER(sh7021_r);
-	DECLARE_WRITE16_MEMBER(sh7021_w);
-	DECLARE_READ8_MEMBER(bitmap_r);
-	DECLARE_WRITE8_MEMBER(bitmap_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(loopy_cart);
+	uint16_t vregs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pal_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pal_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t cart_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t sh7021_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sh7021_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t bitmap_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	image_init_result device_image_load_loopy_cart(device_image_interface &image);
 };
 
 
@@ -300,7 +300,7 @@ uint32_t casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ16_MEMBER(casloopy_state::vregs_r)
+uint16_t casloopy_state::vregs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(offset == 4/2)
 	{
@@ -318,18 +318,18 @@ READ16_MEMBER(casloopy_state::vregs_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(casloopy_state::vregs_w)
+void casloopy_state::vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  if(offset != 6/2)
 //      printf("%08x %08x\n",offset*2,data);
 }
 
-READ16_MEMBER(casloopy_state::pal_r)
+uint16_t casloopy_state::pal_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_paletteram[offset];
 }
 
-WRITE16_MEMBER(casloopy_state::pal_w)
+void casloopy_state::pal_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r,g,b;
 	COMBINE_DATA(&m_paletteram[offset]);
@@ -341,12 +341,12 @@ WRITE16_MEMBER(casloopy_state::pal_w)
 	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-READ8_MEMBER(casloopy_state::vram_r)
+uint8_t casloopy_state::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vram[offset];
 }
 
-WRITE8_MEMBER(casloopy_state::vram_w)
+void casloopy_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram[offset] = data;
 
@@ -355,12 +355,12 @@ WRITE8_MEMBER(casloopy_state::vram_w)
 }
 
 /* TODO: all of this should be internal to the SH core, this is just to check what it enables. */
-READ16_MEMBER(casloopy_state::sh7021_r)
+uint16_t casloopy_state::sh7021_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return sh7021_regs[offset];
 }
 
-WRITE16_MEMBER(casloopy_state::sh7021_w)
+void casloopy_state::sh7021_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&sh7021_regs[offset]);
 
@@ -395,17 +395,17 @@ WRITE16_MEMBER(casloopy_state::sh7021_w)
 //  printf("%08x %04x\n",sh7021_regs[offset],0x05ffff00+offset*2);
 }
 
-READ8_MEMBER(casloopy_state::bitmap_r)
+uint8_t casloopy_state::bitmap_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bitmap_vram[offset];
 }
 
-WRITE8_MEMBER(casloopy_state::bitmap_w)
+void casloopy_state::bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bitmap_vram[offset] = data;
 }
 
-READ32_MEMBER(casloopy_state::cart_r)
+uint32_t casloopy_state::cart_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_cart->read32_rom(space, offset, mem_mask);
 }
@@ -474,7 +474,7 @@ static const gfx_layout casloopy_8bpp_layoutROM =
 #endif
 
 
-DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
+image_init_result casloopy_state::device_image_load_loopy_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 	uint8_t *SRC, *DST;
@@ -553,7 +553,7 @@ ROM_START( casloopy )
 	ROM_LOAD( "bios2.lsi352", 0x0000, 0x80000, CRC(8f51fa17) SHA1(99f50be06b083fdb07e08f30b0b26d9037afc869) )
 ROM_END
 
-DRIVER_INIT_MEMBER(casloopy_state,casloopy)
+void casloopy_state::init_casloopy()
 {
 	/* load hand made bios data*/
 	m_bios_rom[0/4] = 0x6000480;//0x600af3c;//0x6000964; //SPC

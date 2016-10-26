@@ -167,7 +167,7 @@ void acia6850_device::device_reset()
 	output_irq(1);
 }
 
-READ8_MEMBER( acia6850_device::status_r )
+uint8_t acia6850_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t status = m_status;
 
@@ -184,7 +184,7 @@ READ8_MEMBER( acia6850_device::status_r )
 	return status;
 }
 
-WRITE8_MEMBER( acia6850_device::control_w )
+void acia6850_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("MC6850 '%s' Control: %02x\n", tag(), data);
 
@@ -254,7 +254,7 @@ void acia6850_device::update_irq()
 	output_irq(calculate_txirq() && calculate_rxirq());
 }
 
-WRITE8_MEMBER( acia6850_device::data_w )
+void acia6850_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("MC6850 '%s' Data: %02x\n", tag(), data);
 
@@ -271,7 +271,7 @@ WRITE8_MEMBER( acia6850_device::data_w )
 	update_irq();
 }
 
-READ8_MEMBER( acia6850_device::data_r )
+uint8_t acia6850_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_overrun_pending)
 	{
@@ -294,7 +294,7 @@ READ8_MEMBER( acia6850_device::data_r )
 	return m_rdr;
 }
 
-DECLARE_WRITE_LINE_MEMBER( acia6850_device::write_cts )
+void acia6850_device::write_cts(int state)
 {
 	if (state)
 	{
@@ -306,12 +306,12 @@ DECLARE_WRITE_LINE_MEMBER( acia6850_device::write_cts )
 	}
 }
 
-DECLARE_WRITE_LINE_MEMBER( acia6850_device::write_dcd )
+void acia6850_device::write_dcd(int state)
 {
 	m_dcd = state;
 }
 
-WRITE_LINE_MEMBER( acia6850_device::write_rxc )
+void acia6850_device::write_rxc(int state)
 {
 	if (m_rxc != state)
 	{
@@ -459,12 +459,12 @@ WRITE_LINE_MEMBER( acia6850_device::write_rxc )
 	}
 }
 
-DECLARE_WRITE_LINE_MEMBER( acia6850_device::write_rxd )
+void acia6850_device::write_rxd(int state)
 {
 	m_rxd = state;
 }
 
-WRITE_LINE_MEMBER( acia6850_device::write_txc )
+void acia6850_device::write_txc(int state)
 {
 	if (m_txc != state)
 	{

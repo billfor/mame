@@ -28,28 +28,28 @@ public:
 	required_device<z80ctc_device> m_ctc0;
 	required_device<z80ctc_device> m_ctc1;
 
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_WRITE8_MEMBER(adpcm_latch_w);
-	DECLARE_WRITE8_MEMBER(ay1_porta_w);
+	uint8_t soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adpcm_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_adpcm_data;
 
 	void write_command(uint8_t data);
 	uint8_t m_command;
 	
-	DECLARE_WRITE_LINE_MEMBER(ctc1_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc1_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc1_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_int_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc1_int_w);
+	void ctc1_z0_w(int state);
+	void ctc1_z1_w(int state);
+	void ctc1_z2_w(int state);
+	void ctc0_z0_w(int state);
+	void ctc0_z1_w(int state);
+	void ctc0_z2_w(int state);
+	void ctc0_int_w(int state);
+	void ctc1_int_w(int state);
 
-	TIMER_CALLBACK_MEMBER(reset_assert_callback) override;
+	void reset_assert_callback(void *ptr, int32_t param) override;
 
 	int m_fake_counter;
-	INTERRUPT_GEN_MEMBER(fake_irq);
+	void fake_irq(device_t &device);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

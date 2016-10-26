@@ -47,17 +47,17 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	DECLARE_DRIVER_INIT(dreambal);
+	void init_dreambal();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	uint32_t screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
-	DECLARE_READ16_MEMBER( dreambal_protection_region_0_104_r );
-	DECLARE_WRITE16_MEMBER( dreambal_protection_region_0_104_w );
+	uint16_t dreambal_protection_region_0_104_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dreambal_protection_region_0_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER( dreambal_eeprom_w )
+	void dreambal_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		if (data&0xfff8)
 		{
@@ -91,7 +91,7 @@ uint32_t dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_in
 }
 
 
-READ16_MEMBER( dreambal_state::dreambal_protection_region_0_104_r )
+uint16_t dreambal_state::dreambal_protection_region_0_104_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -100,7 +100,7 @@ READ16_MEMBER( dreambal_state::dreambal_protection_region_0_104_r )
 	return data;
 }
 
-WRITE16_MEMBER( dreambal_state::dreambal_protection_region_0_104_w )
+void dreambal_state::dreambal_protection_region_0_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -362,7 +362,7 @@ ROM_START( dreambal )
 	ROM_LOAD( "mm_01-1.12f",    0x00000, 0x20000, CRC(4f134be7) SHA1(b83230cc62bde55be736fd604af23f927706a770) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dreambal_state,dreambal)
+void dreambal_state::init_dreambal()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 }

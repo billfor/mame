@@ -49,19 +49,19 @@ TODO:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(exzisus_state::cpua_bankswitch_w)
+void exzisus_state::cpua_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("cpuabank")->set_entry(data & 0x0f);
 	flip_screen_set(data & 0x40);
 }
 
-WRITE8_MEMBER(exzisus_state::cpub_bankswitch_w)
+void exzisus_state::cpub_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("cpubbank")->set_entry(data & 0x0f);
 	flip_screen_set(data & 0x40);
 }
 
-WRITE8_MEMBER(exzisus_state::coincounter_w)
+void exzisus_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0,~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1,~data & 0x02);
@@ -70,7 +70,7 @@ WRITE8_MEMBER(exzisus_state::coincounter_w)
 }
 
 // is it ok that cpub_reset refers to cpuc?
-WRITE8_MEMBER(exzisus_state::cpub_reset_w)
+void exzisus_state::cpub_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpuc->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
@@ -78,7 +78,7 @@ WRITE8_MEMBER(exzisus_state::cpub_reset_w)
 #if 0
 // without cpub_reset_w, the following patch would be needed for
 // the RAM check to work
-DRIVER_INIT_MEMBER(exzisus_state,exzisus)
+void exzisus_state::init_exzisus()
 {
 	uint8_t *RAM = memregion("cpua")->base();
 

@@ -89,20 +89,20 @@ public:
 	optional_region_ptr<uint8_t> m_colors;
 	optional_region_ptr<uint8_t> m_stars;
 
-	DECLARE_READ8_MEMBER(dip_switch_r);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_WRITE8_MEMBER(enigma2_flip_screen_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(p1_controls_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
-	DECLARE_READ8_MEMBER(sound_latch_r);
-	DECLARE_WRITE8_MEMBER(protection_data_w);
-	DECLARE_DRIVER_INIT(enigma2);
+	uint8_t dip_switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void enigma2_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value p1_controls_r(ioport_field &field, void *param);
+	ioport_value p2_controls_r(ioport_field &field, void *param);
+	uint8_t sound_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void protection_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_enigma2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_enigma2a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(interrupt_clear_callback);
-	TIMER_CALLBACK_MEMBER(interrupt_assert_callback);
+	void interrupt_clear_callback(void *ptr, int32_t param);
+	void interrupt_assert_callback(void *ptr, int32_t param);
 	inline uint16_t vpos_to_vysnc_chain_counter( int vpos );
 	inline int vysnc_chain_counter_to_vpos( uint16_t counter );
 	void create_interrupt_timers(  );
@@ -129,13 +129,13 @@ int enigma2_state::vysnc_chain_counter_to_vpos( uint16_t counter )
 }
 
 
-TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_clear_callback)
+void enigma2_state::interrupt_clear_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_assert_callback)
+void enigma2_state::interrupt_assert_callback(void *ptr, int32_t param)
 {
 	uint16_t next_counter;
 	int next_vpos;
@@ -353,7 +353,7 @@ uint32_t enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb
 
 
 
-READ8_MEMBER(enigma2_state::dip_switch_r)
+uint8_t enigma2_state::dip_switch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x00;
 
@@ -385,7 +385,7 @@ READ8_MEMBER(enigma2_state::dip_switch_r)
 }
 
 
-WRITE8_MEMBER(enigma2_state::sound_data_w)
+void enigma2_state::sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* clock sound latch shift register on rising edge of D2 */
 	if (!(data & 0x04) && (m_last_sound_data & 0x04))
@@ -397,32 +397,32 @@ WRITE8_MEMBER(enigma2_state::sound_data_w)
 }
 
 
-READ8_MEMBER(enigma2_state::sound_latch_r)
+uint8_t enigma2_state::sound_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return BITSWAP8(m_sound_latch,0,1,2,3,4,5,6,7);
 }
 
 
-WRITE8_MEMBER(enigma2_state::protection_data_w)
+void enigma2_state::protection_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_PROT) logerror("%s: Protection Data Write: %x\n", machine().describe_context(), data);
 	m_protection_data = data;
 }
 
 
-WRITE8_MEMBER(enigma2_state::enigma2_flip_screen_w)
+void enigma2_state::enigma2_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flip_screen = ((data >> 5) & 0x01) && ((ioport("DSW")->read() & 0x20) == 0x20);
 }
 
 
-CUSTOM_INPUT_MEMBER(enigma2_state::p1_controls_r)
+ioport_value enigma2_state::p1_controls_r(ioport_field &field, void *param)
 {
 	return ioport("P1CONTROLS")->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(enigma2_state::p2_controls_r)
+ioport_value enigma2_state::p2_controls_r(ioport_field &field, void *param)
 {
 	if (m_flip_screen)
 		return ioport("P2CONTROLS")->read();
@@ -691,7 +691,7 @@ ROM_START( enigma2b )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(enigma2_state,enigma2)
+void enigma2_state::init_enigma2()
 {
 	offs_t i;
 	uint8_t *rom = memregion("audiocpu")->base();

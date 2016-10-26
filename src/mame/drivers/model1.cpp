@@ -636,7 +636,7 @@ Notes:
 #include "vr.lh"
 
 
-READ16_MEMBER(model1_state::io_r)
+uint16_t model1_state::io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(offset < 0x8)
 		return m_analog_ports[offset].read_safe(0x00);
@@ -656,7 +656,7 @@ READ16_MEMBER(model1_state::io_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(model1_state::io_w)
+void model1_state::io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset == 0x0f){
 		// lamp and coinmeters
@@ -679,12 +679,12 @@ WRITE16_MEMBER(model1_state::io_w)
 	logerror("IOW: %02x %02x\n", offset, data);
 }
 
-READ16_MEMBER(model1_state::fifoin_status_r)
+uint16_t model1_state::fifoin_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(model1_state::bank_w)
+void model1_state::bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 
 	if(ACCESSING_BITS_0_7) {
@@ -711,7 +711,7 @@ void model1_state::irq_raise(int level)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
+int model1_state::irq_callback(device_t &device, int irqline)
 {
 	return m_last_irq;
 }
@@ -734,7 +734,7 @@ void model1_state::irq_init()
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
+void model1_state::model1_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -753,7 +753,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 	}
 }
 
-MACHINE_RESET_MEMBER(model1_state,model1)
+void model1_state::machine_reset_model1()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
 	irq_init();
@@ -768,7 +768,7 @@ MACHINE_RESET_MEMBER(model1_state,model1)
 	}
 }
 
-MACHINE_RESET_MEMBER(model1_state,model1_vr)
+void model1_state::machine_reset_model1_vr()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
 	irq_init();
@@ -776,7 +776,7 @@ MACHINE_RESET_MEMBER(model1_state,model1_vr)
 	m_sound_irq = 3;
 }
 
-READ16_MEMBER(model1_state::network_ctl_r)
+uint16_t model1_state::network_ctl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(offset)
 		return 0x40;
@@ -784,11 +784,11 @@ READ16_MEMBER(model1_state::network_ctl_r)
 		return 0x00;
 }
 
-WRITE16_MEMBER(model1_state::network_ctl_w)
+void model1_state::network_ctl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-WRITE16_MEMBER(model1_state::md1_w)
+void model1_state::md1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_display_list1+offset);
 	// never executed
@@ -798,7 +798,7 @@ WRITE16_MEMBER(model1_state::md1_w)
 		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
 }
 
-WRITE16_MEMBER(model1_state::md0_w)
+void model1_state::md0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_display_list0+offset);
 	// never executed
@@ -808,7 +808,7 @@ WRITE16_MEMBER(model1_state::md0_w)
 		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
 }
 
-WRITE16_MEMBER(model1_state::p_w)
+void model1_state::p_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_paletteram16[offset];
 	m_palette->write(space, offset, data, mem_mask);
@@ -816,14 +816,14 @@ WRITE16_MEMBER(model1_state::p_w)
 		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
 }
 
-WRITE16_MEMBER(model1_state::mr_w)
+void model1_state::mr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_mr+offset);
 	if(0 && offset == 0x1138/2)
 		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, space.device().safe_pc());
 }
 
-WRITE16_MEMBER(model1_state::mr2_w)
+void model1_state::mr2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_mr2+offset);
 #if 0
@@ -847,7 +847,7 @@ WRITE16_MEMBER(model1_state::mr2_w)
 		logerror("MW 10[r10], %f (%x)\n", *(float *)(m_mr2+0x1f10/2), space.device().safe_pc());
 }
 
-READ16_MEMBER(model1_state::snd_68k_ready_r)
+uint16_t model1_state::snd_68k_ready_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_m1audio->ready_r(space, 0) == 0)
 	{
@@ -858,7 +858,7 @@ READ16_MEMBER(model1_state::snd_68k_ready_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
+void model1_state::snd_latch_to_68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_m1audio->write_fifo(data);
 

@@ -23,12 +23,12 @@ public:
 		, m_io_joy(*this, "JOY")
 	{ }
 
-	DECLARE_PALETTE_INIT(gmaster);
-	DECLARE_READ8_MEMBER(gmaster_io_r);
-	DECLARE_WRITE8_MEMBER(gmaster_io_w);
-	DECLARE_READ8_MEMBER(gmaster_port_r);
-	DECLARE_WRITE8_MEMBER(gmaster_port_w);
-	DECLARE_DRIVER_INIT(gmaster) { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
+	void palette_init_gmaster(palette_device &palette);
+	uint8_t gmaster_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gmaster_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gmaster_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gmaster_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_gmaster() { memset(&m_video, 0, sizeof(m_video)); memset(m_ram, 0, sizeof(m_ram)); }
 	uint32_t screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
@@ -53,7 +53,7 @@ private:
 };
 
 
-READ8_MEMBER(gmaster_state::gmaster_io_r)
+uint8_t gmaster_state::gmaster_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -86,7 +86,7 @@ READ8_MEMBER(gmaster_state::gmaster_io_r)
 #define BLITTER_Y ((m_ports[2]&4)|(m_video.data[0]&3))
 
 
-WRITE8_MEMBER(gmaster_state::gmaster_io_w)
+void gmaster_state::gmaster_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ports[2] & 1)
 	{
@@ -149,7 +149,7 @@ WRITE8_MEMBER(gmaster_state::gmaster_io_w)
 }
 
 
-READ8_MEMBER(gmaster_state::gmaster_port_r)
+uint8_t gmaster_state::gmaster_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  uint8_t data = m_ports[offset];
 	uint8_t data = 0xff;
@@ -166,7 +166,7 @@ READ8_MEMBER(gmaster_state::gmaster_port_r)
 }
 
 
-WRITE8_MEMBER(gmaster_state::gmaster_port_w)
+void gmaster_state::gmaster_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ports[offset] = data;
 	logerror("%.4x port %d written %.2x\n", m_maincpu->pc(), offset, data);
@@ -219,7 +219,7 @@ static const unsigned char gmaster_palette[2][3] =
 };
 
 
-PALETTE_INIT_MEMBER(gmaster_state, gmaster)
+void gmaster_state::palette_init_gmaster(palette_device &palette)
 {
 	int i;
 

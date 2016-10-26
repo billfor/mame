@@ -11,7 +11,7 @@
 #include "includes/tryout.h"
 
 
-PALETTE_INIT_MEMBER(tryout_state, tryout)
+void tryout_state::palette_init_tryout(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -39,7 +39,7 @@ PALETTE_INIT_MEMBER(tryout_state, tryout)
 	}
 }
 
-TILE_GET_INFO_MEMBER(tryout_state::get_fg_tile_info)
+void tryout_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int attr = m_videoram[tile_index + 0x400];
@@ -49,23 +49,23 @@ TILE_GET_INFO_MEMBER(tryout_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(tryout_state::get_bg_tile_info)
+void tryout_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(2, m_vram[tile_index] & 0x7f, 2, 0);
 }
 
-READ8_MEMBER(tryout_state::vram_r)
+uint8_t tryout_state::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vram[offset]; // debug only
 }
 
-WRITE8_MEMBER(tryout_state::videoram_w)
+void tryout_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(tryout_state::vram_w)
+void tryout_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*  There are eight banks of vram - in bank 0 the first 0x400 bytes
 	is reserved for the tilemap.  In banks 2, 4 and 6 the game never
@@ -133,22 +133,22 @@ WRITE8_MEMBER(tryout_state::vram_w)
 	m_gfxdecode->gfx(2)->mark_dirty((offset-0x400/64)&0x7f);
 }
 
-WRITE8_MEMBER(tryout_state::vram_bankswitch_w)
+void tryout_state::vram_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_bank = data;
 }
 
-WRITE8_MEMBER(tryout_state::flipscreen_w)
+void tryout_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }
 
-TILEMAP_MAPPER_MEMBER(tryout_state::get_fg_memory_offset)
+tilemap_memory_index tryout_state::get_fg_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (row ^ 0x1f) + (col << 5);
 }
 
-TILEMAP_MAPPER_MEMBER(tryout_state::get_bg_memory_offset)
+tilemap_memory_index tryout_state::get_bg_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int a;
 //  if (col&0x20)

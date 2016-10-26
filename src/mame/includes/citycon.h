@@ -35,15 +35,15 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(citycon_in_r);
-	DECLARE_READ8_MEMBER(citycon_irq_ack_r);
-	DECLARE_WRITE8_MEMBER(citycon_videoram_w);
-	DECLARE_WRITE8_MEMBER(citycon_linecolor_w);
-	DECLARE_WRITE8_MEMBER(citycon_background_w);
-	DECLARE_DRIVER_INIT(citycon);
-	TILEMAP_MAPPER_MEMBER(citycon_scan);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	uint8_t citycon_in_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t citycon_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void citycon_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void citycon_linecolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void citycon_background_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_citycon();
+	tilemap_memory_index citycon_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

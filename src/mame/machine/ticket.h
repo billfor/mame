@@ -61,10 +61,10 @@ public:
 	static void static_set_senses(device_t &device, uint8_t motor_sense, uint8_t status_sense);
 
 	// read/write handlers
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_READ_LINE_MEMBER( line_r );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE_LINE_MEMBER( motor_w );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	int line_r();
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void motor_w(int state);
 
 protected:
 	// device-level overrides

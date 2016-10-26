@@ -288,27 +288,27 @@ public:
 	// construction/destruction
 	ygv608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_READ16_MEMBER( read );
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 
 	void set_gfxbank(uint8_t gfxbank);
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER( timed_interrupt );
+	void timed_interrupt(device_t &device);
 
 	// to be removed
-	DECLARE_READ16_MEMBER( debug_trigger_r );
+	uint16_t debug_trigger_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 private:
-	TILEMAP_MAPPER_MEMBER(get_tile_offset);
-	TILE_GET_INFO_MEMBER(get_tile_info_A_8);
-	TILE_GET_INFO_MEMBER(get_tile_info_B_8);
-	TILE_GET_INFO_MEMBER(get_tile_info_A_16);
-	TILE_GET_INFO_MEMBER(get_tile_info_B_16);
+	tilemap_memory_index get_tile_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_tile_info_A_8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_B_8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_A_16(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_B_16(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void postload();
 	void register_state_save();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

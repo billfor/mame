@@ -602,7 +602,7 @@ void lynx_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-TIMER_CALLBACK_MEMBER(lynx_state::lynx_blitter_timer)
+void lynx_state::lynx_blitter_timer(void *ptr, int32_t param)
 {
 	m_blitter.busy=0; // blitter finished
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -892,7 +892,7 @@ void lynx_state::lynx_multiply()
 	}
 }
 
-READ8_MEMBER(lynx_state::suzy_read)
+uint8_t lynx_state::suzy_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0, input;
 
@@ -1042,7 +1042,7 @@ READ8_MEMBER(lynx_state::suzy_read)
 	return value;
 }
 
-WRITE8_MEMBER(lynx_state::suzy_write)
+void lynx_state::suzy_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_suzy.data[offset] = data;
 	//logerror("suzy write %.2x %.2x\n",offset,data);
@@ -1491,7 +1491,7 @@ uint32_t lynx_state::lynx_time_factor(int val)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(lynx_state::lynx_timer_shot)
+void lynx_state::lynx_timer_shot(void *ptr, int32_t param)
 {
 	lynx_timer_signal_irq(param);
 	if (!(m_timer[param].cntrl1 & 0x10)) // if reload not enabled
@@ -1600,12 +1600,12 @@ void lynx_state::lynx_uart_reset()
 	memset(&m_uart, 0, sizeof(m_uart));
 }
 
-TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_loopback_timer)
+void lynx_state::lynx_uart_loopback_timer(void *ptr, int32_t param)
 {
 	m_uart.received = false;
 }
 
-TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_timer)
+void lynx_state::lynx_uart_timer(void *ptr, int32_t param)
 {
 	if (m_uart.buffer_loaded)
 	{
@@ -1635,7 +1635,7 @@ TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_timer)
 	}
 }
 
-READ8_MEMBER(lynx_state::lynx_uart_r)
+uint8_t lynx_state::lynx_uart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0x00;
 	switch (offset)
@@ -1657,7 +1657,7 @@ READ8_MEMBER(lynx_state::lynx_uart_r)
 	return value;
 }
 
-WRITE8_MEMBER(lynx_state::lynx_uart_w)
+void lynx_state::lynx_uart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("uart write %.2x %.2x\n", offset, data);
 	switch (offset)
@@ -1691,7 +1691,7 @@ WRITE8_MEMBER(lynx_state::lynx_uart_w)
 ****************************************/
 
 
-READ8_MEMBER(lynx_state::mikey_read)
+uint8_t lynx_state::mikey_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t direction, value = 0x00;
 
@@ -1760,7 +1760,7 @@ READ8_MEMBER(lynx_state::mikey_read)
 	return value;
 }
 
-WRITE8_MEMBER(lynx_state::mikey_write)
+void lynx_state::mikey_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1875,12 +1875,12 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 
 ****************************************/
 
-READ8_MEMBER(lynx_state::lynx_memory_config_r)
+uint8_t lynx_state::lynx_memory_config_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_memory_config;
 }
 
-WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
+void lynx_state::lynx_memory_config_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7: hispeed, uses page mode accesses (4 instead of 5 cycles )
 	 * when these are safe in the cpu */
@@ -2058,7 +2058,7 @@ image_verify_result lynx_state::lynx_verify_cart(char *header, int kind)
 	return image_verify_result::PASS;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
+image_init_result lynx_state::device_image_load_lynx_cart(device_image_interface &image)
 {
 	/* Lynx carts have 19 address lines, the upper 8 used for bank select. The lower
 	11 bits are used to address data within the selected bank. Valid bank sizes are 256,

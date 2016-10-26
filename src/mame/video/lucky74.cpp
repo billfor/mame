@@ -100,32 +100,32 @@
 #include "includes/lucky74.h"
 
 
-WRITE8_MEMBER(lucky74_state::lucky74_fg_videoram_w)
+void lucky74_state::lucky74_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lucky74_state::lucky74_fg_colorram_w)
+void lucky74_state::lucky74_fg_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lucky74_state::lucky74_bg_videoram_w)
+void lucky74_state::lucky74_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lucky74_state::lucky74_bg_colorram_w)
+void lucky74_state::lucky74_bg_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-PALETTE_INIT_MEMBER(lucky74_state, lucky74)
+void lucky74_state::palette_init_lucky74(palette_device &palette)
 /*
    There are 2 states (see the technical notes).
    We're constructing a double-sized palette with one half for each state.
@@ -198,7 +198,7 @@ PALETTE_INIT_MEMBER(lucky74_state, lucky74)
 }
 
 
-TILE_GET_INFO_MEMBER(lucky74_state::get_fg_tile_info)
+void lucky74_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -213,7 +213,7 @@ TILE_GET_INFO_MEMBER(lucky74_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(lucky74_state::get_bg_tile_info)
+void lucky74_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210

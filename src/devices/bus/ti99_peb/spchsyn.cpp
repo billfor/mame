@@ -60,7 +60,7 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 /*
     Memory write
 */
-WRITE8_MEMBER( ti_speech_synthesizer_device::write )
+void ti_speech_synthesizer_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (space.debugger_access()) return;
 
@@ -102,7 +102,7 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 
 /****************************************************************************/
 
-WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
+void ti_speech_synthesizer_device::speech_ready(int state)
 {
 	// The TMS5200 implementation uses true/false, not ASSERT/CLEAR semantics
 	// and we have to adapt a /READY to a READY line.

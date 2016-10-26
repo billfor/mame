@@ -25,7 +25,7 @@ hotd2o: bp 0xc0ba1f6, modify work RAM 0xc9c35a8 to be zero, bpclear
 #include "includes/naomi.h"
 #include "sound/aica.h"
 
-READ64_MEMBER(naomi_state::naomi_biose_idle_skip_r )
+uint64_t naomi_state::naomi_biose_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc04173c)
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -36,7 +36,7 @@ READ64_MEMBER(naomi_state::naomi_biose_idle_skip_r )
 	return dc_ram[0x2ad238/8];
 }
 
-READ64_MEMBER(naomi_state::naomi_biosh_idle_skip_r )
+uint64_t naomi_state::naomi_biosh_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc045ffc)
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -46,7 +46,7 @@ READ64_MEMBER(naomi_state::naomi_biosh_idle_skip_r )
 	return dc_ram[0x2b0600/8];
 }
 
-READ64_MEMBER(naomi_state::naomi2_biose_idle_skip_r )
+uint64_t naomi_state::naomi2_biose_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc04637c)
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -201,7 +201,7 @@ void naomi_state::create_pic_from_retdat()
 	}
 }
 
-DRIVER_INIT_MEMBER(naomi_state,naomi)
+void naomi_state::init_naomi()
 {
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
@@ -209,18 +209,18 @@ DRIVER_INIT_MEMBER(naomi_state,naomi)
 	create_pic_from_retdat();
 }
 
-DRIVER_INIT_MEMBER(naomi_state,naomi2)
+void naomi_state::init_naomi2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi2_biose_idle_skip_r),this)); // rev e bios
 
 	create_pic_from_retdat();
 }
 
-INPUT_CHANGED_MEMBER(naomi_state::naomi_mp_w)
+void naomi_state::naomi_mp_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_mp_mux = newval;
 }
-CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
+ioport_value naomi_state::naomi_mp_r(ioport_field &field, void *param)
 {
 	const char *tagptr = (const char *)param;
 	uint8_t retval = 0;
@@ -238,7 +238,7 @@ CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 	return retval;
 }
 
-DRIVER_INIT_MEMBER(naomi_state,naomi_mp)
+void naomi_state::init_naomi_mp()
 {
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
@@ -247,7 +247,7 @@ DRIVER_INIT_MEMBER(naomi_state,naomi_mp)
 	create_pic_from_retdat();
 }
 
-DRIVER_INIT_MEMBER(naomi_state,naomigd)
+void naomi_state::init_naomigd()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
@@ -255,7 +255,7 @@ DRIVER_INIT_MEMBER(naomi_state,naomigd)
 	create_pic_from_retdat();
 }
 
-DRIVER_INIT_MEMBER(naomi_state,naomigd_mp)
+void naomi_state::init_naomigd_mp()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
@@ -265,7 +265,7 @@ DRIVER_INIT_MEMBER(naomi_state,naomigd_mp)
 }
 
 
-READ64_MEMBER(naomi_state::naomigd_ggxxsla_idle_skip_r )
+uint64_t naomi_state::naomigd_ggxxsla_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0x0c0c9adc)
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -273,13 +273,13 @@ READ64_MEMBER(naomi_state::naomigd_ggxxsla_idle_skip_r )
 	return dc_ram[0x1aae18/8];
 }
 
-DRIVER_INIT_MEMBER(naomi_state,ggxxsla)
+void naomi_state::init_ggxxsla()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc1aae18, 0xc1aae1f, read64_delegate(FUNC(naomi_state::naomigd_ggxxsla_idle_skip_r),this));
-	DRIVER_INIT_CALL(naomigd);
+	init_naomigd();
 }
 
-READ64_MEMBER(naomi_state::naomigd_ggxx_idle_skip_r )
+uint64_t naomi_state::naomigd_ggxx_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc0b5c3c) // or 0xc0bab0c
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -288,13 +288,13 @@ READ64_MEMBER(naomi_state::naomigd_ggxx_idle_skip_r )
 }
 
 
-DRIVER_INIT_MEMBER(naomi_state,ggxx)
+void naomi_state::init_ggxx()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc1837b8, 0xc1837bf, read64_delegate(FUNC(naomi_state::naomigd_ggxx_idle_skip_r),this));
-	DRIVER_INIT_CALL(naomigd);
+	init_naomigd();
 }
 
-READ64_MEMBER(naomi_state::naomigd_ggxxrl_idle_skip_r )
+uint64_t naomi_state::naomigd_ggxxrl_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc0b84bc) // or 0xc0bab0c
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -304,14 +304,14 @@ READ64_MEMBER(naomi_state::naomigd_ggxxrl_idle_skip_r )
 	return dc_ram[0x18d6c8/8];
 }
 
-DRIVER_INIT_MEMBER(naomi_state,ggxxrl)
+void naomi_state::init_ggxxrl()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc18d6c8, 0xc18d6cf, read64_delegate(FUNC(naomi_state::naomigd_ggxxrl_idle_skip_r),this));
-	DRIVER_INIT_CALL(naomigd);
+	init_naomigd();
 }
 
 /* at least speeds up the annoying copyright screens ;-) */
-READ64_MEMBER(naomi_state::naomigd_sfz3ugd_idle_skip_r )
+uint64_t naomi_state::naomigd_sfz3ugd_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc36a2dc)
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -319,14 +319,14 @@ READ64_MEMBER(naomi_state::naomigd_sfz3ugd_idle_skip_r )
 	return dc_ram[0x5dc900/8];
 }
 
-DRIVER_INIT_MEMBER(naomi_state,sfz3ugd)
+void naomi_state::init_sfz3ugd()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc5dc900, 0xc5dc907, read64_delegate(FUNC(naomi_state::naomigd_sfz3ugd_idle_skip_r),this));
-	DRIVER_INIT_CALL(naomigd);
+	init_naomigd();
 }
 
 
-READ64_MEMBER(naomi_state::hotd2_idle_skip_r )
+uint64_t naomi_state::hotd2_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc0cfcbc)
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -337,7 +337,7 @@ READ64_MEMBER(naomi_state::hotd2_idle_skip_r )
 	return dc_ram[0xa25fb8/8];
 }
 
-DRIVER_INIT_MEMBER(naomi_state,hotd2)
+void naomi_state::init_hotd2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca25fb8, 0xca25fbf, read64_delegate(FUNC(naomi_state::hotd2_idle_skip_r),this));
 }

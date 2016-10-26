@@ -73,21 +73,21 @@ public:
 		, m_crtc(*this,"crtc")
 	{ }
 
-	DECLARE_READ8_MEMBER( ts803_port_r );
-	DECLARE_WRITE8_MEMBER( ts803_port_w );
-	DECLARE_READ8_MEMBER( ts803_porthi_r );
-	DECLARE_WRITE8_MEMBER( ts803_porthi_w );
+	uint8_t ts803_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ts803_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ts803_porthi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ts803_porthi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( disk_0_control_w );
-	DECLARE_READ8_MEMBER( disk_0_control_r );
+	void disk_0_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t disk_0_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( keyboard_put );
+	void keyboard_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
-	DECLARE_WRITE8_MEMBER( crtc_controlreg_w );
-	DECLARE_DRIVER_INIT(ts803);
-	TIMER_DEVICE_CALLBACK_MEMBER(dart_tick);
+	void crtc_controlreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_ts803();
+	void dart_tick(timer_device &timer, void *ptr, int32_t param);
 
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<palette_device> m_palette;
@@ -166,7 +166,7 @@ INPUT_PORTS_END
 
 /* keyboard */
 
-WRITE8_MEMBER( ts803_state::keyboard_put )
+void ts803_state::keyboard_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 	{
@@ -191,7 +191,7 @@ static SLOT_INTERFACE_START( ts803_floppies )
 	SLOT_INTERFACE( "drive1", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-WRITE8_MEMBER( ts803_state::disk_0_control_w )
+void ts803_state::disk_0_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
 d0 ready
@@ -220,13 +220,13 @@ d7 Drive select 3 (active low)
 	m_fdc->dden_w(BIT(data, 3));
 }
 
-READ8_MEMBER( ts803_state::disk_0_control_r )
+uint8_t ts803_state::disk_0_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("Disk0 control register read\n");
 	return 0xff;
 }
 
-READ8_MEMBER( ts803_state::ts803_porthi_r )
+uint8_t ts803_state::ts803_porthi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("PortHI read [%x]\n",offset+0x91);
 
@@ -257,7 +257,7 @@ READ8_MEMBER( ts803_state::ts803_porthi_r )
 	return 0x00;
 }
 
-WRITE8_MEMBER( ts803_state::ts803_porthi_w )
+void ts803_state::ts803_porthi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("PortHI write [%2x] [%2x]\n",offset+0x91,data);
 
@@ -272,7 +272,7 @@ WRITE8_MEMBER( ts803_state::ts803_porthi_w )
 	}
 }
 
-READ8_MEMBER( ts803_state::ts803_port_r )
+uint8_t ts803_state::ts803_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("Port read [%x]\n",offset);
 
@@ -324,7 +324,7 @@ READ8_MEMBER( ts803_state::ts803_port_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( ts803_state::ts803_port_w )
+void ts803_state::ts803_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("Port write [%2x] [%2x]\n",offset,data);
 
@@ -412,7 +412,7 @@ MC6845_UPDATE_ROW( ts803_state::crtc_update_row )
 	}
 }
 
-WRITE8_MEMBER( ts803_state::crtc_controlreg_w )
+void ts803_state::crtc_controlreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
 Bit 0 = 0 alpha mode
@@ -428,7 +428,7 @@ Bit 2 = 0 alpha memory access (round off)
 }
 
 // baud rate generator for keyboard, 9600 baud.
-TIMER_DEVICE_CALLBACK_MEMBER( ts803_state::dart_tick )
+void ts803_state::dart_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_tick ^= 1;
 	m_dart->rxca_w(m_tick);
@@ -457,7 +457,7 @@ void ts803_state::machine_reset()
 	membank("bank4")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER( ts803_state, ts803 )
+void ts803_state::init_ts803()
 {
 	m_videoram = std::make_unique<uint8_t[]>(0x8000);
 	m_56kram = std::make_unique<uint8_t[]>(0xc000);

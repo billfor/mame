@@ -123,7 +123,7 @@ BG0 palette intensity ( $C47F, $C4FF )
   Callbacks for the tilemap code
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(argus_state::argus_get_tx_tile_info)
+void argus_state::argus_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_tx_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::argus_get_bg0_tile_info)
+void argus_state::argus_get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 
@@ -153,7 +153,7 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_bg0_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::argus_get_bg1_tile_info)
+void argus_state::argus_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 
@@ -168,7 +168,7 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_bg1_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::valtric_get_tx_tile_info)
+void argus_state::valtric_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 
@@ -183,7 +183,7 @@ TILE_GET_INFO_MEMBER(argus_state::valtric_get_tx_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::valtric_get_bg_tile_info)
+void argus_state::valtric_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 
@@ -198,7 +198,7 @@ TILE_GET_INFO_MEMBER(argus_state::valtric_get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(argus_state::butasan_get_tx_tile_info)
+void argus_state::butasan_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 
@@ -214,7 +214,7 @@ TILE_GET_INFO_MEMBER(argus_state::butasan_get_tx_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg0_tile_info)
+void argus_state::butasan_get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 	int attrib;
@@ -232,7 +232,7 @@ TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg0_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg1_tile_info)
+void argus_state::butasan_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attrib, tile;
 
@@ -259,7 +259,7 @@ void argus_state::reset_common()
 	m_palette_intensity = 0;
 }
 
-VIDEO_START_MEMBER(argus_state,argus)
+void argus_state::video_start_argus()
 {
 	/*                           info                     offset             w   h  col  row */
 	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::argus_get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
@@ -280,7 +280,7 @@ VIDEO_START_MEMBER(argus_state,argus)
 	save_item(NAME(m_prvscrollx));
 }
 
-VIDEO_RESET_MEMBER(argus_state,argus)
+void argus_state::video_reset_argus()
 {
 	m_lowbitscroll = 0;
 	m_prvscrollx = 0;
@@ -290,7 +290,7 @@ VIDEO_RESET_MEMBER(argus_state,argus)
 	reset_common();
 }
 
-VIDEO_START_MEMBER(argus_state,valtric)
+void argus_state::video_start_valtric()
 {
 	/*                           info                      offset             w   h  col  row */
 	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::valtric_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
@@ -308,13 +308,13 @@ VIDEO_START_MEMBER(argus_state,valtric)
 	save_item(NAME(m_mosaic));
 }
 
-VIDEO_RESET_MEMBER(argus_state,valtric)
+void argus_state::video_reset_valtric()
 {
 	m_valtric_mosaic = 0x0f;
 	reset_common();
 }
 
-VIDEO_START_MEMBER(argus_state,butasan)
+void argus_state::video_start_butasan()
 {
 	/*                           info                       offset             w   h  col  row */
 	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::butasan_get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -342,7 +342,7 @@ VIDEO_START_MEMBER(argus_state,butasan)
 	save_item(NAME(m_butasan_unknown));
 }
 
-VIDEO_RESET_MEMBER(argus_state,butasan)
+void argus_state::video_reset_butasan()
 {
 	m_butasan_page_latch = 0;
 	m_butasan_bg1_status = 0x01;
@@ -431,24 +431,24 @@ void argus_state::change_bg_palette(int color, int lo_offs, int hi_offs)
   Memory handler
 ***************************************************************************/
 
-WRITE8_MEMBER(argus_state::valtric_mosaic_w)
+void argus_state::valtric_mosaic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_valtric_mosaic = data;
 }
 
-WRITE8_MEMBER(argus_state::txram_w)
+void argus_state::txram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_txram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(argus_state::bg1ram_w)
+void argus_state::bg1ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg1ram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(argus_state::argus_bg_status_w)
+void argus_state::argus_bg_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bg_status != data)
 	{
@@ -467,7 +467,7 @@ WRITE8_MEMBER(argus_state::argus_bg_status_w)
 	}
 }
 
-WRITE8_MEMBER(argus_state::valtric_bg_status_w)
+void argus_state::valtric_bg_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bg_status != data)
 	{
@@ -486,12 +486,12 @@ WRITE8_MEMBER(argus_state::valtric_bg_status_w)
 	}
 }
 
-WRITE8_MEMBER(argus_state::butasan_bg0_status_w)
+void argus_state::butasan_bg0_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_status = data;
 }
 
-WRITE8_MEMBER(argus_state::butasan_bg1_status_w)
+void argus_state::butasan_bg1_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_butasan_bg1_status != data)
 	{
@@ -502,12 +502,12 @@ WRITE8_MEMBER(argus_state::butasan_bg1_status_w)
 	}
 }
 
-WRITE8_MEMBER(argus_state::flipscreen_w)
+void argus_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data & 0x80;
 }
 
-WRITE8_MEMBER(argus_state::argus_paletteram_w)
+void argus_state::argus_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int offs;
 
@@ -553,7 +553,7 @@ WRITE8_MEMBER(argus_state::argus_paletteram_w)
 	}
 }
 
-WRITE8_MEMBER(argus_state::valtric_paletteram_w)
+void argus_state::valtric_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 
@@ -581,7 +581,7 @@ WRITE8_MEMBER(argus_state::valtric_paletteram_w)
 	}
 }
 
-WRITE8_MEMBER(argus_state::butasan_paletteram_w)
+void argus_state::butasan_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 
@@ -614,7 +614,7 @@ WRITE8_MEMBER(argus_state::butasan_paletteram_w)
 		change_palette(((offset & 0x1f) >> 1) + 0xf0, offset & ~1, offset | 1);
 }
 
-WRITE8_MEMBER(argus_state::butasan_bg1ram_w)
+void argus_state::butasan_bg1ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int idx;
 
@@ -626,12 +626,12 @@ WRITE8_MEMBER(argus_state::butasan_bg1ram_w)
 	m_bg1_tilemap->mark_tile_dirty(idx);
 }
 
-WRITE8_MEMBER(argus_state::butasan_pageselect_w)
+void argus_state::butasan_pageselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_butasan_page_latch = data & 1;
 }
 
-READ8_MEMBER(argus_state::butasan_pagedram_r)
+uint8_t argus_state::butasan_pagedram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset <= 0x07ff)
 		return m_butasan_pagedram[m_butasan_page_latch][offset];
@@ -639,7 +639,7 @@ READ8_MEMBER(argus_state::butasan_pagedram_r)
 		return m_butasan_pagedram[0][offset];
 }
 
-WRITE8_MEMBER(argus_state::butasan_pagedram_w)
+void argus_state::butasan_pagedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_butasan_pagedram[m_butasan_page_latch][offset] = data;
 
@@ -660,12 +660,12 @@ WRITE8_MEMBER(argus_state::butasan_pagedram_w)
 	}
 }
 
-WRITE8_MEMBER(argus_state::valtric_unknown_w)
+void argus_state::valtric_unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_valtric_unknown = data;
 }
 
-WRITE8_MEMBER(argus_state::butasan_unknown_w)
+void argus_state::butasan_unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_butasan_unknown = data;
 }

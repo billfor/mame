@@ -7,7 +7,7 @@
 
 /* background, appears to be the bottom layer */
 
-TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_bg_tile_info)
+void stlforce_state::get_stlforce_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -17,7 +17,7 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
-WRITE16_MEMBER(stlforce_state::stlforce_bg_videoram_w)
+void stlforce_state::stlforce_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -25,7 +25,7 @@ WRITE16_MEMBER(stlforce_state::stlforce_bg_videoram_w)
 
 /* middle layer, low */
 
-TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mlow_tile_info)
+void stlforce_state::get_stlforce_mlow_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mlow_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
-WRITE16_MEMBER(stlforce_state::stlforce_mlow_videoram_w)
+void stlforce_state::stlforce_mlow_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_mlow_videoram[offset] = data;
 	m_mlow_tilemap->mark_tile_dirty(offset);
@@ -46,7 +46,7 @@ WRITE16_MEMBER(stlforce_state::stlforce_mlow_videoram_w)
 
 /* middle layer, high */
 
-TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mhigh_tile_info)
+void stlforce_state::get_stlforce_mhigh_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mhigh_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
-WRITE16_MEMBER(stlforce_state::stlforce_mhigh_videoram_w)
+void stlforce_state::stlforce_mhigh_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_mhigh_videoram[offset] = data;
 	m_mhigh_tilemap->mark_tile_dirty(offset);
@@ -67,7 +67,7 @@ WRITE16_MEMBER(stlforce_state::stlforce_mhigh_videoram_w)
 
 /* text layer, appears to be the top layer */
 
-TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_tx_tile_info)
+void stlforce_state::get_stlforce_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_tx_tile_info)
 	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
 }
 
-WRITE16_MEMBER(stlforce_state::stlforce_tx_videoram_w)
+void stlforce_state::stlforce_tx_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tx_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);

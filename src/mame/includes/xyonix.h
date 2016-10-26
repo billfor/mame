@@ -21,15 +21,15 @@ public:
 	int m_coins;
 	int m_prev_coin;
 
-	DECLARE_WRITE8_MEMBER(irqack_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_WRITE8_MEMBER(vidram_w);
+	void irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_PALETTE_INIT(xyonix);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void palette_init_xyonix(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void handle_coins(int coin);

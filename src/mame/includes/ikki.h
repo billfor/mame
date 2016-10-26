@@ -37,14 +37,14 @@ public:
 	int        m_punch_through_pen;
 	uint8_t      m_irq_source;
 
-	DECLARE_READ8_MEMBER(ikki_e000_r);
-	DECLARE_WRITE8_MEMBER(ikki_coin_counters);
-	DECLARE_WRITE8_MEMBER(ikki_scrn_ctrl_w);
+	uint8_t ikki_e000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ikki_coin_counters(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ikki_scrn_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ikki);
+	void palette_init_ikki(palette_device &palette);
 	uint32_t screen_update_ikki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(ikki_irq);
+	void ikki_irq(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

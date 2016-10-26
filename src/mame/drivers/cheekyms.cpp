@@ -12,7 +12,7 @@
 #include "sound/volt_reg.h"
 
 
-INPUT_CHANGED_MEMBER(cheekyms_state::coin_inserted)
+void cheekyms_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)
@@ -112,7 +112,7 @@ void cheekyms_state::machine_start()
 	save_item(NAME(m_irq_mask));
 }
 
-INTERRUPT_GEN_MEMBER(cheekyms_state::vblank_irq)
+void cheekyms_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

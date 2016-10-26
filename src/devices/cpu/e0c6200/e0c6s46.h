@@ -86,8 +86,8 @@ public:
 
 	static void static_set_pixel_update_cb(device_t &device, e0c6s46_pixel_update_func _cb) { downcast<e0c6s46_device &>(device).m_pixel_update_handler = _cb; }
 
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -135,7 +135,7 @@ private:
 	// timers
 	int m_256_src_pulse;
 	emu_timer *m_core_256_handle;
-	TIMER_CALLBACK_MEMBER(core_256_cb);
+	void core_256_cb(void *ptr, int32_t param);
 
 	int m_watchdog_count;
 	void clock_watchdog();
@@ -156,7 +156,7 @@ private:
 	uint8_t m_prgtimer_count;
 	uint8_t m_prgtimer_reload;
 	emu_timer *m_prgtimer_handle;
-	TIMER_CALLBACK_MEMBER(prgtimer_cb);
+	void prgtimer_cb(void *ptr, int32_t param);
 	bool prgtimer_reset_prescaler();
 	void clock_prgtimer();
 
@@ -169,7 +169,7 @@ private:
 	uint8_t m_bz_1shot_count;
 	int m_bz_pulse;
 	emu_timer *m_buzzer_handle;
-	TIMER_CALLBACK_MEMBER(buzzer_cb);
+	void buzzer_cb(void *ptr, int32_t param);
 	void schedule_buzzer();
 	void reset_buzzer();
 	void clock_bz_1shot();

@@ -48,26 +48,26 @@ public:
 		, m_keyboard(*this, "X.%u", 0)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_WRITE8_MEMBER(port02_w);
-	DECLARE_WRITE8_MEMBER(port03_w);
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_READ8_MEMBER(port05_r);
-	DECLARE_WRITE8_MEMBER(port06_w);
-	DECLARE_WRITE8_MEMBER(port07_w);
-	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_READ_LINE_MEMBER(ef1_r);
-	DECLARE_READ_LINE_MEMBER(ef4_r);
-	DECLARE_WRITE_LINE_MEMBER(q4013a_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(clock2_w);
+	void port01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port03_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port04_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port05_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port07_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int clear_r();
+	int ef1_r();
+	int ef4_r();
+	void q4013a_w(int state);
+	void clock_w(int state);
+	void clock2_w(int state);
 	// Zira
-	DECLARE_WRITE8_MEMBER(sound_d_w);
-	DECLARE_WRITE8_MEMBER(sound_g_w);
-	DECLARE_READ8_MEMBER(psg_r);
-	DECLARE_WRITE8_MEMBER(psg_w);
-	DECLARE_READ8_MEMBER(sound_in_r);
-	DECLARE_DRIVER_INIT(zira);
+	void sound_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t psg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void psg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_in_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_zira();
 
 private:
 	uint16_t m_clockcnt;
@@ -196,7 +196,7 @@ void play_2_state::machine_reset()
 	m_1863->oe_w(1);
 }
 
-WRITE8_MEMBER( play_2_state::port01_w )
+void play_2_state::port01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbdrow = data;
 	if (m_kbdrow && m_disp_sw)
@@ -210,7 +210,7 @@ WRITE8_MEMBER( play_2_state::port01_w )
 	m_1863->set_output_gain(0, BIT(data, 7) ? 1.00 : 0.00);
 }
 
-WRITE8_MEMBER( play_2_state::port02_w )
+void play_2_state::port02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_segment[4] = m_segment[3];
 	m_segment[3] = m_segment[2];
@@ -220,11 +220,11 @@ WRITE8_MEMBER( play_2_state::port02_w )
 	m_disp_sw = 1;
 }
 
-WRITE8_MEMBER( play_2_state::port03_w )
+void play_2_state::port03_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER( play_2_state::port04_r )
+uint8_t play_2_state::port04_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_kbdrow & 0x3f)
 		for (uint8_t i = 0; i < 6; i++)
@@ -234,17 +234,17 @@ READ8_MEMBER( play_2_state::port04_r )
 	return 0;
 }
 
-READ8_MEMBER( play_2_state::port05_r )
+uint8_t play_2_state::port05_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_keyboard[6]->read();
 }
 
-WRITE8_MEMBER( play_2_state::port06_w )
+void play_2_state::port06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port06 = data & 15;
 }
 
-WRITE8_MEMBER( play_2_state::port07_w )
+void play_2_state::port07_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch = (data & 0x70) >> 4; // Zira (manual doesn't say where data comes from)
 	m_4013b->clear_w(0);
@@ -258,7 +258,7 @@ WRITE8_MEMBER( play_2_state::port07_w )
 	}
 }
 
-READ_LINE_MEMBER( play_2_state::clear_r )
+int play_2_state::clear_r()
 {
 	// A hack to make the machine reset itself on boot
 	if (m_resetcnt < 0xffff)
@@ -266,17 +266,17 @@ READ_LINE_MEMBER( play_2_state::clear_r )
 	return (m_resetcnt == 0xff00) ? 0 : 1;
 }
 
-READ_LINE_MEMBER( play_2_state::ef1_r )
+int play_2_state::ef1_r()
 {
 	return (!BIT(m_clockcnt, 10)); // inverted
 }
 
-READ_LINE_MEMBER( play_2_state::ef4_r )
+int play_2_state::ef4_r()
 {
 	return BIT(m_keyboard[7]->read(), 0); // inverted test button - doesn't seem to do anything
 }
 
-WRITE_LINE_MEMBER( play_2_state::clock_w )
+void play_2_state::clock_w(int state)
 {
 	m_4013a->clock_w(state);
 
@@ -289,25 +289,25 @@ WRITE_LINE_MEMBER( play_2_state::clock_w )
 	}
 }
 
-WRITE_LINE_MEMBER( play_2_state::clock2_w )
+void play_2_state::clock2_w(int state)
 {
 	m_4013b->clock_w(state);
 	m_maincpu->ef3_w(state); // inverted
 }
 
-WRITE_LINE_MEMBER( play_2_state::q4013a_w )
+void play_2_state::q4013a_w(int state)
 {
 	m_clockcnt = 0;
 }
 
 // *********** Zira Sound handlers ***************** (same as cidelsa.cpp)
-WRITE8_MEMBER( play_2_state::sound_d_w )
+void play_2_state::sound_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    D3      2716 A10
 	membank("bank1")->set_entry(BIT(data, 3));
 }
 
-WRITE8_MEMBER( play_2_state::sound_g_w )
+void play_2_state::sound_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -325,17 +325,17 @@ WRITE8_MEMBER( play_2_state::sound_g_w )
 	}
 }
 
-READ8_MEMBER( play_2_state::sound_in_r )
+uint8_t play_2_state::sound_in_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_soundlatch;
 }
 
-READ8_MEMBER( play_2_state::psg_r )
+uint8_t play_2_state::psg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_psg_latch;
 }
 
-WRITE8_MEMBER( play_2_state::psg_w )
+void play_2_state::psg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_psg_latch = data;
 }
@@ -394,7 +394,7 @@ static MACHINE_CONFIG_DERIVED( zira, play_2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER( play_2_state, zira )
+void play_2_state::init_zira()
 {
 	/* setup COP402 memory banking */
 	membank("bank1")->configure_entries(0, 2, memregion("cop402")->base(), 0x400);

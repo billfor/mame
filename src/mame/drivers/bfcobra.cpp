@@ -257,29 +257,29 @@ public:
 	uint8_t m_col6bit[256];
 	struct bf_blitter_t m_blitter;
 	struct fdc_t m_fdc;
-	DECLARE_READ8_MEMBER(chipset_r);
-	DECLARE_WRITE8_MEMBER(chipset_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_READ8_MEMBER(fdctrl_r);
-	DECLARE_READ8_MEMBER(fddata_r);
-	DECLARE_WRITE8_MEMBER(fdctrl_w);
-	DECLARE_READ8_MEMBER(int_latch_r);
-	DECLARE_READ8_MEMBER(meter_r);
-	DECLARE_WRITE8_MEMBER(meter_w);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_READ8_MEMBER(upd_r);
-	DECLARE_WRITE8_MEMBER(upd_w);
-	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
-	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_DRIVER_INIT(bfcobra);
+	uint8_t chipset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void chipset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t fddata_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t int_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t meter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void meter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t upd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void upd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void z80_acia_irq(int state);
+	void m6809_data_irq(int state);
+	void data_acia_tx_w(int state);
+	void write_acia_clock(int state);
+	void init_bfcobra();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(timer_irq);
-	INTERRUPT_GEN_MEMBER(vblank_gen);
+	void timer_irq(device_t &device);
+	void vblank_gen(device_t &device);
 	void RunBlit(address_space &space);
 	void update_irqs();
 	void reset_fdc();
@@ -797,7 +797,7 @@ void bfcobra_state::update_irqs()
 	}
 }
 
-READ8_MEMBER(bfcobra_state::chipset_r)
+uint8_t bfcobra_state::chipset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0xff;
 
@@ -851,7 +851,7 @@ READ8_MEMBER(bfcobra_state::chipset_r)
 	return val;
 }
 
-WRITE8_MEMBER(bfcobra_state::chipset_w)
+void bfcobra_state::chipset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -959,7 +959,7 @@ void bfcobra_state::z80_bank(int num, int data)
 	}
 }
 
-WRITE8_MEMBER(bfcobra_state::rombank_w)
+void bfcobra_state::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank_data[0] = data;
 	z80_bank(1, m_bank_data[1]);
@@ -1018,7 +1018,7 @@ void bfcobra_state::reset_fdc()
 	m_fdc.phase = COMMAND;
 }
 
-READ8_MEMBER(bfcobra_state::fdctrl_r)
+uint8_t bfcobra_state::fdctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0;
 
@@ -1027,7 +1027,7 @@ READ8_MEMBER(bfcobra_state::fdctrl_r)
 	return val;
 }
 
-READ8_MEMBER(bfcobra_state::fddata_r)
+uint8_t bfcobra_state::fddata_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	struct fdc_t &fdc = m_fdc;
 	#define BPS     1024
@@ -1100,7 +1100,7 @@ READ8_MEMBER(bfcobra_state::fddata_r)
 	return val;
 }
 
-WRITE8_MEMBER(bfcobra_state::fdctrl_w)
+void bfcobra_state::fdctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct fdc_t &fdc = m_fdc;
 	switch (fdc.phase)
@@ -1220,11 +1220,11 @@ uint8_t bfcobra_state::results_phase(void)
 	return 0;
 }
 
-WRITE8_MEMBER(bfcobra_state::fd_op_w)
+void bfcobra_state::fd_op_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(bfcobra_state::fd_ctrl_w)
+void bfcobra_state::fd_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 #endif
@@ -1301,19 +1301,19 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /* TODO */
-READ8_MEMBER(bfcobra_state::int_latch_r)
+uint8_t bfcobra_state::int_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 2 | 1;
 }
 
 /* TODO */
-READ8_MEMBER(bfcobra_state::meter_r)
+uint8_t bfcobra_state::meter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_meter_latch;
 }
 
 /* TODO: This is borrowed from Scorpion 1 */
-WRITE8_MEMBER(bfcobra_state::meter_w)
+void bfcobra_state::meter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	int  changed = m_meter_latch ^ data;
@@ -1335,12 +1335,12 @@ WRITE8_MEMBER(bfcobra_state::meter_w)
 }
 
 /* TODO */
-READ8_MEMBER(bfcobra_state::latch_r)
+uint8_t bfcobra_state::latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mux_input;
 }
 
-WRITE8_MEMBER(bfcobra_state::latch_w)
+void bfcobra_state::latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: This is borrowed from Scorpion 1 */
 	switch(offset)
@@ -1376,12 +1376,12 @@ WRITE8_MEMBER(bfcobra_state::latch_w)
 	}
 }
 
-READ8_MEMBER(bfcobra_state::upd_r)
+uint8_t bfcobra_state::upd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 2 | m_upd7759->busy_r();
 }
 
-WRITE8_MEMBER(bfcobra_state::upd_w)
+void bfcobra_state::upd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->reset_w(data & 0x80);
 	m_upd7759->port_w(space, 0, data & 0x3f);
@@ -1526,26 +1526,26 @@ void bfcobra_state::init_ram()
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::z80_acia_irq)
+void bfcobra_state::z80_acia_irq(int state)
 {
 	m_acia_irq = state;
 	update_irqs();
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::m6809_data_irq)
+void bfcobra_state::m6809_data_irq(int state)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::data_acia_tx_w)
+void bfcobra_state::data_acia_tx_w(int state)
 {
 	m_data_t = state;
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::write_acia_clock)
+void bfcobra_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);
@@ -1557,7 +1557,7 @@ WRITE_LINE_MEMBER(bfcobra_state::write_acia_clock)
 
 
 /* TODO: Driver vs Machine Init */
-DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
+void bfcobra_state::init_bfcobra()
 {
 	/*
 	    6809 ROM address and data lines are scrambled.
@@ -1617,13 +1617,13 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 }
 
 /* TODO */
-INTERRUPT_GEN_MEMBER(bfcobra_state::timer_irq)
+void bfcobra_state::timer_irq(device_t &device)
 {
 	device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /* TODO */
-INTERRUPT_GEN_MEMBER(bfcobra_state::vblank_gen)
+void bfcobra_state::vblank_gen(device_t &device)
 {
 	m_vblank_irq = 1;
 	update_irqs();

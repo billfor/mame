@@ -429,7 +429,7 @@ void mn10200_device::refresh_all_timers()
 		refresh_timer(tmr);
 }
 
-TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
+void mn10200_device::simple_timer_cb(void *ptr, int32_t param)
 {
 	int tmr = param;
 
@@ -1695,7 +1695,7 @@ void mn10200_device::execute_run()
 //  internal i/o
 //-------------------------------------------------
 
-WRITE8_MEMBER(mn10200_device::io_control_w)
+void mn10200_device::io_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -2098,7 +2098,7 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 }
 
 
-READ8_MEMBER(mn10200_device::io_control_r)
+uint8_t mn10200_device::io_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{

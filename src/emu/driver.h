@@ -24,63 +24,28 @@
 
 // core machine callbacks
 #define MCFG_MACHINE_START_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_START, driver_callback_delegate(&_class::MACHINE_START_NAME(_func), #_class "::machine_start_" #_func, downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_START, driver_callback_delegate(&_class::machine_start_##_func, #_class "::machine_start_" #_func, downcast<_class *>(owner)));
 
 #define MCFG_MACHINE_RESET_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate(&_class::MACHINE_RESET_NAME(_func), #_class "::machine_reset_" #_func, downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate(&_class::machine_reset_##_func, #_class "::machine_reset_" #_func, downcast<_class *>(owner)));
 
 #define MCFG_MACHINE_RESET_REMOVE() \
 	driver_device::static_set_callback(config.root_device(), driver_device::CB_MACHINE_RESET, driver_callback_delegate());
 
 // core sound callbacks
 #define MCFG_SOUND_START_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_START, driver_callback_delegate(&_class::SOUND_START_NAME(_func), #_class "::sound_start_" #_func, downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_START, driver_callback_delegate(&_class::sound_start_##_func, #_class "::sound_start_" #_func, downcast<_class *>(owner)));
 
 #define MCFG_SOUND_RESET_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_RESET, driver_callback_delegate(&_class::SOUND_RESET_NAME(_func), #_class "::sound_reset_" #_func, downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_SOUND_RESET, driver_callback_delegate(&_class::sound_reset_##_func, #_class "::sound_reset_" #_func, downcast<_class *>(owner)));
 
 
 // core video callbacks
 #define MCFG_VIDEO_START_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_START, driver_callback_delegate(&_class::VIDEO_START_NAME(_func), #_class "::video_start_" #_func, downcast<_class *>(owner)));
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_START, driver_callback_delegate(&_class::video_start_##_func, #_class "::video_start_" #_func, downcast<_class *>(owner)));
 
 #define MCFG_VIDEO_RESET_OVERRIDE(_class, _func) \
-	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_RESET, driver_callback_delegate(&_class::VIDEO_RESET_NAME(_func), #_class "::video_reset_" #_func, downcast<_class *>(owner)));
-
-
-
-//**************************************************************************
-//  OTHER MACROS
-//**************************************************************************
-
-#define MACHINE_START_NAME(name)    machine_start_##name
-#define MACHINE_START_CALL_MEMBER(name) MACHINE_START_NAME(name)()
-#define DECLARE_MACHINE_START(name) void MACHINE_START_NAME(name)() ATTR_COLD
-#define MACHINE_START_MEMBER(cls,name) void cls::MACHINE_START_NAME(name)()
-
-#define MACHINE_RESET_NAME(name)    machine_reset_##name
-#define MACHINE_RESET_CALL_MEMBER(name) MACHINE_RESET_NAME(name)()
-#define DECLARE_MACHINE_RESET(name) void MACHINE_RESET_NAME(name)()
-#define MACHINE_RESET_MEMBER(cls,name) void cls::MACHINE_RESET_NAME(name)()
-
-#define SOUND_START_NAME(name)      sound_start_##name
-#define DECLARE_SOUND_START(name)   void SOUND_START_NAME(name)() ATTR_COLD
-#define SOUND_START_MEMBER(cls,name) void cls::SOUND_START_NAME(name)()
-
-#define SOUND_RESET_NAME(name)      sound_reset_##name
-#define SOUND_RESET_CALL_MEMBER(name) SOUND_RESET_NAME(name)()
-#define DECLARE_SOUND_RESET(name)   void SOUND_RESET_NAME(name)()
-#define SOUND_RESET_MEMBER(cls,name) void cls::SOUND_RESET_NAME(name)()
-
-#define VIDEO_START_NAME(name)      video_start_##name
-#define VIDEO_START_CALL_MEMBER(name)       VIDEO_START_NAME(name)()
-#define DECLARE_VIDEO_START(name)   void VIDEO_START_NAME(name)() ATTR_COLD
-#define VIDEO_START_MEMBER(cls,name) void cls::VIDEO_START_NAME(name)()
-
-#define VIDEO_RESET_NAME(name)      video_reset_##name
-#define VIDEO_RESET_CALL_MEMBER(name)       VIDEO_RESET_NAME(name)()
-#define DECLARE_VIDEO_RESET(name)   void VIDEO_RESET_NAME(name)()
-#define VIDEO_RESET_MEMBER(cls,name) void cls::VIDEO_RESET_NAME(name)()
+	driver_device::static_set_callback(config.root_device(), driver_device::CB_VIDEO_RESET, driver_callback_delegate(&_class::video_reset_##_func, #_class "::video_reset_" #_func, downcast<_class *>(owner)));
 
 
 
@@ -144,40 +109,40 @@ public:
 	void generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles);
 	void generic_pulse_irq_line_and_vector(device_execute_interface &exec, int irqline, int vector, int cycles);
 
-	INTERRUPT_GEN_MEMBER( nmi_line_pulse );
-	INTERRUPT_GEN_MEMBER( nmi_line_assert );
+	void nmi_line_pulse(device_t &device);
+	void nmi_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq0_line_hold );
-	INTERRUPT_GEN_MEMBER( irq0_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq0_line_assert );
+	void irq0_line_hold(device_t &device);
+	void irq0_line_pulse(device_t &device);
+	void irq0_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq1_line_hold );
-	INTERRUPT_GEN_MEMBER( irq1_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq1_line_assert );
+	void irq1_line_hold(device_t &device);
+	void irq1_line_pulse(device_t &device);
+	void irq1_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq2_line_hold );
-	INTERRUPT_GEN_MEMBER( irq2_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq2_line_assert );
+	void irq2_line_hold(device_t &device);
+	void irq2_line_pulse(device_t &device);
+	void irq2_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq3_line_hold );
-	INTERRUPT_GEN_MEMBER( irq3_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq3_line_assert );
+	void irq3_line_hold(device_t &device);
+	void irq3_line_pulse(device_t &device);
+	void irq3_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq4_line_hold );
-	INTERRUPT_GEN_MEMBER( irq4_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq4_line_assert );
+	void irq4_line_hold(device_t &device);
+	void irq4_line_pulse(device_t &device);
+	void irq4_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq5_line_hold );
-	INTERRUPT_GEN_MEMBER( irq5_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq5_line_assert );
+	void irq5_line_hold(device_t &device);
+	void irq5_line_pulse(device_t &device);
+	void irq5_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq6_line_hold );
-	INTERRUPT_GEN_MEMBER( irq6_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq6_line_assert );
+	void irq6_line_hold(device_t &device);
+	void irq6_line_pulse(device_t &device);
+	void irq6_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq7_line_hold );
-	INTERRUPT_GEN_MEMBER( irq7_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq7_line_assert );
+	void irq7_line_hold(device_t &device);
+	void irq7_line_pulse(device_t &device);
+	void irq7_line_assert(device_t &device);
 
 
 	// generic video
@@ -190,11 +155,11 @@ public:
 	uint32_t flip_screen_y() const { return m_flip_screen_y; }
 
 	// generic input port helpers
-	DECLARE_CUSTOM_INPUT_MEMBER( custom_port_read );
+	ioport_value custom_port_read(ioport_field &field, void *param);
 
 	// general fatal error handlers
-	DECLARE_READ8_MEMBER( fatal_generic_read );
-	DECLARE_WRITE8_MEMBER( fatal_generic_write );
+	uint8_t fatal_generic_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fatal_generic_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// helpers called at startup

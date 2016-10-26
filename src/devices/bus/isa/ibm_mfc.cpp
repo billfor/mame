@@ -155,18 +155,18 @@ INPUT_PORTS_END
 //  D71055C PPI (PC)
 //-------------------------------------------------
 
-READ8_MEMBER( isa8_ibm_mfc_device::ppi0_i_a )
+uint8_t isa8_ibm_mfc_device::ppi0_i_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Read data from the Z80 PIU
 	return m_d71055c_1->pa_r();
 }
 
-WRITE8_MEMBER( isa8_ibm_mfc_device::ppi0_o_b )
+void isa8_ibm_mfc_device::ppi0_o_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Write data to the Z80 PIU - no action required
 }
 
-WRITE8_MEMBER( isa8_ibm_mfc_device::ppi0_o_c )
+void isa8_ibm_mfc_device::ppi0_o_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// PC Port B /OBF (C1) -> Z80 Port B /STB (C2)
 	m_d71055c_1->pc2_w(BIT(data, 1));
@@ -188,7 +188,7 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ppi0_o_c )
 	m_pc_ppi_c = data;
 }
 
-READ8_MEMBER( isa8_ibm_mfc_device::ppi0_i_c )
+uint8_t isa8_ibm_mfc_device::ppi0_i_c(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Receive data bit 8
 	return BIT(m_z80_ppi_c, 5) << 7;
@@ -198,18 +198,18 @@ READ8_MEMBER( isa8_ibm_mfc_device::ppi0_i_c )
 //  D71055C PPI (Z80)
 //-------------------------------------------------
 
-WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_a )
+void isa8_ibm_mfc_device::ppi1_o_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Write data to the PC PIU - no action required
 }
 
-READ8_MEMBER( isa8_ibm_mfc_device::ppi1_i_b )
+uint8_t isa8_ibm_mfc_device::ppi1_i_b(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Read data from the PC PIU
 	return m_d71055c_0->pb_r();
 }
 
-WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_c )
+void isa8_ibm_mfc_device::ppi1_o_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// PortA /OBF (C7) -> PortA /STB (C2)
 	m_d71055c_0->pc4_w(BIT(data, 7));
@@ -232,13 +232,13 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ppi1_o_c )
 //  D8253 PIT
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_out0 )
+void isa8_ibm_mfc_device::d8253_out0(int state)
 {
 	if (m_tcr & TCR_TAE)
 		set_pc_interrupt(PC_IRQ_TIMERA, 1);
 }
 
-WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_out1 )
+void isa8_ibm_mfc_device::d8253_out1(int state)
 {
 	if (m_tcr & TCR_TBE)
 		set_pc_interrupt(PC_IRQ_TIMERB, 1);
@@ -249,7 +249,7 @@ WRITE_LINE_MEMBER( isa8_ibm_mfc_device::d8253_out1 )
 //  uPD71051 USART
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( isa8_ibm_mfc_device::write_usart_clock )
+void isa8_ibm_mfc_device::write_usart_clock(int state)
 {
 	m_d71051->write_txc(state);
 	m_d71051->write_rxc(state);
@@ -260,7 +260,7 @@ WRITE_LINE_MEMBER( isa8_ibm_mfc_device::write_usart_clock )
 //-------------------------------------------------
 
 
-WRITE_LINE_MEMBER(isa8_ibm_mfc_device::ibm_mfc_ym_irq)
+void isa8_ibm_mfc_device::ibm_mfc_ym_irq(int state)
 {
 	set_z80_interrupt(Z80_IRQ_YM, state);
 }
@@ -311,7 +311,7 @@ MACHINE_CONFIG_END
 //  ISA interface
 //-------------------------------------------------
 
-READ8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_r )
+uint8_t isa8_ibm_mfc_device::ibm_mfc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val;
 
@@ -344,7 +344,7 @@ READ8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_r )
 	return val;
 }
 
-WRITE8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_w )
+void isa8_ibm_mfc_device::ibm_mfc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

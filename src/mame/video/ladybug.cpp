@@ -92,25 +92,25 @@ void ladybug_state::palette_init_common( palette_device &palette, const uint8_t 
 }
 
 
-PALETTE_INIT_MEMBER(ladybug_state,ladybug)
+void ladybug_state::palette_init_ladybug(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	palette_init_common(palette, color_prom, 0, 5, 2, 6, 4, 7);
 }
 
-WRITE8_MEMBER(ladybug_state::ladybug_videoram_w)
+void ladybug_state::ladybug_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ladybug_state::ladybug_colorram_w)
+void ladybug_state::ladybug_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ladybug_state::ladybug_flipscreen_w)
+void ladybug_state::ladybug_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (data & 0x01))
 	{
@@ -119,7 +119,7 @@ WRITE8_MEMBER(ladybug_state::ladybug_flipscreen_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(ladybug_state::get_bg_tile_info)
+void ladybug_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 32 * (m_colorram[tile_index] & 0x08);
 	int color = m_colorram[tile_index] & 0x07;
@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(ladybug_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(ladybug_state::get_grid_tile_info)
+void ladybug_state::get_grid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	if (tile_index < 512)
 		SET_TILE_INFO_MEMBER(3, tile_index, 0, 0);
@@ -139,7 +139,7 @@ TILE_GET_INFO_MEMBER(ladybug_state::get_grid_tile_info)
 	}
 }
 
-VIDEO_START_MEMBER(ladybug_state,ladybug)
+void ladybug_state::video_start_ladybug()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ladybug_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(32);

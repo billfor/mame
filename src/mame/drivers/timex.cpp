@@ -166,23 +166,23 @@ http://www.z88forever.org.uk/zxplus3e/
 /* TS2048 specific functions */
 
 
-READ8_MEMBER( spectrum_state::ts2068_port_f4_r )
+uint8_t spectrum_state::ts2068_port_f4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port_f4_data;
 }
 
-WRITE8_MEMBER( spectrum_state::ts2068_port_f4_w )
+void spectrum_state::ts2068_port_f4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_f4_data = data;
 	ts2068_update_memory();
 }
 
-READ8_MEMBER( spectrum_state::ts2068_port_ff_r )
+uint8_t spectrum_state::ts2068_port_ff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port_ff_data;
 }
 
-WRITE8_MEMBER( spectrum_state::ts2068_port_ff_w )
+void spectrum_state::ts2068_port_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		/* Bits 0-2 Video Mode Select
 		   Bits 3-5 64 column mode ink/paper selection
@@ -549,7 +549,7 @@ static ADDRESS_MAP_START(ts2068_mem, AS_PROGRAM, 8, spectrum_state )
 ADDRESS_MAP_END
 
 
-MACHINE_RESET_MEMBER(spectrum_state,ts2068)
+void spectrum_state::machine_reset_ts2068()
 {
 	m_port_ff_data = 0;
 	m_port_f4_data = 0;
@@ -559,7 +559,7 @@ MACHINE_RESET_MEMBER(spectrum_state,ts2068)
 	m_dock_cart_type = m_dock_crt ? TIMEX_CART_DOCK : TIMEX_CART_NONE;
 
 	ts2068_update_memory();
-	MACHINE_RESET_CALL_MEMBER(spectrum);
+	machine_reset_spectrum();
 }
 
 
@@ -567,7 +567,7 @@ MACHINE_RESET_MEMBER(spectrum_state,ts2068)
 /* TC2048 specific functions */
 
 
-WRITE8_MEMBER( spectrum_state::tc2048_port_ff_w )
+void spectrum_state::tc2048_port_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_ff_data = data;
 	logerror("Port %04x write %02x\n", offset, data);
@@ -586,7 +586,7 @@ static ADDRESS_MAP_START(tc2048_mem, AS_PROGRAM, 8, spectrum_state )
 	AM_RANGE( 0x4000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(spectrum_state,tc2048)
+void spectrum_state::machine_reset_tc2048()
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -594,11 +594,11 @@ MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 	membank("bank2")->set_base(messram);
 	m_port_ff_data = 0;
 	m_port_f4_data = -1;
-	MACHINE_RESET_CALL_MEMBER(spectrum);
+	machine_reset_spectrum();
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
+image_init_result spectrum_state::device_image_load_timex_cart(device_image_interface &image)
 {
 	uint32_t size = m_dock->common_get_size("rom");
 

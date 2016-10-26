@@ -35,43 +35,43 @@
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( tmc2000e_state::vismac_r )
+uint8_t tmc2000e_state::vismac_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( tmc2000e_state::vismac_w )
+void tmc2000e_state::vismac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER( tmc2000e_state::floppy_r )
-{
-	return 0;
-}
-
-WRITE8_MEMBER( tmc2000e_state::floppy_w )
-{
-}
-
-READ8_MEMBER( tmc2000e_state::ascii_keyboard_r )
+uint8_t tmc2000e_state::floppy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-READ8_MEMBER( tmc2000e_state::io_r )
+void tmc2000e_state::floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+}
+
+uint8_t tmc2000e_state::ascii_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( tmc2000e_state::io_w )
+uint8_t tmc2000e_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
+{
+	return 0;
+}
+
+void tmc2000e_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( tmc2000e_state::io_select_w )
+void tmc2000e_state::io_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( tmc2000e_state::keyboard_latch_w )
+void tmc2000e_state::keyboard_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data;
 }
@@ -197,41 +197,41 @@ INPUT_PORTS_END
 
 /* Video */
 
-READ_LINE_MEMBER( tmc2000e_state::rdata_r )
+int tmc2000e_state::rdata_r()
 {
 	return BIT(m_color, 2);
 }
 
-READ_LINE_MEMBER( tmc2000e_state::bdata_r )
+int tmc2000e_state::bdata_r()
 {
 	return BIT(m_color, 1);
 }
 
-READ_LINE_MEMBER( tmc2000e_state::gdata_r )
+int tmc2000e_state::gdata_r()
 {
 	return BIT(m_color, 0);
 }
 
 /* CDP1802 Interface */
 
-READ_LINE_MEMBER( tmc2000e_state::clear_r )
+int tmc2000e_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( tmc2000e_state::ef2_r )
+int tmc2000e_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( tmc2000e_state::ef3_r )
+int tmc2000e_state::ef3_r()
 {
 	uint8_t data = ~(m_key_row[m_keylatch / 8])->read();
 
 	return BIT(data, m_keylatch % 8);
 }
 
-WRITE_LINE_MEMBER( tmc2000e_state::q_w )
+void tmc2000e_state::q_w(int state)
 {
 	// turn CDP1864 sound generator on/off
 	m_cti->aoe_w(state);
@@ -245,7 +245,7 @@ WRITE_LINE_MEMBER( tmc2000e_state::q_w )
 	// floppy control (FDC-6)
 }
 
-WRITE8_MEMBER( tmc2000e_state::dma_w )
+void tmc2000e_state::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color = (m_colorram[offset & 0x3ff]) & 0x07; // 0x04 = R, 0x02 = B, 0x01 = G
 

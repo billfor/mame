@@ -34,7 +34,7 @@ Credits:
 
 
 
-INTERRUPT_GEN_MEMBER(thief_state::thief_interrupt)
+void thief_state::thief_interrupt(device_t &device)
 {
 	/* SLAM switch causes an NMI if it's pressed */
 	if( (ioport("P2")->read() & 0x10) == 0 )
@@ -94,12 +94,12 @@ void thief_state::tape_set_motor( int bOn )
 
 /***********************************************************/
 
-WRITE8_MEMBER(thief_state::thief_input_select_w)
+void thief_state::thief_input_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_select = data;
 }
 
-WRITE8_MEMBER(thief_state::tape_control_w)
+void thief_state::tape_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( data )
 	{
@@ -138,7 +138,7 @@ WRITE8_MEMBER(thief_state::tape_control_w)
 	}
 }
 
-READ8_MEMBER(thief_state::thief_io_r)
+uint8_t thief_state::thief_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( m_input_select )
 	{
@@ -617,7 +617,7 @@ ROM_START( natodefa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(thief_state,thief)
+void thief_state::init_thief()
 {
 	uint8_t *dest = memregion( "maincpu" )->base();
 	const uint8_t *source = memregion( "cpu1" )->base();

@@ -76,7 +76,7 @@ TO DO :
 #include "includes/stlforce.h"
 
 
-WRITE16_MEMBER(stlforce_state::eeprom_w)
+void stlforce_state::eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -86,7 +86,7 @@ WRITE16_MEMBER(stlforce_state::eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(stlforce_state::oki_bank_w)
+void stlforce_state::oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_oki->set_rom_bank((data>>8) & 3);
 }
@@ -361,12 +361,12 @@ ROM_START( twinbrata )
 	ROM_LOAD( "eeprom-twinbrat.bin", 0x0000, 0x0080, CRC(9366263d) SHA1(ff5155498ed0b349ecc1ce98a39566b642201cf2) )
 ROM_END
 
-DRIVER_INIT_MEMBER(stlforce_state,stlforce)
+void stlforce_state::init_stlforce()
 {
 	m_sprxoffs = 0;
 }
 
-DRIVER_INIT_MEMBER(stlforce_state,twinbrat)
+void stlforce_state::init_twinbrat()
 {
 	m_sprxoffs = 9;
 }

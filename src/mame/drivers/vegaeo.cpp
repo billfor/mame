@@ -33,36 +33,36 @@ public:
 	std::unique_ptr<uint32_t[]> m_vega_vram;
 	uint8_t m_vega_vbuffer;
 
-	DECLARE_WRITE32_MEMBER(vega_vram_w);
-	DECLARE_READ32_MEMBER(vega_vram_r);
-	DECLARE_WRITE32_MEMBER(vega_misc_w);
-	DECLARE_READ32_MEMBER(vegaeo_custom_read);
-	DECLARE_WRITE32_MEMBER(soundlatch_w);
-	DECLARE_READ8_MEMBER(qs1000_p1_r);
-	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+	void vega_vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t vega_vram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void vega_misc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t vegaeo_custom_read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void soundlatch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t qs1000_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void qs1000_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void qs1000_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void qs1000_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(vegaeo);
-	DECLARE_VIDEO_START(vega);
+	void init_vegaeo();
+	void video_start_vega();
 
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-READ8_MEMBER( vegaeo_state::qs1000_p1_r )
+uint8_t vegaeo_state::qs1000_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_soundlatch->read(space, 0);
 }
 
-WRITE8_MEMBER( vegaeo_state::qs1000_p1_w )
+void vegaeo_state::qs1000_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( vegaeo_state::qs1000_p2_w )
+void vegaeo_state::qs1000_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( vegaeo_state::qs1000_p3_w )
+void vegaeo_state::qs1000_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// .... .xxx - Data ROM bank (64kB)
 	// ...x .... - ?
@@ -74,7 +74,7 @@ WRITE8_MEMBER( vegaeo_state::qs1000_p3_w )
 		m_qs1000->set_irq(CLEAR_LINE);
 }
 
-WRITE32_MEMBER(vegaeo_state::vega_vram_w)
+void vegaeo_state::vega_vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(mem_mask)
 	{
@@ -104,12 +104,12 @@ WRITE32_MEMBER(vegaeo_state::vega_vram_w)
 	COMBINE_DATA(&m_vega_vram[offset + m_vega_vbuffer * (0x14000/4)]);
 }
 
-READ32_MEMBER(vegaeo_state::vega_vram_r)
+uint32_t vegaeo_state::vega_vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vega_vram[offset + (0x14000/4) * m_vega_vbuffer];
 }
 
-WRITE32_MEMBER(vegaeo_state::vega_misc_w)
+void vegaeo_state::vega_misc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// other bits ???
 
@@ -117,13 +117,13 @@ WRITE32_MEMBER(vegaeo_state::vega_misc_w)
 }
 
 
-READ32_MEMBER(vegaeo_state::vegaeo_custom_read)
+uint32_t vegaeo_state::vegaeo_custom_read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	speedup_read();
 	return ioport("SYSTEM")->read();
 }
 
-WRITE32_MEMBER(vegaeo_state::soundlatch_w)
+void vegaeo_state::soundlatch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_qs1000->set_irq(ASSERT_LINE);
@@ -179,7 +179,7 @@ static INPUT_PORTS_START( crazywar )
 INPUT_PORTS_END
 
 
-VIDEO_START_MEMBER(vegaeo_state,vega)
+void vegaeo_state::video_start_vega()
 {
 	m_vega_vram = std::make_unique<uint32_t[]>(0x14000*2/4);
 	save_pointer(NAME(m_vega_vram.get()), 0x14000*2/4);
@@ -328,7 +328,7 @@ ROM_START( crazywar )
 	ROM_LOAD( "qs1001a.u86",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
-DRIVER_INIT_MEMBER(vegaeo_state,vegaeo)
+void vegaeo_state::init_vegaeo()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");

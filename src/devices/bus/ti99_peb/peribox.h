@@ -46,24 +46,24 @@ public:
 
 	// Next eight methods are called from the console
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
-	DECLARE_WRITE_LINE_MEMBER(senila);
-	DECLARE_WRITE_LINE_MEMBER(senilb);
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void senila(int state);
+	void senilb(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( memen_in );
-	DECLARE_WRITE_LINE_MEMBER( msast_in );
+	void memen_in(int state);
+	void msast_in(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
+	void clock_in(int state);
 
 	// Part of configuration
 	void set_prefix(int prefix) { m_address_prefix = prefix; }
 
 	// Genmod support
-	DECLARE_INPUT_CHANGED_MEMBER( genmod_changed );
+	void genmod_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void set_genmod(bool set);
 
 protected:
@@ -167,21 +167,21 @@ public:
 
 	// Called from the box (direction to card)
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
-	DECLARE_WRITE_LINE_MEMBER(senila);
-	DECLARE_WRITE_LINE_MEMBER(senilb);
-	DECLARE_WRITE_LINE_MEMBER(clock_in);
+	void senila(int state);
+	void senilb(int state);
+	void clock_in(int state);
 
 	// Called from the card (direction to box)
-	DECLARE_WRITE_LINE_MEMBER( set_inta );
-	DECLARE_WRITE_LINE_MEMBER( set_intb );
-	DECLARE_WRITE_LINE_MEMBER( lcp_line );
-	DECLARE_WRITE_LINE_MEMBER( set_ready );
+	void set_inta(int state);
+	void set_intb(int state);
+	void lcp_line(int state);
+	void set_ready(int state);
 
 	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// called from the box itself
 	void set_genmod(bool set);
@@ -219,12 +219,12 @@ public:
 	}
 
 	virtual DECLARE_READ8Z_MEMBER(crureadz) =0;
-	virtual DECLARE_WRITE8_MEMBER(cruwrite) =0;
+	virtual void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) =0;
 
 	void    set_senila(int state) { m_senila = state; }
 	void    set_senilb(int state) { m_senilb = state; }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(clock_in) { };
+	virtual void clock_in(int state) { };
 
 protected:
 	peribox_slot_device *m_slot;        // using a link to the slot for callbacks

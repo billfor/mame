@@ -60,7 +60,7 @@ Notes:
 #include "includes/dbz.h"
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::dbz_scanline)
+void dbz_state::dbz_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -72,13 +72,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::dbz_scanline)
 }
 
 #if 0
-READ16_MEMBER(dbz_state::dbzcontrol_r)
+uint16_t dbz_state::dbzcontrol_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_control;
 }
 #endif
 
-WRITE16_MEMBER(dbz_state::dbzcontrol_w)
+void dbz_state::dbzcontrol_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 10 = enable '246 readback */
 
@@ -93,12 +93,12 @@ WRITE16_MEMBER(dbz_state::dbzcontrol_w)
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-WRITE16_MEMBER(dbz_state::dbz_sound_command_w)
+void dbz_state::dbz_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data >> 8);
 }
 
-WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
+void dbz_state::dbz_sound_cause_nmi(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -291,7 +291,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE_LINE_MEMBER(dbz_state::dbz_irq2_ack_w)
+void dbz_state::dbz_irq2_ack_w(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 }
@@ -491,7 +491,7 @@ ROM_START( dbz2 )
 	ROM_LOAD( "pcm.7c", 0x000000, 0x40000, CRC(b58c884a) SHA1(0e2a7267e9dff29c9af25558081ec9d56629bc43) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dbz_state,dbz)
+void dbz_state::init_dbz()
 {
 	uint16_t *ROM;
 
@@ -524,7 +524,7 @@ DRIVER_INIT_MEMBER(dbz_state,dbz)
 	ROM[0x810/2] = 0x4e71;    /* 0x005e */
 }
 
-DRIVER_INIT_MEMBER(dbz_state,dbza)
+void dbz_state::init_dbza()
 {
 	uint16_t *ROM;
 
@@ -547,7 +547,7 @@ DRIVER_INIT_MEMBER(dbz_state,dbza)
 	ROM[0x990/2] = 0x4e71;    /* 0x0010 */
 }
 
-DRIVER_INIT_MEMBER(dbz_state,dbz2)
+void dbz_state::init_dbz2()
 {
 	uint16_t *ROM;
 

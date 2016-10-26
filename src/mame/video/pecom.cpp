@@ -14,7 +14,7 @@
 #include "cpu/cosmac/cosmac.h"
 #include "includes/pecom.h"
 
-WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
+void pecom_state::pecom_cdp1869_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t ma = m_cdp1802->get_memory_address();
 
@@ -67,7 +67,7 @@ CDP1869_PCB_READ_MEMBER(pecom_state::pecom_pcb_r )
 	return BIT(pmd, 7);
 }
 
-WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
+void pecom_state::pecom_prd_w(int state)
 {
 	// every other PRD triggers a DMAOUT request
 	if (m_dma)
@@ -78,7 +78,7 @@ WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
 	m_dma = !m_dma;
 }
 
-VIDEO_START_MEMBER(pecom_state,pecom)
+void pecom_state::video_start_pecom()
 {
 	/* allocate memory */
 	m_charram = std::make_unique<uint8_t[]>(PECOM_CHAR_RAM_SIZE);

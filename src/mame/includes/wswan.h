@@ -49,9 +49,9 @@ public:
 	required_device<wswan_video_device> m_vdp;
 	required_device<wswan_sound_device> m_sound;
 	required_device<ws_cart_slot_device> m_cart;
-	DECLARE_READ8_MEMBER(bios_r);
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
+	uint8_t bios_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_ws_portram[256];
 	uint8_t m_internal_eeprom[INTERNAL_EEPROM_SIZE];
@@ -66,9 +66,9 @@ public:
 	void common_start();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(wswan);
-	DECLARE_MACHINE_START(wscolor);
-	DECLARE_PALETTE_INIT(wscolor);
+	void palette_init_wswan(palette_device &palette);
+	void machine_start_wscolor();
+	void palette_init_wscolor(palette_device &palette);
 
 protected:
 	/* Interrupt flags */

@@ -38,23 +38,23 @@ void tankbust_state::machine_start()
 
 //port A of ay8910#0
 
-TIMER_CALLBACK_MEMBER(tankbust_state::soundlatch_callback)
+void tankbust_state::soundlatch_callback(void *ptr, int32_t param)
 {
 	m_latch = param;
 }
 
-WRITE8_MEMBER(tankbust_state::soundlatch_w)
+void tankbust_state::soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(tankbust_state::soundlatch_callback),this), data);
 }
 
-READ8_MEMBER(tankbust_state::soundlatch_r)
+uint8_t tankbust_state::soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_latch;
 }
 
 //port B of ay8910#0
-READ8_MEMBER(tankbust_state::soundtimer_r)
+uint8_t tankbust_state::soundtimer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ret;
 
@@ -63,7 +63,7 @@ READ8_MEMBER(tankbust_state::soundtimer_r)
 	return ret;
 }
 
-TIMER_CALLBACK_MEMBER(tankbust_state::soundirqline_callback)
+void tankbust_state::soundirqline_callback(void *ptr, int32_t param)
 {
 //logerror("sound_irq_line write = %2x (after CPUs synced) \n",param);
 
@@ -73,7 +73,7 @@ TIMER_CALLBACK_MEMBER(tankbust_state::soundirqline_callback)
 
 
 
-WRITE8_MEMBER(tankbust_state::e0xx_w)
+void tankbust_state::e0xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_e0xx_data[offset] = data;
 
@@ -117,7 +117,7 @@ WRITE8_MEMBER(tankbust_state::e0xx_w)
 	}
 }
 
-READ8_MEMBER(tankbust_state::debug_output_area_r)
+uint8_t tankbust_state::debug_output_area_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_e0xx_data[offset];
 }
@@ -125,7 +125,7 @@ READ8_MEMBER(tankbust_state::debug_output_area_r)
 
 
 
-PALETTE_INIT_MEMBER(tankbust_state, tankbust)
+void tankbust_state::palette_init_tankbust(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -175,13 +175,13 @@ PALETTE_INIT_MEMBER(tankbust_state, tankbust)
 }
 
 #if 0
-READ8_MEMBER(tankbust_state::read_from_unmapped_memory)
+uint8_t tankbust_state::read_from_unmapped_memory(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 #endif
 
-READ8_MEMBER(tankbust_state::some_changing_input)
+uint8_t tankbust_state::some_changing_input(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_variable_data += 8;
 	return m_variable_data;
@@ -321,7 +321,7 @@ void tankbust_state::machine_reset()
 	m_variable_data = 0x11;
 }
 
-INTERRUPT_GEN_MEMBER(tankbust_state::vblank_irq)
+void tankbust_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

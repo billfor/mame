@@ -136,12 +136,12 @@ static ADDRESS_MAP_START( sms_supergame_map, AS_PROGRAM, 8, smsbootleg_state )
 //  AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(smsbootleg_state::port08_w)
+void smsbootleg_state::port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("port08_w %02x\n", data);
 }
 
-WRITE8_MEMBER(smsbootleg_state::port18_w)
+void smsbootleg_state::port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("port18_w %02x\n", data);
 }
@@ -269,7 +269,7 @@ static INPUT_PORTS_START( sms_supergame )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(smsbootleg_state,sms_supergame)
+void smsbootleg_state::init_sms_supergame()
 {
 	uint8_t* rom = memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();

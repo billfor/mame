@@ -31,14 +31,14 @@ public:
 	/* misc */
 	int m_adpcm_bank_shift;
 	int m_sndbank;
-	DECLARE_WRITE16_MEMBER(ohmygod_ctrl_w);
-	DECLARE_WRITE16_MEMBER(ohmygod_videoram_w);
-	DECLARE_WRITE16_MEMBER(ohmygod_spritebank_w);
-	DECLARE_WRITE16_MEMBER(ohmygod_scrollx_w);
-	DECLARE_WRITE16_MEMBER(ohmygod_scrolly_w);
-	DECLARE_DRIVER_INIT(ohmygod);
-	DECLARE_DRIVER_INIT(naname);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void ohmygod_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ohmygod_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ohmygod_spritebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ohmygod_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ohmygod_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void init_ohmygod();
+	void init_naname();
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

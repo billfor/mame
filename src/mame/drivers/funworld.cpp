@@ -1008,7 +1008,7 @@
 * Read/Write Handlers *
 **********************/
 
-WRITE8_MEMBER(funworld_state::funworld_lamp_a_w)
+void funworld_state::funworld_lamp_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  - bits -
     7654 3210
@@ -1036,7 +1036,7 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_a_w)
 //  popmessage("Lamps A: %02X", (data ^ 0xff));
 }
 
-WRITE8_MEMBER(funworld_state::funworld_lamp_b_w)
+void funworld_state::funworld_lamp_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  - bits -
     7654 3210
@@ -1051,7 +1051,7 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_b_w)
 //  popmessage("Lamps B: %02X", data);
 }
 
-WRITE_LINE_MEMBER(funworld_state::pia1_ca2_w)
+void funworld_state::pia1_ca2_w(int state)
 {
 /* TAB and Impera games are writing 0x01 constantly, and 0x00 with each screen change.
    This line is tied to sort of reset circuitery.
@@ -1081,7 +1081,7 @@ ADDRESS_MAP_END
 
 static uint8_t funquiz_question_bank = 0x80;
 
-READ8_MEMBER(funworld_state::questions_r)
+uint8_t funworld_state::questions_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t* quiz = memregion("questions")->base();
 	int extraoffset = ((funquiz_question_bank & 0x1f) * 0x8000);
@@ -1092,7 +1092,7 @@ READ8_MEMBER(funworld_state::questions_r)
 	return quiz[offset + extraoffset];
 }
 
-WRITE8_MEMBER(funworld_state::question_bank_w)
+void funworld_state::question_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("question bank write %02x\n", data);
 	funquiz_question_bank = data;
@@ -1149,7 +1149,7 @@ static ADDRESS_MAP_START( cuoreuno_map, AS_PROGRAM, 8, funworld_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(funworld_state::chinatow_r_32f0)
+uint8_t funworld_state::chinatow_r_32f0(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("read from 0x32f0 at offset %02X\n",offset);
 	switch (offset)
@@ -2934,12 +2934,12 @@ GFXDECODE_END
 */
 
 /* these ports are set to output anyway, but this quietens the log */
-READ8_MEMBER(funworld_state::funquiz_ay8910_a_r)
+uint8_t funworld_state::funquiz_ay8910_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-READ8_MEMBER(funworld_state::funquiz_ay8910_b_r)
+uint8_t funworld_state::funquiz_ay8910_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
@@ -2948,13 +2948,13 @@ READ8_MEMBER(funworld_state::funquiz_ay8910_b_r)
 *     Machine Start & Reset     *
 ********************************/
 
-MACHINE_START_MEMBER(funworld_state, lunapark)
+void funworld_state::machine_start_lunapark()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x8000);
 }
 
-MACHINE_RESET_MEMBER(funworld_state, lunapark)
+void funworld_state::machine_reset_lunapark()
 {
 	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);
@@ -6020,7 +6020,7 @@ ROM_END
 *  Driver Initialization  *
 **************************/
 
-DRIVER_INIT_MEMBER(funworld_state, tabblue)
+void funworld_state::init_tabblue()
 {
 /****************************************************************************************************
 
@@ -6058,7 +6058,7 @@ DRIVER_INIT_MEMBER(funworld_state, tabblue)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, magicd2b)
+void funworld_state::init_magicd2b()
 /*****************************************************************
 
   For a serie of Mexican Rockwell's 65c02
@@ -6079,7 +6079,7 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2b)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, magicd2c)
+void funworld_state::init_magicd2c()
 /*** same as blue TAB PCB, with the magicd2a patch ***/
 {
 	int x, na, nb, nad, nbd;
@@ -6101,7 +6101,7 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2c)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, mongolnw)
+void funworld_state::init_mongolnw()
 {
 /* temporary patch to avoid hardware errors for debug purposes */
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -6113,7 +6113,7 @@ DRIVER_INIT_MEMBER(funworld_state, mongolnw)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, soccernw)
+void funworld_state::init_soccernw()
 {
 /* temporary patch to avoid hardware errors for debug purposes */
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -6127,7 +6127,7 @@ DRIVER_INIT_MEMBER(funworld_state, soccernw)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, saloon)
+void funworld_state::init_saloon()
 /*************************************************
 
     LEOPARDO 5 Hardware
@@ -6236,7 +6236,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, multiwin)
+void funworld_state::init_multiwin()
 /*****************************************************
 
   This only decrypt the text strings.
@@ -6264,7 +6264,7 @@ DRIVER_INIT_MEMBER(funworld_state, multiwin)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, royalcdc)
+void funworld_state::init_royalcdc()
 {
 /*****************************************************
 
@@ -6315,7 +6315,7 @@ DRIVER_INIT_MEMBER(funworld_state, royalcdc)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, dino4)
+void funworld_state::init_dino4()
 /*****************************************************
 
   DINO 4 hardware.
@@ -6387,7 +6387,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 }
 
 
-DRIVER_INIT_MEMBER(funworld_state, ctunk)
+void funworld_state::init_ctunk()
 /*********************************************************
 
   CTUNK: Rare board with blue TAB board encryption scheme
@@ -6588,7 +6588,7 @@ static uint8_t rcdino4_keys80[] =
 	0x06, 0x1e, 0x28, 0x5a, 0xcf, 0x79, 0x11
 };
 
-DRIVER_INIT_MEMBER(funworld_state, rcdino4)
+void funworld_state::init_rcdino4()
 /*****************************************************
 
   Dino4 hardware with CPU+PLCC daughterboard
@@ -6726,7 +6726,7 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 	while (1);
 }
 
-DRIVER_INIT_MEMBER(funworld_state, rcdinch)
+void funworld_state::init_rcdinch()
 /*****************************************************
 
   Dino4 hardware with CPU+PLCC daughterboard

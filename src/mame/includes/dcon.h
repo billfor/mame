@@ -34,20 +34,20 @@ public:
 	uint16_t m_scroll_ram[6];
 	uint16_t m_layer_en;
 
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
-	DECLARE_WRITE16_MEMBER(gfxbank_w);
-	DECLARE_WRITE16_MEMBER(background_w);
-	DECLARE_WRITE16_MEMBER(foreground_w);
-	DECLARE_WRITE16_MEMBER(midground_w);
-	DECLARE_WRITE16_MEMBER(text_w);
+	void layer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void layer_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void background_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void foreground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void midground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void text_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_back_tile_info);
-	TILE_GET_INFO_MEMBER(get_fore_tile_info);
-	TILE_GET_INFO_MEMBER(get_mid_tile_info);
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	void get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	DECLARE_DRIVER_INIT(sdgndmps);
+	void init_sdgndmps();
 	virtual void video_start() override;
 
 	uint32_t screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

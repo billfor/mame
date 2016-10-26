@@ -140,37 +140,37 @@ void deco_bac06_device::set_gfx_region_wide(device_t &device, int region8x8, int
 	dev.m_wide = wide;
 }
 
-TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_scan)
+tilemap_memory_index deco_bac06_device::tile_shape0_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0xf) + ((row & 0xf) << 4) + ((col & 0x1f0) << 4);
 }
 
-TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape1_scan)
+tilemap_memory_index deco_bac06_device::tile_shape1_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0xf) + ((row & 0x1f) << 4) + ((col & 0xf0) << 5);
 }
 
-TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape2_scan)
+tilemap_memory_index deco_bac06_device::tile_shape2_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0xf) + ((row & 0x3f) << 4) + ((col & 0x70) << 6);
 }
 
-TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_8x8_scan)
+tilemap_memory_index deco_bac06_device::tile_shape0_8x8_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
 }
 
-TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape1_8x8_scan)
+tilemap_memory_index deco_bac06_device::tile_shape1_8x8_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((row & 0x20) << 5) + ((col & 0x20) << 6);
 }
 
-TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape2_8x8_scan)
+tilemap_memory_index deco_bac06_device::tile_shape2_8x8_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0x1f) + ((row & 0x7f) << 5);
 }
 
-TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf8x8_tile_info)
+void deco_bac06_device::get_pf8x8_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	if (m_rambank&1) tile_index+=0x1000;
 	int tile=m_pf_data[tile_index];
@@ -179,7 +179,7 @@ TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf8x8_tile_info)
 	tileinfo.category = colourpri;
 }
 
-TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf16x16_tile_info)
+void deco_bac06_device::get_pf16x16_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	if (m_rambank&1) tile_index+=0x1000;
 	int tile=m_pf_data[tile_index];
@@ -360,7 +360,7 @@ void deco_bac06_device::deco_bac06_pf_draw_bootleg(bitmap_ind16 &bitmap,const re
 
 
 
-WRITE16_MEMBER( deco_bac06_device::pf_control_0_w )
+void deco_bac06_device::pf_control_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 3;
 
@@ -387,19 +387,19 @@ WRITE16_MEMBER( deco_bac06_device::pf_control_0_w )
 	}
 }
 
-READ16_MEMBER( deco_bac06_device::pf_control_1_r )
+uint16_t deco_bac06_device::pf_control_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= 7;
 	return m_pf_control_1[offset];
 }
 
-WRITE16_MEMBER( deco_bac06_device::pf_control_1_w )
+void deco_bac06_device::pf_control_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 7;
 	COMBINE_DATA(&m_pf_control_1[offset]);
 }
 
-WRITE16_MEMBER( deco_bac06_device::pf_data_w )
+void deco_bac06_device::pf_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_rambank&1) offset+=0x1000;
 
@@ -412,14 +412,14 @@ WRITE16_MEMBER( deco_bac06_device::pf_data_w )
 	m_pf16x16_tilemap[2]->mark_tile_dirty(offset);
 }
 
-READ16_MEMBER( deco_bac06_device::pf_data_r )
+uint16_t deco_bac06_device::pf_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_rambank&1) offset+=0x1000;
 
 	return m_pf_data[offset];
 }
 
-WRITE8_MEMBER( deco_bac06_device::pf_data_8bit_w )
+void deco_bac06_device::pf_data_8bit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset&1)
 		pf_data_w(space,offset/2,data,0x00ff);
@@ -427,7 +427,7 @@ WRITE8_MEMBER( deco_bac06_device::pf_data_8bit_w )
 		pf_data_w(space,offset/2,data<<8,0xff00);
 }
 
-READ8_MEMBER( deco_bac06_device::pf_data_8bit_r )
+uint8_t deco_bac06_device::pf_data_8bit_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset&1) /* MSB */
 		return pf_data_r(space,offset/2,0x00ff);
@@ -435,28 +435,28 @@ READ8_MEMBER( deco_bac06_device::pf_data_8bit_r )
 		return pf_data_r(space,offset/2,0xff00)>>8;
 }
 
-WRITE16_MEMBER( deco_bac06_device::pf_rowscroll_w )
+void deco_bac06_device::pf_rowscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf_rowscroll[offset]);
 }
 
-WRITE16_MEMBER( deco_bac06_device::pf_colscroll_w )
+void deco_bac06_device::pf_colscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf_colscroll[offset]);
 }
 
-READ16_MEMBER( deco_bac06_device::pf_rowscroll_r )
+uint16_t deco_bac06_device::pf_rowscroll_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pf_rowscroll[offset];
 }
 
-READ16_MEMBER( deco_bac06_device::pf_colscroll_r )
+uint16_t deco_bac06_device::pf_colscroll_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pf_colscroll[offset];
 }
 
 /* used by dec8.c */
-WRITE8_MEMBER( deco_bac06_device::pf_control0_8bit_w )
+void deco_bac06_device::pf_control0_8bit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset&1)
 		pf_control_0_w(space,offset/2,data,0x00ff); // oscar (mirrors?)
@@ -465,7 +465,7 @@ WRITE8_MEMBER( deco_bac06_device::pf_control0_8bit_w )
 }
 
 /* used by dec8.c */
-READ8_MEMBER( deco_bac06_device::pf_control1_8bit_r )
+uint8_t deco_bac06_device::pf_control1_8bit_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset&1)
 		return pf_control_1_r(space,offset/2,0x00ff);
@@ -474,7 +474,7 @@ READ8_MEMBER( deco_bac06_device::pf_control1_8bit_r )
 }
 
 /* used by dec8.c */
-WRITE8_MEMBER( deco_bac06_device::pf_control1_8bit_w )
+void deco_bac06_device::pf_control1_8bit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset<4) // these registers are 16-bit?
 	{
@@ -492,7 +492,7 @@ WRITE8_MEMBER( deco_bac06_device::pf_control1_8bit_w )
 	}
 }
 
-READ8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_r )
+uint8_t deco_bac06_device::pf_rowscroll_8bit_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset&1)
 		return pf_rowscroll_r(space,offset/2,0x00ff);
@@ -501,7 +501,7 @@ READ8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_r )
 }
 
 
-WRITE8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_w )
+void deco_bac06_device::pf_rowscroll_8bit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset&1)
 		pf_rowscroll_w(space,offset/2,data,0x00ff);
@@ -509,7 +509,7 @@ WRITE8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_w )
 		pf_rowscroll_w(space,offset/2,data<<8,0xff00);
 }
 
-READ8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_swap_r )
+uint8_t deco_bac06_device::pf_rowscroll_8bit_swap_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset&1)
 		return pf_rowscroll_r(space,offset/2,0xff00)>>8;
@@ -517,7 +517,7 @@ READ8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_swap_r )
 		return pf_rowscroll_r(space,offset/2,0x00ff);
 }
 
-WRITE8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_swap_w )
+void deco_bac06_device::pf_rowscroll_8bit_swap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset&1)
 		pf_rowscroll_w(space,offset/2,data<<8,0xff00);
@@ -528,7 +528,7 @@ WRITE8_MEMBER( deco_bac06_device::pf_rowscroll_8bit_swap_w )
 
 
 /* used by hippodrm */
-WRITE8_MEMBER( deco_bac06_device::pf_control0_8bit_packed_w )
+void deco_bac06_device::pf_control0_8bit_packed_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset&1)
 		pf_control_0_w(space,offset/2,data<<8,0xff00);
@@ -537,19 +537,19 @@ WRITE8_MEMBER( deco_bac06_device::pf_control0_8bit_packed_w )
 }
 
 /* used by hippodrm */
-WRITE8_MEMBER( deco_bac06_device::pf_control1_8bit_swap_w )
+void deco_bac06_device::pf_control1_8bit_swap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pf_control1_8bit_w(space, offset^1, data);
 }
 
 /* used by hippodrm */
-READ8_MEMBER( deco_bac06_device::pf_data_8bit_swap_r )
+uint8_t deco_bac06_device::pf_data_8bit_swap_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pf_data_8bit_r(space, offset^1);
 }
 
 /* used by hippodrm */
-WRITE8_MEMBER( deco_bac06_device::pf_data_8bit_swap_w )
+void deco_bac06_device::pf_data_8bit_swap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pf_data_8bit_w(space, offset^1, data);
 }

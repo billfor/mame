@@ -38,10 +38,10 @@ public:
 	// construction/destruction
 	pc_t1t_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	DECLARE_PALETTE_INIT( pcjr );
+	void palette_init_pcjr(palette_device &palette);
 
-	DECLARE_WRITE_LINE_MEMBER( t1000_de_changed );
-	DECLARE_READ8_MEMBER( read );
+	void t1000_de_changed(int state);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_UPDATE_ROW( t1000_text_inten_update_row );
@@ -95,9 +95,9 @@ public:
 	// construction/destruction
 	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE_LINE_MEMBER( t1000_vsync_changed );
-	DECLARE_WRITE_LINE_MEMBER( disable_w );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void t1000_vsync_changed(int state);
+	void disable_w(int state);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -122,8 +122,8 @@ public:
 	// construction/destruction
 	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE_LINE_MEMBER( pcjr_vsync_changed );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pcjr_vsync_changed(int state);
 
 	uint8_t   *m_jxkanji;
 

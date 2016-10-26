@@ -43,20 +43,20 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
-	DECLARE_DRIVER_INIT(gameking);
+	void init_gameking();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(gameking);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(lcd_r);
-	DECLARE_WRITE8_MEMBER(lcd_w);
-	INTERRUPT_GEN_MEMBER(gameking_frame_int);
-	TIMER_CALLBACK_MEMBER(gameking_timer);
-	TIMER_CALLBACK_MEMBER(gameking_timer2);
+	void palette_init_gameking(palette_device &palette);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lcd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gameking_frame_int(device_t &device);
+	void gameking_timer(void *ptr, int32_t param);
+	void gameking_timer2(void *ptr, int32_t param);
 
 	uint32_t screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameking_cart);
+	image_init_result device_image_load_gameking_cart(device_image_interface &image);
 
 	struct Gkio {
 		uint8_t input, input2;
@@ -81,7 +81,7 @@ protected:
 };
 
 
-WRITE8_MEMBER(gameking_state::io_w)
+void gameking_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset != offsetof(Gkio, bank8000_cart))
 		logerror("%.6f io w %x %x\n", machine().time().as_double(), offset, data);
@@ -108,7 +108,7 @@ WRITE8_MEMBER(gameking_state::io_w)
 	}
 }
 
-READ8_MEMBER(gameking_state::io_r)
+uint8_t gameking_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	memory_region *maincpu_rom = memregion("maincpu");
 	uint8_t data = maincpu_rom->base()[offset];
@@ -129,13 +129,13 @@ READ8_MEMBER(gameking_state::io_r)
 	return data;
 }
 
-WRITE8_MEMBER( gameking_state::lcd_w )
+void gameking_state::lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	memory_region *maincpu_rom = memregion("maincpu");
 	maincpu_rom->base()[offset+0x600]=data;
 }
 
-READ8_MEMBER(gameking_state::lcd_r)
+uint8_t gameking_state::lcd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	memory_region *maincpu_rom = memregion("maincpu");
 	uint8_t data = maincpu_rom->base()[offset + 0x600];
@@ -178,7 +178,7 @@ static const unsigned char gameking_palette[] =
 	0, 0, 0
 };
 
-PALETTE_INIT_MEMBER(gameking_state, gameking)
+void gameking_state::palette_init_gameking(palette_device &palette)
 {
 	for (int i = 0; i < sizeof(gameking_palette) / 3; i++)
 		palette.set_pen_color(i, gameking_palette[i*3], gameking_palette[i*3+1], gameking_palette[i*3+2]);
@@ -203,13 +203,13 @@ uint32_t gameking_state::screen_update_gameking(screen_device &screen, bitmap_in
 }
 
 
-DRIVER_INIT_MEMBER(gameking_state, gameking)
+void gameking_state::init_gameking()
 {
 	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameking_state::gameking_timer), this));
 	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameking_state::gameking_timer2), this));
 }
 
-TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)
+void gameking_state::gameking_timer(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); // in reality int for vector at fff4
 	timer1->enable(false);
@@ -217,7 +217,7 @@ TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)
 	timer2->reset(m_maincpu->cycles_to_attotime(10/*?*/));
 }
 
-TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer2)
+void gameking_state::gameking_timer2(void *ptr, int32_t param)
 {
 	memory_region *maincpu_rom = memregion("maincpu");
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); // in reality int for vector at fff4
@@ -227,7 +227,7 @@ TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer2)
 	timer1->reset(m_maincpu->cycles_to_attotime(io->timer * 300/*?*/));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( gameking_state, gameking_cart )
+image_init_result gameking_state::device_image_load_gameking_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -266,7 +266,7 @@ void gameking_state::machine_reset()
 	//m_bank8000->set_base(maincpu_rom->base()+0x10000); //? no reason to enforce this yet
 }
 
-INTERRUPT_GEN_MEMBER(gameking_state::gameking_frame_int) // guess to get over bios wai
+void gameking_state::gameking_frame_int(device_t &device) // guess to get over bios wai
 {
 	//  static int line=0;
 	//  line++;

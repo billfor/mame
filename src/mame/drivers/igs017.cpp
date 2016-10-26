@@ -108,69 +108,69 @@ public:
 	uint32_t m_igs029_mgcs_long;
 
 
-	DECLARE_WRITE8_MEMBER(input_select_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE16_MEMBER(mgcs_magic_w);
-	DECLARE_READ16_MEMBER(mgcs_magic_r);
+	void input_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mgcs_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mgcs_magic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	uint16_t mgcs_palette_bitswap(uint16_t bgr);
 	uint16_t lhzb2a_palette_bitswap(uint16_t bgr);
 	uint16_t tjsb_palette_bitswap(uint16_t bgr);
 	uint16_t slqz2_palette_bitswap(uint16_t bgr);
 
-	DECLARE_READ8_MEMBER(sdmg2_keys_r);
-	DECLARE_WRITE16_MEMBER(sdmg2_magic_w);
-	DECLARE_READ16_MEMBER(sdmg2_magic_r);
-	DECLARE_READ8_MEMBER(mgdh_keys_r);
-	DECLARE_WRITE16_MEMBER(mgdha_magic_w);
-	DECLARE_READ16_MEMBER(mgdha_magic_r);
+	uint8_t sdmg2_keys_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sdmg2_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sdmg2_magic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t mgdh_keys_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mgdha_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mgdha_magic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE8_MEMBER(tjsb_output_w);
-	DECLARE_READ8_MEMBER(tjsb_input_r);
-	DECLARE_READ8_MEMBER(spkrform_input_r);
+	void tjsb_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tjsb_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spkrform_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ16_MEMBER(lhzb2a_input_r);
-	DECLARE_WRITE16_MEMBER(lhzb2a_input_addr_w);
-	DECLARE_WRITE16_MEMBER(lhzb2a_input_select_w);
+	uint16_t lhzb2a_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lhzb2a_input_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lhzb2a_input_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(lhzb2a_prot_w);
-	DECLARE_READ16_MEMBER(lhzb2a_prot_r);
+	void lhzb2a_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lhzb2a_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(lhzb2a_prot2_reset_w);
-	DECLARE_WRITE16_MEMBER(lhzb2a_prot2_inc_w);
-	DECLARE_WRITE16_MEMBER(lhzb2a_prot2_dec_w);
-	DECLARE_READ16_MEMBER(lhzb2a_prot2_r);
+	void lhzb2a_prot2_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lhzb2a_prot2_inc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lhzb2a_prot2_dec_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lhzb2a_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(lhzb2_magic_w);
-	DECLARE_READ16_MEMBER(lhzb2_magic_r);
+	void lhzb2_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lhzb2_magic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(slqz2_magic_w);
-	DECLARE_READ16_MEMBER(slqz2_magic_r);
-	DECLARE_READ8_MEMBER(mgcs_keys_r);
-	DECLARE_DRIVER_INIT(iqblocka);
-	DECLARE_DRIVER_INIT(mgdh);
-	DECLARE_DRIVER_INIT(slqz2);
-	DECLARE_DRIVER_INIT(lhzb2);
-	DECLARE_DRIVER_INIT(starzan);
-	DECLARE_DRIVER_INIT(mgcs);
-	DECLARE_DRIVER_INIT(tjsb);
-	DECLARE_DRIVER_INIT(spkrform);
-	DECLARE_DRIVER_INIT(iqblockf);
-	DECLARE_DRIVER_INIT(sdmg2);
-	DECLARE_DRIVER_INIT(tarzan);
-	DECLARE_DRIVER_INIT(tarzana);
-	DECLARE_DRIVER_INIT(lhzb2a);
-	DECLARE_DRIVER_INIT(mgdha);
+	void slqz2_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t slqz2_magic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t mgcs_keys_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_iqblocka();
+	void init_mgdh();
+	void init_slqz2();
+	void init_lhzb2();
+	void init_starzan();
+	void init_mgcs();
+	void init_tjsb();
+	void init_spkrform();
+	void init_iqblockf();
+	void init_sdmg2();
+	void init_tarzan();
+	void init_tarzana();
+	void init_lhzb2a();
+	void init_mgdha();
 
 	virtual void video_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(iqblocka);
-	DECLARE_MACHINE_RESET(mgcs);
-	DECLARE_MACHINE_RESET(lhzb2a);
+	void machine_reset_iqblocka();
+	void machine_reset_mgcs();
+	void machine_reset_lhzb2a();
 	uint32_t screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(iqblocka_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(mgcs_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(mgdh_interrupt);
+	void iqblocka_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void mgcs_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void mgdh_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 
 	void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0);
@@ -330,7 +330,7 @@ void igs017_state::iqblocka_patch_rom()
 //  rom[0x385b1] = 0x18;
 }
 
-DRIVER_INIT_MEMBER(igs017_state,iqblocka)
+void igs017_state::init_iqblocka()
 {
 	decrypt_program_rom(0x11, 7, 6, 5, 4, 3, 2, 1, 0);
 	iqblocka_patch_rom();
@@ -338,7 +338,7 @@ DRIVER_INIT_MEMBER(igs017_state,iqblocka)
 
 // iqblockf
 
-DRIVER_INIT_MEMBER(igs017_state,iqblockf)
+void igs017_state::init_iqblockf()
 {
 	decrypt_program_rom(0x11, 7, 6, 5, 4, 3, 2, 1, 0);
 //  iqblockf_patch_rom();
@@ -371,7 +371,7 @@ void igs017_state::tjsb_decrypt_sprites()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,tjsb)
+void igs017_state::init_tjsb()
 {
 	decrypt_program_rom(0x05, 7, 6, 3, 2, 5, 4, 1, 0);
 
@@ -479,7 +479,7 @@ void igs017_state::mgcs_patch_rom()
 //  rom[0x4e036/2] = 0x6006;    // 04E036: 6306    bls     $4e03e
 }
 
-DRIVER_INIT_MEMBER(igs017_state,mgcs)
+void igs017_state::init_mgcs()
 {
 	mgcs_decrypt_program_rom();
 	mgcs_patch_rom();
@@ -551,13 +551,13 @@ void igs017_state::tarzana_decrypt_program_rom()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,tarzan)
+void igs017_state::init_tarzan()
 {
 	tarzan_decrypt_program_rom();
 	tarzan_decrypt_tiles();
 }
 
-DRIVER_INIT_MEMBER(igs017_state,tarzana)
+void igs017_state::init_tarzana()
 {
 	tarzana_decrypt_program_rom();
 //  tarzana_decrypt_tiles();    // to do
@@ -615,7 +615,7 @@ void igs017_state::starzan_decrypt(uint8_t *ROM, int size, bool isOpcode)
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,starzan)
+void igs017_state::init_starzan()
 {
 	int size = 0x040000;
 
@@ -632,7 +632,7 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 
 // sdmg2
 
-DRIVER_INIT_MEMBER(igs017_state,sdmg2)
+void igs017_state::init_sdmg2()
 {
 	int i;
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
@@ -689,7 +689,7 @@ DRIVER_INIT_MEMBER(igs017_state,sdmg2)
 
 // mgdh, mgdha
 
-DRIVER_INIT_MEMBER(igs017_state,mgdha)
+void igs017_state::init_mgdha()
 {
 	int i;
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
@@ -723,9 +723,9 @@ DRIVER_INIT_MEMBER(igs017_state,mgdha)
 	mgcs_flip_sprites();
 }
 
-DRIVER_INIT_MEMBER(igs017_state,mgdh)
+void igs017_state::init_mgdh()
 {
-	DRIVER_INIT_CALL(mgdha);
+	init_mgdha();
 
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -796,7 +796,7 @@ void igs017_state::igs025_to_igs022_callback( void )
 
 
 
-DRIVER_INIT_MEMBER(igs017_state,lhzb2)
+void igs017_state::init_lhzb2()
 {
 	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
@@ -897,7 +897,7 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 
 //lhzb2a
 
-DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
+void igs017_state::init_lhzb2a()
 {
 	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
@@ -988,7 +988,7 @@ void igs017_state::slqz2_decrypt_tiles()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,slqz2)
+void igs017_state::init_slqz2()
 {
 	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
@@ -1098,7 +1098,7 @@ void igs017_state::spkrform_decrypt_sprites()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,spkrform)
+void igs017_state::init_spkrform()
 {
 	decrypt_program_rom(0x14, 7, 6, 5, 4, 3, 0, 1, 2);
 
@@ -1126,12 +1126,12 @@ ADDRESS_MAP_END
 
 
 
-WRITE8_MEMBER(igs017_state::input_select_w)
+void igs017_state::input_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_select = data;
 }
 
-READ8_MEMBER(igs017_state::input_r)
+uint8_t igs017_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_select)
 	{
@@ -1311,7 +1311,7 @@ void igs017_state::mgcs_igs029_run()
 	m_igs029_send_len = 0;
 }
 
-WRITE16_MEMBER(igs017_state::mgcs_magic_w)
+void igs017_state::mgcs_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_magic[offset]);
 
@@ -1394,7 +1394,7 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 	}
 }
 
-READ16_MEMBER(igs017_state::mgcs_magic_r)
+uint16_t igs017_state::mgcs_magic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0)
 		return m_igs_magic[0];
@@ -1428,7 +1428,7 @@ READ16_MEMBER(igs017_state::mgcs_magic_r)
 	return 0xffff;
 }
 
-READ8_MEMBER(igs017_state::mgcs_keys_r)
+uint8_t igs017_state::mgcs_keys_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (~m_input_select & 0x08) return ioport("KEY0")->read();
 	if (~m_input_select & 0x10) return ioport("KEY1")->read();
@@ -1456,7 +1456,7 @@ ADDRESS_MAP_END
 
 // sdmg2
 
-READ8_MEMBER(igs017_state::sdmg2_keys_r)
+uint8_t igs017_state::sdmg2_keys_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (~m_input_select & 0x01) return ioport("KEY0")->read();
 	if (~m_input_select & 0x02) return ioport("KEY1")->read();
@@ -1470,7 +1470,7 @@ READ8_MEMBER(igs017_state::sdmg2_keys_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
+void igs017_state::sdmg2_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_magic[offset]);
 
@@ -1503,7 +1503,7 @@ WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
 	}
 }
 
-READ16_MEMBER(igs017_state::sdmg2_magic_r)
+uint16_t igs017_state::sdmg2_magic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs_magic[0])
 	{
@@ -1539,7 +1539,7 @@ ADDRESS_MAP_END
 // mgdh, mgdha
 
 
-READ8_MEMBER(igs017_state::mgdh_keys_r)
+uint8_t igs017_state::mgdh_keys_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (~m_input_select & 0x04) return ioport("KEY0")->read();
 	if (~m_input_select & 0x08) return ioport("KEY1")->read();
@@ -1553,7 +1553,7 @@ READ8_MEMBER(igs017_state::mgdh_keys_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(igs017_state::mgdha_magic_w)
+void igs017_state::mgdha_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_magic[offset]);
 
@@ -1610,7 +1610,7 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
 	}
 }
 
-READ16_MEMBER(igs017_state::mgdha_magic_r)
+uint16_t igs017_state::mgdha_magic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs_magic[0])
 	{
@@ -1652,7 +1652,7 @@ ADDRESS_MAP_END
 // tjsb
 
 
-WRITE8_MEMBER(igs017_state::tjsb_output_w)
+void igs017_state::tjsb_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(m_input_select)
 	{
@@ -1683,7 +1683,7 @@ WRITE8_MEMBER(igs017_state::tjsb_output_w)
 	logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_input_select, data);
 }
 
-READ8_MEMBER(igs017_state::tjsb_input_r)
+uint8_t igs017_state::tjsb_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_select)
 	{
@@ -1734,7 +1734,7 @@ static ADDRESS_MAP_START( spkrform_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
 
-READ8_MEMBER(igs017_state::spkrform_input_r)
+uint8_t igs017_state::spkrform_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_select)
 	{
@@ -1772,7 +1772,7 @@ ADDRESS_MAP_END
 // lhzb2
 
 
-WRITE16_MEMBER(igs017_state::lhzb2_magic_w)
+void igs017_state::lhzb2_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_magic[offset]);
 
@@ -1806,7 +1806,7 @@ WRITE16_MEMBER(igs017_state::lhzb2_magic_w)
 	}
 }
 
-READ16_MEMBER(igs017_state::lhzb2_magic_r)
+uint16_t igs017_state::lhzb2_magic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs_magic[0])
 	{
@@ -1884,7 +1884,7 @@ ADDRESS_MAP_END
 
 // Bitswap protection
 
-WRITE16_MEMBER(igs017_state::lhzb2a_prot_w)
+void igs017_state::lhzb2a_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_prot_regs[offset]);
 
@@ -2013,7 +2013,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_prot_w)
 	}
 }
 
-READ16_MEMBER(igs017_state::lhzb2a_prot_r)
+uint16_t igs017_state::lhzb2a_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_prot_regs[0])
 	{
@@ -2043,25 +2043,25 @@ READ16_MEMBER(igs017_state::lhzb2a_prot_r)
 
 // Protection 2
 
-WRITE16_MEMBER(igs017_state::lhzb2a_prot2_reset_w)
+void igs017_state::lhzb2a_prot2_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_prot2 = 0x00;
 	logerror("%s: prot2 reset -> %02x\n", machine().describe_context(), m_prot2);
 }
 
-WRITE16_MEMBER(igs017_state::lhzb2a_prot2_inc_w)
+void igs017_state::lhzb2a_prot2_inc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_prot2++;
 	logerror("%s: prot2 inc -> %02x\n", machine().describe_context(), m_prot2);
 }
 
-WRITE16_MEMBER(igs017_state::lhzb2a_prot2_dec_w)
+void igs017_state::lhzb2a_prot2_dec_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_prot2--;
 	logerror("%s: prot2 dec -> %02x\n", machine().describe_context(), m_prot2);
 }
 
-READ16_MEMBER(igs017_state::lhzb2a_prot2_r)
+uint16_t igs017_state::lhzb2a_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t x     =   m_prot2;
 	uint8_t res   =   (BIT(x, 0) << 7) |
@@ -2075,7 +2075,7 @@ READ16_MEMBER(igs017_state::lhzb2a_prot2_r)
 
 
 
-READ16_MEMBER(igs017_state::lhzb2a_input_r)
+uint16_t igs017_state::lhzb2a_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset*2)
 	{
@@ -2104,7 +2104,7 @@ READ16_MEMBER(igs017_state::lhzb2a_input_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(igs017_state::lhzb2a_input_addr_w)
+void igs017_state::lhzb2a_input_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Unmap previous address ranges
 	if (m_input_addr != -1)
@@ -2124,7 +2124,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_addr_w)
 	logerror("%s: inputs and protection remapped at %02xxxxx\n", machine().describe_context(), m_input_addr);
 }
 
-WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
+void igs017_state::lhzb2a_input_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2164,7 +2164,7 @@ ADDRESS_MAP_END
 // slqz2
 
 
-WRITE16_MEMBER(igs017_state::slqz2_magic_w)
+void igs017_state::slqz2_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_magic[offset]);
 
@@ -2192,7 +2192,7 @@ WRITE16_MEMBER(igs017_state::slqz2_magic_w)
 	}
 }
 
-READ16_MEMBER(igs017_state::slqz2_magic_r)
+uint16_t igs017_state::slqz2_magic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs_magic[0])
 	{
@@ -3227,7 +3227,7 @@ INPUT_PORTS_END
                                 Machine Drivers
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::iqblocka_interrupt)
+void igs017_state::iqblocka_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -3239,7 +3239,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::iqblocka_interrupt)
 }
 
 
-MACHINE_RESET_MEMBER(igs017_state,iqblocka)
+void igs017_state::machine_reset_iqblocka()
 {
 	m_input_select = 0;
 }
@@ -3290,7 +3290,7 @@ MACHINE_CONFIG_END
 
 // mgcs
 
-TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgcs_interrupt)
+void igs017_state::mgcs_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -3301,9 +3301,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgcs_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-MACHINE_RESET_MEMBER(igs017_state,mgcs)
+void igs017_state::machine_reset_mgcs()
 {
-	MACHINE_RESET_CALL_MEMBER( iqblocka );
+	machine_reset_iqblocka();
 
 	m_scramble_data = 0;
 	memset(m_igs_magic, 0, sizeof(m_igs_magic));
@@ -3394,9 +3394,9 @@ MACHINE_CONFIG_END
 
 // lhzb2a
 
-MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
+void igs017_state::machine_reset_lhzb2a()
 {
-	MACHINE_RESET_CALL_MEMBER( mgcs );
+	machine_reset_mgcs();
 	lhzb2a_input_addr_w(m_maincpu->space(AS_PROGRAM), 0, 0xf0);
 }
 
@@ -3518,7 +3518,7 @@ MACHINE_CONFIG_END
 
 // mgdh
 
-TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
+void igs017_state::mgdh_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

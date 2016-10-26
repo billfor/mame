@@ -40,7 +40,7 @@ J Clegg
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(travrusa_state, travrusa)
+void travrusa_state::palette_init_travrusa(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -113,7 +113,7 @@ PALETTE_INIT_MEMBER(travrusa_state, travrusa)
 	}
 }
 
-PALETTE_INIT_MEMBER(travrusa_state,shtrider)
+void travrusa_state::palette_init_shtrider(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -194,7 +194,7 @@ PALETTE_INIT_MEMBER(travrusa_state,shtrider)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(travrusa_state::get_tile_info)
+void travrusa_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_videoram[2 * tile_index + 1];
 	int flags = TILE_FLIPXY((attr & 0x30) >> 4);
@@ -235,7 +235,7 @@ void travrusa_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(travrusa_state::travrusa_videoram_w)
+void travrusa_state::travrusa_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -252,20 +252,20 @@ void travrusa_state::set_scroll(  )
 	m_bg_tilemap->set_scrollx(3, 0);
 }
 
-WRITE8_MEMBER(travrusa_state::travrusa_scroll_x_low_w)
+void travrusa_state::travrusa_scroll_x_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx[0] = data;
 	set_scroll();
 }
 
-WRITE8_MEMBER(travrusa_state::travrusa_scroll_x_high_w)
+void travrusa_state::travrusa_scroll_x_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx[1] = data;
 	set_scroll();
 }
 
 
-WRITE8_MEMBER(travrusa_state::travrusa_flipscreen_w)
+void travrusa_state::travrusa_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* screen flip is handled both by software and hardware */
 	data ^= ~ioport("DSW2")->read() & 1;

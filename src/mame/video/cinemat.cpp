@@ -69,7 +69,7 @@ void cinemat_state::cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, 
  *
  *************************************/
 
-WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
+void cinemat_state::cinemat_vector_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b, i;
 	cpu_device *cpu = m_maincpu;
@@ -171,25 +171,25 @@ void cinemat_state::video_start()
 }
 
 
-VIDEO_START_MEMBER(cinemat_state,cinemat_16level)
+void cinemat_state::video_start_cinemat_16level()
 {
 	m_color_mode = COLOR_16LEVEL;
 }
 
 
-VIDEO_START_MEMBER(cinemat_state,cinemat_64level)
+void cinemat_state::video_start_cinemat_64level()
 {
 	m_color_mode = COLOR_64LEVEL;
 }
 
 
-VIDEO_START_MEMBER(cinemat_state,cinemat_color)
+void cinemat_state::video_start_cinemat_color()
 {
 	m_color_mode = COLOR_RGB;
 }
 
 
-VIDEO_START_MEMBER(cinemat_state,cinemat_qb3color)
+void cinemat_state::video_start_cinemat_qb3color()
 {
 	m_color_mode = COLOR_QB3;
 }

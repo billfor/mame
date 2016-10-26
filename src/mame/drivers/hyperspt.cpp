@@ -24,12 +24,12 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "sound/volt_reg.h"
 
 
-WRITE8_MEMBER(hyperspt_state::hyperspt_coin_counter_w)
+void hyperspt_state::hyperspt_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
-WRITE8_MEMBER(hyperspt_state::irq_mask_w)
+void hyperspt_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }
@@ -286,7 +286,7 @@ static GFXDECODE_START( roadf )
 	GFXDECODE_ENTRY( "gfx2", 0, roadf_charlayout,    16*16, 16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(hyperspt_state::vblank_irq)
+void hyperspt_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -550,7 +550,7 @@ ROM_START( roadf2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(hyperspt_state,hyperspt)
+void hyperspt_state::init_hyperspt()
 {
 }
 

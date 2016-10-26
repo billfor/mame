@@ -57,14 +57,14 @@ void sidearms_state::machine_start()
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x8000, 0x4000);
 }
 
-WRITE8_MEMBER(sidearms_state::bankswitch_w)
+void sidearms_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }
 
 
 // Turtle Ship input ports are rotated 90 degrees
-READ8_MEMBER(sidearms_state::turtship_ports_r)
+uint8_t sidearms_state::turtship_ports_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = 0;
 	for (int i = 0; i < 5;i++)
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 
 /* Whizz */
 
-WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
+void sidearms_state::whizz_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = 0;
 	switch (data & 0xC0)
@@ -1210,22 +1210,22 @@ ROM_START( whizz )  /* Whizz Philko 1989. Original pcb. Boardnumber: 01-90 / Ser
 	ROM_LOAD( "t-7.y8",    0x0000, 0x8000, CRC(a8b5f750) SHA1(94eb7af3cb8bee87ce3d31260e3bde062ebbc8f0) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sidearms_state,sidearms)
+void sidearms_state::init_sidearms()
 {
 	m_gameid = 0;
 }
 
-DRIVER_INIT_MEMBER(sidearms_state,turtship)
+void sidearms_state::init_turtship()
 {
 	m_gameid = 1;
 }
 
-DRIVER_INIT_MEMBER(sidearms_state,dyger)
+void sidearms_state::init_dyger()
 {
 	m_gameid = 2;
 }
 
-DRIVER_INIT_MEMBER(sidearms_state,whizz)
+void sidearms_state::init_whizz()
 {
 	m_gameid = 3;
 }

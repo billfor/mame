@@ -129,13 +129,13 @@ Notes (couriersud)
 
 #define LOG(x) do { if (M10_DEBUG) printf x; } while (0)
 
-WRITE8_MEMBER(m10_state::ic8j1_output_changed)
+void m10_state::ic8j1_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("ic8j1: %d %d\n", data, m_screen->vpos()));
 	m_maincpu->set_input_line(0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(m10_state::ic8j2_output_changed)
+void m10_state::ic8j2_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* written from /Q to A with slight delight */
 	LOG(("ic8j2: %d\n", data));
@@ -149,7 +149,7 @@ WRITE8_MEMBER(m10_state::ic8j2_output_changed)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(m10_state,m10)
+void m10_state::palette_init_m10(palette_device &palette)
 {
 	int i;
 
@@ -166,14 +166,14 @@ PALETTE_INIT_MEMBER(m10_state,m10)
 	}
 }
 
-MACHINE_START_MEMBER(m10_state,m10)
+void m10_state::machine_start_m10()
 {
 	save_item(NAME(m_bottomline));
 	save_item(NAME(m_flip));
 	save_item(NAME(m_last));
 }
 
-MACHINE_RESET_MEMBER(m10_state,m10)
+void m10_state::machine_reset_m10()
 {
 	m_bottomline = 0;
 	m_flip = 0;
@@ -205,7 +205,7 @@ MACHINE_RESET_MEMBER(m10_state,m10)
  *              0x06: SAUCER HIT
  */
 
-WRITE8_MEMBER(m10_state::m10_ctrl_w)
+void m10_state::m10_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if M10_DEBUG
 	if (data & 0x40)
@@ -280,7 +280,7 @@ WRITE8_MEMBER(m10_state::m10_ctrl_w)
  *              Will be updated only in attract mode
  */
 
-WRITE8_MEMBER(m10_state::m11_ctrl_w)
+void m10_state::m11_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if M10_DEBUG
 	if (data & 0x4c)
@@ -311,7 +311,7 @@ WRITE8_MEMBER(m10_state::m11_ctrl_w)
  *              Will be updated only in attract mode
  */
 
-WRITE8_MEMBER(m10_state::m15_ctrl_w)
+void m10_state::m15_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if M10_DEBUG
 	if (data & 0xf0)
@@ -337,7 +337,7 @@ WRITE8_MEMBER(m10_state::m15_ctrl_w)
  *              Will be updated only in attract mode
  */
 
-WRITE8_MEMBER(m10_state::m10_a500_w)
+void m10_state::m10_a500_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if M10_DEBUG
 	if (data & 0xfc)
@@ -345,7 +345,7 @@ WRITE8_MEMBER(m10_state::m10_a500_w)
 #endif
 }
 
-WRITE8_MEMBER(m10_state::m11_a100_w)
+void m10_state::m11_a100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int raising_bits = data & ~m_last;
 	//int falling_bits = ~data & m_last;
@@ -379,7 +379,7 @@ WRITE8_MEMBER(m10_state::m11_a100_w)
 
 }
 
-WRITE8_MEMBER(m10_state::m15_a100_w)
+void m10_state::m15_a100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//int raising_bits = data & ~m_last;
 	int falling_bits = ~data & m_last;
@@ -436,7 +436,7 @@ WRITE8_MEMBER(m10_state::m15_a100_w)
 	m_last = data;
 }
 
-READ8_MEMBER(m10_state::m10_a700_r)
+uint8_t m10_state::m10_a700_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	LOG(("clear\n"));
@@ -445,7 +445,7 @@ READ8_MEMBER(m10_state::m10_a700_r)
 	return 0x00;
 }
 
-READ8_MEMBER(m10_state::m11_a700_r)
+uint8_t m10_state::m11_a700_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	//m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -461,14 +461,14 @@ READ8_MEMBER(m10_state::m11_a700_r)
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(m10_state::coin_inserted)
+void m10_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(m10_state::interrupt_callback)
+void m10_state::interrupt_callback(void *ptr, int32_t param)
 {
 	if (param == 0)
 	{
@@ -497,19 +497,19 @@ void m10_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 }
 
 #if 0
-INTERRUPT_GEN_MEMBER(m10_state::m11_interrupt)
+void m10_state::m11_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 	//timer_set(m_screen->time_until_pos(IREMM10_VBEND), TIMER_INTERRUPT, -1);
 }
 
-INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
+void m10_state::m10_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 }
 #endif
 
-INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
+void m10_state::m15_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 	timer_set(m_screen->time_until_pos(IREMM10_VBSTART + 1, 80), TIMER_INTERRUPT, -1);
@@ -917,7 +917,7 @@ MACHINE_CONFIG_END
  * Hacks to work around missing roms to get at least some
  * video output
  */
-DRIVER_INIT_MEMBER(m10_state,andromed)
+void m10_state::init_andromed()
 {
 	int i;
 
@@ -925,7 +925,7 @@ DRIVER_INIT_MEMBER(m10_state,andromed)
 		m_rom[i] = 0x60;
 }
 
-DRIVER_INIT_MEMBER(m10_state,ipminva1)
+void m10_state::init_ipminva1()
 {
 	int i;
 

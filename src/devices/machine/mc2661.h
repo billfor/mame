@@ -93,17 +93,17 @@ public:
 	template<class _Object> static devcb_base &set_bkdet_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_bkdet.set_callback(object); }
 	template<class _Object> static devcb_base &set_xsync_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_xsync.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( dsr_w );
-	DECLARE_WRITE_LINE_MEMBER( dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( cts_w );
+	void dsr_w(int state);
+	void dcd_w(int state);
+	void cts_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( rxrdy_r );
-	DECLARE_READ_LINE_MEMBER( txemt_r );
+	int rxrdy_r();
+	int txemt_r();
 
-	DECLARE_WRITE_LINE_MEMBER( rx_w ) { device_serial_interface::rx_w(state); }
+	void rx_w(int state) { device_serial_interface::rx_w(state); }
 
 protected:
 	// device-level overrides

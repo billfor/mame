@@ -150,7 +150,7 @@ void gba_state::request_irq(uint32_t int_type)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gba_state::dma_complete)
+void gba_state::dma_complete(void *ptr, int32_t param)
 {
 	static const uint32_t ch_int[4] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
 
@@ -391,7 +391,7 @@ void gba_state::audio_tick(int ref)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
+void gba_state::timer_expire(void *ptr, int32_t param)
 {
 	static const uint32_t tmr_ints[4] = { INT_TM0_OVERFLOW, INT_TM1_OVERFLOW, INT_TM2_OVERFLOW, INT_TM3_OVERFLOW };
 	uintptr_t tmr = (uintptr_t) param;
@@ -521,7 +521,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gba_state::handle_irq)
+void gba_state::handle_irq(void *ptr, int32_t param)
 {
 	request_irq(IF);
 
@@ -543,7 +543,7 @@ static const char *reg_names[] = {
 	"FIFO_B_L",    "FIFO_B_H"
 };
 
-READ32_MEMBER(gba_state::gba_io_r)
+uint32_t gba_state::gba_io_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t retval = 0;
 
@@ -739,7 +739,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 	return retval;
 }
 
-WRITE32_MEMBER(gba_state::gba_io_w)
+void gba_state::gba_io_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t soundcnt_x = SOUNDCNT_X;
 	uint16_t siocnt = SIOCNT;
@@ -1130,7 +1130,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 	}
 }
 
-READ32_MEMBER(gba_state::gba_bios_r)
+uint32_t gba_state::gba_bios_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *rom = m_region_maincpu;
 	if (m_bios_hack->read())
@@ -1147,7 +1147,7 @@ READ32_MEMBER(gba_state::gba_bios_r)
 	return rom[offset & 0x3fff];
 }
 
-READ32_MEMBER(gba_state::gba_10000000_r)
+uint32_t gba_state::gba_10000000_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 	uint32_t pc = m_maincpu->state_int(ARM7_PC);
@@ -1165,22 +1165,22 @@ READ32_MEMBER(gba_state::gba_10000000_r)
 	return data;
 }
 
-WRITE_LINE_MEMBER(gba_state::int_hblank_callback)
+void gba_state::int_hblank_callback(int state)
 {
 	request_irq(INT_HBL);
 }
 
-WRITE_LINE_MEMBER(gba_state::int_vblank_callback)
+void gba_state::int_vblank_callback(int state)
 {
 	request_irq(INT_VBL);
 }
 
-WRITE_LINE_MEMBER(gba_state::int_vcount_callback)
+void gba_state::int_vcount_callback(int state)
 {
 	request_irq(INT_VCNT);
 }
 
-WRITE_LINE_MEMBER(gba_state::dma_hblank_callback)
+void gba_state::dma_hblank_callback(int state)
 {
 	for (int ch = 0; ch < 4; ch++)
 	{
@@ -1191,7 +1191,7 @@ WRITE_LINE_MEMBER(gba_state::dma_hblank_callback)
 	}
 }
 
-WRITE_LINE_MEMBER(gba_state::dma_vblank_callback)
+void gba_state::dma_vblank_callback(int state)
 {
 	for (int ch = 0; ch < 4; ch++)
 	{
@@ -1435,7 +1435,7 @@ ROM_END
 
 // this emulates the GBA's hardware protection: the BIOS returns only zeros when the PC is not in it,
 // and some games verify that as a protection check (notably Metroid Fusion)
-DIRECT_UPDATE_MEMBER(gba_state::gba_direct)
+offs_t gba_state::gba_direct(direct_read_data &direct, offs_t address)
 {
 	if (address > 0x4000)
 	{
@@ -1450,7 +1450,7 @@ DIRECT_UPDATE_MEMBER(gba_state::gba_direct)
 }
 
 
-DRIVER_INIT_MEMBER(gba_state,gbadv)
+void gba_state::init_gbadv()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(gba_state::gba_direct), this));
 }

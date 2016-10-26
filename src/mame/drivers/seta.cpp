@@ -1407,7 +1407,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 /*------------------------------
     callback
 ------------------------------*/
-TIMER_CALLBACK_MEMBER(seta_state::uPD71054_timer_callback)
+void seta_state::uPD71054_timer_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE );
 	uPD71054_update_timer( machine(), nullptr, param );
@@ -1438,7 +1438,7 @@ void seta_state::uPD71054_timer_init(  )
 /*------------------------------
     timer write handler
 ------------------------------*/
-WRITE16_MEMBER(seta_state::timer_regs_w)
+void seta_state::timer_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uPD71054_state *uPD71054 = &m_uPD71054;
 
@@ -1484,7 +1484,7 @@ WRITE16_MEMBER(seta_state::timer_regs_w)
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(seta_state::utoukond_ym3438_interrupt)
+void seta_state::utoukond_ym3438_interrupt(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
 }
@@ -1503,7 +1503,7 @@ WRITE_LINE_MEMBER(seta_state::utoukond_ym3438_interrupt)
 
 */
 
-WRITE_LINE_MEMBER(seta_state::pit_out0)
+void seta_state::pit_out0(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(4, HOLD_LINE);
@@ -1520,12 +1520,12 @@ WRITE_LINE_MEMBER(seta_state::pit_out0)
 
 */
 
-READ16_MEMBER(seta_state::sharedram_68000_r)
+uint16_t seta_state::sharedram_68000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((uint16_t)m_sharedram[offset]) & 0xff;
 }
 
-WRITE16_MEMBER(seta_state::sharedram_68000_w)
+void seta_state::sharedram_68000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1542,7 +1542,7 @@ WRITE16_MEMBER(seta_state::sharedram_68000_w)
 
 */
 
-WRITE16_MEMBER(seta_state::sub_ctrl_w)
+void seta_state::sub_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1571,7 +1571,7 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 
 
 /* DSW reading for 16 bit CPUs */
-READ16_MEMBER(seta_state::seta_dsw_r)
+uint16_t seta_state::seta_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t dsw = ioport("DSW")->read();
 	if (offset == 0)    return (dsw >> 8) & 0xff;
@@ -1581,12 +1581,12 @@ READ16_MEMBER(seta_state::seta_dsw_r)
 
 /* DSW reading for 8 bit CPUs */
 
-READ8_MEMBER(seta_state::dsw1_r)
+uint8_t seta_state::dsw1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_dsw->read() >> 8) & 0xff;
 }
 
-READ8_MEMBER(seta_state::dsw2_r)
+uint8_t seta_state::dsw2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_dsw->read() >> 0) & 0xff;
 }
@@ -1681,7 +1681,7 @@ ADDRESS_MAP_END
                                 Caliber 50
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::calibr50_ip_r)
+uint16_t seta_state::calibr50_ip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int dir1 = m_rot[0]->read();  // analog port
 	int dir2 = m_rot[1]->read();  // analog port
@@ -1704,7 +1704,7 @@ READ16_MEMBER(seta_state::calibr50_ip_r)
 	}
 }
 
-WRITE16_MEMBER(seta_state::calibr50_soundlatch_w)
+void seta_state::calibr50_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1742,7 +1742,7 @@ ADDRESS_MAP_END
                                 U.S. Classic
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::usclssic_dsw_r)
+uint16_t seta_state::usclssic_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1754,7 +1754,7 @@ READ16_MEMBER(seta_state::usclssic_dsw_r)
 	return 0;
 }
 
-READ16_MEMBER(seta_state::usclssic_trackball_x_r)
+uint16_t seta_state::usclssic_trackball_x_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const portx_name[2] = { "P1X", "P2X" };
 
@@ -1766,7 +1766,7 @@ READ16_MEMBER(seta_state::usclssic_trackball_x_r)
 	return 0;
 }
 
-READ16_MEMBER(seta_state::usclssic_trackball_y_r)
+uint16_t seta_state::usclssic_trackball_y_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const porty_name[2] = { "P1Y", "P2Y" };
 
@@ -1779,7 +1779,7 @@ READ16_MEMBER(seta_state::usclssic_trackball_y_r)
 }
 
 
-WRITE16_MEMBER(seta_state::usclssic_lockout_w)
+void seta_state::usclssic_lockout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1917,7 +1917,7 @@ ADDRESS_MAP_END
                     and Zombie Raid (with slight variations)
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::zombraid_gun_r)// Serial interface
+uint16_t seta_state::zombraid_gun_r(address_space &space, offs_t offset, uint16_t mem_mask)// Serial interface
 {
 	static const char *const portnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
@@ -1926,7 +1926,7 @@ READ16_MEMBER(seta_state::zombraid_gun_r)// Serial interface
 }
 
 // Bit 0 is clock, 1 is data, 2 is reset
-WRITE16_MEMBER(seta_state::zombraid_gun_w)
+void seta_state::zombraid_gun_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(data&4) { m_gun_bit_count = 0; return; } // Reset
 
@@ -1961,7 +1961,7 @@ WRITE16_MEMBER(seta_state::zombraid_gun_w)
 	m_gun_old_clock = data & 1;
 }
 
-READ16_MEMBER(seta_state::extra_r)
+uint16_t seta_state::extra_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_extra_port.read_safe(0xff);
 }
@@ -2002,7 +2002,7 @@ static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xf00000, 0xf00001) AM_WRITENOP                        // ? Sound  IRQ Ack
 ADDRESS_MAP_END
 
-READ16_MEMBER(seta_state::zingzipbl_unknown_r)
+uint16_t seta_state::zingzipbl_unknown_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0000;
 }
@@ -2117,7 +2117,7 @@ static const uint16_t keroppi_protection_word[] = {
 };
 
 
-READ16_MEMBER(seta_state::keroppi_protection_r)
+uint16_t seta_state::keroppi_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = keroppi_protection_word[m_keroppi_protection_count];
 
@@ -2128,14 +2128,14 @@ READ16_MEMBER(seta_state::keroppi_protection_r)
 	return result;
 }
 
-READ16_MEMBER(seta_state::keroppi_protection_init_r)
+uint16_t seta_state::keroppi_protection_init_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_keroppi_protection_count = 0;
 
 	return 0x00;
 }
 
-READ16_MEMBER(seta_state::keroppi_coin_r)
+uint16_t seta_state::keroppi_coin_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = m_coins->read();
 
@@ -2148,12 +2148,12 @@ READ16_MEMBER(seta_state::keroppi_coin_r)
 	return result;
 }
 
-TIMER_CALLBACK_MEMBER(seta_state::keroppi_prize_hop_callback)
+void seta_state::keroppi_prize_hop_callback(void *ptr, int32_t param)
 {
 	m_keroppi_prize_hop = 2;
 }
 
-WRITE16_MEMBER(seta_state::keroppi_prize_w)
+void seta_state::keroppi_prize_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((data & 0x0010) && !m_keroppi_prize_hop)
 	{
@@ -2184,7 +2184,7 @@ static ADDRESS_MAP_START( keroppi_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xe00600, 0xe00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 ADDRESS_MAP_END
 
-MACHINE_START_MEMBER(seta_state,keroppi)
+void seta_state::machine_start_keroppi()
 {
 	m_keroppi_prize_hop = 0;
 	m_keroppi_protection_count = 0;
@@ -2340,23 +2340,23 @@ ADDRESS_MAP_END
 // the spritey low bits are mapped to 1 in every 4 bytes here as if it were a 32-bit bus..which is weird
 // other ram is similar..
 
-WRITE16_MEMBER(seta_state::setaroul_spriteylow_w)
+void seta_state::setaroul_spriteylow_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((offset&1)==0) m_seta001->spriteylow_w8(space, offset>>1, (data & 0xff00) >> 8);
 }
 
-WRITE16_MEMBER(seta_state::setaroul_spritectrl_w)
+void seta_state::setaroul_spritectrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((offset&1)==0) m_seta001->spritectrl_w8(space, offset>>1, (data & 0xff00) >> 8);
 }
 
-WRITE16_MEMBER(seta_state::setaroul_spritecode_w)
+void seta_state::setaroul_spritecode_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((offset&1)==1) m_seta001->spritecodelow_w8(space, offset>>1, (data & 0xff00) >> 8);
 	if ((offset&1)==0) m_seta001->spritecodehigh_w8(space, offset>>1, (data & 0xff00) >> 8);
 }
 
-READ16_MEMBER(seta_state::setaroul_spritecode_r)
+uint16_t seta_state::setaroul_spritecode_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret;
 	if ((offset&1)==1)
@@ -2494,7 +2494,7 @@ static ADDRESS_MAP_START( madshark_map, AS_PROGRAM, 16, seta_state )
 ADDRESS_MAP_END
 
 
-WRITE16_MEMBER(seta_state::magspeed_lights_w)
+void seta_state::magspeed_lights_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_magspeed_lights[offset] );
 
@@ -2545,7 +2545,7 @@ ADDRESS_MAP_END
                                 Krazy Bowl
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::krzybowl_input_r)
+uint16_t seta_state::krzybowl_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// analog ports
 	int dir1x = m_track1_x->read() & 0xfff;
@@ -2595,7 +2595,7 @@ ADDRESS_MAP_END
                             Mobile Suit Gundam
 ***************************************************************************/
 
-WRITE16_MEMBER(seta_state::msgundam_vregs_w)
+void seta_state::msgundam_vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// swap $500002 with $500004
 	switch( offset )
@@ -2698,12 +2698,12 @@ ADDRESS_MAP_END
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::kiwame_nvram_r)
+uint16_t seta_state::kiwame_nvram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_kiwame_nvram[offset] & 0xff;
 }
 
-WRITE16_MEMBER(seta_state::kiwame_nvram_w)
+void seta_state::kiwame_nvram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2711,7 +2711,7 @@ WRITE16_MEMBER(seta_state::kiwame_nvram_w)
 	}
 }
 
-READ16_MEMBER(seta_state::kiwame_input_r)
+uint16_t seta_state::kiwame_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int row_select = kiwame_nvram_r( space, 0x10a/2,0x00ff ) & 0x1f;
 	int i;
@@ -2753,12 +2753,12 @@ ADDRESS_MAP_END
                         Thunder & Lightning / Wit's
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::thunderl_protection_r)
+uint16_t seta_state::thunderl_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  logerror("PC %06X - Protection Read\n", space.device().safe_pc());
 	return 0x00dd;
 }
-WRITE16_MEMBER(seta_state::thunderl_protection_w)
+void seta_state::thunderl_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  logerror("PC %06X - Protection Written: %04X <- %04X\n", space.device().safe_pc(), offset*2, data);
 }
@@ -2816,12 +2816,12 @@ ADDRESS_MAP_END
                     Wiggie Waggie
 ***************************************************************************/
 
-READ8_MEMBER(seta_state::wiggie_soundlatch_r)
+uint8_t seta_state::wiggie_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_wiggie_soundlatch;
 }
 
-WRITE16_MEMBER(seta_state::wiggie_soundlatch_w)
+void seta_state::wiggie_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_wiggie_soundlatch = data >> 8;
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -2886,7 +2886,7 @@ ADDRESS_MAP_END
                             Ultra Toukond Densetsu
 ***************************************************************************/
 
-WRITE16_MEMBER(seta_state::utoukond_soundlatch_w)
+void seta_state::utoukond_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2919,7 +2919,7 @@ ADDRESS_MAP_END
                                 Pairs Love
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::pairlove_prot_r)
+uint16_t seta_state::pairlove_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int retdata;
 
@@ -2929,7 +2929,7 @@ READ16_MEMBER(seta_state::pairlove_prot_r)
 	return retdata;
 }
 
-WRITE16_MEMBER(seta_state::pairlove_prot_w)
+void seta_state::pairlove_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//osd_printf_debug("pairs love protection? write %06x %04x %04x\n",space.device().safe_pc(), offset,data);
 	m_pairslove_protram_old[offset] = m_pairslove_protram[offset];
@@ -2988,7 +2988,7 @@ ADDRESS_MAP_END
                              International Toote
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::inttoote_dsw_r)
+uint16_t seta_state::inttoote_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int shift = offset * 4;
 	return  ((((m_dsw1->read() >> shift)       & 0xf)) << 0) |
@@ -2996,7 +2996,7 @@ READ16_MEMBER(seta_state::inttoote_dsw_r)
 			((((m_dsw2_3->read() >> (shift+8)) & 0xf)) << 8) ;
 }
 
-READ16_MEMBER(seta_state::inttoote_key_r)
+uint16_t seta_state::inttoote_key_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch( *m_inttoote_key_select )
 	{
@@ -3011,7 +3011,7 @@ READ16_MEMBER(seta_state::inttoote_key_r)
 	return 0xffff;
 }
 
-READ16_MEMBER(seta_state::inttoote_700000_r)
+uint16_t seta_state::inttoote_700000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_inttoote_700000[offset] & 0x3f;
 }
@@ -3051,7 +3051,7 @@ static ADDRESS_MAP_START( inttoote_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // RAM
 ADDRESS_MAP_END
 
-READ16_MEMBER(seta_state::jockeyc_mux_r)
+uint16_t seta_state::jockeyc_mux_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch( m_jockeyc_key_select )
 	{
@@ -3065,13 +3065,13 @@ READ16_MEMBER(seta_state::jockeyc_mux_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(seta_state::jockeyc_mux_w)
+void seta_state::jockeyc_mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* other bits used too */
 	m_jockeyc_key_select = data & 0xf8;
 }
 
-READ16_MEMBER(seta_state::unk_r)
+uint16_t seta_state::unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;//machine().rand();
 }
@@ -3122,7 +3122,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(seta_state::sub_bankswitch_w)
+void seta_state::sub_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("sub")->base();
 	int bank = data >> 4;
@@ -3130,7 +3130,7 @@ WRITE8_MEMBER(seta_state::sub_bankswitch_w)
 	membank("bank1")->set_base(&rom[bank * 0x4000 + 0xc000]);
 }
 
-WRITE8_MEMBER(seta_state::sub_bankswitch_lockout_w)
+void seta_state::sub_bankswitch_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	sub_bankswitch_w(space,offset,data);
 	seta_coin_lockout_w(data);
@@ -3141,7 +3141,7 @@ WRITE8_MEMBER(seta_state::sub_bankswitch_lockout_w)
                                 Thundercade
 ***************************************************************************/
 
-READ8_MEMBER(seta_state::ff_r){return 0xff;}
+uint8_t seta_state::ff_r(address_space &space, offs_t offset, uint8_t mem_mask){return 0xff;}
 
 static ADDRESS_MAP_START( tndrcade_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM                             // RAM
@@ -3184,7 +3184,7 @@ ADDRESS_MAP_END
                                 DownTown
 ***************************************************************************/
 
-READ8_MEMBER(seta_state::downtown_ip_r)
+uint8_t seta_state::downtown_ip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int dir1 = ioport("ROT1")->read();  // analog port
 	int dir2 = ioport("ROT2")->read();  // analog port
@@ -3224,13 +3224,13 @@ ADDRESS_MAP_END
                         Caliber 50 / U.S. Classic
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(seta_state,calibr50)
+void seta_state::machine_reset_calibr50()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	sub_bankswitch_w(space, 0, 0);
 }
 
-WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
+void seta_state::calibr50_soundlatch2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch2->write(space,0,data);
 	space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
@@ -7646,7 +7646,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_interrupt_1_and_2)
+void seta_state::seta_interrupt_1_and_2(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -7657,7 +7657,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_interrupt_1_and_2)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_interrupt_2_and_4)
+void seta_state::seta_interrupt_2_and_4(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -7669,7 +7669,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_interrupt_2_and_4)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_sub_interrupt)
+void seta_state::seta_sub_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -7685,7 +7685,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_sub_interrupt)
                                 Thundercade
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::tndrcade_sub_interrupt)
+void seta_state::tndrcade_sub_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -7846,7 +7846,7 @@ MACHINE_CONFIG_END
     5 ints per frame
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::calibr50_interrupt)
+void seta_state::calibr50_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -8354,7 +8354,7 @@ MACHINE_CONFIG_END
                                 Seta Roulette
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::setaroul_interrupt)
+void seta_state::setaroul_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -8494,12 +8494,12 @@ MACHINE_CONFIG_END
                                 Gundhara
 ***************************************************************************/
 #if __uPD71054_TIMER
-INTERRUPT_GEN_MEMBER(seta_state::wrofaero_interrupt)
+void seta_state::wrofaero_interrupt(device_t &device)
 {
 	device.execute().set_input_line(2, HOLD_LINE );
 }
 
-MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(); }
+void seta_state::machine_start_wrofaero(){ uPD71054_timer_init(); }
 #endif  // __uPD71054_TIMER
 
 
@@ -9480,7 +9480,7 @@ MACHINE_CONFIG_END
                                 Crazy Fight
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::crazyfgt_interrupt)
+void seta_state::crazyfgt_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -9534,7 +9534,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 // Test mode shows a 16ms and 2ms counters, then there's vblank and presumably ACIA irqs ...
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::inttoote_interrupt)
+void seta_state::inttoote_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -11344,7 +11344,7 @@ ROM_START( setaroul )
 	ROM_LOAD16_BYTE( "ufo018.bin", 0x001, 0x200, CRC(1c584d5f) SHA1(f1c7e3da8b108d78b459cae53fabb6e28d3a7ee8) )
 ROM_END
 
-READ16_MEMBER(seta_state::twineagl_debug_r)
+uint16_t seta_state::twineagl_debug_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*  At several points in the code, the program checks if four
 	    consecutive bytes in this range are equal to a string, and if they
@@ -11376,13 +11376,13 @@ READ16_MEMBER(seta_state::twineagl_debug_r)
 
 /* Extra RAM ? Check code at 0x00ba90 */
 /* 2000F8 = A3 enables it, 2000F8 = 00 disables? see downtown too */
-READ16_MEMBER(seta_state::twineagl_200100_r)
+uint16_t seta_state::twineagl_200100_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// protection check at boot
 	logerror("%04x: twineagl_200100_r %d\n",space.device().safe_pc(),offset);
 	return m_twineagl_xram[offset];
 }
-WRITE16_MEMBER(seta_state::twineagl_200100_w)
+void seta_state::twineagl_200100_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%04x: twineagl_200100_w %d = %02x\n",space.device().safe_pc(),offset,data);
 
@@ -11392,7 +11392,7 @@ WRITE16_MEMBER(seta_state::twineagl_200100_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(seta_state,twineagl)
+void seta_state::init_twineagl()
 {
 	/* debug? */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16_delegate(FUNC(seta_state::twineagl_debug_r),this));
@@ -11403,7 +11403,7 @@ DRIVER_INIT_MEMBER(seta_state,twineagl)
 
 
 /* Protection? NVRAM is handled writing commands here */
-READ16_MEMBER(seta_state::downtown_protection_r)
+uint16_t seta_state::downtown_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int job = m_downtown_protection[0xf8/2] & 0xff;
 
@@ -11420,18 +11420,18 @@ READ16_MEMBER(seta_state::downtown_protection_r)
 	}
 }
 
-WRITE16_MEMBER(seta_state::downtown_protection_w)
+void seta_state::downtown_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_downtown_protection[offset]);
 }
 
-DRIVER_INIT_MEMBER(seta_state,downtown)
+void seta_state::init_downtown()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(FUNC(seta_state::downtown_protection_r),this), write16_delegate(FUNC(seta_state::downtown_protection_w),this));
 }
 
 
-READ16_MEMBER(seta_state::arbalest_debug_r)
+uint16_t seta_state::arbalest_debug_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*  At some points in the code, the program checks if four
 	    consecutive bytes in this range are equal to a string, and if they
@@ -11445,13 +11445,13 @@ READ16_MEMBER(seta_state::arbalest_debug_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(seta_state,arbalest)
+void seta_state::init_arbalest()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16_delegate(FUNC(seta_state::arbalest_debug_r),this));
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,metafox)
+void seta_state::init_metafox()
 {
 	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
@@ -11464,7 +11464,7 @@ DRIVER_INIT_MEMBER(seta_state,metafox)
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,blandia)
+void seta_state::init_blandia()
 {
 	/* rearrange the gfx data so it can be decoded in the same way as the other set */
 
@@ -11495,20 +11495,20 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,eightfrc)
+void seta_state::init_eightfrc()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500004, 0x500005);   // watchdog??
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,zombraid)
+void seta_state::init_zombraid()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf00002, 0xf00003, read16_delegate(FUNC(seta_state::zombraid_gun_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf00000, 0xf00001, write16_delegate(FUNC(seta_state::zombraid_gun_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,kiwame)
+void seta_state::init_kiwame()
 {
 	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
@@ -11520,12 +11520,12 @@ DRIVER_INIT_MEMBER(seta_state,kiwame)
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,rezon)
+void seta_state::init_rezon()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500006, 0x500007);   // irq ack?
 }
 
-DRIVER_INIT_MEMBER(seta_state,wiggie)
+void seta_state::init_wiggie()
 {
 	uint8_t *src;
 	int len;
@@ -11559,7 +11559,7 @@ DRIVER_INIT_MEMBER(seta_state,wiggie)
 
 }
 
-DRIVER_INIT_MEMBER(seta_state,crazyfgt)
+void seta_state::init_crazyfgt()
 {
 	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
@@ -11569,14 +11569,14 @@ DRIVER_INIT_MEMBER(seta_state,crazyfgt)
 	// fixed priorities?
 	m_vregs.allocate(3);
 
-	DRIVER_INIT_CALL(blandia);
+	init_blandia();
 }
 
 /***************************************************************************
                              International Toote
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(seta_state,inttoote)
+void seta_state::init_inttoote()
 {
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
@@ -11590,7 +11590,7 @@ DRIVER_INIT_MEMBER(seta_state,inttoote)
 	ROM[0x368a/2] = 0x50f9; // betting count down
 }
 
-DRIVER_INIT_MEMBER(seta_state,inttootea)
+void seta_state::init_inttootea()
 {
 	//uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 

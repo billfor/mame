@@ -11,7 +11,7 @@ Atari Sprint 4 video emulation
 #include "includes/sprint4.h"
 
 
-PALETTE_INIT_MEMBER(sprint4_state, sprint4)
+void sprint4_state::palette_init_sprint4(palette_device &palette)
 {
 	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00)); /* black  */
 	palette.set_indirect_color(1, rgb_t(0xfc, 0xdf, 0x80)); /* peach  */
@@ -34,7 +34,7 @@ PALETTE_INIT_MEMBER(sprint4_state, sprint4)
 }
 
 
-TILE_GET_INFO_MEMBER(sprint4_state::sprint4_tile_info)
+void sprint4_state::sprint4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	uint8_t code = videoram[tile_index];
@@ -143,7 +143,7 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 }
 
 
-WRITE8_MEMBER(sprint4_state::sprint4_video_ram_w)
+void sprint4_state::sprint4_video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;

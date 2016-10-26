@@ -113,13 +113,13 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
+	void scanline_callback(timer_device &timer, void *ptr, int32_t param);
 
-	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
+	void write_keyboard_clock(int state);
+	void write_line_clock(int state);
 
-	DECLARE_WRITE8_MEMBER(ksm_ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
+	void ksm_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ksm_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
@@ -215,24 +215,24 @@ void ksm_state::video_start()
 	m_tmpbmp.allocate(KSM_DISP_HORZ, KSM_DISP_VERT);
 }
 
-WRITE8_MEMBER(ksm_state::ksm_ppi_porta_w)
+void ksm_state::ksm_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(1,"PPI port A", ("line %d\n", data));
 	m_video.line = data;
 }
 
-WRITE8_MEMBER(ksm_state::ksm_ppi_portc_w)
+void ksm_state::ksm_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(1,"PPI port C", ("blink %d speed %d\n", BIT(data, 7), ((data >> 4) & 7) ));
 }
 
-WRITE_LINE_MEMBER(ksm_state::write_keyboard_clock)
+void ksm_state::write_keyboard_clock(int state)
 {
 	m_i8251kbd->write_txc(state);
 	m_i8251kbd->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(ksm_state::write_line_clock)
+void ksm_state::write_line_clock(int state)
 {
 	m_i8251line->write_txc(state);
 	m_i8251line->write_rxc(state);
@@ -287,7 +287,7 @@ uint32_t ksm_state::draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ksm_state::scanline_callback)
+void ksm_state::scanline_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	uint16_t y = m_screen->vpos();
 	uint16_t offset;

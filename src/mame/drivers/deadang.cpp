@@ -50,11 +50,11 @@ Dip locations and factory settings verified with US manual
 
 /* Read/Write Handlers */
 
-READ16_MEMBER(deadang_state::ghunter_trackball_low_r)
+uint16_t deadang_state::ghunter_trackball_low_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("TRACKX")->read() & 0xff) | ((ioport("TRACKY")->read() & 0xff) << 8);
 }
-READ16_MEMBER(deadang_state::ghunter_trackball_high_r)
+uint16_t deadang_state::ghunter_trackball_high_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((ioport("TRACKX")->read() & 0x0f00) >> 4) | (ioport("TRACKY")->read() & 0x0f00);
 }
@@ -211,7 +211,7 @@ GFXDECODE_END
 
 /* Interrupt Generators */
 
-TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::main_scanline)
+void deadang_state::main_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -222,7 +222,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::main_scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
+void deadang_state::sub_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -464,13 +464,13 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(deadang_state,deadang)
+void deadang_state::init_deadang()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
 }
 
-DRIVER_INIT_MEMBER(deadang_state,ghunter)
+void deadang_state::init_ghunter()
 {
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();

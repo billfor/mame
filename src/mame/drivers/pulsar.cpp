@@ -59,16 +59,16 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(pulsar);
-	DECLARE_MACHINE_RESET(pulsar);
-	TIMER_CALLBACK_MEMBER(pulsar_reset);
-	DECLARE_WRITE8_MEMBER(baud_w);
-	DECLARE_WRITE_LINE_MEMBER(fr_w);
-	DECLARE_WRITE_LINE_MEMBER(ft_w);
-	DECLARE_WRITE8_MEMBER(ppi_pa_w);
-	DECLARE_WRITE8_MEMBER(ppi_pb_w);
-	DECLARE_WRITE8_MEMBER(ppi_pc_w);
-	DECLARE_READ8_MEMBER(ppi_pc_r);
+	void init_pulsar();
+	void machine_reset_pulsar();
+	void pulsar_reset(void *ptr, int32_t param);
+	void baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fr_w(int state);
+	void ft_w(int state);
+	void ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 private:
 	floppy_image_device *m_floppy;
@@ -98,26 +98,26 @@ ADDRESS_MAP_END
 
 // Schematic has the labels for FT and FR the wrong way around,
 //  the pin numbers are correct.
-WRITE_LINE_MEMBER( pulsar_state::fr_w )
+void pulsar_state::fr_w(int state)
 {
 	m_dart->rxca_w(state);
 	m_dart->txca_w(state);
 }
 
-WRITE_LINE_MEMBER( pulsar_state::ft_w )
+void pulsar_state::ft_w(int state)
 {
 	m_dart->rxcb_w(state);
 	m_dart->txcb_w(state);
 }
 
-WRITE8_MEMBER( pulsar_state::baud_w )
+void pulsar_state::baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_brg->str_w(data & 0x0f);
 	m_brg->stt_w(data >> 4);
 }
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER( pulsar_state::pulsar_reset)
+void pulsar_state::pulsar_reset(void *ptr, int32_t param)
 {
 	membank("bankr0")->set_entry(1);
 }
@@ -135,7 +135,7 @@ d5     /DDEN
 d6     /DSK_WAITEN (don't know what this is, not emulated)
 d7     XMEMEX line (for external memory, not emulated)
 */
-WRITE8_MEMBER( pulsar_state::ppi_pa_w )
+void pulsar_state::ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_floppy = nullptr;
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
@@ -150,7 +150,7 @@ d5     RTC write line (inverted in emulation)
 d6     RTC hold line
 d7     Allow 64k of ram
 */
-WRITE8_MEMBER( pulsar_state::ppi_pb_w )
+void pulsar_state::ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->address_w(data & 0x0f);
 	m_rtc->read_w(!BIT(data, 4));
@@ -163,14 +163,14 @@ WRITE8_MEMBER( pulsar_state::ppi_pb_w )
 d0..d3 Data lines to rtc
 d7     /2 SIDES (assumed to be side select)
 */
-WRITE8_MEMBER( pulsar_state::ppi_pc_w )
+void pulsar_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->data_w(space, 0, data & 15);
 	if (m_floppy)
 		m_floppy->ss_w(BIT(data, 7));
 }
 
-READ8_MEMBER( pulsar_state::ppi_pc_r )
+uint8_t pulsar_state::ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc->data_r(space, 0);
 }
@@ -192,7 +192,7 @@ SLOT_INTERFACE_END
 static INPUT_PORTS_START( pulsar )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( pulsar_state, pulsar )
+void pulsar_state::machine_reset_pulsar()
 {
 	machine().scheduler().timer_set(attotime::from_usec(3), timer_expired_delegate(FUNC(pulsar_state::pulsar_reset),this));
 	membank("bankr0")->set_entry(0); // point at rom
@@ -202,7 +202,7 @@ MACHINE_RESET_MEMBER( pulsar_state, pulsar )
 	m_rtc->cs_w(1); // always enabled
 }
 
-DRIVER_INIT_MEMBER( pulsar_state, pulsar )
+void pulsar_state::init_pulsar()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

@@ -1661,7 +1661,7 @@ CPS1 VIDEO RENDERER
 #define CPS2_OBJ_YOFFS  0x0a    /* Y offset (always 0x0010) */
 
 
-MACHINE_RESET_MEMBER(cps_state,cps)
+void cps_state::machine_reset_cps()
 {
 	const char *gamename = machine().system().name;
 	const struct CPS1config *pCFG = &cps1_config_table[0];
@@ -1732,7 +1732,7 @@ inline uint16_t *cps_state::cps1_base( int offset, int boundary )
 
 
 
-WRITE16_MEMBER(cps_state::cps1_cps_a_w)
+void cps_state::cps1_cps_a_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_cps_a_regs[offset]);
 
@@ -1758,7 +1758,7 @@ WRITE16_MEMBER(cps_state::cps1_cps_a_w)
 }
 
 
-READ16_MEMBER(cps_state::cps1_cps_b_r)
+uint16_t cps_state::cps1_cps_b_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* Some games interrogate a couple of registers on bootup. */
 	/* These are CPS1 board B self test checks. They wander from game to */
@@ -1800,7 +1800,7 @@ READ16_MEMBER(cps_state::cps1_cps_b_r)
 }
 
 
-WRITE16_MEMBER(cps_state::cps1_cps_b_w)
+void cps_state::cps1_cps_b_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_cps_b_regs[offset]);
 
@@ -1900,7 +1900,7 @@ void cps_state::cps2_gfx_decode()
 }
 
 
-DRIVER_INIT_MEMBER(cps_state,cps1)
+void cps_state::init_cps1()
 {
 	m_scanline1 = 0;
 	m_scanline2 = 0;
@@ -1912,7 +1912,7 @@ DRIVER_INIT_MEMBER(cps_state,cps1)
 
 
 
-DRIVER_INIT_MEMBER(cps_state,cps2_video)
+void cps_state::init_cps2_video()
 {
 	cps2_gfx_decode();
 
@@ -2052,7 +2052,7 @@ void cps_state::cps1_get_video_base()
 }
 
 
-WRITE16_MEMBER(cps_state::cps1_gfxram_w)
+void cps_state::cps1_gfxram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int page = (offset >> 7) & 0x3c0;
 	COMBINE_DATA(&m_gfxram[offset]);
@@ -2119,25 +2119,25 @@ int cps_state::gfxrom_bank_mapper( int type, int code )
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(cps_state::tilemap0_scan)
+tilemap_memory_index cps_state::tilemap0_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x1f) + ((col & 0x3f) << 5) + ((row & 0x20) << 6);
 }
 
-TILEMAP_MAPPER_MEMBER(cps_state::tilemap1_scan)
+tilemap_memory_index cps_state::tilemap1_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0x3f) << 4) + ((row & 0x30) << 6);
 }
 
-TILEMAP_MAPPER_MEMBER(cps_state::tilemap2_scan)
+tilemap_memory_index cps_state::tilemap2_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x07) + ((col & 0x3f) << 3) + ((row & 0x38) << 6);
 }
 
-TILE_GET_INFO_MEMBER(cps_state::get_tile0_info)
+void cps_state::get_tile0_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_scroll1[2 * tile_index];
 	int attr = m_scroll1[2 * tile_index + 1];
@@ -2162,7 +2162,7 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile0_info)
 		tileinfo.pen_data = m_empty_tile;
 }
 
-TILE_GET_INFO_MEMBER(cps_state::get_tile1_info)
+void cps_state::get_tile1_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_scroll2[2 * tile_index];
 	int attr = m_scroll2[2 * tile_index + 1];
@@ -2180,7 +2180,7 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile1_info)
 		tileinfo.pen_data = m_empty_tile;
 }
 
-TILE_GET_INFO_MEMBER(cps_state::get_tile2_info)
+void cps_state::get_tile2_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_scroll3[2 * tile_index] & 0x3fff;
 	int attr = m_scroll3[2 * tile_index + 1];
@@ -2221,11 +2221,11 @@ void cps_state::cps1_update_transmasks()
 	}
 }
 
-VIDEO_START_MEMBER(cps_state,cps)
+void cps_state::video_start_cps()
 {
 	int i;
 
-	MACHINE_RESET_CALL_MEMBER(cps);
+	machine_reset_cps();
 
 	/* Put in some const */
 	m_scroll_size    = 0x4000;  /* scroll1, scroll2, scroll3 */
@@ -2318,16 +2318,16 @@ VIDEO_START_MEMBER(cps_state,cps)
 	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
 }
 
-VIDEO_START_MEMBER(cps_state,cps1)
+void cps_state::video_start_cps1()
 {
 	m_cps_version = 1;
-	VIDEO_START_CALL_MEMBER(cps);
+	video_start_cps();
 }
 
-VIDEO_START_MEMBER(cps_state,cps2)
+void cps_state::video_start_cps2()
 {
 	m_cps_version = 2;
-	VIDEO_START_CALL_MEMBER(cps);
+	video_start_cps();
 }
 
 /***************************************************************************
@@ -2606,13 +2606,13 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 
 
 
-WRITE16_MEMBER(cps_state::cps2_objram_bank_w)
+void cps_state::cps2_objram_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_objram_bank = data & 1;
 }
 
-READ16_MEMBER(cps_state::cps2_objram1_r)
+uint16_t cps_state::cps2_objram1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_objram_bank & 1)
 		return m_objram2[offset];
@@ -2620,7 +2620,7 @@ READ16_MEMBER(cps_state::cps2_objram1_r)
 		return m_objram1[offset];
 }
 
-READ16_MEMBER(cps_state::cps2_objram2_r)
+uint16_t cps_state::cps2_objram2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_objram_bank & 1)
 		return m_objram1[offset];
@@ -2628,7 +2628,7 @@ READ16_MEMBER(cps_state::cps2_objram2_r)
 		return m_objram2[offset];
 }
 
-WRITE16_MEMBER(cps_state::cps2_objram1_w)
+void cps_state::cps2_objram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_objram_bank & 1)
 		COMBINE_DATA(&m_objram2[offset]);
@@ -2636,7 +2636,7 @@ WRITE16_MEMBER(cps_state::cps2_objram1_w)
 		COMBINE_DATA(&m_objram1[offset]);
 }
 
-WRITE16_MEMBER(cps_state::cps2_objram2_w)
+void cps_state::cps2_objram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_objram_bank & 1)
 		COMBINE_DATA(&m_objram1[offset]);

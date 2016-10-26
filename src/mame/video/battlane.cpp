@@ -17,7 +17,7 @@
         0x01    = Scroll MSB
 */
 
-WRITE8_MEMBER(battlane_state::battlane_palette_w)
+void battlane_state::battlane_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b;
 	int bit0, bit1, bit2;
@@ -46,28 +46,28 @@ WRITE8_MEMBER(battlane_state::battlane_palette_w)
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
-WRITE8_MEMBER(battlane_state::battlane_scrollx_w)
+void battlane_state::battlane_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, ((m_video_ctrl & 0x01) << 8) + data);
 }
 
-WRITE8_MEMBER(battlane_state::battlane_scrolly_w)
+void battlane_state::battlane_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, ((m_cpu_control & 0x01) << 8) + data);
 }
 
-WRITE8_MEMBER(battlane_state::battlane_tileram_w)
+void battlane_state::battlane_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tileram[offset] = data;
 	//m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(battlane_state::battlane_spriteram_w)
+void battlane_state::battlane_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spriteram[offset] = data;
 }
 
-WRITE8_MEMBER(battlane_state::battlane_bitmap_w)
+void battlane_state::battlane_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i, orval;
 
@@ -89,12 +89,12 @@ WRITE8_MEMBER(battlane_state::battlane_bitmap_w)
 	}
 }
 
-WRITE8_MEMBER(battlane_state::battlane_video_ctrl_w)
+void battlane_state::battlane_video_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ctrl = data;
 }
 
-TILE_GET_INFO_MEMBER(battlane_state::get_tile_info_bg)
+void battlane_state::get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram[tile_index];
 	int attr = m_tileram[tile_index + 0x400];
@@ -104,7 +104,7 @@ TILE_GET_INFO_MEMBER(battlane_state::get_tile_info_bg)
 	SET_TILE_INFO_MEMBER(gfxn, code, color, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(battlane_state::battlane_tilemap_scan_rows_2x2)
+tilemap_memory_index battlane_state::battlane_tilemap_scan_rows_2x2(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/*
 	        Tilemap Memory Organization

@@ -34,7 +34,7 @@ static const res_net_decode_info tagteam_decode_info =
 	{  0x07, 0x07, 0x03 }  /* masks */
 };
 
-PALETTE_INIT_MEMBER(tagteam_state, tagteam)
+void tagteam_state::palette_init_tagteam(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -44,19 +44,19 @@ PALETTE_INIT_MEMBER(tagteam_state, tagteam)
 }
 
 
-WRITE8_MEMBER(tagteam_state::videoram_w)
+void tagteam_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tagteam_state::colorram_w)
+void tagteam_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(tagteam_state::mirrorvideoram_r)
+uint8_t tagteam_state::mirrorvideoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int x,y;
 
@@ -68,7 +68,7 @@ READ8_MEMBER(tagteam_state::mirrorvideoram_r)
 	return m_videoram[offset];
 }
 
-READ8_MEMBER(tagteam_state::mirrorcolorram_r)
+uint8_t tagteam_state::mirrorcolorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int x,y;
 
@@ -80,7 +80,7 @@ READ8_MEMBER(tagteam_state::mirrorcolorram_r)
 	return m_colorram[offset];
 }
 
-WRITE8_MEMBER(tagteam_state::mirrorvideoram_w)
+void tagteam_state::mirrorvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x,y;
 
@@ -92,7 +92,7 @@ WRITE8_MEMBER(tagteam_state::mirrorvideoram_w)
 	videoram_w(space,offset,data);
 }
 
-WRITE8_MEMBER(tagteam_state::mirrorcolorram_w)
+void tagteam_state::mirrorcolorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x,y;
 
@@ -104,7 +104,7 @@ WRITE8_MEMBER(tagteam_state::mirrorcolorram_w)
 	colorram_w(space,offset,data);
 }
 
-WRITE8_MEMBER(tagteam_state::control_w)
+void tagteam_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-3: color for blank screen, applies to h/v borders too
 	// (not implemented yet, and tagteam doesn't have a global screen on/off bit)
@@ -113,7 +113,7 @@ WRITE8_MEMBER(tagteam_state::control_w)
 	m_palettebank = (data & 0x80) >> 7;
 }
 
-WRITE8_MEMBER(tagteam_state::flipscreen_w)
+void tagteam_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: flip screen
 	if (flip_screen() != (data &0x01))
@@ -127,7 +127,7 @@ WRITE8_MEMBER(tagteam_state::flipscreen_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 }
 
-TILE_GET_INFO_MEMBER(tagteam_state::get_bg_tile_info)
+void tagteam_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 256 * m_colorram[tile_index];
 	int color = m_palettebank << 1;

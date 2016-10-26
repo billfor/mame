@@ -279,15 +279,15 @@ public:
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	int m_mux_data;
-	DECLARE_WRITE8_MEMBER(megadpkr_videoram_w);
-	DECLARE_WRITE8_MEMBER(megadpkr_colorram_w);
-	DECLARE_READ8_MEMBER(megadpkr_mux_port_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(lamps_a_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void megadpkr_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void megadpkr_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t megadpkr_mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(blitz);
+	void palette_init_blitz(palette_device &palette);
 	uint32_t screen_update_megadpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -298,20 +298,20 @@ public:
 *               Video Hardware               *
 *********************************************/
 
-WRITE8_MEMBER(blitz_state::megadpkr_videoram_w)
+void blitz_state::megadpkr_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(blitz_state::megadpkr_colorram_w)
+void blitz_state::megadpkr_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(blitz_state::get_bg_tile_info)
+void blitz_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -341,7 +341,7 @@ uint32_t blitz_state::screen_update_megadpkr(screen_device &screen, bitmap_ind16
 }
 
 
-PALETTE_INIT_MEMBER(blitz_state, blitz)
+void blitz_state::palette_init_blitz(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 /*
@@ -396,7 +396,7 @@ PALETTE_INIT_MEMBER(blitz_state, blitz)
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
    The selector bits are located in PIA1, portB (bits 4-7).
 */
-READ8_MEMBER(blitz_state::megadpkr_mux_port_r)
+uint8_t blitz_state::megadpkr_mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( m_mux_data & 0xf0 )     /* bits 4-7 */
 	{
@@ -409,7 +409,7 @@ READ8_MEMBER(blitz_state::megadpkr_mux_port_r)
 }
 
 
-WRITE8_MEMBER(blitz_state::mux_w)
+void blitz_state::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = data ^ 0xff;   /* inverted */
 }
@@ -417,7 +417,7 @@ WRITE8_MEMBER(blitz_state::mux_w)
 
 /***** Lamps & Counters wiring *****/
 
-WRITE8_MEMBER(blitz_state::lamps_a_w)
+void blitz_state::lamps_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  output().set_lamp_value(0, 1 - ((data) & 1));         /* Lamp 0 */
 //  output().set_lamp_value(1, 1 - ((data >> 1) & 1));    /* Lamp 1 */
@@ -432,7 +432,7 @@ WRITE8_MEMBER(blitz_state::lamps_a_w)
 }
 
 
-WRITE8_MEMBER(blitz_state::sound_w)
+void blitz_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 555 voltage controlled */
 	logerror("Sound Data: %2x\n",data & 0x0f);

@@ -28,7 +28,7 @@
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(shaolins_state, shaolins)
+void shaolins_state::palette_init_shaolins(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
@@ -88,19 +88,19 @@ PALETTE_INIT_MEMBER(shaolins_state, shaolins)
 	}
 }
 
-WRITE8_MEMBER(shaolins_state::videoram_w)
+void shaolins_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(shaolins_state::colorram_w)
+void shaolins_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(shaolins_state::palettebank_w)
+void shaolins_state::palettebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palettebank != (data & 0x07))
 	{
@@ -109,13 +109,13 @@ WRITE8_MEMBER(shaolins_state::palettebank_w)
 	}
 }
 
-WRITE8_MEMBER(shaolins_state::scroll_w)
+void shaolins_state::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (int col = 4; col < 32; col++)
 		m_bg_tilemap->set_scrolly(col, data + 1);
 }
 
-WRITE8_MEMBER(shaolins_state::nmi_w)
+void shaolins_state::nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data;
 
@@ -126,7 +126,7 @@ WRITE8_MEMBER(shaolins_state::nmi_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(shaolins_state::get_bg_tile_info)
+void shaolins_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x40) << 2);

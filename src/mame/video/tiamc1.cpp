@@ -13,7 +13,7 @@
 #include "includes/tiamc1.h"
 
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_videoram_w)
+void tiamc1_state::tiamc1_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!(m_layers_ctrl & 2))
 		m_charram[offset + 0x0000] = data;
@@ -36,7 +36,7 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_videoram_w)
 	}
 }
 
-WRITE8_MEMBER(tiamc1_state::kot_videoram_w)
+void tiamc1_state::kot_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_layers_ctrl & 1) == 0)
 	{
@@ -45,7 +45,7 @@ WRITE8_MEMBER(tiamc1_state::kot_videoram_w)
 	}
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_bankswitch_w)
+void tiamc1_state::tiamc1_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 128) != (m_layers_ctrl & 128))
 		machine().tilemap().mark_all_dirty();
@@ -53,49 +53,49 @@ WRITE8_MEMBER(tiamc1_state::tiamc1_bankswitch_w)
 	m_layers_ctrl = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::kot_bankswitch_w)
+void tiamc1_state::kot_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxdecode->gfx(0)->set_source(m_charram + (data >> 1) * 0x100);
 	m_layers_ctrl = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_sprite_x_w)
+void tiamc1_state::tiamc1_sprite_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spriteram_x[offset] = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_sprite_y_w)
+void tiamc1_state::tiamc1_sprite_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spriteram_y[offset] = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_sprite_a_w)
+void tiamc1_state::tiamc1_sprite_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spriteram_a[offset] = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_sprite_n_w)
+void tiamc1_state::tiamc1_sprite_n_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spriteram_n[offset] = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_bg_vshift_w)
+void tiamc1_state::tiamc1_bg_vshift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_vshift = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_bg_hshift_w)
+void tiamc1_state::tiamc1_bg_hshift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_hshift = data;
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_bg_bplctrl_w)
+void tiamc1_state::tiamc1_bg_bplctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_bplctrl = data;
 	update_bg_palette();
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_palette_w)
+void tiamc1_state::tiamc1_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 	m_palette->set_pen_color(offset, m_palette_ptr[data]);
@@ -109,7 +109,7 @@ void tiamc1_state::update_bg_palette()
 		m_palette->set_pen_color(i + 16, m_palette_ptr[m_paletteram[i | bplmask]]);
 }
 
-PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
+void tiamc1_state::palette_init_tiamc1(palette_device &palette)
 {
 	// Voltage computed by Proteus
 	//static const float g_v[8]={1.05f,0.87f,0.81f,0.62f,0.44f,0.25f,0.19f,0.00f};
@@ -142,12 +142,12 @@ PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
 	}
 }
 
-TILE_GET_INFO_MEMBER(tiamc1_state::get_bg1_tile_info)
+void tiamc1_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(tiamc1_state::get_bg2_tile_info)
+void tiamc1_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index + 1024], 0, 0);
 }
@@ -188,7 +188,7 @@ void tiamc1_state::video_start()
 	m_gfxdecode->gfx(0)->set_source(m_charram);
 }
 
-VIDEO_START_MEMBER(tiamc1_state, kot)
+void tiamc1_state::video_start_kot()
 {
 	m_charram = memregion("gfx2")->base();
 

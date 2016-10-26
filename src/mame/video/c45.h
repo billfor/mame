@@ -39,8 +39,8 @@ public:
 	DECLARE_ADDRESS_MAP(map, 16);
 
 	// read/write handlers
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// C45 Land (Road) Emulation
 	void set_transparent_color(pen_t pen) { m_transparent_color = pen; }
@@ -54,9 +54,9 @@ protected:
 private:
 	// internal helpers
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
-	DECLARE_WRITE16_MEMBER( tilemap_w );
-	DECLARE_WRITE16_MEMBER( tileram_w );
-	TILE_GET_INFO_MEMBER( get_road_info );
+	void tilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void get_road_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	// internal state
 	address_space_config        m_space_config;

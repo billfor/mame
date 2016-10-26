@@ -128,13 +128,13 @@ void sms_rapid_fire_device::peripheral_w(uint8_t data)
 //  machine configurations
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sms_rapid_fire_device::th_pin_w )
+void sms_rapid_fire_device::th_pin_w(int state)
 {
 	m_port->th_pin_w(state);
 }
 
 
-READ32_MEMBER( sms_rapid_fire_device::pixel_r )
+uint32_t sms_rapid_fire_device::pixel_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_port->pixel_r();
 }

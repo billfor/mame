@@ -175,13 +175,13 @@ void vectrex_state::vectrex_configuration()
 
 *********************************************************************/
 
-WRITE_LINE_MEMBER(vectrex_state::vectrex_via_irq)
+void vectrex_state::vectrex_via_irq(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
 
-READ8_MEMBER(vectrex_state::vectrex_via_pb_r)
+uint8_t vectrex_state::vectrex_via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int pot = m_io_contr[(m_via_out[PORTB] & 0x6) >> 1]->read() - 0x80;
 
@@ -194,7 +194,7 @@ READ8_MEMBER(vectrex_state::vectrex_via_pb_r)
 }
 
 
-READ8_MEMBER(vectrex_state::vectrex_via_pa_r)
+uint8_t vectrex_state::vectrex_via_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((!(m_via_out[PORTB] & 0x10)) && (m_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
@@ -206,7 +206,7 @@ READ8_MEMBER(vectrex_state::vectrex_via_pa_r)
 }
 
 
-READ8_MEMBER(vectrex_state::vectrex_s1_via_pb_r)
+uint8_t vectrex_state::vectrex_s1_via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_via_out[PORTB] & ~0x40) | (m_io_coin->read() & 0x40);
 }
@@ -218,20 +218,20 @@ READ8_MEMBER(vectrex_state::vectrex_s1_via_pb_r)
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_change_color)
+void vectrex_state::vectrex_imager_change_color(void *ptr, int32_t param)
 {
 	m_beam_color = param;
 }
 
 
-TIMER_CALLBACK_MEMBER(vectrex_state::update_level)
+void vectrex_state::update_level(void *ptr, int32_t param)
 {
 	if (ptr)
 		* (uint8_t *) ptr = param;
 }
 
 
-TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_eye)
+void vectrex_state::vectrex_imager_eye(void *ptr, int32_t param)
 {
 	int coffset;
 	double rtime = (1.0 / m_imager_freq);
@@ -258,7 +258,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_eye)
 }
 
 
-WRITE8_MEMBER(vectrex_state::vectrex_psg_port_w)
+void vectrex_state::vectrex_psg_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	double wavel, ang_acc, tmp;
 	int mcontrol;
@@ -299,7 +299,7 @@ WRITE8_MEMBER(vectrex_state::vectrex_psg_port_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(vectrex_state,vectrex)
+void vectrex_state::init_vectrex()
 {
 	m_imager_angles = unknown_game_angles;
 	m_beam_color = rgb_t::white();

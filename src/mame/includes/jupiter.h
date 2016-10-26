@@ -24,7 +24,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(jupiter);
+	void init_jupiter();
 };
 
 class jupiter3_state : public driver_device
@@ -39,10 +39,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_READ8_MEMBER(ff_r);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -53,7 +53,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(jupiter3);
+	void init_jupiter3();
 };
 
 #endif

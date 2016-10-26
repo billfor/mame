@@ -835,13 +835,13 @@ static ADDRESS_MAP_START( hexa_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-READ8_MEMBER(arkanoid_state::hexaa_f000_r)
+uint8_t arkanoid_state::hexaa_f000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  return m_hexaa_from_sub;
 	return rand();
 }
 
-WRITE8_MEMBER(arkanoid_state::hexaa_f000_w)
+void arkanoid_state::hexaa_f000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hexaa_from_main = data;
 }
@@ -864,12 +864,12 @@ static ADDRESS_MAP_START( hexaa_sub_map, AS_PROGRAM, 8, arkanoid_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(arkanoid_state::hexaa_sub_80_w)
+void arkanoid_state::hexaa_sub_80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hexaa_from_sub = data;
 }
 
-READ8_MEMBER(arkanoid_state::hexaa_sub_90_r)
+uint8_t arkanoid_state::hexaa_sub_90_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_hexaa_from_main;
 //  return rand();
@@ -2031,19 +2031,19 @@ void arkanoid_state::arkanoid_bootleg_init(  )
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd008, 0xd008, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d008_r),this) );
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkangc)
+void arkanoid_state::init_arkangc()
 {
 	m_bootleg_id = ARKANGC;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkangc2)
+void arkanoid_state::init_arkangc2()
 {
 	m_bootleg_id = ARKANGC2;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,block2)
+void arkanoid_state::init_block2()
 {
 	// the graphics on this bootleg have the data scrambled
 	int tile;
@@ -2076,32 +2076,32 @@ DRIVER_INIT_MEMBER(arkanoid_state,block2)
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkblock)
+void arkanoid_state::init_arkblock()
 {
 	m_bootleg_id = ARKBLOCK;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkbloc2)
+void arkanoid_state::init_arkbloc2()
 {
 	m_bootleg_id = ARKBLOC2;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkgcbl)
+void arkanoid_state::init_arkgcbl()
 {
 	m_bootleg_id = ARKGCBL;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,paddle2)
+void arkanoid_state::init_paddle2()
 {
 	m_bootleg_id = PADDLE2;
 	arkanoid_bootleg_init();
 }
 
 
-DRIVER_INIT_MEMBER(arkanoid_state,tetrsark)
+void arkanoid_state::init_tetrsark()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int x;
@@ -2115,7 +2115,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,tetrsark)
 }
 
 
-DRIVER_INIT_MEMBER(arkanoid_state,hexa)
+void arkanoid_state::init_hexa()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 #if 0
@@ -2134,9 +2134,9 @@ DRIVER_INIT_MEMBER(arkanoid_state,hexa)
 	membank("bank1")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,hexaa)
+void arkanoid_state::init_hexaa()
 {
-	DRIVER_INIT_CALL(hexa);
+	init_hexa();
 
 	m_hexaa_from_main = 0;
 	m_hexaa_from_sub = 0;
@@ -2145,7 +2145,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,hexaa)
 	save_item(NAME(m_hexaa_from_sub));
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,brixian)
+void arkanoid_state::init_brixian()
 {
 	uint8_t *RAM = memregion("protdata")->base();
 

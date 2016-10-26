@@ -67,11 +67,11 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( xi_r );
-	DECLARE_WRITE8_MEMBER( xo_w );
-	DECLARE_WRITE_LINE_MEMBER( xmt_w );
+	uint8_t xi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void xo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void xmt_w(int state);
 
-	IRQ_CALLBACK_MEMBER( int_ack );
+	int int_ack(device_t &device, int irqline);
 
 	uint8_t m_xo;
 };
@@ -289,7 +289,7 @@ uint32_t compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-READ8_MEMBER( compucolor2_state::xi_r )
+uint8_t compucolor2_state::xi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -311,7 +311,7 @@ READ8_MEMBER( compucolor2_state::xi_r )
 	return data;
 }
 
-WRITE8_MEMBER( compucolor2_state::xo_w )
+void compucolor2_state::xo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -350,7 +350,7 @@ WRITE8_MEMBER( compucolor2_state::xo_w )
 	}
 }
 
-WRITE_LINE_MEMBER( compucolor2_state::xmt_w )
+void compucolor2_state::xmt_w(int state)
 {
 	switch ((m_xo >> 4) & 0x03)
 	{
@@ -368,7 +368,7 @@ WRITE_LINE_MEMBER( compucolor2_state::xmt_w )
 	}
 }
 
-IRQ_CALLBACK_MEMBER( compucolor2_state::int_ack )
+int compucolor2_state::int_ack(device_t &device, int irqline)
 {
 	return m_mioc->get_vector();
 }

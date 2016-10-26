@@ -109,7 +109,7 @@ void xor100_state::bankswitch()
 	}
 }
 
-WRITE8_MEMBER( xor100_state::mmu_w )
+void xor100_state::mmu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -131,7 +131,7 @@ WRITE8_MEMBER( xor100_state::mmu_w )
 	bankswitch();
 }
 
-WRITE8_MEMBER( xor100_state::prom_toggle_w )
+void xor100_state::prom_toggle_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_mode)
 	{
@@ -142,7 +142,7 @@ WRITE8_MEMBER( xor100_state::prom_toggle_w )
 	bankswitch();
 }
 
-READ8_MEMBER( xor100_state::prom_disable_r )
+uint8_t xor100_state::prom_disable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_mode = EPROM_F800;
 
@@ -151,23 +151,23 @@ READ8_MEMBER( xor100_state::prom_disable_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( xor100_state::baud_w )
+void xor100_state::baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dbrg->str_w(data & 0x0f);
 	m_dbrg->stt_w(data >> 4);
 }
 
-READ8_MEMBER( xor100_state::fdc_r )
+uint8_t xor100_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->gen_r(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( xor100_state::fdc_w )
+void xor100_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->gen_w(offset, data ^ 0xff);
 }
 
-READ8_MEMBER( xor100_state::fdc_wait_r )
+uint8_t xor100_state::fdc_wait_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -196,7 +196,7 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 	return !m_fdc_irq << 7;
 }
 
-WRITE8_MEMBER( xor100_state::fdc_dcont_w )
+void xor100_state::fdc_dcont_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -226,7 +226,7 @@ WRITE8_MEMBER( xor100_state::fdc_dcont_w )
 	if (floppy) floppy->mon_w(0);
 }
 
-WRITE8_MEMBER( xor100_state::fdc_dsel_w )
+void xor100_state::fdc_dsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -362,13 +362,13 @@ INPUT_PORTS_END
 
 /* COM5016 Interface */
 
-WRITE_LINE_MEMBER( xor100_state::com5016_fr_w )
+void xor100_state::com5016_fr_w(int state)
 {
 	m_uart_a->write_txc(state);
 	m_uart_a->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( xor100_state::com5016_ft_w )
+void xor100_state::com5016_ft_w(int state)
 {
 	m_uart_b->write_txc(state);
 	m_uart_b->write_rxc(state);
@@ -376,17 +376,17 @@ WRITE_LINE_MEMBER( xor100_state::com5016_ft_w )
 
 /* Printer 8255A Interface */
 
-WRITE_LINE_MEMBER( xor100_state::write_centronics_busy )
+void xor100_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( xor100_state::write_centronics_select )
+void xor100_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
 
-READ8_MEMBER(xor100_state::i8255_pc_r)
+uint8_t xor100_state::i8255_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -416,15 +416,15 @@ READ8_MEMBER(xor100_state::i8255_pc_r)
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( xor100_state::ctc_z0_w )
+void xor100_state::ctc_z0_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( xor100_state::ctc_z1_w )
+void xor100_state::ctc_z1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( xor100_state::ctc_z2_w )
+void xor100_state::ctc_z2_w(int state)
 {
 }
 

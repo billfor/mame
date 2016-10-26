@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(holeland_state::holeland_get_tile_info)
+void holeland_state::holeland_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/*
 	--x- ---- priority?
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(holeland_state::holeland_get_tile_info)
 	tileinfo.group = (attr >> 5) & 1;
 }
 
-TILE_GET_INFO_MEMBER(holeland_state::crzrally_get_tile_info)
+void holeland_state::crzrally_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int tile_number = m_videoram[tile_index] | ((attr & 0x03) << 8);
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(holeland_state::crzrally_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(holeland_state,holeland)
+void holeland_state::video_start_holeland()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(holeland_state::holeland_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
@@ -66,7 +66,7 @@ VIDEO_START_MEMBER(holeland_state,holeland)
 	save_item(NAME(m_palette_offset));
 }
 
-VIDEO_START_MEMBER(holeland_state,crzrally)
+void holeland_state::video_start_crzrally()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(holeland_state::crzrally_get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
@@ -74,19 +74,19 @@ VIDEO_START_MEMBER(holeland_state,crzrally)
 	save_item(NAME(m_palette_offset));
 }
 
-WRITE8_MEMBER(holeland_state::videoram_w)
+void holeland_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::colorram_w)
+void holeland_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::pal_offs_w)
+void holeland_state::pal_offs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 1) != m_po[offset])
 	{
@@ -96,12 +96,12 @@ WRITE8_MEMBER(holeland_state::pal_offs_w)
 	}
 }
 
-WRITE8_MEMBER(holeland_state::scroll_w)
+void holeland_state::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(holeland_state::flipscreen_w)
+void holeland_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 		flip_screen_y_set(data);

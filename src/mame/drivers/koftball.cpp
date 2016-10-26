@@ -59,21 +59,21 @@ public:
 	tilemap_t *m_tilemap_2;
 	uint16_t m_prot_data;
 
-	DECLARE_READ16_MEMBER(random_number_r);
-	DECLARE_READ16_MEMBER(prot_r);
-	DECLARE_WRITE16_MEMBER(prot_w);
-	DECLARE_WRITE16_MEMBER(bmc_1_videoram_w);
-	DECLARE_WRITE16_MEMBER(bmc_2_videoram_w);
-	DECLARE_DRIVER_INIT(koftball);
-	TILE_GET_INFO_MEMBER(get_t1_tile_info);
-	TILE_GET_INFO_MEMBER(get_t2_tile_info);
+	uint16_t random_number_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bmc_1_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bmc_2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void init_koftball();
+	void get_t1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_t2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(bmc_interrupt);
+	void bmc_interrupt(timer_device &timer, void *ptr, int32_t param);
 };
 
 
-TILE_GET_INFO_MEMBER(koftball_state::get_t1_tile_info)
+void koftball_state::get_t1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_bmc_1_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(koftball_state::get_t1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(koftball_state::get_t2_tile_info)
+void koftball_state::get_t2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_bmc_2_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -106,13 +106,13 @@ uint32_t koftball_state::screen_update_koftball(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ16_MEMBER(koftball_state::random_number_r)
+uint16_t koftball_state::random_number_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand();
 }
 
 
-READ16_MEMBER(koftball_state::prot_r)
+uint16_t koftball_state::prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_prot_data)
 	{
@@ -126,18 +126,18 @@ READ16_MEMBER(koftball_state::prot_r)
 	return machine().rand();
 }
 
-WRITE16_MEMBER(koftball_state::prot_w)
+void koftball_state::prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_prot_data);
 }
 
-WRITE16_MEMBER(koftball_state::bmc_1_videoram_w)
+void koftball_state::bmc_1_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bmc_1_videoram[offset]);
 	m_tilemap_1->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(koftball_state::bmc_2_videoram_w)
+void koftball_state::bmc_2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bmc_2_videoram[offset]);
 	m_tilemap_2->mark_tile_dirty(offset);
@@ -196,7 +196,7 @@ static INPUT_PORTS_START( koftball )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(koftball_state::bmc_interrupt)
+void koftball_state::bmc_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -296,7 +296,7 @@ static const uint16_t nvram[]=
 };
 
 #endif
-DRIVER_INIT_MEMBER(koftball_state,koftball)
+void koftball_state::init_koftball()
 {
 	save_item(NAME(m_prot_data));
 

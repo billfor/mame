@@ -89,12 +89,12 @@ const tiny_rom_entry *o2_voice_device::device_rom_region() const
 	return ROM_NAME( o2voice );
 }
 
-WRITE_LINE_MEMBER(o2_voice_device::lrq_callback)
+void o2_voice_device::lrq_callback(int state)
 {
 	m_lrq_state = state;
 }
 
-WRITE8_MEMBER(o2_voice_device::io_write)
+void o2_voice_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x20)
 		m_speech->ald_w(space, 0, offset & 0x7f);

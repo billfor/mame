@@ -39,13 +39,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
-	DECLARE_DRIVER_INIT(at);
-	DECLARE_DRIVER_INIT(atpci);
-	DECLARE_DRIVER_INIT(megapcpla);
-	DECLARE_READ16_MEMBER(ps1_unk_r);
-	DECLARE_WRITE16_MEMBER(ps1_unk_w);
-	DECLARE_READ8_MEMBER(ps1_portb_r);
-	DECLARE_MACHINE_START(vrom_fix);
+	void init_at();
+	void init_atpci();
+	void init_megapcpla();
+	uint16_t ps1_unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ps1_unk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t ps1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void machine_start_vrom_fix();
 
 	void init_at_common(int xmsbase);
 	uint16_t m_ps1_reg[2];
@@ -68,14 +68,14 @@ public:
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
-	DECLARE_DRIVER_INIT(megapc);
-	DECLARE_DRIVER_INIT(megapcpl);
+	void init_megapc();
+	void init_megapcpl();
 
-	DECLARE_READ16_MEMBER( wd7600_ior );
-	DECLARE_WRITE16_MEMBER( wd7600_iow );
-	DECLARE_WRITE_LINE_MEMBER( wd7600_hold );
-	DECLARE_WRITE8_MEMBER( wd7600_tc ) { m_isabus->eop_w(offset, data); }
-	DECLARE_WRITE_LINE_MEMBER( wd7600_spkr ) { m_speaker->level_w(state); }
+	uint16_t wd7600_ior(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void wd7600_iow(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void wd7600_hold(int state);
+	void wd7600_tc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_isabus->eop_w(offset, data); }
+	void wd7600_spkr(int state) { m_speaker->level_w(state); }
 };
 
 
@@ -121,12 +121,12 @@ static ADDRESS_MAP_START( at16_io, AS_IO, 16, at_state )
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
 ADDRESS_MAP_END
 
-READ16_MEMBER( at_state::ps1_unk_r )
+uint16_t at_state::ps1_unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ps1_reg[offset];
 }
 
-WRITE16_MEMBER( at_state::ps1_unk_w )
+void at_state::ps1_unk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if((offset == 0) && (data == 0x60))
 		data = 0x68;
@@ -134,7 +134,7 @@ WRITE16_MEMBER( at_state::ps1_unk_w )
 	COMBINE_DATA(&m_ps1_reg[offset]);
 }
 
-READ8_MEMBER( at_state::ps1_portb_r )
+uint8_t at_state::ps1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_mb->portb_r(space, offset);
 	/* 0x10 is the dram refresh line bit, 15.085us. */
@@ -172,21 +172,21 @@ static ADDRESS_MAP_START( ficpio_io, AS_IO, 32, at_state )
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 ADDRESS_MAP_END
 
-DRIVER_INIT_MEMBER(megapc_state, megapc)
+void megapc_state::init_megapc()
 {
 	uint8_t* ROM = memregion("bios")->base();
 	ROM[0x19145] = 0x45;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
-DRIVER_INIT_MEMBER(megapc_state, megapcpl)
+void megapc_state::init_megapcpl()
 {
 	uint8_t* ROM = memregion("bios")->base();
 	ROM[0x187b1] = 0x55;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
-DRIVER_INIT_MEMBER(at_state, megapcpla)
+void at_state::init_megapcpla()
 {
 	uint8_t* ROM = memregion("bios")->base();
 
@@ -199,7 +199,7 @@ DRIVER_INIT_MEMBER(at_state, megapcpla)
 	ROM[0x3ffff] = 0x41;  // to correct checksum
 }
 
-READ16_MEMBER( megapc_state::wd7600_ior )
+uint16_t megapc_state::wd7600_ior(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 4)
 		return m_isabus->dack_r(offset);
@@ -207,7 +207,7 @@ READ16_MEMBER( megapc_state::wd7600_ior )
 		return m_isabus->dack16_r(offset);
 }
 
-WRITE16_MEMBER( megapc_state::wd7600_iow )
+void megapc_state::wd7600_iow(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 4)
 		m_isabus->dack_w(offset, data);
@@ -215,7 +215,7 @@ WRITE16_MEMBER( megapc_state::wd7600_iow )
 		m_isabus->dack16_w(offset, data);
 }
 
-WRITE_LINE_MEMBER( megapc_state::wd7600_hold )
+void megapc_state::wd7600_hold(int state)
 {
 	// halt cpu
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
@@ -260,17 +260,17 @@ void at_state::init_at_common(int xmsbase)
 	}
 }
 
-DRIVER_INIT_MEMBER(at_state,at)
+void at_state::init_at()
 {
 	init_at_common(0xa0000);
 }
 
-DRIVER_INIT_MEMBER(at_state,atpci)
+void at_state::init_atpci()
 {
 	init_at_common(0x100000);
 }
 
-MACHINE_START_MEMBER(at_state,vrom_fix)
+void at_state::machine_start_vrom_fix()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_bank(0xc0000, 0xcffff, "vrom_bank");

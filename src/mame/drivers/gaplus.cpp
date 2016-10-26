@@ -159,7 +159,7 @@ TODO:
 #include "includes/gaplus.h"
 
 
-WRITE8_MEMBER(gaplus_state::irq_1_ctrl_w)
+void gaplus_state::irq_1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit & 1;
@@ -167,7 +167,7 @@ WRITE8_MEMBER(gaplus_state::irq_1_ctrl_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_state::irq_2_ctrl_w)
+void gaplus_state::irq_2_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = offset & 1;
 	m_sub_irq_mask = bit & 1;
@@ -175,7 +175,7 @@ WRITE8_MEMBER(gaplus_state::irq_2_ctrl_w)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_state::irq_3_ctrl_w)
+void gaplus_state::irq_3_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset, 13);
 	m_sub2_irq_mask = bit & 1;
@@ -183,7 +183,7 @@ WRITE8_MEMBER(gaplus_state::irq_3_ctrl_w)
 		m_subcpu2->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_state::sreset_w)
+void gaplus_state::sreset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset, 11);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
@@ -191,7 +191,7 @@ WRITE8_MEMBER(gaplus_state::sreset_w)
 	m_namco_15xx->mappy_sound_enable(bit);
 }
 
-WRITE8_MEMBER(gaplus_state::freset_w)
+void gaplus_state::freset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset, 11);
 
@@ -220,7 +220,7 @@ void gaplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gaplus_state::namcoio_run)
+void gaplus_state::namcoio_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -233,7 +233,7 @@ TIMER_CALLBACK_MEMBER(gaplus_state::namcoio_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::vblank_main_irq)
+void gaplus_state::vblank_main_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -245,7 +245,7 @@ INTERRUPT_GEN_MEMBER(gaplus_state::vblank_main_irq)
 		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 1);
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::gapluso_vblank_main_irq)
+void gaplus_state::gapluso_vblank_main_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -257,13 +257,13 @@ INTERRUPT_GEN_MEMBER(gaplus_state::gapluso_vblank_main_irq)
 		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 0);
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::vblank_sub_irq)
+void gaplus_state::vblank_sub_irq(device_t &device)
 {
 	if(m_sub_irq_mask)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::vblank_sub2_irq)
+void gaplus_state::vblank_sub2_irq(device_t &device)
 {
 	if(m_sub2_irq_mask)
 		m_subcpu2->set_input_line(0, ASSERT_LINE);
@@ -473,7 +473,7 @@ static const char *const gaplus_sample_names[] =
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gaplus_state::out_lamps0)
+void gaplus_state::out_lamps0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 1);
 	output().set_led_value(1, data & 2);
@@ -481,7 +481,7 @@ WRITE8_MEMBER(gaplus_state::out_lamps0)
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
-WRITE8_MEMBER(gaplus_state::out_lamps1)
+void gaplus_state::out_lamps1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(1, ~data & 1);
 }
@@ -977,7 +977,7 @@ ROM_START( galaga3m ) /* Version (AKA Midway) 1 PCB */
 ROM_END
 
 
-DRIVER_INIT_MEMBER(gaplus_state,gaplus)
+void gaplus_state::init_gaplus()
 {
 	uint8_t *rom;
 
@@ -993,15 +993,15 @@ DRIVER_INIT_MEMBER(gaplus_state,gaplus)
 }
 
 
-DRIVER_INIT_MEMBER(gaplus_state,gaplusd)
+void gaplus_state::init_gaplusd()
 {
-	DRIVER_INIT_CALL(gaplus);
+	init_gaplus();
 	m_type = GAME_GAPLUSD;
 }
 
-DRIVER_INIT_MEMBER(gaplus_state,galaga3)
+void gaplus_state::init_galaga3()
 {
-	DRIVER_INIT_CALL(gaplus);
+	init_gaplus();
 	m_type = GAME_GALAGA3;
 }
 

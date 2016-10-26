@@ -80,24 +80,24 @@ are almost identical, except for much darker BG layer colors).
 #include "sound/okim6295.h"
 #include "includes/dooyong.h"
 
-WRITE8_MEMBER(dooyong_z80_state::bankswitch_w)
+void dooyong_z80_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x07);
 
 	if (data & 0xf8) popmessage("bankswitch %02x",data);
 }
 
-MACHINE_START_MEMBER(dooyong_z80_state, cpu_z80)
+void dooyong_z80_state::machine_start_cpu_z80()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 }
 
-WRITE8_MEMBER(dooyong_z80_state::flip_screen_w)
+void dooyong_z80_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data);
 }
 
-MACHINE_RESET_MEMBER(dooyong_z80_ym2203_state, sound_ym2203)
+void dooyong_z80_ym2203_state::machine_reset_sound_ym2203()
 {
 	m_interrupt_line_1 = 0;
 	m_interrupt_line_2 = 0;
@@ -743,18 +743,18 @@ static GFXDECODE_START( popbingo )
 
 GFXDECODE_END
 
-READ8_MEMBER(dooyong_z80_ym2203_state::unk_r)
+uint8_t dooyong_z80_ym2203_state::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE_LINE_MEMBER(dooyong_z80_ym2203_state::irqhandler_2203_1)
+void dooyong_z80_ym2203_state::irqhandler_2203_1(int state)
 {
 	m_interrupt_line_1=state;
 	m_audiocpu->set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(dooyong_z80_ym2203_state::irqhandler_2203_2)
+void dooyong_z80_ym2203_state::irqhandler_2203_2(int state)
 {
 	m_interrupt_line_2=state;
 	m_audiocpu->set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
@@ -1059,7 +1059,7 @@ static MACHINE_CONFIG_START( primella, dooyong_z80_state )
 MACHINE_CONFIG_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(dooyong_68k_state::scanline)
+void dooyong_68k_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

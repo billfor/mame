@@ -109,15 +109,15 @@ public:
 	required_shared_ptr<uint8_t> m_bg_ram;
 	tilemap_t *m_bg_tmap;
 	tilemap_t *m_fg_tmap;
-	DECLARE_WRITE8_MEMBER(bg_ram_w);
-	DECLARE_WRITE8_MEMBER(fg_ram_w);
-	DECLARE_READ8_MEMBER(quizpun2_protection_r);
-	DECLARE_WRITE8_MEMBER(quizpun2_protection_w);
-	DECLARE_WRITE8_MEMBER(quizpun2_rombank_w);
-	DECLARE_WRITE8_MEMBER(quizpun2_irq_ack);
-	DECLARE_WRITE8_MEMBER(quizpun2_soundlatch_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void bg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t quizpun2_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void quizpun2_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void quizpun2_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void quizpun2_irq_ack(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void quizpun2_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -135,26 +135,26 @@ public:
                                 Video Hardware
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(quizpun2_state::get_bg_tile_info)
+void quizpun2_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg_ram[ tile_index * 2 ] + m_bg_ram[ tile_index * 2 + 1 ] * 256;
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(quizpun2_state::get_fg_tile_info)
+void quizpun2_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code  = m_fg_ram[ tile_index * 4 ] + m_fg_ram[ tile_index * 4 + 1 ] * 256;
 	uint8_t  color = m_fg_ram[ tile_index * 4 + 2 ];
 	SET_TILE_INFO_MEMBER(1, code, color & 0x0f, 0);
 }
 
-WRITE8_MEMBER(quizpun2_state::bg_ram_w)
+void quizpun2_state::bg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_ram[offset] = data;
 	m_bg_tmap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(quizpun2_state::fg_ram_w)
+void quizpun2_state::fg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_ram[offset] = data;
 	m_fg_tmap->mark_tile_dirty(offset/4);
@@ -226,7 +226,7 @@ static void log_protection( address_space &space, const char *warning )
 	);
 }
 
-READ8_MEMBER(quizpun2_state::quizpun2_protection_r)
+uint8_t quizpun2_state::quizpun2_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	struct prot_t &prot = m_prot;
 	uint8_t ret;
@@ -281,7 +281,7 @@ READ8_MEMBER(quizpun2_state::quizpun2_protection_r)
 	return ret;
 }
 
-WRITE8_MEMBER(quizpun2_state::quizpun2_protection_w)
+void quizpun2_state::quizpun2_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct prot_t &prot = m_prot;
 
@@ -354,18 +354,18 @@ WRITE8_MEMBER(quizpun2_state::quizpun2_protection_w)
                             Memory Maps - Main CPU
 ***************************************************************************/
 
-WRITE8_MEMBER(quizpun2_state::quizpun2_rombank_w)
+void quizpun2_state::quizpun2_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
 }
 
-WRITE8_MEMBER(quizpun2_state::quizpun2_irq_ack)
+void quizpun2_state::quizpun2_irq_ack(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(quizpun2_state::quizpun2_soundlatch_w)
+void quizpun2_state::quizpun2_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

@@ -102,15 +102,15 @@ public:
 		, m_cart(*this, "cartslot")
 	{}
 
-	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(port30_w);
-	DECLARE_WRITE8_MEMBER(port80_w);
-	DECLARE_WRITE8_MEMBER(portc0_w);
-	DECLARE_READ8_MEMBER(porte2_r);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
+	void port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port30_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portc0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t porte2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_centronics_ack(int state);
+	void write_centronics_busy(int state);
+	ioport_value printer_ready_r(ioport_field &field, void *param);
+	ioport_value printer_ack_r(ioport_field &field, void *param);
 private:
 	virtual void machine_start() override;
 	int m_centronics_busy;
@@ -153,46 +153,46 @@ static ADDRESS_MAP_START(pencil2_io, AS_IO, 8, pencil2_state)
 	AM_RANGE(0xf2, 0xf2) AM_READ_PORT("F2")
 ADDRESS_MAP_END
 
-READ8_MEMBER( pencil2_state::porte2_r)
+uint8_t pencil2_state::porte2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_cass->input() > 0.1) ? 0xff : 0x7f;
 }
 
-WRITE8_MEMBER( pencil2_state::port10_w )
+void pencil2_state::port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics->write_strobe(BIT(data, 0));
 }
 
-WRITE8_MEMBER( pencil2_state::port30_w )
+void pencil2_state::port30_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cass_state ^= 1;
 	m_cass->output( m_cass_state ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER( pencil2_state::port80_w )
+void pencil2_state::port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( pencil2_state::portc0_w )
+void pencil2_state::portc0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE_LINE_MEMBER( pencil2_state::write_centronics_busy )
+void pencil2_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-CUSTOM_INPUT_MEMBER( pencil2_state::printer_ready_r )
+ioport_value pencil2_state::printer_ready_r(ioport_field &field, void *param)
 {
 	return m_centronics_busy;
 }
 
-WRITE_LINE_MEMBER( pencil2_state::write_centronics_ack )
+void pencil2_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 }
 
-CUSTOM_INPUT_MEMBER( pencil2_state::printer_ack_r )
+ioport_value pencil2_state::printer_ack_r(ioport_field &field, void *param)
 {
 	return m_centronics_ack;
 }

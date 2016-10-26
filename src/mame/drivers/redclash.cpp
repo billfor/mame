@@ -29,28 +29,28 @@ TODO:
 
 
 /* Sound comm between CPU's */
-READ8_MEMBER(redclash_state::sraider_sound_low_r)
+uint8_t redclash_state::sraider_sound_low_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_low;
 }
 
-READ8_MEMBER(redclash_state::sraider_sound_high_r)
+uint8_t redclash_state::sraider_sound_high_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_high;
 }
 
-WRITE8_MEMBER(redclash_state::sraider_sound_low_w)
+void redclash_state::sraider_sound_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_low = data;
 }
 
-WRITE8_MEMBER(redclash_state::sraider_sound_high_w)
+void redclash_state::sraider_sound_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_high = data;
 }
 
 /* Protection? */
-READ8_MEMBER(redclash_state::sraider_8005_r)
+uint8_t redclash_state::sraider_8005_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* This must return X011111X or cpu #1 will hang */
 	/* see code at rst $10 */
@@ -58,7 +58,7 @@ READ8_MEMBER(redclash_state::sraider_8005_r)
 }
 
 /* Unknown IO */
-WRITE8_MEMBER(redclash_state::sraider_misc_w)
+void redclash_state::sraider_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( sraider_cpu2_io_map, AS_IO, 8, redclash_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER( redclash_state::irqack_w )
+void redclash_state::irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -176,13 +176,13 @@ ADDRESS_MAP_END
   Interrupts are still used, but they are related to coin
   slots. Left slot generates an IRQ, Right slot a NMI.
 */
-INPUT_CHANGED_MEMBER( redclash_state::left_coin_inserted )
+void redclash_state::left_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( redclash_state::right_coin_inserted )
+void redclash_state::right_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -560,7 +560,7 @@ static GFXDECODE_START( sraider )
 	GFXDECODE_ENTRY( "gfx3", 0, gridlayout2,   4*8+4*16+32,  1 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(redclash_state,sraider)
+void redclash_state::machine_start_sraider()
 {
 	save_item(NAME(m_grid_color));
 	save_item(NAME(m_sound_low));
@@ -578,7 +578,7 @@ MACHINE_START_MEMBER(redclash_state,sraider)
 	save_item(NAME(m_stars_count));
 }
 
-MACHINE_RESET_MEMBER(redclash_state,sraider)
+void redclash_state::machine_reset_sraider()
 {
 	int i;
 
@@ -601,7 +601,7 @@ MACHINE_RESET_MEMBER(redclash_state,sraider)
 }
 
 
-MACHINE_START_MEMBER(redclash_state,redclash)
+void redclash_state::machine_start_redclash()
 {
 	save_item(NAME(m_star_speed));
 	save_item(NAME(m_gfxbank));
@@ -612,7 +612,7 @@ MACHINE_START_MEMBER(redclash_state,redclash)
 	save_item(NAME(m_stars_count));
 }
 
-MACHINE_RESET_MEMBER(redclash_state,redclash)
+void redclash_state::machine_reset_redclash()
 {
 	m_star_speed = 0;
 	m_gfxbank = 0;
@@ -926,7 +926,7 @@ ROM_START( sraider )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(redclash_state,redclash)
+void redclash_state::init_redclash()
 {
 	int i,j;
 	const uint8_t *src = memregion("gfx2")->base();

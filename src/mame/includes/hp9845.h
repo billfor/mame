@@ -23,19 +23,19 @@ public:
 	virtual void machine_reset() override;
 	virtual void device_reset() override;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(gv_timer);
+	void scanline_timer(timer_device &timer, void *ptr, int32_t param);
+	void gv_timer(timer_device &timer, void *ptr, int32_t param);
 
 	void vblank_w(screen_device &screen, bool state);
 
 	void set_graphic_mode(bool graphic);
-	DECLARE_READ16_MEMBER(graphic_r);
-	DECLARE_WRITE16_MEMBER(graphic_w);
+	uint16_t graphic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void graphic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	attotime time_to_gv_mem_availability(void) const;
 	void advance_gv_fsm(bool ds , bool trigger);
 	void update_graphic_bits(void);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	int irq_callback(device_t &device, int irqline);
 	void update_irq(void);
 	void irq_w(uint8_t sc , int state);
 	void update_flg_sts(void);
@@ -43,17 +43,17 @@ public:
 	void flg_w(uint8_t sc , int state);
 	void install_readwrite_handler(uint8_t sc , read16_delegate rhandler, write16_delegate whandler);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
-	DECLARE_READ16_MEMBER(kb_scancode_r);
-	DECLARE_READ16_MEMBER(kb_status_r);
-	DECLARE_WRITE16_MEMBER(kb_irq_clear_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off);
+	void kb_scan(timer_device &timer, void *ptr, int32_t param);
+	uint16_t kb_scancode_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t kb_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kb_irq_clear_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void beeper_off(timer_device &timer, void *ptr, int32_t param);
 
-	DECLARE_WRITE8_MEMBER(pa_w);
+	void pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(t15_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(t15_flg_w);
-	DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
+	void t15_irq_w(int state);
+	void t15_flg_w(int state);
+	void t15_sts_w(int state);
 
 private:
 	required_device<hp_5061_3001_cpu_device> m_lpu;

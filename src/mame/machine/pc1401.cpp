@@ -23,23 +23,23 @@
 
 
 
-WRITE8_MEMBER(pc1401_state::pc1401_outa)
+void pc1401_state::pc1401_outa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outa = data;
 }
 
-WRITE8_MEMBER(pc1401_state::pc1401_outb)
+void pc1401_state::pc1401_outb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outb = data;
 }
 
-WRITE8_MEMBER(pc1401_state::pc1401_outc)
+void pc1401_state::pc1401_outc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%g outc %.2x\n", machine.time().as_double(), data);
 	m_portc = data;
 }
 
-READ8_MEMBER(pc1401_state::pc1401_ina)
+uint8_t pc1401_state::pc1401_ina(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_outa;
 
@@ -91,7 +91,7 @@ READ8_MEMBER(pc1401_state::pc1401_ina)
 	return data;
 }
 
-READ8_MEMBER(pc1401_state::pc1401_inb)
+uint8_t pc1401_state::pc1401_inb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data=m_outb;
 
@@ -101,12 +101,12 @@ READ8_MEMBER(pc1401_state::pc1401_inb)
 	return data;
 }
 
-READ_LINE_MEMBER(pc1401_state::pc1401_brk)
+int pc1401_state::pc1401_brk()
 {
 	return (ioport("EXTRA")->read() & 0x01);
 }
 
-READ_LINE_MEMBER(pc1401_state::pc1401_reset)
+int pc1401_state::pc1401_reset()
 {
 	return (ioport("EXTRA")->read() & 0x02);
 }
@@ -132,7 +132,7 @@ void pc1401_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-DRIVER_INIT_MEMBER(pc1401_state,pc1401)
+void pc1401_state::init_pc1401()
 {
 	int i;
 	uint8_t *gfx=memregion("gfx1")->base();

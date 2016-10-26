@@ -32,13 +32,13 @@ public:
 		, m_tms(*this, "tms")
 	{ }
 
-	DECLARE_DRIVER_INIT(jeutel);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(ppi0a_w);
-	DECLARE_WRITE8_MEMBER(ppi0b_w);
-	DECLARE_WRITE8_MEMBER(sndcmd_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void init_jeutel();
+	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi0a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi0b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sndcmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void timer_a(timer_device &timer, void *ptr, int32_t param);
 private:
 	bool m_timer_a;
 	uint8_t m_sndcmd;
@@ -85,17 +85,17 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( jeutel )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( jeutel_state::sndcmd_w )
+void jeutel_state::sndcmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sndcmd = data;
 }
 
-READ8_MEMBER( jeutel_state::portb_r )
+uint8_t jeutel_state::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sndcmd;
 }
 
-WRITE8_MEMBER( jeutel_state::porta_w )
+void jeutel_state::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0xf0) == 0xf0)
 	{
@@ -112,7 +112,7 @@ WRITE8_MEMBER( jeutel_state::porta_w )
 	}
 }
 
-WRITE8_MEMBER( jeutel_state::ppi0a_w )
+void jeutel_state::ppi0a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t segment;
 	bool blank = !BIT(data, 7);
@@ -152,7 +152,7 @@ WRITE8_MEMBER( jeutel_state::ppi0a_w )
 	}
 }
 
-WRITE8_MEMBER( jeutel_state::ppi0b_w )
+void jeutel_state::ppi0b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit = data & 0x0f;
 	if (m_digit > 7)
@@ -167,7 +167,7 @@ void jeutel_state::machine_reset()
 	m_digit = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( jeutel_state::timer_a )
+void jeutel_state::timer_a(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer_a ^= 1;
 	m_cpu2->set_input_line(0, (m_timer_a) ? ASSERT_LINE : CLEAR_LINE);
@@ -175,7 +175,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( jeutel_state::timer_a )
 		m_cpu2->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-DRIVER_INIT_MEMBER( jeutel_state, jeutel )
+void jeutel_state::init_jeutel()
 {
 }
 

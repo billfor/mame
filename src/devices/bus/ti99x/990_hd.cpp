@@ -162,7 +162,7 @@ int ti990_hdc_device::get_id_from_device( device_t *device )
 /*
     Initialize hard disk unit and open a hard disk image
 */
-DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device, ti990_hd )
+image_init_result ti990_hdc_device::device_image_load_ti990_hd(device_image_interface &image)
 {
 	int id = get_id_from_device( &image.device() );
 	hd_unit_t *d;
@@ -239,7 +239,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device, ti990_hd )
 /*
     close a hard disk image
 */
-DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hdc_device, ti990_hd )
+void ti990_hdc_device::device_image_unload_ti990_hd(device_image_interface &image)
 {
 	int id = get_id_from_device( image );
 	hd_unit_t *d;
@@ -924,7 +924,7 @@ void ti990_hdc_device::execute_command()
 /*
     Read one register in TPCS space
 */
-READ16_MEMBER(ti990_hdc_device::read)
+uint16_t ti990_hdc_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 8)
 		return m_w[offset];
@@ -935,7 +935,7 @@ READ16_MEMBER(ti990_hdc_device::read)
 /*
     Write one register in TPCS space.  Execute command if w7_idle is cleared.
 */
-WRITE16_MEMBER(ti990_hdc_device::write)
+void ti990_hdc_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 8)
 	{

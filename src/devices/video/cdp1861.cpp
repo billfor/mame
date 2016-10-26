@@ -193,7 +193,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  dma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1861_device::dma_w )
+void cdp1861_device::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sx = m_screen->hpos() + 4;
 	int y = m_screen->vpos();
@@ -212,7 +212,7 @@ WRITE8_MEMBER( cdp1861_device::dma_w )
 //  disp_on_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1861_device::disp_on_w )
+void cdp1861_device::disp_on_w(int state)
 {
 	if (!m_dispon && state) m_disp = 1;
 
@@ -224,7 +224,7 @@ WRITE_LINE_MEMBER( cdp1861_device::disp_on_w )
 //  disp_off_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1861_device::disp_off_w )
+void cdp1861_device::disp_off_w(int state)
 {
 	if (!m_dispon && !m_dispoff && state) m_disp = 0;
 

@@ -66,25 +66,25 @@ public:
 		m_keyboard_row(0)
 	{}
 
-	DECLARE_READ8_MEMBER( ppi_port_a_r );
-	DECLARE_READ8_MEMBER( ppi_port_b_r );
-	DECLARE_WRITE8_MEMBER( ppi_port_c_w );
-	DECLARE_WRITE8_MEMBER( bank_w );
-	DECLARE_WRITE_LINE_MEMBER( intvdp_w );
+	uint8_t ppi_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ppi_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void intvdp_w(int state);
 
-	READ8_MEMBER( mreq_r );
-	WRITE8_MEMBER( mreq_w );
+	uint8_t mreq_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
 	// from expander bus
-	DECLARE_WRITE_LINE_MEMBER( intexp_w );
-	DECLARE_WRITE_LINE_MEMBER( romdis_w );
-	DECLARE_WRITE_LINE_MEMBER( ramdis_w );
-	DECLARE_WRITE_LINE_MEMBER( ctrl1_w );
+	void intexp_w(int state);
+	void romdis_w(int state);
+	void ramdis_w(int state);
+	void ctrl1_w(int state);
 
-	DECLARE_READ8_MEMBER( excs_r );
-	DECLARE_WRITE8_MEMBER( excs_w );
+	uint8_t excs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void excs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	image_init_result device_image_load_cartridge(device_image_interface &image);
 
 protected:
 	virtual void machine_start() override;
@@ -308,7 +308,7 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( svi3x8_state::intvdp_w )
+void svi3x8_state::intvdp_w(int state)
 {
 	m_intvdp = state;
 
@@ -354,7 +354,7 @@ void svi3x8_state::machine_reset()
 		ctrl1_w(1);
 }
 
-READ8_MEMBER( svi3x8_state::mreq_r )
+uint8_t svi3x8_state::mreq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// ctrl1 inverts a15
 	if (m_ctrl1 == 0)
@@ -377,7 +377,7 @@ READ8_MEMBER( svi3x8_state::mreq_r )
 	return data;
 }
 
-WRITE8_MEMBER( svi3x8_state::mreq_w )
+void svi3x8_state::mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ctrl1 inverts a15
 	if (m_ctrl1 == 0)
@@ -395,7 +395,7 @@ WRITE8_MEMBER( svi3x8_state::mreq_w )
 		m_ram->write(IS_SVI328 ? offset : offset - 0xc000, data);
 }
 
-WRITE8_MEMBER( svi3x8_state::bank_w )
+void svi3x8_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("bank_w: %02x\n", data);
 
@@ -413,7 +413,7 @@ WRITE8_MEMBER( svi3x8_state::bank_w )
 	output().set_value("led_caps_lock", BIT(data, 5));
 }
 
-READ8_MEMBER( svi3x8_state::ppi_port_a_r )
+uint8_t svi3x8_state::ppi_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x3f;
 
@@ -429,13 +429,13 @@ READ8_MEMBER( svi3x8_state::ppi_port_a_r )
 	return data;
 }
 
-READ8_MEMBER( svi3x8_state::ppi_port_b_r )
+uint8_t svi3x8_state::ppi_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// bit 0-7, keyboard data
 	return m_keyboard[m_keyboard_row]->read();
 }
 
-WRITE8_MEMBER( svi3x8_state::ppi_port_c_w )
+void svi3x8_state::ppi_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0-3, keyboard row
 	m_keyboard_row = data & 0x0f;
@@ -449,7 +449,7 @@ WRITE8_MEMBER( svi3x8_state::ppi_port_c_w )
 	m_speaker->level_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( svi3x8_state::intexp_w )
+void svi3x8_state::intexp_w(int state)
 {
 	m_intexp = state;
 
@@ -459,17 +459,17 @@ WRITE_LINE_MEMBER( svi3x8_state::intexp_w )
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_intvdp || m_intexp) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( svi3x8_state::romdis_w )
+void svi3x8_state::romdis_w(int state)
 {
 	m_romdis = state;
 }
 
-WRITE_LINE_MEMBER( svi3x8_state::ramdis_w )
+void svi3x8_state::ramdis_w(int state)
 {
 	m_ramdis = state;
 }
 
-WRITE_LINE_MEMBER( svi3x8_state::ctrl1_w )
+void svi3x8_state::ctrl1_w(int state)
 {
 	m_ctrl1 = state;
 
@@ -477,7 +477,7 @@ WRITE_LINE_MEMBER( svi3x8_state::ctrl1_w )
 	m_io->set_bank(m_ctrl1);
 }
 
-READ8_MEMBER( svi3x8_state::excs_r )
+uint8_t svi3x8_state::excs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 1)
 		return m_vdp->register_read(space, 0);
@@ -485,7 +485,7 @@ READ8_MEMBER( svi3x8_state::excs_r )
 		return m_vdp->vram_read(space, 0);
 }
 
-WRITE8_MEMBER( svi3x8_state::excs_w )
+void svi3x8_state::excs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 		m_vdp->register_write(space, 0, data);
@@ -498,7 +498,7 @@ WRITE8_MEMBER( svi3x8_state::excs_w )
 //  CARTRIDGE
 //**************************************************************************
 
-DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
+image_init_result svi3x8_state::device_image_load_cartridge(device_image_interface &image)
 {
 	uint32_t size = m_cart_rom->common_get_size("rom");
 

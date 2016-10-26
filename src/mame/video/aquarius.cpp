@@ -32,7 +32,7 @@ static const unsigned short aquarius_palette[] =
 	0,15, 1,15, 2,15, 3,15, 4,15, 5,15, 6,15, 7,15, 8,15, 9,15,10,15,11,15,12,15,13,15,14,15,15,15,
 };
 
-PALETTE_INIT_MEMBER(aquarius_state, aquarius)
+void aquarius_state::palette_init_aquarius(palette_device &palette)
 {
 	int i;
 
@@ -43,20 +43,20 @@ PALETTE_INIT_MEMBER(aquarius_state, aquarius)
 		m_palette->set_pen_indirect(i, aquarius_palette[i]);
 }
 
-WRITE8_MEMBER(aquarius_state::aquarius_videoram_w)
+void aquarius_state::aquarius_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(aquarius_state::aquarius_colorram_w)
+void aquarius_state::aquarius_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(aquarius_state::aquarius_gettileinfo)
+void aquarius_state::aquarius_gettileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int bank = 0;

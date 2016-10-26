@@ -118,18 +118,18 @@ public:
 
 	uint16_t m_dsw_pc_hack;
 
-	DECLARE_WRITE8_MEMBER(cyclemb_bankswitch_w);
-//  DECLARE_READ8_MEMBER(mcu_status_r);
-//  DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(cyclemb_flip_w);
-	DECLARE_READ8_MEMBER(skydest_i8741_0_r);
-	DECLARE_WRITE8_MEMBER(skydest_i8741_0_w);
+	void cyclemb_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+//  uint8_t mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+//  void sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cyclemb_flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t skydest_i8741_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void skydest_i8741_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(skydest);
-	DECLARE_DRIVER_INIT(cyclemb);
+	void init_skydest();
+	void init_cyclemb();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(cyclemb);
+	void palette_init_cyclemb(palette_device &palette);
 
 	uint32_t screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -142,7 +142,7 @@ public:
 
 
 
-PALETTE_INIT_MEMBER(cyclemb_state, cyclemb)
+void cyclemb_state::palette_init_cyclemb(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
@@ -377,13 +377,13 @@ uint32_t cyclemb_state::screen_update_skydest(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE8_MEMBER(cyclemb_state::cyclemb_bankswitch_w)
+void cyclemb_state::cyclemb_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 3);
 }
 
 #if 0
-WRITE8_MEMBER(cyclemb_state::sound_cmd_w)
+void cyclemb_state::sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -391,20 +391,20 @@ WRITE8_MEMBER(cyclemb_state::sound_cmd_w)
 #endif
 
 #if 0
-READ8_MEMBER(cyclemb_state::mcu_status_r)
+uint8_t cyclemb_state::mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }
 
 
-WRITE8_MEMBER(cyclemb_state::sound_cmd_w)//actually ciom
+void cyclemb_state::sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)//actually ciom
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 #endif
 
-WRITE8_MEMBER(cyclemb_state::cyclemb_flip_w)
+void cyclemb_state::cyclemb_flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 
@@ -420,7 +420,7 @@ void cyclemb_state::skydest_i8741_reset()
 	m_mcu[0].packet_type = 0;
 }
 
-READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
+uint8_t cyclemb_state::skydest_i8741_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset == 1) //status port
 	{
@@ -500,7 +500,7 @@ READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 	}
 }
 
-WRITE8_MEMBER( cyclemb_state::skydest_i8741_0_w )
+void cyclemb_state::skydest_i8741_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 1) //command port
 	{
@@ -1037,13 +1037,13 @@ ROM_START( skydest )
 	ROM_LOAD( "blue.4j",      0x000, 0x100, CRC(34579681) SHA1(10e5e137837bdd71959f0c4bf52e0f333630a22f) ) // on daughterboard, _not_ a color prom
 ROM_END
 
-DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
+void cyclemb_state::init_cyclemb()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x760;
 }
 
-DRIVER_INIT_MEMBER(cyclemb_state,skydest)
+void cyclemb_state::init_skydest()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x554;

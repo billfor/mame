@@ -62,29 +62,29 @@ public:
 	scregg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: btime_state(mconfig, type, tag) { }
 
-	DECLARE_WRITE8_MEMBER(scregg_irqack_w);
-	DECLARE_READ8_MEMBER(scregg_irqack_r);
+	void scregg_irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t scregg_irqack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(rockduck);
-	DECLARE_MACHINE_START(scregg);
-	DECLARE_MACHINE_RESET(scregg);
-	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
+	void init_rockduck();
+	void machine_start_scregg();
+	void machine_reset_scregg();
+	void scregg_interrupt(timer_device &timer, void *ptr, int32_t param);
 };
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(scregg_state::scregg_interrupt)
+void scregg_state::scregg_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	// assume that the irq generator is similar to burgertime hw
 	m_maincpu->set_input_line(0, (param & 8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(scregg_state::scregg_irqack_w)
+void scregg_state::scregg_irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ8_MEMBER(scregg_state::scregg_irqack_r)
+uint8_t scregg_state::scregg_irqack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0;
@@ -235,7 +235,7 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(scregg_state,scregg)
+void scregg_state::machine_start_scregg()
 {
 	save_item(NAME(m_btime_palette));
 	save_item(NAME(m_bnj_scroll1));
@@ -243,7 +243,7 @@ MACHINE_START_MEMBER(scregg_state,scregg)
 	save_item(NAME(m_btime_tilemap));
 }
 
-MACHINE_RESET_MEMBER(scregg_state,scregg)
+void scregg_state::machine_reset_scregg()
 {
 	m_btime_palette = 0;
 	m_bnj_scroll1 = 0;
@@ -407,7 +407,7 @@ ROM_START( rockduck )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(scregg_state,rockduck)
+void scregg_state::init_rockduck()
 {
 	// rd2.rdh and rd1.rdj are bitswapped, but not rd3.rdg .. are they really from the same board?
 	int x;

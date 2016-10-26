@@ -187,7 +187,7 @@ static INPUT_PORTS_START( dodgem )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(zac2650_state, zac2650)
+void zac2650_state::palette_init_zac2650(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t::white());
@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( tinvader, zac2650_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-WRITE8_MEMBER(zac2650_state::tinvader_sound_w)
+void zac2650_state::tinvader_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* sounds are NOT the same as space invaders */
 

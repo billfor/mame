@@ -106,7 +106,7 @@ void arcadecl_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(arcadecl_state,arcadecl)
+void arcadecl_state::machine_reset_arcadecl()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 32);
@@ -120,7 +120,7 @@ MACHINE_RESET_MEMBER(arcadecl_state,arcadecl)
  *
  *************************************/
 
-WRITE16_MEMBER(arcadecl_state::latch_w)
+void arcadecl_state::latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit layout in this register:
 

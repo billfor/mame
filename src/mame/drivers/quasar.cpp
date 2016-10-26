@@ -45,17 +45,17 @@ I8085 Sound Board
 
 ************************************************************************/
 
-WRITE8_MEMBER(quasar_state::video_page_select_w)
+void quasar_state::video_page_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_page = offset & 0x03;
 }
 
-WRITE8_MEMBER(quasar_state::io_page_select_w)
+void quasar_state::io_page_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io_page = offset & 0x03;
 }
 
-WRITE8_MEMBER(quasar_state::quasar_video_w)
+void quasar_state::quasar_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_page)
 	{
@@ -66,7 +66,7 @@ WRITE8_MEMBER(quasar_state::quasar_video_w)
 	}
 }
 
-READ8_MEMBER(quasar_state::quasar_IO_r)
+uint8_t quasar_state::quasar_IO_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ans = 0;
 
@@ -81,12 +81,12 @@ READ8_MEMBER(quasar_state::quasar_IO_r)
 	return ans;
 }
 
-WRITE8_MEMBER(quasar_state::quasar_bullet_w)
+void quasar_state::quasar_bullet_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bullet_ram[offset] = (data ^ 0xff);
 }
 
-WRITE8_MEMBER(quasar_state::quasar_sh_command_w)
+void quasar_state::quasar_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 4 = Sound Invader : Linked to an NE555V circuit
 	// Not handled yet
@@ -97,12 +97,12 @@ WRITE8_MEMBER(quasar_state::quasar_sh_command_w)
 	m_soundlatch->write(space, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
 }
 
-READ8_MEMBER(quasar_state::quasar_sh_command_r)
+uint8_t quasar_state::quasar_sh_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_soundlatch->read(space, 0) + (ioport("DSW2")->read() & 0x30);
 }
 
-READ8_MEMBER(quasar_state::audio_t1_r)
+uint8_t quasar_state::audio_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_soundlatch->read(space, 0) == 0);
 }
@@ -267,7 +267,7 @@ static GFXDECODE_START( quasar )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 64+1 )  /* ROM chars */
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(quasar_state::quasar_interrupt)
+void quasar_state::quasar_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
@@ -276,9 +276,9 @@ INTERRUPT_GEN_MEMBER(quasar_state::quasar_interrupt)
 // Quasar S2650 Main CPU, I8035 sound board
 // ****************************************
 
-MACHINE_START_MEMBER(quasar_state,quasar)
+void quasar_state::machine_start_quasar()
 {
-	MACHINE_START_CALL_MEMBER(cvs);
+	machine_start_cvs();
 
 	/* register state save */
 	save_item(NAME(m_effectcontrol));
@@ -286,9 +286,9 @@ MACHINE_START_MEMBER(quasar_state,quasar)
 	save_item(NAME(m_io_page));
 }
 
-MACHINE_RESET_MEMBER(quasar_state,quasar)
+void quasar_state::machine_reset_quasar()
 {
-	MACHINE_RESET_CALL_MEMBER(cvs);
+	machine_reset_cvs();
 
 	m_effectcontrol = 0;
 	m_page = 0;

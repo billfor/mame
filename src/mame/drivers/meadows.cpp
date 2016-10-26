@@ -134,21 +134,21 @@
  *
  *************************************/
 
-READ8_MEMBER(meadows_state::hsync_chain_r)
+uint8_t meadows_state::hsync_chain_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = m_screen->hpos();
 	return BITSWAP8(val,0,1,2,3,4,5,6,7);
 }
 
 
-READ8_MEMBER(meadows_state::vsync_chain_hi_r)
+uint8_t meadows_state::vsync_chain_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = m_screen->vpos();
 	return ((val >> 1) & 0x08) | ((val >> 3) & 0x04) | ((val >> 5) & 0x02) | (val >> 7);
 }
 
 
-READ8_MEMBER(meadows_state::vsync_chain_lo_r)
+uint8_t meadows_state::vsync_chain_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = m_screen->vpos();
 	return val & 0x0f;
@@ -162,7 +162,7 @@ READ8_MEMBER(meadows_state::vsync_chain_lo_r)
  *
  *************************************/
 
-WRITE8_MEMBER(meadows_state::meadows_audio_w)
+void meadows_state::meadows_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -195,7 +195,7 @@ WRITE8_MEMBER(meadows_state::meadows_audio_w)
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
+void meadows_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line_and_vector(0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
 }
@@ -208,7 +208,7 @@ INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(meadows_state::meadows_interrupt)
+void meadows_state::meadows_interrupt(device_t &device)
 {
 	/* fake something toggling the sense input line of the S2650 */
 	m_main_sense_state ^= 1;
@@ -223,7 +223,7 @@ INTERRUPT_GEN_MEMBER(meadows_state::meadows_interrupt)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(meadows_state::minferno_interrupt)
+void meadows_state::minferno_interrupt(device_t &device)
 {
 	m_main_sense_state++;
 	device.execute().set_input_line(1, (m_main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
@@ -237,7 +237,7 @@ INTERRUPT_GEN_MEMBER(meadows_state::minferno_interrupt)
  *
  *************************************/
 
-WRITE8_MEMBER(meadows_state::audio_hardware_w)
+void meadows_state::audio_hardware_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 3)
 	{
@@ -279,7 +279,7 @@ WRITE8_MEMBER(meadows_state::audio_hardware_w)
  *
  *************************************/
 
-READ8_MEMBER(meadows_state::audio_hardware_r)
+uint8_t meadows_state::audio_hardware_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0;
 
@@ -304,7 +304,7 @@ READ8_MEMBER(meadows_state::audio_hardware_r)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(meadows_state::audio_interrupt)
+void meadows_state::audio_interrupt(device_t &device)
 {
 	/* fake something toggling the sense input line of the S2650 */
 	m_audio_sense_state ^= 1;
@@ -829,7 +829,7 @@ ROM_END
  *************************************/
 
 /* A fake for the missing ball sprites #3 and #4 */
-DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
+void meadows_state::init_gypsyjug()
 {
 	static const uint8_t ball[16*2] =
 	{
@@ -857,7 +857,7 @@ DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
 
 
 /* A fake for inverting the data bus */
-DRIVER_INIT_MEMBER(meadows_state,minferno)
+void meadows_state::init_minferno()
 {
 	int i, length;
 	uint8_t *mem;

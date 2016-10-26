@@ -295,17 +295,17 @@ public:
 	required_shared_ptr<uint32_t> m_disp_ram;
 	required_device<screen_device> m_screen;
 
-	DECLARE_READ32_MEMBER(a0000000_r);
-	DECLARE_WRITE32_MEMBER(a0000000_w);
-	DECLARE_READ32_MEMBER(b0000000_r);
+	uint32_t a0000000_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void a0000000_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t b0000000_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER(cmd_callback);
+	void cmd_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	std::unique_ptr<uint8_t[]> m_texture;
 	std::unique_ptr<rollext_renderer> m_renderer;
 
-	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	DECLARE_DRIVER_INIT(rollext);
+	void vblank_interrupt(device_t &device);
+	void init_rollext();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -383,7 +383,7 @@ uint32_t rollext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 }
 
 
-READ32_MEMBER(rollext_state::a0000000_r)
+uint32_t rollext_state::a0000000_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -404,12 +404,12 @@ READ32_MEMBER(rollext_state::a0000000_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(rollext_state::a0000000_w)
+void rollext_state::a0000000_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// FPGA interface?
 }
 
-READ32_MEMBER(rollext_state::b0000000_r)
+uint32_t rollext_state::b0000000_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -422,7 +422,7 @@ READ32_MEMBER(rollext_state::b0000000_r)
 	return 0;
 }
 
-WRITE32_MEMBER(rollext_state::cmd_callback)
+void rollext_state::cmd_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t command = data;
 
@@ -558,12 +558,12 @@ static MACHINE_CONFIG_START(rollext, rollext_state)
 MACHINE_CONFIG_END
 
 
-INTERRUPT_GEN_MEMBER(rollext_state::vblank_interrupt)
+void rollext_state::vblank_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(tms32082_mp_device::INPUT_X1, ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER(rollext_state, rollext)
+void rollext_state::init_rollext()
 {
 	m_maincpu->set_command_callback(write32_delegate(FUNC(rollext_state::cmd_callback),this));
 }

@@ -11,19 +11,19 @@
 #include "emu.h"
 #include "includes/sidearms.h"
 
-WRITE8_MEMBER(sidearms_state::videoram_w)
+void sidearms_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidearms_state::colorram_w)
+void sidearms_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidearms_state::c804_w)
+void sidearms_state::c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -67,13 +67,13 @@ WRITE8_MEMBER(sidearms_state::c804_w)
 	}
 }
 
-WRITE8_MEMBER(sidearms_state::gfxctrl_w)
+void sidearms_state::gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_objon = data & 0x01;
 	m_bgon = data & 0x02;
 }
 
-WRITE8_MEMBER(sidearms_state::star_scrollx_w)
+void sidearms_state::star_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t last_state = m_hcount_191;
 
@@ -85,14 +85,14 @@ WRITE8_MEMBER(sidearms_state::star_scrollx_w)
 		m_hflop_74a_n ^= 1;
 }
 
-WRITE8_MEMBER(sidearms_state::star_scrolly_w)
+void sidearms_state::star_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vcount_191++;
 	m_vcount_191 &= 0xff;
 }
 
 
-TILE_GET_INFO_MEMBER(sidearms_state::get_sidearms_bg_tile_info)
+void sidearms_state::get_sidearms_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, attr, color, flags;
 
@@ -105,7 +105,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_sidearms_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(sidearms_state::get_philko_bg_tile_info)
+void sidearms_state::get_philko_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, attr, color, flags;
 
@@ -118,7 +118,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_philko_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
+void sidearms_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + (attr<<2 & 0x300);
@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(sidearms_state::tilemap_scan)
+tilemap_memory_index sidearms_state::tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	int offset = ((row << 7) + col) << 1;

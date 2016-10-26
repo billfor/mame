@@ -65,8 +65,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	DECLARE_WRITE8_MEMBER(row_addr_w);
-	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
+	void row_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via_crtc_reset_w(int state);
 
 private:
 	virtual void machine_reset() override;
@@ -102,7 +102,7 @@ void tv950_state::machine_reset()
 {
 }
 
-WRITE_LINE_MEMBER(tv950_state::via_crtc_reset_w)
+void tv950_state::via_crtc_reset_w(int state)
 {
 	//printf("via_crtc_reset_w: %d\n", state);
 	m_via->write_ca1(state);
@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER(tv950_state::via_crtc_reset_w)
 	}
 }
 
-WRITE8_MEMBER(tv950_state::row_addr_w)
+void tv950_state::row_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_row_addr = data;
 }

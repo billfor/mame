@@ -30,7 +30,7 @@ void clshroad_state::machine_reset()
 }
 
 
-READ8_MEMBER(clshroad_state::input_r)
+uint8_t clshroad_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return  ((~ioport("P1")->read() & (1 << offset)) ? 1 : 0) |
 			((~ioport("P2")->read() & (1 << offset)) ? 2 : 0) |
@@ -463,7 +463,7 @@ ROM_START( clshroadd )
 	ROM_LOAD( "clashrd.g7",  0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) ) /* high 4 bits */
 ROM_END
 
-DRIVER_INIT_MEMBER(clshroad_state,firebatl)
+void clshroad_state::init_firebatl()
 {
 /*
 Pugsy> firebatl:0:05C6:C3:100:Fix the Game:It's a hack but seems to make it work!

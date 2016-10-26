@@ -156,12 +156,12 @@ static NETLIST_START(nl_1942)
 
 NETLIST_END()
 
-WRITE8_MEMBER(_1942_state::c1942_bankswitch_w)
+void _1942_state::c1942_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::c1942_scanline)
+void _1942_state::c1942_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -194,12 +194,12 @@ static ADDRESS_MAP_START( c1942_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(_1942_state::c1942p_f600_w)
+void _1942_state::c1942p_f600_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("c1942p_f600_w %02x\n", data);
 }
 
-WRITE8_MEMBER(_1942_state::c1942p_palette_w)
+void _1942_state::c1942p_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_protopal[offset] = data;
 
@@ -210,7 +210,7 @@ WRITE8_MEMBER(_1942_state::c1942p_palette_w)
 	m_palette->set_indirect_color(offset, rgb_t(r<<5,g<<5,b<<6));
 }
 
-WRITE8_MEMBER(_1942_state::c1942p_soundlatch_w)
+void _1942_state::c1942p_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -946,7 +946,7 @@ ROM_START( 1942p )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(_1942_state,1942)
+void _1942_state::init_1942()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);

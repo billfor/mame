@@ -59,20 +59,20 @@ public:
 	}
 
 	optional_shared_ptr<uint8_t> m_p_videoram;
-	DECLARE_READ8_MEMBER(sapi1_keyboard_r);
-	DECLARE_WRITE8_MEMBER(sapi1_keyboard_w);
-	DECLARE_READ8_MEMBER(sapi2_keyboard_status_r);
-	DECLARE_READ8_MEMBER(sapi2_keyboard_data_r);
-	DECLARE_READ8_MEMBER(sapi3_0c_r);
-	DECLARE_WRITE8_MEMBER(sapi3_00_w);
-	DECLARE_READ8_MEMBER(sapi3_25_r);
-	DECLARE_WRITE8_MEMBER(sapi3_25_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_DRIVER_INIT(sapizps3);
-	DECLARE_DRIVER_INIT(sapizps3a);
-	DECLARE_DRIVER_INIT(sapizps3b);
-	DECLARE_MACHINE_RESET(sapi1);
-	DECLARE_MACHINE_RESET(sapizps3);
+	uint8_t sapi1_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sapi1_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sapi2_keyboard_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sapi2_keyboard_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sapi3_0c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sapi3_00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sapi3_25_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sapi3_25_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_sapizps3();
+	void init_sapizps3a();
+	void init_sapizps3b();
+	void machine_reset_sapi1();
+	void machine_reset_sapizps3();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -441,7 +441,7 @@ MC6845_UPDATE_ROW( sapi1_state::crtc_update_row )
 
 **************************************/
 
-READ8_MEMBER( sapi1_state::sapi1_keyboard_r )
+uint8_t sapi1_state::sapi1_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t key = 0xff;
 	if (BIT(m_keyboard_mask, 0)) { key &= m_line0->read(); }
@@ -452,24 +452,24 @@ READ8_MEMBER( sapi1_state::sapi1_keyboard_r )
 	return key;
 }
 
-WRITE8_MEMBER( sapi1_state::sapi1_keyboard_w )
+void sapi1_state::sapi1_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyboard_mask = (data ^ 0xff ) & 0x1f;
 }
 
-READ8_MEMBER( sapi1_state::sapi2_keyboard_status_r)
+uint8_t sapi1_state::sapi2_keyboard_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 0 : 1;
 }
 
-READ8_MEMBER( sapi1_state::sapi2_keyboard_data_r)
+uint8_t sapi1_state::sapi2_keyboard_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = ~m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( sapi1_state::kbd_put )
+void sapi1_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }
@@ -480,53 +480,53 @@ WRITE8_MEMBER( sapi1_state::kbd_put )
 
 **************************************/
 
-READ8_MEMBER( sapi1_state::sapi3_0c_r )
+uint8_t sapi1_state::sapi3_0c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xc0;
 }
 
 /* switch out the rom shadow */
-WRITE8_MEMBER( sapi1_state::sapi3_00_w )
+void sapi1_state::sapi3_00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank1->set_entry(0);
 }
 
 /* to stop execution in random ram */
-READ8_MEMBER( sapi1_state::sapi3_25_r )
+uint8_t sapi1_state::sapi3_25_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_zps3_25;
 }
 
-WRITE8_MEMBER( sapi1_state::sapi3_25_w )
+void sapi1_state::sapi3_25_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_zps3_25 = data & 0xfc; //??
 }
 
-MACHINE_RESET_MEMBER( sapi1_state, sapi1 )
+void sapi1_state::machine_reset_sapi1()
 {
 	m_keyboard_mask = 0;
 	m_refresh_counter = 0x20;
 }
 
-MACHINE_RESET_MEMBER( sapi1_state, sapizps3 )
+void sapi1_state::machine_reset_sapizps3()
 {
 	m_keyboard_mask = 0;
 	m_bank1->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3 )
+void sapi1_state::init_sapizps3()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3a )
+void sapi1_state::init_sapizps3a()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
-DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
+void sapi1_state::init_sapizps3b()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	m_bank1->configure_entries(0, 2, &RAM[0x0000], 0x10000);

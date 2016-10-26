@@ -28,7 +28,7 @@ static tilemap_t *bg_tilemap;
     Byte 0:
         pppppppp = picture index
  */
-TILE_GET_INFO_MEMBER(mcr_state::mcr_90009_get_tile_info)
+void mcr_state::mcr_90009_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	SET_TILE_INFO_MEMBER(0, videoram[tile_index], 0, 0);
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_90009_get_tile_info)
         ------x- = X flip
         -------p = picture index (high 1 bit)
  */
-TILE_GET_INFO_MEMBER(mcr_state::mcr_90010_get_tile_info)
+void mcr_state::mcr_90010_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
@@ -77,7 +77,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_90010_get_tile_info)
         -----x-- = X flip
         ------pp = picture index (high 2 bits)
  */
-TILE_GET_INFO_MEMBER(mcr_state::mcr_91490_get_tile_info)
+void mcr_state::mcr_91490_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_91490_get_tile_info)
  *
  *************************************/
 
-VIDEO_START_MEMBER(mcr_state,mcr)
+void mcr_state::video_start_mcr()
 {
 	/* the tilemap callback is based on the CPU board */
 	switch (mcr_cpu_board)
@@ -167,7 +167,7 @@ void mcr_state::journey_set_color(int index, int data)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_paletteram9_w)
+void mcr_state::mcr_paletteram9_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// palette RAM is actually 9 bit (a 93419 SRAM)
 	// however, there is no way for the CPU to read back
@@ -185,7 +185,7 @@ WRITE8_MEMBER(mcr_state::mcr_paletteram9_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr_state::mcr_90009_videoram_w)
+void mcr_state::mcr_90009_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -193,7 +193,7 @@ WRITE8_MEMBER(mcr_state::mcr_90009_videoram_w)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_90010_videoram_w)
+void mcr_state::mcr_90010_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -210,7 +210,7 @@ WRITE8_MEMBER(mcr_state::mcr_90010_videoram_w)
 }
 
 
-READ8_MEMBER(mcr_state::twotiger_videoram_r)
+uint8_t mcr_state::twotiger_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	/* Two Tigers swizzles the address bits on videoram */
@@ -218,7 +218,7 @@ READ8_MEMBER(mcr_state::twotiger_videoram_r)
 	return videoram[effoffs];
 }
 
-WRITE8_MEMBER(mcr_state::twotiger_videoram_w)
+void mcr_state::twotiger_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	/* Two Tigers swizzles the address bits on videoram */
@@ -233,7 +233,7 @@ WRITE8_MEMBER(mcr_state::twotiger_videoram_w)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_91490_videoram_w)
+void mcr_state::mcr_91490_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;

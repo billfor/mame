@@ -78,18 +78,18 @@ public:
 	uint32_t m_in_1;
 	uint32_t m_in_0_shift;
 	uint32_t m_in_1_shift;
-	DECLARE_WRITE8_MEMBER(nt_w);
-	DECLARE_READ8_MEMBER(nt_r);
-	DECLARE_WRITE8_MEMBER(sprite_dma_w);
-	DECLARE_READ8_MEMBER(cham24_IN0_r);
-	DECLARE_WRITE8_MEMBER(cham24_IN0_w);
-	DECLARE_READ8_MEMBER(cham24_IN1_r);
-	DECLARE_WRITE8_MEMBER(cham24_mapper_w);
-	DECLARE_DRIVER_INIT(cham24);
+	void nt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cham24_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cham24_IN0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cham24_IN1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cham24_mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_cham24();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cham24);
+	void palette_init_cham24(palette_device &palette);
 	uint32_t screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cham24_set_mirroring( int mirroring );
 	void ppu_irq(int *ppu_regs);
@@ -129,31 +129,31 @@ void cham24_state::cham24_set_mirroring( int mirroring )
 	}
 }
 
-WRITE8_MEMBER(cham24_state::nt_w)
+void cham24_state::nt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int page = ((offset & 0xc00) >> 10);
 	m_nt_page[page][offset & 0x3ff] = data;
 }
 
-READ8_MEMBER(cham24_state::nt_r)
+uint8_t cham24_state::nt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int page = ((offset & 0xc00) >> 10);
 	return m_nt_page[page][offset & 0x3ff];
 
 }
 
-WRITE8_MEMBER(cham24_state::sprite_dma_w)
+void cham24_state::sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int source = (data & 7);
 	m_ppu->spriteram_dma(space, source);
 }
 
-READ8_MEMBER(cham24_state::cham24_IN0_r)
+uint8_t cham24_state::cham24_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_in_0 >> m_in_0_shift++) & 0x01) | 0x40;
 }
 
-WRITE8_MEMBER(cham24_state::cham24_IN0_w)
+void cham24_state::cham24_IN0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0xfe)
 	{
@@ -173,12 +173,12 @@ WRITE8_MEMBER(cham24_state::cham24_IN0_w)
 
 }
 
-READ8_MEMBER(cham24_state::cham24_IN1_r)
+uint8_t cham24_state::cham24_IN1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
 
-WRITE8_MEMBER(cham24_state::cham24_mapper_w)
+void cham24_state::cham24_mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t gfx_bank = offset & 0x3f;
 	uint32_t prg_16k_bank_page = (offset >> 6) & 0x01;
@@ -253,7 +253,7 @@ void cham24_state::machine_reset()
 {
 }
 
-PALETTE_INIT_MEMBER(cham24_state, cham24)
+void cham24_state::palette_init_cham24(palette_device &palette)
 {
 	m_ppu->init_palette(palette, 0);
 }
@@ -299,7 +299,7 @@ void cham24_state::machine_start()
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff,read8_delegate(FUNC(cham24_state::nt_r), this), write8_delegate(FUNC(cham24_state::nt_w), this));
 }
 
-DRIVER_INIT_MEMBER(cham24_state,cham24)
+void cham24_state::init_cham24()
 {
 }
 

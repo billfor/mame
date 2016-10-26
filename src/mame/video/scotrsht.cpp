@@ -5,7 +5,7 @@
 
 
 /* Similar as Iron Horse */
-PALETTE_INIT_MEMBER(scotrsht_state, scotrsht)
+void scotrsht_state::palette_init_scotrsht(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -36,19 +36,19 @@ PALETTE_INIT_MEMBER(scotrsht_state, scotrsht)
 	}
 }
 
-WRITE8_MEMBER(scotrsht_state::videoram_w)
+void scotrsht_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(scotrsht_state::colorram_w)
+void scotrsht_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(scotrsht_state::charbank_w)
+void scotrsht_state::charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charbank != (data & 0x01))
 	{
@@ -59,7 +59,7 @@ WRITE8_MEMBER(scotrsht_state::charbank_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(scotrsht_state::palettebank_w)
+void scotrsht_state::palettebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palette_bank != ((data & 0x70) >> 4))
 	{
@@ -74,7 +74,7 @@ WRITE8_MEMBER(scotrsht_state::palettebank_w)
 }
 
 
-TILE_GET_INFO_MEMBER(scotrsht_state::get_bg_tile_info)
+void scotrsht_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + (m_charbank << 9) + ((attr & 0x40) << 2);

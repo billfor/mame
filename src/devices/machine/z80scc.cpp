@@ -554,7 +554,7 @@ int z80scc_device::m1_r()
 //-------------------------------------------------
 //  zbus_r - Z-Bus read
 //-------------------------------------------------
-READ8_MEMBER( z80scc_device::zbus_r )
+uint8_t z80scc_device::zbus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = 0;
 	int reg = 0x20; // Default point to a non register number
@@ -588,7 +588,7 @@ READ8_MEMBER( z80scc_device::zbus_r )
 //-------------------------------------------------
 //  zbus_w - Z-Bus write
 //-------------------------------------------------
-WRITE8_MEMBER( z80scc_device::zbus_w )
+void z80scc_device::zbus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ba = 0;
 	int reg = 0x20; // Default point to a non register number
@@ -620,7 +620,7 @@ WRITE8_MEMBER( z80scc_device::zbus_w )
 //-------------------------------------------------
 //  cd_ba_r - Universal Bus read
 //-------------------------------------------------
-READ8_MEMBER( z80scc_device::cd_ba_r )
+uint8_t z80scc_device::cd_ba_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -640,7 +640,7 @@ READ8_MEMBER( z80scc_device::cd_ba_r )
 //-------------------------------------------------
 //  cd_ba_w - Universal Bus write
 //-------------------------------------------------
-WRITE8_MEMBER( z80scc_device::cd_ba_w )
+void z80scc_device::cd_ba_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -665,7 +665,7 @@ WRITE8_MEMBER( z80scc_device::cd_ba_w )
 //  ba_cd_r - Universal Bus read
 //-------------------------------------------------
 
-READ8_MEMBER( z80scc_device::ba_cd_r )
+uint8_t z80scc_device::ba_cd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -687,7 +687,7 @@ READ8_MEMBER( z80scc_device::ba_cd_r )
 //  ba_cd_w - Universal Bus write
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80scc_device::ba_cd_w )
+void z80scc_device::ba_cd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -712,7 +712,7 @@ WRITE8_MEMBER( z80scc_device::ba_cd_w )
 //  ba_cd_inv_r - Universal Bus read
 //-------------------------------------------------
 
-READ8_MEMBER( z80scc_device::ba_cd_inv_r )
+uint8_t z80scc_device::ba_cd_inv_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -734,7 +734,7 @@ READ8_MEMBER( z80scc_device::ba_cd_inv_r )
 //  ba_cd_inv_w - Universal Bus read
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80scc_device::ba_cd_inv_w )
+void z80scc_device::ba_cd_inv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -2237,10 +2237,10 @@ void z80scc_channel::m_tx_fifo_rp_step()
 		}
 }
 
-READ8_MEMBER (z80scc_device::da_r)  { return m_chanA->data_read(); }
-WRITE8_MEMBER (z80scc_device::da_w) { m_chanA->data_write(data); }
-READ8_MEMBER (z80scc_device::db_r)  { return m_chanB->data_read(); }
-WRITE8_MEMBER (z80scc_device::db_w) { m_chanB->data_write(data); }
+uint8_t z80scc_device::da_r(address_space &space, offs_t offset, uint8_t mem_mask)  { return m_chanA->data_read(); }
+void z80scc_device::da_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_chanA->data_write(data); }
+uint8_t z80scc_device::db_r(address_space &space, offs_t offset, uint8_t mem_mask)  { return m_chanB->data_read(); }
+void z80scc_device::db_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_chanB->data_write(data); }
 
 //-------------------------------------------------
 //  data_write - write data register
@@ -2364,7 +2364,7 @@ void z80scc_channel::receive_data(uint8_t data)
 //  cts_w - clear to send handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80scc_channel::cts_w )
+void z80scc_channel::cts_w(int state)
 {
 	LOG(("\"%s\" %s: %c : CTS %u\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state));
 
@@ -2408,7 +2408,7 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 //  dcd_w - data carrier detected handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
+void z80scc_channel::dcd_w(int state)
 {
 	LOG(("\"%s\": %c : DCD %u\n", m_owner->tag(), 'A' + m_index, state));
 
@@ -2458,7 +2458,7 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 //  ri_w - ring indicator handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80scc_channel::ri_w )
+void z80scc_channel::ri_w(int state)
 {
 	LOG(("\"%s\": %c : RI %u\n", m_owner->tag(), 'A' + m_index, state));
 
@@ -2489,7 +2489,7 @@ WRITE_LINE_MEMBER( z80scc_channel::ri_w )
 //-------------------------------------------------
 //  sync_w - sync handler
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::sync_w )
+void z80scc_channel::sync_w(int state)
 {
 	LOG(("\"%s\": %c : SYNC %u\n", m_owner->tag(), 'A' + m_index, state));
 }
@@ -2497,7 +2497,7 @@ WRITE_LINE_MEMBER( z80scc_channel::sync_w )
 //-------------------------------------------------
 //  rxc_w - receive clock
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::rxc_w )
+void z80scc_channel::rxc_w(int state)
 {
 /* Support for external clock as source for BRG yet to be finished */
 #if 0
@@ -2549,7 +2549,7 @@ WRITE_LINE_MEMBER( z80scc_channel::rxc_w )
 //-------------------------------------------------
 //  txc_w - transmit clock
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::txc_w )
+void z80scc_channel::txc_w(int state)
 {
 	//LOG(("\"%s\": %c : Transmitter Clock Pulse\n", m_owner->tag(), m_index + 'A'));
 	if (m_wr5 & WR5_TX_ENABLE)
@@ -2674,7 +2674,7 @@ void z80scc_channel::set_dtr(int state)
 //  write_rx - called by terminal through rs232/diserial
 //         when character is sent to board
 //-------------------------------------------------
-WRITE_LINE_MEMBER(z80scc_channel::write_rx)
+void z80scc_channel::write_rx(int state)
 {
 #if START_BIT_HUNT
 	// Check for start bit if not receiving

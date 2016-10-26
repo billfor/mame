@@ -71,14 +71,14 @@ public:
 		, m_crtc(*this, "mc6845")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_WRITE8_MEMBER(a6809_address_w);
-	DECLARE_WRITE8_MEMBER(a6809_register_w);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_MACHINE_RESET(a6809);
-	TIMER_DEVICE_CALLBACK_MEMBER(a6809_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(a6809_p);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void a6809_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void a6809_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cass_w(int state);
+	void machine_reset_a6809();
+	void a6809_c(timer_device &timer, void *ptr, int32_t param);
+	void a6809_p(timer_device &timer, void *ptr, int32_t param);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint16_t m_start_address;
 	uint16_t m_cursor_address;
@@ -114,7 +114,7 @@ static INPUT_PORTS_START( a6809 )
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER( a6809_state, a6809)
+void a6809_state::machine_reset_a6809()
 {
 	m_via->write_pb0(0);
 	m_via->write_pb1(0);
@@ -126,7 +126,7 @@ MACHINE_RESET_MEMBER( a6809_state, a6809)
 	m_via->write_pb7(0);
 }
 
-READ8_MEMBER( a6809_state::videoram_r )
+uint8_t a6809_state::videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += m_start_address;
 
@@ -136,14 +136,14 @@ READ8_MEMBER( a6809_state::videoram_r )
 		return m_p_videoram[offset&0x3ff];
 }
 
-WRITE8_MEMBER( a6809_state::a6809_address_w )
+void a6809_state::a6809_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc->address_w( space, 0, data );
 
 	m_video_index = data & 0x1f;
 }
 
-WRITE8_MEMBER( a6809_state::a6809_register_w )
+void a6809_state::a6809_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t temp = m_start_address;
 	uint16_t temq = m_cursor_address;
@@ -166,12 +166,12 @@ WRITE8_MEMBER( a6809_state::a6809_register_w )
 		m_cursor_address = data | (temq & 0x3f00);
 }
 
-WRITE_LINE_MEMBER( a6809_state::cass_w )
+void a6809_state::cass_w(int state)
 {
 	m_cass_state = state;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(a6809_state::a6809_c)
+void a6809_state::a6809_c(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[3]++;
 
@@ -187,7 +187,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(a6809_state::a6809_c)
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(a6809_state::a6809_p)
+void a6809_state::a6809_p(timer_device &timer, void *ptr, int32_t param)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -201,7 +201,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(a6809_state::a6809_p)
 	}
 }
 
-WRITE8_MEMBER( a6809_state::kbd_put )
+void a6809_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t d = data & 0x7f;
 	if (d == 8) d = 0x7f; // allow backspace to work

@@ -17,16 +17,16 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_READ16_MEMBER(mem_r);
-	DECLARE_WRITE16_MEMBER(mem_w);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mem_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_00_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_01_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_10_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_11_w);
+	void isbx_irq_00_w(int state);
+	void isbx_irq_01_w(int state);
+	void isbx_irq_10_w(int state);
+	void isbx_irq_11_w(int state);
 
 	static void static_set_wakeup_addr(device_t &device, uint32_t wakeup) { downcast<isbc_215g_device &>(device).m_wakeup = wakeup; }
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag) { downcast<isbc_215g_device &>(device).m_maincpu_tag = maincpu_tag; }

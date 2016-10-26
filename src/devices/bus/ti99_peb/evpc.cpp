@@ -207,7 +207,7 @@ READ8Z_MEMBER(snug_enhanced_video_device::readz)
     0x5f00 - 0x5fef   NOVRAM
     0x5ff0 - 0x5fff   Palette (5ff8, 5ffa, 5ffc, 5ffe)
 */
-WRITE8_MEMBER(snug_enhanced_video_device::write)
+void snug_enhanced_video_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_selected && m_inDsrArea)
 	{
@@ -324,7 +324,7 @@ READ8Z_MEMBER(snug_enhanced_video_device::crureadz)
     Bit 6: -
     Bit 7: -
 */
-WRITE8_MEMBER(snug_enhanced_video_device::cruwrite)
+void snug_enhanced_video_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0xff00)==EVPC_CRU_BASE)
 	{
@@ -372,7 +372,7 @@ WRITE8_MEMBER(snug_enhanced_video_device::cruwrite)
 /*
     READY line for the sound chip
 */
-WRITE_LINE_MEMBER( snug_enhanced_video_device::ready_line )
+void snug_enhanced_video_device::ready_line(int state)
 {
 	m_slot->set_ready(state);
 }
@@ -412,7 +412,7 @@ void snug_enhanced_video_device::device_stop()
 
     For the SGCPU, the signal is delivered by the LCP line.
 */
-WRITE_LINE_MEMBER( snug_enhanced_video_device::video_interrupt_in )
+void snug_enhanced_video_device::video_interrupt_in(int state)
 {
 	if (m_console_conn != nullptr) m_console_conn->vclock_line(state);
 	else m_slot->lcp_line(state);

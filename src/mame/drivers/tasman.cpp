@@ -61,26 +61,26 @@ public:
 	required_device<palette_device> m_palette;
 
 	optional_shared_ptr<uint32_t> m_vram;
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
-	DECLARE_READ32_MEMBER(test_r);
-	// DECLARE_READ32_MEMBER(rng_r);
-	DECLARE_DRIVER_INIT(kingtut);
-	DECLARE_VIDEO_START(kongambl);
+	uint32_t eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kongambl_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t test_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	// uint32_t rng_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void init_kingtut();
+	void video_start_kongambl();
 	uint8_t m_irq_mask;
 
 	virtual void machine_reset() override { m_irq_mask = 0; };
 	uint32_t screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	WRITE_LINE_MEMBER(vblank_irq_ack_w);
-	WRITE_LINE_MEMBER(hblank_irq_ack_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
+	void vblank_irq_ack_w(int state);
+	void hblank_irq_ack_w(int state);
+	void kongambl_vblank(timer_device &timer, void *ptr, int32_t param);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 };
 
 
-VIDEO_START_MEMBER(kongambl_state,kongambl)
+void kongambl_state::video_start_kongambl()
 {
 	#if CUSTOM_DRAW
 
@@ -142,7 +142,7 @@ uint32_t kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ32_MEMBER(kongambl_state::eeprom_r)
+uint32_t kongambl_state::eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//return machine().rand();
 	uint32_t retval = 0;
@@ -164,7 +164,7 @@ READ32_MEMBER(kongambl_state::eeprom_r)
 
 	return retval;
 }
-WRITE8_MEMBER(kongambl_state::eeprom_w)
+void kongambl_state::eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// offset == 3 seems mux writes (active low)
 
@@ -181,19 +181,19 @@ WRITE8_MEMBER(kongambl_state::eeprom_w)
 		m_irq_mask = data;
 }
 
-READ32_MEMBER(kongambl_state::test_r)
+uint32_t kongambl_state::test_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return -1;//space.machine().rand();
 }
 
 /*
- READ32_MEMBER(kongambl_state::rng_r)
+ uint32_t kongambl_state::rng_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
     return space.machine().rand();
 }
 */
 
-WRITE8_MEMBER(kongambl_state::kongambl_ff_w)
+void kongambl_state::kongambl_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* enables thru 0->1 */
 	/* ---- x--- (related to OBJ ROM) */
@@ -602,17 +602,17 @@ static GFXDECODE_START( tasman )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(kongambl_state::vblank_irq_ack_w)
+void kongambl_state::vblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(kongambl_state::hblank_irq_ack_w)
+void kongambl_state::hblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
+void kongambl_state::kongambl_vblank(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -804,7 +804,7 @@ ROM_START( vikingt )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(kongambl_state,kingtut)
+void kongambl_state::init_kingtut()
 {
 	//uint32_t *rom = (uint32_t*)memregion("maincpu")->base();
 

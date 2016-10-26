@@ -66,7 +66,7 @@ rgb_t lasso_state::get_color( int data )
 }
 
 
-PALETTE_INIT_MEMBER(lasso_state, lasso)
+void lasso_state::palette_init_lasso(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -76,7 +76,7 @@ PALETTE_INIT_MEMBER(lasso_state, lasso)
 }
 
 
-PALETTE_INIT_MEMBER(lasso_state,wwjgtin)
+void lasso_state::palette_init_wwjgtin(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -120,7 +120,7 @@ void lasso_state::wwjgtin_set_last_four_colors()
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(lasso_state::lasso_get_bg_tile_info)
+void lasso_state::lasso_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
@@ -131,7 +131,7 @@ TILE_GET_INFO_MEMBER(lasso_state::lasso_get_bg_tile_info)
 					0);
 }
 
-TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
+void lasso_state::wwjgtin_get_track_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *ROM = memregion("user1")->base();
 	int code = ROM[tile_index];
@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
 					0);
 }
 
-TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
+void lasso_state::pinbo_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code  = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
@@ -169,7 +169,7 @@ void lasso_state::video_start()
 	m_bg_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(lasso_state,wwjgtin)
+void lasso_state::video_start_wwjgtin()
 {
 	/* create tilemaps */
 	m_bg_tilemap =    &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lasso_state::lasso_get_bg_tile_info),this),      TILEMAP_SCAN_ROWS,  8,  8,  32, 32);
@@ -178,7 +178,7 @@ VIDEO_START_MEMBER(lasso_state,wwjgtin)
 	m_bg_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(lasso_state,pinbo)
+void lasso_state::video_start_pinbo()
 {
 	/* create tilemap */
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lasso_state::pinbo_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -193,20 +193,20 @@ VIDEO_START_MEMBER(lasso_state,pinbo)
  *
  *************************************/
 
-WRITE8_MEMBER(lasso_state::lasso_videoram_w)
+void lasso_state::lasso_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lasso_state::lasso_colorram_w)
+void lasso_state::lasso_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(lasso_state::lasso_flip_screen_w)
+void lasso_state::lasso_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* don't know which is which, but they are always set together */
 	flip_screen_x_set(data & 0x01);
@@ -216,7 +216,7 @@ WRITE8_MEMBER(lasso_state::lasso_flip_screen_w)
 }
 
 
-WRITE8_MEMBER(lasso_state::lasso_video_control_w)
+void lasso_state::lasso_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = (data & 0x04) >> 2;
 
@@ -229,7 +229,7 @@ WRITE8_MEMBER(lasso_state::lasso_video_control_w)
 	lasso_flip_screen_w(space, offset, data);
 }
 
-WRITE8_MEMBER(lasso_state::wwjgtin_video_control_w)
+void lasso_state::wwjgtin_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = ((data & 0x04) ? 0 : 1) + ((data & 0x10) ? 2 : 0);
 	m_track_enable = data & 0x08;
@@ -243,7 +243,7 @@ WRITE8_MEMBER(lasso_state::wwjgtin_video_control_w)
 	lasso_flip_screen_w(space, offset, data);
 }
 
-WRITE8_MEMBER(lasso_state::pinbo_video_control_w)
+void lasso_state::pinbo_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* no need to dirty the tilemap -- only the sprites use the global bank */
 	m_gfxbank = (data & 0x0c) >> 2;

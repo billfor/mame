@@ -29,7 +29,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(pooyan_state, pooyan)
+void pooyan_state::palette_init_pooyan(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -95,7 +95,7 @@ PALETTE_INIT_MEMBER(pooyan_state, pooyan)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(pooyan_state::get_bg_tile_info)
+void pooyan_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
@@ -126,21 +126,21 @@ void pooyan_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(pooyan_state::videoram_w)
+void pooyan_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(pooyan_state::colorram_w)
+void pooyan_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(pooyan_state::flipscreen_w)
+void pooyan_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 0x01);
 }

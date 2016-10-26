@@ -382,10 +382,10 @@ public:
 	required_device<screen_device> m_screen;
 
 
-	DECLARE_DRIVER_INIT(snes);
-	DECLARE_DRIVER_INIT(snes_hirom);
-	DECLARE_DRIVER_INIT(snes_mess);
-	DECLARE_DRIVER_INIT(snesst);
+	void init_snes();
+	void init_snes_hirom();
+	void init_snes_mess();
+	void init_snesst();
 
 	inline int dma_abus_valid(uint32_t address);
 	inline uint8_t abus_read(address_space &space, uint32_t abus);
@@ -405,29 +405,29 @@ public:
 	void snes_init_ram();
 
 	// input related
-	virtual DECLARE_WRITE8_MEMBER(io_read);
+	virtual void io_read(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual uint8_t oldjoy1_read(int latched);
 	virtual uint8_t oldjoy2_read(int latched);
 
-	DECLARE_READ8_MEMBER(snes_r_io);
-	DECLARE_WRITE8_MEMBER(snes_w_io);
-	DECLARE_READ8_MEMBER(snes_io_dma_r);
-	DECLARE_WRITE8_MEMBER(snes_io_dma_w);
-	DECLARE_READ8_MEMBER(snes_r_bank1);
-	DECLARE_READ8_MEMBER(snes_r_bank2);
-	DECLARE_WRITE8_MEMBER(snes_w_bank1);
-	DECLARE_WRITE8_MEMBER(snes_w_bank2);
-	DECLARE_READ8_MEMBER(snes_open_bus_r);
-	TIMER_CALLBACK_MEMBER(snes_nmi_tick);
-	TIMER_CALLBACK_MEMBER(snes_hirq_tick_callback);
-	TIMER_CALLBACK_MEMBER(snes_reset_oam_address);
-	TIMER_CALLBACK_MEMBER(snes_reset_hdma);
-	TIMER_CALLBACK_MEMBER(snes_update_io);
-	TIMER_CALLBACK_MEMBER(snes_scanline_tick);
-	TIMER_CALLBACK_MEMBER(snes_hblank_tick);
-	DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(snes_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sufami_cart);
+	uint8_t snes_r_io(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snes_w_io(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t snes_io_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snes_io_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t snes_r_bank1(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t snes_r_bank2(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snes_w_bank1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snes_w_bank2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t snes_open_bus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snes_nmi_tick(void *ptr, int32_t param);
+	void snes_hirq_tick_callback(void *ptr, int32_t param);
+	void snes_reset_oam_address(void *ptr, int32_t param);
+	void snes_reset_hdma(void *ptr, int32_t param);
+	void snes_update_io(void *ptr, int32_t param);
+	void snes_scanline_tick(void *ptr, int32_t param);
+	void snes_hblank_tick(void *ptr, int32_t param);
+	void snes_extern_irq_w(int state);
+	image_init_result device_image_load_snes_cart(device_image_interface &image);
+	image_init_result device_image_load_sufami_cart(device_image_interface &image);
 	void snes_init_timers();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -33,7 +33,7 @@ uint32_t stadhero_state::screen_update_stadhero(screen_device &screen, bitmap_in
 
 /******************************************************************************/
 
-WRITE16_MEMBER(stadhero_state::stadhero_pf1_data_w)
+void stadhero_state::stadhero_pf1_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset);
@@ -42,7 +42,7 @@ WRITE16_MEMBER(stadhero_state::stadhero_pf1_data_w)
 
 /******************************************************************************/
 
-TILE_GET_INFO_MEMBER(stadhero_state::get_pf1_tile_info)
+void stadhero_state::get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_pf1_data[tile_index];
 	int color=tile >> 12;

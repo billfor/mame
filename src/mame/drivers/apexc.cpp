@@ -33,14 +33,14 @@ public:
 
 	int m_letters;
 	int m_pos;
-	DECLARE_DRIVER_INIT(apexc);
+	void init_apexc();
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(apexc);
+	void palette_init_apexc(palette_device &palette);
 	uint32_t screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(apexc_interrupt);
-	DECLARE_READ8_MEMBER(tape_read);
-	DECLARE_WRITE8_MEMBER(tape_write);
+	void apexc_interrupt(device_t &device);
+	uint8_t tape_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tape_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void apexc_draw_led(bitmap_ind16 &bitmap, int x, int y, int state);
 	void apexc_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color);
 	void apexc_draw_string(bitmap_ind16 &bitmap, const char *buf, int x, int y, int color);
@@ -265,7 +265,7 @@ apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_con
     Open a tape image
 */
 
-READ8_MEMBER(apexc_state::tape_read)
+uint8_t apexc_state::tape_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	device_t *device = machine().device("tape_reader");
 	uint8_t reply;
@@ -277,7 +277,7 @@ READ8_MEMBER(apexc_state::tape_read)
 		return 0;   /* unit not ready - I don't know what we should do */
 }
 
-WRITE8_MEMBER(apexc_state::tape_write)
+void apexc_state::tape_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_t *device = machine().device("tape_puncher");
 	uint8_t data5 = (data & 0x1f);
@@ -399,7 +399,7 @@ INPUT_PORTS_END
 /*
     Not a real interrupt - just handle keyboard input
 */
-INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
+void apexc_state::apexc_interrupt(device_t &device)
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	uint32_t edit_keys;
@@ -552,7 +552,7 @@ static const rectangle teletyper_scroll_clear_window(
 );
 //static const int var_teletyper_scroll_step = - teletyper_scroll_step;
 
-PALETTE_INIT_MEMBER(apexc_state, apexc)
+void apexc_state::palette_init_apexc(palette_device &palette)
 {
 	palette.set_pen_colors(0, apexc_palette, APEXC_PALETTE_SIZE);
 }
@@ -727,7 +727,7 @@ enum
 };
 
 /* apexc driver init : builds a font for use by the teletyper */
-DRIVER_INIT_MEMBER(apexc_state,apexc)
+void apexc_state::init_apexc()
 {
 	uint8_t *dst;
 

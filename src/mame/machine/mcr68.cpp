@@ -19,7 +19,7 @@
  *
  *************************************/
 
-READ8_MEMBER(mcr68_state::zwackery_port_1_r)
+uint8_t mcr68_state::zwackery_port_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = ioport("IN1")->read();
 
@@ -29,7 +29,7 @@ READ8_MEMBER(mcr68_state::zwackery_port_1_r)
 }
 
 
-READ8_MEMBER(mcr68_state::zwackery_port_3_r)
+uint8_t mcr68_state::zwackery_port_3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = ioport("IN3")->read();
 
@@ -46,7 +46,7 @@ READ8_MEMBER(mcr68_state::zwackery_port_3_r)
  *
  *************************************/
 
-MACHINE_START_MEMBER(mcr68_state,mcr68)
+void mcr68_state::machine_start_mcr68()
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -97,7 +97,7 @@ void mcr68_state::mcr68_common_init()
 }
 
 
-MACHINE_RESET_MEMBER(mcr68_state,mcr68)
+void mcr68_state::machine_reset_mcr68()
 {
 	/* for the most part all MCR/68k games are the same */
 	mcr68_common_init();
@@ -109,13 +109,13 @@ MACHINE_RESET_MEMBER(mcr68_state,mcr68)
 }
 
 
-MACHINE_START_MEMBER(mcr68_state,zwackery)
+void mcr68_state::machine_start_zwackery()
 {
-	MACHINE_START_CALL_MEMBER(mcr68);
+	machine_start_mcr68();
 }
 
 
-MACHINE_RESET_MEMBER(mcr68_state,zwackery)
+void mcr68_state::machine_reset_zwackery()
 {
 	/* for the most part all MCR/68k games are the same */
 	mcr68_common_init();
@@ -134,7 +134,7 @@ MACHINE_RESET_MEMBER(mcr68_state,zwackery)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(mcr68_state::mcr68_interrupt)
+void mcr68_state::mcr68_interrupt(device_t &device)
 {
 	/* update the 6840 VBLANK clock */
 	if (!m_m6840_state[0].timer_active)
@@ -163,14 +163,14 @@ void mcr68_state::update_mcr68_interrupts()
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_off_callback)
+void mcr68_state::mcr68_493_off_callback(void *ptr, int32_t param)
 {
 	m_v493_irq_state = 0;
 	update_mcr68_interrupts();
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_callback)
+void mcr68_state::mcr68_493_callback(void *ptr, int32_t param)
 {
 	m_v493_irq_state = 1;
 	update_mcr68_interrupts();
@@ -186,7 +186,7 @@ TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_callback)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr68_state::zwackery_pia0_w)
+void mcr68_state::zwackery_pia0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7 is the watchdog */
 	if (!(data & 0x80)) m_watchdog->watchdog_reset();
@@ -197,20 +197,20 @@ WRITE8_MEMBER(mcr68_state::zwackery_pia0_w)
 }
 
 
-WRITE8_MEMBER(mcr68_state::zwackery_pia1_w)
+void mcr68_state::zwackery_pia1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_zwackery_sound_data = (data >> 4) & 0x0f;
 }
 
 
-WRITE_LINE_MEMBER(mcr68_state::zwackery_ca2_w)
+void mcr68_state::zwackery_ca2_w(int state)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_chip_squeak_deluxe->write(space, 0, (state << 4) | m_zwackery_sound_data);
 }
 
 
-WRITE_LINE_MEMBER(mcr68_state::zwackery_pia_irq)
+void mcr68_state::zwackery_pia_irq(int state)
 {
 	pia6821_device *pia = machine().device<pia6821_device>("pia0");
 	m_v493_irq_state = pia->irq_a_state() | pia->irq_b_state();
@@ -218,14 +218,14 @@ WRITE_LINE_MEMBER(mcr68_state::zwackery_pia_irq)
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr68_state::zwackery_493_off_callback)
+void mcr68_state::zwackery_493_off_callback(void *ptr, int32_t param)
 {
 	pia6821_device *pia = machine().device<pia6821_device>("pia0");
 	pia->ca1_w(0);
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr68_state::zwackery_493_callback)
+void mcr68_state::zwackery_493_callback(void *ptr, int32_t param)
 {
 	pia6821_device *pia = machine().device<pia6821_device>("pia0");
 
@@ -316,7 +316,7 @@ void mcr68_state::subtract_from_counter(int counter, int count)
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr68_state::counter_fired_callback)
+void mcr68_state::counter_fired_callback(void *ptr, int32_t param)
 {
 	int count = param >> 2;
 	int counter = param & 3;
@@ -407,7 +407,7 @@ uint16_t mcr68_state::compute_counter(int counter)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr68_state::mcr68_6840_w_common)
+void mcr68_state::mcr68_6840_w_common(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -478,7 +478,7 @@ WRITE8_MEMBER(mcr68_state::mcr68_6840_w_common)
 }
 
 
-READ16_MEMBER(mcr68_state::mcr68_6840_r_common)
+uint16_t mcr68_state::mcr68_6840_r_common(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* offset 0 is a no-op */
 	if (offset == 0)
@@ -515,27 +515,27 @@ READ16_MEMBER(mcr68_state::mcr68_6840_r_common)
 }
 
 
-WRITE16_MEMBER(mcr68_state::mcr68_6840_upper_w)
+void mcr68_state::mcr68_6840_upper_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		mcr68_6840_w_common(space, offset, (data >> 8) & 0xff);
 }
 
 
-WRITE16_MEMBER(mcr68_state::mcr68_6840_lower_w)
+void mcr68_state::mcr68_6840_lower_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		mcr68_6840_w_common(space, offset, data & 0xff);
 }
 
 
-READ16_MEMBER(mcr68_state::mcr68_6840_upper_r)
+uint16_t mcr68_state::mcr68_6840_upper_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (mcr68_6840_r_common(space,offset,0) << 8) | 0x00ff;
 }
 
 
-READ16_MEMBER(mcr68_state::mcr68_6840_lower_r)
+uint16_t mcr68_state::mcr68_6840_lower_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return mcr68_6840_r_common(space,offset,0) | 0xff00;
 }

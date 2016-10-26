@@ -28,21 +28,21 @@ public:
 	std::unique_ptr<uint16_t[]> m_vram;
 	int m_vbuffer;
 
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_READ16_MEMBER(eolith16_custom_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_READ16_MEMBER(vram_r);
+	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t eolith16_custom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t vram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DRIVER_INIT(eolith16);
-	DECLARE_VIDEO_START(eolith16);
-	DECLARE_PALETTE_INIT(eolith16);
+	void init_eolith16();
+	void video_start_eolith16();
+	void palette_init_eolith16(palette_device &palette);
 
 	uint32_t screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 
-WRITE16_MEMBER(eolith16_state::eeprom_w)
+void eolith16_state::eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vbuffer = (data & 0x80) >> 7;
 	machine().bookkeeping().coin_counter_w(0, data & 1);
@@ -52,7 +52,7 @@ WRITE16_MEMBER(eolith16_state::eeprom_w)
 	//data & 0x100 and data & 0x004 always set
 }
 
-READ16_MEMBER(eolith16_state::eolith16_custom_r)
+uint16_t eolith16_state::eolith16_custom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	speedup_read();
 	return ioport("SPECIAL")->read();
@@ -60,12 +60,12 @@ READ16_MEMBER(eolith16_state::eolith16_custom_r)
 
 
 
-WRITE16_MEMBER(eolith16_state::vram_w)
+void eolith16_state::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset + (0x10000/2) * m_vbuffer]);
 }
 
-READ16_MEMBER(eolith16_state::vram_r)
+uint16_t eolith16_state::vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_vram[offset + (0x10000/2) * m_vbuffer];
 }
@@ -114,7 +114,7 @@ static INPUT_PORTS_START( eolith16 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 INPUT_PORTS_END
 
-VIDEO_START_MEMBER(eolith16_state,eolith16)
+void eolith16_state::video_start_eolith16()
 {
 	m_vram = std::make_unique<uint16_t[]>(0x10000);
 	save_pointer(NAME(m_vram.get()), 0x10000);
@@ -145,7 +145,7 @@ uint32_t eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_in
 
 
 // setup a custom palette because pixels use 8 bits per color
-PALETTE_INIT_MEMBER(eolith16_state,eolith16)
+void eolith16_state::palette_init_eolith16(palette_device &palette)
 {
 	int c;
 
@@ -257,7 +257,7 @@ ROM_START( klondkp )
 	ROM_LOAD( "kd.u28", 0x000000, 0x080000, CRC(c12112a1) SHA1(729bbaca6db933a730099a4a560a10ed99cae1c3) )
 ROM_END
 
-DRIVER_INIT_MEMBER(eolith16_state,eolith16)
+void eolith16_state::init_eolith16()
 {
 	init_speedup();
 }

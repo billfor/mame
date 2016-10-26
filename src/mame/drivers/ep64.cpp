@@ -204,14 +204,14 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( rd0_r );
-	DECLARE_WRITE8_MEMBER( wr0_w );
-	DECLARE_READ8_MEMBER( rd1_r );
-	DECLARE_WRITE8_MEMBER( wr2_w );
+	uint8_t rd0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wr0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rd1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_key;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 	int m_centronics_busy;
 };
 
@@ -225,7 +225,7 @@ public:
 //  rd0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ep64_state::rd0_r )
+uint8_t ep64_state::rd0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -242,7 +242,7 @@ READ8_MEMBER( ep64_state::rd0_r )
 //  rd0_r -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ep64_state::wr0_w )
+void ep64_state::wr0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -274,7 +274,7 @@ WRITE8_MEMBER( ep64_state::wr0_w )
 	m_cassette2->change_state(BIT(data, 7) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-WRITE_LINE_MEMBER( ep64_state::write_centronics_busy )
+void ep64_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -283,7 +283,7 @@ WRITE_LINE_MEMBER( ep64_state::write_centronics_busy )
 //  rd1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ep64_state::rd1_r )
+uint8_t ep64_state::rd1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -320,7 +320,7 @@ READ8_MEMBER( ep64_state::rd1_r )
 //  wr2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ep64_state::wr2_w )
+void ep64_state::wr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

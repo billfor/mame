@@ -33,10 +33,10 @@ public:
 	required_shared_ptr<uint8_t> m_tile_num_ram;
 	required_shared_ptr<uint8_t> m_tile_atr_ram;
 	tilemap_t *m_tilemap;
-	DECLARE_WRITE8_MEMBER(ltcasino_tile_num_w);
-	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
-	DECLARE_DRIVER_INIT(mv4in1);
-	TILE_GET_INFO_MEMBER(get_ltcasino_tile_info);
+	void ltcasino_tile_num_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ltcasino_tile_atr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_mv4in1();
+	void get_ltcasino_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -46,7 +46,7 @@ public:
 
 /* Video */
 
-TILE_GET_INFO_MEMBER(ltcasino_state::get_ltcasino_tile_info)
+void ltcasino_state::get_ltcasino_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour;
 
@@ -64,13 +64,13 @@ void ltcasino_state::video_start()
 }
 
 
-WRITE8_MEMBER(ltcasino_state::ltcasino_tile_num_w)
+void ltcasino_state::ltcasino_tile_num_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tile_num_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ltcasino_state::ltcasino_tile_atr_w)
+void ltcasino_state::ltcasino_tile_atr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tile_atr_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -716,7 +716,7 @@ ROM_START( mv4in1 )
 	ROM_LOAD( "a.ic19",   0x0000, 0x1000, CRC(a25c125e) SHA1(e0ba83ccddbd82a2bf52585ae0accb9192cbb00e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ltcasino_state,mv4in1)
+void ltcasino_state::init_mv4in1()
 {
 	int i;
 	uint8_t *rom = memregion("maincpu")->base();

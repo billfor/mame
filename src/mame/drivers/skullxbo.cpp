@@ -40,7 +40,7 @@ void skullxbo_state::update_interrupts()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(skullxbo_state::scanline_timer)
+void skullxbo_state::scanline_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	scanline_int_gen(*m_maincpu);
 }
@@ -63,13 +63,13 @@ void skullxbo_state::scanline_update(screen_device &screen, int scanline)
 }
 
 
-WRITE16_MEMBER(skullxbo_state::skullxbo_halt_until_hblank_0_w)
+void skullxbo_state::skullxbo_halt_until_hblank_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	halt_until_hblank_0(space.device(), *m_screen);
 }
 
 
-MACHINE_RESET_MEMBER(skullxbo_state,skullxbo)
+void skullxbo_state::machine_reset_skullxbo()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -83,7 +83,7 @@ MACHINE_RESET_MEMBER(skullxbo_state,skullxbo)
  *
  *************************************/
 
-WRITE16_MEMBER(skullxbo_state::skullxbo_mobwr_w)
+void skullxbo_state::skullxbo_mobwr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("MOBWR[%02X] = %04X\n", offset, data);
 }
@@ -594,7 +594,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(skullxbo_state,skullxbo)
+void skullxbo_state::init_skullxbo()
 {
 	memset(memregion("gfx1")->base() + 0x170000, 0, 0x20000);
 }

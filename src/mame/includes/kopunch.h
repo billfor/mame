@@ -31,23 +31,23 @@ public:
 	uint8_t m_gfxbank;
 	uint8_t m_scrollx;
 
-	DECLARE_READ8_MEMBER(sensors1_r);
-	DECLARE_READ8_MEMBER(sensors2_r);
-	DECLARE_WRITE8_MEMBER(lamp_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(vram_fg_w);
-	DECLARE_WRITE8_MEMBER(vram_bg_w);
-	DECLARE_WRITE8_MEMBER(scroll_x_w);
-	DECLARE_WRITE8_MEMBER(scroll_y_w);
-	DECLARE_WRITE8_MEMBER(gfxbank_w);
+	uint8_t sensors1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sensors2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_fg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_bg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
-	INTERRUPT_GEN_MEMBER(vblank_interrupt);
+	void left_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void right_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void vblank_interrupt(device_t &device);
 
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(kopunch);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void palette_init_kopunch(palette_device &palette);
 	uint32_t screen_update_kopunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;

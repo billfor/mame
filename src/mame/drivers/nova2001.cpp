@@ -137,18 +137,18 @@ e000 - e7ff        R/W      Work RAM
  *************************************/
 
 
-CUSTOM_INPUT_MEMBER(nova2001_state::ninjakun_io_A002_ctrl_r)
+ioport_value nova2001_state::ninjakun_io_A002_ctrl_r(ioport_field &field, void *param)
 {
 	return m_ninjakun_io_a002_ctrl;
 }
 
-WRITE8_MEMBER(nova2001_state::ninjakun_cpu1_io_A002_w)
+void nova2001_state::ninjakun_cpu1_io_A002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( data == 0x80 ) m_ninjakun_io_a002_ctrl |= 0x01;
 	if( data == 0x40 ) m_ninjakun_io_a002_ctrl &= ~0x02;
 }
 
-WRITE8_MEMBER(nova2001_state::ninjakun_cpu2_io_A002_w)
+void nova2001_state::ninjakun_cpu2_io_A002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( data == 0x40 ) m_ninjakun_io_a002_ctrl |= 0x02;
 	if( data == 0x80 ) m_ninjakun_io_a002_ctrl &= ~0x01;
@@ -162,7 +162,7 @@ WRITE8_MEMBER(nova2001_state::ninjakun_cpu2_io_A002_w)
  *
  *************************************/
 
-MACHINE_START_MEMBER(nova2001_state,ninjakun)
+void nova2001_state::machine_start_ninjakun()
 {
 	/* Save State Stuff */
 	save_item(NAME(m_ninjakun_io_a002_ctrl));
@@ -1001,12 +1001,12 @@ void nova2001_state::lineswap_gfx_roms(const char *region, const int bit)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(nova2001_state,pkunwar)
+void nova2001_state::init_pkunwar()
 {
 	lineswap_gfx_roms("gfx1", 13);
 }
 
-DRIVER_INIT_MEMBER(nova2001_state,raiders5)
+void nova2001_state::init_raiders5()
 {
 	lineswap_gfx_roms("gfx1", 13);
 	lineswap_gfx_roms("gfx2", 13);

@@ -35,17 +35,17 @@ static ADDRESS_MAP_START( s11c_bg_map, AS_PROGRAM, 8, s11c_bg_device )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bgbank")
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER( s11c_bg_device::pia40_cb2_w)
+void s11c_bg_device::pia40_cb2_w(int state)
 {
 //  m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
 }
 
-WRITE8_MEMBER( s11c_bg_device::pia40_pb_w )
+void s11c_bg_device::pia40_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_pia34->portb_w(data);
 }
 
-WRITE_LINE_MEMBER( s11c_bg_device::pia40_ca2_w)
+void s11c_bg_device::pia40_ca2_w(int state)
 {
 	if(state == ASSERT_LINE)
 		m_ym2151->reset();
@@ -113,7 +113,7 @@ void s11c_bg_device::static_set_romregion(device_t &device, const char *tag)
 	cpuboard.m_regiontag = tag;
 }
 
-WRITE_LINE_MEMBER( s11c_bg_device::ym2151_irq_w)
+void s11c_bg_device::ym2151_irq_w(int state)
 {
 	if(state == CLEAR_LINE)
 		m_pia40->ca1_w(1);
@@ -121,19 +121,19 @@ WRITE_LINE_MEMBER( s11c_bg_device::ym2151_irq_w)
 		m_pia40->ca1_w(0);
 }
 
-WRITE8_MEMBER( s11c_bg_device::bg_speech_clock_w )
+void s11c_bg_device::bg_speech_clock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// pulses clock input?
 	m_hc55516->clock_w(1);
 	m_hc55516->clock_w(0);
 }
 
-WRITE8_MEMBER( s11c_bg_device::bg_speech_digit_w )
+void s11c_bg_device::bg_speech_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hc55516->digit_w(data);
 }
 
-WRITE8_MEMBER( s11c_bg_device::bgbank_w )
+void s11c_bg_device::bgbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bank = ((data & 0x04) >> 2) | ((data & 0x03) << 1);
 	m_cpubank->set_entry(bank);

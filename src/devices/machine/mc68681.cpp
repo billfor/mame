@@ -262,7 +262,7 @@ void mc68681_device::duart68681_start_ct(int count)
 	duart_timer->adjust(attotime::from_hz(clock) * count, 0);
 }
 
-TIMER_CALLBACK_MEMBER( mc68681_device::duart_timer_callback )
+void mc68681_device::duart_timer_callback(void *ptr, int32_t param)
 {
 	if (ACR & 0x40)
 	{
@@ -320,7 +320,7 @@ TIMER_CALLBACK_MEMBER( mc68681_device::duart_timer_callback )
 
 }
 
-READ8_MEMBER( mc68681_device::read )
+uint8_t mc68681_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t r = 0xff;
 
@@ -424,7 +424,7 @@ READ8_MEMBER( mc68681_device::read )
 	return r;
 }
 
-WRITE8_MEMBER( mc68681_device::write )
+void mc68681_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x0f;
 	LOG(( "Writing 68681 (%s) reg %x (%s) with %04x\n", tag(), offset, duart68681_reg_write_names[offset], data ));
@@ -516,7 +516,7 @@ WRITE8_MEMBER( mc68681_device::write )
 	}
 }
 
-WRITE_LINE_MEMBER( mc68681_device::ip0_w )
+void mc68681_device::ip0_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x01) | ((state == ASSERT_LINE) ? 1 : 0);
 
@@ -536,7 +536,7 @@ WRITE_LINE_MEMBER( mc68681_device::ip0_w )
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER( mc68681_device::ip1_w )
+void mc68681_device::ip1_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x02) | ((state == ASSERT_LINE) ? 2 : 0);
 
@@ -556,7 +556,7 @@ WRITE_LINE_MEMBER( mc68681_device::ip1_w )
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER( mc68681_device::ip2_w )
+void mc68681_device::ip2_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x04) | ((state == ASSERT_LINE) ? 4 : 0);
 
@@ -576,7 +576,7 @@ WRITE_LINE_MEMBER( mc68681_device::ip2_w )
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER( mc68681_device::ip3_w )
+void mc68681_device::ip3_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x08) | ((state == ASSERT_LINE) ? 8 : 0);
 
@@ -596,14 +596,14 @@ WRITE_LINE_MEMBER( mc68681_device::ip3_w )
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER( mc68681_device::ip4_w )
+void mc68681_device::ip4_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x10) | ((state == ASSERT_LINE) ? 0x10 : 0);
 // TODO: special mode for ip4 (Ch. A Rx clock)
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER( mc68681_device::ip5_w )
+void mc68681_device::ip5_w(int state)
 {
 	uint8_t newIP = (IP_last_state & ~0x20) | ((state == ASSERT_LINE) ? 0x20 : 0);
 // TODO: special mode for ip5 (Ch. B Tx clock)

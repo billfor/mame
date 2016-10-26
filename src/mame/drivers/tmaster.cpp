@@ -155,36 +155,36 @@ public:
 	uint8_t m_palette_index;
 	uint8_t m_palette_data[3];
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_READ16_MEMBER(rtc_r);
-	DECLARE_WRITE16_MEMBER(rtc_w);
-	DECLARE_WRITE16_MEMBER(tmaster_color_w);
-	DECLARE_WRITE16_MEMBER(tmaster_addr_w);
-	DECLARE_WRITE16_MEMBER(tmaster_blitter_w);
-	DECLARE_READ16_MEMBER(tmaster_blitter_r);
-	DECLARE_READ_LINE_MEMBER(read_rand);
-	DECLARE_READ16_MEMBER(galgames_eeprom_r);
-	DECLARE_WRITE16_MEMBER(galgames_eeprom_w);
-	DECLARE_WRITE16_MEMBER(galgames_palette_offset_w);
-	DECLARE_WRITE16_MEMBER(galgames_palette_data_w);
-	DECLARE_READ16_MEMBER(galgames_okiram_r);
-	DECLARE_WRITE16_MEMBER(galgames_okiram_w);
-	DECLARE_WRITE16_MEMBER(galgames_cart_sel_w);
-	DECLARE_READ16_MEMBER(galgames_cart_clock_r);
-	DECLARE_WRITE16_MEMBER(galgames_cart_clock_w);
-	DECLARE_READ16_MEMBER(galgames_cart_data_r);
-	DECLARE_WRITE16_MEMBER(galgames_cart_data_w);
-	DECLARE_READ16_MEMBER(dummy_read_01);
-	DECLARE_WRITE_LINE_MEMBER(write_oki_bank0);
-	DECLARE_WRITE_LINE_MEMBER(write_oki_bank1);
-	DECLARE_DRIVER_INIT(galgames);
-	DECLARE_DRIVER_INIT(galgame2);
-	DECLARE_MACHINE_RESET(tmaster);
-	DECLARE_VIDEO_START(tmaster);
-	DECLARE_MACHINE_RESET(galgames);
-	DECLARE_VIDEO_START(galgames);
+	void duart_irq_handler(int state);
+	uint16_t rtc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void rtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tmaster_color_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tmaster_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tmaster_blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tmaster_blitter_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	int read_rand();
+	uint16_t galgames_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void galgames_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galgames_palette_offset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galgames_palette_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t galgames_okiram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void galgames_okiram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galgames_cart_sel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t galgames_cart_clock_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void galgames_cart_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t galgames_cart_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void galgames_cart_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dummy_read_01(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write_oki_bank0(int state);
+	void write_oki_bank1(int state);
+	void init_galgames();
+	void init_galgame2();
+	void machine_reset_tmaster();
+	void video_start_tmaster();
+	void machine_reset_galgames();
+	void video_start_galgames();
 	uint32_t screen_update_tmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(tm3k_interrupt);
+	void tm3k_interrupt(timer_device &timer, void *ptr, int32_t param);
 	uint8_t binary_to_BCD(uint8_t data);
 	int tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high);
 	int galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high);
@@ -199,7 +199,7 @@ public:
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(tmaster_state::write_oki_bank0)
+void tmaster_state::write_oki_bank0(int state)
 {
 	if (state)
 		m_okibank |= 1;
@@ -209,7 +209,7 @@ WRITE_LINE_MEMBER(tmaster_state::write_oki_bank0)
 	m_oki->set_rom_bank(m_okibank);
 }
 
-WRITE_LINE_MEMBER(tmaster_state::write_oki_bank1)
+void tmaster_state::write_oki_bank1(int state)
 {
 	if (state)
 		m_okibank |= 2;
@@ -225,7 +225,7 @@ WRITE_LINE_MEMBER(tmaster_state::write_oki_bank1)
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(tmaster_state::duart_irq_handler)
+void tmaster_state::duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line_and_vector(4, state, m_duart->get_irq_vector());
 }
@@ -244,7 +244,7 @@ uint8_t tmaster_state::binary_to_BCD(uint8_t data)
 	return ((data / 10) << 4) | (data %10);
 }
 
-READ16_MEMBER(tmaster_state::rtc_r)
+uint16_t tmaster_state::rtc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	system_time systime;
 
@@ -260,7 +260,7 @@ READ16_MEMBER(tmaster_state::rtc_r)
 	return m_rtc_ram[offset];
 }
 
-WRITE16_MEMBER(tmaster_state::rtc_w)
+void tmaster_state::rtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ( offset == 0 )
 	{
@@ -327,7 +327,7 @@ int tmaster_state::galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uin
 	return reg_low | (reg_mid << 16);
 }
 
-VIDEO_START_MEMBER(tmaster_state,tmaster)
+void tmaster_state::video_start_tmaster()
 {
 	int layer, buffer;
 	for (layer = 0; layer < 2; layer++)
@@ -342,9 +342,9 @@ VIDEO_START_MEMBER(tmaster_state,tmaster)
 	m_compute_addr = &tmaster_state::tmaster_compute_addr;
 }
 
-VIDEO_START_MEMBER(tmaster_state,galgames)
+void tmaster_state::video_start_galgames()
 {
-	VIDEO_START_CALL_MEMBER( tmaster );
+	video_start_tmaster();
 	m_compute_addr = &tmaster_state::galgames_compute_addr;
 }
 
@@ -371,12 +371,12 @@ uint32_t tmaster_state::screen_update_tmaster(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE16_MEMBER(tmaster_state::tmaster_color_w)
+void tmaster_state::tmaster_color_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_color );
 }
 
-WRITE16_MEMBER(tmaster_state::tmaster_addr_w)
+void tmaster_state::tmaster_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_addr );
 }
@@ -493,7 +493,7 @@ void tmaster_state::tmaster_draw()
 	}
 }
 
-WRITE16_MEMBER(tmaster_state::tmaster_blitter_w)
+void tmaster_state::tmaster_blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( m_regs + offset );
 	switch (offset*2)
@@ -505,7 +505,7 @@ WRITE16_MEMBER(tmaster_state::tmaster_blitter_w)
 	}
 }
 
-READ16_MEMBER(tmaster_state::tmaster_blitter_r)
+uint16_t tmaster_state::tmaster_blitter_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0000;  // bit 7 = 1 -> blitter busy
 }
@@ -520,7 +520,7 @@ READ16_MEMBER(tmaster_state::tmaster_blitter_r)
                                 Touch Master
 ***************************************************************************/
 
-READ_LINE_MEMBER(tmaster_state::read_rand)
+int tmaster_state::read_rand()
 {
 	return machine().rand()&1;
 }
@@ -581,14 +581,14 @@ ADDRESS_MAP_END
 
 static const char *const galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALGAMES_EEPROM_CART1, GALGAMES_EEPROM_CART2, GALGAMES_EEPROM_CART3, GALGAMES_EEPROM_CART4 };
 
-READ16_MEMBER(tmaster_state::galgames_eeprom_r)
+uint16_t tmaster_state::galgames_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(galgames_eeprom_names[m_galgames_cart]);
 
 	return eeprom->do_read() ? 0x80 : 0x00;
 }
 
-WRITE16_MEMBER(tmaster_state::galgames_eeprom_w)
+void tmaster_state::galgames_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0x0003)
 		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",space.device().safe_pc(),data);
@@ -607,7 +607,7 @@ WRITE16_MEMBER(tmaster_state::galgames_eeprom_w)
 
 // BT481A Palette RAMDAC
 
-WRITE16_MEMBER(tmaster_state::galgames_palette_offset_w)
+void tmaster_state::galgames_palette_offset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -615,7 +615,7 @@ WRITE16_MEMBER(tmaster_state::galgames_palette_offset_w)
 		m_palette_index = 0;
 	}
 }
-WRITE16_MEMBER(tmaster_state::galgames_palette_data_w)
+void tmaster_state::galgames_palette_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -632,11 +632,11 @@ WRITE16_MEMBER(tmaster_state::galgames_palette_data_w)
 }
 
 // Sound
-READ16_MEMBER(tmaster_state::galgames_okiram_r)
+uint16_t tmaster_state::galgames_okiram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return memregion("oki")->base()[offset] | 0xff00;
 }
-WRITE16_MEMBER(tmaster_state::galgames_okiram_w)
+void tmaster_state::galgames_okiram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		memregion("oki")->base()[offset] = data & 0xff;
@@ -656,7 +656,7 @@ void tmaster_state::galgames_update_rombank(uint32_t cart)
 	membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0 + m_galgames_cart);  // rom
 }
 
-WRITE16_MEMBER(tmaster_state::galgames_cart_sel_w)
+void tmaster_state::galgames_cart_sel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// cart selection (0 1 2 3 4 7)
 
@@ -689,12 +689,12 @@ WRITE16_MEMBER(tmaster_state::galgames_cart_sel_w)
 	}
 }
 
-READ16_MEMBER(tmaster_state::galgames_cart_clock_r)
+uint16_t tmaster_state::galgames_cart_clock_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0080;
 }
 
-WRITE16_MEMBER(tmaster_state::galgames_cart_clock_w)
+void tmaster_state::galgames_cart_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -716,16 +716,16 @@ WRITE16_MEMBER(tmaster_state::galgames_cart_clock_w)
 	}
 }
 
-READ16_MEMBER(tmaster_state::galgames_cart_data_r)
+uint16_t tmaster_state::galgames_cart_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
-WRITE16_MEMBER(tmaster_state::galgames_cart_data_w)
+void tmaster_state::galgames_cart_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
 
-READ16_MEMBER(tmaster_state::dummy_read_01)
+uint16_t tmaster_state::dummy_read_01(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x3; // Pass the check at PC = 0xfae & a later one
 }
@@ -879,14 +879,14 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(tmaster_state,tmaster)
+void tmaster_state::machine_reset_tmaster()
 {
 	m_gfx_offs = 0;
 	m_gfx_size = memregion("blitter")->bytes();
 
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(tmaster_state::tm3k_interrupt)
+void tmaster_state::tm3k_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -936,7 +936,7 @@ static MACHINE_CONFIG_DERIVED( tmds1204, tm )
 	MCFG_DS1204_ADD("ds1204")
 MACHINE_CONFIG_END
 
-MACHINE_RESET_MEMBER(tmaster_state,galgames)
+void tmaster_state::machine_reset_galgames()
 {
 	m_gfx_offs = 0;
 	m_gfx_size = 0x200000;
@@ -1785,7 +1785,7 @@ ROM_START( galgame2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(tmaster_state,galgames)
+void tmaster_state::init_galgames()
 {
 	uint8_t *ROM  =   memregion("maincpu")->base();
 	int cart;
@@ -1819,7 +1819,7 @@ DRIVER_INIT_MEMBER(tmaster_state,galgames)
 	}
 }
 
-DRIVER_INIT_MEMBER(tmaster_state,galgame2)
+void tmaster_state::init_galgame2()
 {
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
@@ -1836,7 +1836,7 @@ DRIVER_INIT_MEMBER(tmaster_state,galgame2)
 	// Cartdridge check on game selection screen
 	ROM[0x12da0/2] = 0x4e71;
 
-	DRIVER_INIT_CALL(galgames);
+	init_galgames();
 }
 
 GAME( 1996, tm,       0,        tm,       tm,       driver_device, 0,        ROT0, "Midway Games Inc. / CES Inc.",            "Touchmaster (v3.00 Euro)",               0 )

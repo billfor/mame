@@ -50,7 +50,7 @@ TODO:
 #include "sound/volt_reg.h"
 
 
-DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
+void nbmj8891_state::init_gionbana()
 {
 	uint8_t *prot = memregion("protection")->base();
 	int i;
@@ -66,7 +66,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,omotesnd)
+void nbmj8891_state::init_omotesnd()
 {
 #if 0
 	uint8_t *prot = memregion("protection")->base();
@@ -100,7 +100,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,omotesnd)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,telmahjn)
+void nbmj8891_state::init_telmahjn()
 {
 	uint8_t *prot = memregion("protection")->base();
 	int i;
@@ -116,7 +116,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,telmahjn)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,mgmen89)
+void nbmj8891_state::init_mgmen89()
 {
 	uint8_t *prot = memregion("protection")->base();
 	int i;
@@ -132,7 +132,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mgmen89)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,mjfocus)
+void nbmj8891_state::init_mjfocus()
 {
 	uint8_t *prot = memregion("protection")->base();
 	uint8_t *ram = memregion("maincpu")->base() + 0xf800;
@@ -152,7 +152,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjfocus)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,mjfocusm)
+void nbmj8891_state::init_mjfocusm()
 {
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -164,7 +164,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjfocusm)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,scandal)
+void nbmj8891_state::init_scandal()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
@@ -172,7 +172,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,scandal)
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,mjnanpas)
+void nbmj8891_state::init_mjnanpas()
 {
 	/* they forgot to enable the protection check in this game... */
 #if 0
@@ -193,7 +193,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjnanpas)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,pairsnb)
+void nbmj8891_state::init_pairsnb()
 {
 	uint8_t *prot = memregion("protection")->base();
 	int i;
@@ -209,7 +209,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,pairsnb)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,pairsten)
+void nbmj8891_state::init_pairsten()
 {
 	uint8_t *prot = memregion("protection")->base();
 	int i;
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( hanaoji_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-READ8_MEMBER(nbmj8891_state::taiwanmb_unk_r)
+uint8_t nbmj8891_state::taiwanmb_unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;                                                    // MCU or 1413M3 STATUS?
 }
@@ -546,7 +546,7 @@ static ADDRESS_MAP_START( taiwanmb_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER( nbmj8891_state::nb1413m3_busyflag_r )
+ioport_value nbmj8891_state::nb1413m3_busyflag_r(ioport_field &field, void *param)
 {
 	return m_nb1413m3->m_busyflag & 0x01;
 }
@@ -556,7 +556,7 @@ CUSTOM_INPUT_MEMBER( nbmj8891_state::nb1413m3_busyflag_r )
  * However, a few games (lovehous, maiko, mmaiko, hanaoji and the ones using inputport3_r below)
  * read nb1413m3_outcoin_flag also at inputport3! Is this the correct behaviour for these games
  * or should they only check the flag at inputport3? */
-CUSTOM_INPUT_MEMBER( nbmj8891_state::nb1413m3_outcoin_flag_r )
+ioport_value nbmj8891_state::nb1413m3_outcoin_flag_r(ioport_field &field, void *param)
 {
 	return m_nb1413m3->m_outcoin_flag & 0x01;
 }

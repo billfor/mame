@@ -96,13 +96,13 @@
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(gridlee_state::irq_off_tick)
+void gridlee_state::irq_off_tick(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(gridlee_state::irq_timer_tick)
+void gridlee_state::irq_timer_tick(void *ptr, int32_t param)
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
@@ -118,13 +118,13 @@ TIMER_CALLBACK_MEMBER(gridlee_state::irq_timer_tick)
 }
 
 
-TIMER_CALLBACK_MEMBER(gridlee_state::firq_off_tick)
+void gridlee_state::firq_off_tick(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(gridlee_state::firq_timer_tick)
+void gridlee_state::firq_timer_tick(void *ptr, int32_t param)
 {
 	/* same time next frame */
 	m_firq_timer->adjust(m_screen->time_until_pos(FIRQ_SCANLINE));
@@ -166,7 +166,7 @@ void gridlee_state::machine_reset()
  *
  *************************************/
 
-READ8_MEMBER(gridlee_state::analog_port_r)
+uint8_t gridlee_state::analog_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int delta, sign, magnitude;
 	uint8_t newval;
@@ -248,7 +248,7 @@ void gridlee_state::poly17_init()
  *
  *************************************/
 
-READ8_MEMBER(gridlee_state::random_num_r)
+uint8_t gridlee_state::random_num_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t cc;
 
@@ -268,21 +268,21 @@ READ8_MEMBER(gridlee_state::random_num_r)
  *
  *************************************/
 
-WRITE8_MEMBER(gridlee_state::led_0_w)
+void gridlee_state::led_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 1);
 	logerror("LED 0 %s\n", (data & 1) ? "on" : "off");
 }
 
 
-WRITE8_MEMBER(gridlee_state::led_1_w)
+void gridlee_state::led_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(1, data & 1);
 	logerror("LED 1 %s\n", (data & 1) ? "on" : "off");
 }
 
 
-WRITE8_MEMBER(gridlee_state::gridlee_coin_counter_w)
+void gridlee_state::gridlee_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	logerror("coin counter %s\n", (data & 1) ? "on" : "off");

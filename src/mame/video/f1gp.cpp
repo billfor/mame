@@ -14,21 +14,21 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(f1gp_state::f1gp_get_roz_tile_info)
+void f1gp_state::f1gp_get_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_rozvideoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(3, code & 0x7ff, code >> 12, 0);
 }
 
-TILE_GET_INFO_MEMBER(f1gp_state::f1gp2_get_roz_tile_info)
+void f1gp_state::f1gp2_get_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_rozvideoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(2, (code & 0x7ff) + (m_roz_bank << 11), code >> 12, 0);
 }
 
-TILE_GET_INFO_MEMBER(f1gp_state::get_fg_tile_info)
+void f1gp_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fgvideoram[tile_index];
 
@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(f1gp_state::get_fg_tile_info)
 
 
 
-VIDEO_START_MEMBER(f1gp_state,f1gp)
+void f1gp_state::video_start_f1gp()
 {
 	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
@@ -59,7 +59,7 @@ VIDEO_START_MEMBER(f1gp_state,f1gp)
 }
 
 
-VIDEO_START_MEMBER(f1gp_state,f1gpb)
+void f1gp_state::video_start_f1gpb()
 {
 	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
@@ -91,7 +91,7 @@ uint32_t f1gp_state::f1gp_ol2_tile_callback( uint32_t code )
 
 
 
-VIDEO_START_MEMBER(f1gp_state,f1gp2)
+void f1gp_state::video_start_f1gp2()
 {
 	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::f1gp2_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
@@ -111,35 +111,35 @@ VIDEO_START_MEMBER(f1gp_state,f1gp2)
 
 ***************************************************************************/
 
-READ16_MEMBER(f1gp_state::f1gp_zoomdata_r)
+uint16_t f1gp_state::f1gp_zoomdata_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_zoomdata[offset];
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_zoomdata_w)
+void f1gp_state::f1gp_zoomdata_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_zoomdata[offset]);
 	m_gfxdecode->gfx(3)->mark_dirty(offset / 64);
 }
 
-READ16_MEMBER(f1gp_state::f1gp_rozvideoram_r)
+uint16_t f1gp_state::f1gp_rozvideoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_rozvideoram[offset];
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_rozvideoram_w)
+void f1gp_state::f1gp_rozvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rozvideoram[offset]);
 	m_roz_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_fgvideoram_w)
+void f1gp_state::f1gp_fgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_fgscroll_w)
+void f1gp_state::f1gp_fgscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll[offset]);
 
@@ -147,7 +147,7 @@ WRITE16_MEMBER(f1gp_state::f1gp_fgscroll_w)
 	m_fg_tilemap->set_scrolly(0, m_scroll[1]);
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_gfxctrl_w)
+void f1gp_state::f1gp_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -156,7 +156,7 @@ WRITE16_MEMBER(f1gp_state::f1gp_gfxctrl_w)
 	}
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp2_gfxctrl_w)
+void f1gp_state::f1gp2_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

@@ -29,15 +29,15 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(clock_write) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override;
+	virtual void clock_write(int state) override;
+	virtual void data_write(int state) override;
 
-	DECLARE_READ8_MEMBER(p0_read);
-	DECLARE_WRITE8_MEMBER(p0_write);
-	DECLARE_WRITE8_MEMBER(p1_write);
-	DECLARE_WRITE8_MEMBER(p2_write);
-	DECLARE_READ8_MEMBER(p3_read);
-	DECLARE_WRITE8_MEMBER(p3_write);
+	uint8_t p0_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p0_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p1_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p3_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p3_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	required_ioport m_p2_0;

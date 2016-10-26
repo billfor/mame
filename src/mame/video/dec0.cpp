@@ -12,7 +12,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(dec0_state::dec0_update_sprites_w)
+void dec0_state::dec0_update_sprites_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	memcpy(m_buffered_spriteram,m_spriteram,0x800);
 }
@@ -333,19 +333,19 @@ uint32_t dec0_state::screen_update_midres(screen_device &screen, bitmap_ind16 &b
 }
 
 
-WRITE16_MEMBER(dec0_state::dec0_priority_w)
+void dec0_state::dec0_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pri);
 }
 
-VIDEO_START_MEMBER(dec0_state,dec0_nodma)
+void dec0_state::video_start_dec0_nodma()
 {
 	save_item(NAME(m_pri));
 	m_buffered_spriteram = m_spriteram;
 	save_pointer(NAME(m_buffered_spriteram), 0x800/2);
 }
 
-VIDEO_START_MEMBER(dec0_state,dec0)
+void dec0_state::video_start_dec0()
 {
 	save_item(NAME(m_pri));
 	m_buffered_spriteram = auto_alloc_array(machine(), uint16_t, 0x800/2);

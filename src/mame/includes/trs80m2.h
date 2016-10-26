@@ -86,23 +86,23 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( drvslt_w );
-	DECLARE_WRITE8_MEMBER( rom_enable_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_READ8_MEMBER( nmi_r );
-	DECLARE_WRITE8_MEMBER( nmi_w );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
-	DECLARE_WRITE_LINE_MEMBER( de_w );
-	DECLARE_WRITE_LINE_MEMBER( vsync_w );
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_WRITE8_MEMBER( pio_pa_w );
-	DECLARE_WRITE_LINE_MEMBER( strobe_w );
-	DECLARE_WRITE_LINE_MEMBER( kb_clock_w );
-	DECLARE_WRITE8_MEMBER( kbd_w );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void drvslt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rom_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t nmi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void de_w(int state);
+	void vsync_w(int state);
+	uint8_t pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void strobe_w(int state);
+	void kb_clock_w(int state);
+	void kbd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 
@@ -126,17 +126,17 @@ public:
 	int m_rtc_int;
 	int m_enable_rtc_int;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	void ctc_tick(timer_device &timer, void *ptr, int32_t param);
+	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	int m_centronics_busy;
 	int m_centronics_fault;
 	int m_centronics_perror;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_busy(int state);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
 };
 
 class trs80m16_state : public trs80m2_state
@@ -153,8 +153,8 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER( ual_w );
-	DECLARE_WRITE8_MEMBER( tcl_w );
+	void ual_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tcl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint16_t m_ual;
 	uint8_t m_limit[2];

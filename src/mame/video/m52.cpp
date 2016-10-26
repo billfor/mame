@@ -19,7 +19,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(m52_state, m52)
+void m52_state::palette_init_m52(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	const uint8_t *char_pal = color_prom + 0x000;
@@ -115,7 +115,7 @@ PALETTE_INIT_MEMBER(m52_state, m52)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
+void m52_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t video = m_videoram[tile_index];
 	uint8_t color = m_colorram[tile_index];
@@ -170,7 +170,7 @@ void m52_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(m52_state::m52_scroll_w)
+void m52_state::m52_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     According to the schematics there is only one video register that holds the X scroll value
@@ -193,14 +193,14 @@ WRITE8_MEMBER(m52_state::m52_scroll_w)
  *
  *************************************/
 
-WRITE8_MEMBER(m52_state::m52_videoram_w)
+void m52_state::m52_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(m52_state::m52_colorram_w)
+void m52_state::m52_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -217,7 +217,7 @@ WRITE8_MEMBER(m52_state::m52_colorram_w)
 /* This looks like some kind of protection implemented by a custom chip on the
    scroll board. It mangles the value written to the port m52_bg1xpos_w, as
    follows: result = popcount(value & 0x7f) ^ (value >> 7) */
-READ8_MEMBER(m52_state::m52_protection_r)
+uint8_t m52_state::m52_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int popcount = 0;
 	int temp;
@@ -235,27 +235,27 @@ READ8_MEMBER(m52_state::m52_protection_r)
  *
  *************************************/
 
-WRITE8_MEMBER(m52_state::m52_bg1ypos_w)
+void m52_state::m52_bg1ypos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg1ypos = data;
 }
 
-WRITE8_MEMBER(m52_state::m52_bg1xpos_w)
+void m52_state::m52_bg1xpos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg1xpos = data;
 }
 
-WRITE8_MEMBER(m52_state::m52_bg2xpos_w)
+void m52_state::m52_bg2xpos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg2xpos = data;
 }
 
-WRITE8_MEMBER(m52_state::m52_bg2ypos_w)
+void m52_state::m52_bg2ypos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg2ypos = data;
 }
 
-WRITE8_MEMBER(m52_state::m52_bgcontrol_w)
+void m52_state::m52_bgcontrol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgcontrol = data;
 }
@@ -268,7 +268,7 @@ WRITE8_MEMBER(m52_state::m52_bgcontrol_w)
  *
  *************************************/
 
-WRITE8_MEMBER(m52_state::m52_flipscreen_w)
+void m52_state::m52_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* screen flip is handled both by software and hardware */
 	flip_screen_set((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));
@@ -277,7 +277,7 @@ WRITE8_MEMBER(m52_state::m52_flipscreen_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
 }
 
-WRITE8_MEMBER(m52_state::alpha1v_flipscreen_w)
+void m52_state::alpha1v_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 }

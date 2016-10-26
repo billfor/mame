@@ -113,43 +113,43 @@ void k001604_device::device_reset()
 /* FIXME: The TILEMAP_MAPPER below depends on parameters passed by the device interface (being game dependent).
 we might simplify the code, by passing the whole TILEMAP_MAPPER as a callback in the interface, but is it really worth? */
 
-TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_8x8_0_size0)
+tilemap_memory_index k001604_device::scan_layer_8x8_0_size0(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row * 128) + col + m_txt_mem_offset;
 }
 
-TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_8x8_0_size1)
+tilemap_memory_index k001604_device::scan_layer_8x8_0_size1(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row * 256) + col + m_txt_mem_offset;
 }
 
-TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_8x8_1_size0)
+tilemap_memory_index k001604_device::scan_layer_8x8_1_size0(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row * 128) + col + 64 + m_txt_mem_offset;
 }
 
-TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_8x8_1_size1)
+tilemap_memory_index k001604_device::scan_layer_8x8_1_size1(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row * 256) + col + 64 + m_txt_mem_offset;
 }
 
-TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_roz_128)
+tilemap_memory_index k001604_device::scan_layer_roz_128(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row * 128) + col + m_roz_mem_offset;
 }
 
-TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_roz_256)
+tilemap_memory_index k001604_device::scan_layer_roz_256(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row * 256) + col + 128 + m_roz_mem_offset;
 }
 
-TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_8x8)
+void k001604_device::tile_info_layer_8x8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t val = m_tile_ram[tile_index];
 	int color = (val >> 17) & 0x1f;
@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_8x8)
 	SET_TILE_INFO_MEMBER(0, tile, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_roz)
+void k001604_device::tile_info_layer_roz(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t val = m_tile_ram[tile_index];
 	int flags = 0;
@@ -281,12 +281,12 @@ void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitm
 	m_layer_8x8[0]->draw(screen, bitmap, cliprect, 0,0);
 }
 
-READ32_MEMBER( k001604_device::tile_r )
+uint32_t k001604_device::tile_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_tile_ram[offset];
 }
 
-READ32_MEMBER( k001604_device::char_r )
+uint32_t k001604_device::char_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int set, bank;
 	uint32_t addr;
@@ -303,7 +303,7 @@ READ32_MEMBER( k001604_device::char_r )
 	return m_char_ram[addr];
 }
 
-READ32_MEMBER( k001604_device::reg_r )
+uint32_t k001604_device::reg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -314,7 +314,7 @@ READ32_MEMBER( k001604_device::reg_r )
 	return m_reg[offset];
 }
 
-WRITE32_MEMBER( k001604_device::tile_w )
+void k001604_device::tile_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int x/*, y*/;
 	COMBINE_DATA(m_tile_ram.get() + offset);
@@ -360,7 +360,7 @@ WRITE32_MEMBER( k001604_device::tile_w )
 	}
 }
 
-WRITE32_MEMBER( k001604_device::char_w )
+void k001604_device::char_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int set, bank;
 	uint32_t addr;
@@ -380,7 +380,7 @@ WRITE32_MEMBER( k001604_device::char_w )
 	gfx(1)->mark_dirty(addr / 128);
 }
 
-WRITE32_MEMBER( k001604_device::reg_w )
+void k001604_device::reg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_reg.get() + offset);
 

@@ -56,18 +56,18 @@ protected:
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
 public:
-	DECLARE_DRIVER_INIT(wpc_dot);
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
-	DECLARE_WRITE_LINE_MEMBER(wpc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(wpc_firq_w);
-	DECLARE_READ8_MEMBER(wpc_sound_ctrl_r);
-	DECLARE_WRITE8_MEMBER(wpc_sound_ctrl_w);
-	DECLARE_READ8_MEMBER(wpc_sound_data_r);
-	DECLARE_WRITE8_MEMBER(wpc_sound_data_w);
-	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
-	DECLARE_WRITE8_MEMBER(wpc_dmdbank_w);
+	void init_wpc_dot();
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wpcsnd_reply_w(int state);
+	void wpc_irq_w(int state);
+	void wpc_firq_w(int state);
+	uint8_t wpc_sound_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wpc_sound_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t wpc_sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wpc_sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wpc_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wpc_dmdbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

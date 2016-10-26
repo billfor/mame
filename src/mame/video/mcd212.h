@@ -132,9 +132,9 @@ public:
 	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device members
-	DECLARE_READ16_MEMBER( regs_r );
-	DECLARE_WRITE16_MEMBER( regs_w );
-	TIMER_CALLBACK_MEMBER( perform_scan );
+	uint16_t regs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void perform_scan(void *ptr, int32_t param);
 
 	void ab_init();
 

@@ -87,7 +87,7 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(vicdual_state::clear_coin_status)
+void vicdual_state::clear_coin_status(timer_device &timer, void *ptr, int32_t param)
 {
 	m_coin_status = 0;
 }
@@ -97,7 +97,7 @@ void vicdual_state::assert_coin_status()
 	m_coin_status = 1;
 }
 
-CUSTOM_INPUT_MEMBER(vicdual_state::read_coin_status)
+ioport_value vicdual_state::read_coin_status(ioport_field &field, void *param)
 {
 	return m_coin_status;
 }
@@ -112,7 +112,7 @@ void vicdual_state::coin_in()
 	m_coinstate_timer->adjust(attotime::from_msec(70));
 }
 
-INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
+void vicdual_state::coin_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{
@@ -155,25 +155,25 @@ int vicdual_state::get_vcounter()
 }
 
 
-CUSTOM_INPUT_MEMBER(vicdual_state::get_64v)
+ioport_value vicdual_state::get_64v(ioport_field &field, void *param)
 {
 	return (get_vcounter() >> 6) & 0x01;
 }
 
 
-CUSTOM_INPUT_MEMBER(vicdual_state::get_vblank_comp)
+ioport_value vicdual_state::get_vblank_comp(ioport_field &field, void *param)
 {
 	return (get_vcounter() < VICDUAL_VBSTART);
 }
 
 
-CUSTOM_INPUT_MEMBER(vicdual_state::get_composite_blank_comp)
+ioport_value vicdual_state::get_composite_blank_comp(ioport_field &field, void *param)
 {
 	return (get_vblank_comp(field, nullptr) && !m_screen->hblank());
 }
 
 
-CUSTOM_INPUT_MEMBER(vicdual_state::get_timer_value)
+ioport_value vicdual_state::get_timer_value(ioport_field &field, void *param)
 {
 	/* return the state of the timer (old code claims "4MHz square wave", but it was toggled once every 2msec, or 500Hz) */
 	return machine().time().as_ticks(500) & 1;
@@ -210,7 +210,7 @@ int vicdual_state::is_cabinet_color()
  *************************************/
 
 
-WRITE8_MEMBER(vicdual_state::videoram_w)
+void vicdual_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -218,7 +218,7 @@ WRITE8_MEMBER(vicdual_state::videoram_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::characterram_w)
+void vicdual_state::characterram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -271,7 +271,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::depthch_io_r)
+uint8_t vicdual_state::depthch_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -282,7 +282,7 @@ READ8_MEMBER(vicdual_state::depthch_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::depthch_io_w)
+void vicdual_state::depthch_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x04)  depthch_audio_w(space, 0, data);
@@ -352,7 +352,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::safari_io_r)
+uint8_t vicdual_state::safari_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -363,7 +363,7 @@ READ8_MEMBER(vicdual_state::safari_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::safari_io_w)
+void vicdual_state::safari_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02) { /* safari_audio_w(0, data) */ }
@@ -435,7 +435,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::frogs_io_r)
+uint8_t vicdual_state::frogs_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -446,7 +446,7 @@ READ8_MEMBER(vicdual_state::frogs_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::frogs_io_w)
+void vicdual_state::frogs_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02)  frogs_audio_w(space, 0, data);
@@ -546,7 +546,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::headon_io_r)
+uint8_t vicdual_state::headon_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -557,7 +557,7 @@ READ8_MEMBER(vicdual_state::headon_io_r)
 }
 
 
-READ8_MEMBER(vicdual_state::sspaceat_io_r)
+uint8_t vicdual_state::sspaceat_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -569,7 +569,7 @@ READ8_MEMBER(vicdual_state::sspaceat_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::headon_io_w)
+void vicdual_state::headon_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02)  headon_audio_w(space, 0, data);
@@ -805,7 +805,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::headon2_io_r)
+uint8_t vicdual_state::headon2_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -819,7 +819,7 @@ READ8_MEMBER(vicdual_state::headon2_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::headon2_io_w)
+void vicdual_state::headon2_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02)  headon_audio_w(space, 0, data);
@@ -830,7 +830,7 @@ WRITE8_MEMBER(vicdual_state::headon2_io_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::digger_io_w)
+void vicdual_state::digger_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02) { /* digger_audio_1_w(0, data) */ }
@@ -1034,7 +1034,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(vicdual_state::invho2_io_w)
+void vicdual_state::invho2_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  invho2_audio_w(space, 0, data);
 	if (offset & 0x02)  invinco_audio_w(space, 0, data);
@@ -1043,7 +1043,7 @@ WRITE8_MEMBER(vicdual_state::invho2_io_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::invds_io_w)
+void vicdual_state::invds_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  invinco_audio_w(space, 0, data);
 	if (offset & 0x02) { /* deepscan_audio_w(0, data) */ }
@@ -1051,7 +1051,7 @@ WRITE8_MEMBER(vicdual_state::invds_io_w)
 	if (offset & 0x40)  palette_bank_w(space, 0, data);
 }
 
-WRITE8_MEMBER(vicdual_state::carhntds_io_w)
+void vicdual_state::carhntds_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01) { /* invinco_audio_w(space, 0, data); */ }
 	if (offset & 0x02) { /* deepscan_audio_w(0, data) */ }
@@ -1060,7 +1060,7 @@ WRITE8_MEMBER(vicdual_state::carhntds_io_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::sspacaho_io_w)
+void vicdual_state::sspacaho_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  invho2_audio_w(space, 0, data);
 	if (offset & 0x02) { /* sspaceatt_audio_w(space, 0, data) */ }
@@ -1069,7 +1069,7 @@ WRITE8_MEMBER(vicdual_state::sspacaho_io_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::tranqgun_io_w)
+void vicdual_state::tranqgun_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01) { /* tranqgun_audio_w(space, 0, data) */ }
 	if (offset & 0x02)  palette_bank_w(space, 0, data);
@@ -1077,7 +1077,7 @@ WRITE8_MEMBER(vicdual_state::tranqgun_io_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::spacetrk_io_w)
+void vicdual_state::spacetrk_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01) { /* spacetrk_audio_w(space, 0, data) */ }
 	if (offset & 0x02) { /* spacetrk_audio_w(space, 0, data) */ }
@@ -1086,7 +1086,7 @@ WRITE8_MEMBER(vicdual_state::spacetrk_io_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::carnival_io_w)
+void vicdual_state::carnival_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  carnival_audio_1_w(space, 0, data);
 	if (offset & 0x02)  carnival_audio_2_w(space, 0, data);
@@ -1095,7 +1095,7 @@ WRITE8_MEMBER(vicdual_state::carnival_io_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::brdrline_io_w)
+void vicdual_state::brdrline_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01) { /* brdrline_audio_w(space, 0, data) */ }
 	if (offset & 0x02)  palette_bank_w(space, 0, data);
@@ -1103,7 +1103,7 @@ WRITE8_MEMBER(vicdual_state::brdrline_io_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::pulsar_io_w)
+void vicdual_state::pulsar_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  pulsar_audio_1_w(space, 0, data);
 	if (offset & 0x02)  pulsar_audio_2_w(space, 0, data);
@@ -1112,7 +1112,7 @@ WRITE8_MEMBER(vicdual_state::pulsar_io_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::heiankyo_io_w)
+void vicdual_state::heiankyo_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01) { /* heiankyo_audio_1_w(0, data) */ }
 	if (offset & 0x02) { /* heiankyo_audio_2_w(0, data) */ }
@@ -1120,7 +1120,7 @@ WRITE8_MEMBER(vicdual_state::heiankyo_io_w)
 }
 
 
-WRITE8_MEMBER(vicdual_state::alphaho_io_w)
+void vicdual_state::alphaho_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01) { /* headon_audio_w(0, data) */ }
 	if (offset & 0x02) { /* alphaf_audio_w(0, data) */ }
@@ -1296,7 +1296,7 @@ ADDRESS_MAP_END
 
 
 /* several of the games' lives DIPs are spread across two input ports */
-CUSTOM_INPUT_MEMBER(vicdual_state::fake_lives_r)
+ioport_value vicdual_state::fake_lives_r(ioport_field &field, void *param)
 {
 	/* use the low byte for the bitmask */
 	uint8_t bit_mask = ((uintptr_t)param) & 0xff;
@@ -2098,13 +2098,13 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(vicdual_state::samurai_protection_w)
+void vicdual_state::samurai_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_samurai_protection_data = data;
 }
 
 
-CUSTOM_INPUT_MEMBER(vicdual_state::samurai_protection_r)
+ioport_value vicdual_state::samurai_protection_r(ioport_field &field, void *param)
 {
 	int offset = (uintptr_t)param;
 	uint32_t answer = 0;
@@ -2118,7 +2118,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::samurai_protection_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::samurai_io_w)
+void vicdual_state::samurai_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x02) { /* samurai_audio_w(0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
@@ -2200,7 +2200,7 @@ static INPUT_PORTS_START( samurai )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(vicdual_state,samurai)
+void vicdual_state::machine_start_samurai()
 {
 	m_samurai_protection_data = 0;
 	save_item(NAME(m_samurai_protection_data));
@@ -2230,7 +2230,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::nsub_io_r)
+uint8_t vicdual_state::nsub_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -2241,7 +2241,7 @@ READ8_MEMBER(vicdual_state::nsub_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::nsub_io_w)
+void vicdual_state::nsub_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02) { /* nsub_audio_w(0, data) */ }
@@ -2269,7 +2269,7 @@ ADDRESS_MAP_END
 
 // coinage is handled by extra hardware on a daughterboard, put before the coin-in pin on the main logic board
 // IC board "COIN CALCULATOR" (97201-P): two 74191 counters, a 555 timer, coin meters, and lots of other TTL
-TIMER_DEVICE_CALLBACK_MEMBER(vicdual_state::nsub_coin_pulse)
+void vicdual_state::nsub_coin_pulse(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_nsub_play_counter > 0)
 	{
@@ -2278,7 +2278,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vicdual_state::nsub_coin_pulse)
 	}
 }
 
-INPUT_CHANGED_MEMBER(vicdual_state::nsub_coin_in)
+void vicdual_state::nsub_coin_in(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{
@@ -2366,7 +2366,7 @@ static INPUT_PORTS_START( nsub )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(vicdual_state,nsub)
+void vicdual_state::machine_start_nsub()
 {
 	m_nsub_play_counter = 0;
 	save_item(NAME(m_nsub_coin_counter));
@@ -2379,7 +2379,7 @@ MACHINE_START_MEMBER(vicdual_state,nsub)
 	m_nsub_coinage_timer->adjust(attotime::zero, 0, attotime::from_msec(150));
 }
 
-MACHINE_RESET_MEMBER(vicdual_state,nsub)
+void vicdual_state::machine_reset_nsub()
 {
 	m_nsub_coin_counter = m_coinage->read() & 7;
 
@@ -2411,7 +2411,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-READ8_MEMBER(vicdual_state::invinco_io_r)
+uint8_t vicdual_state::invinco_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -2423,7 +2423,7 @@ READ8_MEMBER(vicdual_state::invinco_io_r)
 }
 
 
-WRITE8_MEMBER(vicdual_state::invinco_io_w)
+void vicdual_state::invinco_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02)  invinco_audio_w(space, 0, data);

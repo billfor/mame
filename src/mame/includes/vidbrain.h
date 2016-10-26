@@ -68,18 +68,18 @@ public:
 		TIMER_JOYSTICK
 	};
 
-	DECLARE_WRITE8_MEMBER( keyboard_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( sound_w );
-	DECLARE_WRITE8_MEMBER( f3853_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
-	DECLARE_WRITE_LINE_MEMBER( hblank_w );
-	DECLARE_READ8_MEMBER(memory_read_byte);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void f3853_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void ext_int_w(int state);
+	void hblank_w(int state);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	F3853_INTERRUPT_REQ_CB(f3853_int_req_w);
 
-	IRQ_CALLBACK_MEMBER(vidbrain_int_ack);
+	int vidbrain_int_ack(device_t &device, int irqline);
 
 	void interrupt_check();
 

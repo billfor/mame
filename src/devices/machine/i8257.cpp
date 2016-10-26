@@ -489,7 +489,7 @@ void i8257_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( i8257_device::read )
+uint8_t i8257_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -544,7 +544,7 @@ READ8_MEMBER( i8257_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8257_device::write )
+void i8257_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!BIT(offset, 3))
 	{
@@ -607,7 +607,7 @@ WRITE8_MEMBER( i8257_device::write )
 //  hlda_w - hold acknowledge
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8257_device::hlda_w )
+void i8257_device::hlda_w(int state)
 {
 	if (LOG) logerror("I8257 '%s' Hold Acknowledge: %u\n", tag(), state);
 
@@ -620,7 +620,7 @@ WRITE_LINE_MEMBER( i8257_device::hlda_w )
 //  ready_w - ready
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8257_device::ready_w )
+void i8257_device::ready_w(int state)
 {
 	if (LOG) logerror("I8257 '%s' Ready: %u\n", tag(), state);
 
@@ -632,7 +632,7 @@ WRITE_LINE_MEMBER( i8257_device::ready_w )
 //  dreq0_w - DMA request for channel 0
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8257_device::dreq0_w )
+void i8257_device::dreq0_w(int state)
 {
 	dma_request(0, state);
 }
@@ -642,7 +642,7 @@ WRITE_LINE_MEMBER( i8257_device::dreq0_w )
 //  dreq0_w - DMA request for channel 1
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8257_device::dreq1_w )
+void i8257_device::dreq1_w(int state)
 {
 	dma_request(1, state);
 }
@@ -652,7 +652,7 @@ WRITE_LINE_MEMBER( i8257_device::dreq1_w )
 //  dreq1_w - DMA request for channel 2
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8257_device::dreq2_w )
+void i8257_device::dreq2_w(int state)
 {
 	dma_request(2, state);
 }
@@ -662,7 +662,7 @@ WRITE_LINE_MEMBER( i8257_device::dreq2_w )
 //  dreq3_w - DMA request for channel 3
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8257_device::dreq3_w )
+void i8257_device::dreq3_w(int state)
 {
 	dma_request(3, state);
 }

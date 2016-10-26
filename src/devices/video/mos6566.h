@@ -222,14 +222,14 @@ public:
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( lp_w );
+	void lp_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( phi0_r ) { return m_phi0; } // phi 0
-	DECLARE_READ_LINE_MEMBER( ba_r )   { return m_ba; }   // bus available
-	DECLARE_READ_LINE_MEMBER( aec_r )  { return m_aec; }  // address enable control
+	int phi0_r() { return m_phi0; } // phi 0
+	int ba_r()   { return m_ba; }   // bus available
+	int aec_r()  { return m_aec; }  // address enable control
 
 	uint8_t bus_r() { return m_last_data; }
 

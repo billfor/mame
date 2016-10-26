@@ -10,36 +10,36 @@
 #include "includes/renegade.h"
 
 
-WRITE8_MEMBER(renegade_state::bg_videoram_w)
+void renegade_state::bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	offset = offset % (64 * 16);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(renegade_state::fg_videoram_w)
+void renegade_state::fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_videoram[offset] = data;
 	offset = offset % (32 * 32);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(renegade_state::flipscreen_w)
+void renegade_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 0x01);
 }
 
-WRITE8_MEMBER(renegade_state::scroll_lsb_w)
+void renegade_state::scroll_lsb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx = (m_scrollx & 0xff00) | data;
 }
 
-WRITE8_MEMBER(renegade_state::scroll_msb_w)
+void renegade_state::scroll_msb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx = (m_scrollx & 0xff) | (data << 8);
 }
 
-TILE_GET_INFO_MEMBER(renegade_state::get_bg_tilemap_info)
+void renegade_state::get_bg_tilemap_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint8_t *source = &m_bg_videoram[tile_index];
 	uint8_t attributes = source[0x400]; /* CCC??BBB */
@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(renegade_state::get_bg_tilemap_info)
 		0);
 }
 
-TILE_GET_INFO_MEMBER(renegade_state::get_fg_tilemap_info)
+void renegade_state::get_fg_tilemap_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint8_t *source = &m_fg_videoram[tile_index];
 	uint8_t attributes = source[0x400];

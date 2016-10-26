@@ -46,20 +46,20 @@ public:
 
 	int m_sprxoffs;
 
-	DECLARE_WRITE16_MEMBER(stlforce_bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(stlforce_mlow_videoram_w);
-	DECLARE_WRITE16_MEMBER(stlforce_mhigh_videoram_w);
-	DECLARE_WRITE16_MEMBER(stlforce_tx_videoram_w);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE16_MEMBER(oki_bank_w);
+	void stlforce_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void stlforce_mlow_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void stlforce_mhigh_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void stlforce_tx_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DRIVER_INIT(twinbrat);
-	DECLARE_DRIVER_INIT(stlforce);
+	void init_twinbrat();
+	void init_stlforce();
 
-	TILE_GET_INFO_MEMBER(get_stlforce_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_stlforce_mlow_tile_info);
-	TILE_GET_INFO_MEMBER(get_stlforce_mhigh_tile_info);
-	TILE_GET_INFO_MEMBER(get_stlforce_tx_tile_info);
+	void get_stlforce_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stlforce_mlow_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stlforce_mhigh_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stlforce_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 	uint32_t screen_update_stlforce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

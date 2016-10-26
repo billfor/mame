@@ -47,14 +47,14 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(ginganin_fgram16_w);
-	DECLARE_WRITE16_MEMBER(ginganin_txtram16_w);
-	DECLARE_WRITE16_MEMBER(ginganin_vregs16_w);
-	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
-	DECLARE_DRIVER_INIT(ginganin);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_txt_tile_info);
+	void ginganin_fgram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ginganin_txtram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ginganin_vregs16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ptm_irq(int state);
+	void init_ginganin();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_txt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

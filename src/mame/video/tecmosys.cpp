@@ -10,7 +10,7 @@
 #include "includes/tecmosys.h"
 
 
-TILE_GET_INFO_MEMBER(tecmosys_state::get_bg0tile_info)
+void tecmosys_state::get_bg0tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1,
 			m_bg0tilemap_ram[2*tile_index+1],
@@ -18,7 +18,7 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_bg0tile_info)
 			TILE_FLIPYX((m_bg0tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
-TILE_GET_INFO_MEMBER(tecmosys_state::get_bg1tile_info)
+void tecmosys_state::get_bg1tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(2,
 			m_bg1tilemap_ram[2*tile_index+1],
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_bg1tile_info)
 			TILE_FLIPYX((m_bg1tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
-TILE_GET_INFO_MEMBER(tecmosys_state::get_bg2tile_info)
+void tecmosys_state::get_bg2tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(3,
 			m_bg2tilemap_ram[2*tile_index+1],
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_bg2tile_info)
 			TILE_FLIPYX((m_bg2tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
-TILE_GET_INFO_MEMBER(tecmosys_state::get_fg_tile_info)
+void tecmosys_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0,
 			m_fgtilemap_ram[2*tile_index+1],
@@ -43,25 +43,25 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_fg_tile_info)
 }
 
 
-WRITE16_MEMBER(tecmosys_state::bg0_tilemap_w)
+void tecmosys_state::bg0_tilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg0tilemap_ram[offset]);
 	m_bg0tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(tecmosys_state::bg1_tilemap_w)
+void tecmosys_state::bg1_tilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg1tilemap_ram[offset]);
 	m_bg1tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(tecmosys_state::bg2_tilemap_w)
+void tecmosys_state::bg2_tilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2tilemap_ram[offset]);
 	m_bg2tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(tecmosys_state::fg_tilemap_w)
+void tecmosys_state::fg_tilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgtilemap_ram[offset]);
 	m_txt_tilemap->mark_tile_dirty(offset/2);
@@ -73,25 +73,25 @@ inline void tecmosys_state::set_color_555(pen_t color, int rshift, int gshift, i
 	m_palette->set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
-WRITE16_MEMBER(tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w)
+void tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_paletteram16[offset]);
 	set_color_555(offset+0x4000, 5, 10, 0, m_tilemap_paletteram16[offset]);
 }
 
-WRITE16_MEMBER(tecmosys_state::bg0_tilemap_lineram_w)
+void tecmosys_state::bg0_tilemap_lineram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg0tilemap_lineram[offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg0 lineram %04x %04x",offset,data);
 }
 
-WRITE16_MEMBER(tecmosys_state::bg1_tilemap_lineram_w)
+void tecmosys_state::bg1_tilemap_lineram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg1tilemap_lineram[offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg1 lineram %04x %04x",offset,data);
 }
 
-WRITE16_MEMBER(tecmosys_state::bg2_tilemap_lineram_w)
+void tecmosys_state::bg2_tilemap_lineram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2tilemap_lineram[offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg2 lineram %04x %04x",offset,data);

@@ -50,15 +50,15 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(dmax8000);
-	DECLARE_MACHINE_RESET(dmax8000);
-	DECLARE_WRITE8_MEMBER(port0c_w);
-	DECLARE_WRITE8_MEMBER(port0d_w);
-	DECLARE_WRITE8_MEMBER(port14_w);
-	DECLARE_WRITE8_MEMBER(port40_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void init_dmax8000();
+	void machine_reset_dmax8000();
+	void port0c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port0d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctc_z0_w(int state);
+	void fdc_drq_w(int state);
+	void clock_w(int state);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -70,12 +70,12 @@ private:
 };
 
 
-WRITE_LINE_MEMBER( dmax8000_state::fdc_drq_w )
+void dmax8000_state::fdc_drq_w(int state)
 {
 	if (state) printf("DRQ ");
 }
 
-WRITE8_MEMBER( dmax8000_state::port0c_w )
+void dmax8000_state::port0c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("Port0c=%X\n", data);
 	m_fdc->dden_w(BIT(data, 6));
@@ -89,17 +89,17 @@ WRITE8_MEMBER( dmax8000_state::port0c_w )
 	}
 }
 
-WRITE8_MEMBER( dmax8000_state::port0d_w )
+void dmax8000_state::port0d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("Port0d=%X\n", data);
 }
 
-WRITE8_MEMBER( dmax8000_state::port14_w )
+void dmax8000_state::port14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("Port14=%X\n", data);
 }
 
-WRITE8_MEMBER( dmax8000_state::port40_w )
+void dmax8000_state::port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(BIT(data, 0));
 }
@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( dmax8000 )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( dmax8000_state, dmax8000 )
+void dmax8000_state::machine_reset_dmax8000()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -138,7 +138,7 @@ MACHINE_RESET_MEMBER( dmax8000_state, dmax8000 )
 	m_maincpu->set_input_line_vector(0, 0xee); // fdc vector
 }
 
-DRIVER_INIT_MEMBER( dmax8000_state, dmax8000 )
+void dmax8000_state::init_dmax8000()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -148,14 +148,14 @@ DRIVER_INIT_MEMBER( dmax8000_state, dmax8000 )
 }
 
 // Baud rate generator. All inputs are 2MHz.
-WRITE_LINE_MEMBER( dmax8000_state::clock_w )
+void dmax8000_state::clock_w(int state)
 {
 	m_ctc->trg0(state);
 	m_ctc->trg1(state);
 	m_ctc->trg2(state);
 }
 
-WRITE_LINE_MEMBER( dmax8000_state::ctc_z0_w )
+void dmax8000_state::ctc_z0_w(int state)
 {
 	m_dart1->rxca_w(state);
 	m_dart1->txca_w(state);

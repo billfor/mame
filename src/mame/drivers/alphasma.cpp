@@ -46,17 +46,17 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(alphasmart);
+	void palette_init_alphasmart(palette_device &palette);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
-	DECLARE_READ8_MEMBER(kb_r);
-	DECLARE_WRITE8_MEMBER(kb_matrixl_w);
-	DECLARE_WRITE8_MEMBER(kb_matrixh_w);
-	DECLARE_READ8_MEMBER(port_a_r);
-	virtual DECLARE_WRITE8_MEMBER(port_a_w);
-	DECLARE_READ8_MEMBER(port_d_r);
-	DECLARE_WRITE8_MEMBER(port_d_w);
+	void kb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	uint8_t kb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kb_matrixl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kb_matrixh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_d_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void update_lcdc(address_space &space, bool lcdc0, bool lcdc1);
 
 protected:
@@ -77,20 +77,20 @@ public:
 
 	required_shared_ptr<uint8_t> m_intram;
 
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	virtual DECLARE_WRITE8_MEMBER(port_a_w) override;
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 private:
 	uint8_t m_lcd_ctrl;
 };
 
-INPUT_CHANGED_MEMBER(alphasmart_state::kb_irq)
+void alphasmart_state::kb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
 }
 
-READ8_MEMBER(alphasmart_state::kb_r)
+uint8_t alphasmart_state::kb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t matrix = (m_matrix[1]<<8) | m_matrix[0];
 	uint8_t data = 0xff;
@@ -102,17 +102,17 @@ READ8_MEMBER(alphasmart_state::kb_r)
 	return data;
 }
 
-WRITE8_MEMBER(alphasmart_state::kb_matrixl_w)
+void alphasmart_state::kb_matrixl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_matrix[0] = data;
 }
 
-WRITE8_MEMBER(alphasmart_state::kb_matrixh_w)
+void alphasmart_state::kb_matrixh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_matrix[1] = data;
 }
 
-READ8_MEMBER(alphasmart_state::port_a_r)
+uint8_t alphasmart_state::port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_a & 0xfd) | (m_battery_status->read() << 1);
 }
@@ -143,7 +143,7 @@ void alphasmart_state::update_lcdc(address_space &space, bool lcdc0, bool lcdc1)
 	}
 }
 
-WRITE8_MEMBER(alphasmart_state::port_a_w)
+void alphasmart_state::port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t changed = (m_port_a ^ data) & data;
 	update_lcdc(space, changed & 0x80, changed & 0x20);
@@ -151,12 +151,12 @@ WRITE8_MEMBER(alphasmart_state::port_a_w)
 	m_port_a = data;
 }
 
-READ8_MEMBER(alphasmart_state::port_d_r)
+uint8_t alphasmart_state::port_d_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port_d;
 }
 
-WRITE8_MEMBER(alphasmart_state::port_d_w)
+void alphasmart_state::port_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_d = data;
 }
@@ -177,7 +177,7 @@ static ADDRESS_MAP_START(alphasmart_io, AS_IO, 8, alphasmart_state)
 	AM_RANGE( MC68HC11_IO_PORTD, MC68HC11_IO_PORTD ) AM_READWRITE(port_d_r, port_d_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(asma2k_state::io_r)
+uint8_t asma2k_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0x2000)
 		return kb_r(space, offset);
@@ -187,7 +187,7 @@ READ8_MEMBER(asma2k_state::io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(asma2k_state::io_w)
+void asma2k_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0x2000)
 		kb_matrixh_w(space, offset, data);
@@ -201,7 +201,7 @@ WRITE8_MEMBER(asma2k_state::io_w)
 	//else printf("unknown w: %x %x\n", offset, data);
 }
 
-WRITE8_MEMBER(asma2k_state::port_a_w)
+void asma2k_state::port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_port_a ^ data) & 0x40)
 	{
@@ -384,7 +384,7 @@ static INPUT_PORTS_START( alphasmart )
 	PORT_CONFSETTING (0x01, DEF_STR(Normal))
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(alphasmart_state, alphasmart)
+void alphasmart_state::palette_init_alphasmart(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

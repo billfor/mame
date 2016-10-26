@@ -29,7 +29,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(docastle_state, docastle)
+void docastle_state::palette_init_docastle(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -63,30 +63,30 @@ PALETTE_INIT_MEMBER(docastle_state, docastle)
 	}
 }
 
-WRITE8_MEMBER(docastle_state::docastle_videoram_w)
+void docastle_state::docastle_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(docastle_state::docastle_colorram_w)
+void docastle_state::docastle_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(docastle_state::flipscreen_r)
+uint8_t docastle_state::flipscreen_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	flip_screen_set(offset);
 	return (offset ? 1 : 0); // is this really needed?
 }
 
-WRITE8_MEMBER(docastle_state::flipscreen_w)
+void docastle_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(offset);
 }
 
-TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
+void docastle_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 8 * (m_colorram[tile_index] & 0x20);
 	int color = m_colorram[tile_index] & 0x1f;
@@ -106,7 +106,7 @@ void docastle_state::video_start()
 	video_start_common(0x00ff);
 }
 
-VIDEO_START_MEMBER(docastle_state,dorunrun)
+void docastle_state::video_start_dorunrun()
 {
 	video_start_common(0xff00);
 }

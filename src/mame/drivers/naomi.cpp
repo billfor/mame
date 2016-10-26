@@ -1572,24 +1572,24 @@ Premier Eleven
 
 #define CPU_CLOCK (200000000)
 
-READ64_MEMBER(naomi_state::naomi_arm_r )
+uint64_t naomi_state::naomi_arm_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return *(reinterpret_cast<uint64_t *>(dc_sound_ram.target())+offset);
 }
 
-WRITE64_MEMBER(naomi_state::naomi_arm_w )
+void naomi_state::naomi_arm_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	COMBINE_DATA(reinterpret_cast<uint64_t *>(dc_sound_ram.target()) + offset);
 }
 
-READ64_MEMBER(naomi_state::naomi_unknown1_r )
+uint64_t naomi_state::naomi_unknown1_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	if ((offset * 8) == 0xc0) // trick so that it does not "wait for multiboard sync"
 		return -1;
 	return 0;
 }
 
-WRITE64_MEMBER(naomi_state::naomi_unknown1_w )
+void naomi_state::naomi_unknown1_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 }
 
@@ -1598,7 +1598,7 @@ WRITE64_MEMBER(naomi_state::naomi_unknown1_w )
 */
 
 
-READ64_MEMBER(naomi_state::eeprom_93c46a_r )
+uint64_t naomi_state::eeprom_93c46a_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	int res;
 	// bit 0 - EEPROM type: 0 - 93C46, 1 - X76F100 TODO
@@ -1608,7 +1608,7 @@ READ64_MEMBER(naomi_state::eeprom_93c46a_r )
 	return res;
 }
 
-WRITE64_MEMBER(naomi_state::eeprom_93c46a_w )
+void naomi_state::eeprom_93c46a_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	/* bit 4 is data */
 	/* bit 2 is clock */
@@ -1793,13 +1793,13 @@ ADDRESS_MAP_END
  * Atomiswave address map, almost identical to Dreamcast
  */
 
-READ64_MEMBER(naomi_state::aw_flash_r )
+uint64_t naomi_state::aw_flash_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return (uint64_t)m_awflash->read(offset*8) | (uint64_t)m_awflash->read((offset*8)+1)<<8 | (uint64_t)m_awflash->read((offset*8)+2)<<16 | (uint64_t)m_awflash->read((offset*8)+3)<<24 |
 			(uint64_t)m_awflash->read((offset*8)+4)<<32 | (uint64_t)m_awflash->read((offset*8)+5)<<40 | (uint64_t)m_awflash->read((offset*8)+6)<<48 | (uint64_t)m_awflash->read((offset*8)+7)<<56;
 }
 
-WRITE64_MEMBER(naomi_state::aw_flash_w )
+void naomi_state::aw_flash_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int i;
 	uint32_t addr = offset * 8;
@@ -1840,7 +1840,7 @@ inline int naomi_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint
 	return reg;
 }
 
-READ64_MEMBER(naomi_state::aw_modem_r )
+uint64_t naomi_state::aw_modem_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -1866,7 +1866,7 @@ READ64_MEMBER(naomi_state::aw_modem_r )
 	return 0;
 }
 
-WRITE64_MEMBER(naomi_state::aw_modem_w )
+void naomi_state::aw_modem_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -1956,12 +1956,12 @@ ADDRESS_MAP_END
 /*
  * Aica
  */
-WRITE_LINE_MEMBER(naomi_state::aica_irq)
+void naomi_state::aica_irq(int state)
 {
 	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(naomi_state::sh4_aica_irq)
+void naomi_state::sh4_aica_irq(int state)
 {
 	if(state)
 		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_AICA;
@@ -2629,7 +2629,7 @@ static INPUT_PORTS_START( aw1w )
 	PORT_INCLUDE( naomi_debug )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(naomi_state,naomi)
+void naomi_state::machine_reset_naomi()
 {
 	naomi_state::machine_reset();
 	m_aica->set_ram_base(dc_sound_ram, 8*1024*1024);
@@ -9001,7 +9001,7 @@ ROM_END
 // EN cartridges have this area empty (FF-filled), i.e. AW-NET features not used.
 // JP cartridges have it filled with unique ID, which also means dumps of several JP cartridges will differ by this few bytes.
 
-DRIVER_INIT_MEMBER(naomi_state,atomiswave)
+void naomi_state::init_atomiswave()
 {
 	uint64_t *ROM = (uint64_t *)memregion("awflash")->base();
 
@@ -9011,7 +9011,7 @@ DRIVER_INIT_MEMBER(naomi_state,atomiswave)
 	aw_ctrl_type = 0;
 }
 
-READ64_MEMBER(naomi_state::xtrmhnt2_hack_r)
+uint64_t naomi_state::xtrmhnt2_hack_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	// disable ALL.Net board check
 	if (space.device().safe_pc() == 0xc03cb30)
@@ -9026,9 +9026,9 @@ READ64_MEMBER(naomi_state::xtrmhnt2_hack_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(naomi_state,xtrmhnt2)
+void naomi_state::init_xtrmhnt2()
 {
-	DRIVER_INIT_CALL(atomiswave);
+	init_atomiswave();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000000, 0x100011f, read64_delegate(FUNC(naomi_state::xtrmhnt2_hack_r), this));
 }
 

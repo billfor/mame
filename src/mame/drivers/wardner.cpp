@@ -146,8 +146,8 @@ public:
 
 	required_device<address_map_bank_device> m_membank;
 
-	DECLARE_WRITE8_MEMBER(wardner_bank_w);
-	DECLARE_DRIVER_INIT(wardner);
+	void wardner_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_wardner();
 
 protected:
 	virtual void driver_start() override;
@@ -157,7 +157,7 @@ protected:
 
 /***************************** Z80 Main Memory Map **************************/
 
-WRITE8_MEMBER(wardner_state::wardner_bank_w)
+void wardner_state::wardner_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_membank->set_bank(data & 7);
 }
@@ -352,7 +352,7 @@ void wardner_state::driver_start()
 
 void wardner_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(twincobr);
+	machine_reset_twincobr();
 
 	m_toaplan_main_cpu = 1;     /* Z80 */
 	twincobr_display(1);

@@ -90,17 +90,17 @@ void sv801_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( sv801_device::intrq_w )
+void sv801_device::intrq_w(int state)
 {
 	m_irq = state;
 }
 
-WRITE_LINE_MEMBER( sv801_device::drq_w )
+void sv801_device::drq_w(int state)
 {
 	m_drq = state;
 }
 
-WRITE8_MEMBER( sv801_device::motor_w )
+void sv801_device::motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_floppy = nullptr;
 
@@ -115,7 +115,7 @@ WRITE8_MEMBER( sv801_device::motor_w )
 		m_floppy1->get_device()->mon_w(!BIT(data, 3));
 }
 
-READ8_MEMBER( sv801_device::iorq_r )
+uint8_t sv801_device::iorq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -129,7 +129,7 @@ READ8_MEMBER( sv801_device::iorq_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( sv801_device::iorq_w )
+void sv801_device::iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

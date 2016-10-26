@@ -52,13 +52,13 @@ Sprite layout.
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(ddragon_state::background_scan)
+tilemap_memory_index ddragon_state::background_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
+void ddragon_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_bgvideoram[2 * tile_index];
 	SET_TILE_INFO_MEMBER(2,
@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
 			TILE_FLIPYX((attr & 0xc0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
+void ddragon_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_fgvideoram[2 * tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ddragon_state::get_fg_16color_tile_info)
+void ddragon_state::get_fg_16color_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_fgvideoram[2 * tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -92,7 +92,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_fg_16color_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(ddragon_state,ddragon)
+void ddragon_state::video_start_ddragon()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ddragon_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(ddragon_state::background_scan),this), 16, 16, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ddragon_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -111,13 +111,13 @@ VIDEO_START_MEMBER(ddragon_state,ddragon)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(ddragon_state::ddragon_bgvideoram_w)
+void ddragon_state::ddragon_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(ddragon_state::ddragon_fgvideoram_w)
+void ddragon_state::ddragon_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);

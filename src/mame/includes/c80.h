@@ -38,12 +38,12 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( pio1_pa_r );
-	DECLARE_WRITE8_MEMBER( pio1_pa_w );
-	DECLARE_WRITE8_MEMBER( pio1_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( pio1_brdy_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+	uint8_t pio1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio1_brdy_w(int state);
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	/* keyboard state */
 	int m_keylatch;

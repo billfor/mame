@@ -454,23 +454,23 @@ public:
 				, m_smpc_nv(*this, "smpc_nv")
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
-	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
+	void nmi_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void tray_open(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void tray_close(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	DECLARE_MACHINE_START(saturn);
-	DECLARE_MACHINE_RESET(saturn);
+	void machine_start_saturn();
+	void machine_reset_saturn();
 
-	DECLARE_READ8_MEMBER(saturn_cart_type_r);
-	DECLARE_READ32_MEMBER(abus_dummy_r);
+	uint8_t saturn_cart_type_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint32_t abus_dummy_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER(saturn_null_ram_r);
-	DECLARE_WRITE32_MEMBER(saturn_null_ram_w);
+	uint32_t saturn_null_ram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void saturn_null_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void saturn_init_driver(int rgn);
-	DECLARE_DRIVER_INIT(saturnus);
-	DECLARE_DRIVER_INIT(saturneu);
-	DECLARE_DRIVER_INIT(saturnjp);
+	void init_saturnus();
+	void init_saturneu();
+	void init_saturnjp();
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
@@ -480,7 +480,7 @@ public:
 };
 
 
-READ8_MEMBER(sat_console_state::saturn_cart_type_r)
+uint8_t sat_console_state::saturn_cart_type_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_exp)
 		return m_exp->get_cart_type();
@@ -489,7 +489,7 @@ READ8_MEMBER(sat_console_state::saturn_cart_type_r)
 }
 
 /* TODO: Bug! accesses this one, if returning 0 the SH-2 hard-crashes. Might be an actual bug with the CD block. */
-READ32_MEMBER( sat_console_state::abus_dummy_r )
+uint32_t sat_console_state::abus_dummy_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("A-Bus Dummy access %08x\n",offset*4);
 	return -1;
@@ -542,7 +542,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_CHANGED_MEMBER(sat_console_state::nmi_reset)
+void sat_console_state::nmi_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* TODO: correct? */
 	if(!m_NMI_reset)
@@ -553,13 +553,13 @@ INPUT_CHANGED_MEMBER(sat_console_state::nmi_reset)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER(sat_console_state::tray_open)
+void sat_console_state::tray_open(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		stvcd_set_tray_open();
 }
 
-INPUT_CHANGED_MEMBER(sat_console_state::tray_close)
+void sat_console_state::tray_close(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		stvcd_set_tray_close();
@@ -640,7 +640,7 @@ void saturn_state::debug_commands(int ref, int params, const char **param)
 }
 
 
-MACHINE_START_MEMBER(sat_console_state, saturn)
+void sat_console_state::machine_start_saturn()
 {
 	system_time systime;
 	machine().base_datetime(systime);
@@ -743,16 +743,16 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 }
 
 /* Die Hard Trilogy tests RAM address 0x25e7ffe bit 2 with Slave during FRT minit irq, in-development tool for breaking execution of it? */
-READ32_MEMBER(sat_console_state::saturn_null_ram_r)
+uint32_t sat_console_state::saturn_null_ram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(sat_console_state::saturn_null_ram_w)
+void sat_console_state::saturn_null_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-MACHINE_RESET_MEMBER(sat_console_state,saturn)
+void sat_console_state::machine_reset_saturn()
 {
 	m_scsp_last_line = 0;
 
@@ -918,17 +918,17 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 
-DRIVER_INIT_MEMBER(sat_console_state,saturnus)
+void sat_console_state::init_saturnus()
 {
 	saturn_init_driver(4);
 }
 
-DRIVER_INIT_MEMBER(sat_console_state,saturneu)
+void sat_console_state::init_saturneu()
 {
 	saturn_init_driver(12);
 }
 
-DRIVER_INIT_MEMBER(sat_console_state,saturnjp)
+void sat_console_state::init_saturnjp()
 {
 	saturn_init_driver(1);
 }

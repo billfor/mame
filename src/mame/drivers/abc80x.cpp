@@ -172,7 +172,7 @@ DISCRETE_SOUND_END
 //  pling_r - speaker read
 //-------------------------------------------------
 
-READ8_MEMBER( abc800_state::pling_r )
+uint8_t abc800_state::pling_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_pling = !m_pling;
 
@@ -186,7 +186,7 @@ READ8_MEMBER( abc800_state::pling_r )
 //  pling_r - speaker read
 //-------------------------------------------------
 
-READ8_MEMBER( abc802_state::pling_r )
+uint8_t abc802_state::pling_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_pling = !m_pling;
 
@@ -330,7 +330,7 @@ void abc806_state::bankswitch()
 
 					program.install_read_bank(0x7000, 0x77ff, bank_name);
 					program.unmap_write(0x7000, 0x77ff);
-					program.install_readwrite_handler(0x7800, 0x7fff, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
+					program.install_readwrite_handler(0x7800, 0x7fff, read8_delegate(FUNC(abc806_state::charram_r), this), write8_delegate(FUNC(abc806_state::charram_w), this));
 					membank(bank_name)->set_entry(0);
 					break;
 
@@ -365,7 +365,7 @@ void abc806_state::bankswitch()
 			if (start_addr == 0x7000)
 			{
 				program.install_readwrite_bank(0x7000, 0x77ff, bank_name);
-				program.install_readwrite_handler(0x7800, 0x7fff, READ8_DELEGATE(abc806_state, charram_r), WRITE8_DELEGATE(abc806_state, charram_w));
+				program.install_readwrite_handler(0x7800, 0x7fff, read8_delegate(FUNC(abc806_state::charram_r), this), write8_delegate(FUNC(abc806_state::charram_w), this));
 			}
 			else
 			{
@@ -383,7 +383,7 @@ void abc806_state::bankswitch()
 //  mai_r - memory bank map read
 //-------------------------------------------------
 
-READ8_MEMBER( abc806_state::mai_r )
+uint8_t abc806_state::mai_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank = offset >> 12;
 
@@ -395,7 +395,7 @@ READ8_MEMBER( abc806_state::mai_r )
 //  mao_w - memory bank map write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::mao_w )
+void abc806_state::mao_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -643,7 +643,7 @@ INPUT_PORTS_END
 //  Z80CTC
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc800_state::ctc_z0_w )
+void abc800_state::ctc_z0_w(int state)
 {
 	if (BIT(m_sb, 2))
 	{
@@ -654,7 +654,7 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z0_w )
 	clock_cassette(state);
 }
 
-WRITE_LINE_MEMBER( abc800_state::ctc_z1_w )
+void abc800_state::ctc_z1_w(int state)
 {
 	if (BIT(m_sb, 3))
 	{
@@ -668,7 +668,7 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z1_w )
 	}
 }
 
-WRITE_LINE_MEMBER( abc800_state::ctc_z2_w )
+void abc800_state::ctc_z2_w(int state)
 {
 	m_dart->rxca_w(state);
 	m_dart->txca_w(state);
@@ -704,12 +704,12 @@ void abc800_state::clock_cassette(int state)
 	m_ctc_z0 = state;
 }
 
-WRITE_LINE_MEMBER( abc800_state::sio_txdb_w )
+void abc800_state::sio_txdb_w(int state)
 {
 	m_sio_txdb = state;
 }
 
-WRITE_LINE_MEMBER( abc800_state::sio_dtrb_w )
+void abc800_state::sio_dtrb_w(int state)
 {
 	if (m_cassette == nullptr) return;
 
@@ -725,7 +725,7 @@ WRITE_LINE_MEMBER( abc800_state::sio_dtrb_w )
 	}
 }
 
-WRITE_LINE_MEMBER( abc800_state::sio_rtsb_w )
+void abc800_state::sio_rtsb_w(int state)
 {
 	if (m_cassette == nullptr) return;
 
@@ -741,14 +741,14 @@ WRITE_LINE_MEMBER( abc800_state::sio_rtsb_w )
 //  Z80DART abc802
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc802_state::lrs_w )
+void abc802_state::lrs_w(int state)
 {
 	m_lrs = state;
 
 	bankswitch();
 }
 
-WRITE_LINE_MEMBER( abc802_state::mux80_40_w )
+void abc802_state::mux80_40_w(int state)
 {
 	m_80_40_mux = state;
 }
@@ -757,7 +757,7 @@ WRITE_LINE_MEMBER( abc802_state::mux80_40_w )
 //  Z80DART abc806
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc806_state::keydtr_w )
+void abc806_state::keydtr_w(int state)
 {
 	m_keydtr = state;
 
@@ -1582,7 +1582,7 @@ ROM_END
 //  DRIVER_INIT( abc800c )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER( abc800c_state::direct_update_handler )
+offs_t abc800c_state::direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (address >= 0x7c00 && address < 0x8000)
 	{
@@ -1606,7 +1606,7 @@ DIRECT_UPDATE_MEMBER( abc800c_state::direct_update_handler )
 	return address;
 }
 
-DRIVER_INIT_MEMBER(abc800c_state,driver_init)
+void abc800c_state::init_driver_init()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc800c_state::direct_update_handler), this));
 }
@@ -1616,7 +1616,7 @@ DRIVER_INIT_MEMBER(abc800c_state,driver_init)
 //  DRIVER_INIT( abc800m )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER( abc800m_state::direct_update_handler )
+offs_t abc800m_state::direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (address >= 0x7800 && address < 0x8000)
 	{
@@ -1640,7 +1640,7 @@ DIRECT_UPDATE_MEMBER( abc800m_state::direct_update_handler )
 	return address;
 }
 
-DRIVER_INIT_MEMBER(abc800m_state,driver_init)
+void abc800m_state::init_driver_init()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc800m_state::direct_update_handler), this));
 }
@@ -1650,7 +1650,7 @@ DRIVER_INIT_MEMBER(abc800m_state,driver_init)
 //  DRIVER_INIT( abc802 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER( abc802_state::direct_update_handler )
+offs_t abc802_state::direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (m_lrs)
 	{
@@ -1664,7 +1664,7 @@ DIRECT_UPDATE_MEMBER( abc802_state::direct_update_handler )
 	return address;
 }
 
-DRIVER_INIT_MEMBER(abc802_state,driver_init)
+void abc802_state::init_driver_init()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc802_state::direct_update_handler), this));
 }
@@ -1674,7 +1674,7 @@ DRIVER_INIT_MEMBER(abc802_state,driver_init)
 //  DRIVER_INIT( abc806 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER( abc806_state::direct_update_handler )
+offs_t abc806_state::direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (address >= 0x7800 && address < 0x8000)
 	{
@@ -1698,7 +1698,7 @@ DIRECT_UPDATE_MEMBER( abc806_state::direct_update_handler )
 	return address;
 }
 
-DRIVER_INIT_MEMBER(abc806_state,driver_init)
+void abc806_state::init_driver_init()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(abc806_state::direct_update_handler), this));
 }

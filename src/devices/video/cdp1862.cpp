@@ -123,7 +123,7 @@ void cdp1862_device::device_reset()
 //  dma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1862_device::dma_w )
+void cdp1862_device::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int rd = 1, bd = 1, gd = 1;
 	int sx = m_screen->hpos() + 4;
@@ -157,7 +157,7 @@ WRITE8_MEMBER( cdp1862_device::dma_w )
 //  disp_on_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1862_device::bkg_w )
+void cdp1862_device::bkg_w(int state)
 {
 	if (state)
 	{
@@ -175,7 +175,7 @@ WRITE_LINE_MEMBER( cdp1862_device::bkg_w )
 //  disp_off_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1862_device::con_w )
+void cdp1862_device::con_w(int state)
 {
 	if (!state)
 	{

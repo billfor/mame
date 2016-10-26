@@ -83,9 +83,9 @@ public:
 
 
 	uint8_t read(offs_t offset, uint8_t data);
-	DECLARE_WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ_LINE_MEMBER( fsdir_r );
+	int fsdir_r();
 
 	offs_t ta_r(offs_t offset, int aec, int *ms0, int *ms1, int *ms2, int *ms3, int *cas0, int *cas1);
 

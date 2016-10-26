@@ -76,12 +76,12 @@ void seicross_state::machine_reset()
 
 
 
-READ8_MEMBER(seicross_state::portB_r)
+uint8_t seicross_state::portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_portb & 0x9f) | (m_debug_port.read_safe(0) & 0x60);
 }
 
-WRITE8_MEMBER(seicross_state::portB_w)
+void seicross_state::portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("PC %04x: 8910 port B = %02x\n", space.device().safe_pc(), data);
 	/* bit 0 is IRQ enable */
@@ -101,7 +101,7 @@ WRITE8_MEMBER(seicross_state::portB_w)
 	m_portb = data;
 }
 
-WRITE8_MEMBER(seicross_state::dac_w)
+void seicross_state::dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(data >> 4);
 }
@@ -378,7 +378,7 @@ static GFXDECODE_START( seicross )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
+void seicross_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -592,7 +592,7 @@ ROM_START( sectrzon )
 	ROM_LOAD( "pal16h2.3b", 0x0000, 0x0044, CRC(e1a6a86d) SHA1(740a5c2ef8a992f6a794c0fc4c81eb50cfcedc32) )
 ROM_END
 
-DRIVER_INIT_MEMBER(seicross_state,friskytb)
+void seicross_state::init_friskytb()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	// this code is in ROM 6.3h, maps to MCU at dxxx

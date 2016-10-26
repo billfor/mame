@@ -19,18 +19,18 @@ public:
 		, m_p1(*this, "P1")
 	{ }
 
-	DECLARE_MACHINE_START(klax);
-	DECLARE_MACHINE_RESET(klax);
+	void machine_start_klax();
+	void machine_reset_klax();
 
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 
 	virtual void update_interrupts() override;
-	DECLARE_WRITE16_MEMBER(interrupt_ack_w);
+	void interrupt_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(klax_latch_w);
+	void klax_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_VIDEO_START(klax);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	void video_start_klax();
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	uint32_t screen_update_klax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;

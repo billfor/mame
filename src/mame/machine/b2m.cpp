@@ -19,7 +19,7 @@
 #include "machine/ram.h"
 #include "imagedev/flopdrv.h"
 
-READ8_MEMBER(b2m_state::b2m_keyboard_r)
+uint8_t b2m_state::b2m_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t key = 0x00;
 	if (offset < 0x100) {
@@ -142,34 +142,34 @@ void b2m_state::b2m_set_bank(int bank)
 }
 
 
-WRITE_LINE_MEMBER(b2m_state::bm2_pit_out1)
+void b2m_state::bm2_pit_out1(int state)
 {
 	m_speaker->level_w(state);
 }
 
-WRITE8_MEMBER(b2m_state::b2m_8255_porta_w)
+void b2m_state::b2m_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_b2m_8255_porta = data;
 }
 
-WRITE8_MEMBER(b2m_state::b2m_8255_portb_w)
+void b2m_state::b2m_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_b2m_video_scroll = data;
 }
 
-WRITE8_MEMBER(b2m_state::b2m_8255_portc_w)
+void b2m_state::b2m_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_b2m_8255_portc = data;
 	b2m_set_bank(m_b2m_8255_portc & 7);
 	m_b2m_video_page = (m_b2m_8255_portc >> 7) & 1;
 }
 
-READ8_MEMBER(b2m_state::b2m_8255_portb_r)
+uint8_t b2m_state::b2m_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_b2m_video_scroll;
 }
 
-WRITE_LINE_MEMBER( b2m_state::b2m_fdc_drq )
+void b2m_state::b2m_fdc_drq(int state)
 {
 	/* Clears HALT state of CPU when data is ready to read */
 	if (state)
@@ -177,7 +177,7 @@ WRITE_LINE_MEMBER( b2m_state::b2m_fdc_drq )
 }
 
 
-WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
+void b2m_state::b2m_ext_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t drive = ((data >> 1) & 1) ^ 1;
 	uint8_t side  = (data  & 1) ^ 1;
@@ -208,29 +208,29 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 	}
 }
 
-READ8_MEMBER(b2m_state::b2m_romdisk_porta_r)
+uint8_t b2m_state::b2m_romdisk_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *romdisk = memregion("maincpu")->base() + 0x12000;
 	return romdisk[m_b2m_romdisk_msb*256+m_b2m_romdisk_lsb];
 }
 
-WRITE8_MEMBER(b2m_state::b2m_romdisk_portb_w)
+void b2m_state::b2m_romdisk_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_b2m_romdisk_lsb = data;
 }
 
-WRITE8_MEMBER(b2m_state::b2m_romdisk_portc_w)
+void b2m_state::b2m_romdisk_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_b2m_romdisk_msb = data & 0x7f;
 }
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(b2m_state,b2m)
+void b2m_state::init_b2m()
 {
 	m_vblank_state = 0;
 }
 
-WRITE8_MEMBER(b2m_state::b2m_palette_w)
+void b2m_state::b2m_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t b = (3 - ((data >> 6) & 3)) * 0x55;
 	uint8_t g = (3 - ((data >> 4) & 3)) * 0x55;
@@ -247,17 +247,17 @@ WRITE8_MEMBER(b2m_state::b2m_palette_w)
 	}
 }
 
-READ8_MEMBER(b2m_state::b2m_palette_r)
+uint8_t b2m_state::b2m_palette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_b2m_color[offset];
 }
 
-WRITE8_MEMBER(b2m_state::b2m_localmachine_w)
+void b2m_state::b2m_localmachine_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_b2m_localmachine = data;
 }
 
-READ8_MEMBER(b2m_state::b2m_localmachine_r)
+uint8_t b2m_state::b2m_localmachine_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_b2m_localmachine;
 }
@@ -288,7 +288,7 @@ void b2m_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(b2m_state::b2m_postload), this));
 }
 
-INTERRUPT_GEN_MEMBER(b2m_state::b2m_vblank_interrupt)
+void b2m_state::b2m_vblank_interrupt(device_t &device)
 {
 	m_vblank_state++;
 	if (m_vblank_state>1) m_vblank_state=0;

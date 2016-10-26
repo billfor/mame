@@ -31,7 +31,7 @@ PAL16R6A 11H
 #include "includes/dietgo.h"
 
 
-READ16_MEMBER( dietgo_state::dietgo_protection_region_0_104_r )
+uint16_t dietgo_state::dietgo_protection_region_0_104_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -40,7 +40,7 @@ READ16_MEMBER( dietgo_state::dietgo_protection_region_0_104_r )
 	return data;
 }
 
-WRITE16_MEMBER( dietgo_state::dietgo_protection_region_0_104_w )
+void dietgo_state::dietgo_protection_region_0_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -369,7 +369,7 @@ ROM_START( dietgoj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(dietgo_state,dietgo)
+void dietgo_state::init_dietgo()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0xe9ba, 0x01, 0x19);

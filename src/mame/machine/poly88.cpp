@@ -33,13 +33,13 @@ void poly88_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-TIMER_CALLBACK_MEMBER(poly88_state::poly88_usart_timer_callback)
+void poly88_state::poly88_usart_timer_callback(void *ptr, int32_t param)
 {
 	m_int_vector = 0xe7;
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(poly88_state::poly88_baud_rate_w)
+void poly88_state::poly88_baud_rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("poly88_baud_rate_w %02x\n",data);
 	m_usart_timer = timer_alloc(TIMER_USART);
@@ -59,7 +59,7 @@ uint8_t poly88_state::row_number(uint8_t code) {
 	return 0;
 }
 
-TIMER_CALLBACK_MEMBER(poly88_state::keyboard_callback)
+void poly88_state::keyboard_callback(void *ptr, int32_t param)
 {
 	int i;
 	uint8_t code;
@@ -153,17 +153,17 @@ TIMER_CALLBACK_MEMBER(poly88_state::keyboard_callback)
 	timer_set(attotime::from_hz(24000), TIMER_KEYBOARD);
 }
 
-IRQ_CALLBACK_MEMBER(poly88_state::poly88_irq_callback)
+int poly88_state::poly88_irq_callback(device_t &device, int irqline)
 {
 	return m_int_vector;
 }
 
-WRITE_LINE_MEMBER(poly88_state::write_cas_tx)
+void poly88_state::write_cas_tx(int state)
 {
 	m_cas_tx = state;
 }
 
-TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
+void poly88_state::poly88_cassette_timer_callback(void *ptr, int32_t param)
 {
 	int data;
 	int current_level;
@@ -216,7 +216,7 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
 }
 
 
-DRIVER_INIT_MEMBER(poly88_state,poly88)
+void poly88_state::init_poly88()
 {
 	m_previous_level = 0;
 	m_clk_level = m_clk_level_tape = 1;
@@ -232,19 +232,19 @@ void poly88_state::machine_reset()
 	m_last_code = 0;
 }
 
-INTERRUPT_GEN_MEMBER(poly88_state::poly88_interrupt)
+void poly88_state::poly88_interrupt(device_t &device)
 {
 	m_int_vector = 0xf7;
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(poly88_state::poly88_usart_rxready)
+void poly88_state::poly88_usart_rxready(int state)
 {
 	//drvm_int_vector = 0xe7;
 	//execute().set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER(poly88_state::poly88_keyboard_r)
+uint8_t poly88_state::poly88_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = m_last_code;
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -252,7 +252,7 @@ READ8_MEMBER(poly88_state::poly88_keyboard_r)
 	return retVal;
 }
 
-WRITE8_MEMBER(poly88_state::poly88_intr_w)
+void poly88_state::poly88_intr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }

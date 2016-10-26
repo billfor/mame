@@ -62,29 +62,29 @@ public:
 	uint8_t m_keyb_input[10];
 	uint8_t m_keyb_mux;
 
-	DECLARE_READ8_MEMBER(vic4567_dummy_r);
-	DECLARE_WRITE8_MEMBER(vic4567_dummy_w);
-	DECLARE_WRITE8_MEMBER(PalRed_w);
-	DECLARE_WRITE8_MEMBER(PalGreen_w);
-	DECLARE_WRITE8_MEMBER(PalBlue_w);
-	DECLARE_WRITE8_MEMBER(DMAgic_w);
-	DECLARE_READ8_MEMBER(CIASelect_r);
-	DECLARE_WRITE8_MEMBER(CIASelect_w);
-	DECLARE_READ8_MEMBER(cia0_porta_r);
-	DECLARE_WRITE8_MEMBER(cia0_porta_w);
-	DECLARE_READ8_MEMBER(cia0_portb_r);
-	DECLARE_WRITE8_MEMBER(cia0_portb_w);
-	DECLARE_WRITE_LINE_MEMBER(cia0_irq);
+	uint8_t vic4567_dummy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vic4567_dummy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void PalRed_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void PalGreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void PalBlue_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void DMAgic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t CIASelect_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void CIASelect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cia0_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia0_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cia0_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cia0_irq(int state);
 
-	DECLARE_READ8_MEMBER(dummy_r);
+	uint8_t dummy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(c65);
-	DECLARE_DRIVER_INIT(c65);
-	DECLARE_DRIVER_INIT(c65pal);
+	void palette_init_c65(palette_device &palette);
+	void init_c65();
+	void init_c65pal();
 
-	INTERRUPT_GEN_MEMBER(vic3_vblank_irq);
+	void vic3_vblank_irq(device_t &device);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -154,7 +154,7 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-READ8_MEMBER(c65_state::vic4567_dummy_r)
+uint8_t c65_state::vic4567_dummy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -189,7 +189,7 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 	return res;
 }
 
-WRITE8_MEMBER(c65_state::vic4567_dummy_w)
+void c65_state::vic4567_dummy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -231,19 +231,19 @@ void c65_state::PalEntryFlush(uint8_t offset)
 	m_palette->set_pen_color(offset, pal4bit(m_palred[offset]), pal4bit(m_palgreen[offset]), pal4bit(m_palblue[offset]));
 }
 
-WRITE8_MEMBER(c65_state::PalRed_w)
+void c65_state::PalRed_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palred[offset] = data;
 	PalEntryFlush(offset);
 }
 
-WRITE8_MEMBER(c65_state::PalGreen_w)
+void c65_state::PalGreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palgreen[offset] = data;
 	PalEntryFlush(offset);
 }
 
-WRITE8_MEMBER(c65_state::PalBlue_w)
+void c65_state::PalBlue_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palblue[offset] = data;
 	PalEntryFlush(offset);
@@ -315,14 +315,14 @@ void c65_state::DMAgicExecute(address_space &space,uint32_t address)
 }
 
 
-WRITE8_MEMBER(c65_state::DMAgic_w)
+void c65_state::DMAgic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dmalist[offset] = data;
 	if(offset == 0)
 		DMAgicExecute(space,(m_dmalist[0])|(m_dmalist[1]<<8)|(m_dmalist[2]<<16));
 }
 
-READ8_MEMBER(c65_state::CIASelect_r)
+uint8_t c65_state::CIASelect_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_VIC3_ControlA & 1)
 		return m_cram[offset];
@@ -345,7 +345,7 @@ READ8_MEMBER(c65_state::CIASelect_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(c65_state::CIASelect_w)
+void c65_state::CIASelect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_VIC3_ControlA & 1)
 		m_cram[offset] = data;
@@ -369,12 +369,12 @@ WRITE8_MEMBER(c65_state::CIASelect_w)
 
 }
 
-READ8_MEMBER(c65_state::cia0_porta_r)
+uint8_t c65_state::cia0_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(c65_state::cia0_portb_r)
+uint8_t c65_state::cia0_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 	uint8_t res;
@@ -391,17 +391,17 @@ READ8_MEMBER(c65_state::cia0_portb_r)
 	return res;
 }
 
-WRITE8_MEMBER(c65_state::cia0_porta_w)
+void c65_state::cia0_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyb_mux = ~data;
 	printf("%02x\n",m_keyb_mux);
 }
 
-WRITE8_MEMBER(c65_state::cia0_portb_w)
+void c65_state::cia0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(c65_state::dummy_r)
+uint8_t c65_state::dummy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -530,7 +530,7 @@ void c65_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(c65_state, c65)
+void c65_state::palette_init_c65(palette_device &palette)
 {
 	// TODO: initial state?
 }
@@ -558,14 +558,14 @@ void c65_state::IRQCheck(uint8_t irq_cause)
 	m_maincpu->set_input_line(M4510_IRQ_LINE,m_VIC2_IRQMask & m_VIC2_IRQPend ? ASSERT_LINE : CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
+void c65_state::vic3_vblank_irq(device_t &device)
 {
 	IRQCheck(1);
 	//if(m_VIC2_IRQMask & 1)
 	//  m_maincpu->set_input_line(M4510_IRQ_LINE,HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(c65_state::cia0_irq)
+void c65_state::cia0_irq(int state)
 {
 	printf("%d IRQ\n",state);
 
@@ -653,13 +653,13 @@ ROM_START( c64dx )
 	ROM_LOAD( "910429.bin", 0x0000, 0x20000, CRC(b025805c) SHA1(c3b05665684f74adbe33052a2d10170a1063ee7d) )
 ROM_END
 
-DRIVER_INIT_MEMBER(c65_state,c65)
+void c65_state::init_c65()
 {
 //  m_dma.version = 2;
 //  c65_common_driver_init();
 }
 
-DRIVER_INIT_MEMBER(c65_state,c65pal)
+void c65_state::init_c65pal()
 {
 //  m_dma.version = 1;
 //  c65_common_driver_init();

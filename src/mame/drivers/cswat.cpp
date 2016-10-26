@@ -46,15 +46,15 @@ public:
 	uint8_t m_nmi_enabled;
 	tilemap_t *m_tilemap;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(sensors_r);
-	DECLARE_READ8_MEMBER(dipswitch_r);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sensors_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dipswitch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	INTERRUPT_GEN_MEMBER(nmi_handler);
+	void nmi_handler(device_t &device);
 
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	tilemap_memory_index tilemap_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	uint32_t screen_update_cswat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void video_start() override;
@@ -69,7 +69,7 @@ public:
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(cswat_state::tilemap_scan_rows)
+tilemap_memory_index cswat_state::tilemap_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	// like with pacman, lower and upper parts of vram are left and right columns of the screen
 	row += 2;
@@ -80,7 +80,7 @@ TILEMAP_MAPPER_MEMBER(cswat_state::tilemap_scan_rows)
 		return col + (row << 5);
 }
 
-TILE_GET_INFO_MEMBER(cswat_state::get_tile_info)
+void cswat_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color = m_videoram[tile_index | 0x400];
 	int attr = m_videoram[tile_index | 0x800]; // high bits unused
@@ -108,26 +108,26 @@ uint32_t cswat_state::screen_update_cswat(screen_device &screen, bitmap_ind16 &b
 
 ***************************************************************************/
 
-WRITE8_MEMBER(cswat_state::videoram_w)
+void cswat_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(cswat_state::irq_ack_w)
+void cswat_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// clear vblank irq and enable nmi?
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_nmi_enabled = data & 1;
 }
 
-READ8_MEMBER(cswat_state::dipswitch_r)
+uint8_t cswat_state::dipswitch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t dips = m_dips_inp->read();
 	return offset ? dips >> 8 : dips & 0xff;
 }
 
-READ8_MEMBER(cswat_state::sensors_r)
+uint8_t cswat_state::sensors_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// ?
 	return rand();
@@ -235,7 +235,7 @@ static GFXDECODE_START( cswat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 256 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(cswat_state::nmi_handler)
+void cswat_state::nmi_handler(device_t &device)
 {
 	if (m_nmi_enabled)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

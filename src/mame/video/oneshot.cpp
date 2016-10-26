@@ -7,28 +7,28 @@
 
 
 /* bg tilemap */
-TILE_GET_INFO_MEMBER(oneshot_state::get_oneshot_bg_tile_info)
+void oneshot_state::get_oneshot_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_bg_videoram[tile_index * 2 + 1];
 
 	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
-WRITE16_MEMBER(oneshot_state::oneshot_bg_videoram_w)
+void oneshot_state::oneshot_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 /* mid tilemap */
-TILE_GET_INFO_MEMBER(oneshot_state::get_oneshot_mid_tile_info)
+void oneshot_state::get_oneshot_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_mid_videoram[tile_index * 2 + 1];
 
 	SET_TILE_INFO_MEMBER(0, tileno, 2, 0);
 }
 
-WRITE16_MEMBER(oneshot_state::oneshot_mid_videoram_w)
+void oneshot_state::oneshot_mid_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mid_videoram[offset]);
 	m_mid_tilemap->mark_tile_dirty(offset / 2);
@@ -36,14 +36,14 @@ WRITE16_MEMBER(oneshot_state::oneshot_mid_videoram_w)
 
 
 /* fg tilemap */
-TILE_GET_INFO_MEMBER(oneshot_state::get_oneshot_fg_tile_info)
+void oneshot_state::get_oneshot_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_fg_videoram[tile_index * 2 + 1];
 
 	SET_TILE_INFO_MEMBER(0, tileno, 3, 0);
 }
 
-WRITE16_MEMBER(oneshot_state::oneshot_fg_videoram_w)
+void oneshot_state::oneshot_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);

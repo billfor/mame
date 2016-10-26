@@ -137,100 +137,100 @@ public:
 	uint8_t m_igs003_prot_h1;
 	uint8_t m_igs003_prot_h2;
 
-	DECLARE_WRITE16_MEMBER(igs011_priority_w);
-	DECLARE_READ16_MEMBER(igs011_layers_r);
-	DECLARE_WRITE16_MEMBER(igs011_layers_w);
-	DECLARE_WRITE16_MEMBER(igs011_palette);
-	DECLARE_WRITE16_MEMBER(igs011_blit_x_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_y_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_gfx_lo_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_gfx_hi_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_w_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_h_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_depth_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_pen_w);
-	DECLARE_WRITE16_MEMBER(igs011_blit_flags_w);
-	DECLARE_WRITE16_MEMBER(igs_dips_w);
-	DECLARE_READ16_MEMBER(igs_3_dips_r);
-	DECLARE_READ16_MEMBER(igs_4_dips_r);
-	DECLARE_READ16_MEMBER(igs_5_dips_r);
-	DECLARE_WRITE16_MEMBER(igs011_prot1_w);
-	DECLARE_READ16_MEMBER(igs011_prot1_r);
-	DECLARE_WRITE16_MEMBER(igs011_prot_addr_w);
-	DECLARE_WRITE16_MEMBER(igs011_prot2_reset_w);
-	DECLARE_READ16_MEMBER(igs011_prot2_reset_r);
-	DECLARE_WRITE16_MEMBER(igs011_prot2_inc_w);
-	DECLARE_WRITE16_MEMBER(igs011_prot2_dec_w);
-	DECLARE_WRITE16_MEMBER(drgnwrld_igs011_prot2_swap_w);
-	DECLARE_WRITE16_MEMBER(lhb_igs011_prot2_swap_w);
-	DECLARE_WRITE16_MEMBER(wlcc_igs011_prot2_swap_w);
-	DECLARE_WRITE16_MEMBER(vbowl_igs011_prot2_swap_w);
-	DECLARE_READ16_MEMBER(drgnwrldv21_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(drgnwrldv20j_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(lhb_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(dbc_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(ryukobou_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(lhb2_igs011_prot2_r);
-	DECLARE_READ16_MEMBER(vbowl_igs011_prot2_r);
-	DECLARE_WRITE16_MEMBER(igs012_prot_reset_w);
-	DECLARE_WRITE16_MEMBER(igs012_prot_mode_w);
-	DECLARE_WRITE16_MEMBER(igs012_prot_inc_w);
-	DECLARE_WRITE16_MEMBER(igs012_prot_dec_inc_w);
-	DECLARE_WRITE16_MEMBER(igs012_prot_dec_copy_w);
-	DECLARE_WRITE16_MEMBER(igs012_prot_copy_w);
-	DECLARE_WRITE16_MEMBER(igs012_prot_swap_w);
-	DECLARE_READ16_MEMBER(igs012_prot_r);
-	DECLARE_WRITE16_MEMBER(drgnwrld_igs003_w);
-	DECLARE_READ16_MEMBER(drgnwrld_igs003_r);
-	DECLARE_WRITE16_MEMBER(lhb_inputs_w);
-	DECLARE_READ16_MEMBER(lhb_inputs_r);
-	DECLARE_WRITE16_MEMBER(lhb2_igs003_w);
-	DECLARE_READ16_MEMBER(lhb2_igs003_r);
-	DECLARE_WRITE16_MEMBER(wlcc_igs003_w);
-	DECLARE_READ16_MEMBER(wlcc_igs003_r);
-	DECLARE_WRITE16_MEMBER(xymg_igs003_w);
-	DECLARE_READ16_MEMBER(xymg_igs003_r);
-	DECLARE_WRITE16_MEMBER(vbowl_igs003_w);
-	DECLARE_READ16_MEMBER(vbowl_igs003_r);
-	DECLARE_WRITE16_MEMBER(lhb_irq_enable_w);
-	DECLARE_READ16_MEMBER(vbowl_unk_r);
-	DECLARE_WRITE16_MEMBER(vbowl_pen_hi_w);
-	DECLARE_WRITE16_MEMBER(vbowl_link_0_w);
-	DECLARE_WRITE16_MEMBER(vbowl_link_1_w);
-	DECLARE_WRITE16_MEMBER(vbowl_link_2_w);
-	DECLARE_WRITE16_MEMBER(vbowl_link_3_w);
+	void igs011_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t igs011_layers_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void igs011_layers_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs011_palette(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs011_blit_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs011_blit_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs011_blit_gfx_lo_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs011_blit_gfx_hi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs011_blit_w_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs011_blit_h_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs011_blit_depth_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs011_blit_pen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs011_blit_flags_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs_dips_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t igs_3_dips_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t igs_4_dips_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t igs_5_dips_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void igs011_prot1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t igs011_prot1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void igs011_prot_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs011_prot2_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t igs011_prot2_reset_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void igs011_prot2_inc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs011_prot2_dec_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void drgnwrld_igs011_prot2_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lhb_igs011_prot2_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void wlcc_igs011_prot2_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vbowl_igs011_prot2_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t drgnwrldv21_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t drgnwrldv20j_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t lhb_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dbc_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t ryukobou_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t lhb2_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t vbowl_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void igs012_prot_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs012_prot_mode_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs012_prot_inc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs012_prot_dec_inc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs012_prot_dec_copy_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs012_prot_copy_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void igs012_prot_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t igs012_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void drgnwrld_igs003_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t drgnwrld_igs003_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lhb_inputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lhb_inputs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lhb2_igs003_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lhb2_igs003_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void wlcc_igs003_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t wlcc_igs003_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void xymg_igs003_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t xymg_igs003_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vbowl_igs003_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t vbowl_igs003_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lhb_irq_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t vbowl_unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vbowl_pen_hi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vbowl_link_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vbowl_link_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vbowl_link_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vbowl_link_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t igs_dips_r(int NUM);
-	DECLARE_CUSTOM_INPUT_MEMBER(igs_hopper_r);
-	DECLARE_WRITE16_MEMBER(lhb_okibank_w);
-	DECLARE_READ16_MEMBER(ics2115_word_r);
-	DECLARE_WRITE16_MEMBER(ics2115_word_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	DECLARE_DRIVER_INIT(lhbv33c);
-	DECLARE_DRIVER_INIT(drgnwrldv21j);
-	DECLARE_DRIVER_INIT(wlcc);
-	DECLARE_DRIVER_INIT(nkishusp);
-	DECLARE_DRIVER_INIT(drgnwrldv21);
-	DECLARE_DRIVER_INIT(dbc);
-	DECLARE_DRIVER_INIT(lhb);
-	DECLARE_DRIVER_INIT(drgnwrld);
-	DECLARE_DRIVER_INIT(drgnwrldv30);
-	DECLARE_DRIVER_INIT(drgnwrldv11h);
-	DECLARE_DRIVER_INIT(lhb2);
-	DECLARE_DRIVER_INIT(xymg);
-	DECLARE_DRIVER_INIT(drgnwrldv10c);
-	DECLARE_DRIVER_INIT(drgnwrldv20j);
-	DECLARE_DRIVER_INIT(drgnwrldv40k);
-	DECLARE_DRIVER_INIT(vbowl);
-	DECLARE_DRIVER_INIT(vbowlj);
-	DECLARE_DRIVER_INIT(ryukobou);
-	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
+	ioport_value igs_hopper_r(ioport_field &field, void *param);
+	void lhb_okibank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ics2115_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ics2115_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_irq(int state);
+	void init_lhbv33c();
+	void init_drgnwrldv21j();
+	void init_wlcc();
+	void init_nkishusp();
+	void init_drgnwrldv21();
+	void init_dbc();
+	void init_lhb();
+	void init_drgnwrld();
+	void init_drgnwrldv30();
+	void init_drgnwrldv11h();
+	void init_lhb2();
+	void init_xymg();
+	void init_drgnwrldv10c();
+	void init_drgnwrldv20j();
+	void init_drgnwrldv40k();
+	void init_vbowl();
+	void init_vbowlj();
+	void init_ryukobou();
+	void lev5_timer_irq_cb(timer_device &timer, void *ptr, int32_t param);
+	void lhb_timer_irq_cb(timer_device &timer, void *ptr, int32_t param);
+	void lev3_timer_irq_cb(timer_device &timer, void *ptr, int32_t param);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_vbowl(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
+	void lhb_vblank_irq(device_t &device);
 	void wlcc_decrypt();
 	void lhb_decrypt();
 	void drgnwrld_type3_decrypt();
@@ -268,7 +268,7 @@ public:
 
 
 
-WRITE16_MEMBER(igs011_state::igs011_priority_w)
+void igs011_state::igs011_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_priority);
 
@@ -378,7 +378,7 @@ uint32_t igs011_state::screen_update_igs011(screen_device &screen, bitmap_ind16 
 
 ***************************************************************************/
 
-READ16_MEMBER(igs011_state::igs011_layers_r)
+uint16_t igs011_state::igs011_layers_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
@@ -391,7 +391,7 @@ READ16_MEMBER(igs011_state::igs011_layers_r)
 	return (l0[offset] << 8) | l1[offset];
 }
 
-WRITE16_MEMBER(igs011_state::igs011_layers_w)
+void igs011_state::igs011_layers_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t word;
 
@@ -418,7 +418,7 @@ WRITE16_MEMBER(igs011_state::igs011_layers_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(igs011_state::igs011_palette)
+void igs011_state::igs011_palette(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int rgb;
 
@@ -435,56 +435,56 @@ WRITE16_MEMBER(igs011_state::igs011_palette)
 ***************************************************************************/
 
 
-WRITE16_MEMBER(igs011_state::igs011_blit_x_w)
+void igs011_state::igs011_blit_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.x);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_y_w)
+void igs011_state::igs011_blit_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.y);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_gfx_lo_w)
+void igs011_state::igs011_blit_gfx_lo_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.gfx_lo);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_gfx_hi_w)
+void igs011_state::igs011_blit_gfx_hi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.gfx_hi);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_w_w)
+void igs011_state::igs011_blit_w_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.w);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_h_w)
+void igs011_state::igs011_blit_h_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.h);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_depth_w)
+void igs011_state::igs011_blit_depth_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.depth);
 }
 
-WRITE16_MEMBER(igs011_state::igs011_blit_pen_w)
+void igs011_state::igs011_blit_pen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.pen);
 }
 
 
-WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
+void igs011_state::igs011_blit_flags_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct blitter_t &blitter = m_blitter;
 	int x, xstart, xend, xinc, flipx;
@@ -624,12 +624,12 @@ void igs011_state::machine_start()
 // Inputs
 
 
-CUSTOM_INPUT_MEMBER(igs011_state::igs_hopper_r)
+ioport_value igs011_state::igs_hopper_r(ioport_field &field, void *param)
 {
 	return (m_igs_hopper && ((m_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
 }
 
-WRITE16_MEMBER(igs011_state::igs_dips_w)
+void igs011_state::igs_dips_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_dips_sel);
 }
@@ -649,9 +649,9 @@ uint16_t igs011_state::igs_dips_r(int NUM)
 }
 
 // Games have 3 to 5 dips
-READ16_MEMBER(igs011_state::igs_3_dips_r){ return igs_dips_r(3); }
-READ16_MEMBER(igs011_state::igs_4_dips_r){ return igs_dips_r(4); }
-READ16_MEMBER(igs011_state::igs_5_dips_r){ return igs_dips_r(5); }
+uint16_t igs011_state::igs_3_dips_r(address_space &space, offs_t offset, uint16_t mem_mask){ return igs_dips_r(3); }
+uint16_t igs011_state::igs_4_dips_r(address_space &space, offs_t offset, uint16_t mem_mask){ return igs_dips_r(4); }
+uint16_t igs011_state::igs_5_dips_r(address_space &space, offs_t offset, uint16_t mem_mask){ return igs_dips_r(5); }
 
 /***************************************************************************
 
@@ -1049,7 +1049,7 @@ void igs011_state::drgnwrld_gfx_decrypt()
 
 
 
-WRITE16_MEMBER(igs011_state::igs011_prot1_w)
+void igs011_state::igs011_prot1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 
@@ -1092,7 +1092,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot1_w)
 
 	logerror("%s: warning, unknown igs011_prot1_w( %04x, %04x )\n", machine().describe_context(), offset, data);
 }
-READ16_MEMBER(igs011_state::igs011_prot1_r)
+uint16_t igs011_state::igs011_prot1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// !(b1&b2) . 0 . 0 . (b0^b3) . 0 . 0
 	uint8_t x = m_prot1;
@@ -1100,7 +1100,7 @@ READ16_MEMBER(igs011_state::igs011_prot1_r)
 }
 
 
-WRITE16_MEMBER(igs011_state::igs011_prot_addr_w)
+void igs011_state::igs011_prot_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_prot1 = 0x00;
 	m_prot1_swap = 0x00;
@@ -1127,7 +1127,7 @@ void igs011_state::prot_mem_range_set()
 	sp.install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16_delegate(FUNC(igs011_state::igs011_prot1_r), this));
 }
 /*
-READ16_MEMBER(igs011_state::igs011_prot_fake_r)
+uint16_t igs011_state::igs011_prot_fake_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
     switch (offset)
     {
@@ -1147,13 +1147,13 @@ READ16_MEMBER(igs011_state::igs011_prot_fake_r)
 // Prot2
 
 // drgnwrld (33)
-WRITE16_MEMBER(igs011_state::igs011_prot2_reset_w)
+void igs011_state::igs011_prot2_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_prot2 = 0x00;
 }
 
 // wlcc
-READ16_MEMBER(igs011_state::igs011_prot2_reset_r)
+uint16_t igs011_state::igs011_prot2_reset_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_prot2 = 0x00;
 	return 0;
@@ -1162,7 +1162,7 @@ READ16_MEMBER(igs011_state::igs011_prot2_reset_r)
 
 
 // lhb2 (55), lhb/dbc/ryukobou (33)
-WRITE16_MEMBER(igs011_state::igs011_prot2_inc_w)
+void igs011_state::igs011_prot2_inc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x5500) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0055)) )
 	{
@@ -1173,7 +1173,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot2_inc_w)
 }
 
 // vbowl (33)
-WRITE16_MEMBER(igs011_state::igs011_prot2_dec_w)
+void igs011_state::igs011_prot2_dec_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
 	{
@@ -1185,7 +1185,7 @@ WRITE16_MEMBER(igs011_state::igs011_prot2_dec_w)
 
 
 
-WRITE16_MEMBER(igs011_state::drgnwrld_igs011_prot2_swap_w)
+void igs011_state::drgnwrld_igs011_prot2_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 
@@ -1200,7 +1200,7 @@ WRITE16_MEMBER(igs011_state::drgnwrld_igs011_prot2_swap_w)
 }
 
 // lhb, xymg, lhb2
-WRITE16_MEMBER(igs011_state::lhb_igs011_prot2_swap_w)
+void igs011_state::lhb_igs011_prot2_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 
@@ -1215,7 +1215,7 @@ WRITE16_MEMBER(igs011_state::lhb_igs011_prot2_swap_w)
 }
 
 // wlcc
-WRITE16_MEMBER(igs011_state::wlcc_igs011_prot2_swap_w)
+void igs011_state::wlcc_igs011_prot2_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 
@@ -1230,7 +1230,7 @@ WRITE16_MEMBER(igs011_state::wlcc_igs011_prot2_swap_w)
 }
 
 // vbowl
-WRITE16_MEMBER(igs011_state::vbowl_igs011_prot2_swap_w)
+void igs011_state::vbowl_igs011_prot2_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 
@@ -1247,14 +1247,14 @@ WRITE16_MEMBER(igs011_state::vbowl_igs011_prot2_swap_w)
 
 
 // drgnwrld
-READ16_MEMBER(igs011_state::drgnwrldv21_igs011_prot2_r)
+uint16_t igs011_state::drgnwrldv21_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// b9 = (!b4) | (!b0 & b2) | (!(b3 ^ b1) & !(!(b4 & b0) | b2))
 	uint8_t x = m_prot2;
 	uint8_t b9 = (BIT(x,4)^1) | ((BIT(x,0)^1) & BIT(x,2)) | ( (BIT(x,3)^BIT(x,1)^1) & ((((BIT(x,4)^1) & BIT(x,0)) | BIT(x,2))^1) );
 	return (b9 << 9);
 }
-READ16_MEMBER(igs011_state::drgnwrldv20j_igs011_prot2_r)
+uint16_t igs011_state::drgnwrldv20j_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// b9 = (!b4 | !b0) | !(b3 | b1) | !(b2 & b0)
 	uint8_t x = m_prot2;
@@ -1263,7 +1263,7 @@ READ16_MEMBER(igs011_state::drgnwrldv20j_igs011_prot2_r)
 }
 
 // lhb, xymg
-READ16_MEMBER(igs011_state::lhb_igs011_prot2_r)
+uint16_t igs011_state::lhb_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// b9 = !b2 | (b1 & b0)
 	uint8_t x = m_prot2;
@@ -1272,7 +1272,7 @@ READ16_MEMBER(igs011_state::lhb_igs011_prot2_r)
 }
 
 // dbc
-READ16_MEMBER(igs011_state::dbc_igs011_prot2_r)
+uint16_t igs011_state::dbc_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// b9 = !b1 | (!b0 & b2)
 	uint8_t x = m_prot2;
@@ -1281,7 +1281,7 @@ READ16_MEMBER(igs011_state::dbc_igs011_prot2_r)
 }
 
 // ryukobou
-READ16_MEMBER(igs011_state::ryukobou_igs011_prot2_r)
+uint16_t igs011_state::ryukobou_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// b9 = (!b1 | b2) & b0
 	uint8_t x = m_prot2;
@@ -1290,7 +1290,7 @@ READ16_MEMBER(igs011_state::ryukobou_igs011_prot2_r)
 }
 
 // lhb2
-READ16_MEMBER(igs011_state::lhb2_igs011_prot2_r)
+uint16_t igs011_state::lhb2_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// b3 = !b2 | !b1 | b0
 	uint8_t x = m_prot2;
@@ -1299,7 +1299,7 @@ READ16_MEMBER(igs011_state::lhb2_igs011_prot2_r)
 }
 
 // vbowl
-READ16_MEMBER(igs011_state::vbowl_igs011_prot2_r)
+uint16_t igs011_state::vbowl_igs011_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t x = m_prot2;
 	uint8_t b9 = ((BIT(x,4)^1) & (BIT(x,3)^1)) | ((BIT(x,2) & BIT(x,1))^1) | ((BIT(x,4) | BIT(x,0))^1);
@@ -1328,7 +1328,7 @@ READ16_MEMBER(igs011_state::vbowl_igs011_prot2_r)
 ***************************************************************************/
 
 
-WRITE16_MEMBER(igs011_state::igs012_prot_reset_w)
+void igs011_state::igs012_prot_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_igs012_prot = 0x00;
 	m_igs012_prot_swap = 0x00;
@@ -1336,7 +1336,7 @@ WRITE16_MEMBER(igs011_state::igs012_prot_reset_w)
 	m_igs012_prot_mode = 0;
 }
 /*
-READ16_MEMBER(igs011_state::igs012_prot_fake_r)
+uint16_t igs011_state::igs012_prot_fake_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
     switch (offset)
     {
@@ -1351,7 +1351,7 @@ READ16_MEMBER(igs011_state::igs012_prot_fake_r)
 // Macro that checks whether the current mode and data byte written match the arguments
 #define MODE_AND_DATA(_MODE,_DATA)  (m_igs012_prot_mode == (_MODE) && ( (ACCESSING_BITS_8_15 && (data & 0xff00) == ((_DATA)<<8)) || (ACCESSING_BITS_0_7 && ((data & 0x00ff) == (_DATA))) ) )
 
-WRITE16_MEMBER(igs011_state::igs012_prot_mode_w)
+void igs011_state::igs012_prot_mode_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ( MODE_AND_DATA(0, 0xcc) || MODE_AND_DATA(1, 0xdd) )
 	{
@@ -1361,7 +1361,7 @@ WRITE16_MEMBER(igs011_state::igs012_prot_mode_w)
 		logerror("%s: warning, unknown igs012_prot_mode_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-WRITE16_MEMBER(igs011_state::igs012_prot_inc_w)
+void igs011_state::igs012_prot_inc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ( MODE_AND_DATA(0, 0xff) )
 	{
@@ -1371,7 +1371,7 @@ WRITE16_MEMBER(igs011_state::igs012_prot_inc_w)
 		logerror("%s: warning, unknown igs012_prot_inc_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-WRITE16_MEMBER(igs011_state::igs012_prot_dec_inc_w)
+void igs011_state::igs012_prot_dec_inc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ( MODE_AND_DATA(0, 0xaa) )
 	{
@@ -1385,7 +1385,7 @@ WRITE16_MEMBER(igs011_state::igs012_prot_dec_inc_w)
 		logerror("%s: warning, unknown igs012_prot_dec_inc_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-WRITE16_MEMBER(igs011_state::igs012_prot_dec_copy_w)
+void igs011_state::igs012_prot_dec_copy_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ( MODE_AND_DATA(0, 0x33) )
 	{
@@ -1399,7 +1399,7 @@ WRITE16_MEMBER(igs011_state::igs012_prot_dec_copy_w)
 		logerror("%s: warning, unknown igs012_prot_dec_copy_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-WRITE16_MEMBER(igs011_state::igs012_prot_copy_w)
+void igs011_state::igs012_prot_copy_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ( MODE_AND_DATA(1, 0x22) )
 	{
@@ -1409,7 +1409,7 @@ WRITE16_MEMBER(igs011_state::igs012_prot_copy_w)
 		logerror("%s: warning, unknown igs012_prot_copy_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-WRITE16_MEMBER(igs011_state::igs012_prot_swap_w)
+void igs011_state::igs012_prot_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ( MODE_AND_DATA(0, 0x55) || MODE_AND_DATA(1, 0xa5) )
 	{
@@ -1421,7 +1421,7 @@ WRITE16_MEMBER(igs011_state::igs012_prot_swap_w)
 		logerror("%s: warning, unknown igs012_prot_swap_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-READ16_MEMBER(igs011_state::igs012_prot_r)
+uint16_t igs011_state::igs012_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// FIXME: mode 0 and mode 1 are mapped to different memory ranges
 	uint8_t x = m_igs012_prot;
@@ -1439,7 +1439,7 @@ READ16_MEMBER(igs011_state::igs012_prot_r)
 ***************************************************************************/
 
 
-WRITE16_MEMBER(igs011_state::drgnwrld_igs003_w)
+void igs011_state::drgnwrld_igs003_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs003_reg[offset]);
 
@@ -1469,7 +1469,7 @@ WRITE16_MEMBER(igs011_state::drgnwrld_igs003_w)
 			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
 	}
 }
-READ16_MEMBER(igs011_state::drgnwrld_igs003_r)
+uint16_t igs011_state::drgnwrld_igs003_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs003_reg[0])
 	{
@@ -1508,7 +1508,7 @@ READ16_MEMBER(igs011_state::drgnwrld_igs003_r)
 
 
 
-WRITE16_MEMBER(igs011_state::lhb_inputs_w)
+void igs011_state::lhb_inputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_input_sel);
 
@@ -1524,7 +1524,7 @@ WRITE16_MEMBER(igs011_state::lhb_inputs_w)
 
 //  popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
 }
-READ16_MEMBER(igs011_state::lhb_inputs_r)
+uint16_t igs011_state::lhb_inputs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1545,7 +1545,7 @@ READ16_MEMBER(igs011_state::lhb_inputs_r)
 
 
 
-WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
+void igs011_state::lhb2_igs003_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs003_reg[offset]);
 
@@ -1644,7 +1644,7 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
 	}
 }
-READ16_MEMBER(igs011_state::lhb2_igs003_r)
+uint16_t igs011_state::lhb2_igs003_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs003_reg[0])
 	{
@@ -1694,7 +1694,7 @@ READ16_MEMBER(igs011_state::lhb2_igs003_r)
 
 
 
-WRITE16_MEMBER(igs011_state::wlcc_igs003_w)
+void igs011_state::wlcc_igs003_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs003_reg[offset]);
 
@@ -1723,7 +1723,7 @@ WRITE16_MEMBER(igs011_state::wlcc_igs003_w)
 			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
 	}
 }
-READ16_MEMBER(igs011_state::wlcc_igs003_r)
+uint16_t igs011_state::wlcc_igs003_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs003_reg[0])
 	{
@@ -1760,7 +1760,7 @@ READ16_MEMBER(igs011_state::wlcc_igs003_r)
 
 
 
-WRITE16_MEMBER(igs011_state::xymg_igs003_w)
+void igs011_state::xymg_igs003_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs003_reg[offset]);
 
@@ -1789,7 +1789,7 @@ WRITE16_MEMBER(igs011_state::xymg_igs003_w)
 			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
 	}
 }
-READ16_MEMBER(igs011_state::xymg_igs003_r)
+uint16_t igs011_state::xymg_igs003_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs003_reg[0])
 	{
@@ -1835,7 +1835,7 @@ READ16_MEMBER(igs011_state::xymg_igs003_r)
 
 
 
-WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
+void igs011_state::vbowl_igs003_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs003_reg[offset]);
 
@@ -1917,7 +1917,7 @@ WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
 			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
 	}
 }
-READ16_MEMBER(igs011_state::vbowl_igs003_r)
+uint16_t igs011_state::vbowl_igs003_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs003_reg[0])
 	{
@@ -1965,7 +1965,7 @@ READ16_MEMBER(igs011_state::vbowl_igs003_r)
 ***************************************************************************/
 
 // V0400O
-DRIVER_INIT_MEMBER(igs011_state,drgnwrld)
+void igs011_state::init_drgnwrld()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -1991,7 +1991,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrld)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv30)
+void igs011_state::init_drgnwrldv30()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2016,7 +2016,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv30)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21)
+void igs011_state::init_drgnwrldv21()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2045,7 +2045,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21j)
+void igs011_state::init_drgnwrldv21j()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2072,7 +2072,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21j)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv20j)
+void igs011_state::init_drgnwrldv20j()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2101,7 +2101,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv20j)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv40k)
+void igs011_state::init_drgnwrldv40k()
 {
 	//drgnwrld_type3_decrypt(); // wrong
 	drgnwrld_gfx_decrypt();
@@ -2109,7 +2109,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv40k)
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this)); // wrong
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv11h)
+void igs011_state::init_drgnwrldv11h()
 {
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2118,7 +2118,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv11h)
 	// the protection checks are already patched out like we do!
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv10c)
+void igs011_state::init_drgnwrldv10c()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2144,7 +2144,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv10c)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,lhb)
+void igs011_state::init_lhb()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2154,7 +2154,7 @@ DRIVER_INIT_MEMBER(igs011_state,lhb)
 //  rom[0x2eef6/2]  =   0x4e75;     // 02EEF6: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
 }
 
-DRIVER_INIT_MEMBER(igs011_state,lhbv33c)
+void igs011_state::init_lhbv33c()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2164,7 +2164,7 @@ DRIVER_INIT_MEMBER(igs011_state,lhbv33c)
 //  rom[0x2e988/2]  =   0x4e75;     // 02E988: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
 }
 
-DRIVER_INIT_MEMBER(igs011_state,dbc)
+void igs011_state::init_dbc()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2194,7 +2194,7 @@ DRIVER_INIT_MEMBER(igs011_state,dbc)
 //  rom[0x19E90/2]  =   0x00ff;
 }
 
-DRIVER_INIT_MEMBER(igs011_state,ryukobou)
+void igs011_state::init_ryukobou()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2207,7 +2207,7 @@ DRIVER_INIT_MEMBER(igs011_state,ryukobou)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,xymg)
+void igs011_state::init_xymg()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2241,7 +2241,7 @@ DRIVER_INIT_MEMBER(igs011_state,xymg)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,wlcc)
+void igs011_state::init_wlcc()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2265,7 +2265,7 @@ DRIVER_INIT_MEMBER(igs011_state,wlcc)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,lhb2)
+void igs011_state::init_lhb2()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2288,7 +2288,7 @@ DRIVER_INIT_MEMBER(igs011_state,lhb2)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,vbowl)
+void igs011_state::init_vbowl()
 {
 	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 	uint8_t  *gfx = (uint8_t *)  memregion("blitter")->base();
@@ -2315,7 +2315,7 @@ DRIVER_INIT_MEMBER(igs011_state,vbowl)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,vbowlj)
+void igs011_state::init_vbowlj()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 	uint8_t  *gfx = (uint8_t *)  memregion("blitter")->base();
@@ -2339,7 +2339,7 @@ DRIVER_INIT_MEMBER(igs011_state,vbowlj)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,nkishusp)
+void igs011_state::init_nkishusp()
 {
 	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2434,12 +2434,12 @@ ADDRESS_MAP_END
 
 
 // Only values 0 and 7 are written (1 bit per irq source?)
-WRITE16_MEMBER(igs011_state::lhb_irq_enable_w)
+void igs011_state::lhb_irq_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_lhb_irq_enable );
 }
 
-WRITE16_MEMBER(igs011_state::lhb_okibank_w)
+void igs011_state::lhb_okibank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -2655,7 +2655,7 @@ ADDRESS_MAP_END
 /* trap15's note:
  * TODO: change this horrible device-> chain to be proper.
  */
-READ16_MEMBER(igs011_state::ics2115_word_r)
+uint16_t igs011_state::ics2115_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	ics2115_device* ics2115 = machine().device<ics2115_device>("ics");
 	switch(offset)
@@ -2667,7 +2667,7 @@ READ16_MEMBER(igs011_state::ics2115_word_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(igs011_state::ics2115_word_w)
+void igs011_state::ics2115_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	ics2115_device* ics2115 = machine().device<ics2115_device>("ics");
 	switch(offset)
@@ -2682,7 +2682,7 @@ WRITE16_MEMBER(igs011_state::ics2115_word_w)
 	}
 }
 
-READ16_MEMBER(igs011_state::vbowl_unk_r)
+uint16_t igs011_state::vbowl_unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
@@ -2697,7 +2697,7 @@ void igs011_state::screen_eof_vbowl(screen_device &screen, bool state)
 	}
 }
 
-WRITE16_MEMBER(igs011_state::vbowl_pen_hi_w)
+void igs011_state::vbowl_pen_hi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2708,10 +2708,10 @@ WRITE16_MEMBER(igs011_state::vbowl_pen_hi_w)
 		logerror("%06x: warning, unknown bits written to pen_hi = %04x\n", space.device().safe_pc(), m_priority);
 }
 
-WRITE16_MEMBER(igs011_state::vbowl_link_0_w){ }
-WRITE16_MEMBER(igs011_state::vbowl_link_1_w){ }
-WRITE16_MEMBER(igs011_state::vbowl_link_2_w){ }
-WRITE16_MEMBER(igs011_state::vbowl_link_3_w){ }
+void igs011_state::vbowl_link_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ }
+void igs011_state::vbowl_link_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ }
+void igs011_state::vbowl_link_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ }
+void igs011_state::vbowl_link_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ }
 
 static ADDRESS_MAP_START( vbowl, AS_PROGRAM, 16, igs011_state )
 //  vbowl: IGS011 protection dynamically mapped at 834x
@@ -4012,7 +4012,7 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 MACHINE_CONFIG_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev5_timer_irq_cb )
+void igs011_state::lev5_timer_irq_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(5, HOLD_LINE);
 }
@@ -4034,7 +4034,7 @@ MACHINE_CONFIG_END
 
 
 
-INTERRUPT_GEN_MEMBER(igs011_state::lhb_vblank_irq)
+void igs011_state::lhb_vblank_irq(device_t &device)
 {
 	if (!m_lhb_irq_enable)
 		return;
@@ -4042,7 +4042,7 @@ INTERRUPT_GEN_MEMBER(igs011_state::lhb_vblank_irq)
 	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lhb_timer_irq_cb )
+void igs011_state::lhb_timer_irq_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	if (!m_lhb_irq_enable)
 		return;
@@ -4060,7 +4060,7 @@ MACHINE_CONFIG_END
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev3_timer_irq_cb )
+void igs011_state::lev3_timer_irq_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
@@ -4114,7 +4114,7 @@ MACHINE_CONFIG_END
 
 
 
-WRITE_LINE_MEMBER(igs011_state::sound_irq)
+void igs011_state::sound_irq(int state)
 {
 //   m_maincpu->set_input_line(3, state);
 }

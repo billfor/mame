@@ -204,21 +204,21 @@ public:
 	std::unique_ptr<uint32_t[]> m_sprite_regs32_2;
 	int m_irq_sub_enable;
 
-	DECLARE_WRITE16_MEMBER(ctrl_w);
-	DECLARE_READ16_MEMBER(ctrl_r);
-	DECLARE_WRITE16_MEMBER(main2sub_cmd_w);
-	DECLARE_WRITE16_MEMBER(sub2main_cmd_w);
-	DECLARE_WRITE16_MEMBER(sknsspr_sprite32_1_w);
-	DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_1_w);
-	DECLARE_WRITE16_MEMBER(sknsspr_sprite32_2_w);
-	DECLARE_WRITE16_MEMBER(sknsspr_sprite32regs_2_w);
+	void ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void main2sub_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sub2main_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sknsspr_sprite32_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sknsspr_sprite32regs_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sknsspr_sprite32_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sknsspr_sprite32regs_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DRIVER_INIT(jchan);
+	void init_jchan();
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
+	void vblank(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -237,7 +237,7 @@ public:
 //  if it is incorrect jchan2 will crash when
 //  certain characters win/lose but no finish
 //  move was performed
-TIMER_DEVICE_CALLBACK_MEMBER(jchan_state::vblank)
+void jchan_state::vblank(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -356,12 +356,12 @@ uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
     $f00000 is the only location also written
 */
 
-WRITE16_MEMBER(jchan_state::ctrl_w)
+void jchan_state::ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_irq_sub_enable = data & 0x8000; // hack / guess!
 }
 
-READ16_MEMBER(jchan_state::ctrl_r)
+uint16_t jchan_state::ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -381,42 +381,42 @@ READ16_MEMBER(jchan_state::ctrl_r)
 ***************************************************************************/
 
 /* communications - hacky! */
-WRITE16_MEMBER(jchan_state::main2sub_cmd_w)
+void jchan_state::main2sub_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mainsub_shared_ram[0x03ffe/2]);
 	m_subcpu->set_input_line(4, HOLD_LINE);
 }
 
 // is this called?
-WRITE16_MEMBER(jchan_state::sub2main_cmd_w)
+void jchan_state::sub2main_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mainsub_shared_ram[0x0000/2]);
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 /* ram convert for suprnova (requires 32-bit stuff) */
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32_1_w)
+void jchan_state::sknsspr_sprite32_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram_1[offset]);
 	offset>>=1;
 	m_sprite_ram32_1[offset]=(m_spriteram_1[offset*2+1]<<16) | (m_spriteram_1[offset*2]);
 }
 
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32regs_1_w)
+void jchan_state::sknsspr_sprite32regs_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sprregs_1[offset]);
 	offset>>=1;
 	m_sprite_regs32_1[offset]=(m_sprregs_1[offset*2+1]<<16) | (m_sprregs_1[offset*2]);
 }
 
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32_2_w)
+void jchan_state::sknsspr_sprite32_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram_2[offset]);
 	offset>>=1;
 	m_sprite_ram32_2[offset]=(m_spriteram_2[offset*2+1]<<16) | (m_spriteram_2[offset*2]);
 }
 
-WRITE16_MEMBER(jchan_state::sknsspr_sprite32regs_2_w)
+void jchan_state::sknsspr_sprite32regs_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sprregs_2[offset]);
 	offset>>=1;
@@ -703,7 +703,7 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD16_WORD_SWAP( "j2d1x1.u13", 0x000000, 0x020000, CRC(b2b7fc90) SHA1(1b90c13bb41a313c4ed791a15d56073a7c29928b) )
 ROM_END
 
-DRIVER_INIT_MEMBER( jchan_state, jchan )
+void jchan_state::init_jchan()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),this));
 	m_subcpu->space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),this));

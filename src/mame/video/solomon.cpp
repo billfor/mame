@@ -3,31 +3,31 @@
 #include "emu.h"
 #include "includes/solomon.h"
 
-WRITE8_MEMBER(solomon_state::solomon_videoram_w)
+void solomon_state::solomon_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(solomon_state::solomon_colorram_w)
+void solomon_state::solomon_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(solomon_state::solomon_videoram2_w)
+void solomon_state::solomon_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(solomon_state::solomon_colorram2_w)
+void solomon_state::solomon_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(solomon_state::solomon_flipscreen_w)
+void solomon_state::solomon_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (data & 0x01))
 	{
@@ -36,7 +36,7 @@ WRITE8_MEMBER(solomon_state::solomon_flipscreen_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(solomon_state::get_bg_tile_info)
+void solomon_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram2[tile_index];
 	int code = m_videoram2[tile_index] + 256 * (attr & 0x07);
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(solomon_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(solomon_state::get_fg_tile_info)
+void solomon_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + 256 * (attr & 0x07);

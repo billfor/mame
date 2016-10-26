@@ -54,12 +54,12 @@ void hyprduel_state::update_irq_state(  )
 	m_maincpu->set_input_line(3, (irq & m_int_num) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(hyprduel_state::vblank_end_callback)
+void hyprduel_state::vblank_end_callback(void *ptr, int32_t param)
 {
 	m_requested_int &= ~param;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::hyprduel_interrupt)
+void hyprduel_state::hyprduel_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int line = param;
 
@@ -77,12 +77,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::hyprduel_interrupt)
 	update_irq_state();
 }
 
-READ16_MEMBER(hyprduel_state::hyprduel_irq_cause_r)
+uint16_t hyprduel_state::hyprduel_irq_cause_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_requested_int;
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_irq_cause_w)
+void hyprduel_state::hyprduel_irq_cause_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -96,7 +96,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_irq_cause_w)
 }
 
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_subcpu_control_w)
+void hyprduel_state::hyprduel_subcpu_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (data)
 	{
@@ -127,7 +127,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_subcpu_control_w)
 }
 
 
-READ16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_r)
+uint16_t hyprduel_state::hyprduel_cpusync_trigger1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_cpu_trigger == 1001)
 	{
@@ -138,7 +138,7 @@ READ16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_r)
 	return m_sharedram1[0x000408 / 2 + offset];
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_w)
+void hyprduel_state::hyprduel_cpusync_trigger1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sharedram1[0x00040e / 2 + offset]);
 
@@ -153,7 +153,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_w)
 }
 
 
-READ16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_r)
+uint16_t hyprduel_state::hyprduel_cpusync_trigger2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_cpu_trigger == 1002)
 	{
@@ -164,7 +164,7 @@ READ16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_r)
 	return m_sharedram3[(0xfff34c - 0xfe4000) / 2 + offset];
 }
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_w)
+void hyprduel_state::hyprduel_cpusync_trigger2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sharedram1[0x000408 / 2 + offset]);
 
@@ -179,7 +179,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_w)
 }
 
 
-TIMER_CALLBACK_MEMBER(hyprduel_state::magerror_irq_callback)
+void hyprduel_state::magerror_irq_callback(void *ptr, int32_t param)
 {
 	m_subcpu->set_input_line(1, HOLD_LINE);
 }
@@ -196,7 +196,7 @@ TIMER_CALLBACK_MEMBER(hyprduel_state::magerror_irq_callback)
     that the blitter can readily use (which is a form of compression)
 */
 
-READ16_MEMBER(hyprduel_state::hyprduel_bankedrom_r)
+uint16_t hyprduel_state::hyprduel_bankedrom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t *ROM = memregion("gfx1")->base();
 	size_t  len = memregion("gfx1")->bytes();
@@ -253,7 +253,7 @@ READ16_MEMBER(hyprduel_state::hyprduel_bankedrom_r)
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(hyprduel_state::hyprduel_blit_done)
+void hyprduel_state::hyprduel_blit_done(void *ptr, int32_t param)
 {
 	m_requested_int |= 1 << m_blitter_bit;
 	update_irq_state();
@@ -276,7 +276,7 @@ void hyprduel_state::blt_write( address_space &space, const int tmap, const offs
 }
 
 
-WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
+void hyprduel_state::hyprduel_blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_blitter_regs[offset]);
 
@@ -628,7 +628,7 @@ void hyprduel_state::machine_reset()
 	*m_irq_enable = 0xff;
 }
 
-MACHINE_START_MEMBER(hyprduel_state,hyprduel)
+void hyprduel_state::machine_start_hyprduel()
 {
 	save_item(NAME(m_blitter_bit));
 	save_item(NAME(m_requested_int));
@@ -636,9 +636,9 @@ MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 	save_item(NAME(m_cpu_trigger));
 }
 
-MACHINE_START_MEMBER(hyprduel_state,magerror)
+void hyprduel_state::machine_start_magerror()
 {
-	MACHINE_START_CALL_MEMBER(hyprduel);
+	machine_start_hyprduel();
 	m_magerror_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(968));        /* tempo? */
 }
 
@@ -772,7 +772,7 @@ ROM_START( magerror )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
+void hyprduel_state::init_hyprduel()
 {
 	m_int_num = 0x02;
 
@@ -783,7 +783,7 @@ DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0xfff34c, 0xfff34d, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r),this));
 }
 
-DRIVER_INIT_MEMBER(hyprduel_state,magerror)
+void hyprduel_state::init_magerror()
 {
 	m_int_num = 0x01;
 	m_magerror_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyprduel_state::magerror_irq_callback),this));

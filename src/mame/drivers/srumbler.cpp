@@ -20,7 +20,7 @@
 #include "includes/srumbler.h"
 
 
-WRITE8_MEMBER(srumbler_state::bankswitch_w)
+void srumbler_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	  banking is controlled by two PROMs. 0000-4fff is mapped to the same
@@ -57,7 +57,7 @@ void srumbler_state::machine_start()
 	bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(srumbler_state::interrupt)
+void srumbler_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

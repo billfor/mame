@@ -186,20 +186,20 @@ public:
 	tilemap_t *m_bg_tilemap;
 	virtual void video_start() override;
 	uint32_t screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(nevada);
+	void palette_init_nevada(palette_device &palette);
 
-	DECLARE_WRITE_LINE_MEMBER(duart18_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart39_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart40_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(nevada_rtc_irq);
-	DECLARE_READ16_MEMBER(io_board_r);
-	DECLARE_WRITE16_MEMBER(io_board_w);
-	DECLARE_WRITE16_MEMBER (io_board_x);
-	DECLARE_READ16_MEMBER( nevada_sec_r );
-	DECLARE_WRITE16_MEMBER( nevada_sec_w );
+	void duart18_irq_handler(int state);
+	void duart39_irq_handler(int state);
+	void duart40_irq_handler(int state);
+	void nevada_rtc_irq(int state);
+	uint16_t io_board_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void io_board_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void io_board_x(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t nevada_sec_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void nevada_sec_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_MACHINE_START(nevada);
-	DECLARE_DRIVER_INIT(nevada);
+	void machine_start_nevada();
+	void init_nevada();
 };
 
 /*
@@ -253,7 +253,7 @@ static const gfx_layout charlayout =
 
 /***************************************************************************/
 /*
-WRITE16_MEMBER( nevada_state:nevada_videoram_w )
+void nevada_state:nevada_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 // Todo, Just for sample
 
@@ -270,7 +270,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 /*
-static TILE_GET_INFO_MEMBER( nevada_state::get_bg_tile_info )
+static void nevada_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 // Todo, Just for sample
     int attr = m_colorram[tile_index];
@@ -303,7 +303,7 @@ uint32_t nevada_state::screen_update_nevada(screen_device &screen, bitmap_ind16 
 }
 
 /***************************************************************************/
-PALETTE_INIT_MEMBER(nevada_state, nevada)
+void nevada_state::palette_init_nevada(palette_device &palette)
 {
 	// Palette init
 }
@@ -327,7 +327,7 @@ void nevada_state::nvram_init(nvram_device &nvram, void *data, size_t size)
     Interrupt 4
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(nevada_state::duart18_irq_handler)
+void nevada_state::duart18_irq_handler(int state)
 {
 	m_maincpu->set_input_line_and_vector(4, state, m_duart18_68681->get_irq_vector());
 }
@@ -342,7 +342,7 @@ WRITE_LINE_MEMBER(nevada_state::duart18_irq_handler)
     Interrupt 3
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(nevada_state::duart39_irq_handler)
+void nevada_state::duart39_irq_handler(int state)
 {
 	m_maincpu->set_input_line_and_vector(3, state, m_duart39_68681->get_irq_vector());
 }
@@ -358,7 +358,7 @@ WRITE_LINE_MEMBER(nevada_state::duart39_irq_handler)
     Interrupt 5
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(nevada_state::duart40_irq_handler)
+void nevada_state::duart40_irq_handler(int state)
 {
 	m_maincpu->set_input_line_and_vector(5, state, m_duart40_68681->get_irq_vector());
 }
@@ -366,7 +366,7 @@ WRITE_LINE_MEMBER(nevada_state::duart40_irq_handler)
 /***************************************************************************/
 /*********************    RTC SECTION       ********************************/
 /***************************************************************************/
-WRITE_LINE_MEMBER(nevada_state::nevada_rtc_irq)
+void nevada_state::nevada_rtc_irq(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);  // rtc interrupt on INT1
 }
@@ -389,24 +389,24 @@ static const ay8910_interface ay8910_config =
 #endif
 
 /***************************************************************************/
-READ16_MEMBER(nevada_state::io_board_r)
+uint16_t nevada_state::io_board_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// IO board Serial communication 0xA00000
 	return 1;
 }
 /***************************************************************************/
-WRITE16_MEMBER(nevada_state::io_board_w)
+void nevada_state::io_board_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// IO board Serial communication 0xA00000 on bit0
 }
 /***************************************************************************/
-WRITE16_MEMBER(nevada_state::io_board_x)
+void nevada_state::io_board_x(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// IO board Serial communication 0xA80000  on bit15
 }
 
 /***************************************************************************/
-READ16_MEMBER(nevada_state::nevada_sec_r )
+uint16_t nevada_state::nevada_sec_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  D3..D0 = DOOR OPEN or Track STATE of PAL35
 	uint16_t res;
@@ -419,7 +419,7 @@ READ16_MEMBER(nevada_state::nevada_sec_r )
 	return res;
 }
 /***************************************************************************/
-WRITE16_MEMBER(nevada_state::nevada_sec_w )
+void nevada_state::nevada_sec_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 74LS173 $bits Register used LOWER bits D3..D0 for DOOR LOGIC SWITCH
 	m_datA40000 = data | 0x00f0;     // since D7..D4 are not used and are connected to PULLUP
@@ -579,7 +579,7 @@ INPUT_PORTS_END
 *     Machine start      *
 *************************/
 
-MACHINE_START_MEMBER(nevada_state, nevada)
+void nevada_state::machine_start_nevada()
 {
 	m_nvram->set_base(m_ram62256, 0x1000);
 }
@@ -673,7 +673,7 @@ ROM_END
 /*************************
 *      Driver Init       *
 *************************/
-DRIVER_INIT_MEMBER(nevada_state,nevada)
+void nevada_state::init_nevada()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 

@@ -55,19 +55,19 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_fd800(*this, "fd800") { }
 
-	DECLARE_READ8_MEMBER( panel_read );
-	DECLARE_WRITE8_MEMBER( panel_write );
-	DECLARE_WRITE8_MEMBER( external_operation );
-	DECLARE_READ8_MEMBER( interrupt_level );
-	DECLARE_WRITE_LINE_MEMBER( fd_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( asrkey_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( vdtkey_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( line_interrupt );
+	uint8_t panel_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void panel_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t interrupt_level(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fd_interrupt(int state);
+	void asrkey_interrupt(int state);
+	void vdtkey_interrupt(int state);
+	void line_interrupt(int state);
 
-	DECLARE_DRIVER_INIT(ti990_4);
-	DECLARE_DRIVER_INIT(ti990_4v);
+	void init_ti990_4();
+	void init_ti990_4v();
 
-	DECLARE_MACHINE_RESET(ti990_4);
+	void machine_reset_ti990_4();
 
 private:
 	void        hold_load();
@@ -106,7 +106,7 @@ void ti990_4_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	logerror("ti990_4: Released LOAD interrupt\n");
 }
 
-READ8_MEMBER( ti990_4_state::panel_read )
+uint8_t ti990_4_state::panel_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 1)
 		return 0x48;
@@ -114,7 +114,7 @@ READ8_MEMBER( ti990_4_state::panel_read )
 	return 0;
 }
 
-WRITE8_MEMBER( ti990_4_state::panel_write )
+void ti990_4_state::panel_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("ti990_4: writing to panel @CRU %04x: %02x\n", offset<<1, data);
 }
@@ -145,7 +145,7 @@ void ti990_4_state::reset_int_lines()
 /*
     Callback from the floppy controller.
 */
-WRITE_LINE_MEMBER(ti990_4_state::fd_interrupt)
+void ti990_4_state::fd_interrupt(int state)
 {
 	set_int_line(7, state);
 }
@@ -153,12 +153,12 @@ WRITE_LINE_MEMBER(ti990_4_state::fd_interrupt)
 /*
     Connection to VDT
 */
-WRITE_LINE_MEMBER(ti990_4_state::vdtkey_interrupt)
+void ti990_4_state::vdtkey_interrupt(int state)
 {
 	set_int_line(3, state);
 }
 
-WRITE_LINE_MEMBER(ti990_4_state::line_interrupt)
+void ti990_4_state::line_interrupt(int state)
 {
 	if (m_ckon_state) set_int_line(5, state);
 }
@@ -166,12 +166,12 @@ WRITE_LINE_MEMBER(ti990_4_state::line_interrupt)
 /*
     Callback from the terminal.
 */
-WRITE_LINE_MEMBER(ti990_4_state::asrkey_interrupt)
+void ti990_4_state::asrkey_interrupt(int state)
 {
 	set_int_line(6, state);
 }
 
-WRITE8_MEMBER( ti990_4_state::external_operation )
+void ti990_4_state::external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	switch (offset)
@@ -199,7 +199,7 @@ WRITE8_MEMBER( ti990_4_state::external_operation )
 	}
 }
 
-READ8_MEMBER( ti990_4_state::interrupt_level )
+uint8_t ti990_4_state::interrupt_level(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_int_level;
 }
@@ -268,7 +268,7 @@ ADDRESS_MAP_END
     nullptr
 }; */
 
-MACHINE_RESET_MEMBER(ti990_4_state,ti990_4)
+void ti990_4_state::machine_reset_ti990_4()
 {
 	hold_load();
 	reset_int_lines();
@@ -276,7 +276,7 @@ MACHINE_RESET_MEMBER(ti990_4_state,ti990_4)
 	m_maincpu->set_ready(ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER(ti990_4_state, ti990_4)
+void ti990_4_state::init_ti990_4()
 {
 	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
 }

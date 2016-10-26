@@ -231,39 +231,39 @@ public:
 	int m_psd_a15;
 	uint16_t m_questions_loword_address;
 
-	DECLARE_WRITE8_MEMBER(meritm_crt250_bank_w);
-	DECLARE_WRITE8_MEMBER(meritm_psd_a15_w);
-	DECLARE_WRITE8_MEMBER(meritm_bank_w);
-	DECLARE_WRITE8_MEMBER(meritm_crt250_questions_lo_w);
-	DECLARE_WRITE8_MEMBER(meritm_crt250_questions_hi_w);
-	DECLARE_WRITE8_MEMBER(meritm_crt250_questions_bank_w);
-	DECLARE_WRITE8_MEMBER(meritm_ds1644_w);
-	DECLARE_READ8_MEMBER(meritm_ds1644_r);
-	DECLARE_READ8_MEMBER(meritm_8255_port_c_r);
-	DECLARE_WRITE8_MEMBER(meritm_crt250_port_b_w);
-	DECLARE_WRITE8_MEMBER(meritm_ay8930_port_b_w);
-	DECLARE_READ8_MEMBER(meritm_audio_pio_port_a_r);
-	DECLARE_READ8_MEMBER(meritm_audio_pio_port_b_r);
-	DECLARE_WRITE8_MEMBER(meritm_audio_pio_port_a_w);
-	DECLARE_WRITE8_MEMBER(meritm_audio_pio_port_b_w);
-	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_a_w);
-	DECLARE_WRITE8_MEMBER(meritm_io_pio_port_b_w);
-	DECLARE_DRIVER_INIT(megat3te);
+	void meritm_crt250_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meritm_psd_a15_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meritm_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meritm_crt250_questions_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meritm_crt250_questions_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meritm_crt250_questions_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meritm_ds1644_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t meritm_ds1644_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t meritm_8255_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void meritm_crt250_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meritm_ay8930_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t meritm_audio_pio_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t meritm_audio_pio_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void meritm_audio_pio_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meritm_audio_pio_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meritm_io_pio_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meritm_io_pio_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_megat3te();
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(meritm_crt250_questions);
-	DECLARE_MACHINE_START(meritm_crt250_crt252_crt258);
-	DECLARE_MACHINE_START(meritm_crt260);
-	DECLARE_MACHINE_START(merit_common);
+	void machine_start_meritm_crt250_questions();
+	void machine_start_meritm_crt250_crt252_crt258();
+	void machine_start_meritm_crt260();
+	void machine_start_merit_common();
 	uint32_t screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(vblank_end_tick);
+	void vblank_start_tick(timer_device &timer, void *ptr, int32_t param);
+	void vblank_end_tick(timer_device &timer, void *ptr, int32_t param);
 	void meritm_crt250_switch_banks(  );
 	void meritm_switch_banks(  );
 	int meritm_touch_coord_transform(int *touch_x, int *touch_y);
 	uint8_t binary_to_BCD(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(meritm_vdp0_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(meritm_vdp1_interrupt);
+	void meritm_vdp0_interrupt(int state);
+	void meritm_vdp1_interrupt(int state);
 };
 
 
@@ -308,13 +308,13 @@ int meritm_state::meritm_touch_coord_transform(int *touch_x, int *touch_y)
  *************************************/
 
 
-WRITE_LINE_MEMBER(meritm_state::meritm_vdp0_interrupt)
+void meritm_state::meritm_vdp0_interrupt(int state)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
 	   interrupts seem to be fired quite randomly */
 }
 
-WRITE_LINE_MEMBER(meritm_state::meritm_vdp1_interrupt)
+void meritm_state::meritm_vdp1_interrupt(int state)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
 	   interrupts seem to be fired quite randomly */
@@ -373,7 +373,7 @@ void meritm_state::meritm_crt250_switch_banks(  )
 	m_bank1->set_entry(rombank );
 }
 
-WRITE8_MEMBER(meritm_state::meritm_crt250_bank_w)
+void meritm_state::meritm_crt250_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	meritm_crt250_switch_banks();
 }
@@ -392,14 +392,14 @@ void meritm_state::meritm_switch_banks(  )
 	m_bank3->set_entry(rambank);
 }
 
-WRITE8_MEMBER(meritm_state::meritm_psd_a15_w)
+void meritm_state::meritm_psd_a15_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_psd_a15 = data;
 	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, space.device().safe_pc() );
 	meritm_switch_banks();
 }
 
-WRITE8_MEMBER(meritm_state::meritm_bank_w)
+void meritm_state::meritm_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	meritm_switch_banks();
 }
@@ -411,19 +411,19 @@ WRITE8_MEMBER(meritm_state::meritm_bank_w)
  *************************************/
 
 
-WRITE8_MEMBER(meritm_state::meritm_crt250_questions_lo_w)
+void meritm_state::meritm_crt250_questions_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_questions_loword_address &= 0xff00;
 	m_questions_loword_address |= data;
 }
 
-WRITE8_MEMBER(meritm_state::meritm_crt250_questions_hi_w)
+void meritm_state::meritm_crt250_questions_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_questions_loword_address &= 0x00ff;
 	m_questions_loword_address |= (data << 8);
 }
 
-WRITE8_MEMBER(meritm_state::meritm_crt250_questions_bank_w)
+void meritm_state::meritm_crt250_questions_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t questions_address;
 	uint8_t *dst;
@@ -474,7 +474,7 @@ WRITE8_MEMBER(meritm_state::meritm_crt250_questions_bank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(meritm_state::meritm_ds1644_w)
+void meritm_state::meritm_ds1644_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int rambank = (m_psd_a15 >> 2) & 0x3;
 	if (rambank < 3)
@@ -498,7 +498,7 @@ uint8_t meritm_state::binary_to_BCD(uint8_t data)
 	return ((data / 10) << 4) | (data %10);
 }
 
-READ8_MEMBER(meritm_state::meritm_ds1644_r)
+uint8_t meritm_state::meritm_ds1644_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	system_time systime;
 	int rambank = (m_psd_a15 >> 2) & 0x3;
@@ -858,13 +858,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ8_MEMBER(meritm_state::meritm_8255_port_c_r)
+uint8_t meritm_state::meritm_8255_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror( "8255 port C read\n" );
 	return 0xff;
 }
 
-WRITE8_MEMBER(meritm_state::meritm_crt250_port_b_w)
+void meritm_state::meritm_crt250_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,0), BIT(data,1), BIT(data,2), BIT(data,3), BIT(data,4), BIT(data,5), BIT(data,6) );
 	output().set_value("P1 DISC 1 LAMP", !BIT(data,0));
@@ -887,7 +887,7 @@ WRITE8_MEMBER(meritm_state::meritm_crt250_port_b_w)
  Port B: Bits 0,1 used
 */
 
-WRITE8_MEMBER(meritm_state::meritm_ay8930_port_b_w)
+void meritm_state::meritm_ay8930_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// lamps
 }
@@ -898,7 +898,7 @@ WRITE8_MEMBER(meritm_state::meritm_ay8930_port_b_w)
  *
  *************************************/
 
-READ8_MEMBER(meritm_state::meritm_audio_pio_port_a_r)
+uint8_t meritm_state::meritm_audio_pio_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -918,7 +918,7 @@ READ8_MEMBER(meritm_state::meritm_audio_pio_port_a_r)
 	return m_vint;
 }
 
-READ8_MEMBER(meritm_state::meritm_audio_pio_port_b_r)
+uint8_t meritm_state::meritm_audio_pio_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -938,7 +938,7 @@ READ8_MEMBER(meritm_state::meritm_audio_pio_port_b_r)
 	return m_ds1204->read_dq();
 }
 
-WRITE8_MEMBER(meritm_state::meritm_audio_pio_port_a_w)
+void meritm_state::meritm_audio_pio_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -959,7 +959,7 @@ WRITE8_MEMBER(meritm_state::meritm_audio_pio_port_a_w)
 	//logerror("Writing BANK with %x (raw = %x)\n", m_bank, data);
 }
 
-WRITE8_MEMBER(meritm_state::meritm_audio_pio_port_b_w)
+void meritm_state::meritm_audio_pio_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -981,7 +981,7 @@ WRITE8_MEMBER(meritm_state::meritm_audio_pio_port_b_w)
 	m_ds1204->write_dq(data & 0x01);
 }
 
-WRITE8_MEMBER(meritm_state::meritm_io_pio_port_a_w)
+void meritm_state::meritm_io_pio_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -999,7 +999,7 @@ WRITE8_MEMBER(meritm_state::meritm_io_pio_port_a_w)
 	*/
 }
 
-WRITE8_MEMBER(meritm_state::meritm_io_pio_port_b_w)
+void meritm_state::meritm_io_pio_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1024,7 +1024,7 @@ static const z80_daisy_config meritm_daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_START_MEMBER(meritm_state,merit_common)
+void meritm_state::machine_start_merit_common()
 {
 	m_z80pio_0->strobe_a(1);
 	m_z80pio_0->strobe_b(1);
@@ -1037,23 +1037,23 @@ void meritm_state::machine_start()
 	m_bank1->configure_entries(0, 8, m_region_maincpu->base(), 0x10000);
 	m_bank = 0xff;
 	meritm_crt250_switch_banks();
-	MACHINE_START_CALL_MEMBER(merit_common);
+	machine_start_merit_common();
 	save_item(NAME(m_bank));
 
 }
 
-MACHINE_START_MEMBER(meritm_state,meritm_crt250_questions)
+void meritm_state::machine_start_meritm_crt250_questions()
 {
 	meritm_state::machine_start();
 	save_item(NAME(m_questions_loword_address));
 }
 
-MACHINE_START_MEMBER(meritm_state,meritm_crt250_crt252_crt258)
+void meritm_state::machine_start_meritm_crt250_crt252_crt258()
 {
-	MACHINE_START_CALL_MEMBER(meritm_crt250_questions);
+	machine_start_meritm_crt250_questions();
 }
 
-MACHINE_START_MEMBER(meritm_state,meritm_crt260)
+void meritm_state::machine_start_meritm_crt260()
 {
 	m_ram = std::make_unique<uint8_t[]>( 0x8000 );
 	machine().device<nvram_device>("nvram")->set_base(m_ram.get(), 0x8000);
@@ -1064,20 +1064,20 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 	m_bank = 0xff;
 	m_psd_a15 = 0;
 	meritm_switch_banks();
-	MACHINE_START_CALL_MEMBER(merit_common);
+	machine_start_merit_common();
 	save_item(NAME(m_bank));
 	save_item(NAME(m_psd_a15));
 	save_pointer(NAME(m_ram.get()), 0x8000);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_start_tick)
+void meritm_state::vblank_start_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	/* this is a workaround to signal the v9938 vblank interrupt correctly */
 	m_vint = 0x08;
 	m_z80pio_0->port_a_write(m_vint);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
+void meritm_state::vblank_end_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	/* this is a workaround to signal the v9938 vblank interrupt correctly */
 	m_vint = 0x18;
@@ -2285,7 +2285,7 @@ ROM_START( megat6 ) /* Dallas DS1204V security key at U5 labeled 9255-80 U5-B-RO
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-DRIVER_INIT_MEMBER(meritm_state,megat3te)
+void meritm_state::init_megat3te()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 }

@@ -37,15 +37,15 @@ public:
 	ertictac_state(const machine_config &mconfig, device_type type, const char *tag)
 		: archimedes_state(mconfig, type, tag) { }
 
-	DECLARE_READ32_MEMBER(ertictac_podule_r);
-	DECLARE_DRIVER_INIT(ertictac);
+	uint32_t ertictac_podule_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void init_ertictac();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
+	void ertictac_podule_irq(device_t &device);
 };
 
 
-READ32_MEMBER(ertictac_state::ertictac_podule_r)
+uint32_t ertictac_state::ertictac_podule_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	archimedes_clear_irq_b(ARCHIMEDES_IRQB_PODULE_IRQ);
 
@@ -194,7 +194,7 @@ static INPUT_PORTS_START( poizone )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW2:6" )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(ertictac_state,ertictac)
+void ertictac_state::init_ertictac()
 {
 	archimedes_driver_init();
 }
@@ -209,7 +209,7 @@ void ertictac_state::machine_reset()
 	archimedes_reset();
 }
 
-INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
+void ertictac_state::ertictac_podule_irq(device_t &device)
 {
 	archimedes_request_irq_b(ARCHIMEDES_IRQB_PODULE_IRQ);
 }

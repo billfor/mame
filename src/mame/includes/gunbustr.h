@@ -50,17 +50,17 @@ public:
 	std::unique_ptr<gb_tempsprite[]> m_spritelist;
 	uint32_t m_mem[2];
 
-	DECLARE_WRITE32_MEMBER(gunbustr_input_w);
-	DECLARE_WRITE32_MEMBER(motor_control_w);
-	DECLARE_READ32_MEMBER(gunbustr_gun_r);
-	DECLARE_WRITE32_MEMBER(gunbustr_gun_w);
-	DECLARE_READ32_MEMBER(main_cycle_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
-	DECLARE_DRIVER_INIT(gunbustrj);
-	DECLARE_DRIVER_INIT(gunbustr);
+	void gunbustr_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void motor_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gunbustr_gun_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void gunbustr_gun_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t main_cycle_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	ioport_value coin_word_r(ioport_field &field, void *param);
+	void init_gunbustrj();
+	void init_gunbustr();
 	virtual void video_start() override;
 	uint32_t screen_update_gunbustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gunbustr_interrupt);
+	void gunbustr_interrupt(device_t &device);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 
 protected:

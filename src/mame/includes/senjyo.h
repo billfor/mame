@@ -72,33 +72,33 @@ public:
 	tilemap_t *m_bg2_tilemap;
 	tilemap_t *m_bg3_tilemap;
 
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(starforb_scrolly2);
-	DECLARE_WRITE8_MEMBER(starforb_scrollx2);
-	DECLARE_WRITE8_MEMBER(fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(fgcolorram_w);
-	DECLARE_WRITE8_MEMBER(bg1videoram_w);
-	DECLARE_WRITE8_MEMBER(bg2videoram_w);
-	DECLARE_WRITE8_MEMBER(bg3videoram_w);
-	DECLARE_WRITE8_MEMBER(volume_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_line_clock);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
-	DECLARE_READ8_MEMBER(pio_pa_r);
+	void flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void starforb_scrolly2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void starforb_scrollx2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgcolorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg1videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg2videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg3videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_line_clock(int state);
+	void sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_DECODER(IIBBGGRR);
-	DECLARE_PALETTE_INIT(radar);
+	static rgb_t IIBBGGRR_decoder(uint32_t raw);
+	void palette_init_radar(palette_device &palette);
 
-	DECLARE_DRIVER_INIT(starfora);
-	DECLARE_DRIVER_INIT(senjyo);
-	DECLARE_DRIVER_INIT(starfore);
-	DECLARE_DRIVER_INIT(starforc);
+	void init_starfora();
+	void init_senjyo();
+	void init_starfore();
+	void init_starforc();
 
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(senjyo_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(starforc_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void senjyo_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void starforc_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

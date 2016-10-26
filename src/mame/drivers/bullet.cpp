@@ -101,7 +101,7 @@ enum
 //  mreq_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bullet_state::mreq_r )
+uint8_t bullet_state::mreq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -129,7 +129,7 @@ READ8_MEMBER( bullet_state::mreq_r )
 //  mreq_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::mreq_w )
+void bullet_state::mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0xc000)
 	{
@@ -146,7 +146,7 @@ WRITE8_MEMBER( bullet_state::mreq_w )
 //  win_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bullet_state::win_r )
+uint8_t bullet_state::win_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -156,7 +156,7 @@ READ8_MEMBER( bullet_state::win_r )
 //  wstrobe_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::wstrobe_w )
+void bullet_state::wstrobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -165,7 +165,7 @@ WRITE8_MEMBER( bullet_state::wstrobe_w )
 //  brom_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bullet_state::brom_r )
+uint8_t bullet_state::brom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_brom = 1;
 
@@ -177,7 +177,7 @@ READ8_MEMBER( bullet_state::brom_r )
 //  brom_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::brom_w )
+void bullet_state::brom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_brom = 1;
 }
@@ -187,7 +187,7 @@ WRITE8_MEMBER( bullet_state::brom_w )
 //  exdsk_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::exdsk_w )
+void bullet_state::exdsk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -246,7 +246,7 @@ WRITE8_MEMBER( bullet_state::exdsk_w )
 //  exdma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::exdma_w )
+void bullet_state::exdma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -275,7 +275,7 @@ WRITE8_MEMBER( bullet_state::exdma_w )
 //  hdcon_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::hdcon_w )
+void bullet_state::hdcon_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -312,7 +312,7 @@ WRITE8_MEMBER( bullet_state::hdcon_w )
 //  info_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bullet_state::info_r )
+uint8_t bullet_state::info_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -348,7 +348,7 @@ READ8_MEMBER( bullet_state::info_r )
 //  segst_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bullet_state::segst_w )
+void bullet_state::segst_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_segst = BIT(data, 0);
 }
@@ -358,7 +358,7 @@ WRITE8_MEMBER( bullet_state::segst_w )
 //  mreq_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bulletf_state::mreq_r )
+uint8_t bulletf_state::mreq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -393,7 +393,7 @@ READ8_MEMBER( bulletf_state::mreq_r )
 //  mreq_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bulletf_state::mreq_w )
+void bulletf_state::mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0xc000)
 	{
@@ -417,7 +417,7 @@ WRITE8_MEMBER( bulletf_state::mreq_w )
 //  xdma0_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bulletf_state::xdma0_w )
+void bulletf_state::xdma0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -444,7 +444,7 @@ WRITE8_MEMBER( bulletf_state::xdma0_w )
 //  xfdc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bulletf_state::xfdc_w )
+void bulletf_state::xfdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -504,7 +504,7 @@ WRITE8_MEMBER( bulletf_state::xfdc_w )
 //  mbank_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bulletf_state::mbank_w )
+void bulletf_state::mbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -529,7 +529,7 @@ WRITE8_MEMBER( bulletf_state::mbank_w )
 //  scsi_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bulletf_state::scsi_r )
+uint8_t bulletf_state::scsi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_scsi_data_in->read();
 
@@ -546,7 +546,7 @@ READ8_MEMBER( bulletf_state::scsi_r )
 //  scsi_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bulletf_state::scsi_w )
+void bulletf_state::scsi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scsi_data_out->write(data);
 
@@ -560,7 +560,7 @@ WRITE8_MEMBER( bulletf_state::scsi_w )
 //  hwsts_r -
 //-------------------------------------------------
 
-READ8_MEMBER( bulletf_state::hwsts_r )
+uint8_t bulletf_state::hwsts_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -714,7 +714,7 @@ INPUT_PORTS_END
 //  Z80CTC
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER(bullet_state::ctc_tick)
+void bullet_state::ctc_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ctc->trg0(1);
 	m_ctc->trg0(0);
@@ -726,7 +726,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bullet_state::ctc_tick)
 	m_ctc->trg2(0);
 }
 
-WRITE_LINE_MEMBER( bullet_state::dart_rxtxca_w )
+void bullet_state::dart_rxtxca_w(int state)
 {
 	m_dart->txca_w(state);
 	m_dart->rxca_w(state);
@@ -736,13 +736,13 @@ WRITE_LINE_MEMBER( bullet_state::dart_rxtxca_w )
 //  Z80DART
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( bullet_state::dartardy_w )
+void bullet_state::dartardy_w(int state)
 {
 	m_dartardy = state;
 	update_dma_rdy();
 }
 
-WRITE_LINE_MEMBER( bullet_state::dartbrdy_w )
+void bullet_state::dartbrdy_w(int state)
 {
 	m_dartbrdy = state;
 	update_dma_rdy();
@@ -786,7 +786,7 @@ void bullet_state::update_dma_rdy()
 	m_dmac->rdy_w(rdy);
 }
 
-READ8_MEMBER( bullet_state::dma_mreq_r )
+uint8_t bullet_state::dma_mreq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_ram->pointer()[(m_buf << 16) | offset];
 
@@ -798,7 +798,7 @@ READ8_MEMBER( bullet_state::dma_mreq_r )
 	return data;
 }
 
-WRITE8_MEMBER( bullet_state::dma_mreq_w )
+void bullet_state::dma_mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram->pointer()[(m_buf << 16) | offset] = data;
 
@@ -808,12 +808,12 @@ WRITE8_MEMBER( bullet_state::dma_mreq_w )
 	}
 }
 
-READ8_MEMBER(bullet_state::io_read_byte)
+uint8_t bullet_state::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_IO).read_byte(offset);
 }
 
-WRITE8_MEMBER(bullet_state::io_write_byte)
+void bullet_state::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->space(AS_IO).write_byte(offset, data);
 }
@@ -838,12 +838,12 @@ void bulletf_state::update_dma_rdy()
 	m_dmac->rdy_w(rdy);
 }
 
-READ8_MEMBER( bulletf_state::dma_mreq_r )
+uint8_t bulletf_state::dma_mreq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram->pointer()[(DMB4 << 16) | offset];
 }
 
-WRITE8_MEMBER( bulletf_state::dma_mreq_w )
+void bulletf_state::dma_mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram->pointer()[(DMB6 << 16) | offset] = data;
 }
@@ -852,27 +852,27 @@ WRITE8_MEMBER( bulletf_state::dma_mreq_w )
 //  Z80PIO
 //-------------------------------------------------
 
-DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_busy )
+void bullet_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_perror )
+void bullet_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_select )
+void bullet_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_fault )
+void bullet_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER( bullet_state::pio_pb_r )
+uint8_t bullet_state::pio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -901,7 +901,7 @@ READ8_MEMBER( bullet_state::pio_pb_r )
 }
 
 
-WRITE8_MEMBER( bulletf_state::pio_pa_w )
+void bulletf_state::pio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -923,7 +923,7 @@ WRITE8_MEMBER( bulletf_state::pio_pa_w )
 	m_scsibus->write_sel(BIT(data, 2));
 }
 
-WRITE_LINE_MEMBER( bulletf_state::cstrb_w )
+void bulletf_state::cstrb_w(int state)
 {
 	m_centronics->write_strobe(!state);
 }
@@ -943,13 +943,13 @@ static SLOT_INTERFACE_START( bullet_35_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( bullet_state::fdc_drq_w )
+void bullet_state::fdc_drq_w(int state)
 {
 	m_fdrdy = !state;
 	update_dma_rdy();
 }
 
-WRITE_LINE_MEMBER( bulletf_state::req_w )
+void bulletf_state::req_w(int state)
 {
 	if (!state)
 	{

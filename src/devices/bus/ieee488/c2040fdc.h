@@ -51,19 +51,19 @@ public:
 	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_ready.set_callback(object); }
 	template<class _Object> static devcb_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<c2040_fdc_t &>(device).m_write_error.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( ds0_w );
-	DECLARE_WRITE_LINE_MEMBER( ds1_w );
-	DECLARE_WRITE_LINE_MEMBER( drv_sel_w );
-	DECLARE_WRITE_LINE_MEMBER( mode_sel_w );
-	DECLARE_WRITE_LINE_MEMBER( rw_sel_w );
-	DECLARE_WRITE_LINE_MEMBER( mtr0_w );
-	DECLARE_WRITE_LINE_MEMBER( mtr1_w );
+	void ds0_w(int state);
+	void ds1_w(int state);
+	void drv_sel_w(int state);
+	void mode_sel_w(int state);
+	void rw_sel_w(int state);
+	void mtr0_w(int state);
+	void mtr1_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( wps_r ) { return checkpoint_live.drv_sel ? m_floppy1->wpt_r() : m_floppy0->wpt_r(); }
-	DECLARE_READ_LINE_MEMBER( sync_r ) { return checkpoint_live.sync; }
+	int wps_r() { return checkpoint_live.drv_sel ? m_floppy1->wpt_r() : m_floppy0->wpt_r(); }
+	int sync_r() { return checkpoint_live.sync; }
 
 	void stp0_w(int stp);
 	void stp1_w(int stp);

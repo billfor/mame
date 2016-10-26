@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(vastar_state::get_fg_tile_info)
+void vastar_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fgvideoram[tile_index + 0x800] | (m_fgvideoram[tile_index + 0x400] << 8);
 	int color = m_fgvideoram[tile_index];
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_fg_tile_info)
 			TILE_FLIPXY(fxy));
 }
 
-TILE_GET_INFO_MEMBER(vastar_state::get_bg1_tile_info)
+void vastar_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg1videoram[tile_index + 0x800] | (m_bg1videoram[tile_index] << 8);
 	int color = m_bg1videoram[tile_index + 0xc00];
@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_bg1_tile_info)
 			TILE_FLIPXY(fxy));
 }
 
-TILE_GET_INFO_MEMBER(vastar_state::get_bg2_tile_info)
+void vastar_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg2videoram[tile_index + 0x800] | (m_bg2videoram[tile_index] << 8);
 	int color = m_bg2videoram[tile_index + 0xc00];
@@ -79,19 +79,19 @@ void vastar_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(vastar_state::fgvideoram_w)
+void vastar_state::fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(vastar_state::bg1videoram_w)
+void vastar_state::bg1videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg1videoram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(vastar_state::bg2videoram_w)
+void vastar_state::bg2videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset & 0x3ff);

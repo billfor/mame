@@ -52,14 +52,14 @@ public:
 	required_region_ptr<uint8_t> m_bootscreen_rom;
 	required_memory_bank m_bank1;
 	required_device<palette_device> m_palette;
-	DECLARE_WRITE32_MEMBER(pnp_config_w);
-	DECLARE_WRITE32_MEMBER(pnp_data_w);
-	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_DRIVER_INIT(taitowlf);
+	void pnp_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void pnp_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void bios_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void init_taitowlf();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	#if !ENABLE_VGA
-	DECLARE_PALETTE_INIT(taitowlf);
+	void palette_init_taitowlf(palette_device &palette);
 	#endif
 	uint32_t screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void intel82439tx_init();
@@ -239,7 +239,7 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 }
 
 // ISA Plug-n-Play
-WRITE32_MEMBER(taitowlf_state::pnp_config_w)
+void taitowlf_state::pnp_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -247,7 +247,7 @@ WRITE32_MEMBER(taitowlf_state::pnp_config_w)
 	}
 }
 
-WRITE32_MEMBER(taitowlf_state::pnp_data_w)
+void taitowlf_state::pnp_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -257,7 +257,7 @@ WRITE32_MEMBER(taitowlf_state::pnp_data_w)
 
 
 
-WRITE32_MEMBER(taitowlf_state::bios_ram_w)
+void taitowlf_state::bios_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -353,7 +353,7 @@ void taitowlf_state::machine_reset()
 
 #if !ENABLE_VGA
 /* debug purpose*/
-PALETTE_INIT_MEMBER(taitowlf_state, taitowlf)
+void taitowlf_state::palette_init_taitowlf(palette_device &palette)
 {
 	palette.set_pen_color(0x70,rgb_t(0xff,0xff,0xff));
 	palette.set_pen_color(0x71,rgb_t(0xff,0xff,0xff));
@@ -394,7 +394,7 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	#endif
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
+void taitowlf_state::init_taitowlf()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
 

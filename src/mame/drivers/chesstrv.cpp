@@ -24,44 +24,44 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( ram_addr_r );
-	DECLARE_WRITE8_MEMBER( ram_addr_w );
-	DECLARE_READ8_MEMBER( ram_r );
-	DECLARE_WRITE8_MEMBER( ram_w );
-	DECLARE_WRITE8_MEMBER( display_w );
-	DECLARE_WRITE8_MEMBER( matrix_w );
-	DECLARE_READ8_MEMBER( keypad_r );
-	DECLARE_WRITE8_MEMBER( diplomat_display_w );
-	DECLARE_READ8_MEMBER( diplomat_keypad_r );
+	uint8_t ram_addr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keypad_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void diplomat_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t diplomat_keypad_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	uint8_t m_ram_addr;
 	uint8_t *m_ram;
 	uint8_t m_matrix;
-	//TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_timer_interrupt);
+	//void borisdpl_timer_interrupt(timer_device &timer, void *ptr, int32_t param);
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE8_MEMBER( chesstrv_state::ram_addr_w )
+void chesstrv_state::ram_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_addr = data;
 }
 
-READ8_MEMBER( chesstrv_state::ram_addr_r )
+uint8_t chesstrv_state::ram_addr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram_addr;
 }
 
-READ8_MEMBER( chesstrv_state::ram_r )
+uint8_t chesstrv_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram[m_ram_addr];
 }
 
-WRITE8_MEMBER( chesstrv_state::ram_w )
+void chesstrv_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram[m_ram_addr] = data;
 }
 
-WRITE8_MEMBER( chesstrv_state::display_w )
+void chesstrv_state::display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t seg_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
 
@@ -75,12 +75,12 @@ WRITE8_MEMBER( chesstrv_state::display_w )
 		output().set_digit_value( 0, seg_data );
 }
 
-WRITE8_MEMBER( chesstrv_state::matrix_w )
+void chesstrv_state::matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_matrix = data;
 }
 
-READ8_MEMBER( chesstrv_state::keypad_r )
+uint8_t chesstrv_state::keypad_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -96,12 +96,12 @@ READ8_MEMBER( chesstrv_state::keypad_r )
 	return data;
 }
 
-WRITE8_MEMBER( chesstrv_state::diplomat_display_w )
+void chesstrv_state::diplomat_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value( m_matrix & 7, data ^ 0xff );
 }
 
-READ8_MEMBER( chesstrv_state::diplomat_keypad_r )
+uint8_t chesstrv_state::diplomat_keypad_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_matrix & 0x07;
 
@@ -199,7 +199,7 @@ static INPUT_PORTS_START( borisdpl )
 INPUT_PORTS_END
 
 /*
-TIMER_DEVICE_CALLBACK_MEMBER(chesstrv_state::borisdpl_timer_interrupt)
+void chesstrv_state::borisdpl_timer_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
     m_maincpu->set_input_line_and_vector(F8_INPUT_LINE_INT_REQ, HOLD_LINE, 0x20);
 }

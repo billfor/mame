@@ -33,20 +33,20 @@
 #include "includes/snookr10.h"
 
 
-WRITE8_MEMBER(snookr10_state::snookr10_videoram_w)
+void snookr10_state::snookr10_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snookr10_state::snookr10_colorram_w)
+void snookr10_state::snookr10_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-PALETTE_INIT_MEMBER(snookr10_state, snookr10)
+void snookr10_state::palette_init_snookr10(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	/* GGBBBRRR */
@@ -87,7 +87,7 @@ PALETTE_INIT_MEMBER(snookr10_state, snookr10)
 	}
 }
 
-TILE_GET_INFO_MEMBER(snookr10_state::get_bg_tile_info)
+void snookr10_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -112,7 +112,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::get_bg_tile_info)
 
 **********************************************************/
 
-PALETTE_INIT_MEMBER(snookr10_state, apple10)
+void snookr10_state::palette_init_apple10(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	/* GGBBBRRR */
@@ -156,7 +156,7 @@ PALETTE_INIT_MEMBER(snookr10_state, apple10)
 	}
 }
 
-TILE_GET_INFO_MEMBER(snookr10_state::apple10_get_bg_tile_info)
+void snookr10_state::apple10_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::apple10_get_bg_tile_info)
 
 **********************************************************/
 
-PALETTE_INIT_MEMBER(snookr10_state, crystalc)
+void snookr10_state::palette_init_crystalc(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	/* GGBBBRRR */
@@ -225,7 +225,7 @@ PALETTE_INIT_MEMBER(snookr10_state, crystalc)
 	}
 }
 
-TILE_GET_INFO_MEMBER(snookr10_state::crystalc_get_bg_tile_info)
+void snookr10_state::crystalc_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -246,12 +246,12 @@ void snookr10_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
-VIDEO_START_MEMBER(snookr10_state, apple10)
+void snookr10_state::video_start_apple10()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::apple10_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }
 
-VIDEO_START_MEMBER(snookr10_state, crystalc)
+void snookr10_state::video_start_crystalc()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snookr10_state::crystalc_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 128, 30);
 }

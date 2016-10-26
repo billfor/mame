@@ -200,7 +200,7 @@ void ssv_state::video_start()
 	save_item(NAME(m_shadow_pen_shift));
 }
 
-VIDEO_START_MEMBER(ssv_state,eaglshot)
+void ssv_state::video_start_eaglshot()
 {
 	ssv_state::video_start();
 
@@ -212,20 +212,20 @@ VIDEO_START_MEMBER(ssv_state,eaglshot)
 	save_pointer(NAME(m_eaglshot_gfxram.get()), 16 * 0x40000 / 2);
 }
 
-TILE_GET_INFO_MEMBER(ssv_state::get_tile_info_0)
+void ssv_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_gdfs_tmapram[tile_index];
 
 	SET_TILE_INFO_MEMBER(2, tile, 0, TILE_FLIPXY( tile >> 14 ));
 }
 
-WRITE16_MEMBER(ssv_state::gdfs_tmapram_w)
+void ssv_state::gdfs_tmapram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gdfs_tmapram[offset]);
 	m_gdfs_tmap->mark_tile_dirty(offset);
 }
 
-VIDEO_START_MEMBER(ssv_state,gdfs)
+void ssv_state::video_start_gdfs()
 {
 	ssv_state::video_start();
 
@@ -374,7 +374,7 @@ VIDEO_START_MEMBER(ssv_state,gdfs)
 
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::vblank_r)
+uint16_t ssv_state::vblank_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_screen->vblank())
 		return 0x2000 | 0x1000;
@@ -382,7 +382,7 @@ READ16_MEMBER(ssv_state::vblank_r)
 		return 0x0000;
 }
 
-WRITE16_MEMBER(ssv_state::scroll_w)
+void ssv_state::scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_scroll + offset);
 

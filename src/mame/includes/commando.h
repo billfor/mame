@@ -39,22 +39,22 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	DECLARE_WRITE8_MEMBER(commando_videoram_w);
-	DECLARE_WRITE8_MEMBER(commando_colorram_w);
-	DECLARE_WRITE8_MEMBER(commando_videoram2_w);
-	DECLARE_WRITE8_MEMBER(commando_colorram2_w);
-	DECLARE_WRITE8_MEMBER(commando_scrollx_w);
-	DECLARE_WRITE8_MEMBER(commando_scrolly_w);
-	DECLARE_WRITE8_MEMBER(commando_c804_w);
-	DECLARE_DRIVER_INIT(spaceinv);
-	DECLARE_DRIVER_INIT(commando);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void commando_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void commando_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void commando_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void commando_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void commando_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void commando_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void commando_c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_spaceinv();
+	void init_commando();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_commando(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(commando_interrupt);
+	void commando_interrupt(device_t &device);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

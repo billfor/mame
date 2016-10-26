@@ -176,10 +176,10 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    INPUT_CHANGED_MEMBER( trigger_nmi )
+    void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 -------------------------------------------------*/
 
-INPUT_CHANGED_MEMBER( crvision_state::trigger_nmi )
+void crvision_state::trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -471,7 +471,7 @@ INPUT_PORTS_END
     DEVICE CONFIGURATION
 ***************************************************************************/
 
-WRITE8_MEMBER( crvision_state::pia_pa_w )
+void crvision_state::pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description
@@ -522,7 +522,7 @@ uint8_t crvision_state::read_keyboard(int pa)
 	return 0xff;
 }
 
-READ8_MEMBER( crvision_state::pia_pa_r )
+uint8_t crvision_state::pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    PA0     Keyboard raster player 1 output (joystick)
@@ -542,7 +542,7 @@ READ8_MEMBER( crvision_state::pia_pa_r )
 	return data;
 }
 
-READ8_MEMBER( crvision_state::pia_pb_r )
+uint8_t crvision_state::pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description
@@ -566,7 +566,7 @@ READ8_MEMBER( crvision_state::pia_pb_r )
 	return data;
 }
 
-READ8_MEMBER( laser2001_state::pia_pa_r )
+uint8_t laser2001_state::pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description
@@ -590,7 +590,7 @@ READ8_MEMBER( laser2001_state::pia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( laser2001_state::pia_pa_w )
+void laser2001_state::pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    PA0     Joystick player 1 output 0
@@ -606,7 +606,7 @@ WRITE8_MEMBER( laser2001_state::pia_pa_w )
 	m_joylatch = data;
 }
 
-READ8_MEMBER( laser2001_state::pia_pb_r )
+uint8_t laser2001_state::pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -617,7 +617,7 @@ READ8_MEMBER( laser2001_state::pia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( laser2001_state::pia_pb_w )
+void laser2001_state::pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description
@@ -639,36 +639,36 @@ WRITE8_MEMBER( laser2001_state::pia_pb_w )
 	m_cent_data_out->write(space, 0, data);
 }
 
-READ_LINE_MEMBER( laser2001_state::pia_ca1_r )
+int laser2001_state::pia_ca1_r()
 {
 	return (m_cassette)->input() > -0.1469;
 }
 
-WRITE_LINE_MEMBER( laser2001_state::pia_ca2_w )
+void laser2001_state::pia_ca2_w(int state)
 {
 	m_cassette->output(state ? +1.0 : -1.0);
 }
 
 
-WRITE_LINE_MEMBER(laser2001_state::write_centronics_busy)
+void laser2001_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 	m_pia->cb1_w(pia_cb1_r());
 }
 
-WRITE_LINE_MEMBER(laser2001_state::write_psg_ready)
+void laser2001_state::write_psg_ready(int state)
 {
 	m_psg_ready = state;
 	m_pia->cb1_w(pia_cb1_r());
 }
 
-READ_LINE_MEMBER( laser2001_state::pia_cb1_r )
+int laser2001_state::pia_cb1_r()
 {
 	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if no device is mounted -> Manager won't boot */
 	return m_psg_ready && (!m_centronics_busy || m_pia->ca2_output_z());
 }
 
-WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
+void laser2001_state::pia_cb2_w(int state)
 {
 	if (m_pia->ca2_output_z())
 	{

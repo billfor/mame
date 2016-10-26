@@ -14,7 +14,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(msisaac_state::get_fg_tile_info)
+void msisaac_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_number = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(msisaac_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(msisaac_state::get_bg_tile_info)
+void msisaac_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_number = m_videoram2[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(msisaac_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(msisaac_state::get_bg2_tile_info)
+void msisaac_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_number = m_videoram3[tile_index];
 
@@ -68,39 +68,39 @@ void msisaac_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(msisaac_state::msisaac_fg_scrolly_w)
+void msisaac_state::msisaac_fg_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_fg_scrollx_w)
+void msisaac_state::msisaac_fg_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_tilemap->set_scrollx(0, 9 + data);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg2_scrolly_w)
+void msisaac_state::msisaac_bg2_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg2_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg2_scrollx_w)
+void msisaac_state::msisaac_bg2_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg2_tilemap->set_scrollx(0, 9 + 2 + data);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg_scrolly_w)
+void msisaac_state::msisaac_bg_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg_scrollx_w)
+void msisaac_state::msisaac_bg_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, 9 + 4 + data);
 }
 
 
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(msisaac_state::msisaac_textbank1_w)
+void msisaac_state::msisaac_textbank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (textbank1!=data)
 	{
@@ -110,7 +110,7 @@ WRITE8_MEMBER(msisaac_state::msisaac_textbank1_w)
 }
 #endif
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg2_textbank_w)
+void msisaac_state::msisaac_bg2_textbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bg2_textbank != data )
 	{
@@ -125,19 +125,19 @@ WRITE8_MEMBER(msisaac_state::msisaac_bg2_textbank_w)
 	}
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg_videoram_w)
+void msisaac_state::msisaac_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_bg2_videoram_w)
+void msisaac_state::msisaac_bg2_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram3[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(msisaac_state::msisaac_fg_videoram_w)
+void msisaac_state::msisaac_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);

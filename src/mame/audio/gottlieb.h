@@ -53,11 +53,11 @@ public:
 	gottlieb_sound_r0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	DECLARE_WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// internal communications
-	DECLARE_READ8_MEMBER( r6530b_r );
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+	uint8_t r6530b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	// device-level overrides
@@ -84,14 +84,14 @@ public:
 	gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool populate_votrax);
 
 	// read/write
-	DECLARE_WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// internal communications
-	DECLARE_WRITE_LINE_MEMBER( snd_interrupt );
-	DECLARE_WRITE8_MEMBER( r6532_portb_w );
-	DECLARE_WRITE8_MEMBER( votrax_data_w );
-	DECLARE_WRITE8_MEMBER( speech_clock_dac_w );
-	DECLARE_WRITE_LINE_MEMBER( votrax_request );
+	void snd_interrupt(int state);
+	void r6532_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void votrax_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void speech_clock_dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void votrax_request(int state);
 
 protected:
 	// device-level overrides
@@ -150,17 +150,17 @@ public:
 	static void static_enable_cobram3_mods(device_t &device);
 
 	// read/write
-	DECLARE_WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// internal communications
-	DECLARE_READ8_MEMBER( speech_data_r );
-	DECLARE_READ8_MEMBER( audio_data_r );
-	DECLARE_WRITE8_MEMBER( signal_audio_nmi_w );
-	DECLARE_WRITE8_MEMBER( nmi_rate_w );
-	CUSTOM_INPUT_MEMBER( speech_drq_custom_r );
-	DECLARE_WRITE8_MEMBER( speech_control_w );
-	DECLARE_WRITE8_MEMBER( sp0250_latch_w );
-	DECLARE_WRITE8_MEMBER( psg_latch_w );
+	uint8_t speech_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t audio_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void signal_audio_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value speech_drq_custom_r(ioport_field &field, void *param);
+	void speech_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sp0250_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void psg_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

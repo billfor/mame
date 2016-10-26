@@ -29,11 +29,11 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ8_MEMBER(portt1_r);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_WRITE8_MEMBER(port2_w);
+	uint8_t portt1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(mouse_timer);
+	void mouse_timer(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	// device-level overrides

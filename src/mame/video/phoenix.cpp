@@ -77,7 +77,7 @@ static const res_net_info survival_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(phoenix_state,phoenix)
+void phoenix_state::palette_init_phoenix(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -94,7 +94,7 @@ PALETTE_INIT_MEMBER(phoenix_state,phoenix)
 	palette.palette()->normalize_range(0, 255);
 }
 
-PALETTE_INIT_MEMBER(phoenix_state,survival)
+void phoenix_state::palette_init_survival(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -111,7 +111,7 @@ PALETTE_INIT_MEMBER(phoenix_state,survival)
 	palette.palette()->normalize_range(0, 255);
 }
 
-PALETTE_INIT_MEMBER(phoenix_state,pleiads)
+void phoenix_state::palette_init_pleiads(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -134,7 +134,7 @@ PALETTE_INIT_MEMBER(phoenix_state,pleiads)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(phoenix_state::get_fg_tile_info)
+void phoenix_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, col;
 
@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(phoenix_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(phoenix_state::get_bg_tile_info)
+void phoenix_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, col;
 
@@ -166,7 +166,7 @@ TILE_GET_INFO_MEMBER(phoenix_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(phoenix_state,phoenix)
+void phoenix_state::video_start_phoenix()
 {
 	m_videoram_pg[0] = std::make_unique<uint8_t[]>(0x1000);
 	memset(m_videoram_pg[0].get(), 0x00, 0x1000 * sizeof(uint8_t));
@@ -219,7 +219,7 @@ VIDEO_START_MEMBER(phoenix_state,phoenix)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(phoenix_state::phoenix_videoram_w)
+void phoenix_state::phoenix_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -238,7 +238,7 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoram_w)
 }
 
 
-WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
+void phoenix_state::phoenix_videoreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_videoram_pg_index != (data & 1))
 	{
@@ -261,7 +261,7 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
 	}
 }
 
-WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
+void phoenix_state::pleiads_videoreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_videoram_pg_index != (data & 1))
 	{
@@ -296,13 +296,13 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 }
 
 
-WRITE8_MEMBER(phoenix_state::phoenix_scroll_w)
+void phoenix_state::phoenix_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0,data);
 }
 
 
-CUSTOM_INPUT_MEMBER(phoenix_state::player_input_r)
+ioport_value phoenix_state::player_input_r(ioport_field &field, void *param)
 {
 	if (m_cocktail_mode)
 		return (ioport("CTRL")->read() & 0xf0) >> 4;
@@ -310,7 +310,7 @@ CUSTOM_INPUT_MEMBER(phoenix_state::player_input_r)
 		return (ioport("CTRL")->read() & 0x0f) >> 0;
 }
 
-CUSTOM_INPUT_MEMBER(phoenix_state::pleiads_protection_r)
+ioport_value phoenix_state::pleiads_protection_r(ioport_field &field, void *param)
 {
 	/* handle Pleiads protection */
 	switch (m_pleiads_protection_question)
@@ -358,7 +358,7 @@ CUSTOM_INPUT_MEMBER(phoenix_state::pleiads_protection_r)
 */
 
 #define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
-READ8_MEMBER(phoenix_state::survival_input_port_0_r)
+uint8_t phoenix_state::survival_input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = ~ioport("IN0")->read();
 
@@ -422,12 +422,12 @@ READ8_MEMBER(phoenix_state::survival_input_port_0_r)
 	return m_survival_input_latches[0];
 }
 
-READ8_MEMBER(phoenix_state::survival_protection_r)
+uint8_t phoenix_state::survival_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_survival_protection_value;
 }
 
-READ_LINE_MEMBER(phoenix_state::survival_sid_callback)
+int phoenix_state::survival_sid_callback()
 {
 	return m_survival_sid_value ? ASSERT_LINE : CLEAR_LINE;
 }

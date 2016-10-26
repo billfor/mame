@@ -59,7 +59,7 @@ tilt the mirror up and down, and the monitor left and right.
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(stactics_state,stactics)
+void stactics_state::palette_init_stactics(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -92,7 +92,7 @@ PALETTE_INIT_MEMBER(stactics_state,stactics)
  *
  *************************************/
 
-WRITE8_MEMBER(stactics_state::scroll_ram_w)
+void stactics_state::scroll_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x01)
 	{
@@ -113,7 +113,7 @@ WRITE8_MEMBER(stactics_state::scroll_ram_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_frame_count_d3)
+ioport_value stactics_state::get_frame_count_d3(ioport_field &field, void *param)
 {
 	return (m_frame_count >> 3) & 0x01;
 }
@@ -126,7 +126,7 @@ CUSTOM_INPUT_MEMBER(stactics_state::get_frame_count_d3)
  *
  *************************************/
 
-WRITE8_MEMBER(stactics_state::speed_latch_w)
+void stactics_state::speed_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* This writes to a shift register which is clocked by   */
 	/* a 555 oscillator.  This value determines the speed of */
@@ -151,25 +151,25 @@ WRITE8_MEMBER(stactics_state::speed_latch_w)
 }
 
 
-WRITE8_MEMBER(stactics_state::shot_trigger_w)
+void stactics_state::shot_trigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shot_standby = 0;
 }
 
 
-WRITE8_MEMBER(stactics_state::shot_flag_clear_w)
+void stactics_state::shot_flag_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shot_arrive = 0;
 }
 
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_shot_standby)
+ioport_value stactics_state::get_shot_standby(ioport_field &field, void *param)
 {
 	return m_shot_standby;
 }
 
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_not_shot_arrive)
+ioport_value stactics_state::get_not_shot_arrive(ioport_field &field, void *param)
 {
 	return !m_shot_arrive;
 }

@@ -22,15 +22,15 @@ public:
 	tilemap_t *m_fg_tilemap;
 	bitmap_ind16 m_bg_bitmap;
 	optional_ioport_array<8> m_inputs;
-	DECLARE_READ8_MEMBER(input_port_r);
-	DECLARE_WRITE8_MEMBER(gomoku_videoram_w);
-	DECLARE_WRITE8_MEMBER(gomoku_colorram_w);
-	DECLARE_WRITE8_MEMBER(gomoku_bgram_w);
-	DECLARE_WRITE8_MEMBER(gomoku_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(gomoku_bg_dispsw_w);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	uint8_t input_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gomoku_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gomoku_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gomoku_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gomoku_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gomoku_bg_dispsw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(gomoku);
+	void palette_init_gomoku(palette_device &palette);
 	uint32_t screen_update_gomoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -81,8 +81,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE8_MEMBER( sound1_w );
-	DECLARE_WRITE8_MEMBER( sound2_w );
+	void sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	void make_mixer_table(int voices, int gain);

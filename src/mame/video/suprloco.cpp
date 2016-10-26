@@ -30,7 +30,7 @@
   I'm not sure about the resistor values, I'm using the Galaxian ones.
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(suprloco_state, suprloco)
+void suprloco_state::palette_init_suprloco(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(suprloco_state, suprloco)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
+void suprloco_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_videoram[2*tile_index+1];
 	SET_TILE_INFO_MEMBER(0,
@@ -112,13 +112,13 @@ void suprloco_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(suprloco_state::videoram_w)
+void suprloco_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(suprloco_state::scrollram_w)
+void suprloco_state::scrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int adj = flip_screen() ? -8 : 8;
 
@@ -126,7 +126,7 @@ WRITE8_MEMBER(suprloco_state::scrollram_w)
 	m_bg_tilemap->set_scrollx(offset, data - adj);
 }
 
-WRITE8_MEMBER(suprloco_state::control_w)
+void suprloco_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* There is probably a palette select in here */
 
@@ -152,7 +152,7 @@ WRITE8_MEMBER(suprloco_state::control_w)
 }
 
 
-READ8_MEMBER(suprloco_state::control_r)
+uint8_t suprloco_state::control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_control;
 }

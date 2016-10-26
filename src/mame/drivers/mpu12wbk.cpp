@@ -228,12 +228,12 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(mpu12wbk_videoram_w);
-	DECLARE_WRITE8_MEMBER(mpu12wbk_colorram_w);
-	DECLARE_DRIVER_INIT(mpu12wbk);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void mpu12wbk_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mpu12wbk_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_mpu12wbk();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mpu12wbk);
+	void palette_init_mpu12wbk(palette_device &palette);
 	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -245,21 +245,21 @@ public:
 *************************/
 
 
-WRITE8_MEMBER(mpu12wbk_state::mpu12wbk_videoram_w)
+void mpu12wbk_state::mpu12wbk_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(mpu12wbk_state::mpu12wbk_colorram_w)
+void mpu12wbk_state::mpu12wbk_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(mpu12wbk_state::get_bg_tile_info)
+void mpu12wbk_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -288,7 +288,7 @@ uint32_t mpu12wbk_state::screen_update_mpu12wbk(screen_device &screen, bitmap_in
 }
 
 
-PALETTE_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
+void mpu12wbk_state::palette_init_mpu12wbk(palette_device &palette)
 {
 }
 
@@ -548,7 +548,7 @@ ROM_END
 *      Driver Init      *
 ************************/
 
-DRIVER_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
+void mpu12wbk_state::init_mpu12wbk()
 {
 	// just in case...
 }

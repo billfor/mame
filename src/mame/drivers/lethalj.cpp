@@ -159,7 +159,7 @@ Pin #11(+) | | R               |
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
+ioport_value lethalj_state::cclownz_paddle(ioport_field &field, void *param)
 {
 	int value = m_paddle->read();
 	return ((value << 4) & 0xf00) | (value & 0x00f);
@@ -173,7 +173,7 @@ CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
  *
  *************************************/
 
-WRITE16_MEMBER(lethalj_state::ripribit_control_w)
+void lethalj_state::ripribit_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	m_ticket->write(space, 0, ((data >> 1) & 1) << 7);
@@ -181,7 +181,7 @@ WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 }
 
 
-WRITE16_MEMBER(lethalj_state::cfarm_control_w)
+void lethalj_state::cfarm_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ticket->write(space, 0, ((data >> 0) & 1) << 7);
 	output().set_lamp_value(0, (data >> 2) & 1);
@@ -191,7 +191,7 @@ WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 }
 
 
-WRITE16_MEMBER(lethalj_state::cclownz_control_w)
+void lethalj_state::cclownz_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ticket->write(space, 0, ((data >> 0) & 1) << 7);
 	output().set_lamp_value(0, (data >> 2) & 1);
@@ -1014,19 +1014,19 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(lethalj_state,ripribit)
+void lethalj_state::init_ripribit()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(lethalj_state,cfarm)
+void lethalj_state::init_cfarm()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(lethalj_state,cclownz)
+void lethalj_state::init_cclownz()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),this));
 }

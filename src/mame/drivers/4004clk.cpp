@@ -25,19 +25,19 @@ public:
 
 	required_device<i4004_cpu_device> m_maincpu;
 	required_ioport m_input;
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( nixie_w );
-	DECLARE_WRITE8_MEMBER( neon_w );
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nixie_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void neon_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint16_t m_nixie[16];
 	uint8_t m_timer;
 	virtual void machine_start() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(timer_device &timer, void *ptr, int32_t param);
 	uint8_t nixie_to_num(uint16_t val);
 	inline void output_set_nixie_value(int index, int value);
 	inline void output_set_neon_value(int index, int value);
 };
 
-READ8_MEMBER(nixieclock_state::data_r)
+uint8_t nixieclock_state::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_input->read() & 0x0f;
 }
@@ -67,7 +67,7 @@ inline void nixieclock_state::output_set_neon_value(int index, int value)
 	output().set_indexed_value("neon", index, value);
 }
 
-WRITE8_MEMBER(nixieclock_state::nixie_w)
+void nixieclock_state::nixie_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nixie[offset] = data;
 	output_set_nixie_value(5,nixie_to_num(((m_nixie[2] & 3)<<8) | (m_nixie[1] << 4) | m_nixie[0]));
@@ -78,7 +78,7 @@ WRITE8_MEMBER(nixieclock_state::nixie_w)
 	output_set_nixie_value(0,nixie_to_num((m_nixie[14] << 6) | (m_nixie[13] << 2) | (m_nixie[12] >>2)));
 }
 
-WRITE8_MEMBER(nixieclock_state::neon_w)
+void nixieclock_state::neon_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output_set_neon_value(0,BIT(data,3));
 	output_set_neon_value(1,BIT(data,2));
@@ -125,7 +125,7 @@ INPUT_PORTS_END
 
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(nixieclock_state::timer_callback)
+void nixieclock_state::timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_test(m_timer);
 	m_timer^=1;

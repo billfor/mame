@@ -251,37 +251,37 @@ public:
 	uint32_t m_flashN;
 
 	// common
-	DECLARE_WRITE32_MEMBER(FIFO_w);
-	DECLARE_READ32_MEMBER(PS7500_IO_r);
-	DECLARE_WRITE32_MEMBER(PS7500_IO_w);
+	void FIFO_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t PS7500_IO_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void PS7500_IO_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// ssfindo and ppcar
-	DECLARE_READ32_MEMBER(io_r);
-	DECLARE_WRITE32_MEMBER(io_w);
+	uint32_t io_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void io_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// ssfindo
-	DECLARE_WRITE32_MEMBER(debug_w);
-	DECLARE_READ32_MEMBER(ff4_r);
-	DECLARE_READ32_MEMBER(SIMPLEIO_r);
+	void debug_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ff4_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t SIMPLEIO_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	// ppcar
-	DECLARE_READ32_MEMBER(randomized_r);
+	uint32_t randomized_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	// tetfight
-	DECLARE_READ32_MEMBER(tetfight_unk_r);
-	DECLARE_WRITE32_MEMBER(tetfight_unk_w);
+	uint32_t tetfight_unk_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void tetfight_unk_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_DRIVER_INIT(common);
-	DECLARE_DRIVER_INIT(ssfindo);
-	DECLARE_DRIVER_INIT(ppcar);
-	DECLARE_DRIVER_INIT(tetfight);
+	void init_common();
+	void init_ssfindo();
+	void init_ppcar();
+	void init_tetfight();
 	virtual void machine_reset() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_CALLBACK_MEMBER(PS7500_Timer0_callback);
-	TIMER_CALLBACK_MEMBER(PS7500_Timer1_callback);
+	void interrupt(device_t &device);
+	void PS7500_Timer0_callback(void *ptr, int32_t param);
+	void PS7500_Timer1_callback(void *ptr, int32_t param);
 
 	typedef void (ssfindo_state::*speedup_func)(address_space &space);
 	speedup_func m_speedup;
@@ -319,7 +319,7 @@ uint32_t ssfindo_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-WRITE32_MEMBER(ssfindo_state::FIFO_w)
+void ssfindo_state::FIFO_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_PS7500_FIFO[data>>28]=data;
 
@@ -329,7 +329,7 @@ WRITE32_MEMBER(ssfindo_state::FIFO_w)
 		m_PS7500_FIFO[1]++; //autoinc
 	}
 }
-TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer0_callback)
+void ssfindo_state::PS7500_Timer0_callback(void *ptr, int32_t param)
 {
 	m_PS7500_IO[IRQSTA]|=0x20;
 	if(m_PS7500_IO[IRQMSKA]&0x20)
@@ -348,7 +348,7 @@ void ssfindo_state::PS7500_startTimer0()
 		m_PS7500timer0->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
 }
 
-TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer1_callback)
+void ssfindo_state::PS7500_Timer1_callback(void *ptr, int32_t param)
 {
 	m_PS7500_IO[IRQSTA]|=0x40;
 	if(m_PS7500_IO[IRQMSKA]&0x40)
@@ -366,7 +366,7 @@ void ssfindo_state::PS7500_startTimer1()
 		m_PS7500timer1->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
 }
 
-INTERRUPT_GEN_MEMBER(ssfindo_state::interrupt)
+void ssfindo_state::interrupt(device_t &device)
 {
 	m_PS7500_IO[IRQSTA]|=0x08;
 		if(m_PS7500_IO[IRQMSKA]&0x08)
@@ -402,7 +402,7 @@ void ssfindo_state::ppcar_speedups(address_space& space)
 }
 
 
-READ32_MEMBER(ssfindo_state::PS7500_IO_r)
+uint32_t ssfindo_state::PS7500_IO_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -454,7 +454,7 @@ READ32_MEMBER(ssfindo_state::PS7500_IO_r)
 	return machine().rand();//m_PS7500_IO[offset];
 }
 
-WRITE32_MEMBER(ssfindo_state::PS7500_IO_w)
+void ssfindo_state::PS7500_IO_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t temp=m_PS7500_IO[offset];
 
@@ -520,7 +520,7 @@ WRITE32_MEMBER(ssfindo_state::PS7500_IO_w)
 	}
 }
 
-READ32_MEMBER(ssfindo_state::io_r)
+uint32_t ssfindo_state::io_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int adr=m_flashAdr*0x200+(m_flashOffset);
 
@@ -545,7 +545,7 @@ READ32_MEMBER(ssfindo_state::io_r)
 	return 0;
 }
 
-WRITE32_MEMBER(ssfindo_state::io_w)
+void ssfindo_state::io_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t temp = 0;
 	COMBINE_DATA(&temp);
@@ -564,24 +564,24 @@ WRITE32_MEMBER(ssfindo_state::io_w)
 	m_adrLatch=(m_adrLatch+1)%3;
 }
 
-WRITE32_MEMBER(ssfindo_state::debug_w)
+void ssfindo_state::debug_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 #if 0
 	osd_printf_debug("%c",data&0xff); //debug texts - malloc (ie "64 KBytes allocated, elapsed : 378 KBytes, free : 2231 KBytes")
 #endif
 }
 
-READ32_MEMBER(ssfindo_state::ff4_r)
+uint32_t ssfindo_state::ff4_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand()&0x20;
 }
 
-READ32_MEMBER(ssfindo_state::SIMPLEIO_r)
+uint32_t ssfindo_state::SIMPLEIO_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand()&1;
 }
 
-READ32_MEMBER(ssfindo_state::randomized_r)
+uint32_t ssfindo_state::randomized_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand();
 }
@@ -619,13 +619,13 @@ static ADDRESS_MAP_START( ppcar_map, AS_PROGRAM, 32, ssfindo_state )
 	AM_RANGE(0x10000000, 0x10ffffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-READ32_MEMBER(ssfindo_state::tetfight_unk_r)
+uint32_t ssfindo_state::tetfight_unk_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//sound status ?
 	return machine().rand();
 }
 
-WRITE32_MEMBER(ssfindo_state::tetfight_unk_w)
+void ssfindo_state::tetfight_unk_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//sound latch ?
 }
@@ -885,7 +885,7 @@ ROM_START( tetfight )
 	ROM_LOAD( "u15",        0x080000, 0x80000, CRC(477f8089) SHA1(8084facb254d60da7983d628d5945d27b9494e65) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ssfindo_state,common)
+void ssfindo_state::init_common()
 {
 	m_speedup = nullptr;
 	m_PS7500timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer0_callback),this));
@@ -895,9 +895,9 @@ DRIVER_INIT_MEMBER(ssfindo_state,common)
 	save_item(NAME(m_PS7500_FIFO));
 }
 
-DRIVER_INIT_MEMBER(ssfindo_state,ssfindo)
+void ssfindo_state::init_ssfindo()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 	m_flashType=0;
 	m_speedup = &ssfindo_state::ssfindo_speedups;
 	m_iocr_hack=0;
@@ -908,16 +908,16 @@ DRIVER_INIT_MEMBER(ssfindo_state,ssfindo)
 	save_item(NAME(m_flashN));
 }
 
-DRIVER_INIT_MEMBER(ssfindo_state,ppcar)
+void ssfindo_state::init_ppcar()
 {
-	DRIVER_INIT_CALL(ssfindo);
+	init_ssfindo();
 	m_flashType=1;
 	m_speedup = &ssfindo_state::ppcar_speedups;
 }
 
-DRIVER_INIT_MEMBER(ssfindo_state,tetfight)
+void ssfindo_state::init_tetfight()
 {
-	DRIVER_INIT_CALL(common);
+	init_common();
 	m_flashType=0;
 	m_iocr_hack=1;
 }

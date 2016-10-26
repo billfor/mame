@@ -74,7 +74,7 @@ public:
 	static void static_set_transparent_pen(device_t &device, unsigned pen);
 	static void static_set_primella_code_bits(device_t &device, unsigned bits);
 
-	DECLARE_WRITE8_MEMBER(ctrl_w);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	dooyong_rom_tilemap_device(
@@ -89,7 +89,7 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual TILE_GET_INFO_MEMBER(tile_info);
+	virtual void tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	tilemap_memory_index adjust_tile_index(tilemap_memory_index tile_index) const
 	{ return tile_index + ((unsigned(m_registers[1]) * 256U / gfx().width()) * m_rows); }
@@ -118,7 +118,7 @@ public:
 protected:
 	virtual void device_start() override;
 
-	virtual TILE_GET_INFO_MEMBER(tile_info) override;
+	virtual void tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) override;
 
 private:
 	required_region_ptr<uint8_t> m_colorrom;
@@ -130,15 +130,15 @@ class dooyong_ram_tilemap_device : public dooyong_tilemap_device_base
 public:
 	dooyong_ram_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(tileram_r) { return m_tileram[offset & ((64U * 32U) - 1)]; }
-	DECLARE_WRITE16_MEMBER(tileram_w);
+	uint16_t tileram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return m_tileram[offset & ((64U * 32U) - 1)]; }
+	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void set_scrolly(int value) { m_tilemap->set_scrolly(value); }
 
 protected:
 	virtual void device_start() override;
 
 private:
-	TILE_GET_INFO_MEMBER(tile_info);
+	void tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	std::unique_ptr<uint16_t[]> m_tileram;
 };
@@ -188,25 +188,25 @@ public:
 		SPRITE_YSHIFT_FLYTIGER = 0x08
 	};
 
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(lastday_tx_r);
-	DECLARE_WRITE8_MEMBER(lastday_tx_w);
-	DECLARE_READ8_MEMBER(bluehawk_tx_r);
-	DECLARE_WRITE8_MEMBER(bluehawk_tx_w);
-	DECLARE_WRITE8_MEMBER(primella_ctrl_w);
-	DECLARE_READ8_MEMBER(paletteram_flytiger_r);
-	DECLARE_WRITE8_MEMBER(paletteram_flytiger_w);
-	DECLARE_WRITE8_MEMBER(flytiger_ctrl_w);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	void flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lastday_tx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lastday_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bluehawk_tx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bluehawk_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void primella_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t paletteram_flytiger_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void paletteram_flytiger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flytiger_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
 	uint32_t screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_MACHINE_START(cpu_z80);
-	DECLARE_VIDEO_START(bluehawk);
-	DECLARE_VIDEO_START(flytiger);
-	DECLARE_VIDEO_START(primella);
+	void machine_start_cpu_z80();
+	void video_start_bluehawk();
+	void video_start_flytiger();
+	void video_start_primella();
 
 	std::unique_ptr<uint8_t[]> m_paletteram_flytiger;
 	uint8_t m_sprites_disabled = 0;
@@ -226,18 +226,18 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(lastday_ctrl_w);
-	DECLARE_WRITE8_MEMBER(pollux_ctrl_w);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_1);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_2);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_MACHINE_RESET(sound_ym2203);
+	void lastday_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pollux_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irqhandler_2203_1(int state);
+	void irqhandler_2203_2(int state);
+	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void machine_reset_sound_ym2203();
 	uint32_t screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_VIDEO_START(lastday);
-	DECLARE_VIDEO_START(gulfstrm);
-	DECLARE_VIDEO_START(pollux);
+	void video_start_lastday();
+	void video_start_gulfstrm();
+	void video_start_pollux();
 
 	int m_interrupt_line_1 = 0;
 	int m_interrupt_line_2 = 0;
@@ -252,8 +252,8 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(ctrl_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -271,7 +271,7 @@ public:
 	}
 
 	uint32_t screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_VIDEO_START(rshark);
+	void video_start_rshark();
 };
 
 class popbingo_state : public dooyong_68k_state
@@ -286,7 +286,7 @@ public:
 	}
 
 	uint32_t screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_VIDEO_START(popbingo);
+	void video_start_popbingo();
 
 protected:
 	bitmap_ind16 m_bg_bitmap;

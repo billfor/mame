@@ -39,7 +39,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(irobot_state, irobot)
+void irobot_state::palette_init_irobot(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -60,7 +60,7 @@ PALETTE_INIT_MEMBER(irobot_state, irobot)
 }
 
 
-WRITE8_MEMBER(irobot_state::irobot_paletteram_w)
+void irobot_state::irobot_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r,g,b;
 	int bits,intensity;

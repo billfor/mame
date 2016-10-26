@@ -27,9 +27,9 @@ public:
 	required_shared_ptr<uint8_t> m_scrollram;
 	required_shared_ptr<uint8_t> m_colorbank;
 
-	DECLARE_WRITE8_MEMBER(ambush_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_PALETTE_INIT(ambush);
+	void ambush_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_init_ambush(palette_device &palette);
 	uint32_t screen_update_ambush(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	required_device<cpu_device> m_maincpu;

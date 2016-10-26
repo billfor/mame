@@ -133,13 +133,13 @@ void tiamc1_state::machine_reset()
 	tiamc1_bankswitch_w(space, 0, 0);
 }
 
-WRITE8_MEMBER(tiamc1_state::tiamc1_control_w)
+void tiamc1_state::tiamc1_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x02);
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 }
 
-WRITE_LINE_MEMBER(tiamc1_state::pit8253_2_w)
+void tiamc1_state::pit8253_2_w(int state)
 {
 	m_speaker->level_w(state);
 }

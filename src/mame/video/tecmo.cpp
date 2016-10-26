@@ -23,7 +23,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(tecmo_state::get_bg_tile_info)
+void tecmo_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_bgvideoram[tile_index+0x200];
 	SET_TILE_INFO_MEMBER(3,
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tecmo_state::get_fg_tile_info)
+void tecmo_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_fgvideoram[tile_index+0x200];
 	SET_TILE_INFO_MEMBER(2,
@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_bg_tile_info)
+void tecmo_state::gemini_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_bgvideoram[tile_index+0x200];
 	SET_TILE_INFO_MEMBER(3,
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_fg_tile_info)
+void tecmo_state::gemini_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_fgvideoram[tile_index+0x200];
 	SET_TILE_INFO_MEMBER(2,
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::gemini_get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tecmo_state::get_tx_tile_info)
+void tecmo_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_txvideoram[tile_index+0x400];
 	SET_TILE_INFO_MEMBER(0,
@@ -109,25 +109,25 @@ void tecmo_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tecmo_state::txvideoram_w)
+void tecmo_state::txvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_txvideoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(tecmo_state::fgvideoram_w)
+void tecmo_state::fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x1ff);
 }
 
-WRITE8_MEMBER(tecmo_state::bgvideoram_w)
+void tecmo_state::bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x1ff);
 }
 
-WRITE8_MEMBER(tecmo_state::fgscroll_w)
+void tecmo_state::fgscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgscroll[offset] = data;
 
@@ -136,7 +136,7 @@ WRITE8_MEMBER(tecmo_state::fgscroll_w)
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE8_MEMBER(tecmo_state::bgscroll_w)
+void tecmo_state::bgscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgscroll[offset] = data;
 
@@ -145,7 +145,7 @@ WRITE8_MEMBER(tecmo_state::bgscroll_w)
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE8_MEMBER(tecmo_state::flipscreen_w)
+void tecmo_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }

@@ -49,11 +49,11 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 
-	DECLARE_DRIVER_INIT(mc1502);
-	DECLARE_MACHINE_START(mc1502);
-	DECLARE_MACHINE_RESET(mc1502);
+	void init_mc1502();
+	void machine_start_mc1502();
+	void machine_reset_mc1502();
 
-	TIMER_CALLBACK_MEMBER(keyb_signal_callback);
+	void keyb_signal_callback(void *ptr, int32_t param);
 
 	struct {
 		uint8_t       pulsing;
@@ -65,17 +65,17 @@ public:
 	uint8_t m_ppi_portc;
 	uint8_t m_spkrdata;
 
-	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out1_changed);
-	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(mc1502_speaker_set_spkrdata);
-	DECLARE_WRITE_LINE_MEMBER(mc1502_i8251_syndet);
+	void mc1502_pit8253_out1_changed(int state);
+	void mc1502_pit8253_out2_changed(int state);
+	void mc1502_speaker_set_spkrdata(int state);
+	void mc1502_i8251_syndet(int state);
 
-	DECLARE_WRITE8_MEMBER(mc1502_ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(mc1502_ppi_portc_w);
-	DECLARE_READ8_MEMBER(mc1502_ppi_portc_r);
-	DECLARE_READ8_MEMBER(mc1502_kppi_porta_r);
-	DECLARE_WRITE8_MEMBER(mc1502_kppi_portb_w);
-	DECLARE_WRITE8_MEMBER(mc1502_kppi_portc_w);
+	void mc1502_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mc1502_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mc1502_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mc1502_kppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mc1502_kppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mc1502_kppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	int m_pit_out2;

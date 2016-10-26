@@ -30,21 +30,21 @@ public:
 
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_READ16_MEMBER(sound_busy_r);
-	DECLARE_READ16_MEMBER(pedal_0_r);
-	DECLARE_READ16_MEMBER(pedal_1_r);
-	DECLARE_READ8_MEMBER(audio_io_r);
-	DECLARE_WRITE8_MEMBER(audio_io_w);
-	DECLARE_READ16_MEMBER(badlandsb_unk_r);
-	DECLARE_DRIVER_INIT(badlands);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_MACHINE_START(badlands);
-	DECLARE_MACHINE_RESET(badlands);
-	DECLARE_VIDEO_START(badlands);
-	DECLARE_MACHINE_RESET(badlandsb);
+	uint16_t sound_busy_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t pedal_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t pedal_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t audio_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void audio_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t badlandsb_unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void init_badlands();
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void machine_start_badlands();
+	void machine_reset_badlands();
+	void video_start_badlands();
+	void machine_reset_badlandsb();
 	uint32_t screen_update_badlands(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_int);
-	DECLARE_WRITE16_MEMBER( badlands_pf_bank_w );
+	void vblank_int(device_t &device);
+	void badlands_pf_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	static const atari_motion_objects_config s_mob_config;
 };

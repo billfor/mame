@@ -159,7 +159,7 @@ Afega stands for "Art-Fiction Electronic Game"
 #include "includes/nmk16.h"
 
 
-WRITE16_MEMBER(nmk16_state::nmk16_x0016_w)
+void nmk16_state::nmk16_x0016_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// this is part of a watchdog scheme
 	// generating an NMI on the NMK004 keeps a timer alive
@@ -168,7 +168,7 @@ WRITE16_MEMBER(nmk16_state::nmk16_x0016_w)
 }
 
 
-WRITE16_MEMBER(nmk16_state::nmk16_bioship_x0016_w)
+void nmk16_state::nmk16_bioship_x0016_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// ugly, ugly logic invert hack, but otherwise bioship doesn't hit the NMI enough to keep the game alive!
 	m_nmk004->m_cpu->set_input_line(INPUT_LINE_NMI, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
@@ -191,7 +191,7 @@ WRITE16_MEMBER(nmk16_state::nmk16_bioship_x0016_w)
 **********************************************************/
 
 
-WRITE16_MEMBER(nmk16_state::nmk16_mainram_strange_w)
+void nmk16_state::nmk16_mainram_strange_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #if 0
 	uint16_t* dstram;
@@ -217,7 +217,7 @@ WRITE16_MEMBER(nmk16_state::nmk16_mainram_strange_w)
 }
 
 
-WRITE16_MEMBER(nmk16_state::ssmissin_sound_w)
+void nmk16_state::ssmissin_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -228,19 +228,19 @@ WRITE16_MEMBER(nmk16_state::ssmissin_sound_w)
 
 
 
-WRITE8_MEMBER(nmk16_state::ssmissin_soundbank_w)
+void nmk16_state::ssmissin_soundbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("okibank1")->set_entry(data & 0x3);
 }
 
 
 
-WRITE16_MEMBER(nmk16_state::tharrier_mcu_control_w)
+void nmk16_state::tharrier_mcu_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  logerror("%04x: mcu_control_w %02x\n",space.device().safe_pc(),data);
 }
 
-READ16_MEMBER(nmk16_state::tharrier_mcu_r)
+uint16_t nmk16_state::tharrier_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* The MCU is mapped as the top byte for byte accesses only,
 	    all word accesses are to the input port */
@@ -273,39 +273,39 @@ READ16_MEMBER(nmk16_state::tharrier_mcu_r)
 	}
 }
 
-WRITE16_MEMBER(nmk16_state::macross2_sound_reset_w)
+void nmk16_state::macross2_sound_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* PCB behaviour verified by Corrado Tomaselli at MAME Italia Forum:
 	   every time music changes Z80 is reset */
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE16_MEMBER(nmk16_state::macross2_sound_command_w)
+void nmk16_state::macross2_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch->write(space,0,data & 0xff);
 }
 
-WRITE8_MEMBER(nmk16_state::macross2_sound_bank_w)
+void nmk16_state::macross2_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }
 
-WRITE8_MEMBER(nmk16_state::tharrier_oki6295_bankswitch_0_w)
+void nmk16_state::tharrier_oki6295_bankswitch_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 3;
 	if (data != 3)
 		membank("okibank1")->set_entry(data);
 }
 
-WRITE8_MEMBER(nmk16_state::tharrier_oki6295_bankswitch_1_w)
+void nmk16_state::tharrier_oki6295_bankswitch_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 3;
 	if (data != 3)
 		membank("okibank2")->set_entry(data);
 }
 
-WRITE16_MEMBER(nmk16_state::afega_soundlatch_w)
+void nmk16_state::afega_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -527,7 +527,7 @@ printed on the up-left corner of the screen).
 	}
 
 #ifdef UNUSED_FUNCTION
-READ16_MEMBER(nmk16_state::mcu_shared_r)
+uint16_t nmk16_state::mcu_shared_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return nmk16_mcu_shared_ram[offset];
 }
@@ -599,7 +599,7 @@ f0 - player bombs (8c36)
 
 */
 
-WRITE16_MEMBER(nmk16_state::hachamf_mainram_w)
+void nmk16_state::hachamf_mainram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mainram[offset]);
 #define DUMMYA 0x7b9c
@@ -680,7 +680,7 @@ ADDRESS_MAP_END
 
 
 
-WRITE16_MEMBER(nmk16_state::tdragon_mainram_w)
+void nmk16_state::tdragon_mainram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mainram[offset]);
 
@@ -874,12 +874,12 @@ void nmk16_state::mcu_run(uint8_t dsw_setting)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::tdragon_mcu_sim)
+void nmk16_state::tdragon_mcu_sim(timer_device &timer, void *ptr, int32_t param)
 {
 	mcu_run(1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::hachamf_mcu_sim)
+void nmk16_state::hachamf_mcu_sim(timer_device &timer, void *ptr, int32_t param)
 {
 	mcu_run(0);
 }
@@ -909,7 +909,7 @@ static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16, nmk16_state )
 ADDRESS_MAP_END
 
 // No sprites without this. Is it actually protection?
-READ16_MEMBER(nmk16_state::tdragonb_prot_r)
+uint16_t nmk16_state::tdragonb_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0003;
 }
@@ -3806,7 +3806,7 @@ LV4         LV2 LV1        LV1
 
 // todo:total scanlines is 263, adjust according to that!
 // todo: replace with raw screen timings
-TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
+void nmk16_state::nmk16_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	const int NUM_SCANLINES = 256;
 	const int IRQ1_SCANLINE = 25; // guess
@@ -4611,7 +4611,7 @@ MACHINE_CONFIG_END
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
+void nmk16_state::manybloc_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -4840,23 +4840,23 @@ void nmk16_state::decode_ssmissin()
 }
 
 
-DRIVER_INIT_MEMBER(nmk16_state,nmk)
+void nmk16_state::init_nmk()
 {
 	decode_gfx();
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,banked_audiocpu)
+void nmk16_state::init_banked_audiocpu()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,tharrier)
+void nmk16_state::init_tharrier()
 {
 	membank("okibank1")->configure_entries(0, 4, memregion("oki1")->base() + 0x20000, 0x20000);
 	membank("okibank2")->configure_entries(0, 4, memregion("oki2")->base() + 0x20000, 0x20000);
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,hachamf_prot)
+void nmk16_state::init_hachamf_prot()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -4869,12 +4869,12 @@ DRIVER_INIT_MEMBER(nmk16_state,hachamf_prot)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0f0000, 0x0fffff, write16_delegate(FUNC(nmk16_state::hachamf_mainram_w),this));
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,tdragonb)
+void nmk16_state::init_tdragonb()
 {
 	decode_tdragonb();
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,tdragon_prot)
+void nmk16_state::init_tdragon_prot()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -4888,14 +4888,14 @@ DRIVER_INIT_MEMBER(nmk16_state,tdragon_prot)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0b0000, 0x0bffff, write16_delegate(FUNC(nmk16_state::tdragon_mainram_w),this));
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,ssmissin)
+void nmk16_state::init_ssmissin()
 {
 	decode_ssmissin();
 
 	membank("okibank1")->configure_entries(0, 4, memregion("oki1")->base() + 0x80000, 0x20000);
 }
 
-DRIVER_INIT_MEMBER(nmk16_state,bjtwin)
+void nmk16_state::init_bjtwin()
 {
 	/* Patch rom to enable test mode */
 
@@ -4918,13 +4918,13 @@ DRIVER_INIT_MEMBER(nmk16_state,bjtwin)
 	rom[0x08f74/2] = 0x4e71;
 #endif
 
-	DRIVER_INIT_CALL(nmk);
+	init_nmk();
 
 }
 
 /* NO NMK004, it has a PIC instead */
-READ16_MEMBER(nmk16_state::vandykeb_r){ return 0x0000; }
-DRIVER_INIT_MEMBER(nmk16_state,vandykeb)
+uint16_t nmk16_state::vandykeb_r(address_space &space, offs_t offset, uint16_t mem_mask){ return 0x0000; }
+void nmk16_state::init_vandykeb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x08000e, 0x08000f, read16_delegate(FUNC(nmk16_state::vandykeb_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x08001e, 0x08001f);
@@ -4939,7 +4939,7 @@ DRIVER_INIT_MEMBER(nmk16_state,vandykeb)
 
 ***************************************************************************/
 
-READ16_MEMBER(nmk16_state::afega_unknown_r)
+uint16_t nmk16_state::afega_unknown_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* This fixes the text in Service Mode. */
 	return 0x0100;
@@ -4947,12 +4947,12 @@ READ16_MEMBER(nmk16_state::afega_unknown_r)
 
 
 
-WRITE16_MEMBER(nmk16_state::afega_scroll0_w)
+void nmk16_state::afega_scroll0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_afega_scroll_0[offset]);
 }
 
-WRITE16_MEMBER(nmk16_state::afega_scroll1_w)
+void nmk16_state::afega_scroll1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_afega_scroll_1[offset]);
 }
@@ -5021,7 +5021,7 @@ ADDRESS_MAP_END
 
 
 ***************************************************************************/
-WRITE8_MEMBER(nmk16_state::spec2k_oki1_banking_w)
+void nmk16_state::spec2k_oki1_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data == 0xfe)
 		m_oki2->set_rom_bank(0);
@@ -5050,7 +5050,7 @@ static ADDRESS_MAP_START( firehawk_sound_cpu, AS_PROGRAM, 8, nmk16_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(nmk16_state::twinactn_oki_bank_w)
+void nmk16_state::twinactn_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki1->set_rom_bank(data & 3);
 
@@ -6896,7 +6896,7 @@ Other: Lattice pLSI 1032 x 2
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(nmk16_state,redhawk)
+void nmk16_state::init_redhawk()
 {
 	decryptcode( machine(), 23, 22, 21, 20,  19, 18, 16, 15,  14, 17, 13, 12,  11, 10, 9, 8,  7, 6, 5, 4,  3, 2, 1, 0 );
 }
@@ -7092,7 +7092,7 @@ AF1-B1.UC3   MASK ROM read as 27C160  - Backgrounds
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(nmk16_state,grdnstrm)
+void nmk16_state::init_grdnstrm()
 {
 	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 16, 17, 14, 15, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
 }
@@ -7185,7 +7185,7 @@ ROM_START( grdnstrmv ) /* Apples Industries license - Vertical version */
 	ROM_LOAD( "afega1.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
-DRIVER_INIT_MEMBER(nmk16_state,grdnstrmg)
+void nmk16_state::init_grdnstrmg()
 {
 	// todo collapse to one bitswap
 	decryptcode( machine(),23, 22, 21, 20,   19,  18, 13,17,   16,15, 14, 12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
@@ -7246,7 +7246,7 @@ ROM_START( redfoxwp2 )
 	ROM_LOAD( "afega1.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
-DRIVER_INIT_MEMBER(nmk16_state,redfoxwp2a)
+void nmk16_state::init_redfoxwp2a()
 {
 	// todo collapse to one bitswap
 	decryptcode( machine(),23, 22, 21, 20,   19, 18, 17, 16, /* */  13,15, 14, /* */ 12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
@@ -7395,7 +7395,7 @@ rom11.107   27C040   /
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(nmk16_state,bubl2000)
+void nmk16_state::init_bubl2000()
 {
 	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 13, 14, 15, 16, 17, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
 }
@@ -7723,7 +7723,7 @@ UC1, UC2 & UC3 have solder pads for both MX29F1610 Flash & 27C160 EPROMs
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(nmk16_state,spec2k)
+void nmk16_state::init_spec2k()
 {
 	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 17, 13, 14, 15, 16, 12, 11, 10, 9,  8, 7,  6,  5,  4, 3,  2,  1,  0 );
 }

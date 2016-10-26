@@ -27,13 +27,13 @@ public:
 
 	uint16_t          m_h256;
 	virtual void update_interrupts() override;
-	DECLARE_READ16_MEMBER(special_port1_r);
-	DECLARE_DRIVER_INIT(xybots);
-	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_MACHINE_START(xybots);
-	DECLARE_MACHINE_RESET(xybots);
-	DECLARE_VIDEO_START(xybots);
+	uint16_t special_port1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void init_xybots();
+	void get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void machine_start_xybots();
+	void machine_reset_xybots();
+	void video_start_xybots();
 	uint32_t screen_update_xybots(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;

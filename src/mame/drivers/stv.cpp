@@ -92,7 +92,7 @@ offsets:
     0x001f PORT-AD
 */
 
-READ8_MEMBER(stv_state::stv_ioga_r)
+uint8_t stv_state::stv_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -116,7 +116,7 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 	return res;
 }
 
-WRITE8_MEMBER(stv_state::stv_ioga_w)
+void stv_state::stv_ioga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset & 0x20 && !space.debugger_access())
 		printf("Writing to mirror %08x %02x?\n",offset,data);
@@ -136,7 +136,7 @@ WRITE8_MEMBER(stv_state::stv_ioga_w)
 	}
 }
 
-READ8_MEMBER(stv_state::critcrsh_ioga_r)
+uint8_t stv_state::critcrsh_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 	const char *const lgnames[] = { "LIGHTX", "LIGHTY" };
@@ -157,7 +157,7 @@ READ8_MEMBER(stv_state::critcrsh_ioga_r)
 	return res;
 }
 
-READ8_MEMBER(stv_state::magzun_ioga_r)
+uint8_t stv_state::magzun_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -182,7 +182,7 @@ READ8_MEMBER(stv_state::magzun_ioga_r)
 	return res;
 }
 
-WRITE8_MEMBER(stv_state::magzun_ioga_w)
+void stv_state::magzun_ioga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -192,7 +192,7 @@ WRITE8_MEMBER(stv_state::magzun_ioga_w)
 	}
 }
 
-READ8_MEMBER(stv_state::stvmp_ioga_r)
+uint8_t stv_state::stvmp_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const char *const mpnames[2][5] = {
 		{"P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4"},
@@ -224,7 +224,7 @@ READ8_MEMBER(stv_state::stvmp_ioga_r)
 	return res;
 }
 
-WRITE8_MEMBER(stv_state::stvmp_ioga_w)
+void stv_state::stvmp_ioga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -235,7 +235,7 @@ WRITE8_MEMBER(stv_state::stvmp_ioga_w)
 }
 
 /* remaps with a 8-bit handler because MAME can't install r/w handlers with a different bus parallelism than the CPU native one, shrug ... */
-READ32_MEMBER(stv_state::stv_ioga_r32)
+uint32_t stv_state::stv_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res;
 
@@ -251,7 +251,7 @@ READ32_MEMBER(stv_state::stv_ioga_r32)
 	return res;
 }
 
-WRITE32_MEMBER(stv_state::stv_ioga_w32)
+void stv_state::stv_ioga_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_16_23)
 		stv_ioga_w(space,offset*4+1,data >> 16);
@@ -264,7 +264,7 @@ WRITE32_MEMBER(stv_state::stv_ioga_w32)
 	return;
 }
 
-READ32_MEMBER(stv_state::critcrsh_ioga_r32)
+uint32_t stv_state::critcrsh_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res;
 
@@ -281,7 +281,7 @@ READ32_MEMBER(stv_state::critcrsh_ioga_r32)
 	return res;
 }
 
-READ32_MEMBER(stv_state::stvmp_ioga_r32)
+uint32_t stv_state::stvmp_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res;
 
@@ -298,7 +298,7 @@ READ32_MEMBER(stv_state::stvmp_ioga_r32)
 	return res;
 }
 
-WRITE32_MEMBER(stv_state::stvmp_ioga_w32)
+void stv_state::stvmp_ioga_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_16_23)
 		stvmp_ioga_w(space,offset*4+1,data >> 16);
@@ -310,7 +310,7 @@ WRITE32_MEMBER(stv_state::stvmp_ioga_w32)
 				printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 }
 
-READ32_MEMBER(stv_state::magzun_ioga_r32)
+uint32_t stv_state::magzun_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res;
 
@@ -327,7 +327,7 @@ READ32_MEMBER(stv_state::magzun_ioga_r32)
 	return res;
 }
 
-WRITE32_MEMBER(stv_state::magzun_ioga_w32)
+void stv_state::magzun_ioga_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_16_23)
 		magzun_ioga_w(space,offset*4+1,data >> 16);
@@ -369,7 +369,7 @@ void stv_state::install_stvbios_speedups( void )
 	m_slave->sh2drc_add_pcflush(0x6013aee);
 }
 
-DRIVER_INIT_MEMBER(stv_state,stv)
+void stv_state::init_stv()
 {
 	system_time systime;
 
@@ -407,9 +407,9 @@ DRIVER_INIT_MEMBER(stv_state,stv)
 	m_vdp2.pal = 0;
 }
 
-DRIVER_INIT_MEMBER(stv_state,critcrsh)
+void stv_state::init_critcrsh()
 {
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
 }
@@ -422,7 +422,7 @@ DRIVER_INIT_MEMBER(stv_state,critcrsh)
     TODO: game doesn't work if not in debugger?
 */
 
-READ32_MEMBER(stv_state::magzun_hef_hack_r)
+uint32_t stv_state::magzun_hef_hack_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(space.device().safe_pc()==0x604bf20) return 0x00000001; //HWEF
 
@@ -431,20 +431,20 @@ READ32_MEMBER(stv_state::magzun_hef_hack_r)
 	return m_workram_h[0x08e830/4];
 }
 
-READ32_MEMBER(stv_state::magzun_rx_hack_r)
+uint32_t stv_state::magzun_rx_hack_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(space.device().safe_pc()==0x604c006) return 0x40;
 
 	return m_workram_h[0x0ff3b4/4];
 }
 
-DRIVER_INIT_MEMBER(stv_state,magzun)
+void stv_state::init_magzun()
 {
 	m_maincpu->sh2drc_add_pcflush(0x604bf20);
 	m_maincpu->sh2drc_add_pcflush(0x604bfbe);
 	m_maincpu->sh2drc_add_pcflush(0x604c006);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::magzun_ioga_r32),this), write32_delegate(FUNC(stv_state::magzun_ioga_w32),this));
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::magzun_ioga_r32),this), write32_delegate(FUNC(stv_state::magzun_ioga_w32),this));
@@ -463,25 +463,25 @@ DRIVER_INIT_MEMBER(stv_state,magzun)
 }
 
 
-DRIVER_INIT_MEMBER(stv_state,stvmp)
+void stv_state::init_stvmp()
 {
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stvmp_ioga_r32),this), write32_delegate(FUNC(stv_state::stvmp_ioga_w32),this));
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stvmp_ioga_r32),this), write32_delegate(FUNC(stv_state::stvmp_ioga_w32),this));
 }
 
 
-DRIVER_INIT_MEMBER(stv_state,shienryu)
+void stv_state::init_shienryu()
 {
 	// master
 	m_maincpu->sh2drc_add_pcflush(0x60041c6);
 	// slave
 	m_slave->sh2drc_add_pcflush(0x600440e);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,prikura)
+void stv_state::init_prikura()
 {
 /*
  06018640: MOV.B   @R14,R0  // 60b9228
@@ -496,13 +496,13 @@ DRIVER_INIT_MEMBER(stv_state,prikura)
 	// slave
 	m_slave->sh2drc_add_pcflush(0x6018c6e);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost = m_sinit_boost = 0;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,hanagumi)
+void stv_state::init_hanagumi()
 {
 /*
     06013E1E: NOP
@@ -523,7 +523,7 @@ DRIVER_INIT_MEMBER(stv_state,hanagumi)
 */
 	m_maincpu->sh2drc_add_pcflush(0x6010160);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
 
@@ -545,13 +545,13 @@ CPU0: Aids Screen
 
 */
 
-DRIVER_INIT_MEMBER(stv_state,puyosun)
+void stv_state::init_puyosun()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6021cf0);
 
 	m_slave->sh2drc_add_pcflush(0x60236fe);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost = m_sinit_boost = 0;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
@@ -567,37 +567,37 @@ CPU0 Data East Logo:
 
 */
 
-DRIVER_INIT_MEMBER(stv_state,mausuke)
+void stv_state::init_mausuke()
 {
 	m_maincpu->sh2drc_add_pcflush(0x60461A0);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost = m_sinit_boost = 0;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,cottonbm)
+void stv_state::init_cottonbm()
 {
 //  m_maincpu->sh2drc_add_pcflush(0x6030ee2);
 //  m_slave->sh2drc_add_pcflush(0x6032b52);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(10);
 }
 
-DRIVER_INIT_MEMBER(stv_state,cotton2)
+void stv_state::init_cotton2()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6031c7a);
 	m_slave->sh2drc_add_pcflush(0x60338ea);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,dnmtdeka)
+void stv_state::init_dnmtdeka()
 {
 	// install all 3 speedups on both master and slave
 	m_maincpu->sh2drc_add_pcflush(0x6027c90);
@@ -608,10 +608,10 @@ DRIVER_INIT_MEMBER(stv_state,dnmtdeka)
 	m_slave->sh2drc_add_pcflush(0xd04);
 	m_slave->sh2drc_add_pcflush(0x60051f2);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,diehard)
+void stv_state::init_diehard()
 {
 	// install all 3 speedups on both master and slave
 	m_maincpu->sh2drc_add_pcflush(0x6027c98);
@@ -622,21 +622,21 @@ DRIVER_INIT_MEMBER(stv_state,diehard)
 	m_slave->sh2drc_add_pcflush(0xd04);
 	m_slave->sh2drc_add_pcflush(0x60051f2);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,fhboxers)
+void stv_state::init_fhboxers()
 {
 	m_maincpu->sh2drc_add_pcflush(0x60041c2);
 	m_maincpu->sh2drc_add_pcflush(0x600bb0a);
 	m_maincpu->sh2drc_add_pcflush(0x600b31e);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 //  m_instadma_hack = 1;
 }
 
-DRIVER_INIT_MEMBER(stv_state,groovef)
+void stv_state::init_groovef()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6005e7c);
 	m_maincpu->sh2drc_add_pcflush(0x6005e86);
@@ -644,81 +644,81 @@ DRIVER_INIT_MEMBER(stv_state,groovef)
 
 	m_slave->sh2drc_add_pcflush(0x60060c2);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost = m_sinit_boost = 0;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,danchih)
+void stv_state::init_danchih()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6028b28);
 	m_maincpu->sh2drc_add_pcflush(0x6028c8e);
 	m_slave->sh2drc_add_pcflush(0x602ae26);
 
-	DRIVER_INIT_CALL(stvmp);
+	init_stvmp();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
-DRIVER_INIT_MEMBER(stv_state,danchiq)
+void stv_state::init_danchiq()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6028b28);
 	m_maincpu->sh2drc_add_pcflush(0x6028c8e);
 	m_slave->sh2drc_add_pcflush(0x602ae26);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
-DRIVER_INIT_MEMBER(stv_state,astrass)
+void stv_state::init_astrass()
 {
 	m_maincpu->sh2drc_add_pcflush(0x60011ba);
 	m_maincpu->sh2drc_add_pcflush(0x605b9da);
 
 	install_common_protection();
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,thunt)
+void stv_state::init_thunt()
 {
 	m_maincpu->sh2drc_add_pcflush(0x602A024);
 	m_maincpu->sh2drc_add_pcflush(0x6013EEA);
 	m_slave->sh2drc_add_pcflush(0x602AAF8);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(1);
 }
 
-DRIVER_INIT_MEMBER(stv_state,sandor)
+void stv_state::init_sandor()
 {
 	m_maincpu->sh2drc_add_pcflush(0x602a0f8);
 	m_maincpu->sh2drc_add_pcflush(0x6013fbe);
 	m_slave->sh2drc_add_pcflush(0x602abcc);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(1);
 }
 
-DRIVER_INIT_MEMBER(stv_state,grdforce)
+void stv_state::init_grdforce()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6041e32);
 	m_slave->sh2drc_add_pcflush(0x6043aa2);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,batmanfr)
+void stv_state::init_batmanfr()
 {
 	m_maincpu->sh2drc_add_pcflush(0x60121c0);
 	m_slave->sh2drc_add_pcflush(0x60125bc);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04800000, 0x04800003, write32_delegate(FUNC(stv_state::batmanfr_sound_comms_w),this));
 	m_slave->space(AS_PROGRAM).install_write_handler(0x04800000, 0x04800003, write32_delegate(FUNC(stv_state::batmanfr_sound_comms_w),this));
@@ -727,206 +727,206 @@ DRIVER_INIT_MEMBER(stv_state,batmanfr)
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,colmns97)
+void stv_state::init_colmns97()
 {
 	m_slave->sh2drc_add_pcflush(0x60298a2);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost = m_sinit_boost = 0;
 }
 
-DRIVER_INIT_MEMBER(stv_state,winterht)
+void stv_state::init_winterht()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6098aea);
 	m_slave->sh2drc_add_pcflush(0x609ae4e);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(2);
 }
 
-DRIVER_INIT_MEMBER(stv_state,seabass)
+void stv_state::init_seabass()
 {
 	m_maincpu->sh2drc_add_pcflush(0x602cbfa);
 	m_slave->sh2drc_add_pcflush(0x60321ee);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
-DRIVER_INIT_MEMBER(stv_state,vfremix)
+void stv_state::init_vfremix()
 {
 	m_maincpu->sh2drc_add_pcflush(0x602c30c);
 	m_slave->sh2drc_add_pcflush(0x604c332);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(20);
 }
 
-DRIVER_INIT_MEMBER(stv_state,sss)
+void stv_state::init_sss()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6026398);
 	m_slave->sh2drc_add_pcflush(0x6028cd6);
 
 	install_common_protection();
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,othellos)
+void stv_state::init_othellos()
 {
 	m_maincpu->sh2drc_add_pcflush(0x602bcbe);
 	m_slave->sh2drc_add_pcflush(0x602d92e);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,sasissu)
+void stv_state::init_sasissu()
 {
 	m_slave->sh2drc_add_pcflush(0x60710be);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(2);
 }
 
-DRIVER_INIT_MEMBER(stv_state,gaxeduel)
+void stv_state::init_gaxeduel()
 {
 //  m_maincpu->sh2drc_add_pcflush(0x6012ee4);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,suikoenb)
+void stv_state::init_suikoenb()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6013f7a);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
 
-DRIVER_INIT_MEMBER(stv_state,sokyugrt)
+void stv_state::init_sokyugrt()
 {
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,znpwfv)
+void stv_state::init_znpwfv()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6012ec2);
 	m_slave->sh2drc_add_pcflush(0x60175a6);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_nsec(500);
 }
 
-DRIVER_INIT_MEMBER(stv_state,twcup98)
+void stv_state::init_twcup98()
 {
 	m_maincpu->sh2drc_add_pcflush(0x605edde);
 	m_slave->sh2drc_add_pcflush(0x6062bca);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	install_common_protection();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
-DRIVER_INIT_MEMBER(stv_state,smleague)
+void stv_state::init_smleague()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6063bf4);
 	m_slave->sh2drc_add_pcflush(0x6062bca);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	/* tight sync to avoid dead locks */
 	m_minit_boost = m_sinit_boost = 5000;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5000);
 }
 
-DRIVER_INIT_MEMBER(stv_state,finlarch)
+void stv_state::init_finlarch()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6064d60);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	/* tight sync to avoid dead locks */
 	m_minit_boost = m_sinit_boost = 5000;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5000);
 }
 
-DRIVER_INIT_MEMBER(stv_state,maruchan)
+void stv_state::init_maruchan()
 {
 	m_maincpu->sh2drc_add_pcflush(0x601ba46);
 	m_slave->sh2drc_add_pcflush(0x601ba46);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
-DRIVER_INIT_MEMBER(stv_state,pblbeach)
+void stv_state::init_pblbeach()
 {
 	m_maincpu->sh2drc_add_pcflush(0x605eb78);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,shanhigw)
+void stv_state::init_shanhigw()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6020c5c);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,elandore)
+void stv_state::init_elandore()
 {
 	m_maincpu->sh2drc_add_pcflush(0x604eac0);
 	m_slave->sh2drc_add_pcflush(0x605340a);
 
 	install_common_protection();
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(0);
 }
 
-DRIVER_INIT_MEMBER(stv_state,rsgun)
+void stv_state::init_rsgun()
 {
 	m_maincpu->sh2drc_add_pcflush(0x6034d04);
 	m_slave->sh2drc_add_pcflush(0x6036152);
 
 	install_common_protection();
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(20);
 }
 
-DRIVER_INIT_MEMBER(stv_state,ffreveng)
+void stv_state::init_ffreveng()
 {
 	install_common_protection();
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,decathlt)
+void stv_state::init_decathlt()
 {
 	m_5838crypt->install_decathlt_protection();
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
-DRIVER_INIT_MEMBER(stv_state,nameclv3)
+void stv_state::init_nameclv3()
 {
 	m_maincpu->sh2drc_add_pcflush(0x601eb4c);
 	m_slave->sh2drc_add_pcflush(0x602b80e);
 
-	DRIVER_INIT_CALL(stv);
+	init_stv();
 }
 
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
@@ -1054,7 +1054,7 @@ MACHINE_CONFIG_END
     Similar if not the same as Magic the Gathering, probably needs merging.
 */
 
-WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
+void stv_state::batmanfr_sound_comms_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_16_31)
 		m_soundlatch->write(space, 0, data >> 16, 0x0000ffff);
@@ -1062,7 +1062,7 @@ WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
 		printf("Warning: write %04x & %08x to lo-word sound communication area\n",data,mem_mask);
 }
 
-READ16_MEMBER( stv_state::adsp_control_r )
+uint16_t stv_state::adsp_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t res = 0;
 
@@ -1081,7 +1081,7 @@ READ16_MEMBER( stv_state::adsp_control_r )
 	return res;
 }
 
-WRITE16_MEMBER( stv_state::adsp_control_w )
+void stv_state::adsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1179,9 +1179,9 @@ static ADDRESS_MAP_START( adsp_io_map, AS_IO, 16, stv_state )
 ADDRESS_MAP_END
 
 
-MACHINE_RESET_MEMBER(stv_state,batmanfr)
+void stv_state::machine_reset_batmanfr()
 {
-	MACHINE_RESET_CALL_MEMBER(stv);
+	machine_reset_stv();
 
 	uint8_t *adsp_boot = (uint8_t*)memregion("adsp")->base();
 
@@ -1235,7 +1235,7 @@ static MACHINE_CONFIG_DERIVED( stv_slot, stv )
 MACHINE_CONFIG_END
 
 
-MACHINE_RESET_MEMBER(stv_state,stv)
+void stv_state::machine_reset_stv()
 {
 	m_scsp_last_line = 0;
 
@@ -1308,7 +1308,7 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 }
 
 
-MACHINE_START_MEMBER(stv_state,stv)
+void stv_state::machine_start_stv()
 {
 	system_time systime;
 	machine().base_datetime(systime);
@@ -1896,7 +1896,7 @@ by introdon in ST-V ("SG0000000"),and according to the manual it's even wrong! (
 by Sega titles,and this is a Sunsoft game)It's likely to be a left-over...
 */
 
-DRIVER_INIT_MEMBER(stv_state,sanjeon)
+void stv_state::init_sanjeon()
 {
 	uint8_t *src = memregion("cart")->base();
 	int x;
@@ -1914,7 +1914,7 @@ DRIVER_INIT_MEMBER(stv_state,sanjeon)
 	}
 
 
-	DRIVER_INIT_CALL(sasissu);
+	init_sasissu();
 }
 
 

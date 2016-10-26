@@ -34,10 +34,10 @@ public:
 		, m_cass(*this, "cassette")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(segment_w);
-	DECLARE_READ8_MEMBER(kp_r);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	void digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kp_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void timer_p(timer_device &timer, void *ptr, int32_t param);
 
 private:
 	uint8_t m_digit_sel;
@@ -50,7 +50,7 @@ private:
 
 // This can read the first few bytes correctly, but after that bit slippage occurs.
 // Needs to be reworked
-TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::timer_p )
+void pro80_state::timer_p(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[1]++;
 	uint8_t cass_ws = ((m_cass)->input() > +0.03) ? 1 : 0;
@@ -65,7 +65,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::timer_p )
 		m_cass_in |= 0x20; // sync bit
 }
 
-WRITE8_MEMBER( pro80_state::digit_w )
+void pro80_state::digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// --xx xxxx digit select
 	// -x-- ---- cassette out
@@ -74,7 +74,7 @@ WRITE8_MEMBER( pro80_state::digit_w )
 	m_cass->output( BIT(data, 6) ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER( pro80_state::segment_w )
+void pro80_state::segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_digit_sel)
 	{
@@ -89,7 +89,7 @@ WRITE8_MEMBER( pro80_state::segment_w )
 	}
 }
 
-READ8_MEMBER( pro80_state::kp_r )
+uint8_t pro80_state::kp_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x0f;
 

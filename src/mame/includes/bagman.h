@@ -45,32 +45,32 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	// common
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// bagman
-	DECLARE_WRITE8_MEMBER(ls259_w);
-	DECLARE_WRITE8_MEMBER(pal16r6_w);
-	DECLARE_READ8_MEMBER(pal16r6_r);
+	void ls259_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pal16r6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pal16r6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// squaitsa
-	DECLARE_READ8_MEMBER(dial_input_p1_r);
-	DECLARE_READ8_MEMBER(dial_input_p2_r);
+	uint8_t dial_input_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dial_input_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
-	DECLARE_MACHINE_START(bagman);
-	DECLARE_MACHINE_START(squaitsa);
+	void machine_start_bagman();
+	void machine_start_squaitsa();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(bagman);
-	DECLARE_DRIVER_INIT(bagman);
+	void palette_init_bagman(palette_device &palette);
+	void init_bagman();
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

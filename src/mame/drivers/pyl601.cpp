@@ -61,32 +61,32 @@ public:
 	uint8_t m_video_mode;
 	uint8_t m_tick50_mark;
 	uint8_t m_floppy_ctrl;
-	DECLARE_READ8_MEMBER(rom_page_r);
-	DECLARE_WRITE8_MEMBER(rom_page_w);
-	DECLARE_WRITE8_MEMBER(vdisk_page_w);
-	DECLARE_WRITE8_MEMBER(vdisk_h_w);
-	DECLARE_WRITE8_MEMBER(vdisk_l_w);
-	DECLARE_WRITE8_MEMBER(vdisk_data_w);
-	DECLARE_READ8_MEMBER(vdisk_data_r);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(keycheck_r);
-	DECLARE_WRITE8_MEMBER(video_mode_w);
-	DECLARE_READ8_MEMBER(video_mode_r);
-	DECLARE_READ8_MEMBER(timer_r);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(floppy_w);
-	DECLARE_READ8_MEMBER(floppy_r);
+	uint8_t rom_page_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rom_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vdisk_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vdisk_h_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vdisk_l_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vdisk_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vdisk_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t keycheck_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t video_mode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t timer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t floppy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(pyl601_update_row);
 	MC6845_UPDATE_ROW(pyl601a_update_row);
 	uint8_t selectedline(uint16_t data);
 	required_device<speaker_sound_device> m_speaker;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
-	DECLARE_DRIVER_INIT(pyl601);
+	void init_pyl601();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
+	void pyl601_interrupt(device_t &device);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -94,12 +94,12 @@ public:
 
 
 
-READ8_MEMBER(pyl601_state::rom_page_r)
+uint8_t pyl601_state::rom_page_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom_page;
 }
 
-WRITE8_MEMBER(pyl601_state::rom_page_w)
+void pyl601_state::rom_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rom_page = data;
 	if (data & 8)
@@ -115,29 +115,29 @@ WRITE8_MEMBER(pyl601_state::rom_page_w)
 }
 
 
-WRITE8_MEMBER(pyl601_state::vdisk_page_w)
+void pyl601_state::vdisk_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vdisk_addr = (m_vdisk_addr & 0x0ffff) | ((data & 0x0f)<<16);
 }
 
-WRITE8_MEMBER(pyl601_state::vdisk_h_w)
+void pyl601_state::vdisk_h_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vdisk_addr = (m_vdisk_addr & 0xf00ff) | (data<<8);
 }
 
-WRITE8_MEMBER(pyl601_state::vdisk_l_w)
+void pyl601_state::vdisk_l_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vdisk_addr = (m_vdisk_addr & 0xfff00) | data;
 }
 
-WRITE8_MEMBER(pyl601_state::vdisk_data_w)
+void pyl601_state::vdisk_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram->pointer()[0x10000 + (m_vdisk_addr & 0x7ffff)] = data;
 	m_vdisk_addr++;
 	m_vdisk_addr&=0x7ffff;
 }
 
-READ8_MEMBER(pyl601_state::vdisk_data_r)
+uint8_t pyl601_state::vdisk_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = m_ram->pointer()[0x10000 + (m_vdisk_addr & 0x7ffff)];
 	m_vdisk_addr++;
@@ -155,14 +155,14 @@ uint8_t pyl601_state::selectedline(uint16_t data)
 	return 0;
 }
 
-READ8_MEMBER(pyl601_state::keyboard_r)
+uint8_t pyl601_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_key_code;
 	m_key_code = 0xff;
 	return ret;
 }
 
-READ8_MEMBER(pyl601_state::keycheck_r)
+uint8_t pyl601_state::keycheck_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = 0x3f;
 	uint8_t *keyboard = memregion("keyboard")->base();
@@ -193,34 +193,34 @@ READ8_MEMBER(pyl601_state::keycheck_r)
 }
 
 
-WRITE8_MEMBER(pyl601_state::video_mode_w)
+void pyl601_state::video_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_mode = data;
 }
 
-READ8_MEMBER(pyl601_state::video_mode_r)
+uint8_t pyl601_state::video_mode_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_video_mode;
 }
 
-READ8_MEMBER(pyl601_state::timer_r)
+uint8_t pyl601_state::timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal= m_tick50_mark | 0x37;
 	m_tick50_mark = 0;
 	return retVal;
 }
 
-WRITE8_MEMBER(pyl601_state::speaker_w)
+void pyl601_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 3));
 }
 
-WRITE8_MEMBER(pyl601_state::led_w)
+void pyl601_state::led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  uint8_t caps_led = BIT(data,4);
 }
 
-WRITE8_MEMBER(pyl601_state::floppy_w)
+void pyl601_state::floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0 is reset (if zero)
 	// bit 1 is TC state
@@ -240,7 +240,7 @@ WRITE8_MEMBER(pyl601_state::floppy_w)
 	m_floppy_ctrl = data;
 }
 
-READ8_MEMBER(pyl601_state::floppy_r)
+uint8_t pyl601_state::floppy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_floppy_ctrl;
 }
@@ -469,12 +469,12 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 
 
 
-DRIVER_INIT_MEMBER(pyl601_state,pyl601)
+void pyl601_state::init_pyl601()
 {
 	memset(m_ram->pointer(), 0, 64 * 1024);
 }
 
-INTERRUPT_GEN_MEMBER(pyl601_state::pyl601_interrupt)
+void pyl601_state::pyl601_interrupt(device_t &device)
 {
 	m_tick50_mark = 0x80;
 	device.execute().set_input_line(0, HOLD_LINE);

@@ -47,7 +47,7 @@ other 2 bits (output & 0x0c) unknown
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(_1943_state,1943)
+void _1943_state::palette_init_1943(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -118,19 +118,19 @@ PALETTE_INIT_MEMBER(_1943_state,1943)
 	}
 }
 
-WRITE8_MEMBER(_1943_state::c1943_videoram_w)
+void _1943_state::c1943_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(_1943_state::c1943_colorram_w)
+void _1943_state::c1943_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(_1943_state::c1943_c804_w)
+void _1943_state::c1943_c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -148,7 +148,7 @@ WRITE8_MEMBER(_1943_state::c1943_c804_w)
 	m_char_on = data & 0x80;
 }
 
-WRITE8_MEMBER(_1943_state::c1943_d806_w)
+void _1943_state::c1943_d806_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 4 enables bg 1 */
 	m_bg1_on = data & 0x10;
@@ -160,7 +160,7 @@ WRITE8_MEMBER(_1943_state::c1943_d806_w)
 	m_obj_on = data & 0x40;
 }
 
-TILE_GET_INFO_MEMBER(_1943_state::c1943_get_bg2_tile_info)
+void _1943_state::c1943_get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *tilerom = memregion("gfx5")->base() + 0x8000;
 
@@ -173,7 +173,7 @@ TILE_GET_INFO_MEMBER(_1943_state::c1943_get_bg2_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(_1943_state::c1943_get_bg_tile_info)
+void _1943_state::c1943_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *tilerom = memregion("gfx5")->base();
 
@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(_1943_state::c1943_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(_1943_state::c1943_get_fg_tile_info)
+void _1943_state::c1943_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0xe0) << 3);

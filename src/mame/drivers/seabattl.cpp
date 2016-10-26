@@ -77,25 +77,25 @@ public:
 	tilemap_t *m_bg_tilemap;
 	bitmap_ind16 m_collision_bg;
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_WRITE8_MEMBER(seabattl_videoram_w);
-	DECLARE_WRITE8_MEMBER(seabattl_colorram_w);
-	DECLARE_WRITE8_MEMBER(seabattl_control_w);
-	DECLARE_READ8_MEMBER(seabattl_collision_r);
-	DECLARE_WRITE8_MEMBER(seabattl_collision_clear_w);
-	DECLARE_READ8_MEMBER(seabattl_collision_clear_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sound2_w);
-	DECLARE_WRITE8_MEMBER(time_display_w);
-	DECLARE_WRITE8_MEMBER(score_display_w);
-	DECLARE_WRITE8_MEMBER(score2_display_w);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void seabattl_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void seabattl_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void seabattl_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t seabattl_collision_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void seabattl_collision_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t seabattl_collision_clear_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void time_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void score_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void score2_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
+	void seabattl_interrupt(device_t &device);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(seabattl);
+	void palette_init_seabattl(palette_device &palette);
 	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	bool m_waveenable;
 	uint8_t m_collision;
@@ -111,7 +111,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(seabattl_state, seabattl)
+void seabattl_state::palette_init_seabattl(palette_device &palette)
 {
 	// sprites (m.obj) + s2636
 	for (int i = 0; i < 8; i++)
@@ -131,7 +131,7 @@ PALETTE_INIT_MEMBER(seabattl_state, seabattl)
 	palette.set_pen_color(25, rgb_t(0x00, 0xff, 0xff)); // cyan
 }
 
-TILE_GET_INFO_MEMBER(seabattl_state::get_bg_tile_info)
+void seabattl_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
@@ -139,13 +139,13 @@ TILE_GET_INFO_MEMBER(seabattl_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, (color & 0x7), 0);
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_videoram_w)
+void seabattl_state::seabattl_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_colorram_w)
+void seabattl_state::seabattl_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -270,13 +270,13 @@ static ADDRESS_MAP_START( seabattl_io_map, AS_IO, 8, seabattl_state )
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
-READ8_MEMBER(seabattl_state::seabattl_collision_r)
+uint8_t seabattl_state::seabattl_collision_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	return m_collision;
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_control_w)
+void seabattl_state::seabattl_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0: play counter
 	// bit 1: super bonus counter
@@ -289,20 +289,20 @@ WRITE8_MEMBER(seabattl_state::seabattl_control_w)
 	m_waveenable = BIT(data, 5);
 }
 
-READ8_MEMBER(seabattl_state::seabattl_collision_clear_r)
+uint8_t seabattl_state::seabattl_collision_clear_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision = 0;
 	return 0;
 }
 
-WRITE8_MEMBER(seabattl_state::seabattl_collision_clear_w )
+void seabattl_state::seabattl_collision_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision = 0;
 }
 
-WRITE8_MEMBER(seabattl_state::sound_w )
+void seabattl_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// sound effects
 	// bits:
@@ -316,7 +316,7 @@ WRITE8_MEMBER(seabattl_state::sound_w )
 	// 7 - unused
 }
 
-WRITE8_MEMBER(seabattl_state::sound2_w )
+void seabattl_state::sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// sound effects
 	// bits:
@@ -330,19 +330,19 @@ WRITE8_MEMBER(seabattl_state::sound2_w )
 	// 7 - unused
 }
 
-WRITE8_MEMBER(seabattl_state::time_display_w )
+void seabattl_state::time_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit5->a_w(data & 0x0f);
 	m_digit4->a_w((data >> 4) & 0x0f);
 }
 
-WRITE8_MEMBER(seabattl_state::score_display_w )
+void seabattl_state::score_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit3->a_w(data & 0x0f);
 	m_digit2->a_w((data >> 4) & 0x0f);
 }
 
-WRITE8_MEMBER(seabattl_state::score2_display_w )
+void seabattl_state::score2_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit1->a_w(data & 0x0f);
 	m_digit0->a_w((data >> 4) & 0x0f);
@@ -440,7 +440,7 @@ void seabattl_state::machine_reset()
 {
 }
 
-INTERRUPT_GEN_MEMBER(seabattl_state::seabattl_interrupt)
+void seabattl_state::seabattl_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }

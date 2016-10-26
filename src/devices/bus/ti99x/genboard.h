@@ -61,9 +61,9 @@ class geneve_keyboard_device : public device_t
 {
 public:
 	geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_WRITE_LINE_MEMBER( reset_line );
-	DECLARE_WRITE_LINE_MEMBER( send_scancodes );
-	DECLARE_WRITE_LINE_MEMBER( clock_control );
+	void reset_line(int state);
+	void send_scancodes(int state);
+	void clock_control(int state);
 	uint8_t get_recent_key();
 
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<geneve_keyboard_device &>(device).m_interrupt.set_callback(object); }
@@ -120,19 +120,19 @@ public:
 	void set_video_waitstates(bool wait);
 	void set_extra_waitstates(bool wait);
 
-	DECLARE_READ8_MEMBER( readm );
-	DECLARE_WRITE8_MEMBER( writem );
-	DECLARE_SETOFFSET_MEMBER( setoffset );
+	uint8_t readm(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void writem(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void setoffset(address_space &space, offs_t offset);
 
-	DECLARE_INPUT_CHANGED_MEMBER( settings_changed );
+	void settings_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
-	DECLARE_WRITE_LINE_MEMBER( dbin_in );
+	void clock_in(int state);
+	void dbin_in(int state);
 
 	// PFM support
-	DECLARE_WRITE_LINE_MEMBER( pfm_select_lsb );
-	DECLARE_WRITE_LINE_MEMBER( pfm_select_msb );
-	DECLARE_WRITE_LINE_MEMBER( pfm_output_enable );
+	void pfm_select_lsb(int state);
+	void pfm_select_msb(int state);
+	void pfm_output_enable(int state);
 
 	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object) {  return downcast<geneve_mapper_device &>(device).m_ready.set_callback(object); }
 
@@ -145,8 +145,8 @@ private:
 	bool    m_gromwaddr_LSB;
 	bool    m_gromraddr_LSB;
 	int     m_grom_address;
-	DECLARE_READ8_MEMBER( read_grom );
-	DECLARE_WRITE8_MEMBER( write_grom );
+	uint8_t read_grom(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_grom(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// wait states
 	void        set_wait(int min);
@@ -184,8 +184,8 @@ private:
 	bool    m_timode;
 
 	// PFM mod (0 = none, 1 = AT29C040, 2 = AT29C040A)
-	DECLARE_READ8_MEMBER( read_from_pfm );
-	DECLARE_WRITE8_MEMBER( write_to_pfm );
+	uint8_t read_from_pfm(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_to_pfm(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void    set_boot_rom(int selection);
 	int     m_pfm_mode;
 	int     m_pfm_bank;

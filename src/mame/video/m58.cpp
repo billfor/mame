@@ -19,7 +19,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(m58_state, m58)
+void m58_state::palette_init_m58(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	const uint8_t *char_lopal = color_prom + 0x000;
@@ -102,14 +102,14 @@ PALETTE_INIT_MEMBER(m58_state, m58)
  *
  *************************************/
 
-WRITE8_MEMBER(m58_state::videoram_w)
+void m58_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
-WRITE8_MEMBER(m58_state::scroll_panel_w)
+void m58_state::scroll_panel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sx = ( offset % 16 );
 	int sy = ( offset / 16 );
@@ -138,7 +138,7 @@ WRITE8_MEMBER(m58_state::scroll_panel_w)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(m58_state::get_bg_tile_info)
+void m58_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int attr = m_videoram[offs + 1];
@@ -150,7 +150,7 @@ TILE_GET_INFO_MEMBER(m58_state::get_bg_tile_info)
 }
 
 
-TILEMAP_MAPPER_MEMBER(m58_state::tilemap_scan_rows)
+tilemap_memory_index m58_state::tilemap_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	if (col >= 32)
@@ -189,7 +189,7 @@ void m58_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(m58_state::flipscreen_w)
+void m58_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* screen flip is handled both by software and hardware */
 	flip_screen_set((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));

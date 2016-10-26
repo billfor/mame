@@ -111,20 +111,20 @@ void msx_cart_sfg::device_start()
 }
 
 
-IRQ_CALLBACK_MEMBER(msx_cart_sfg::irq_callback)
+int msx_cart_sfg::irq_callback(device_t &device, int irqline)
 {
 	return m_ym2148->get_irq_vector();
 }
 
 
-WRITE_LINE_MEMBER(msx_cart_sfg::ym2151_irq_w)
+void msx_cart_sfg::ym2151_irq_w(int state)
 {
 	m_ym2151_irq_state = state ? ASSERT_LINE : CLEAR_LINE;
 	check_irq();
 }
 
 
-WRITE_LINE_MEMBER(msx_cart_sfg::ym2148_irq_w)
+void msx_cart_sfg::ym2148_irq_w(int state)
 {
 	m_ym2148_irq_state = state ? ASSERT_LINE : CLEAR_LINE;
 	check_irq();
@@ -144,7 +144,7 @@ void msx_cart_sfg::check_irq()
 }
 
 
-READ8_MEMBER(msx_cart_sfg::read_cart)
+uint8_t msx_cart_sfg::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 0x3fff)
 	{
@@ -171,7 +171,7 @@ READ8_MEMBER(msx_cart_sfg::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_sfg::write_cart)
+void msx_cart_sfg::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x3fff)
 	{

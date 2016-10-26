@@ -26,7 +26,7 @@
  * colours are taken from SRAM and are programmable   *
  ******************************************************/
 
-PALETTE_INIT_MEMBER(cvs_state,cvs)
+void cvs_state::palette_init_cvs(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, attr;
@@ -79,7 +79,7 @@ void cvs_state::set_pens(  )
 
 
 
-WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
+void cvs_state::cvs_video_fx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0xce)
 		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",space.device().safe_pc(), data & 0xce);
@@ -99,25 +99,25 @@ WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
 
 
 
-READ8_MEMBER(cvs_state::cvs_collision_r)
+uint8_t cvs_state::cvs_collision_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_collision_register;
 }
 
-READ8_MEMBER(cvs_state::cvs_collision_clear)
+uint8_t cvs_state::cvs_collision_clear(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_collision_register = 0;
 	return 0;
 }
 
 
-WRITE8_MEMBER(cvs_state::cvs_scroll_w)
+void cvs_state::cvs_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_reg = 255 - data;
 }
 
 
-VIDEO_START_MEMBER(cvs_state,cvs)
+void cvs_state::video_start_cvs()
 {
 	cvs_init_stars();
 

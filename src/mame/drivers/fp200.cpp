@@ -54,18 +54,18 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(fp200_io_r);
-	DECLARE_WRITE8_MEMBER(fp200_io_w);
-	DECLARE_READ8_MEMBER(fp200_lcd_r);
-	DECLARE_WRITE8_MEMBER(fp200_lcd_w);
-	DECLARE_READ8_MEMBER(fp200_keyb_r);
-	DECLARE_WRITE8_MEMBER(fp200_keyb_w);
-	DECLARE_INPUT_CHANGED_MEMBER(keyb_irq);
+	uint8_t fp200_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fp200_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fp200_lcd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fp200_lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fp200_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fp200_keyb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void keyb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
-	DECLARE_READ_LINE_MEMBER(sid_r);
+	void sod_w(int state);
+	int sid_r();
 
-	DECLARE_PALETTE_INIT(fp200);
+	void palette_init_fp200(palette_device &palette);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -220,7 +220,7 @@ uint8_t fp200_state::read_lcd_vram(uint16_t X, uint16_t Y)
 	return res;
 }
 
-READ8_MEMBER(fp200_state::fp200_lcd_r)
+uint8_t fp200_state::fp200_lcd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -289,7 +289,7 @@ void fp200_state::write_lcd_vram(uint16_t X, uint16_t Y,uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(fp200_state::fp200_lcd_w)
+void fp200_state::fp200_lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -319,7 +319,7 @@ WRITE8_MEMBER(fp200_state::fp200_lcd_w)
 	}
 }
 
-READ8_MEMBER(fp200_state::fp200_keyb_r)
+uint8_t fp200_state::fp200_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const char *const keynames[16] = { "KEY0", "KEY1", "KEY2", "KEY3",
 										"KEY4", "KEY5", "KEY6", "KEY7",
@@ -338,7 +338,7 @@ READ8_MEMBER(fp200_state::fp200_keyb_r)
 	return res;
 }
 
-WRITE8_MEMBER(fp200_state::fp200_keyb_w)
+void fp200_state::fp200_keyb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 1)
 		m_keyb_mux = data & 0xf;
@@ -364,7 +364,7 @@ SOD = 1
 0x40 - 0x4f MT.RS-232C control
 0x80 - 0x8f Printer (Centronics)
 */
-READ8_MEMBER(fp200_state::fp200_io_r)
+uint8_t fp200_state::fp200_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -387,7 +387,7 @@ READ8_MEMBER(fp200_state::fp200_io_r)
 	return res;
 }
 
-WRITE8_MEMBER(fp200_state::fp200_io_w)
+void fp200_state::fp200_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_io_type == 0)
 	{
@@ -420,7 +420,7 @@ static ADDRESS_MAP_START( fp200_io, AS_IO, 8, fp200_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(fp200_io_r,fp200_io_w)
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(fp200_state::keyb_irq)
+void fp200_state::keyb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* a keyboard stroke causes a rst7.5 */
 	m_maincpu->set_input_line(I8085_RST75_LINE, (newval) ? ASSERT_LINE : CLEAR_LINE);
@@ -561,18 +561,18 @@ void fp200_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(fp200_state, fp200)
+void fp200_state::palette_init_fp200(palette_device &palette)
 {
 	palette.set_pen_color(0, 0xa0, 0xa8, 0xa0);
 	palette.set_pen_color(1, 0x30, 0x38, 0x10);
 }
 
-WRITE_LINE_MEMBER( fp200_state::sod_w )
+void fp200_state::sod_w(int state)
 {
 	m_io_type = state;
 }
 
-READ_LINE_MEMBER( fp200_state::sid_r )
+int fp200_state::sid_r()
 {
 	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
 }

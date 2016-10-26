@@ -38,22 +38,22 @@ public:
 	int m_scrollx;
 	int m_scrolly;
 
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
-	DECLARE_WRITE16_MEMBER(palette_bank_w);
-	DECLARE_WRITE16_MEMBER(gfxbank_w);
-	DECLARE_WRITE16_MEMBER(scrollreg_w);
-	DECLARE_WRITE16_MEMBER(charvideoram_w);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void scrollreg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void charvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pending_sound_r);
+	ioport_value pending_sound_r(ioport_field &field, void *param);
 
-	DECLARE_DRIVER_INIT(quiz18k);
-	DECLARE_DRIVER_INIT(welltris);
+	void init_quiz18k();
+	void init_welltris();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void setbank(int num, int bank);

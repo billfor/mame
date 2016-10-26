@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
+void sf_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *base = memregion("gfx5")->base() + 2 * tile_index;
 	int attr = base[0x10000];
@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
 			TILE_FLIPYX(attr & 3));
 }
 
-TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
+void sf_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *base = memregion("gfx5")->base() + 0x20000 + 2 * tile_index;
 	int attr = base[0x10000];
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
 			TILE_FLIPYX(attr & 3));
 }
 
-TILE_GET_INFO_MEMBER(sf_state::get_tx_tile_info)
+void sf_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(3,
@@ -68,25 +68,25 @@ void sf_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(sf_state::videoram_w)
+void sf_state::videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(sf_state::bg_scroll_w)
+void sf_state::bg_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bgscroll);
 	m_bg_tilemap->set_scrollx(0, m_bgscroll);
 }
 
-WRITE16_MEMBER(sf_state::fg_scroll_w)
+void sf_state::fg_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgscroll);
 	m_fg_tilemap->set_scrollx(0, m_fgscroll);
 }
 
-WRITE16_MEMBER(sf_state::gfxctrl_w)
+void sf_state::gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* b0 = reset, or maybe "set anyway" */
 	/* b1 = pulsed when control6.b6==0 until it's 1 */

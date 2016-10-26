@@ -170,7 +170,7 @@ Language
 #include "sound/sn76496.h"
 
 
-WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
+void appoooh_state::adpcm_int(int state)
 {
 	if (m_adpcm_address != 0xffffffff)
 	{
@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 }
 
 /* adpcm address write */
-WRITE8_MEMBER(appoooh_state::adpcm_w)
+void appoooh_state::adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_address = data << 8;
 	m_msm->reset_w(0);
@@ -407,7 +407,7 @@ void appoooh_state::machine_reset()
 	m_priority = 0;
 }
 
-INTERRUPT_GEN_MEMBER(appoooh_state::vblank_irq)
+void appoooh_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -596,7 +596,7 @@ ROM_END
  *************************************/
 
 
-DRIVER_INIT_MEMBER(appoooh_state,robowresb)
+void appoooh_state::init_robowresb()
 {
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x1c000, 0x8000);
 }

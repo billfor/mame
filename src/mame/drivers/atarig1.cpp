@@ -40,14 +40,14 @@ void atarig1_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(atarig1_state,atarig1)
+void atarig1_state::machine_start_atarig1()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_which_input));
 }
 
 
-MACHINE_RESET_MEMBER(atarig1_state,atarig1)
+void atarig1_state::machine_reset_atarig1()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -61,7 +61,7 @@ MACHINE_RESET_MEMBER(atarig1_state,atarig1)
  *
  *************************************/
 
-WRITE16_MEMBER(atarig1_state::mo_command_w)
+void atarig1_state::mo_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_mo_command);
 	m_rle->command_write(space, offset, (data == 0 && m_is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
@@ -75,7 +75,7 @@ WRITE16_MEMBER(atarig1_state::mo_command_w)
  *
  *************************************/
 
-READ16_MEMBER(atarig1_state::special_port0_r)
+uint16_t atarig1_state::special_port0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int temp = ioport("IN0")->read();
 	temp ^= 0x2000;     /* A2DOK always high for now */
@@ -83,13 +83,13 @@ READ16_MEMBER(atarig1_state::special_port0_r)
 }
 
 
-WRITE16_MEMBER(atarig1_state::a2d_select_w)
+void atarig1_state::a2d_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_which_input = offset;
 }
 
 
-READ16_MEMBER(atarig1_state::a2d_data_r)
+uint16_t atarig1_state::a2d_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2" };
 
@@ -140,7 +140,7 @@ void atarig1_state::device_post_load()
 }
 
 
-READ16_MEMBER(atarig1_state::pitfightb_cheap_slapstic_r)
+uint16_t atarig1_state::pitfightb_cheap_slapstic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = m_bslapstic_base[offset & 0xfff];
 
@@ -1283,24 +1283,24 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarig1_state,hydra)
+void atarig1_state::init_hydra()
 {
 	slapstic_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
 	m_is_pitfight = 0;
 }
 
-DRIVER_INIT_MEMBER(atarig1_state,hydrap)
+void atarig1_state::init_hydrap()
 {
 	m_is_pitfight = 0;
 }
 
-DRIVER_INIT_MEMBER(atarig1_state,pitfight)
+void atarig1_state::init_pitfight()
 {
 	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
 	m_is_pitfight = 1;
 }
 
-DRIVER_INIT_MEMBER(atarig1_state,pitfightb)
+void atarig1_state::init_pitfightb()
 {
 	pitfightb_cheap_slapstic_init();
 	save_item(NAME(m_bslapstic_bank));

@@ -12,19 +12,19 @@
 #include "includes/prehisle.h"
 
 
-WRITE16_MEMBER(prehisle_state::fg_vram_w)
+void prehisle_state::fg_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_vram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(prehisle_state::tx_vram_w)
+void prehisle_state::tx_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_vram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-READ16_MEMBER(prehisle_state::control_r)
+uint16_t prehisle_state::control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -37,7 +37,7 @@ READ16_MEMBER(prehisle_state::control_r)
 	}
 }
 
-WRITE16_MEMBER(prehisle_state::control_w)
+void prehisle_state::control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int scroll = 0;
 
@@ -62,7 +62,7 @@ WRITE16_MEMBER(prehisle_state::control_w)
 0  .....xxx  gfx code high bits
 1  xxxxxxxx  gfx code low bits
 */
-TILE_GET_INFO_MEMBER(prehisle_state::get_bg_tile_info)
+void prehisle_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const offs = tile_index * 2;
 	int const attr = m_tilemap_rom[offs + 1] + (m_tilemap_rom[offs] << 8);
@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_bg_tile_info)
 0  ....x... ........  flip y
 0  .....xxx xxxxxxxx  gfx code
 */
-TILE_GET_INFO_MEMBER(prehisle_state::get_fg_tile_info)
+void prehisle_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const attr = m_fg_vram[tile_index];
 	int const code = attr & 0x7ff;
@@ -92,7 +92,7 @@ TILE_GET_INFO_MEMBER(prehisle_state::get_fg_tile_info)
 0  xxxx.... ........  color
 0  ....xxxx xxxxxxxx  gfx code
 */
-TILE_GET_INFO_MEMBER(prehisle_state::get_tx_tile_info)
+void prehisle_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const attr = m_tx_vram[tile_index];
 	int const code = attr & 0xfff;

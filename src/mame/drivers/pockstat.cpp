@@ -124,30 +124,30 @@ public:
 	uint32_t m_lcd_control;
 	int32_t m_ps_flash_write_enable_count;
 	int32_t m_ps_flash_write_count;
-	DECLARE_READ32_MEMBER(ps_ftlb_r);
-	DECLARE_WRITE32_MEMBER(ps_ftlb_w);
-	DECLARE_READ32_MEMBER(ps_intc_r);
-	DECLARE_WRITE32_MEMBER(ps_intc_w);
-	DECLARE_READ32_MEMBER(ps_timer_r);
-	DECLARE_WRITE32_MEMBER(ps_timer_w);
-	DECLARE_READ32_MEMBER(ps_clock_r);
-	DECLARE_WRITE32_MEMBER(ps_clock_w);
-	DECLARE_READ32_MEMBER(ps_rtc_r);
-	DECLARE_WRITE32_MEMBER(ps_rtc_w);
-	DECLARE_READ32_MEMBER(ps_lcd_r);
-	DECLARE_WRITE32_MEMBER(ps_lcd_w);
-	DECLARE_READ32_MEMBER(ps_rombank_r);
-	DECLARE_READ32_MEMBER(ps_flash_r);
-	DECLARE_WRITE32_MEMBER(ps_flash_w);
-	DECLARE_READ32_MEMBER(ps_audio_r);
-	DECLARE_WRITE32_MEMBER(ps_audio_w);
+	uint32_t ps_ftlb_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ps_ftlb_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ps_intc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ps_intc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ps_timer_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ps_timer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ps_clock_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ps_clock_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ps_rtc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ps_rtc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ps_lcd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ps_lcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ps_rombank_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t ps_flash_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ps_flash_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ps_audio_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ps_audio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(input_update);
-	TIMER_CALLBACK_MEMBER(timer_tick);
-	TIMER_CALLBACK_MEMBER(rtc_tick);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pockstat_flash );
+	void input_update(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void timer_tick(void *ptr, int32_t param);
+	void rtc_tick(void *ptr, int32_t param);
+	image_init_result device_image_load_pockstat_flash(device_image_interface &image);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	uint32_t ps_intc_get_interrupt_line(uint32_t line);
 	void ps_intc_set_interrupt_line(uint32_t line, int state);
@@ -214,7 +214,7 @@ inline void ATTR_PRINTF(3,4) pockstat_state::verboselog( int n_level, const char
 #define PS_INT_FIQ_MASK         0x00002040
 #define PS_INT_STATUS_MASK      0x0000021f
 
-READ32_MEMBER(pockstat_state::ps_ftlb_r)
+uint32_t pockstat_state::ps_ftlb_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -261,7 +261,7 @@ READ32_MEMBER(pockstat_state::ps_ftlb_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_ftlb_w)
+void pockstat_state::ps_ftlb_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -355,7 +355,7 @@ void pockstat_state::ps_intc_set_interrupt_line(uint32_t line, int state)
 	}
 }
 
-READ32_MEMBER(pockstat_state::ps_intc_r)
+uint32_t pockstat_state::ps_intc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -381,7 +381,7 @@ READ32_MEMBER(pockstat_state::ps_intc_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_intc_w)
+void pockstat_state::ps_intc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -420,7 +420,7 @@ WRITE32_MEMBER(pockstat_state::ps_intc_w)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pockstat_state::timer_tick)
+void pockstat_state::timer_tick(void *ptr, int32_t param)
 {
 	ps_intc_set_interrupt_line(param == 2 ? PS_INT_TIMER2 : (param == 1 ? PS_INT_TIMER1 : PS_INT_TIMER0), 1);
 	//printf( "Timer %d is calling back\n", param );
@@ -450,7 +450,7 @@ void pockstat_state::ps_timer_start(int index)
 	m_timer_regs.timer[index].timer->adjust(period, index);
 }
 
-READ32_MEMBER(pockstat_state::ps_timer_r)
+uint32_t pockstat_state::ps_timer_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -485,7 +485,7 @@ READ32_MEMBER(pockstat_state::ps_timer_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_timer_w)
+void pockstat_state::ps_timer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -521,7 +521,7 @@ WRITE32_MEMBER(pockstat_state::ps_timer_w)
 	}
 }
 
-READ32_MEMBER(pockstat_state::ps_clock_r)
+uint32_t pockstat_state::ps_clock_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -538,7 +538,7 @@ READ32_MEMBER(pockstat_state::ps_clock_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_clock_w)
+void pockstat_state::ps_clock_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -557,7 +557,7 @@ WRITE32_MEMBER(pockstat_state::ps_clock_w)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pockstat_state::rtc_tick)
+void pockstat_state::rtc_tick(void *ptr, int32_t param)
 {
 	//printf( "RTC is calling back\n" );
 	ps_intc_set_interrupt_line(PS_INT_RTC, ps_intc_get_interrupt_line(PS_INT_RTC) ? 0 : 1);
@@ -603,7 +603,7 @@ TIMER_CALLBACK_MEMBER(pockstat_state::rtc_tick)
 	m_rtc_regs.timer->adjust(attotime::from_hz(1));
 }
 
-READ32_MEMBER(pockstat_state::ps_rtc_r)
+uint32_t pockstat_state::ps_rtc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -626,7 +626,7 @@ READ32_MEMBER(pockstat_state::ps_rtc_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_rtc_w)
+void pockstat_state::ps_rtc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -738,7 +738,7 @@ WRITE32_MEMBER(pockstat_state::ps_rtc_w)
 }
 
 
-READ32_MEMBER(pockstat_state::ps_lcd_r)
+uint32_t pockstat_state::ps_lcd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -752,7 +752,7 @@ READ32_MEMBER(pockstat_state::ps_lcd_r)
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_lcd_w)
+void pockstat_state::ps_lcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -766,7 +766,7 @@ WRITE32_MEMBER(pockstat_state::ps_lcd_w)
 	}
 }
 
-INPUT_CHANGED_MEMBER(pockstat_state::input_update)
+void pockstat_state::input_update(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint32_t buttons = ioport("BUTTONS")->read();
 
@@ -777,7 +777,7 @@ INPUT_CHANGED_MEMBER(pockstat_state::input_update)
 	ps_intc_set_interrupt_line(PS_INT_BTN_UP,    (buttons & 16) ? 1 : 0);
 }
 
-READ32_MEMBER(pockstat_state::ps_rombank_r)
+uint32_t pockstat_state::ps_rombank_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int32_t bank = (offset >> 11) & 0x0f;
 	for (int index = 0; index < 32; index++)
@@ -796,7 +796,7 @@ READ32_MEMBER(pockstat_state::ps_rombank_r)
 
 
 // Horrible hack, probably wrong
-WRITE32_MEMBER(pockstat_state::ps_flash_w)
+void pockstat_state::ps_flash_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(offset == (0x55a8/4))
 	{
@@ -821,18 +821,18 @@ WRITE32_MEMBER(pockstat_state::ps_flash_w)
 	}
 }
 
-READ32_MEMBER(pockstat_state::ps_flash_r)
+uint32_t pockstat_state::ps_flash_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_cart->read32_rom(space, offset, mem_mask);
 }
 
-READ32_MEMBER(pockstat_state::ps_audio_r)
+uint32_t pockstat_state::ps_audio_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	verboselog(0, "ps_audio_r: Unknown Read: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), 0x10, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(pockstat_state::ps_audio_w)
+void pockstat_state::ps_audio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(0, "ps_audio_w: Unknown Write: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), data, mem_mask);
 }
@@ -947,7 +947,7 @@ uint32_t pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
+image_init_result pockstat_state::device_image_load_pockstat_flash(device_image_interface &image)
 {
 	static const char *gme_id = "123-456-STD";
 	char cart_id[0xf40];

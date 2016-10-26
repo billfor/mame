@@ -38,19 +38,19 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ8_MEMBER( anout_r );
-	DECLARE_WRITE8_MEMBER( anout_w );
-	DECLARE_READ8_MEMBER( anin_r );
-	DECLARE_WRITE8_MEMBER( anio_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
-	DECLARE_WRITE_LINE_MEMBER( adc_eoc_w );
+	uint8_t anout_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void anout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t anin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void anio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acia_interrupt(int state);
+	void ctc_z2_w(int state);
+	void adc_eoc_w(int state);
 
 	ADC0808_ANALOG_READ_CB(adc_vref_pos_r);
 	ADC0808_ANALOG_READ_CB(adc_vref_neg_r);
 	ADC0808_ANALOG_READ_CB(adc_input_r);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_c2_tick);
+	void ctc_c2_tick(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	// device-level overrides

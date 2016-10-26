@@ -188,7 +188,7 @@ void saturn_state::smpc_master_on()
 	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER( saturn_state::smpc_slave_enable )
+void saturn_state::smpc_slave_enable(void *ptr, int32_t param)
 {
 	m_slave->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
 	m_smpc.OREG[31] = param + 0x02; //read-back for last command issued
@@ -197,7 +197,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::smpc_slave_enable )
 //  printf("%d %d\n",machine().first_screen()->hpos(),machine().first_screen()->vpos());
 }
 
-TIMER_CALLBACK_MEMBER( saturn_state::smpc_sound_enable )
+void saturn_state::smpc_sound_enable(void *ptr, int32_t param)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
 	m_en_68k = param ^ 1;
@@ -205,7 +205,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::smpc_sound_enable )
 	m_smpc.SF = 0x00; //clear hand-shake flag
 }
 
-TIMER_CALLBACK_MEMBER( saturn_state::smpc_cd_enable )
+void saturn_state::smpc_cd_enable(void *ptr, int32_t param)
 {
 	m_smpc.OREG[31] = param + 0x08; //read-back for last command issued
 	m_smpc.SF = 0x08; //clear hand-shake flag (TODO: diagnostic wants this to have bit 3 high)
@@ -228,7 +228,7 @@ void saturn_state::smpc_system_reset()
 	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
-TIMER_CALLBACK_MEMBER( saturn_state::smpc_change_clock )
+void saturn_state::smpc_change_clock(void *ptr, int32_t param)
 {
 	uint32_t xtal;
 
@@ -257,7 +257,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::smpc_change_clock )
 	/* TODO: VDP1 / VDP2 / SCU / SCSP default power ON values? */
 }
 
-TIMER_CALLBACK_MEMBER( saturn_state::stv_intback_peripheral )
+void saturn_state::stv_intback_peripheral(void *ptr, int32_t param)
 {
 	if (m_smpc.intback_stage == 2)
 	{
@@ -280,7 +280,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::stv_intback_peripheral )
 }
 
 
-TIMER_CALLBACK_MEMBER( saturn_state::stv_smpc_intback )
+void saturn_state::stv_smpc_intback(void *ptr, int32_t param)
 {
 	int i;
 
@@ -373,7 +373,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::stv_smpc_intback )
  how did a real unit behave in this case?
 */
 
-TIMER_CALLBACK_MEMBER( saturn_state::intback_peripheral )
+void saturn_state::intback_peripheral(void *ptr, int32_t param)
 {
 //  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
 
@@ -430,7 +430,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::intback_peripheral )
 	m_smpc.SF = 0x00;    /* clear hand-shake flag */
 }
 
-TIMER_CALLBACK_MEMBER( saturn_state::saturn_smpc_intback )
+void saturn_state::saturn_smpc_intback(void *ptr, int32_t param)
 {
 	if(m_smpc.intback_buf[0] != 0)
 	{
@@ -513,7 +513,7 @@ void saturn_state::smpc_nmi_req()
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-TIMER_CALLBACK_MEMBER( saturn_state::smpc_nmi_set )
+void saturn_state::smpc_nmi_set(void *ptr, int32_t param)
 {
 //  printf("%d %d\n",machine().first_screen()->hpos(),machine().first_screen()->vpos());
 
@@ -527,7 +527,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::smpc_nmi_set )
 }
 
 
-TIMER_CALLBACK_MEMBER( saturn_state::smpc_audio_reset_line_pulse )
+void saturn_state::smpc_audio_reset_line_pulse(void *ptr, int32_t param)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
@@ -655,7 +655,7 @@ void saturn_state::smpc_comreg_exec(address_space &space, uint8_t data, uint8_t 
  *
  *******************************************/
 
-READ8_MEMBER( saturn_state::stv_SMPC_r )
+uint8_t saturn_state::stv_SMPC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int return_data = 0;
 
@@ -680,7 +680,7 @@ READ8_MEMBER( saturn_state::stv_SMPC_r )
 	return return_data;
 }
 
-WRITE8_MEMBER( saturn_state::stv_SMPC_w )
+void saturn_state::stv_SMPC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(offset & 1)) // avoid writing to even bytes
 		return;
@@ -848,7 +848,7 @@ uint8_t saturn_state::smpc_direct_mode(uint8_t pad_n)
 	return 0x80 | 0x10 | ((ctrl_read >> shift_bit[hshake]) & 0xf);
 }
 
-READ8_MEMBER( saturn_state::saturn_SMPC_r )
+uint8_t saturn_state::saturn_SMPC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t return_data = 0;
 
@@ -899,7 +899,7 @@ READ8_MEMBER( saturn_state::saturn_SMPC_r )
 	return return_data;
 }
 
-WRITE8_MEMBER( saturn_state::saturn_SMPC_w )
+void saturn_state::saturn_SMPC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x\n", offset, offset>>1, data);
 

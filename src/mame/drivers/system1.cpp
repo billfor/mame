@@ -394,7 +394,7 @@ void system1_state::machine_start()
 }
 
 
-MACHINE_START_MEMBER(system1_state,system2)
+void system1_state::machine_start_system2()
 {
 	system1_state::machine_start();
 	m_mute_xor = 0x01;
@@ -430,7 +430,7 @@ void system1_state::bank0c_custom_w(uint8_t data, uint8_t prevdata)
 }
 
 
-WRITE8_MEMBER(system1_state::videomode_w)
+void system1_state::videomode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 6 is connected to the 8751 IRQ */
 	if (m_mcu != nullptr)
@@ -456,14 +456,14 @@ WRITE8_MEMBER(system1_state::videomode_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(system1_state::dakkochn_mux_data_r)
+ioport_value system1_state::dakkochn_mux_data_r(ioport_field &field, void *param)
 {
 	static const char *const ports[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
 	return ioport(ports[m_dakkochn_mux_data])->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(system1_state::dakkochn_mux_status_r)
+ioport_value system1_state::dakkochn_mux_status_r(ioport_field &field, void *param)
 {
 	/* reads from here indicate which mux port is selected */
 	return 1 << (m_dakkochn_mux_data);
@@ -488,7 +488,7 @@ void system1_state::dakkochn_custom_w(uint8_t data, uint8_t prevdata)
  *
  *************************************/
 
-READ8_MEMBER(system1_state::shtngmst_gunx_r)
+uint8_t system1_state::shtngmst_gunx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// x is slightly offset, and has a range of 00-fe
 	uint8_t x = ioport("GUNX")->read() - 0x12;
@@ -503,7 +503,7 @@ READ8_MEMBER(system1_state::shtngmst_gunx_r)
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::sound_control_w)
+void system1_state::sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = MUTE (inverted sense on System 2) */
 	machine().sound().system_mute((data ^ m_mute_xor) & 1);
@@ -518,7 +518,7 @@ WRITE8_MEMBER(system1_state::sound_control_w)
 }
 
 
-READ8_MEMBER(system1_state::sound_data_r)
+uint8_t system1_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	z80pio_device *pio = machine().device<z80pio_device>("pio");
 
@@ -543,7 +543,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 }
 
 
-WRITE8_MEMBER(system1_state::soundport_w)
+void system1_state::soundport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* boost interleave when communicating with the sound CPU */
 	m_soundlatch->write(space, 0, data);
@@ -551,7 +551,7 @@ WRITE8_MEMBER(system1_state::soundport_w)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(system1_state::soundirq_gen)
+void system1_state::soundirq_gen(timer_device &timer, void *ptr, int32_t param)
 {
 	/* sound IRQ is generated on 32V, 96V, ... and auto-acknowledged */
 	m_soundcpu->set_input_line(0, HOLD_LINE);
@@ -565,7 +565,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(system1_state::soundirq_gen)
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::mcu_control_w)
+void system1_state::mcu_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Bit 7 -> connects to TD62003 pins 5 & 6 @ IC151
@@ -583,7 +583,7 @@ WRITE8_MEMBER(system1_state::mcu_control_w)
 }
 
 
-WRITE8_MEMBER(system1_state::mcu_io_w)
+void system1_state::mcu_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ((m_mcu_control >> 3) & 3)
 	{
@@ -603,7 +603,7 @@ WRITE8_MEMBER(system1_state::mcu_io_w)
 }
 
 
-READ8_MEMBER(system1_state::mcu_io_r)
+uint8_t system1_state::mcu_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch ((m_mcu_control >> 3) & 3)
 	{
@@ -624,7 +624,7 @@ READ8_MEMBER(system1_state::mcu_io_r)
 }
 
 
-INTERRUPT_GEN_MEMBER(system1_state::mcu_irq_assert)
+void system1_state::mcu_irq_assert(device_t &device)
 {
 	/* toggle the INT0 line on the MCU */
 	device.execute().set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
@@ -635,7 +635,7 @@ INTERRUPT_GEN_MEMBER(system1_state::mcu_irq_assert)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(system1_state::mcu_t0_callback)
+void system1_state::mcu_t0_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	/* The T0 line is clocked by something; if it is not clocked fast
 	   enough, the MCU will fail; on shtngmst this happens after 3
@@ -655,7 +655,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(system1_state::mcu_t0_callback)
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::nob_mcu_control_p2_w)
+void system1_state::nob_mcu_control_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 triggers a read from MCU port 0 */
 	if (((m_mcu_control ^ data) & 0x01) && !(data & 0x01))
@@ -679,13 +679,13 @@ WRITE8_MEMBER(system1_state::nob_mcu_control_p2_w)
 }
 
 
-READ8_MEMBER(system1_state::nob_maincpu_latch_r)
+uint8_t system1_state::nob_maincpu_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nob_maincpu_latch;
 }
 
 
-WRITE8_MEMBER(system1_state::nob_maincpu_latch_w)
+void system1_state::nob_maincpu_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nob_maincpu_latch = data;
 	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
@@ -693,7 +693,7 @@ WRITE8_MEMBER(system1_state::nob_maincpu_latch_w)
 }
 
 
-READ8_MEMBER(system1_state::nob_mcu_status_r)
+uint8_t system1_state::nob_mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return *m_nob_mcu_status;
 }
@@ -706,25 +706,25 @@ READ8_MEMBER(system1_state::nob_mcu_status_r)
  *
  *************************************/
 
-READ8_MEMBER(system1_state::nobb_inport1c_r)
+uint8_t system1_state::nobb_inport1c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("IN  $1c : pc = %04x - data = 0x80\n",space.device().safe_pc());
 	return(0x80);   // infinite loop (at 0x0fb3) until bit 7 is set
 }
 
-READ8_MEMBER(system1_state::nobb_inport22_r)
+uint8_t system1_state::nobb_inport22_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("IN  $22 : pc = %04x - data = %02x\n",space.device().safe_pc(),nobb_inport17_step);
 	return(0);//nobb_inport17_step);
 }
 
-READ8_MEMBER(system1_state::nobb_inport23_r)
+uint8_t system1_state::nobb_inport23_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("IN  $23 : pc = %04x - step = %02x\n",space.device().safe_pc(),m_nobb_inport23_step);
 	return(m_nobb_inport23_step);
 }
 
-WRITE8_MEMBER(system1_state::nobb_outport24_w)
+void system1_state::nobb_outport24_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("OUT $24 : pc = %04x - data = %02x\n",space.device().safe_pc(),data);
 	m_nobb_inport23_step = data;
@@ -5136,16 +5136,16 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(system1_state,bank00)
+void system1_state::init_bank00()
 {
 }
 
-DRIVER_INIT_MEMBER(system1_state,bank44)
+void system1_state::init_bank44()
 {
 	m_videomode_custom = &system1_state::bank44_custom_w;
 }
 
-DRIVER_INIT_MEMBER(system1_state,bank0c)
+void system1_state::init_bank0c()
 {
 	m_videomode_custom = &system1_state::bank0c_custom_w;
 }
@@ -5153,7 +5153,7 @@ DRIVER_INIT_MEMBER(system1_state,bank0c)
 
 
 
-DRIVER_INIT_MEMBER(system1_state,myherok)
+void system1_state::init_myherok()
 {
 	// extra layer of encryption applied BEFORE the usual CPU decryption
 	// probably bootleg?
@@ -5197,7 +5197,7 @@ DRIVER_INIT_MEMBER(system1_state,myherok)
 		}
 	}
 
-	DRIVER_INIT_CALL(bank00);
+	init_bank00();
 }
 
 
@@ -5206,9 +5206,9 @@ DRIVER_INIT_MEMBER(system1_state,myherok)
 
 
 
-DRIVER_INIT_MEMBER(system1_state,blockgal)
+void system1_state::init_blockgal()
 {
-	DRIVER_INIT_CALL(bank00);
+	init_bank00();
 	mc8123_decode(m_maincpu_region->base(), m_decrypted_opcodes, memregion("key")->base(), 0x8000);
 }
 
@@ -5217,23 +5217,23 @@ DRIVER_INIT_MEMBER(system1_state,blockgal)
 
 
 
-DRIVER_INIT_MEMBER(system1_state,wbml)
+void system1_state::init_wbml()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
 	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), memregion("key")->base(), m_maincpu_region->bytes());
 }
 
-DRIVER_INIT_MEMBER(system1_state,ufosensi)
+void system1_state::init_ufosensi()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
 	mc8123_decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), memregion("key")->base(), m_maincpu_region->bytes());
 }
 
 
 
-DRIVER_INIT_MEMBER(system1_state,dakkochn)
+void system1_state::init_dakkochn()
 {
 	m_videomode_custom = &system1_state::dakkochn_custom_w;
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
@@ -5242,18 +5242,18 @@ DRIVER_INIT_MEMBER(system1_state,dakkochn)
 
 
 
-READ8_MEMBER(system1_state::nob_start_r)
+uint8_t system1_state::nob_start_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* in reality, it's likely some M1-dependent behavior */
 	return (space.device().safe_pc() <= 0x0003) ? 0x80 : m_maincpu_region->base()[1];
 }
 
-DRIVER_INIT_MEMBER(system1_state,nob)
+void system1_state::init_nob()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
 
-	DRIVER_INIT_CALL(bank44);
+	init_bank44();
 
 	/* hack to fix incorrect JMP at start, which should obviously be to $0080 */
 	/* patching the ROM causes errors in the self-test */
@@ -5265,7 +5265,7 @@ DRIVER_INIT_MEMBER(system1_state,nob)
 	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nob_mcu_status_r),this));
 }
 
-DRIVER_INIT_MEMBER(system1_state,nobb)
+void system1_state::init_nobb()
 {
 	/* Patch to get PRG ROMS ('T', 'R' and 'S) status as "GOOD" in the "test mode" */
 	/* not really needed */
@@ -5287,7 +5287,7 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
 
-	DRIVER_INIT_CALL(bank44);
+	init_bank44();
 
 	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nobb_inport1c_r),this));
 	iospace.install_read_handler(0x02, 0x02, read8_delegate(FUNC(system1_state::nobb_inport22_r),this));
@@ -5296,29 +5296,29 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 }
 
 
-DRIVER_INIT_MEMBER(system1_state,bootleg)
+void system1_state::init_bootleg()
 {
-	DRIVER_INIT_CALL(bank00);
+	init_bank00();
 	memcpy(m_decrypted_opcodes, m_maincpu_region->base() + 0x10000, 0x8000);
 }
 
 
-DRIVER_INIT_MEMBER(system1_state,bootsys2)
+void system1_state::init_bootsys2()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_bank0d->set_base(m_maincpu_region->base() + 0x20000);
 	m_bank1d->configure_entries(0, 4, m_maincpu_region->base() + 0x30000, 0x4000);
 }
 
-DRIVER_INIT_MEMBER(system1_state,bootsys2d)
+void system1_state::init_bootsys2d()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_bank0d->set_base(m_maincpu_region->base());
 	m_bank1d->configure_entries(0, 4, m_maincpu_region->base() + 0x10000, 0x4000);
 }
 
 
-DRIVER_INIT_MEMBER(system1_state,choplift)
+void system1_state::init_choplift()
 {
 	uint8_t *mcurom = memregion("mcu")->base();
 
@@ -5327,17 +5327,17 @@ DRIVER_INIT_MEMBER(system1_state,choplift)
 	mcurom[0x27b] = 0xfb;       /* F2 in current dump */
 	mcurom[0x2ff] = 0xff - 9;   /* fix up checksum; means there's still something incorrect */
 
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 }
 
-DRIVER_INIT_MEMBER(system1_state,shtngmst)
+void system1_state::init_shtngmst()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_read_port(0x12, 0x12, "TRIGGER");
 	iospace.install_read_port(0x18, 0x18, 0x03, "18");
 	iospace.install_read_handler(0x1c, 0x1c, 0, 0x02, 0, read8_delegate(FUNC(system1_state::shtngmst_gunx_r),this));
 	iospace.install_read_port(0x1d, 0x1d, 0x02, "GUNY");
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 }
 
 

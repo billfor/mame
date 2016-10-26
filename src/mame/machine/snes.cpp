@@ -74,7 +74,7 @@ void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 }
 
 
-TIMER_CALLBACK_MEMBER(snes_state::snes_nmi_tick)
+void snes_state::snes_nmi_tick(void *ptr, int32_t param)
 {
 	// pull NMI
 	m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
@@ -95,12 +95,12 @@ void snes_state::hirq_tick()
 	m_hirq_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(snes_state::snes_hirq_tick_callback)
+void snes_state::snes_hirq_tick_callback(void *ptr, int32_t param)
 {
 	hirq_tick();
 }
 
-TIMER_CALLBACK_MEMBER(snes_state::snes_reset_oam_address)
+void snes_state::snes_reset_oam_address(void *ptr, int32_t param)
 {
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -113,13 +113,13 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_reset_oam_address)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(snes_state::snes_reset_hdma)
+void snes_state::snes_reset_hdma(void *ptr, int32_t param)
 {
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	hdma_init(cpu0space);
 }
 
-TIMER_CALLBACK_MEMBER(snes_state::snes_update_io)
+void snes_state::snes_update_io(void *ptr, int32_t param)
 {
 	io_read(m_maincpu->space(AS_PROGRAM),0,0,0);
 	SNES_CPU_REG(HVBJOY) &= 0xfe;       /* Clear busy bit */
@@ -127,7 +127,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_update_io)
 	m_io_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
+void snes_state::snes_scanline_tick(void *ptr, int32_t param)
 {
 	/* Increase current line - we want to latch on this line during it, not after it */
 	m_ppu->m_beam.current_vert = m_screen->vpos();
@@ -217,7 +217,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 }
 
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
-TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
+void snes_state::snes_hblank_tick(void *ptr, int32_t param)
 {
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	int nextscan;
@@ -260,7 +260,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 
 *************************************/
 
-READ8_MEMBER( snes_state::snes_open_bus_r )
+uint8_t snes_state::snes_open_bus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static uint8_t recurse = 0;
 	uint16_t result;
@@ -276,7 +276,7 @@ READ8_MEMBER( snes_state::snes_open_bus_r )
 }
 
 /* read & write to DMA addresses are defined separately, to be called by snessdd1 handlers */
-READ8_MEMBER( snes_state::snes_io_dma_r )
+uint8_t snes_state::snes_io_dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -322,7 +322,7 @@ READ8_MEMBER( snes_state::snes_io_dma_r )
 	return snes_open_bus_r(space, 0);
 }
 
-WRITE8_MEMBER( snes_state::snes_io_dma_w )
+void snes_state::snes_io_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -386,7 +386,7 @@ WRITE8_MEMBER( snes_state::snes_io_dma_w )
  * mid  - This is the middle byte of a 24 bit value
  * high - This is the high byte of a 16 or 24 bit value
  */
-READ8_MEMBER( snes_state::snes_r_io )
+uint8_t snes_state::snes_r_io(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 
@@ -476,7 +476,7 @@ READ8_MEMBER( snes_state::snes_r_io )
  * mid  - This is the middle byte of a 24 bit value
  * high - This is the high byte of a 16 or 24 bit value
  */
-WRITE8_MEMBER( snes_state::snes_w_io )
+void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// PPU accesses are from 2100 to 213f
 	if (offset >= INIDISP && offset < APU00)
@@ -616,7 +616,7 @@ void snes_state::wrio_write(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(snes_state::snes_extern_irq_w)
+void snes_state::snes_extern_irq_w(int state)
 {
 	m_maincpu->set_input_line(G65816_LINE_IRQ, state);
 }
@@ -721,7 +721,7 @@ inline uint8_t snes_state::snes_rom_access(uint32_t offset)
 }
 
 /* 0x000000 - 0x7dffff */
-READ8_MEMBER(snes_state::snes_r_bank1)
+uint8_t snes_state::snes_r_bank1(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0xff;
 	uint16_t address = offset & 0xffff;
@@ -785,7 +785,7 @@ READ8_MEMBER(snes_state::snes_r_bank1)
 
 
 /* 0x800000 - 0xffffff */
-READ8_MEMBER(snes_state::snes_r_bank2)
+uint8_t snes_state::snes_r_bank2(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 	uint16_t address = offset & 0xffff;
@@ -833,7 +833,7 @@ READ8_MEMBER(snes_state::snes_r_bank2)
 
 
 /* 0x000000 - 0x7dffff */
-WRITE8_MEMBER(snes_state::snes_w_bank1)
+void snes_state::snes_w_bank1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t address = offset & 0xffff;
 
@@ -890,7 +890,7 @@ WRITE8_MEMBER(snes_state::snes_w_bank1)
 }
 
 /* 0x800000 - 0xffffff */
-WRITE8_MEMBER(snes_state::snes_w_bank2)
+void snes_state::snes_w_bank2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t address = offset & 0xffff;
 
@@ -937,7 +937,7 @@ WRITE8_MEMBER(snes_state::snes_w_bank2)
 
 *************************************/
 
-WRITE8_MEMBER(snes_state::io_read)
+void snes_state::io_read(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char *const portnames[2][2] =
 	{
@@ -1168,7 +1168,7 @@ void snes_state::rom_map_setup(uint32_t size)
 }
 
 /* for mame we use an init, maybe we will need more for the different games */
-DRIVER_INIT_MEMBER(snes_state,snes)
+void snes_state::init_snes()
 {
 	m_cart.m_rom_size = memregion("user3")->bytes();
 	m_cart.m_rom = memregion("user3")->base();
@@ -1189,7 +1189,7 @@ DRIVER_INIT_MEMBER(snes_state,snes)
 	m_cart.mode = SNES_MODE_20;
 }
 
-DRIVER_INIT_MEMBER(snes_state,snes_hirom)
+void snes_state::init_snes_hirom()
 {
 	m_cart.m_rom_size = memregion("user3")->bytes();
 	m_cart.m_rom = memregion("user3")->base();

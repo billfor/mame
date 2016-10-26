@@ -48,30 +48,30 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(exprraid_int_clear_w);
-	DECLARE_READ8_MEMBER(exprraid_prot_status_r);
-	DECLARE_READ8_MEMBER(exprraid_prot_data_r);
-	DECLARE_WRITE8_MEMBER(exprraid_prot_data_w);
-	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
-	DECLARE_READ8_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(exprraid_videoram_w);
-	DECLARE_WRITE8_MEMBER(exprraid_colorram_w);
-	DECLARE_WRITE8_MEMBER(exprraid_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(exprraid_bgselect_w);
-	DECLARE_WRITE8_MEMBER(exprraid_scrollx_w);
-	DECLARE_WRITE8_MEMBER(exprraid_scrolly_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_deco16);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
+	void exprraid_int_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t exprraid_prot_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t exprraid_prot_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void exprraid_prot_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_cpu_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vblank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void exprraid_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exprraid_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exprraid_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exprraid_bgselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exprraid_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exprraid_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin_inserted_deco16(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void coin_inserted_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	DECLARE_READ8_MEMBER(sound_cpu_command_r);
+	uint8_t sound_cpu_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_DRIVER_INIT(exprraid);
-	DECLARE_DRIVER_INIT(wexpressb);
-	DECLARE_DRIVER_INIT(wexpressb2);
-	DECLARE_DRIVER_INIT(wexpressb3);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void irqhandler(int state);
+	void init_exprraid();
+	void init_wexpressb();
+	void init_wexpressb2();
+	void init_wexpressb3();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update_exprraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

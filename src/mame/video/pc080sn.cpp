@@ -155,7 +155,7 @@ void pc080sn_device::common_get_pc080sn_bg_tile_info( tile_data &tileinfo, int t
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-TILE_GET_INFO_MEMBER(pc080sn_device::get_bg_tile_info)
+void pc080sn_device::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_pc080sn_bg_tile_info( tileinfo, tile_index, m_bg_ram[0], m_gfxnum );
 }
@@ -181,17 +181,17 @@ void pc080sn_device::common_get_pc080sn_fg_tile_info( tile_data &tileinfo, int t
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-TILE_GET_INFO_MEMBER(pc080sn_device::get_fg_tile_info)
+void pc080sn_device::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_pc080sn_fg_tile_info( tileinfo, tile_index, m_bg_ram[1], m_gfxnum );
 }
 
-READ16_MEMBER( pc080sn_device::word_r )
+uint16_t pc080sn_device::word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( pc080sn_device::word_w )
+void pc080sn_device::word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 
@@ -211,7 +211,7 @@ WRITE16_MEMBER( pc080sn_device::word_w )
 	}
 }
 
-WRITE16_MEMBER( pc080sn_device::xscroll_word_w )
+void pc080sn_device::xscroll_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ctrl[offset]);
 
@@ -229,7 +229,7 @@ WRITE16_MEMBER( pc080sn_device::xscroll_word_w )
 	}
 }
 
-WRITE16_MEMBER( pc080sn_device::yscroll_word_w )
+void pc080sn_device::yscroll_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ctrl[offset + 2]);
 
@@ -250,7 +250,7 @@ WRITE16_MEMBER( pc080sn_device::yscroll_word_w )
 	}
 }
 
-WRITE16_MEMBER( pc080sn_device::ctrl_word_w )
+void pc080sn_device::ctrl_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ctrl[offset + 4]);
 

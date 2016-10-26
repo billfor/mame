@@ -226,7 +226,7 @@ geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const 
 	m_eprom = nullptr;
 }
 
-INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
+void geneve_mapper_device::settings_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int number = (int)((uint64_t)param&0x03);
 	int value = newval;
@@ -263,7 +263,7 @@ INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
     within the gate array. Unlike with real GROMs, no address wrapping occurs,
     and the complete 64K space is available.
 */
-READ8_MEMBER( geneve_mapper_device::read_grom )
+uint8_t geneve_mapper_device::read_grom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t reply;
 	if (offset & 0x0002)
@@ -298,7 +298,7 @@ READ8_MEMBER( geneve_mapper_device::read_grom )
     Simulates GROM. The real Geneve does not use GROMs but simulates them
     within the gate array.
 */
-WRITE8_MEMBER( geneve_mapper_device::write_grom )
+void geneve_mapper_device::write_grom(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x0002)
 	{
@@ -455,7 +455,7 @@ enum
     SETOFFSET method, and we re-use the values stored there to quickly
     access the appropriate component.
 */
-READ8_MEMBER( geneve_mapper_device::readm )
+uint8_t geneve_mapper_device::readm(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 
@@ -644,7 +644,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	return value;
 }
 
-WRITE8_MEMBER( geneve_mapper_device::writem )
+void geneve_mapper_device::writem(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	decdata *dec;
 	decdata debug;
@@ -1223,7 +1223,7 @@ void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read
 /*
     Read from PFM.
 */
-READ8_MEMBER( geneve_mapper_device::read_from_pfm )
+uint8_t geneve_mapper_device::read_from_pfm(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value;
 	if (!m_pfm_output_enable) return 0;
@@ -1247,7 +1247,7 @@ READ8_MEMBER( geneve_mapper_device::read_from_pfm )
 	return value;
 }
 
-WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
+void geneve_mapper_device::write_to_pfm(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Nota bene: The PFM must be write protected on startup, or the RESET
 	// of the 9995 will attempt to write the return vector into the flash EEPROM
@@ -1273,7 +1273,7 @@ WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
     This decoding will later be used in the READ/WRITE member functions. Also,
     we initiate wait state creation here.
 */
-SETOFFSET_MEMBER( geneve_mapper_device::setoffset )
+void geneve_mapper_device::setoffset(address_space &space, offs_t offset)
 {
 	if (TRACE_DETAIL) logerror("setoffset = %04x\n", offset);
 	m_debug_no_ws = false;
@@ -1292,7 +1292,7 @@ SETOFFSET_MEMBER( geneve_mapper_device::setoffset )
     affect the video access itself but become effective after the access; if
     the code runs on the chip, these wait states are ignored.)
 */
-WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
+void geneve_mapper_device::clock_in(int state)
 {
 	if (state==ASSERT_LINE)
 	{
@@ -1348,7 +1348,7 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 /*
     We need the DBIN line for the setoffset operation.
 */
-WRITE_LINE_MEMBER( geneve_mapper_device::dbin_in )
+void geneve_mapper_device::dbin_in(int state)
 {
 	m_read_mode = (state==ASSERT_LINE);
 	if (TRACE_DETAIL) logerror("dbin = %02x\n", m_read_mode? 1:0);
@@ -1357,21 +1357,21 @@ WRITE_LINE_MEMBER( geneve_mapper_device::dbin_in )
 /*
     PFM expansion: Setting the bank.
 */
-WRITE_LINE_MEMBER( geneve_mapper_device::pfm_select_lsb )
+void geneve_mapper_device::pfm_select_lsb(int state)
 {
 	if (state==ASSERT_LINE) m_pfm_bank |= 1;
 	else m_pfm_bank &= 0xfe;
 	if (TRACE_PFM) logerror("Setting bank (l) = %d\n", m_pfm_bank);
 }
 
-WRITE_LINE_MEMBER( geneve_mapper_device::pfm_select_msb )
+void geneve_mapper_device::pfm_select_msb(int state)
 {
 	if (state==ASSERT_LINE) m_pfm_bank |= 2;
 	else m_pfm_bank &= 0xfd;
 	if (TRACE_PFM) logerror("Setting bank (u) = %d\n", m_pfm_bank);
 }
 
-WRITE_LINE_MEMBER( geneve_mapper_device::pfm_output_enable )
+void geneve_mapper_device::pfm_output_enable(int state)
 {
 	// Negative logic
 	m_pfm_output_enable = (state==CLEAR_LINE);
@@ -1765,7 +1765,7 @@ void geneve_keyboard_device::signal_when_key_available()
 	}
 }
 
-WRITE_LINE_MEMBER( geneve_keyboard_device::clock_control )
+void geneve_keyboard_device::clock_control(int state)
 {
 	bool rising_edge = (!m_keyboard_clock && (state==ASSERT_LINE));
 	m_keyboard_clock = (state==ASSERT_LINE);
@@ -1774,7 +1774,7 @@ WRITE_LINE_MEMBER( geneve_keyboard_device::clock_control )
 		signal_when_key_available();
 }
 
-WRITE_LINE_MEMBER( geneve_keyboard_device::send_scancodes )
+void geneve_keyboard_device::send_scancodes(int state)
 {
 	bool rising_edge = (!m_keep_keybuf && (state==ASSERT_LINE));
 	bool falling_edge = (m_keep_keybuf && (state==CLEAR_LINE));
@@ -1797,7 +1797,7 @@ WRITE_LINE_MEMBER( geneve_keyboard_device::send_scancodes )
 	}
 }
 
-WRITE_LINE_MEMBER( geneve_keyboard_device::reset_line )
+void geneve_keyboard_device::reset_line(int state)
 {
 	m_key_reset = !(state==ASSERT_LINE);
 

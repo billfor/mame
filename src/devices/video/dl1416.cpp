@@ -184,25 +184,25 @@ dl1416t_device::dl1416t_device(const machine_config &mconfig, const char *tag, d
 *****************************************************************************/
 
 /* write enable, active low */
-WRITE_LINE_MEMBER( dl1416_device::wr_w )
+void dl1416_device::wr_w(int state)
 {
 	m_write_enable = !state;
 }
 
 /* chip enable, active low */
-WRITE_LINE_MEMBER( dl1416_device::ce_w )
+void dl1416_device::ce_w(int state)
 {
 	m_chip_enable = !state;
 }
 
 /* cursor enable, active low */
-WRITE_LINE_MEMBER( dl1416_device::cu_w )
+void dl1416_device::cu_w(int state)
 {
 	m_cursor_enable = !state;
 }
 
 /* data */
-WRITE8_MEMBER( dl1416_device::data_w )
+void dl1416_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x03; /* A0-A1 */
 	data &= 0x7f;   /* D0-D6 */

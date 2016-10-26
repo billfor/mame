@@ -31,7 +31,7 @@ Verified Dip locations and recommended settings with manual
 
 ***************************************************************************/
 
-WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
+void skyfox_state::skyfox_vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_CHANGED_MEMBER(skyfox_state::coin_inserted)
+void skyfox_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -200,7 +200,7 @@ GFXDECODE_END
 
 /* Scroll the background on every vblank (guess). */
 
-INTERRUPT_GEN_MEMBER(skyfox_state::skyfox_interrupt)
+void skyfox_state::skyfox_interrupt(device_t &device)
 {
 	/* Scroll the bg */
 	m_bg_pos += (m_bg_ctrl >> 1) & 0x7; // maybe..
@@ -397,7 +397,7 @@ ROM_END
 
 
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
-DRIVER_INIT_MEMBER(skyfox_state,skyfox)
+void skyfox_state::init_skyfox()
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	uint8_t *end = rom + memregion("gfx1")->bytes();

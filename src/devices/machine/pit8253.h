@@ -66,12 +66,12 @@ public:
 	template<class _Object> static devcb_base &set_out1_handler(device_t &device, _Object object) { return downcast<pit8253_device &>(device).m_out1_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_out2_handler(device_t &device, _Object object) { return downcast<pit8253_device &>(device).m_out2_handler.set_callback(object); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	WRITE_LINE_MEMBER(write_gate0);
-	WRITE_LINE_MEMBER(write_gate1);
-	WRITE_LINE_MEMBER(write_gate2);
+	void write_gate0(int state);
+	void write_gate1(int state);
+	void write_gate2(int state);
 
 	/* In the 8253/8254 the CLKx input lines can be attached to a regular clock
 	 signal. Another option is to use the output from one timer as the input
@@ -83,9 +83,9 @@ public:
 	 to 0 with pit8253_set_clockin and call pit8253_clkX_w to change
 	 the state of the input CLKx signal.
 	 */
-	WRITE_LINE_MEMBER(write_clk0);
-	WRITE_LINE_MEMBER(write_clk1);
-	WRITE_LINE_MEMBER(write_clk2);
+	void write_clk0(int state);
+	void write_clk1(int state);
+	void write_clk2(int state);
 
 	void set_clockin(int timer, double new_clockin);
 

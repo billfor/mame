@@ -23,10 +23,10 @@ public:
 
 	static void static_set_upper(device_t &device, int upper) { downcast<midway_serial_pic_device &>(device).m_upper = upper; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void reset_w(int state);
 
 protected:
 	// device-level overrides
@@ -66,9 +66,9 @@ public:
 
 	static void static_set_yearoffs(device_t &device, int yearoffs) { downcast<midway_serial_pic2_device &>(device).m_yearoffs = yearoffs; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( status_r );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void set_default_nvram(const uint8_t *nvram);
 
@@ -84,7 +84,7 @@ protected:
 private:
 
 	void pic_register_state();
-	TIMER_CALLBACK_MEMBER( reset_timer );
+	void reset_timer(void *ptr, int32_t param);
 
 	uint16_t  m_latch;
 	attotime m_latch_expire_time;
@@ -131,19 +131,19 @@ public:
 	void fifo_full_w(uint16_t data);
 	void output_w(uint32_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(fifo_reset_w);
-	DECLARE_READ16_MEMBER(fifo_r);
-	DECLARE_READ16_MEMBER(fifo_status_r);
+	void fifo_reset_w(int state);
+	uint16_t fifo_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t fifo_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER(ioasic_input_empty);
-	DECLARE_WRITE_LINE_MEMBER(ioasic_output_full);
+	void ioasic_input_empty(int state);
+	void ioasic_output_full(int state);
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( packed_r );
-	DECLARE_WRITE32_MEMBER( packed_w );
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t packed_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void packed_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE8_MEMBER(cage_irq_handler);
+	void cage_irq_handler(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void ioasic_reset();
 

@@ -15,7 +15,7 @@
 /*
     driver init function
 */
-DRIVER_INIT_MEMBER(patinho_feio_state, patinho_feio)
+void patinho_feio_state::init_patinho_feio()
 {
 	m_out = &output();
 	m_prev_ACC = 0;
@@ -27,12 +27,12 @@ DRIVER_INIT_MEMBER(patinho_feio_state, patinho_feio)
 	m_prev_RC = 0;
 }
 
-READ16_MEMBER(patinho_feio_state::rc_r)
+uint16_t patinho_feio_state::rc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("RC")->read();
 }
 
-READ16_MEMBER(patinho_feio_state::buttons_r)
+uint16_t patinho_feio_state::buttons_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("BUTTONS")->read();
 }
@@ -93,7 +93,7 @@ void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_d
 	m_prev_FLAGS = FLAGS;
 }
 
-WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
+void patinho_feio_state::decwriter_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_decwriter->write(space, 0, data);
 
@@ -110,18 +110,18 @@ WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
 /*
     timer callback to generate decwriter char print completion signal
 */
-TIMER_CALLBACK_MEMBER(patinho_feio_state::decwriter_callback)
+void patinho_feio_state::decwriter_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_iodev_status(0xA, IODEV_READY);
 	m_decwriter_timer->enable(0); //stop the timer
 }
 
-WRITE8_MEMBER(patinho_feio_state::decwriter_kbd_input)
+void patinho_feio_state::decwriter_kbd_input(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->transfer_byte_from_external_device(0xA, ~data);
 }
 
-WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
+void patinho_feio_state::teletype_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tty->write(space, 0, data);
 
@@ -133,13 +133,13 @@ WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
 /*
     timer callback to generate teletype char print completion signal
 */
-TIMER_CALLBACK_MEMBER(patinho_feio_state::teletype_callback)
+void patinho_feio_state::teletype_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_iodev_status(0xB, IODEV_READY);
 	m_teletype_timer->enable(0); //stop the timer
 }
 
-WRITE8_MEMBER(patinho_feio_state::teletype_kbd_input)
+void patinho_feio_state::teletype_kbd_input(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//I figured out that the data is provided inverted (2's complement)
 	//based on a comment in the source code listing of the HEXAM program.
@@ -183,7 +183,7 @@ void patinho_feio_state::load_raw_data(const char* name, unsigned int start_addr
 	memcpy(&RAM[start_address], data, data_length);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state, patinho_tape )
+image_init_result patinho_feio_state::device_image_load_patinho_tape(device_image_interface &image)
 {
 	if (image.software_entry() != nullptr){
 		paper_tape_length = image.get_software_region_length("rom");

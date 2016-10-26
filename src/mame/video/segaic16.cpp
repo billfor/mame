@@ -662,7 +662,7 @@ void draw_virtual_tilemap(screen_device &screen, struct tilemap_info *info, bitm
  *
  *******************************************************************************************/
 
-TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16a_tile_info )
+void segaic16_video_device::tilemap_16a_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
 	uint16_t data = info->rambase[tile_index];
@@ -674,7 +674,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16a_tile_info )
 }
 
 
-TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16a_text_info )
+void segaic16_video_device::tilemap_16a_text_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
 	uint16_t data = info->rambase[tile_index];
@@ -874,7 +874,7 @@ void tilemap_16a_draw_layer(screen_device &screen, struct tilemap_info *info, bi
  *
  *******************************************************************************************/
 
-TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_tile_info )
+void segaic16_video_device::tilemap_16b_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
 	uint16_t data = info->rambase[tile_index];
@@ -888,7 +888,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_tile_info )
 }
 
 
-TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_text_info )
+void segaic16_video_device::tilemap_16b_text_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
 	uint16_t data = info->rambase[tile_index];
@@ -901,7 +901,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_text_info )
 }
 
 
-TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_alt_tile_info )
+void segaic16_video_device::tilemap_16b_alt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
 	uint16_t data = info->rambase[tile_index];
@@ -915,7 +915,7 @@ TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_alt_tile_info )
 }
 
 
-TILE_GET_INFO_MEMBER( segaic16_video_device::tilemap_16b_alt_text_info )
+void segaic16_video_device::tilemap_16b_alt_text_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const struct tilemap_callback_info *info = (const struct tilemap_callback_info *)tilemap.user_data();
 	uint16_t data = info->rambase[tile_index];
@@ -1032,7 +1032,7 @@ void segaic16_video_device::tilemap_16b_fill_latch(int i, uint16_t* latched_page
 //  printf("%02x returning latched page select %04x scrollx %04x scrolly %04x\n", i, latched_pageselect[i], latched_xscroll[i], latched_yscroll[i]);
 }
 
-TIMER_CALLBACK_MEMBER( segaic16_video_device::tilemap_16b_latch_values )
+void segaic16_video_device::tilemap_16b_latch_values(void *ptr, int32_t param)
 {
 	struct tilemap_info *info = &m_bg_tilemap[param];
 	uint16_t *textram = info->textram;
@@ -1303,26 +1303,26 @@ void segaic16_video_device::tilemap_set_colscroll(int which, int enable)
  *
  *************************************/
 
-READ16_MEMBER( segaic16_video_device::tileram_r )
+uint16_t segaic16_video_device::tileram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_tileram[offset];
 }
 
 
-WRITE16_MEMBER( segaic16_video_device::tileram_w )
+void segaic16_video_device::tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tileram[offset]);
 	m_bg_tilemap[0].tilemaps[offset / (64*32)]->mark_tile_dirty(offset % (64*32));
 }
 
 
-READ16_MEMBER( segaic16_video_device::textram_r )
+uint16_t segaic16_video_device::textram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_textram[offset];
 }
 
 
-WRITE16_MEMBER( segaic16_video_device::textram_w )
+void segaic16_video_device::textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
@@ -1454,7 +1454,7 @@ void segaic16_video_device::rotate_draw(int which, bitmap_ind16 &bitmap, const r
  *
  *************************************/
 
-READ16_MEMBER( segaic16_video_device::rotate_control_r )
+uint16_t segaic16_video_device::rotate_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	struct rotate_info *info = &m_rotate[0];
 

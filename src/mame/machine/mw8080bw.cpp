@@ -45,7 +45,7 @@ int mw8080bw_state::vysnc_chain_counter_to_vpos( uint8_t counter, int vblank )
 }
 
 
-TIMER_CALLBACK_MEMBER(mw8080bw_state::mw8080bw_interrupt_callback)
+void mw8080bw_state::mw8080bw_interrupt_callback(void *ptr, int32_t param)
 {
 	uint8_t next_counter;
 	int next_vpos;
@@ -94,7 +94,7 @@ void mw8080bw_state::mw8080bw_start_interrupt_timer(  )
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,mw8080bw)
+void mw8080bw_state::machine_start_mw8080bw()
 {
 	mw8080bw_create_interrupt_timer();
 }
@@ -106,7 +106,7 @@ MACHINE_START_MEMBER(mw8080bw_state,mw8080bw)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(mw8080bw_state,mw8080bw)
+void mw8080bw_state::machine_reset_mw8080bw()
 {
 	mw8080bw_start_interrupt_timer();
 }

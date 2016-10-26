@@ -78,28 +78,28 @@ public:
 	uint8_t        m_cal_cnt;
 	system_time  m_systime;
 
-	DECLARE_READ16_MEMBER(pgm_videoram_r);
-	DECLARE_WRITE16_MEMBER(pgm_videoram_w);
-	DECLARE_WRITE16_MEMBER(pgm_coin_counter_w);
-	DECLARE_READ16_MEMBER(z80_ram_r);
-	DECLARE_WRITE16_MEMBER(z80_ram_w);
-	DECLARE_WRITE16_MEMBER(z80_reset_w);
-	DECLARE_WRITE16_MEMBER(z80_ctrl_w);
-	DECLARE_WRITE16_MEMBER(m68k_l1_w);
-	DECLARE_WRITE8_MEMBER(z80_l3_w);
-	DECLARE_WRITE16_MEMBER(pgm_tx_videoram_w);
-	DECLARE_WRITE16_MEMBER(pgm_bg_videoram_w);
+	uint16_t pgm_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pgm_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pgm_coin_counter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t z80_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void z80_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void z80_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void z80_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void m68k_l1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void z80_l3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pgm_tx_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pgm_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DRIVER_INIT(pgm);
+	void init_pgm();
 
-	TILE_GET_INFO_MEMBER(get_pgm_tx_tilemap_tile_info);
-	TILE_GET_INFO_MEMBER(get_pgm_bg_tilemap_tile_info);
-	DECLARE_VIDEO_START(pgm);
-	DECLARE_MACHINE_START(pgm);
-	DECLARE_MACHINE_RESET(pgm);
+	void get_pgm_tx_tilemap_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pgm_bg_tilemap_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void video_start_pgm();
+	void machine_start_pgm();
+	void machine_reset_pgm();
 	uint32_t screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pgm(screen_device &screen, bool state);
-	TIMER_DEVICE_CALLBACK_MEMBER(pgm_interrupt);
+	void pgm_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	inline void pgm_draw_pix( int xdrawpos, int pri, uint16_t* dest, uint8_t* destpri, uint16_t srcdat);
 	inline void pgm_draw_pix_nopri( int xdrawpos, uint16_t* dest, uint8_t* destpri, uint16_t srcdat);

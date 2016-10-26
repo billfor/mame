@@ -130,16 +130,16 @@ public:
 	required_shared_ptr<uint16_t> m_vid2;
 	required_device<palette_device> m_palette;
 	int m_bmc_input;
-	DECLARE_READ16_MEMBER(bmc_random_read);
-	DECLARE_READ16_MEMBER(bmc_protection_r);
-	DECLARE_WRITE16_MEMBER(scroll_w);
-	DECLARE_READ8_MEMBER(via_b_in);
-	DECLARE_WRITE8_MEMBER(via_a_out);
-	DECLARE_WRITE8_MEMBER(via_b_out);
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
-	DECLARE_READ8_MEMBER(dips1_r);
-	DECLARE_WRITE8_MEMBER(input_mux_w);
-	DECLARE_DRIVER_INIT(bmcbowl);
+	uint16_t bmc_random_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t bmc_protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t via_b_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via_a_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via_b_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via_ca2_out(int state);
+	uint8_t dips1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void input_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_bmcbowl();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -202,12 +202,12 @@ uint32_t bmcbowl_state::screen_update_bmcbowl(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-READ16_MEMBER(bmcbowl_state::bmc_random_read)
+uint16_t bmcbowl_state::bmc_random_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand();
 }
 
-READ16_MEMBER(bmcbowl_state::bmc_protection_r)
+uint16_t bmcbowl_state::bmc_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(space.device().safe_pcbase())
 	{
@@ -223,29 +223,29 @@ READ16_MEMBER(bmcbowl_state::bmc_protection_r)
 	return machine().rand();
 }
 
-WRITE16_MEMBER(bmcbowl_state::scroll_w)
+void bmcbowl_state::scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//TODO - scroll
 }
 
 
-READ8_MEMBER(bmcbowl_state::via_b_in)
+uint8_t bmcbowl_state::via_b_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("IN3")->read();
 }
 
 
-WRITE8_MEMBER(bmcbowl_state::via_a_out)
+void bmcbowl_state::via_a_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// related to video hw ? BG scroll ?
 }
 
-WRITE8_MEMBER(bmcbowl_state::via_b_out)
+void bmcbowl_state::via_b_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//used
 }
 
-WRITE_LINE_MEMBER(bmcbowl_state::via_ca2_out)
+void bmcbowl_state::via_ca2_out(int state)
 {
 	//used
 }
@@ -427,7 +427,7 @@ static INPUT_PORTS_START( bmcbowl )
 
 INPUT_PORTS_END
 
-READ8_MEMBER(bmcbowl_state::dips1_r)
+uint8_t bmcbowl_state::dips1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(m_bmc_input)
 	{
@@ -439,7 +439,7 @@ READ8_MEMBER(bmcbowl_state::dips1_r)
 }
 
 
-WRITE8_MEMBER(bmcbowl_state::input_mux_w)
+void bmcbowl_state::input_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bmc_input=data;
 }
@@ -509,7 +509,7 @@ ROM_START( bmcbowl )
 
 ROM_END
 
-DRIVER_INIT_MEMBER(bmcbowl_state,bmcbowl)
+void bmcbowl_state::init_bmcbowl()
 {
 	save_item(NAME(m_bmc_input));
 }

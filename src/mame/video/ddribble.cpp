@@ -12,7 +12,7 @@
 #include "includes/ddribble.h"
 
 
-PALETTE_INIT_MEMBER(ddribble_state, ddribble)
+void ddribble_state::palette_init_ddribble(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -29,7 +29,7 @@ PALETTE_INIT_MEMBER(ddribble_state, ddribble)
 }
 
 
-WRITE8_MEMBER(ddribble_state::K005885_0_w)
+void ddribble_state::K005885_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -47,7 +47,7 @@ WRITE8_MEMBER(ddribble_state::K005885_0_w)
 	m_vregs[0][offset] = data;
 }
 
-WRITE8_MEMBER(ddribble_state::K005885_1_w)
+void ddribble_state::K005885_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -71,13 +71,13 @@ WRITE8_MEMBER(ddribble_state::K005885_1_w)
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(ddribble_state::tilemap_scan)
+tilemap_memory_index ddribble_state::tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);    /* skip 0x400 */
 }
 
-TILE_GET_INFO_MEMBER(ddribble_state::get_fg_tile_info)
+void ddribble_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_fg_videoram[tile_index];
 	int num = m_fg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + ((m_charbank[0] & 2) << 10);
@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(ddribble_state::get_fg_tile_info)
 			TILE_FLIPYX((attr & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(ddribble_state::get_bg_tile_info)
+void ddribble_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_bg_videoram[tile_index];
 	int num = m_bg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + (m_charbank[1] << 11);
@@ -117,13 +117,13 @@ void ddribble_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(ddribble_state::ddribble_fg_videoram_w)
+void ddribble_state::ddribble_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0xbff);
 }
 
-WRITE8_MEMBER(ddribble_state::ddribble_bg_videoram_w)
+void ddribble_state::ddribble_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0xbff);

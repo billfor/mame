@@ -101,36 +101,36 @@ public:
 	uint8_t m_out[3];
 	uint8_t m_protection_res;
 
-	DECLARE_READ8_MEMBER(igs_irqack_r);
-	DECLARE_WRITE8_MEMBER(igs_irqack_w);
-	DECLARE_WRITE8_MEMBER(bg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(igs_nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(igs_lamps_w);
-	DECLARE_READ8_MEMBER(custom_io_r);
-	DECLARE_WRITE8_MEMBER(custom_io_w);
-	DECLARE_READ8_MEMBER(exp_rom_r);
+	uint8_t igs_irqack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void igs_irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void igs_nmi_and_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void igs_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t custom_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void custom_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t exp_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void show_out();
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
-	DECLARE_DRIVER_INIT(igs_ncs);
-	DECLARE_DRIVER_INIT(number10);
-	DECLARE_DRIVER_INIT(pktet346);
-	DECLARE_DRIVER_INIT(cpokert);
-	DECLARE_DRIVER_INIT(chleague);
-	DECLARE_DRIVER_INIT(cska);
-	DECLARE_DRIVER_INIT(cpoker);
-	DECLARE_DRIVER_INIT(igs_ncs2);
-	DECLARE_DRIVER_INIT(cpokerpk);
-	DECLARE_DRIVER_INIT(kungfu);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	ioport_value hopper_r(ioport_field &field, void *param);
+	void init_igs_ncs();
+	void init_number10();
+	void init_pktet346();
+	void init_cpokert();
+	void init_chleague();
+	void init_cska();
+	void init_cpoker();
+	void init_igs_ncs2();
+	void init_cpokerpk();
+	void init_kungfu();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(cpokerpk);
+	void video_start_cpokerpk();
 	uint32_t screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
+	void igs_interrupt(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -142,7 +142,7 @@ void igspoker_state::machine_reset()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(igspoker_state::igs_interrupt)
+void igspoker_state::igs_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -157,44 +157,44 @@ TIMER_DEVICE_CALLBACK_MEMBER(igspoker_state::igs_interrupt)
 }
 
 
-READ8_MEMBER(igspoker_state::igs_irqack_r)
+uint8_t igspoker_state::igs_irqack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
-WRITE8_MEMBER(igspoker_state::igs_irqack_w)
+void igspoker_state::igs_irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-TILE_GET_INFO_MEMBER(igspoker_state::get_bg_tile_info)
+void igspoker_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_tile_ram[tile_index];
 	SET_TILE_INFO_MEMBER(1 + (tile_index & 3), code, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(igspoker_state::get_fg_tile_info)
+void igspoker_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
 	SET_TILE_INFO_MEMBER(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
-WRITE8_MEMBER(igspoker_state::bg_tile_w)
+void igspoker_state::bg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tile_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(igspoker_state::fg_tile_w)
+void igspoker_state::fg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(igspoker_state::fg_color_w)
+void igspoker_state::fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -220,7 +220,7 @@ uint32_t igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_i
 	return 0;
 }
 
-VIDEO_START_MEMBER(igspoker_state,cpokerpk)
+void igspoker_state::video_start_cpokerpk()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
 }
@@ -240,7 +240,7 @@ void igspoker_state::show_out()
 #endif
 }
 
-WRITE8_MEMBER(igspoker_state::igs_nmi_and_coins_w)
+void igspoker_state::igs_nmi_and_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0,        data & 0x01);   // coin_a
 	machine().bookkeeping().coin_counter_w(1,        data & 0x04);   // coin_c
@@ -258,7 +258,7 @@ WRITE8_MEMBER(igspoker_state::igs_nmi_and_coins_w)
 	show_out();
 }
 
-WRITE8_MEMBER(igspoker_state::igs_lamps_w)
+void igspoker_state::igs_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     - Lbits -
@@ -300,7 +300,7 @@ WRITE8_MEMBER(igspoker_state::igs_lamps_w)
 
 
 
-READ8_MEMBER(igspoker_state::custom_io_r)
+uint8_t igspoker_state::custom_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 #if VERBOSE
 	logerror("PC %06X: Protection read %02x\n",space.device().safe_pc(), m_protection_res);
@@ -308,7 +308,7 @@ READ8_MEMBER(igspoker_state::custom_io_r)
 	return m_protection_res;
 }
 
-WRITE8_MEMBER(igspoker_state::custom_io_w)
+void igspoker_state::custom_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if VERBOSE
 	logerror("PC %06X: Protection write %02x\n",space.device().safe_pc(),data);
@@ -353,13 +353,13 @@ WRITE8_MEMBER(igspoker_state::custom_io_w)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(igspoker_state::hopper_r)
+ioport_value igspoker_state::hopper_r(ioport_field &field, void *param)
 {
 	if (m_hopper) return !(m_screen->frame_number()%10);
 	return machine().input().code_pressed(KEYCODE_H);
 }
 
-READ8_MEMBER(igspoker_state::exp_rom_r)
+uint8_t igspoker_state::exp_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	return rom[offset+0x10000];
@@ -1932,7 +1932,7 @@ ROM_END
 /*  Decode a simple PAL encryption
  */
 
-DRIVER_INIT_MEMBER(igspoker_state,cpoker)
+void igspoker_state::init_cpoker()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1947,7 +1947,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cpoker)
 	}
 }
 
-DRIVER_INIT_MEMBER(igspoker_state,cpokert)
+void igspoker_state::init_cpokert()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i;
@@ -1976,7 +1976,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cpokert)
 	}
 }
 
-DRIVER_INIT_MEMBER(igspoker_state,cska)
+void igspoker_state::init_cska()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1993,7 +1993,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cska)
 }
 
 
-DRIVER_INIT_MEMBER(igspoker_state,igs_ncs)
+void igspoker_state::init_igs_ncs()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2155,7 +2155,7 @@ Clocks
 
 */
 
-DRIVER_INIT_MEMBER(igspoker_state,igs_ncs2)
+void igspoker_state::init_igs_ncs2()
 {
 	uint8_t *src = (uint8_t *) (memregion("maincpu")->base());
 	int i;
@@ -2228,7 +2228,7 @@ ROM_START( igs_ncs2 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(igspoker_state,chleague)
+void igspoker_state::init_chleague()
 {
 	int A;
 	int length;
@@ -2438,7 +2438,7 @@ ROM_START( chleagxb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(igspoker_state,number10)
+void igspoker_state::init_number10()
 {
 	int A;
 	int length;
@@ -2518,7 +2518,7 @@ ROM_START( numbr10l )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(igspoker_state,cpokerpk)
+void igspoker_state::init_cpokerpk()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2586,7 +2586,7 @@ ROM_START( pktet346 )
 
 ROM_END
 
-DRIVER_INIT_MEMBER(igspoker_state,pktet346)
+void igspoker_state::init_pktet346()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2665,7 +2665,7 @@ ROM_START( kungfu )
 	ROM_LOAD( "kungfu.u48", 0x000, 0xde1, CRC(5d4aacaf) SHA1(733546ce0585c40833e1c34504c33219a2bea0a9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(igspoker_state, kungfu)
+void igspoker_state::init_kungfu()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();

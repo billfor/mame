@@ -136,18 +136,18 @@ public:
 	uint8_t      m_bitmap_disable;
 	uint8_t      m_tilemap_bank;
 	uint8_t      m_pri;
-	DECLARE_WRITE8_MEMBER(jollyjgr_videoram_w);
-	DECLARE_WRITE8_MEMBER(jollyjgr_attrram_w);
-	DECLARE_WRITE8_MEMBER(jollyjgr_misc_w);
-	DECLARE_WRITE8_MEMBER(jollyjgr_coin_lookout_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void jollyjgr_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jollyjgr_attrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jollyjgr_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jollyjgr_coin_lookout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jollyjgr);
+	void palette_init_jollyjgr(palette_device &palette);
 	uint32_t screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(jollyjgr_interrupt);
+	void jollyjgr_interrupt(device_t &device);
 	void draw_bitmap( bitmap_rgb32 &bitmap );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -162,13 +162,13 @@ public:
  *
  *************************************/
 
-WRITE8_MEMBER(jollyjgr_state::jollyjgr_videoram_w)
+void jollyjgr_state::jollyjgr_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jollyjgr_state::jollyjgr_attrram_w)
+void jollyjgr_state::jollyjgr_attrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -186,7 +186,7 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_attrram_w)
 	m_colorram[offset] = data;
 }
 
-WRITE8_MEMBER(jollyjgr_state::jollyjgr_misc_w)
+void jollyjgr_state::jollyjgr_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// they could be swapped, because it always set "data & 3"
 	m_flip_x = data & 1;
@@ -203,7 +203,7 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_misc_w)
 	m_nmi_enable = data & 0x80;
 }
 
-WRITE8_MEMBER(jollyjgr_state::jollyjgr_coin_lookout_w)
+void jollyjgr_state::jollyjgr_coin_lookout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(data & 1);
 
@@ -418,7 +418,7 @@ INPUT_PORTS_END
  *************************************/
 
 /* tilemap / sprites palette */
-PALETTE_INIT_MEMBER(jollyjgr_state, jollyjgr)
+void jollyjgr_state::palette_init_jollyjgr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -447,7 +447,7 @@ PALETTE_INIT_MEMBER(jollyjgr_state, jollyjgr)
 }
 
 /* Tilemap is the same as in Galaxian */
-TILE_GET_INFO_MEMBER(jollyjgr_state::get_bg_tile_info)
+void jollyjgr_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color = m_colorram[((tile_index & 0x1f) << 1) | 1] & 7;
 	int region = (m_tilemap_bank & 0x20) ? 2 : 0;
@@ -624,7 +624,7 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(jollyjgr_state::jollyjgr_interrupt)
+void jollyjgr_state::jollyjgr_interrupt(device_t &device)
 {
 	if(m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

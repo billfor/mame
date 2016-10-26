@@ -233,14 +233,14 @@ do { \
 	SET_TILE_INFO_MEMBER(1, tile >> 1, color, 0); \
 } while (0)
 
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer0_4bit) { MODEL3_TILE_INFO4(0x000); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer0_8bit) { MODEL3_TILE_INFO8(0x000); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer1_4bit) { MODEL3_TILE_INFO4(0x400); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer1_8bit) { MODEL3_TILE_INFO8(0x400); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer2_4bit) { MODEL3_TILE_INFO4(0x800); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer2_8bit) { MODEL3_TILE_INFO8(0x800); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer3_4bit) { MODEL3_TILE_INFO4(0xc00); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer3_8bit) { MODEL3_TILE_INFO8(0xc00); }
+void model3_state::tile_info_layer0_4bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO4(0x000); }
+void model3_state::tile_info_layer0_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO8(0x000); }
+void model3_state::tile_info_layer1_4bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO4(0x400); }
+void model3_state::tile_info_layer1_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO8(0x400); }
+void model3_state::tile_info_layer2_4bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO4(0x800); }
+void model3_state::tile_info_layer2_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO8(0x800); }
+void model3_state::tile_info_layer3_4bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO4(0xc00); }
+void model3_state::tile_info_layer3_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO8(0xc00); }
 
 #ifdef UNUSED_FUNCTION
 void model3_state::draw_texture_sheet(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -388,24 +388,24 @@ uint32_t model3_state::screen_update_model3(screen_device &screen, bitmap_rgb32 
 
 
 
-READ64_MEMBER(model3_state::model3_char_r)
+uint64_t model3_state::model3_char_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return m_m3_char_ram[offset];
 }
 
-WRITE64_MEMBER(model3_state::model3_char_w)
+void model3_state::model3_char_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	COMBINE_DATA(&m_m3_char_ram[offset]);
 	m_gfxdecode->gfx(0)->mark_dirty(offset / 4);
 	m_gfxdecode->gfx(1)->mark_dirty(offset / 8);
 }
 
-READ64_MEMBER(model3_state::model3_tile_r)
+uint64_t model3_state::model3_tile_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return m_m3_tile_ram[offset];
 }
 
-WRITE64_MEMBER(model3_state::model3_tile_w)
+void model3_state::model3_tile_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	COMBINE_DATA(&m_m3_tile_ram[offset]);
 
@@ -483,7 +483,7 @@ WRITE64_MEMBER(model3_state::model3_tile_w)
 */
 
 
-READ64_MEMBER(model3_state::model3_vid_reg_r)
+uint64_t model3_state::model3_vid_reg_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	switch(offset)
 	{
@@ -496,7 +496,7 @@ READ64_MEMBER(model3_state::model3_vid_reg_r)
 	return 0;
 }
 
-WRITE64_MEMBER(model3_state::model3_vid_reg_w)
+void model3_state::model3_vid_reg_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch(offset)
 	{
@@ -515,7 +515,7 @@ WRITE64_MEMBER(model3_state::model3_vid_reg_w)
 	}
 }
 
-WRITE64_MEMBER(model3_state::model3_palette_w)
+void model3_state::model3_palette_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram64[offset]);
 	uint32_t data1 = BYTE_REVERSE32((uint32_t)(m_paletteram64[offset] >> 32));
@@ -525,7 +525,7 @@ WRITE64_MEMBER(model3_state::model3_palette_w)
 	m_palette->set_pen_color((offset*2)+1, pal5bit(data2 >> 0), pal5bit(data2 >> 5), pal5bit(data2 >> 10));
 }
 
-READ64_MEMBER(model3_state::model3_palette_r)
+uint64_t model3_state::model3_palette_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return m_paletteram64[offset];
 }
@@ -981,7 +981,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 */
 
 
-WRITE64_MEMBER(model3_state::real3d_display_list_w)
+void model3_state::real3d_display_list_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -993,7 +993,7 @@ WRITE64_MEMBER(model3_state::real3d_display_list_w)
 	}
 }
 
-WRITE64_MEMBER(model3_state::real3d_polygon_ram_w)
+void model3_state::real3d_polygon_ram_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -1358,7 +1358,7 @@ void model3_state::real3d_polygon_ram_dma(uint32_t src, uint32_t dst, int length
 	}
 }
 
-WRITE64_MEMBER(model3_state::real3d_cmd_w)
+void model3_state::real3d_cmd_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	real3d_display_list_end();
 }

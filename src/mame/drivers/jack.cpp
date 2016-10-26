@@ -93,14 +93,14 @@ Stephh's Notes:
  *
  *************************************/
 
-READ8_MEMBER(jack_state::timer_r)
+uint8_t jack_state::timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* wrong! there should be no need for timer_rate, the same function */
 	/* should work for both games */
 	return m_audiocpu->total_cycles() / m_timer_rate;
 }
 
-WRITE8_MEMBER(jack_state::jack_sh_command_w)
+void jack_state::jack_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -109,7 +109,7 @@ WRITE8_MEMBER(jack_state::jack_sh_command_w)
 
 /***************************************************************/
 
-READ8_MEMBER(jack_state::striv_question_r)
+uint8_t jack_state::striv_question_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Set-up the remap table for every 16 bytes
 	if ((offset & 0xc00) == 0x800)
@@ -143,7 +143,7 @@ READ8_MEMBER(jack_state::striv_question_r)
 }
 
 
-WRITE8_MEMBER(jack_state::joinem_control_w)
+void jack_state::joinem_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: related to test mode?
 	// d1: unused?
@@ -866,14 +866,14 @@ void jack_state::machine_reset()
 }
 
 
-MACHINE_START_MEMBER(jack_state,striv)
+void jack_state::machine_start_striv()
 {
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_question_rom));
 	save_item(NAME(m_remap_address));
 }
 
-MACHINE_RESET_MEMBER(jack_state,striv)
+void jack_state::machine_reset_striv()
 {
 	m_question_address = 0;
 	m_question_rom = 0;
@@ -883,7 +883,7 @@ MACHINE_RESET_MEMBER(jack_state,striv)
 }
 
 
-MACHINE_START_MEMBER(jack_state,joinem)
+void jack_state::machine_start_joinem()
 {
 	m_joinem_palette_bank = 0;
 
@@ -891,7 +891,7 @@ MACHINE_START_MEMBER(jack_state,joinem)
 	save_item(NAME(m_joinem_palette_bank));
 }
 
-MACHINE_RESET_MEMBER(jack_state,joinem)
+void jack_state::machine_reset_joinem()
 {
 	joinem_control_w(m_maincpu->space(AS_PROGRAM), 0, 0, 0xff);
 }
@@ -958,7 +958,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************/
 
-INTERRUPT_GEN_MEMBER(jack_state::joinem_vblank_irq)
+void jack_state::joinem_vblank_irq(device_t &device)
 {
 	if (m_joinem_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -1457,13 +1457,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(jack_state,jack)
+void jack_state::init_jack()
 {
 	m_timer_rate = 256;
 }
 
 
-DRIVER_INIT_MEMBER(jack_state,zzyzzyxx)
+void jack_state::init_zzyzzyxx()
 {
 	m_timer_rate = 32;
 }
@@ -1508,14 +1508,14 @@ void jack_state::treahunt_decode(  )
 	}
 }
 
-DRIVER_INIT_MEMBER(jack_state,treahunt)
+void jack_state::init_treahunt()
 {
 	m_timer_rate = 256;
 	treahunt_decode();
 }
 
 
-DRIVER_INIT_MEMBER(jack_state,loverboy)
+void jack_state::init_loverboy()
 {
 	/* this doesn't make sense.. the startup code, and irq0 have jumps to 0..
 	   I replace the startup jump with another jump to what appears to be
@@ -1536,7 +1536,7 @@ DRIVER_INIT_MEMBER(jack_state,loverboy)
 }
 
 
-DRIVER_INIT_MEMBER(jack_state,striv)
+void jack_state::init_striv()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t data;

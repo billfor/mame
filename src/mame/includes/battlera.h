@@ -32,12 +32,12 @@ public:
 	int m_msm5205next;
 	int m_toggle;
 
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(control_data_w);
-	DECLARE_READ8_MEMBER(control_data_r);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void control_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t control_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_int(int state);
 
 	virtual void machine_start() override;
 

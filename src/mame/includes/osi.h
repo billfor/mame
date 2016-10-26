@@ -54,15 +54,15 @@ public:
 	}
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( keyboard_w );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
-	DECLARE_WRITE_LINE_MEMBER( cassette_tx );
-	DECLARE_WRITE_LINE_MEMBER( write_cassette_clock );
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cassette_tx(int state);
+	void write_cassette_clock(int state);
 
 	void floppy_index_callback(floppy_image_device *floppy, int state);
 
-	DECLARE_PALETTE_INIT(osi630);
+	void palette_init_osi630(palette_device &palette);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -118,9 +118,9 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );
-	DECLARE_WRITE8_MEMBER( osi630_sound_w );
-	DECLARE_DRIVER_INIT(c1p);
+	void osi630_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void osi630_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_c1p();
 };
 
 class c1pmf_state : public c1p_state
@@ -132,10 +132,10 @@ public:
 		m_floppy1(*this, "floppy1")
 	{ }
 
-	DECLARE_READ8_MEMBER( osi470_pia_pa_r );
-	DECLARE_WRITE8_MEMBER( osi470_pia_pa_w );
-	DECLARE_WRITE8_MEMBER( osi470_pia_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( osi470_pia_cb2_w );
+	uint8_t osi470_pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void osi470_pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void osi470_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void osi470_pia_cb2_w(int state);
 
 protected:
 	virtual void machine_start() override;
@@ -155,7 +155,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( keyboard_w );
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 /* ---------- defined in video/osi.c ---------- */

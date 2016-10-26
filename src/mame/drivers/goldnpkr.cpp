@@ -1108,52 +1108,52 @@ public:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_mux_data;
 	uint8_t m_pia0_PA_data;
-	DECLARE_WRITE8_MEMBER(goldnpkr_videoram_w);
-	DECLARE_WRITE8_MEMBER(goldnpkr_colorram_w);
-	DECLARE_READ8_MEMBER(goldnpkr_mux_port_r);
-	DECLARE_READ8_MEMBER(pottnpkr_mux_port_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(mux_port_w);
-	DECLARE_WRITE8_MEMBER(wcfalcon_snd_w);
-	DECLARE_WRITE8_MEMBER(lamps_a_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(pia0_a_w);
-	DECLARE_WRITE8_MEMBER(pia0_b_w);
-	DECLARE_WRITE8_MEMBER(pia1_a_w);
-	DECLARE_WRITE8_MEMBER(pia1_b_w);
-	DECLARE_READ8_MEMBER(pia0_a_r);
-	DECLARE_READ8_MEMBER(pia0_b_r);
-	DECLARE_READ8_MEMBER(pia1_a_r);
-	DECLARE_READ8_MEMBER(pia1_b_r);
-	DECLARE_DRIVER_INIT(vkdlswwh);
-	DECLARE_DRIVER_INIT(icp1db);
-	DECLARE_DRIVER_INIT(flcnw);
-	DECLARE_DRIVER_INIT(vkdlswwp);
-	DECLARE_DRIVER_INIT(vkdlsww);
-	DECLARE_DRIVER_INIT(vkdlsb);
-	DECLARE_DRIVER_INIT(vkdlsc);
-	DECLARE_DRIVER_INIT(vkdlswwl);
-	DECLARE_DRIVER_INIT(vkdlswwu);
-	DECLARE_DRIVER_INIT(vkdlswwo);
-	DECLARE_DRIVER_INIT(vkdlswwa);
-	DECLARE_DRIVER_INIT(vkdlsa);
-	DECLARE_DRIVER_INIT(vkdlswwt);
-	DECLARE_DRIVER_INIT(vkdlswwd);
-	DECLARE_DRIVER_INIT(wstrike);
-	DECLARE_DRIVER_INIT(vkdlswws);
-	DECLARE_DRIVER_INIT(vkdlswwc);
-	DECLARE_DRIVER_INIT(vkdlswwr);
-	DECLARE_DRIVER_INIT(vkdlswwv);
-	DECLARE_DRIVER_INIT(bchancep);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
+	void goldnpkr_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void goldnpkr_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t goldnpkr_mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pottnpkr_mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mux_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wcfalcon_snd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia0_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia0_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia0_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia0_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia1_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia1_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_vkdlswwh();
+	void init_icp1db();
+	void init_flcnw();
+	void init_vkdlswwp();
+	void init_vkdlsww();
+	void init_vkdlsb();
+	void init_vkdlsc();
+	void init_vkdlswwl();
+	void init_vkdlswwu();
+	void init_vkdlswwo();
+	void init_vkdlswwa();
+	void init_vkdlsa();
+	void init_vkdlswwt();
+	void init_vkdlswwd();
+	void init_wstrike();
+	void init_vkdlswws();
+	void init_vkdlswwc();
+	void init_vkdlswwr();
+	void init_vkdlswwv();
+	void init_bchancep();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void wcrdxtnd_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(goldnpkr);
-	DECLARE_PALETTE_INIT(witchcrd);
-	DECLARE_VIDEO_START(wcrdxtnd);
-	DECLARE_PALETTE_INIT(wcrdxtnd);
-	DECLARE_MACHINE_START(mondial);
-	DECLARE_MACHINE_RESET(mondial);
+	void palette_init_goldnpkr(palette_device &palette);
+	void palette_init_witchcrd(palette_device &palette);
+	void video_start_wcrdxtnd();
+	void palette_init_wcrdxtnd(palette_device &palette);
+	void machine_start_mondial();
+	void machine_reset_mondial();
 	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	optional_device<discrete_device> m_discrete;
@@ -1167,19 +1167,19 @@ public:
 *********************************************/
 
 
-WRITE8_MEMBER(goldnpkr_state::goldnpkr_videoram_w)
+void goldnpkr_state::goldnpkr_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(goldnpkr_state::goldnpkr_colorram_w)
+void goldnpkr_state::goldnpkr_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(goldnpkr_state::get_bg_tile_info)
+void goldnpkr_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -1197,7 +1197,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(goldnpkr_state::wcrdxtnd_get_bg_tile_info)
+void goldnpkr_state::wcrdxtnd_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /* 16 graphics banks system for VK extended (up & down) PCB's
 
@@ -1220,7 +1220,7 @@ void goldnpkr_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldnpkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-VIDEO_START_MEMBER(goldnpkr_state,wcrdxtnd)
+void goldnpkr_state::video_start_wcrdxtnd()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goldnpkr_state::wcrdxtnd_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
@@ -1231,7 +1231,7 @@ uint32_t goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state, goldnpkr)
+void goldnpkr_state::palette_init_goldnpkr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 /*  prom bits
@@ -1275,7 +1275,7 @@ PALETTE_INIT_MEMBER(goldnpkr_state, goldnpkr)
 	}
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
+void goldnpkr_state::palette_init_witchcrd(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 /*
@@ -1323,7 +1323,7 @@ PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
 	}
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
+void goldnpkr_state::palette_init_wcrdxtnd(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 /*
@@ -1378,7 +1378,7 @@ PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
    The selector bits are located in PIA1, portB (bits 4-7).
 */
-READ8_MEMBER(goldnpkr_state::goldnpkr_mux_port_r)
+uint8_t goldnpkr_state::goldnpkr_mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( m_mux_data & 0xf0 )     /* bits 4-7 */
 	{
@@ -1398,7 +1398,7 @@ READ8_MEMBER(goldnpkr_state::goldnpkr_mux_port_r)
 	return 0xff;
 }
 
-READ8_MEMBER(goldnpkr_state::pottnpkr_mux_port_r)
+uint8_t goldnpkr_state::pottnpkr_mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t pa_0_4 = 0xff, pa_7;  /* Temporary place holder for bits 0 to 4 & 7 */
 
@@ -1415,13 +1415,13 @@ READ8_MEMBER(goldnpkr_state::pottnpkr_mux_port_r)
 	return ( (pa_0_4 & 0x3f) | (pa_7 << 6) | (pa_7 << 7) ) ;
 }
 
-WRITE8_MEMBER(goldnpkr_state::mux_w)
+void goldnpkr_state::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("mux_w: %2x\n",data);
 	m_mux_data = data ^ 0xff;   /* inverted */
 }
 
-WRITE8_MEMBER(goldnpkr_state::mux_port_w)
+void goldnpkr_state::mux_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia0_PA_data = data;
 }
@@ -1431,7 +1431,7 @@ WRITE8_MEMBER(goldnpkr_state::mux_port_w)
 
 uint8_t wcfalcon_flag = 0;
 
-WRITE8_MEMBER(goldnpkr_state::wcfalcon_snd_w)
+void goldnpkr_state::wcfalcon_snd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (wcfalcon_flag == 0)
 	{
@@ -1489,7 +1489,7 @@ WRITE8_MEMBER(goldnpkr_state::wcfalcon_snd_w)
   ---- x---  Take Lamp.
 
 */
-WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
+void goldnpkr_state::lamps_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /***** General Lamps and Counters wiring *****
 
@@ -1517,7 +1517,7 @@ WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
 	machine().bookkeeping().coin_counter_w(2, data & 0x20);  /* counter3 */
 }
 
-WRITE8_MEMBER(goldnpkr_state::sound_w)
+void goldnpkr_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 555 voltage controlled */
 	logerror("Sound Data: %2x\n",data & 0x0f);
@@ -1527,43 +1527,43 @@ WRITE8_MEMBER(goldnpkr_state::sound_w)
 	m_discrete->write(space, NODE_10, data & 0x07);
 }
 
-WRITE8_MEMBER(goldnpkr_state::pia0_a_w)
+void goldnpkr_state::pia0_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("pia0_a_w: %2x\n", data);
 }
 
-WRITE8_MEMBER(goldnpkr_state::pia0_b_w)
+void goldnpkr_state::pia0_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("pia0_b_w: %2x\n", data);
 }
 
-WRITE8_MEMBER(goldnpkr_state::pia1_a_w)
+void goldnpkr_state::pia1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("pia1_a_w: %2x\n", data);
 }
 
-WRITE8_MEMBER(goldnpkr_state::pia1_b_w)
+void goldnpkr_state::pia1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("pia1_b_w: %2x\n", data);
 }
 
 
-READ8_MEMBER(goldnpkr_state::pia0_a_r)
+uint8_t goldnpkr_state::pia0_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(goldnpkr_state::pia0_b_r)
+uint8_t goldnpkr_state::pia0_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(goldnpkr_state::pia1_a_r)
+uint8_t goldnpkr_state::pia1_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(goldnpkr_state::pia1_b_r)
+uint8_t goldnpkr_state::pia1_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -4003,13 +4003,13 @@ DISCRETE_SOUND_END
 *          Machine Start & Reset          *
 ******************************************/
 
-MACHINE_START_MEMBER(goldnpkr_state, mondial)
+void goldnpkr_state::machine_start_mondial()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x4000);
 }
 
-MACHINE_RESET_MEMBER(goldnpkr_state, mondial)
+void goldnpkr_state::machine_reset_mondial()
 {
 	uint8_t seldsw = (ioport("SELDSW")->read() );
 	popmessage("ROM Bank: %02X", seldsw);
@@ -10491,7 +10491,7 @@ ROM_END
 
 ***********************************************/
 
-DRIVER_INIT_MEMBER(goldnpkr_state, flcnw)
+void goldnpkr_state::init_flcnw()
 {
 	/* Attempt to decrypt the MCU program (we're sooo close!) */
 
@@ -10508,7 +10508,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, flcnw)
 }
 
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsa)
+void goldnpkr_state::init_vkdlsa()
 {
 	/* $e097-e098, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10520,7 +10520,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsa)
 	ROM[0xe098] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsb)
+void goldnpkr_state::init_vkdlsb()
 {
 	/* $e87b-e87c, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10532,7 +10532,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsb)
 	ROM[0xe87c] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsc)
+void goldnpkr_state::init_vkdlsc()
 {
 	/* $453a-453b, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10544,7 +10544,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsc)
 	ROM[0x453b] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsww)
+void goldnpkr_state::init_vkdlsww()
 {
 	/* $f2c9-f2ca, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10556,7 +10556,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsww)
 	ROM[0xf2ca] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwa)
+void goldnpkr_state::init_vkdlswwa()
 {
 	/* $df80-df81, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10568,7 +10568,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwa)
 	ROM[0xdf81] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwc)
+void goldnpkr_state::init_vkdlswwc()
 {
 	/* $e42f-e430, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10580,7 +10580,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwc)
 	ROM[0xe430] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwd)
+void goldnpkr_state::init_vkdlswwd()
 {
 	/* $e442-e443, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10592,7 +10592,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwd)
 	ROM[0xe443] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwh)
+void goldnpkr_state::init_vkdlswwh()
 {
 	/* $e4d5-e4d6, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10604,7 +10604,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwh)
 	ROM[0xe4d6] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwl)
+void goldnpkr_state::init_vkdlswwl()
 {
 	/* $e87c-e87d, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10616,7 +10616,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwl)
 	ROM[0xe87d] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwo)
+void goldnpkr_state::init_vkdlswwo()
 {
 	/* $e7d5-e7d6, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10628,7 +10628,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwo)
 	ROM[0xe7d6] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwp)
+void goldnpkr_state::init_vkdlswwp()
 {
 	/* $e7d9-e7da, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10640,7 +10640,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwp)
 	ROM[0xe7da] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwr)
+void goldnpkr_state::init_vkdlswwr()
 {
 	/* $e7f7-e7f8, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10652,7 +10652,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwr)
 	ROM[0xe7f8] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswws)
+void goldnpkr_state::init_vkdlswws()
 {
 	/* $e8a5-e8a6, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10664,7 +10664,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswws)
 	ROM[0xe8a6] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwt)
+void goldnpkr_state::init_vkdlswwt()
 {
 	/* $e955-e956, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10676,7 +10676,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwt)
 	ROM[0xe956] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwu)
+void goldnpkr_state::init_vkdlswwu()
 {
 	/* $ee6b-ee6c, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10688,7 +10688,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwu)
 	ROM[0xee6c] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwv)
+void goldnpkr_state::init_vkdlswwv()
 {
 	/* $f052-f053, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -10738,7 +10738,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwv)
 
 ***********************************************/
 
-DRIVER_INIT_MEMBER(goldnpkr_state, icp1db)
+void goldnpkr_state::init_icp1db()
 {
 /*
     int i;
@@ -10809,7 +10809,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, icp1db)
 
 ***********************************************/
 
-DRIVER_INIT_MEMBER(goldnpkr_state, wstrike)
+void goldnpkr_state::init_wstrike()
 {
 	/* NOPing the BNE --> $F2EA (KILL)
 	   after compare with a string inside the Dallas TK RAM
@@ -10822,7 +10822,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, wstrike)
 }
 
 
-DRIVER_INIT_MEMBER(goldnpkr_state, bchancep)
+void goldnpkr_state::init_bchancep()
 {
 	/* Attempt to invert the color data from the bipolar PROM */
 

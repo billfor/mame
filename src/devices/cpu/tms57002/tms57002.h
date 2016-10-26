@@ -16,15 +16,15 @@ class tms57002_device : public cpu_device, public device_sound_interface {
 public:
 	tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(pload_w);
-	DECLARE_WRITE_LINE_MEMBER(cload_w);
-	DECLARE_READ_LINE_MEMBER(empty_r);
-	DECLARE_READ_LINE_MEMBER(dready_r);
-	DECLARE_READ_LINE_MEMBER(pc0_r);
-	DECLARE_WRITE_LINE_MEMBER(sync_w);
+	void pload_w(int state);
+	void cload_w(int state);
+	int empty_r();
+	int dready_r();
+	int pc0_r();
+	void sync_w(int state);
 
 protected:
 	virtual void device_start() override;

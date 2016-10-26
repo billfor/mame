@@ -20,7 +20,7 @@
 #include "cpu/s2650/s2650.h"
 #include "includes/quasar.h"
 
-PALETTE_INIT_MEMBER(quasar_state,quasar)
+void quasar_state::palette_init_quasar(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -89,7 +89,7 @@ PALETTE_INIT_MEMBER(quasar_state,quasar)
 }
 
 
-VIDEO_START_MEMBER(quasar_state,quasar)
+void quasar_state::video_start_quasar()
 {
 	m_effectram = std::make_unique<uint8_t[]>(0x400);
 

@@ -63,12 +63,12 @@ enum int_levels
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jpmsys5_state::generate_tms34061_interrupt)
+void jpmsys5_state::generate_tms34061_interrupt(int state)
 {
 	m_maincpu->set_input_line(INT_TMS34061, state);
 }
 
-WRITE16_MEMBER(jpmsys5_state::sys5_tms34061_w)
+void jpmsys5_state::sys5_tms34061_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0x1ff;
@@ -91,7 +91,7 @@ WRITE16_MEMBER(jpmsys5_state::sys5_tms34061_w)
 		m_tms34061->write(space, col | 1, row, func, data & 0xff);
 }
 
-READ16_MEMBER(jpmsys5_state::sys5_tms34061_r)
+uint16_t jpmsys5_state::sys5_tms34061_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 	int func = (offset >> 19) & 3;
@@ -117,7 +117,7 @@ READ16_MEMBER(jpmsys5_state::sys5_tms34061_r)
 	return data;
 }
 
-WRITE16_MEMBER(jpmsys5_state::ramdac_w)
+void jpmsys5_state::ramdac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -189,14 +189,14 @@ void jpmsys5_state::sys5_draw_lamps()
  *
  ****************************************/
 
-WRITE16_MEMBER(jpmsys5_state::rombank_w)
+void jpmsys5_state::rombank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	data &= 0x1f;
 	membank("bank1")->set_base(&rom[0x20000 + 0x20000 * data]);
 }
 
-READ16_MEMBER(jpmsys5_state::coins_r)
+uint16_t jpmsys5_state::coins_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 2)
 		return ioport("COINS")->read() << 8;
@@ -204,22 +204,22 @@ READ16_MEMBER(jpmsys5_state::coins_r)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(jpmsys5_state::coins_w)
+void jpmsys5_state::coins_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* TODO */
 }
 
-READ16_MEMBER(jpmsys5_state::unk_r)
+uint16_t jpmsys5_state::unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(jpmsys5_state::mux_w)
+void jpmsys5_state::mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_muxram[offset]=data;
 }
 
-READ16_MEMBER(jpmsys5_state::mux_r)
+uint16_t jpmsys5_state::mux_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0x81/2)
 		return ioport("DSW")->read();
@@ -227,7 +227,7 @@ READ16_MEMBER(jpmsys5_state::mux_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
+void jpmsys5_state::jpm_upd7759_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -260,7 +260,7 @@ WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
 	}
 }
 
-READ16_MEMBER(jpmsys5_state::jpm_upd7759_r)
+uint16_t jpmsys5_state::jpm_upd7759_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x14 | m_upd7759->busy_r();
 }
@@ -323,7 +323,7 @@ ADDRESS_MAP_END
 	*************************************/
 
 /* Serial bit transmission callback */
-TIMER_CALLBACK_MEMBER(jpmsys5_state::touch_cb)
+void jpmsys5_state::touch_cb(void *ptr, int32_t param)
 {
 	switch (m_touch_state)
 	{
@@ -372,7 +372,7 @@ TIMER_CALLBACK_MEMBER(jpmsys5_state::touch_cb)
 	}
 }
 
-INPUT_CHANGED_MEMBER(jpmsys5_state::touchscreen_press)
+void jpmsys5_state::touchscreen_press(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval == 0)
 	{
@@ -465,12 +465,12 @@ INPUT_PORTS_END
  *  6821 PIA
  *
  *************************************/
-WRITE_LINE_MEMBER(jpmsys5_state::pia_irq)
+void jpmsys5_state::pia_irq(int state)
 {
 	m_maincpu->set_input_line(INT_6821PIA, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(jpmsys5_state::u29_porta_r)
+uint8_t jpmsys5_state::u29_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int meter_bit =0;
 
@@ -497,7 +497,7 @@ READ8_MEMBER(jpmsys5_state::u29_porta_r)
 		return m_direct_port->read() | meter_bit;
 }
 
-WRITE8_MEMBER(jpmsys5_state::u29_portb_w)
+void jpmsys5_state::u29_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_meters != nullptr)
 	{
@@ -508,13 +508,13 @@ WRITE8_MEMBER(jpmsys5_state::u29_portb_w)
 	}
 }
 
-WRITE_LINE_MEMBER(jpmsys5_state::u29_ca2_w)
+void jpmsys5_state::u29_ca2_w(int state)
 {
 	//The 'CHOP' line controls power to the reel motors, without this the reels won't turn
 	m_chop = state;
 }
 
-WRITE_LINE_MEMBER(jpmsys5_state::u29_cb2_w)
+void jpmsys5_state::u29_cb2_w(int state)
 {
 	//On a cabinet, this overrides the volume, we don't emulate this yet
 	logerror("Alarm override enabled \n");
@@ -526,12 +526,12 @@ WRITE_LINE_MEMBER(jpmsys5_state::u29_cb2_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jpmsys5_state::ptm_irq)
+void jpmsys5_state::ptm_irq(int state)
 {
 	m_maincpu->set_input_line(INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(jpmsys5_state::u26_o1_callback)
+void jpmsys5_state::u26_o1_callback(int state)
 {
 	if (m_mpxclk != state)
 	{
@@ -555,27 +555,27 @@ WRITE_LINE_MEMBER(jpmsys5_state::u26_o1_callback)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jpmsys5_state::acia_irq)
+void jpmsys5_state::acia_irq(int state)
 {
 	m_maincpu->set_input_line(INT_6850ACIA, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(jpmsys5_state::a0_tx_w)
+void jpmsys5_state::a0_tx_w(int state)
 {
 	m_a0_data_out = state;
 }
 
-WRITE_LINE_MEMBER(jpmsys5_state::a1_tx_w)
+void jpmsys5_state::a1_tx_w(int state)
 {
 	m_a1_data_out = state;
 }
 
-WRITE_LINE_MEMBER(jpmsys5_state::a2_tx_w)
+void jpmsys5_state::a2_tx_w(int state)
 {
 	m_a2_data_out = state;
 }
 
-WRITE_LINE_MEMBER(jpmsys5_state::write_acia_clock)
+void jpmsys5_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);
@@ -591,13 +591,13 @@ WRITE_LINE_MEMBER(jpmsys5_state::write_acia_clock)
  *
  *************************************/
 
-MACHINE_START_MEMBER(jpmsys5_state,jpmsys5v)
+void jpmsys5_state::machine_start_jpmsys5v()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base()+0x20000);
 	m_touch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jpmsys5_state::touch_cb),this));
 }
 
-MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5v)
+void jpmsys5_state::machine_reset_jpmsys5v()
 {
 	m_touch_timer->reset();
 	m_touch_state = IDLE;
@@ -676,7 +676,7 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 MACHINE_CONFIG_END
 
-READ16_MEMBER(jpmsys5_state::mux_awp_r)
+uint16_t jpmsys5_state::mux_awp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const portnames[] = { "DSW", "DSW2", "ROTARY", "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4" };
 
@@ -690,7 +690,7 @@ READ16_MEMBER(jpmsys5_state::mux_awp_r)
 	}
 }
 
-READ16_MEMBER(jpmsys5_state::coins_awp_r)
+uint16_t jpmsys5_state::coins_awp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -811,12 +811,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(jpmsys5_state,jpmsys5)
+void jpmsys5_state::machine_start_jpmsys5()
 {
 //  membank("bank1")->set_base(memregion("maincpu")->base()+0x20000);
 }
 
-MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
+void jpmsys5_state::machine_reset_jpmsys5()
 {
 	m_acia6850_2->write_rxd(1);
 	m_acia6850_2->write_dcd(0);

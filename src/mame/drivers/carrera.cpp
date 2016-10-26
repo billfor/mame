@@ -65,8 +65,8 @@ public:
 		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<uint8_t> m_tileram;
-	DECLARE_READ8_MEMBER(unknown_r);
-	DECLARE_PALETTE_INIT(carrera);
+	uint8_t unknown_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palette_init_carrera(palette_device &palette);
 	uint32_t screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -274,12 +274,12 @@ uint32_t carrera_state::screen_update_carrera(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-READ8_MEMBER(carrera_state::unknown_r)
+uint8_t carrera_state::unknown_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-PALETTE_INIT_MEMBER(carrera_state, carrera)
+void carrera_state::palette_init_carrera(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int br_bit0, br_bit1, bit0, bit1, r, g, b;

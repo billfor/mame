@@ -235,21 +235,21 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER( gamecom_internal_r );
-	DECLARE_READ8_MEMBER( gamecom_pio_r );
-	DECLARE_WRITE8_MEMBER( gamecom_internal_w );
-	DECLARE_WRITE8_MEMBER( gamecom_pio_w );
-	DECLARE_DRIVER_INIT(gamecom);
-	DECLARE_PALETTE_INIT(gamecom);
-	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
-	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);
-	TIMER_CALLBACK_MEMBER(gamecom_sound0_timer_callback);
-	TIMER_CALLBACK_MEMBER(gamecom_sound1_timer_callback);
-	TIMER_CALLBACK_MEMBER(gamecom_scanline);
-	DECLARE_WRITE8_MEMBER( gamecom_handle_dma );
-	DECLARE_WRITE8_MEMBER( gamecom_update_timers );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart1 );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart2 );
+	uint8_t gamecom_internal_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gamecom_pio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gamecom_internal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gamecom_pio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_gamecom();
+	void palette_init_gamecom(palette_device &palette);
+	void gamecom_interrupt(device_t &device);
+	void gamecom_clock_timer_callback(void *ptr, int32_t param);
+	void gamecom_sound0_timer_callback(void *ptr, int32_t param);
+	void gamecom_sound1_timer_callback(void *ptr, int32_t param);
+	void gamecom_scanline(void *ptr, int32_t param);
+	void gamecom_handle_dma(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gamecom_update_timers(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	image_init_result device_image_load_gamecom_cart1(device_image_interface &image);
+	image_init_result device_image_load_gamecom_cart2(device_image_interface &image);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	uint8_t *m_p_ram;

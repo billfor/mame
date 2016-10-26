@@ -37,9 +37,9 @@ public:
 
 	static void set_voodoo_tag(device_t &device, const char *tag) { downcast<k033906_device &>(device).m_voodoo.set_tag(tag); }
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_WRITE_LINE_MEMBER( set_reg );
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void set_reg(int state);
 
 protected:
 	// device-level overrides

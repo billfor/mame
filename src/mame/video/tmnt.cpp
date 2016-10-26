@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/tmnt.h"
 
-TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)
+void tmnt_state::glfgreat_get_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *rom = memregion("user1")->base();
 	int code;
@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)
 	SET_TILE_INFO_MEMBER(0, code & 0x3fff, code >> 14, 0);
 }
 
-TILE_GET_INFO_MEMBER(tmnt_state::prmrsocr_get_roz_tile_info)
+void tmnt_state::prmrsocr_get_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *rom = memregion("user1")->base();
 	int code = rom[tile_index + 0x20000] + 256 * rom[tile_index];
@@ -206,7 +206,7 @@ K05324X_CB_MEMBER(tmnt_state::prmrsocr_sprite_callback)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(tmnt_state,cuebrick)
+void tmnt_state::video_start_cuebrick()
 {
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 32;
@@ -214,7 +214,7 @@ VIDEO_START_MEMBER(tmnt_state,cuebrick)
 	m_sprite_colorbase = 16;
 }
 
-VIDEO_START_MEMBER(tmnt_state,mia)
+void tmnt_state::video_start_mia()
 {
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 32;
@@ -225,7 +225,7 @@ VIDEO_START_MEMBER(tmnt_state,mia)
 	save_item(NAME(m_tmnt_priorityflag));
 }
 
-VIDEO_START_MEMBER(tmnt_state,tmnt)
+void tmnt_state::video_start_tmnt()
 {
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 32;
@@ -238,7 +238,7 @@ VIDEO_START_MEMBER(tmnt_state,tmnt)
 	m_palette->set_shadow_factor(0.75);
 }
 
-VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
+void tmnt_state::video_start_lgtnfght()/* also tmnt2, ssriders */
 {
 	m_k053245->set_z_rejection(0);
 
@@ -250,7 +250,7 @@ VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
 	save_item(NAME(m_lasten));
 }
 
-VIDEO_START_MEMBER(tmnt_state,glfgreat)
+void tmnt_state::video_start_glfgreat()
 {
 	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::glfgreat_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	m_roz_tilemap->set_transparent_pen(0);
@@ -263,7 +263,7 @@ VIDEO_START_MEMBER(tmnt_state,glfgreat)
 	save_item(NAME(m_glfgreat_roz_rom_mode));
 }
 
-VIDEO_START_MEMBER(tmnt_state,prmrsocr)
+void tmnt_state::video_start_prmrsocr()
 {
 	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::prmrsocr_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
 	m_roz_tilemap->set_transparent_pen(0);
@@ -274,7 +274,7 @@ VIDEO_START_MEMBER(tmnt_state,prmrsocr)
 	save_item(NAME(m_glfgreat_roz_char_bank));
 }
 
-VIDEO_START_MEMBER(tmnt_state,blswhstl)
+void tmnt_state::video_start_blswhstl()
 {
 	m_blswhstl_rombank = -1;
 	save_item(NAME(m_blswhstl_rombank));
@@ -287,7 +287,7 @@ VIDEO_START_MEMBER(tmnt_state,blswhstl)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
+void tmnt_state::tmnt_0a0000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -311,7 +311,7 @@ WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::punkshot_0a0020_w)
+void tmnt_state::punkshot_0a0020_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -329,7 +329,7 @@ WRITE16_MEMBER(tmnt_state::punkshot_0a0020_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::lgtnfght_0a0018_w)
+void tmnt_state::lgtnfght_0a0018_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -348,7 +348,7 @@ WRITE16_MEMBER(tmnt_state::lgtnfght_0a0018_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
+void tmnt_state::blswhstl_700300_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -371,7 +371,7 @@ WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
 }
 
 
-READ16_MEMBER(tmnt_state::glfgreat_rom_r)
+uint16_t tmnt_state::glfgreat_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_glfgreat_roz_rom_mode)
 		return memregion("zoom")->base()[m_glfgreat_roz_char_bank * 0x80000 + offset];
@@ -384,7 +384,7 @@ READ16_MEMBER(tmnt_state::glfgreat_rom_r)
 		return memregion("user1")->base()[((offset & 0x3ffff) >> 2) + 0x100000 + m_glfgreat_roz_rom_bank * 0x10000];
 }
 
-WRITE16_MEMBER(tmnt_state::glfgreat_122000_w)
+void tmnt_state::glfgreat_122000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -415,7 +415,7 @@ WRITE16_MEMBER(tmnt_state::glfgreat_122000_w)
 }
 
 
-WRITE16_MEMBER(tmnt_state::ssriders_eeprom_w)
+void tmnt_state::ssriders_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -434,7 +434,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::ssriders_1c0300_w)
+void tmnt_state::ssriders_1c0300_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -450,7 +450,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_1c0300_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
+void tmnt_state::prmrsocr_122000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -472,7 +472,7 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
 	}
 }
 
-READ16_MEMBER(tmnt_state::prmrsocr_rom_r)
+uint16_t tmnt_state::prmrsocr_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(m_glfgreat_roz_char_bank)
 		return memregion("zoom")->base()[offset];
@@ -483,7 +483,7 @@ READ16_MEMBER(tmnt_state::prmrsocr_rom_r)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::tmnt_priority_w)
+void tmnt_state::tmnt_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -604,7 +604,7 @@ uint32_t tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 
 }
 
 
-READ16_MEMBER(tmnt_state::glfgreat_ball_r)
+uint16_t tmnt_state::glfgreat_ball_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 #ifdef MAME_DEBUG
 popmessage("%04x", m_glfgreat_pixel);

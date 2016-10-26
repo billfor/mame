@@ -191,19 +191,19 @@ public:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 
-	DECLARE_READ32_MEMBER(pluto5_mem_r);
-	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
+	uint32_t pluto5_mem_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pluto5_mem_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 
 	// devices
 	required_device<m68340cpu_device> m_maincpu;
 public:
-	DECLARE_DRIVER_INIT(hb);
+	void init_hb();
 	virtual void machine_start() override;
 };
 
-READ32_MEMBER(pluto5_state::pluto5_mem_r)
+uint32_t pluto5_state::pluto5_mem_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int cs = m_maincpu->get_cs(offset * 4);
@@ -221,7 +221,7 @@ READ32_MEMBER(pluto5_state::pluto5_mem_r)
 	return 0x0000;
 }
 
-WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
+void pluto5_state::pluto5_mem_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int cs = m_maincpu->get_cs(offset * 4);
@@ -853,7 +853,7 @@ static void astra_addresslines( uint16_t* src, size_t srcsize, int small )
 }
 
 
-DRIVER_INIT_MEMBER(pluto5_state,hb)
+void pluto5_state::init_hb()
 {
 	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
 

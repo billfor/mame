@@ -87,13 +87,13 @@ static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, ladybu
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(ladybug_state::coin1_inserted)
+void ladybug_state::coin1_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* left coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
+void ladybug_state::coin2_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* right coin insertion causes an IRQ */
 	if (newval)
@@ -104,12 +104,12 @@ INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
 #define LADYBUG_P1_CONTROL_PORT_TAG ("CONTP1")
 #define LADYBUG_P2_CONTROL_PORT_TAG ("CONTP2")
 
-CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p1_control_r)
+ioport_value ladybug_state::ladybug_p1_control_r(ioport_field &field, void *param)
 {
 	return m_p1_control->read();
 }
 
-CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p2_control_r)
+ioport_value ladybug_state::ladybug_p2_control_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -506,7 +506,7 @@ static GFXDECODE_START( ladybug )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2, 4*8, 16 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(ladybug_state,ladybug)
+void ladybug_state::machine_start_ladybug()
 {
 }
 
@@ -720,7 +720,7 @@ ROM_START( dorodon2 )
 	ROM_LOAD( "dorodon.bp2", 0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* timing?? */
 ROM_END
 
-DRIVER_INIT_MEMBER(ladybug_state,dorodon)
+void ladybug_state::init_dorodon()
 {
 	/* decode the opcodes */
 

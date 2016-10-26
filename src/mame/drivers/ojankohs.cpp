@@ -41,12 +41,12 @@ Memo:
 #include "machine/nvram.h"
 
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_rombank_w)
+void ojankohs_state::ojankohs_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x3f);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankoy_rombank_w)
+void ojankohs_state::ojankoy_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x1f);
 
@@ -57,7 +57,7 @@ WRITE8_MEMBER(ojankohs_state::ojankoy_rombank_w)
 	m_msm->reset_w(!m_adpcm_reset);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_adpcm_reset_w)
+void ojankohs_state::ojankohs_adpcm_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_reset = BIT(data, 0);
 	m_vclk_left = 0;
@@ -65,13 +65,13 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_adpcm_reset_w)
 	m_msm->reset_w(!m_adpcm_reset);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_msm5205_w)
+void ojankohs_state::ojankohs_msm5205_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_data = data;
 	m_vclk_left = 2;
 }
 
-WRITE_LINE_MEMBER(ojankohs_state::ojankohs_adpcm_int)
+void ojankohs_state::ojankohs_adpcm_int(int state)
 {
 	/* skip if we're reset */
 	if (!m_adpcm_reset)
@@ -90,7 +90,7 @@ WRITE_LINE_MEMBER(ojankohs_state::ojankohs_adpcm_int)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
+void ojankohs_state::ojankoc_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 
@@ -99,12 +99,12 @@ WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
 	ojankoc_flipscreen(space, data);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_portselect_w)
+void ojankohs_state::ojankohs_portselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portselect = data;
 }
 
-READ8_MEMBER(ojankohs_state::ojankohs_keymatrix_r)
+uint8_t ojankohs_state::ojankohs_keymatrix_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ret;
 
@@ -131,7 +131,7 @@ READ8_MEMBER(ojankohs_state::ojankohs_keymatrix_r)
 	return ret;
 }
 
-READ8_MEMBER(ojankohs_state::ojankoc_keymatrix_r)
+uint8_t ojankohs_state::ojankoc_keymatrix_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int i;
 	int ret = 0;
@@ -150,7 +150,7 @@ READ8_MEMBER(ojankohs_state::ojankoc_keymatrix_r)
 	return (ret & 0x3f) | (ioport(offset ? "IN1" : "IN0")->read() & 0xc0);
 }
 
-READ8_MEMBER(ojankohs_state::ojankohs_ay8910_0_r)
+uint8_t ojankohs_state::ojankohs_ay8910_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// DIPSW 1
 	return (((ioport("DSW1")->read() & 0x01) << 7) | ((ioport("DSW1")->read() & 0x02) << 5) |
@@ -159,7 +159,7 @@ READ8_MEMBER(ojankohs_state::ojankohs_ay8910_0_r)
 			((ioport("DSW1")->read() & 0x40) >> 5) | ((ioport("DSW1")->read() & 0x80) >> 7));
 }
 
-READ8_MEMBER(ojankohs_state::ojankohs_ay8910_1_r)
+uint8_t ojankohs_state::ojankohs_ay8910_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// DIPSW 1
 	return (((ioport("DSW2")->read() & 0x01) << 7) | ((ioport("DSW2")->read() & 0x02) << 5) |
@@ -168,22 +168,22 @@ READ8_MEMBER(ojankohs_state::ojankohs_ay8910_1_r)
 			((ioport("DSW2")->read() & 0x40) >> 5) | ((ioport("DSW2")->read() & 0x80) >> 7));
 }
 
-READ8_MEMBER(ojankohs_state::ccasino_dipsw3_r)
+uint8_t ojankohs_state::ccasino_dipsw3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW3")->read() ^ 0xff);     // DIPSW 3
 }
 
-READ8_MEMBER(ojankohs_state::ccasino_dipsw4_r)
+uint8_t ojankohs_state::ccasino_dipsw4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW4")->read() ^ 0xff);     // DIPSW 4
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankoy_coinctr_w)
+void ojankohs_state::ojankoy_coinctr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE8_MEMBER(ojankohs_state::ccasino_coinctr_w)
+void ojankohs_state::ccasino_coinctr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 }
@@ -752,7 +752,7 @@ static GFXDECODE_START( ojankohs )
 	GFXDECODE_ENTRY( "gfx1", 0, ojankohs_bglayout,   0, 64 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(ojankohs_state,common)
+void ojankohs_state::machine_start_common()
 {
 	save_item(NAME(m_gfxreg));
 	save_item(NAME(m_flipscreen));
@@ -766,31 +766,31 @@ MACHINE_START_MEMBER(ojankohs_state,common)
 	save_item(NAME(m_vclk_left));
 }
 
-MACHINE_START_MEMBER(ojankohs_state,ojankohs)
+void ojankohs_state::machine_start_ojankohs()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x40, &ROM[0x10000], 0x4000);
 
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 }
 
-MACHINE_START_MEMBER(ojankohs_state,ojankoy)
+void ojankohs_state::machine_start_ojankoy()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x4000);
 
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 }
 
-MACHINE_START_MEMBER(ojankohs_state,ojankoc)
+void ojankohs_state::machine_start_ojankoc()
 {
 	uint8_t *ROM = memregion("user1")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x0000], 0x8000);
 
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 }
 
 void ojankohs_state::machine_reset()

@@ -185,27 +185,27 @@ public:
 	emu_timer *m_mk5_VSYNC_timer;
 	uint8_t m_ext_latch;
 	uint8_t m_flyback;
-	DECLARE_WRITE32_MEMBER(Ns5w48);
-	DECLARE_READ32_MEMBER(Ns5x58);
-	DECLARE_READ32_MEMBER(mk5_ioc_r);
-	DECLARE_WRITE32_MEMBER(mk5_ioc_w);
-	DECLARE_READ32_MEMBER(Ns5r50);
-	DECLARE_WRITE32_MEMBER(sram_banksel_w);
-	DECLARE_DRIVER_INIT(aristmk5);
+	void Ns5w48(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t Ns5x58(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t mk5_ioc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void mk5_ioc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t Ns5r50(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sram_banksel_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void init_aristmk5();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(mk5_VSYNC_callback);
-	TIMER_CALLBACK_MEMBER(mk5_2KHz_callback);
+	void mk5_VSYNC_callback(void *ptr, int32_t param);
+	void mk5_2KHz_callback(void *ptr, int32_t param);
 };
 
 
-TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_VSYNC_callback)
+void aristmk5_state::mk5_VSYNC_callback(void *ptr, int32_t param)
 {
 	m_ioc_regs[IRQ_STATUS_A] |= 0x08; //turn vsync bit on
 	m_mk5_VSYNC_timer->adjust(attotime::never);
 }
 
-WRITE32_MEMBER(aristmk5_state::Ns5w48)
+void aristmk5_state::Ns5w48(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	There is one writeable register which is written with the Ns5w48 strobe. It contains four bits which are
@@ -263,14 +263,14 @@ WRITE32_MEMBER(aristmk5_state::Ns5w48)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_2KHz_callback)
+void aristmk5_state::mk5_2KHz_callback(void *ptr, int32_t param)
 {
 	m_ioc_regs[IRQ_STATUS_A] |= 0x01;
 	m_mk5_2KHz_timer->adjust(attotime::never);
 
 }
 
-READ32_MEMBER(aristmk5_state::Ns5x58)
+uint32_t aristmk5_state::Ns5x58(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/*
 	    1953.125 Hz for the operating system timer interrupt
@@ -299,7 +299,7 @@ READ32_MEMBER(aristmk5_state::Ns5x58)
 }
 
 /* same as plain AA but with the I2C unconnected */
-READ32_MEMBER(aristmk5_state::mk5_ioc_r)
+uint32_t aristmk5_state::mk5_ioc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ioc_addr;
 
@@ -322,7 +322,7 @@ READ32_MEMBER(aristmk5_state::mk5_ioc_r)
 	return archimedes_ioc_r(space,offset,mem_mask);
 }
 
-WRITE32_MEMBER(aristmk5_state::mk5_ioc_w)
+void aristmk5_state::mk5_ioc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t ioc_addr;
 
@@ -342,12 +342,12 @@ WRITE32_MEMBER(aristmk5_state::mk5_ioc_w)
 	}
 }
 
-READ32_MEMBER(aristmk5_state::Ns5r50)
+uint32_t aristmk5_state::Ns5r50(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xf5; // checked inside the CPU check, unknown meaning
 }
 
-WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
+void aristmk5_state::sram_banksel_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 
@@ -470,7 +470,7 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_CONFSETTING(    0x03, "Game Mode" )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
+void aristmk5_state::init_aristmk5()
 {
 	uint8_t *SRAM    = memregion("sram")->base();
 	uint8_t *SRAM_NZ = memregion("sram")->base();

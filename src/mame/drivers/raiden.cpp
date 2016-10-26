@@ -260,7 +260,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(raiden_state::raiden_interrupt)
+void raiden_state::raiden_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); /* VBL */
 }
@@ -314,7 +314,7 @@ static MACHINE_CONFIG_DERIVED( raidenu, raidene )
 	MCFG_CPU_PROGRAM_MAP(raidenu_sub_map)
 MACHINE_CONFIG_END
 
-WRITE16_MEMBER( raiden_state::raidenb_layer_scroll_w )
+void raiden_state::raidenb_layer_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_raidenb_scroll_ram[offset]);
 }
@@ -616,17 +616,17 @@ void raiden_state::common_decrypt()
 }
 
 
-DRIVER_INIT_MEMBER(raiden_state,raiden)
+void raiden_state::init_raiden()
 {
 	common_decrypt();
 }
 
-DRIVER_INIT_MEMBER(raiden_state,raidenk)
+void raiden_state::init_raidenk()
 {
 	common_decrypt();
 }
 
-DRIVER_INIT_MEMBER(raiden_state,raidenu)
+void raiden_state::init_raidenu()
 {
 }
 

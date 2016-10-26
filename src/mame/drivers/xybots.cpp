@@ -40,7 +40,7 @@ void xybots_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(xybots_state,xybots)
+void xybots_state::machine_reset_xybots()
 {
 	atarigen_state::machine_reset();
 }
@@ -53,7 +53,7 @@ MACHINE_RESET_MEMBER(xybots_state,xybots)
  *
  *************************************/
 
-READ16_MEMBER(xybots_state::special_port1_r)
+uint16_t xybots_state::special_port1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = ioport("FFE200")->read();
 	result ^= m_h256 ^= 0x0400;
@@ -390,7 +390,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(xybots_state,xybots)
+void xybots_state::init_xybots()
 {
 	m_h256 = 0x0400;
 	slapstic_configure(*m_maincpu, 0x008000, 0, memregion("maincpu")->base() + 0x8000);

@@ -400,11 +400,11 @@ public:
 	uint8_t m_flipscreen;
 	uint64_t m_madsel_lastcycles;
 
-	DECLARE_WRITE8_MEMBER(missile_w);
-	DECLARE_READ8_MEMBER(missile_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
-	DECLARE_DRIVER_INIT(missilem);
-	DECLARE_DRIVER_INIT(suprmatk);
+	void missile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t missile_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	ioport_value get_vblank(ioport_field &field, void *param);
+	void init_missilem();
+	void init_suprmatk();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -417,8 +417,8 @@ public:
 	void write_vram(address_space &space, offs_t address, uint8_t data);
 	uint8_t read_vram(address_space &space, offs_t address);
 
-	TIMER_CALLBACK_MEMBER(clock_irq);
-	TIMER_CALLBACK_MEMBER(adjust_cpu_speed);
+	void clock_irq(void *ptr, int32_t param);
+	void adjust_cpu_speed(void *ptr, int32_t param);
 };
 
 
@@ -472,7 +472,7 @@ void missile_state::schedule_next_irq(int curv)
 }
 
 
-TIMER_CALLBACK_MEMBER(missile_state::clock_irq)
+void missile_state::clock_irq(void *ptr, int32_t param)
 {
 	int curv = param;
 
@@ -488,7 +488,7 @@ TIMER_CALLBACK_MEMBER(missile_state::clock_irq)
 }
 
 
-CUSTOM_INPUT_MEMBER(missile_state::get_vblank)
+ioport_value missile_state::get_vblank(ioport_field &field, void *param)
 {
 	int v = scanline_to_v(m_screen->vpos());
 	return v < 24;
@@ -502,7 +502,7 @@ CUSTOM_INPUT_MEMBER(missile_state::get_vblank)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(missile_state::adjust_cpu_speed)
+void missile_state::adjust_cpu_speed(void *ptr, int32_t param)
 {
 	int curv = param;
 
@@ -703,7 +703,7 @@ uint32_t missile_state::screen_update_missile(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-WRITE8_MEMBER(missile_state::missile_w)
+void missile_state::missile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 
@@ -763,7 +763,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 }
 
 
-READ8_MEMBER(missile_state::missile_r)
+uint8_t missile_state::missile_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	uint8_t result = 0xff;
@@ -1209,7 +1209,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(missile_state,suprmatk)
+void missile_state::init_suprmatk()
 {
 	int i;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1283,7 +1283,7 @@ DRIVER_INIT_MEMBER(missile_state,suprmatk)
 	}
 }
 
-DRIVER_INIT_MEMBER(missile_state,missilem)
+void missile_state::init_missilem()
 {
 	uint8_t *src = memregion("user1")->base();
 	uint8_t *dest = memregion("maincpu")->base();

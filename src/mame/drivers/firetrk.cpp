@@ -29,19 +29,19 @@ void firetrk_state::set_service_mode(int enable)
 }
 
 
-INPUT_CHANGED_MEMBER(firetrk_state::service_mode_switch_changed)
+void firetrk_state::service_mode_switch_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	set_service_mode(newval);
 }
 
 
-INPUT_CHANGED_MEMBER(firetrk_state::firetrk_horn_changed)
+void firetrk_state::firetrk_horn_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_discrete->write(generic_space(), FIRETRUCK_HORN_EN, newval);
 }
 
 
-INPUT_CHANGED_MEMBER(firetrk_state::gear_changed)
+void firetrk_state::gear_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{
@@ -51,7 +51,7 @@ INPUT_CHANGED_MEMBER(firetrk_state::gear_changed)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(firetrk_state::firetrk_scanline)
+void firetrk_state::firetrk_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -66,7 +66,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(firetrk_state::firetrk_scanline)
 }
 
 
-WRITE8_MEMBER(firetrk_state::firetrk_output_w)
+void firetrk_state::firetrk_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* BIT0 => START1 LAMP */
 	output().set_led_value(0, !(data & 0x01));
@@ -95,7 +95,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 }
 
 
-WRITE8_MEMBER(firetrk_state::superbug_output_w)
+void firetrk_state::superbug_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* BIT0 => START LAMP */
 	output().set_led_value(0, offset & 0x01);
@@ -113,7 +113,7 @@ WRITE8_MEMBER(firetrk_state::superbug_output_w)
 }
 
 
-WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
+void firetrk_state::montecar_output_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* BIT0 => START LAMP    */
 	output().set_led_value(0, !(data & 0x01));
@@ -138,7 +138,7 @@ WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
 }
 
 
-WRITE8_MEMBER(firetrk_state::montecar_output_2_w)
+void firetrk_state::montecar_output_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flash = data & 0x80;
 
@@ -153,7 +153,7 @@ void firetrk_state::machine_reset()
 }
 
 
-READ8_MEMBER(firetrk_state::firetrk_dip_r)
+uint8_t firetrk_state::firetrk_dip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val0 = m_dips[0]->read();
 	uint8_t val1 = m_dips[1]->read();
@@ -165,7 +165,7 @@ READ8_MEMBER(firetrk_state::firetrk_dip_r)
 }
 
 
-READ8_MEMBER(firetrk_state::montecar_dip_r)
+uint8_t firetrk_state::montecar_dip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val0 = m_dips[0]->read();
 	uint8_t val1 = m_dips[1]->read();
@@ -177,19 +177,19 @@ READ8_MEMBER(firetrk_state::montecar_dip_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::steer_dir_r)
+ioport_value firetrk_state::steer_dir_r(ioport_field &field, void *param)
 {
 	return m_steer_dir[(uintptr_t)param];
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::steer_flag_r)
+ioport_value firetrk_state::steer_flag_r(ioport_field &field, void *param)
 {
 	return m_steer_flag[(uintptr_t)param];
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::skid_r)
+ioport_value firetrk_state::skid_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 	int which = (uintptr_t)param;
@@ -203,7 +203,7 @@ CUSTOM_INPUT_MEMBER(firetrk_state::skid_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::crash_r)
+ioport_value firetrk_state::crash_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 	int which = (uintptr_t)param;
@@ -217,13 +217,13 @@ CUSTOM_INPUT_MEMBER(firetrk_state::crash_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::gear_r)
+ioport_value firetrk_state::gear_r(ioport_field &field, void *param)
 {
 	return (m_gear == (uintptr_t)param) ? 1 : 0;
 }
 
 
-READ8_MEMBER(firetrk_state::firetrk_input_r)
+uint8_t firetrk_state::firetrk_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int i;
 
@@ -248,7 +248,7 @@ READ8_MEMBER(firetrk_state::firetrk_input_r)
 }
 
 
-READ8_MEMBER(firetrk_state::montecar_input_r)
+uint8_t firetrk_state::montecar_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = firetrk_input_r(space, offset);
 
@@ -263,34 +263,34 @@ READ8_MEMBER(firetrk_state::montecar_input_r)
 }
 
 
-WRITE8_MEMBER(firetrk_state::blink_on_w)
+void firetrk_state::blink_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	*m_blink = true;
 }
 
 
-WRITE8_MEMBER(firetrk_state::montecar_car_reset_w)
+void firetrk_state::montecar_car_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crash[0] = 0;
 	m_skid[0] = 0;
 }
 
 
-WRITE8_MEMBER(firetrk_state::montecar_drone_reset_w)
+void firetrk_state::montecar_drone_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crash[1] = 0;
 	m_skid[1] = 0;
 }
 
 
-WRITE8_MEMBER(firetrk_state::steer_reset_w)
+void firetrk_state::steer_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_steer_flag[0] = 1;
 	m_steer_flag[1] = 1;
 }
 
 
-WRITE8_MEMBER(firetrk_state::crash_reset_w)
+void firetrk_state::crash_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crash[0] = 0;
 	m_crash[1] = 0;

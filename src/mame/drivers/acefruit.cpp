@@ -39,19 +39,19 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	emu_timer *m_refresh_timer;
-	DECLARE_WRITE8_MEMBER(acefruit_colorram_w);
-	DECLARE_WRITE8_MEMBER(acefruit_coin_w);
-	DECLARE_WRITE8_MEMBER(acefruit_sound_w);
-	DECLARE_WRITE8_MEMBER(acefruit_lamp_w);
-	DECLARE_WRITE8_MEMBER(acefruit_solenoid_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(sidewndr_payout_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
-	DECLARE_DRIVER_INIT(sidewndr);
+	void acefruit_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acefruit_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acefruit_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acefruit_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acefruit_solenoid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value sidewndr_payout_r(ioport_field &field, void *param);
+	ioport_value starspnr_coinage_r(ioport_field &field, void *param);
+	ioport_value starspnr_payout_r(ioport_field &field, void *param);
+	void init_sidewndr();
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(acefruit);
+	void palette_init_acefruit(palette_device &palette);
 	uint32_t screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(acefruit_vblank);
+	void acefruit_vblank(device_t &device);
 	void acefruit_update_irq(int vpos);
 
 	enum
@@ -110,7 +110,7 @@ void acefruit_state::video_start()
 	m_refresh_timer = timer_alloc(TIMER_ACEFRUIT_REFRESH);
 }
 
-INTERRUPT_GEN_MEMBER(acefruit_state::acefruit_vblank)
+void acefruit_state::acefruit_vblank(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE );
 	m_refresh_timer->adjust( attotime::zero );
@@ -200,7 +200,7 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(acefruit_state::sidewndr_payout_r)
+ioport_value acefruit_state::sidewndr_payout_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 
@@ -216,7 +216,7 @@ CUSTOM_INPUT_MEMBER(acefruit_state::sidewndr_payout_r)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_coinage_r)
+ioport_value acefruit_state::starspnr_coinage_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 
@@ -236,7 +236,7 @@ CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_coinage_r)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_payout_r)
+ioport_value acefruit_state::starspnr_payout_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 
@@ -254,22 +254,22 @@ CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_payout_r)
 	}
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_colorram_w)
+void acefruit_state::acefruit_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[ offset ] = data & 0xf;
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_coin_w)
+void acefruit_state::acefruit_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: ? */
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_sound_w)
+void acefruit_state::acefruit_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: ? */
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_lamp_w)
+void acefruit_state::acefruit_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -279,7 +279,7 @@ WRITE8_MEMBER(acefruit_state::acefruit_lamp_w)
 	}
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
+void acefruit_state::acefruit_solenoid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -289,7 +289,7 @@ WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
 	}
 }
 
-PALETTE_INIT_MEMBER(acefruit_state, acefruit)
+void acefruit_state::palette_init_acefruit(palette_device &palette)
 {
 	/* sprites */
 	palette.set_pen_color( 0, rgb_t(0x00, 0x00, 0x00) );
@@ -633,7 +633,7 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(acefruit_state,sidewndr)
+void acefruit_state::init_sidewndr()
 {
 	uint8_t *ROM = memregion( "maincpu" )->base();
 	/* replace "ret nc" ( 0xd0 ) with "di" */

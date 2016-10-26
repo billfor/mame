@@ -31,14 +31,14 @@ public:
 
 	DECLARE_ADDRESS_MAP(mmio, 8);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(timer_device &timer, void *ptr, int32_t param);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket_load);
+	image_init_result device_image_load_socket_load(device_image_interface &image);
 
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
-	DECLARE_READ8_MEMBER(irq_r);
-	DECLARE_WRITE8_MEMBER(select_w);
-	DECLARE_WRITE8_MEMBER(command_w);
+	void intrq_w(int state);
+	uint8_t irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 

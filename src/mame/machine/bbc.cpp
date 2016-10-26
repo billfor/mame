@@ -27,13 +27,13 @@ Model A memory handling functions
 *************************/
 
 /* for the model A just address the 4 on board ROM sockets */
-WRITE8_MEMBER(bbc_state::bbc_page_selecta_w)
+void bbc_state::bbc_page_selecta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank4->set_entry(data & 0x03);
 }
 
 
-WRITE8_MEMBER(bbc_state::bbc_memorya1_w)
+void bbc_state::bbc_memorya1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_region_maincpu->base()[offset]=data;
 }
@@ -43,14 +43,14 @@ Model B memory handling functions
 *************************/
 
 /* the model B address all 16 of the ROM sockets */
-WRITE8_MEMBER(bbc_state::bbc_page_selectb_w)
+void bbc_state::bbc_page_selectb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = data & 0x0f;
 	m_bank4->set_entry(m_rombank);
 }
 
 
-WRITE8_MEMBER(bbc_state::bbc_memoryb3_w)
+void bbc_state::bbc_memoryb3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ram->size() == 32*1024)
 	{
@@ -72,7 +72,7 @@ static const unsigned short bbc_SWRAMtype1[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1}
 static const unsigned short bbc_SWRAMtype2[16]={0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0};
 static const unsigned short bbc_SWRAMtype3[16]={0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1};
 
-WRITE8_MEMBER(bbc_state::bbc_memoryb4_w)
+void bbc_state::bbc_memoryb4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_SWRAMtype)
 	{
@@ -103,7 +103,7 @@ int bbc_state::vdudriverset()
 
 /* the model B Plus addresses all 16 of the ROM sockets plus the extra 12K of ram at 0x8000
    and 20K of shadow ram at 0x3000 */
-WRITE8_MEMBER(bbc_state::bbc_page_selectbp_w)
+void bbc_state::bbc_page_selectbp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset&0x04)==0)
 	{
@@ -139,7 +139,7 @@ WRITE8_MEMBER(bbc_state::bbc_page_selectbp_w)
    the writes to this memory are just done the normal
    way */
 
-WRITE8_MEMBER(bbc_state::bbc_memorybp1_w)
+void bbc_state::bbc_memorybp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_region_maincpu->base()[offset]=data;
 }
@@ -155,7 +155,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp1_w)
 */
 
 
-DIRECT_UPDATE_MEMBER(bbc_state::bbcbp_direct_handler)
+offs_t bbc_state::bbcbp_direct_handler(direct_read_data &direct, offs_t address)
 {
 	uint8_t *RAM = m_region_maincpu->base();
 	if (m_vdusel == 0)
@@ -180,7 +180,7 @@ DIRECT_UPDATE_MEMBER(bbc_state::bbcbp_direct_handler)
 }
 
 
-WRITE8_MEMBER(bbc_state::bbc_memorybp2_w)
+void bbc_state::bbc_memorybp2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *RAM = m_region_maincpu->base();
 	if (m_vdusel==0)
@@ -206,7 +206,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp2_w)
 
 /* if the pagedRAM is set write to RAM between 0x8000 to 0xafff
 otherwise this area contains ROM so no write is required */
-WRITE8_MEMBER(bbc_state::bbc_memorybp4_w)
+void bbc_state::bbc_memorybp4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_pagedRAM)
 	{
@@ -226,7 +226,7 @@ which could either be sideways ROM or sideways RAM */
 static const unsigned short bbc_b_plus_sideways_ram_banks[16]={ 1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0 };
 
 
-WRITE8_MEMBER(bbc_state::bbc_memorybp4_128_w)
+void bbc_state::bbc_memorybp4_128_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_pagedRAM)
 	{
@@ -241,7 +241,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp4_128_w)
 	}
 }
 
-WRITE8_MEMBER(bbc_state::bbc_memorybp6_128_w)
+void bbc_state::bbc_memorybp6_128_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (bbc_b_plus_sideways_ram_banks[m_rombank])
 	{
@@ -303,13 +303,13 @@ if the program counter is anywhere else main ram is accessed.
 */
 
 
-READ8_MEMBER(bbc_state::bbcm_ACCCON_read)
+uint8_t bbc_state::bbcm_ACCCON_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("ACCCON read %d\n",offset);
 	return m_ACCCON;
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
+void bbc_state::bbcm_ACCCON_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int tempIRR;
 	m_ACCCON=data;
@@ -376,7 +376,7 @@ int bbc_state::bbcm_vdudriverset()
 }
 
 
-WRITE8_MEMBER(bbc_state::page_selectbm_w)
+void bbc_state::page_selectbm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pagedRAM = (data & 0x80) >> 7;
 	m_rombank = data & 0x0f;
@@ -395,13 +395,13 @@ WRITE8_MEMBER(bbc_state::page_selectbm_w)
 
 
 
-WRITE8_MEMBER(bbc_state::bbc_memorybm1_w)
+void bbc_state::bbc_memorybm1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_region_maincpu->base()[offset] = data;
 }
 
 
-DIRECT_UPDATE_MEMBER(bbc_state::bbcm_direct_handler)
+offs_t bbc_state::bbcm_direct_handler(direct_read_data &direct, offs_t address)
 {
 	if (m_ACCCON_X)
 	{
@@ -424,7 +424,7 @@ DIRECT_UPDATE_MEMBER(bbc_state::bbcm_direct_handler)
 
 
 
-WRITE8_MEMBER(bbc_state::bbc_memorybm2_w)
+void bbc_state::bbc_memorybm2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *RAM = m_region_maincpu->base();
 	if (m_ACCCON_X)
@@ -450,7 +450,7 @@ static const unsigned short bbc_master_sideways_ram_banks[16]=
 };
 
 
-WRITE8_MEMBER(bbc_state::bbc_memorybm4_w)
+void bbc_state::bbc_memorybm4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_pagedRAM)
 	{
@@ -466,7 +466,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm4_w)
 }
 
 
-WRITE8_MEMBER(bbc_state::bbc_memorybm5_w)
+void bbc_state::bbc_memorybm5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (bbc_master_sideways_ram_banks[m_rombank])
 	{
@@ -475,7 +475,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm5_w)
 }
 
 
-WRITE8_MEMBER(bbc_state::bbc_memorybm7_w)
+void bbc_state::bbc_memorybm7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ACCCON_Y)
 	{
@@ -526,7 +526,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm7_w)
 &FEE0-&FEFF Tube ULA        Tube system interface   Tube system interface   32 (32 bytes x  1 ) 2MHz
 ******************************************************************************/
 
-READ8_MEMBER(bbc_state::bbcm_r)
+uint8_t bbc_state::bbcm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	long myo;
 
@@ -567,7 +567,7 @@ READ8_MEMBER(bbc_state::bbcm_r)
 	return 0xfe;
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_w)
+void bbc_state::bbcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	long myo;
 
@@ -702,7 +702,7 @@ B7 - Operates the SHIFT lock LED (Pin 16 keyboard connector)
 ******************************************************************************/
 
 
-INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
+void bbc_state::bbcb_keyscan(device_t &device)
 {
 	/* only do auto scan if keyboard is not enabled */
 	if (m_b3_keyboard == 1)
@@ -826,7 +826,7 @@ void bbc_state::MC146818_set(address_space &space)
 }
 
 
-WRITE8_MEMBER(bbc_state::bbcb_via_system_write_porta)
+void bbc_state::bbcb_via_system_write_porta(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("SYSTEM write porta %d\n",data);
 
@@ -855,7 +855,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_porta)
 }
 
 
-WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
+void bbc_state::bbcb_via_system_write_portb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit, value;
 	bit = data & 0x07;
@@ -1051,14 +1051,14 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 }
 
 
-READ8_MEMBER(bbc_state::bbcb_via_system_read_porta)
+uint8_t bbc_state::bbcb_via_system_read_porta(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("SYSTEM read porta %d\n",m_via_system_porta);
 	return m_via_system_porta;
 }
 
 
-READ8_MEMBER(bbc_state::bbcb_via_system_read_portb)
+uint8_t bbc_state::bbcb_via_system_read_portb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// D4 of portb is joystick fire button 1
 	// D5 of portb is joystick fire button 2
@@ -1082,7 +1082,7 @@ collector output only. It usually acts as the printer strobe line.
 ***********************************************************************/
 
 /* USER VIA 6522 port B is connected to the BBC user port */
-READ8_MEMBER(bbc_state::bbcb_via_user_read_portb)
+uint8_t bbc_state::bbcb_via_user_read_portb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// D0 of portb is joystick FIRE (Compact)
 	// D1 of portb is joystick LEFT (Compact)
@@ -1092,7 +1092,7 @@ READ8_MEMBER(bbc_state::bbcb_via_user_read_portb)
 	return ((m_joyport ? m_joyport->pb_r() : 0x1f) | 0xe0);
 }
 
-WRITE8_MEMBER(bbc_state::bbcb_via_user_write_portb)
+void bbc_state::bbcb_via_user_write_portb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_userport = data;
 }
@@ -1137,7 +1137,7 @@ void bbc_state::MC6850_Receive_Clock(int new_clock)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
+void bbc_state::bbc_tape_timer_cb(void *ptr, int32_t param)
 {
 	if ( m_cass_out_enabled )
 	{
@@ -1247,7 +1247,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 	}
 }
 
-WRITE_LINE_MEMBER( bbc_state::write_rxd_serial )
+void bbc_state::write_rxd_serial(int state)
 {
 	m_rxd_serial = state;
 	update_acia_rxd();
@@ -1259,7 +1259,7 @@ void bbc_state::update_acia_rxd()
 }
 
 
-WRITE_LINE_MEMBER( bbc_state::write_dcd_serial )
+void bbc_state::write_dcd_serial(int state)
 {
 	m_dcd_serial = state;
 	update_acia_dcd();
@@ -1271,7 +1271,7 @@ void bbc_state::update_acia_dcd()
 }
 
 
-WRITE_LINE_MEMBER( bbc_state::write_cts_serial )
+void bbc_state::write_cts_serial(int state)
 {
 	m_cts_serial = state;
 	update_acia_cts();
@@ -1283,7 +1283,7 @@ void bbc_state::update_acia_cts()
 }
 
 
-WRITE_LINE_MEMBER( bbc_state::bbc_rts_w )
+void bbc_state::bbc_rts_w(int state)
 {
 	if ( m_serproc_data & 0x40 )
 	{
@@ -1297,7 +1297,7 @@ WRITE_LINE_MEMBER( bbc_state::bbc_rts_w )
 }
 
 
-WRITE_LINE_MEMBER( bbc_state::bbc_txd_w )
+void bbc_state::bbc_txd_w(int state)
 {
 	if ( m_serproc_data & 0x40 )
 	{
@@ -1350,7 +1350,7 @@ void bbc_state::BBC_Cassette_motor(unsigned char status)
 //             110 - 16MHz / 13 /   8 -  2400 baud
 //             110 - 16MHz / 13 / 256 -    75 baud
 //
-WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
+void bbc_state::bbc_SerialULA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const int serial_clocks[8] =
 	{
@@ -1374,7 +1374,7 @@ WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 	m_acia_clock->set_clock_scale( (double) 1 / serial_clocks[ data & 0x07 ] );
 }
 
-WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
+void bbc_state::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 
@@ -1388,7 +1388,7 @@ WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
 ***************************************/
 
 
-WRITE_LINE_MEMBER(bbc_state::bus_nmi_w)
+void bbc_state::bus_nmi_w(int state)
 {
 	m_bus_nmi = state;
 	bbc_update_nmi();
@@ -1400,7 +1400,7 @@ WRITE_LINE_MEMBER(bbc_state::bus_nmi_w)
 ***************************************/
 
 
-WRITE_LINE_MEMBER(bbc_state::motor_w)
+void bbc_state::motor_w(int state)
 {
 	for (int i=0; i != 2; i++) {
 		char devname[8];
@@ -1412,7 +1412,7 @@ WRITE_LINE_MEMBER(bbc_state::motor_w)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_state::side_w)
+void bbc_state::side_w(int state)
 {
 	for (int i=0; i != 2; i++) {
 		char devname[8];
@@ -1455,13 +1455,13 @@ void bbc_state::bbc_update_nmi()
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_state::fdc_intrq_w)
+void bbc_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 	bbc_update_nmi();
 }
 
-WRITE_LINE_MEMBER(bbc_state::fdc_drq_w)
+void bbc_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 	bbc_update_nmi();
@@ -1481,7 +1481,7 @@ WRITE_LINE_MEMBER(bbc_state::fdc_drq_w)
          0        Drive select 0.
 */
 
-WRITE8_MEMBER(bbc_state::bbc_wd1770_status_w)
+void bbc_state::bbc_wd1770_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -1517,12 +1517,12 @@ WRITE8_MEMBER(bbc_state::bbc_wd1770_status_w)
          0        Drive select 0.
 */
 
-READ8_MEMBER(bbc_state::bbcm_wd177xl_read)
+uint8_t bbc_state::bbcm_wd177xl_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_drive_control;
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
+void bbc_state::bbcm_wd1770l_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -1545,7 +1545,7 @@ WRITE8_MEMBER(bbc_state::bbcm_wd1770l_write)
 	if (!BIT(data, 2)) m_wd1770->soft_reset();
 }
 
-WRITE8_MEMBER(bbc_state::bbcm_wd1772l_write)
+void bbc_state::bbcm_wd1772l_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -1633,7 +1633,7 @@ image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, gener
    Machine Initialisation functions
 ***************************************/
 
-DRIVER_INIT_MEMBER(bbc_state,bbc)
+void bbc_state::init_bbc()
 {
 	m_os01 = false;
 
@@ -1712,14 +1712,14 @@ void bbc_state::bbcm_setup_banks(memory_bank *membank, int banks, uint32_t shift
 	}
 }
 
-MACHINE_START_MEMBER(bbc_state, bbca)
+void bbc_state::machine_start_bbca()
 {
 	m_machinetype = MODELA;
 
 	bbc_setup_banks(m_bank4, 4, 0, 0x4000);
 }
 
-MACHINE_RESET_MEMBER(bbc_state, bbca)
+void bbc_state::machine_reset_bbca()
 {
 	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
 	m_Speech      = m_bbcconfig.read_safe(0) & 0x04;
@@ -1747,14 +1747,14 @@ MACHINE_RESET_MEMBER(bbc_state, bbca)
 	bbcb_IC32_initialise(this);
 }
 
-MACHINE_START_MEMBER(bbc_state, bbcb)
+void bbc_state::machine_start_bbcb()
 {
 	m_machinetype = MODELB;
 	m_mc6850_clock = 0;
 	bbc_setup_banks(m_bank4, 16, 0, 0x4000);
 }
 
-MACHINE_RESET_MEMBER(bbc_state, bbcb)
+void bbc_state::machine_reset_bbcb()
 {
 	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
 	m_Speech      = m_bbcconfig.read_safe(1) & 0x04;
@@ -1773,9 +1773,9 @@ MACHINE_RESET_MEMBER(bbc_state, bbcb)
 }
 
 
-MACHINE_RESET_MEMBER(bbc_state, torch)
+void bbc_state::machine_reset_torch()
 {
-	MACHINE_RESET_CALL_MEMBER(bbcb);
+	machine_reset_bbcb();
 
 	m_monitortype = monitor_type_t::COLOUR;
 	m_Speech      = 1;
@@ -1783,7 +1783,7 @@ MACHINE_RESET_MEMBER(bbc_state, torch)
 }
 
 
-MACHINE_START_MEMBER(bbc_state, bbcbp)
+void bbc_state::machine_start_bbcbp()
 {
 	m_machinetype = BPLUS;
 	m_mc6850_clock = 0;
@@ -1795,7 +1795,7 @@ MACHINE_START_MEMBER(bbc_state, bbcbp)
 	bbc_setup_banks(m_bank6, 16, 0x3000, 0x1000);
 }
 
-MACHINE_RESET_MEMBER(bbc_state, bbcbp)
+void bbc_state::machine_reset_bbcbp()
 {
 	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
 	m_Speech      = m_bbcconfig.read_safe(1) & 0x04;
@@ -1811,7 +1811,7 @@ MACHINE_RESET_MEMBER(bbc_state, bbcbp)
 }
 
 
-MACHINE_START_MEMBER(bbc_state, bbcm)
+void bbc_state::machine_start_bbcm()
 {
 	m_machinetype = MASTER;
 	m_mc6850_clock = 0;
@@ -1829,7 +1829,7 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 	output().set_value("power_led", 0);
 }
 
-MACHINE_RESET_MEMBER(bbc_state, bbcm)
+void bbc_state::machine_reset_bbcm()
 {
 	m_monitortype = m_bbcconfig.read_safe(0) & 0x03;
 	m_Speech      = 0;
@@ -1845,31 +1845,31 @@ MACHINE_RESET_MEMBER(bbc_state, bbcm)
 }
 
 
-MACHINE_START_MEMBER(bbc_state, bbcmc)
+void bbc_state::machine_start_bbcmc()
 {
-	MACHINE_START_CALL_MEMBER(bbcm);
+	machine_start_bbcm();
 
 	m_machinetype = COMPACT;
 }
 
-MACHINE_RESET_MEMBER(bbc_state, bbcmc)
+void bbc_state::machine_reset_bbcmc()
 {
-	MACHINE_RESET_CALL_MEMBER(bbcm);
+	machine_reset_bbcm();
 }
 
 
-MACHINE_RESET_MEMBER(bbc_state, ltmpbp)
+void bbc_state::machine_reset_ltmpbp()
 {
-	MACHINE_RESET_CALL_MEMBER(bbcbp);
+	machine_reset_bbcbp();
 
 	m_monitortype = monitor_type_t::GREEN;
 	m_Speech      = 1;
 	m_SWRAMtype   = 0;
 }
 
-MACHINE_RESET_MEMBER(bbc_state, ltmpm)
+void bbc_state::machine_reset_ltmpm()
 {
-	MACHINE_RESET_CALL_MEMBER(bbcm);
+	machine_reset_bbcm();
 
 	m_monitortype = monitor_type_t::GREEN;
 	m_Speech      = 0;

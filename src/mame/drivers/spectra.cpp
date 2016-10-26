@@ -51,12 +51,12 @@ public:
 		, m_p_ram(*this, "nvram")
 	{ }
 
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
-	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
+	uint8_t porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmitimer(timer_device &timer, void *ptr, int32_t param);
+	void outtimer(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_porta;
 	uint8_t m_portb;
@@ -125,7 +125,7 @@ void spectra_state::machine_reset()
 	m_t_c = 0;
 }
 
-READ8_MEMBER( spectra_state::porta_r )
+uint8_t spectra_state::porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t row = (m_porta & 0x18) >> 3;
 	uint8_t key = m_switch[row]->read();
@@ -137,7 +137,7 @@ READ8_MEMBER( spectra_state::porta_r )
 	return ret;
 }
 
-READ8_MEMBER( spectra_state::portb_r )
+uint8_t spectra_state::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_p_ram[0xf0] != 1)
 		return 0x5a; // factory reset if first time
@@ -145,13 +145,13 @@ READ8_MEMBER( spectra_state::portb_r )
 		return m_portb;
 }
 
-WRITE8_MEMBER( spectra_state::porta_w )
+void spectra_state::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_porta = data;
 }
 
 // sound port
-WRITE8_MEMBER( spectra_state::portb_w )
+void spectra_state::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portb = data;
 	float vco = 5.0;
@@ -168,7 +168,7 @@ WRITE8_MEMBER( spectra_state::portb_w )
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::nmitimer)
+void spectra_state::nmitimer(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_t_c > 0x10)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -179,7 +179,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::nmitimer)
 // 00-27 displays
 // 40-6F lamps
 // 70-7F solenoids - no knocker
-TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
+void spectra_state::outtimer(timer_device &timer, void *ptr, int32_t param)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x5c, 0x63, 0x01, 0x40, 0x08, 0 }; // 74C912
 	m_out_offs++;

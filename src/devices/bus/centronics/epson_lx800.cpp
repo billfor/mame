@@ -248,7 +248,7 @@ void epson_lx800_t::device_reset()
  * PA6             not used
  * PA7  R   P/S    P/S signal from the optional interface
  */
-READ8_MEMBER( epson_lx800_t::porta_r )
+uint8_t epson_lx800_t::porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -263,7 +263,7 @@ READ8_MEMBER( epson_lx800_t::porta_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx800_t::porta_w )
+void epson_lx800_t::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: lx800_porta_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> carriage: %d, paper feed: %d\n", BIT(data, 0), BIT(data, 2));
@@ -278,7 +278,7 @@ WRITE8_MEMBER( epson_lx800_t::porta_w )
  * PC6   W  FIRE       drive pulse width signal
  * PC7   W  BUZZER     buzzer signal
  */
-READ8_MEMBER( epson_lx800_t::portc_r )
+uint8_t epson_lx800_t::portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -289,7 +289,7 @@ READ8_MEMBER( epson_lx800_t::portc_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx800_t::portc_w )
+void epson_lx800_t::portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: lx800_portc_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
@@ -298,32 +298,32 @@ WRITE8_MEMBER( epson_lx800_t::portc_w )
 	m_beep->set_state(!BIT(data, 7));
 }
 
-READ_LINE_MEMBER( epson_lx800_t::an0_r )
+int epson_lx800_t::an0_r()
 {
 	return BIT(ioport("DIPSW2")->read(), 0);
 }
 
-READ_LINE_MEMBER( epson_lx800_t::an1_r )
+int epson_lx800_t::an1_r()
 {
 	return BIT(ioport("DIPSW2")->read(), 1);
 }
 
-READ_LINE_MEMBER( epson_lx800_t::an2_r )
+int epson_lx800_t::an2_r()
 {
 	return BIT(ioport("DIPSW2")->read(), 2);
 }
 
-READ_LINE_MEMBER( epson_lx800_t::an3_r )
+int epson_lx800_t::an3_r()
 {
 	return BIT(ioport("DIPSW2")->read(), 3); // can also read an external line AUTO_FEED_XT
 }
 
-READ_LINE_MEMBER( epson_lx800_t::an4_r )
+int epson_lx800_t::an4_r()
 {
 	return 0; // Printer select line (0=always selected)
 }
 
-READ_LINE_MEMBER( epson_lx800_t::an5_r )
+int epson_lx800_t::an5_r()
 {
 	return 1; // Monitors 24v line, should return 4.08 volts
 }
@@ -333,24 +333,24 @@ READ_LINE_MEMBER( epson_lx800_t::an5_r )
     GATE ARRAY
 ***************************************************************************/
 
-READ8_MEMBER( epson_lx800_t::centronics_data_r )
+uint8_t epson_lx800_t::centronics_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("centronics: data read\n");
 	return 0x55;
 }
 
-WRITE_LINE_MEMBER( epson_lx800_t::centronics_pe_w )
+void epson_lx800_t::centronics_pe_w(int state)
 {
 	logerror("centronics: pe = %d\n", state);
 }
 
-WRITE_LINE_MEMBER( epson_lx800_t::paperempty_led_w )
+void epson_lx800_t::paperempty_led_w(int state)
 {
 	logerror("setting paperout led: %d\n", state);
 	machine().output().set_value("paperout_led", state);
 }
 
-WRITE_LINE_MEMBER( epson_lx800_t::reset_w )
+void epson_lx800_t::reset_w(int state)
 {
 	logerror("cpu reset");
 	m_maincpu->reset();

@@ -63,7 +63,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(pacman_state,pacman)
+void pacman_state::palette_init_pacman(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
@@ -118,7 +118,7 @@ PALETTE_INIT_MEMBER(pacman_state,pacman)
 	}
 }
 
-TILEMAP_MAPPER_MEMBER(pacman_state::pacman_scan_rows)
+tilemap_memory_index pacman_state::pacman_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -132,7 +132,7 @@ TILEMAP_MAPPER_MEMBER(pacman_state::pacman_scan_rows)
 	return offs;
 }
 
-TILE_GET_INFO_MEMBER(pacman_state::pacman_get_tile_info)
+void pacman_state::pacman_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] | (m_charbank << 8);
 	int attr = (m_colorram[tile_index] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6 );
@@ -157,7 +157,7 @@ void pacman_state::init_save_state()
 }
 
 
-VIDEO_START_MEMBER(pacman_state,pacman)
+void pacman_state::video_start_pacman()
 {
 	init_save_state();
 
@@ -176,26 +176,26 @@ VIDEO_START_MEMBER(pacman_state,pacman)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),this), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),this),  8, 8, 36, 28 );
 }
 
-VIDEO_START_MEMBER(pacman_state,birdiy)
+void pacman_state::video_start_birdiy()
 {
-	VIDEO_START_CALL_MEMBER( pacman );
+	video_start_pacman();
 	m_xoffsethack = 0;
 	m_inv_spr = 1; // sprites are mirrored in X-axis compared to normal behaviour
 }
 
-WRITE8_MEMBER(pacman_state::pacman_videoram_w)
+void pacman_state::pacman_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset );
 }
 
-WRITE8_MEMBER(pacman_state::pacman_colorram_w)
+void pacman_state::pacman_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset );
 }
 
-WRITE8_MEMBER(pacman_state::pacman_flipscreen_w)
+void pacman_state::pacman_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data & 1;
 	m_bg_tilemap->set_flip(m_flipscreen * ( TILEMAP_FLIPX + TILEMAP_FLIPY ) );
@@ -309,7 +309,7 @@ uint32_t pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 
 
 **************************************************************************/
 
-VIDEO_START_MEMBER(pacman_state,pengo)
+void pacman_state::video_start_pengo()
 {
 	init_save_state();
 
@@ -325,7 +325,7 @@ VIDEO_START_MEMBER(pacman_state,pengo)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),this), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),this),  8, 8, 36, 28 );
 }
 
-WRITE8_MEMBER(pacman_state::pengo_palettebank_w)
+void pacman_state::pengo_palettebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palettebank != data)
 	{
@@ -334,7 +334,7 @@ WRITE8_MEMBER(pacman_state::pengo_palettebank_w)
 	}
 }
 
-WRITE8_MEMBER(pacman_state::pengo_colortablebank_w)
+void pacman_state::pengo_colortablebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_colortablebank != data)
 	{
@@ -343,7 +343,7 @@ WRITE8_MEMBER(pacman_state::pengo_colortablebank_w)
 	}
 }
 
-WRITE8_MEMBER(pacman_state::pengo_gfxbank_w)
+void pacman_state::pengo_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charbank != (data & 1))
 	{
@@ -360,7 +360,7 @@ S2650 Games
 
 **************************************************************************/
 
-TILE_GET_INFO_MEMBER(pacman_state::s2650_get_tile_info)
+void pacman_state::s2650_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int colbank, code, attr;
 
@@ -372,7 +372,7 @@ TILE_GET_INFO_MEMBER(pacman_state::s2650_get_tile_info)
 	SET_TILE_INFO_MEMBER(0,code,attr & 0x1f,0);
 }
 
-VIDEO_START_MEMBER(pacman_state,s2650games)
+void pacman_state::video_start_s2650games()
 {
 	init_save_state();
 
@@ -439,13 +439,13 @@ uint32_t pacman_state::screen_update_s2650games(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(pacman_state::s2650games_videoram_w)
+void pacman_state::s2650games_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pacman_state::s2650games_colorram_w)
+void pacman_state::s2650games_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	m_colorram[offset & 0x1f] = data;
@@ -453,12 +453,12 @@ WRITE8_MEMBER(pacman_state::s2650games_colorram_w)
 		m_bg_tilemap->mark_tile_dirty(i);
 }
 
-WRITE8_MEMBER(pacman_state::s2650games_scroll_w)
+void pacman_state::s2650games_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(offset, data);
 }
 
-WRITE8_MEMBER(pacman_state::s2650games_tilesbank_w)
+void pacman_state::s2650games_tilesbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_s2650games_tileram[offset] = data;
 	m_bg_tilemap->mark_all_dirty();
@@ -484,7 +484,7 @@ Jr. Pac-Man
 2018 - 2045 = column 1 attr (28 rows)
 */
 
-TILEMAP_MAPPER_MEMBER(pacman_state::jrpacman_scan_rows)
+tilemap_memory_index pacman_state::jrpacman_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -499,7 +499,7 @@ TILEMAP_MAPPER_MEMBER(pacman_state::jrpacman_scan_rows)
 	return offs;
 }
 
-TILE_GET_INFO_MEMBER(pacman_state::jrpacman_get_tile_info)
+void pacman_state::jrpacman_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color_index, code, attr;
 	if( tile_index < 1792 )
@@ -540,7 +540,7 @@ void pacman_state::jrpacman_mark_tile_dirty( int offset )
 	}
 }
 
-VIDEO_START_MEMBER(pacman_state,jrpacman)
+void pacman_state::video_start_jrpacman()
 {
 	init_save_state();
 
@@ -559,13 +559,13 @@ VIDEO_START_MEMBER(pacman_state,jrpacman)
 	m_bg_tilemap->set_scroll_cols(36 );
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_videoram_w)
+void pacman_state::jrpacman_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	jrpacman_mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_charbank_w)
+void pacman_state::jrpacman_charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charbank != (data & 1))
 	{
@@ -574,12 +574,12 @@ WRITE8_MEMBER(pacman_state::jrpacman_charbank_w)
 	}
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_spritebank_w)
+void pacman_state::jrpacman_spritebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritebank = (data & 1);
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_scroll_w)
+void pacman_state::jrpacman_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	for( i = 2; i < 34; i++ )
@@ -588,7 +588,7 @@ WRITE8_MEMBER(pacman_state::jrpacman_scroll_w)
 	}
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_bgpriority_w)
+void pacman_state::jrpacman_bgpriority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgpriority = (data & 1);
 }

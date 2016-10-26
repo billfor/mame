@@ -38,7 +38,7 @@ MACHINE_CONFIG_END
 
 // Game specific input definitions
 
-INPUT_CHANGED_MEMBER(neopcb_state::select_bios)
+void neopcb_state::select_bios(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	membank("bios_bank")->set_entry(newval ? 0 : 1);
 }
@@ -402,7 +402,7 @@ void neopcb_state::kf2k3pcb_sp1_decrypt()
 /*********************************************** non-carts */
 
 
-WRITE16_MEMBER(neopcb_state::write_bankpvc)
+void neopcb_state::write_bankpvc(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// write to cart ram
 	m_pvc_prot->protection_w(space, offset, data, mem_mask);
@@ -442,9 +442,9 @@ void neopcb_state::install_banked_bios()
 
 }
 
-DRIVER_INIT_MEMBER(neopcb_state, ms5pcb)
+void neopcb_state::init_ms5pcb()
 {
-	DRIVER_INIT_CALL(neogeo);
+	init_neogeo();
 	install_common();
 	install_banked_bios();
 
@@ -462,9 +462,9 @@ DRIVER_INIT_MEMBER(neopcb_state, ms5pcb)
 }
 
 
-DRIVER_INIT_MEMBER(neopcb_state, svcpcb)
+void neopcb_state::init_svcpcb()
 {
-	DRIVER_INIT_CALL(neogeo);
+	init_neogeo();
 	install_common();
 	install_banked_bios();
 
@@ -482,9 +482,9 @@ DRIVER_INIT_MEMBER(neopcb_state, svcpcb)
 }
 
 
-DRIVER_INIT_MEMBER(neopcb_state, kf2k3pcb)
+void neopcb_state::init_kf2k3pcb()
 {
-	DRIVER_INIT_CALL(neogeo);
+	init_neogeo();
 	install_common();
 
 	m_sprgen->m_fixed_layer_bank_type = 2;

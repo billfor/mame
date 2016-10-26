@@ -132,7 +132,7 @@ void side116_device::device_reset()
 //  IDE INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( side116_device::read )
+uint8_t side116_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -158,7 +158,7 @@ READ8_MEMBER( side116_device::read )
 	return data;
 }
 
-WRITE8_MEMBER( side116_device::write )
+void side116_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -179,7 +179,7 @@ WRITE8_MEMBER( side116_device::write )
 	}
 }
 
-WRITE_LINE_MEMBER( side116_device::ide_interrupt )
+void side116_device::ide_interrupt(int state)
 {
 	uint8_t level = m_config->read() & 0x18;
 

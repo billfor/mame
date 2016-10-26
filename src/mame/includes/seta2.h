@@ -59,58 +59,58 @@ public:
 
 	uint16_t m_lamps1, m_lamps2, m_cam;
 
-	DECLARE_WRITE16_MEMBER(spriteram16_word_w);
-	DECLARE_READ16_MEMBER(spriteram16_word_r);
-	DECLARE_WRITE16_MEMBER(vregs_w);
-	DECLARE_READ32_MEMBER(oki_read);
-	DECLARE_WRITE32_MEMBER(oki_write);
-	DECLARE_WRITE16_MEMBER(sound_bank_w);
+	void spriteram16_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t spriteram16_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint32_t oki_read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void oki_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(grdians_lockout_w);
+	void grdians_lockout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(mj4simai_p1_r);
-	DECLARE_READ16_MEMBER(mj4simai_p2_r);
-	DECLARE_WRITE16_MEMBER(mj4simai_keyboard_w);
+	uint16_t mj4simai_p1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t mj4simai_p2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mj4simai_keyboard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(pzlbowl_protection_r);
-	DECLARE_READ16_MEMBER(pzlbowl_coins_r);
-	DECLARE_WRITE16_MEMBER(pzlbowl_coin_counter_w);
+	uint16_t pzlbowl_protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t pzlbowl_coins_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pzlbowl_coin_counter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(reelquak_leds_w);
-	DECLARE_WRITE16_MEMBER(reelquak_coin_w);
+	void reelquak_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void reelquak_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(samshoot_coin_w);
+	void samshoot_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(gundamex_eeprom_r);
-	DECLARE_WRITE16_MEMBER(gundamex_eeprom_w);
+	uint16_t gundamex_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void gundamex_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ32_MEMBER(funcube_nvram_dword_r);
-	DECLARE_WRITE32_MEMBER(funcube_nvram_dword_w);
-	DECLARE_READ32_MEMBER(funcube_debug_r);
-	DECLARE_READ16_MEMBER(funcube_coins_r);
-	DECLARE_WRITE16_MEMBER(funcube_leds_w);
-	DECLARE_READ16_MEMBER(funcube_outputs_r);
-	DECLARE_WRITE16_MEMBER(funcube_outputs_w);
-	DECLARE_READ16_MEMBER(funcube_battery_r);
+	uint32_t funcube_nvram_dword_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void funcube_nvram_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t funcube_debug_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t funcube_coins_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void funcube_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t funcube_outputs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void funcube_outputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t funcube_battery_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(staraudi_camera_w);
-	DECLARE_WRITE16_MEMBER(staraudi_lamps1_w);
-	DECLARE_WRITE16_MEMBER(staraudi_lamps2_w);
-	DECLARE_READ16_MEMBER(staraudi_tileram_r);
-	DECLARE_WRITE16_MEMBER(staraudi_tileram_w);
+	void staraudi_camera_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void staraudi_lamps1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void staraudi_lamps2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t staraudi_tileram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void staraudi_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DRIVER_INIT(funcube3);
-	DECLARE_DRIVER_INIT(funcube);
-	DECLARE_DRIVER_INIT(funcube2);
-	DECLARE_DRIVER_INIT(staraudi);
+	void init_funcube3();
+	void init_funcube();
+	void init_funcube2();
+	void init_staraudi();
 
-	DECLARE_MACHINE_START(mj4simai);
-	DECLARE_MACHINE_START(funcube);
-	DECLARE_MACHINE_RESET(funcube);
+	void machine_start_mj4simai();
+	void machine_start_funcube();
+	void machine_reset_funcube();
 
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(yoffset);
-	DECLARE_VIDEO_START(xoffset);
+	void video_start_yoffset();
+	void video_start_xoffset();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -118,9 +118,9 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_rgbram(bitmap_ind16 &bitmap);
 
-	INTERRUPT_GEN_MEMBER(seta2_interrupt);
-	INTERRUPT_GEN_MEMBER(samshoot_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
+	void seta2_interrupt(device_t &device);
+	void samshoot_interrupt(device_t &device);
+	void funcube_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	void funcube_debug_outputs();
 	void staraudi_debug_outputs();

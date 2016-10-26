@@ -39,7 +39,7 @@ DIP locations verified for:
 #include "sound/volt_reg.h"
 
 
-INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
+void lasso_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
@@ -47,19 +47,19 @@ INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
 
 
 /* Write to the sound latch and generate an IRQ on the sound CPU */
-WRITE8_MEMBER(lasso_state::sound_command_w)
+void lasso_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER(lasso_state::sound_status_r)
+uint8_t lasso_state::sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*  0x01: chip#0 ready; 0x02: chip#1 ready */
 	return 0x03;
 }
 
-WRITE8_MEMBER(lasso_state::sound_select_w)
+void lasso_state::sound_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t to_write = BITSWAP8(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
@@ -459,7 +459,7 @@ void lasso_state::machine_start()
 	save_item(NAME(m_gfxbank));
 }
 
-MACHINE_START_MEMBER(lasso_state,wwjgtin)
+void lasso_state::machine_start_wwjgtin()
 {
 	lasso_state::machine_start();
 
@@ -471,7 +471,7 @@ void lasso_state::machine_reset()
 	m_gfxbank = 0;
 }
 
-MACHINE_RESET_MEMBER(lasso_state,wwjgtin)
+void lasso_state::machine_reset_wwjgtin()
 {
 	lasso_state::machine_reset();
 

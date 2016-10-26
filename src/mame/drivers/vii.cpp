@@ -111,13 +111,13 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<generic_slot_device> m_cart;
-	DECLARE_READ16_MEMBER(video_r);
-	DECLARE_WRITE16_MEMBER(video_w);
-	DECLARE_READ16_MEMBER(audio_r);
-	DECLARE_WRITE16_MEMBER(audio_w);
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_READ16_MEMBER(rom_r);
+	uint16_t video_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t audio_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void audio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t rom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	required_shared_ptr<uint16_t> m_p_ram;
 	required_shared_ptr<uint16_t> m_p_rowscroll;
 	required_shared_ptr<uint16_t> m_p_palette;
@@ -148,19 +148,19 @@ public:
 	void switch_bank(uint32_t bank);
 	void do_i2c();
 	void spg_do_dma(uint32_t len);
-	DECLARE_DRIVER_INIT(vsmile);
-	DECLARE_DRIVER_INIT(walle);
-	DECLARE_DRIVER_INIT(vii);
-	DECLARE_DRIVER_INIT(batman);
+	void init_vsmile();
+	void init_walle();
+	void init_vii();
+	void init_batman();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vii_vblank);
-	TIMER_CALLBACK_MEMBER(tmb1_tick);
-	TIMER_CALLBACK_MEMBER(tmb2_tick);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
+	void vii_vblank(device_t &device);
+	void tmb1_tick(void *ptr, int32_t param);
+	void tmb2_tick(void *ptr, int32_t param);
+	image_init_result device_image_load_vii_cart(device_image_interface &image);
+	image_init_result device_image_load_vsmile_cart(device_image_interface &image);
 
 protected:
 	optional_memory_region m_bios_rom;
@@ -489,7 +489,7 @@ void vii_state::do_dma(uint32_t len)
 	m_video_regs[0x63] |= 4;
 }
 
-READ16_MEMBER( vii_state::video_r )
+uint16_t vii_state::video_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -508,7 +508,7 @@ READ16_MEMBER( vii_state::video_r )
 	return m_video_regs[offset];
 }
 
-WRITE16_MEMBER( vii_state::video_w )
+void vii_state::video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -562,7 +562,7 @@ WRITE16_MEMBER( vii_state::video_w )
 	}
 }
 
-READ16_MEMBER( vii_state::audio_r )
+uint16_t vii_state::audio_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -573,7 +573,7 @@ READ16_MEMBER( vii_state::audio_r )
 	return 0;
 }
 
-WRITE16_MEMBER( vii_state::audio_w )
+void vii_state::audio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -659,7 +659,7 @@ void vii_state::spg_do_dma(uint32_t len)
 	m_io_regs[0x102] = 0;
 }
 
-READ16_MEMBER( vii_state::io_r )
+uint16_t vii_state::io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[] = { 'A', 'B', 'C' };
@@ -730,7 +730,7 @@ READ16_MEMBER( vii_state::io_r )
 	return val;
 }
 
-WRITE16_MEMBER( vii_state::io_w )
+void vii_state::io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[3] = { 'A', 'B', 'C' };
@@ -871,7 +871,7 @@ WRITE16_MEMBER( vii_state::io_w )
 }
 
 /*
-WRITE16_MEMBER( vii_state::rowscroll_w )
+void vii_state::rowscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
     switch(offset)
     {
@@ -881,7 +881,7 @@ WRITE16_MEMBER( vii_state::rowscroll_w )
     }
 }
 
-WRITE16_MEMBER( vii_state::spriteram_w )
+void vii_state::spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
     switch(offset)
     {
@@ -965,7 +965,7 @@ void vii_state::test_centered(uint8_t *ROM)
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
+image_init_result vii_state::device_image_load_vii_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -983,7 +983,7 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
+image_init_result vii_state::device_image_load_vsmile_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -994,12 +994,12 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
 }
 
 
-TIMER_CALLBACK_MEMBER(vii_state::tmb1_tick)
+void vii_state::tmb1_tick(void *ptr, int32_t param)
 {
 	m_io_regs[0x22] |= 1;
 }
 
-TIMER_CALLBACK_MEMBER(vii_state::tmb2_tick)
+void vii_state::tmb2_tick(void *ptr, int32_t param)
 {
 	m_io_regs[0x22] |= 2;
 }
@@ -1046,7 +1046,7 @@ void vii_state::machine_reset()
 {
 }
 
-INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
+void vii_state::vii_vblank(device_t &device)
 {
 	uint32_t x = machine().rand() & 0x3ff;
 	uint32_t y = machine().rand() & 0x3ff;
@@ -1174,25 +1174,25 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_PALETTE_ADD("palette", 32768)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(vii_state,vii)
+void vii_state::init_vii()
 {
 	m_spg243_mode = SPG243_VII;
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(vii_state,batman)
+void vii_state::init_batman()
 {
 	m_spg243_mode = SPG243_BATMAN;
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(vii_state,vsmile)
+void vii_state::init_vsmile()
 {
 	m_spg243_mode = SPG243_VSMILE;
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(vii_state,walle)
+void vii_state::init_walle()
 {
 	m_spg243_mode = SPG243_BATMAN;
 	m_centered_coordinates = 0;

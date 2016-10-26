@@ -96,7 +96,7 @@ Notes:
 #include "includes/pirates.h"
 
 
-WRITE16_MEMBER(pirates_state::out_w)
+void pirates_state::out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -114,7 +114,7 @@ WRITE16_MEMBER(pirates_state::out_w)
 //  logerror("%06x: out_w %04x\n",space.device().safe_pc(),data);
 }
 
-CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
+ioport_value pirates_state::prot_r(ioport_field &field, void *param)
 {
 //  static int prot = 0xa3;
 //  offs_t pc;
@@ -440,7 +440,7 @@ void pirates_state::decrypt_oki()
 }
 
 
-DRIVER_INIT_MEMBER(pirates_state,pirates)
+void pirates_state::init_pirates()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -453,9 +453,9 @@ DRIVER_INIT_MEMBER(pirates_state,pirates)
 	rom[0x62c0/2] = 0x6006; // beq -> bra
 }
 
-READ16_MEMBER(pirates_state::genix_prot_r){ if(!offset) return 0x0004; else return 0x0000; }
+uint16_t pirates_state::genix_prot_r(address_space &space, offs_t offset, uint16_t mem_mask){ if(!offset) return 0x0004; else return 0x0000; }
 
-DRIVER_INIT_MEMBER(pirates_state,genix)
+void pirates_state::init_genix()
 {
 	decrypt_68k();
 	decrypt_p();

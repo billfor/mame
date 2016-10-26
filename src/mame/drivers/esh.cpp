@@ -51,18 +51,18 @@ public:
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
 	bool m_ld_video_visible;
-	DECLARE_READ8_MEMBER(ldp_read);
-	DECLARE_WRITE8_MEMBER(ldp_write);
-	DECLARE_WRITE8_MEMBER(misc_write);
-	DECLARE_WRITE8_MEMBER(led_writes);
-	DECLARE_WRITE8_MEMBER(nmi_line_w);
-	DECLARE_DRIVER_INIT(esh);
+	uint8_t ldp_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void misc_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void led_writes(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_line_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_esh();
 	bool m_nmi_enable;
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(esh);
+	void palette_init_esh(palette_device &palette);
 	uint32_t screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_callback_esh);
-	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
+	void vblank_callback_esh(device_t &device);
+	void ld_command_strobe_cb(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<beep_device> m_beep;
@@ -136,17 +136,17 @@ uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitma
 
 
 /* MEMORY HANDLERS */
-READ8_MEMBER(esh_state::ldp_read)
+uint8_t esh_state::ldp_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_laserdisc->status_r();
 }
 
-WRITE8_MEMBER(esh_state::ldp_write)
+void esh_state::ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_laserdisc->data_w(data);
 }
 
-WRITE8_MEMBER(esh_state::misc_write)
+void esh_state::misc_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Bit 0 unknown */
 
@@ -160,7 +160,7 @@ WRITE8_MEMBER(esh_state::misc_write)
 	/* They cycle through a repeating pattern though */
 }
 
-WRITE8_MEMBER(esh_state::led_writes)
+void esh_state::led_writes(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -191,7 +191,7 @@ WRITE8_MEMBER(esh_state::led_writes)
 	}
 }
 
-WRITE8_MEMBER(esh_state::nmi_line_w)
+void esh_state::nmi_line_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 0 -> 1 transition enables this, else disabled?
 	m_nmi_enable = (data & 1) == 1;
@@ -272,7 +272,7 @@ static INPUT_PORTS_START( esh )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(esh_state, esh)
+void esh_state::palette_init_esh(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -330,14 +330,14 @@ static GFXDECODE_START( esh )
 	GFXDECODE_ENTRY("gfx2", 0, esh_gfx_layout, 0x0, 0x20)
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(esh_state::vblank_callback_esh)
+void esh_state::vblank_callback_esh(device_t &device)
 {
 	// IRQ
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 // TODO: 0xfe NMI enabled after writing to LD command port, NMI reads LD port.
-WRITE_LINE_MEMBER(esh_state::ld_command_strobe_cb)
+void esh_state::ld_command_strobe_cb(int state)
 {
 	if(m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
@@ -460,7 +460,7 @@ ROM_START( eshb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(esh_state,esh)
+void esh_state::init_esh()
 {
 }
 

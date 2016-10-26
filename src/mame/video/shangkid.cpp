@@ -6,7 +6,7 @@
 #include "includes/shangkid.h"
 
 
-TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info){
+void shangkid_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){
 	int attributes = m_videoram[tile_index+0x800];
 	int tile_number = m_videoram[tile_index]+0x100*(attributes&0x3);
 	int color;
@@ -43,12 +43,12 @@ TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info){
 		(memregion( "proms" )->base()[0x800+color*4]==2)?1:0;
 }
 
-VIDEO_START_MEMBER(shangkid_state,shangkid)
+void shangkid_state::video_start_shangkid()
 {
 	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(shangkid_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
-WRITE8_MEMBER(shangkid_state::videoram_w)
+void shangkid_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_background->mark_tile_dirty(offset&0x7ff );
@@ -190,7 +190,7 @@ uint32_t shangkid_state::screen_update_shangkid(screen_device &screen, bitmap_in
 }
 
 
-PALETTE_INIT_MEMBER(shangkid_state,dynamski)
+void shangkid_state::palette_init_dynamski(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

@@ -53,34 +53,34 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_READ8_MEMBER(vector06_8255_portb_r);
-	DECLARE_READ8_MEMBER(vector06_8255_portc_r);
-	DECLARE_WRITE8_MEMBER(vector06_8255_porta_w);
-	DECLARE_WRITE8_MEMBER(vector06_8255_portb_w);
-	DECLARE_WRITE8_MEMBER(vector06_color_set);
-	DECLARE_READ8_MEMBER(vector06_romdisk_portb_r);
-	DECLARE_WRITE8_MEMBER(vector06_romdisk_portb_w);
-	DECLARE_WRITE8_MEMBER(vector06_romdisk_porta_w);
-	DECLARE_WRITE8_MEMBER(vector06_romdisk_portc_w);
-	DECLARE_READ8_MEMBER(vector06_8255_1_r);
-	DECLARE_WRITE8_MEMBER(vector06_8255_1_w);
-	DECLARE_READ8_MEMBER(vector06_8255_2_r);
-	DECLARE_WRITE8_MEMBER(vector06_8255_2_w);
-	DECLARE_WRITE8_MEMBER(vector06_disc_w);
-	DECLARE_WRITE8_MEMBER(vector06_status_callback);
-	DECLARE_WRITE8_MEMBER(vector06_ramdisk_w);
-	DECLARE_WRITE8_MEMBER(pit8253_w);
-	DECLARE_READ8_MEMBER(pit8253_r);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	uint8_t vector06_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vector06_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vector06_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vector06_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vector06_color_set(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vector06_romdisk_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vector06_romdisk_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vector06_romdisk_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vector06_romdisk_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vector06_8255_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vector06_8255_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vector06_8255_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vector06_8255_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vector06_disc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vector06_status_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vector06_ramdisk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pit8253_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pit8253_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void speaker_w(int state);
 	void vector06_set_video_mode(int width);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(vector06);
+	void palette_init_vector06(palette_device &palette);
 	uint32_t screen_update_vector06(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vector06_interrupt);
-	TIMER_CALLBACK_MEMBER(reset_check_callback);
-	IRQ_CALLBACK_MEMBER(vector06_irq_callback);
+	void vector06_interrupt(device_t &device);
+	void reset_check_callback(void *ptr, int32_t param);
+	int vector06_irq_callback(device_t &device, int irqline);
 
 private:
 	required_device<cpu_device> m_maincpu;

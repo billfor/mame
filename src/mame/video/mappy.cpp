@@ -32,7 +32,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(mappy_state,superpac)
+void mappy_state::palette_init_superpac(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
@@ -89,7 +89,7 @@ PALETTE_INIT_MEMBER(mappy_state,superpac)
 	}
 }
 
-PALETTE_INIT_MEMBER(mappy_state,mappy)
+void mappy_state::palette_init_mappy(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
@@ -158,7 +158,7 @@ PALETTE_INIT_MEMBER(mappy_state,mappy)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(mappy_state,phozon)
+void mappy_state::palette_init_phozon(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
@@ -228,7 +228,7 @@ PALETTE_INIT_MEMBER(mappy_state,phozon)
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-TILEMAP_MAPPER_MEMBER(mappy_state::superpac_tilemap_scan)
+tilemap_memory_index mappy_state::superpac_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -243,7 +243,7 @@ TILEMAP_MAPPER_MEMBER(mappy_state::superpac_tilemap_scan)
 }
 
 /* tilemap is a composition of a 32x60 scrolling portion and two 2x28 fixed portions on the sides */
-TILEMAP_MAPPER_MEMBER(mappy_state::mappy_tilemap_scan)
+tilemap_memory_index mappy_state::mappy_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -264,7 +264,7 @@ TILEMAP_MAPPER_MEMBER(mappy_state::mappy_tilemap_scan)
 	return offs;
 }
 
-TILE_GET_INFO_MEMBER(mappy_state::superpac_get_tile_info)
+void mappy_state::superpac_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_videoram[tile_index + 0x400];
 
@@ -276,7 +276,7 @@ TILE_GET_INFO_MEMBER(mappy_state::superpac_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(mappy_state::phozon_get_tile_info)
+void mappy_state::phozon_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_videoram[tile_index + 0x400];
 
@@ -288,7 +288,7 @@ TILE_GET_INFO_MEMBER(mappy_state::phozon_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(mappy_state::mappy_get_tile_info)
+void mappy_state::mappy_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_videoram[tile_index + 0x800];
 
@@ -308,7 +308,7 @@ TILE_GET_INFO_MEMBER(mappy_state::mappy_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(mappy_state,superpac)
+void mappy_state::video_start_superpac()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mappy_state::superpac_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),this),8,8,36,28);
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
@@ -316,14 +316,14 @@ VIDEO_START_MEMBER(mappy_state,superpac)
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 31);
 }
 
-VIDEO_START_MEMBER(mappy_state,phozon)
+void mappy_state::video_start_phozon()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mappy_state::phozon_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),this),8,8,36,28);
 
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 15);
 }
 
-VIDEO_START_MEMBER(mappy_state,mappy)
+void mappy_state::video_start_mappy()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mappy_state::mappy_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::mappy_tilemap_scan),this),8,8,36,60);
 
@@ -341,30 +341,30 @@ VIDEO_START_MEMBER(mappy_state,mappy)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mappy_state::superpac_videoram_w)
+void mappy_state::superpac_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(mappy_state::mappy_videoram_w)
+void mappy_state::mappy_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(mappy_state::superpac_flipscreen_w)
+void mappy_state::superpac_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }
 
-READ8_MEMBER(mappy_state::superpac_flipscreen_r)
+uint8_t mappy_state::superpac_flipscreen_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	flip_screen_set(1);
 	return 0xff;
 }
 
-WRITE8_MEMBER(mappy_state::mappy_scroll_w)
+void mappy_state::mappy_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll = offset >> 3;
 }

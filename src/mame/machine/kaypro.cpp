@@ -15,12 +15,12 @@
 
 ************************************************************/
 
-WRITE_LINE_MEMBER( kaypro_state::write_centronics_busy )
+void kaypro_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( kaypro_state::pio_system_r )
+uint8_t kaypro_state::pio_system_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -33,7 +33,7 @@ READ8_MEMBER( kaypro_state::pio_system_r )
 	return data;
 }
 
-WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
+void kaypro_state::kayproii_pio_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  d7 bank select
     d6 disk drive motors - (0=on)
@@ -71,7 +71,7 @@ WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 	m_system_port = data;
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
+void kaypro_state::kaypro4_pio_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	kayproii_pio_system_w(space, offset, data);
 
@@ -87,13 +87,13 @@ WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
 
 ************************************************************/
 
-READ8_MEMBER( kaypro_state::kaypro2x_system_port_r )
+uint8_t kaypro_state::kaypro2x_system_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_centronics_busy << 6;
 	return (m_system_port & 0xbf) | data;
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
+void kaypro_state::kaypro2x_system_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  d7 bank select
     d6 alternate character set (write only)
@@ -162,7 +162,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
     FFh    19200 */
 
 
-READ8_MEMBER(kaypro_state::kaypro_sio_r)
+uint8_t kaypro_state::kaypro_sio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 1)
 		return kay_kbd_d_r();
@@ -173,7 +173,7 @@ READ8_MEMBER(kaypro_state::kaypro_sio_r)
 		return m_sio->cd_ba_r(space, offset);
 }
 
-WRITE8_MEMBER(kaypro_state::kaypro_sio_w)
+void kaypro_state::kaypro_sio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 1)
 		kay_kbd_d_w(data);
@@ -224,12 +224,12 @@ void kaypro_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-WRITE_LINE_MEMBER( kaypro_state::fdc_intrq_w )
+void kaypro_state::fdc_intrq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 0x82) | state;
 }
 
-WRITE_LINE_MEMBER( kaypro_state::fdc_drq_w )
+void kaypro_state::fdc_drq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 0x81) | (state << 1);
 }
@@ -240,14 +240,14 @@ WRITE_LINE_MEMBER( kaypro_state::fdc_drq_w )
     Machine
 
 ************************************************************/
-MACHINE_START_MEMBER( kaypro_state,kayproii )
+void kaypro_state::machine_start_kayproii()
 {
 	m_pio_s->strobe_a(0);
 }
 
-MACHINE_RESET_MEMBER( kaypro_state,kaypro )
+void kaypro_state::machine_reset_kaypro()
 {
-	MACHINE_RESET_CALL_MEMBER(kay_kbd);
+	machine_reset_kay_kbd();
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 	membank("bank3")->set_entry(1); // point at video ram

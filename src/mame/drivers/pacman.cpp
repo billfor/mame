@@ -377,7 +377,7 @@ Boards:
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(pacman_state,mschamp)
+void pacman_state::machine_reset_mschamp()
 {
 	uint8_t *rom = memregion("maincpu")->base() + 0x10000;
 	int whichbank = ioport("GAME")->read() & 1;
@@ -389,7 +389,7 @@ MACHINE_RESET_MEMBER(pacman_state,mschamp)
 	membank("bank2")->set_entry(whichbank);
 }
 
-MACHINE_RESET_MEMBER(pacman_state,superabc)
+void pacman_state::machine_reset_superabc()
 {
 	superabc_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
@@ -402,24 +402,24 @@ MACHINE_RESET_MEMBER(pacman_state,superabc)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(pacman_state::vblank_irq)
+void pacman_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(pacman_state::vblank_nmi)
+void pacman_state::vblank_nmi(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(pacman_state::irq_mask_w)
+void pacman_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }
 
-WRITE8_MEMBER(pacman_state::pacman_interrupt_vector_w)
+void pacman_state::pacman_interrupt_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line_vector(0, data);
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -482,7 +482,7 @@ did look at(sprite buffer), was copied from Pacman.  The addresses for the varia
 to be the same as well.
 */
 
-WRITE8_MEMBER(pacman_state::piranha_interrupt_vector_w)
+void pacman_state::piranha_interrupt_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0xfa) data = 0x78;
 	if (data == 0xfc) data = 0xfc;
@@ -490,7 +490,7 @@ WRITE8_MEMBER(pacman_state::piranha_interrupt_vector_w)
 }
 
 
-WRITE8_MEMBER(pacman_state::nmouse_interrupt_vector_w)
+void pacman_state::nmouse_interrupt_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0xbf) data = 0x3c;
 	if (data == 0xc6) data = 0x40;
@@ -506,19 +506,19 @@ WRITE8_MEMBER(pacman_state::nmouse_interrupt_vector_w)
  *
  *************************************/
 
-WRITE8_MEMBER(pacman_state::pacman_leds_w)
+void pacman_state::pacman_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(offset,data & 1);
 }
 
 
-WRITE8_MEMBER(pacman_state::pacman_coin_counter_w)
+void pacman_state::pacman_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset,data & 1);
 }
 
 
-WRITE8_MEMBER(pacman_state::pacman_coin_lockout_global_w)
+void pacman_state::pacman_coin_lockout_global_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(~data & 0x01);
 }
@@ -531,7 +531,7 @@ WRITE8_MEMBER(pacman_state::pacman_coin_lockout_global_w)
  *
  *************************************/
 
-WRITE8_MEMBER(pacman_state::alibaba_sound_w)
+void pacman_state::alibaba_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* since the sound region in Ali Baba is not contiguous, translate the
 	   offset into the 0-0x1f range */
@@ -543,7 +543,7 @@ WRITE8_MEMBER(pacman_state::alibaba_sound_w)
 		m_namco_sound->pacman_sound_w(space, offset - 0x10, data);
 }
 
-READ8_MEMBER(pacman_state::alibaba_mystery_1_r)
+uint8_t pacman_state::alibaba_mystery_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* The return value determines what the mystery item is.  Each bit corresponds
 	   to a question mark */
@@ -551,7 +551,7 @@ READ8_MEMBER(pacman_state::alibaba_mystery_1_r)
 }
 
 
-READ8_MEMBER(pacman_state::alibaba_mystery_2_r)
+uint8_t pacman_state::alibaba_mystery_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* The single bit return value determines when the mystery is lit up.
 	   This is certainly wrong */
@@ -567,7 +567,7 @@ READ8_MEMBER(pacman_state::alibaba_mystery_2_r)
  *
  *************************************/
 
-READ8_MEMBER(pacman_state::maketrax_special_port2_r)
+uint8_t pacman_state::maketrax_special_port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = ioport("DSW1")->read();
 	int pc = space.device().safe_pcbase();
@@ -588,7 +588,7 @@ READ8_MEMBER(pacman_state::maketrax_special_port2_r)
 	return data;
 }
 
-READ8_MEMBER(pacman_state::maketrax_special_port3_r)
+uint8_t pacman_state::maketrax_special_port3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int pc = space.device().safe_pcbase();
 
@@ -609,7 +609,7 @@ READ8_MEMBER(pacman_state::maketrax_special_port3_r)
 	}
 }
 
-READ8_MEMBER(pacman_state::korosuke_special_port2_r)
+uint8_t pacman_state::korosuke_special_port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = ioport("DSW1")->read();
 	int pc = space.device().safe_pcbase();
@@ -630,7 +630,7 @@ READ8_MEMBER(pacman_state::korosuke_special_port2_r)
 	return data;
 }
 
-READ8_MEMBER(pacman_state::korosuke_special_port3_r)
+uint8_t pacman_state::korosuke_special_port3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int pc = space.device().safe_pcbase();
 
@@ -658,7 +658,7 @@ READ8_MEMBER(pacman_state::korosuke_special_port3_r)
  *
  *************************************/
 
-READ8_MEMBER(pacman_state::mschamp_kludge_r)
+uint8_t pacman_state::mschamp_kludge_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_counter++;
 }
@@ -670,12 +670,12 @@ READ8_MEMBER(pacman_state::mschamp_kludge_r)
  *
  ************************************/
 
-WRITE8_MEMBER(pacman_state::bigbucks_bank_w)
+void pacman_state::bigbucks_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bigbucks_bank = data;
 }
 
-READ8_MEMBER(pacman_state::bigbucks_question_r)
+uint8_t pacman_state::bigbucks_question_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *question = memregion("user1")->base();
 	uint8_t ret;
@@ -692,12 +692,12 @@ READ8_MEMBER(pacman_state::bigbucks_question_r)
  *
  ************************************/
 
-INTERRUPT_GEN_MEMBER(pacman_state::s2650_interrupt)
+void pacman_state::s2650_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
 
-WRITE8_MEMBER(pacman_state::porky_banking_w)
+void pacman_state::porky_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 1);
 	membank("bank2")->set_entry(data & 1);
@@ -705,7 +705,7 @@ WRITE8_MEMBER(pacman_state::porky_banking_w)
 	membank("bank4")->set_entry(data & 1);
 }
 
-READ8_MEMBER(pacman_state::drivfrcp_port1_r)
+uint8_t pacman_state::drivfrcp_port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (space.device().safe_pc())
 	{
@@ -717,7 +717,7 @@ READ8_MEMBER(pacman_state::drivfrcp_port1_r)
 	return 0;
 }
 
-READ8_MEMBER(pacman_state::_8bpm_port1_r)
+uint8_t pacman_state::_8bpm_port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (space.device().safe_pc())
 	{
@@ -729,7 +729,7 @@ READ8_MEMBER(pacman_state::_8bpm_port1_r)
 	return 0;
 }
 
-READ8_MEMBER(pacman_state::porky_port1_r)
+uint8_t pacman_state::porky_port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (space.device().safe_pc())
 	{
@@ -749,37 +749,37 @@ READ8_MEMBER(pacman_state::porky_port1_r)
  *
  ************************************/
 
-READ8_MEMBER(pacman_state::rocktrv2_prot1_data_r)
+uint8_t pacman_state::rocktrv2_prot1_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rocktrv2_prot_data[0] >> 4;
 }
 
-READ8_MEMBER(pacman_state::rocktrv2_prot2_data_r)
+uint8_t pacman_state::rocktrv2_prot2_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rocktrv2_prot_data[1] >> 4;
 }
 
-READ8_MEMBER(pacman_state::rocktrv2_prot3_data_r)
+uint8_t pacman_state::rocktrv2_prot3_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rocktrv2_prot_data[2] >> 4;
 }
 
-READ8_MEMBER(pacman_state::rocktrv2_prot4_data_r)
+uint8_t pacman_state::rocktrv2_prot4_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rocktrv2_prot_data[3] >> 4;
 }
 
-WRITE8_MEMBER(pacman_state::rocktrv2_prot_data_w)
+void pacman_state::rocktrv2_prot_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rocktrv2_prot_data[offset] = data;
 }
 
-WRITE8_MEMBER(pacman_state::rocktrv2_question_bank_w)
+void pacman_state::rocktrv2_question_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rocktrv2_question_bank = data;
 }
 
-READ8_MEMBER(pacman_state::rocktrv2_question_r)
+uint8_t pacman_state::rocktrv2_question_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *question = memregion("user1")->base();
 
@@ -811,7 +811,7 @@ READ8_MEMBER(pacman_state::rocktrv2_question_r)
   The two PROMs on the main board at 7F and 4A are also replaced with PROMs from the kit
 */
 
-WRITE8_MEMBER(pacman_state::superabc_bank_w)
+void pacman_state::superabc_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d4-d6: bank
 	int bank = data >> 4 & 7;
@@ -929,21 +929,21 @@ WRITE8_MEMBER(pacman_state::superabc_bank_w)
 #define mspacman_disable_decode_latch(m) m.root_device().membank("bank1")->set_entry(0)
 
 // any access to these ROM addresses disables the decoder, and all you see is the original Pac-Man code
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x0038){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x0038]; }
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x03b0){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x03b0]; }
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x1600){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x1600]; }
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x2120){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x2120]; }
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x3ff0){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x3ff0]; }
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x8000){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x8000]; }
-READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x97f0){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x97f0]; }
-WRITE8_MEMBER(pacman_state::mspacman_disable_decode_w){ mspacman_disable_decode_latch(machine()); }
+uint8_t pacman_state::mspacman_disable_decode_r_0x0038(address_space &space, offs_t offset, uint8_t mem_mask){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x0038]; }
+uint8_t pacman_state::mspacman_disable_decode_r_0x03b0(address_space &space, offs_t offset, uint8_t mem_mask){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x03b0]; }
+uint8_t pacman_state::mspacman_disable_decode_r_0x1600(address_space &space, offs_t offset, uint8_t mem_mask){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x1600]; }
+uint8_t pacman_state::mspacman_disable_decode_r_0x2120(address_space &space, offs_t offset, uint8_t mem_mask){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x2120]; }
+uint8_t pacman_state::mspacman_disable_decode_r_0x3ff0(address_space &space, offs_t offset, uint8_t mem_mask){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x3ff0]; }
+uint8_t pacman_state::mspacman_disable_decode_r_0x8000(address_space &space, offs_t offset, uint8_t mem_mask){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x8000]; }
+uint8_t pacman_state::mspacman_disable_decode_r_0x97f0(address_space &space, offs_t offset, uint8_t mem_mask){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x97f0]; }
+void pacman_state::mspacman_disable_decode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ mspacman_disable_decode_latch(machine()); }
 
 // any access to these ROM addresses enables the decoder, and you'll see the Ms. Pac-Man code
-READ8_MEMBER(pacman_state::mspacman_enable_decode_r_0x3ff8){ mspacman_enable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x3ff8+0x10000]; }
-WRITE8_MEMBER(pacman_state::mspacman_enable_decode_w){ mspacman_enable_decode_latch(machine()); }
+uint8_t pacman_state::mspacman_enable_decode_r_0x3ff8(address_space &space, offs_t offset, uint8_t mem_mask){ mspacman_enable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x3ff8+0x10000]; }
+void pacman_state::mspacman_enable_decode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ mspacman_enable_decode_latch(machine()); }
 
 
-READ8_MEMBER(pacman_state::pacman_read_nop)
+uint8_t pacman_state::pacman_read_nop(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Return value of reading the bus with no devices enabled.
 	// This seems to be common but more tests are needed. Ms Pacman reads bytes in sequence
@@ -6817,7 +6817,7 @@ void pacman_state::maketrax_rom_decode()
 	m_patched_opcodes[0x3aef] = 0xb0;
 }
 
-DRIVER_INIT_MEMBER(pacman_state,maketrax)
+void pacman_state::init_maketrax()
 {
 	/* set up protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5080, 0x50bf, read8_delegate(FUNC(pacman_state::maketrax_special_port2_r),this));
@@ -6846,7 +6846,7 @@ void pacman_state::korosuke_rom_decode()
 	m_patched_opcodes[0x3af3] = 0xb0;
 }
 
-DRIVER_INIT_MEMBER(pacman_state,korosuke)
+void pacman_state::init_korosuke()
 {
 	/* set up protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5080, 0x5080, read8_delegate(FUNC(pacman_state::korosuke_special_port2_r),this));
@@ -6855,7 +6855,7 @@ DRIVER_INIT_MEMBER(pacman_state,korosuke)
 	korosuke_rom_decode();
 }
 
-DRIVER_INIT_MEMBER(pacman_state,ponpoko)
+void pacman_state::init_ponpoko()
 {
 	/* The gfx data is swapped wrt the other Pac-Man hardware games. */
 	/* Here we revert it to the usual format. */
@@ -6907,7 +6907,7 @@ void pacman_state::eyes_decode(uint8_t *data)
 	}
 }
 
-DRIVER_INIT_MEMBER(pacman_state,eyes)
+void pacman_state::init_eyes()
 {
 	int i, len;
 	uint8_t *RAM;
@@ -6990,7 +6990,7 @@ void pacman_state::mspacman_install_patches(uint8_t *ROM)
 	}
 }
 
-DRIVER_INIT_MEMBER(pacman_state,mspacman)
+void pacman_state::init_mspacman()
 {
 	int i;
 	uint8_t *ROM, *DROM;
@@ -7040,12 +7040,12 @@ DRIVER_INIT_MEMBER(pacman_state,mspacman)
 	membank("bank1")->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER(pacman_state, mschamp)
+void pacman_state::init_mschamp()
 {
 	save_item(NAME(m_counter));
 }
 
-DRIVER_INIT_MEMBER(pacman_state,woodpek)
+void pacman_state::init_woodpek()
 {
 	int i, len;
 	uint8_t *RAM;
@@ -7059,17 +7059,17 @@ DRIVER_INIT_MEMBER(pacman_state,woodpek)
 		eyes_decode(&RAM[i]);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,pacplus)
+void pacman_state::init_pacplus()
 {
 	pacplus_decode();
 }
 
-DRIVER_INIT_MEMBER(pacman_state,jumpshot)
+void pacman_state::init_jumpshot()
 {
 	jumpshot_decode();
 }
 
-DRIVER_INIT_MEMBER(pacman_state,drivfrcp)
+void pacman_state::init_drivfrcp()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[0 * 0x2000]);
@@ -7078,7 +7078,7 @@ DRIVER_INIT_MEMBER(pacman_state,drivfrcp)
 	membank("bank4")->set_base(&ROM[3 * 0x2000]);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,8bpm)
+void pacman_state::init_8bpm()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
@@ -7095,7 +7095,7 @@ DRIVER_INIT_MEMBER(pacman_state,8bpm)
 	membank("bank4")->set_base(&ROM[3 * 0x2000]);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,porky)
+void pacman_state::init_porky()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
@@ -7117,7 +7117,7 @@ DRIVER_INIT_MEMBER(pacman_state,porky)
 	membank("bank4")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,rocktrv2)
+void pacman_state::init_rocktrv2()
 {
 	/* hack to pass the rom check for the bad rom */
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -7131,7 +7131,7 @@ DRIVER_INIT_MEMBER(pacman_state,rocktrv2)
 /* The encrpytion is provided by a 74298 sitting on top of the rom at 6f.
 The select line is tied to a2; a0 and a1 of the eprom are are left out of
 socket and run through the 74298.  Clock is tied to system clock.  */
-DRIVER_INIT_MEMBER(pacman_state,mspacmbe)
+void pacman_state::init_mspacmbe()
 {
 	uint8_t temp;
 	uint8_t *RAM = memregion("maincpu")->base();
@@ -7149,20 +7149,20 @@ DRIVER_INIT_MEMBER(pacman_state,mspacmbe)
 	}
 }
 
-READ8_MEMBER(pacman_state::mspacii_protection_r)
+uint8_t pacman_state::mspacii_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* used by extra routine at $3FE, bit 4 of 504d needs to be low, and of 504e to be high */
 	uint8_t data = ioport("IN1")->read();
 	return (data & 0xef) | (offset << 4 & 0x10);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,mspacii)
+void pacman_state::init_mspacii()
 {
 	// protection
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x504d, 0x506f, read8_delegate(FUNC(pacman_state::mspacii_protection_r), this));
 }
 
-DRIVER_INIT_MEMBER(pacman_state,superabc)
+void pacman_state::init_superabc()
 {
 	uint8_t *src = memregion("user1")->base();
 	uint8_t *dest = memregion("gfx1")->base();
@@ -7172,7 +7172,7 @@ DRIVER_INIT_MEMBER(pacman_state,superabc)
 		dest[i] = src[BITSWAP24(i,23,22,21,20,19,18,17, 12,13,14,16,15, 11,10,9,8,7,6,5,4,3,2,1,0)];
 }
 
-READ8_MEMBER(pacman_state::cannonbp_protection_r)
+uint8_t pacman_state::cannonbp_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* At 6p where a rom would usually be there is an epoxy resin chip with 'Novomatic Industrie' Cannon Ball tm 1984 label. */
 	/* As I have no clue about what shall be in this chip, what follows is only a simulation which is enough to play the game. */
@@ -7216,7 +7216,7 @@ READ8_MEMBER(pacman_state::cannonbp_protection_r)
 }
 
 
-DRIVER_INIT_MEMBER(pacman_state,cannonbp)
+void pacman_state::init_cannonbp()
 {
 	/* extra memory */
 	m_maincpu->space(AS_PROGRAM).install_ram(0x4800, 0x4bff);

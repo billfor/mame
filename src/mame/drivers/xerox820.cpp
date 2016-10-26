@@ -90,23 +90,23 @@ void xerox820ii_state::bankswitch(int bank)
 	}
 }
 
-READ8_MEMBER( xerox820_state::fdc_r )
+uint8_t xerox820_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->gen_r(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( xerox820_state::fdc_w )
+void xerox820_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->gen_w(offset, data ^ 0xff);
 }
 
-WRITE8_MEMBER( xerox820_state::scroll_w )
+void xerox820_state::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll = (offset >> 8) & 0x1f;
 }
 
 #ifdef UNUSED_CODE
-WRITE8_MEMBER( xerox820_state::x120_system_w )
+void xerox820_state::x120_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -125,27 +125,27 @@ WRITE8_MEMBER( xerox820_state::x120_system_w )
 }
 #endif
 
-WRITE8_MEMBER( xerox820ii_state::bell_w )
+void xerox820ii_state::bell_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(offset);
 }
 
-WRITE8_MEMBER( xerox820ii_state::slden_w )
+void xerox820ii_state::slden_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->dden_w(offset);
 }
 
-WRITE8_MEMBER( xerox820ii_state::chrom_w )
+void xerox820ii_state::chrom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_chrom = offset;
 }
 
-WRITE8_MEMBER( xerox820ii_state::lowlite_w )
+void xerox820ii_state::lowlite_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lowlite = data;
 }
 
-WRITE8_MEMBER( xerox820ii_state::sync_w )
+void xerox820ii_state::sync_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 	{
@@ -210,14 +210,14 @@ static INPUT_PORTS_START( xerox820 )
 	// inputs defined in machine/keyboard.c
 INPUT_PORTS_END
 
-TIMER_CALLBACK_MEMBER( bigboard_state::bigboard_beepoff )
+void bigboard_state::bigboard_beepoff(void *ptr, int32_t param)
 {
 	m_beeper->set_state(0);
 }
 
 /* Z80 PIO */
 
-READ8_MEMBER( xerox820_state::kbpio_pa_r )
+uint8_t xerox820_state::kbpio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -246,7 +246,7 @@ READ8_MEMBER( xerox820_state::kbpio_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
+void xerox820_state::kbpio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -296,7 +296,7 @@ WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 	bankswitch(BIT(data, 7));
 }
 
-WRITE8_MEMBER( bigboard_state::kbpio_pa_w )
+void bigboard_state::kbpio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	xerox820_state::kbpio_pa_w(space, offset, data);
 
@@ -309,7 +309,7 @@ WRITE8_MEMBER( bigboard_state::kbpio_pa_w )
 	m_bit5 = BIT(data, 5);
 }
 
-READ8_MEMBER( xerox820_state::kbpio_pb_r )
+uint8_t xerox820_state::kbpio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -329,7 +329,7 @@ READ8_MEMBER( xerox820_state::kbpio_pb_r )
 	return m_kb->read() ^ 0xff;
 }
 
-WRITE8_MEMBER( xerox820ii_state::rdpio_pb_w )
+void xerox820ii_state::rdpio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -350,14 +350,14 @@ WRITE8_MEMBER( xerox820ii_state::rdpio_pb_w )
 	// TODO: LS74 Q
 }
 
-WRITE_LINE_MEMBER( xerox820ii_state::rdpio_pardy_w )
+void xerox820ii_state::rdpio_pardy_w(int state)
 {
 	// TODO
 }
 
 /* Z80 CTC */
 
-TIMER_DEVICE_CALLBACK_MEMBER( xerox820_state::ctc_tick )
+void xerox820_state::ctc_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ctc->trg0(1);
 	m_ctc->trg0(0);
@@ -391,14 +391,14 @@ void xerox820_state::update_nmi()
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-WRITE_LINE_MEMBER( xerox820_state::fdc_intrq_w )
+void xerox820_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 
 	update_nmi();
 }
 
-WRITE_LINE_MEMBER( xerox820_state::fdc_drq_w )
+void xerox820_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 
@@ -407,7 +407,7 @@ WRITE_LINE_MEMBER( xerox820_state::fdc_drq_w )
 
 /* COM8116 Interface */
 
-WRITE_LINE_MEMBER( xerox820_state::fr_w )
+void xerox820_state::fr_w(int state)
 {
 	m_sio->rxca_w(state);
 	m_sio->txca_w(state);

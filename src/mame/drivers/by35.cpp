@@ -97,41 +97,41 @@ public:
 		, m_timer_s_freq(*this, "timer_s_freq")
 	{ }
 
-	DECLARE_DRIVER_INIT(by35_6);
-	DECLARE_DRIVER_INIT(by35_7);
-	DECLARE_DRIVER_INIT(playboy);
-	DECLARE_READ8_MEMBER(u10_a_r);
-	DECLARE_WRITE8_MEMBER(u10_a_w);
-	DECLARE_READ8_MEMBER(u10_b_r);
-	DECLARE_WRITE8_MEMBER(u10_b_w);
-	DECLARE_READ8_MEMBER(u11_a_r);
-	DECLARE_WRITE8_MEMBER(u11_a_w);
-	DECLARE_WRITE8_MEMBER(u11_b_w);
-	DECLARE_WRITE8_MEMBER(u11_b_as2888_w);
-	DECLARE_READ8_MEMBER(nibble_nvram_r);
-	DECLARE_WRITE8_MEMBER(nibble_nvram_w);
-	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_READ_LINE_MEMBER(u11_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_as2888_w);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
-	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x0);
-	DECLARE_CUSTOM_INPUT_MEMBER(kickback_x3);
-	DECLARE_MACHINE_START(as2888);
-	DECLARE_MACHINE_RESET(by35);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
-	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
+	void init_by35_6();
+	void init_by35_7();
+	void init_playboy();
+	uint8_t u10_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u10_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t u10_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u10_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t u11_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u11_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void u11_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void u11_b_as2888_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nibble_nvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nibble_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int u10_ca1_r();
+	int u10_cb1_r();
+	void u10_ca2_w(int state);
+	void u10_cb2_w(int state);
+	int u11_ca1_r();
+	int u11_cb1_r();
+	void u11_ca2_w(int state);
+	void u11_cb2_w(int state);
+	void u11_cb2_as2888_w(int state);
+	void activity_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	ioport_value outhole_x0(ioport_field &field, void *param);
+	ioport_value drop_target_x0(ioport_field &field, void *param);
+	ioport_value kickback_x3(ioport_field &field, void *param);
+	void machine_start_as2888();
+	void machine_reset_by35();
+	void timer_z_freq(timer_device &timer, void *ptr, int32_t param);
+	void timer_z_pulse(timer_device &timer, void *ptr, int32_t param);
+	void u11_timer(timer_device &timer, void *ptr, int32_t param);
+	void timer_d_pulse(timer_device &timer, void *ptr, int32_t param);
+	void timer_s(timer_device &timer, void *ptr, int32_t param);
+	void timer_as2888(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -428,7 +428,7 @@ static INPUT_PORTS_START( playboy )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER( by35_state::outhole_x0 )
+ioport_value by35_state::outhole_x0(ioport_field &field, void *param)
 {
 	int bit_shift = ((uintptr_t)param & 0x07);
 	int port = (((uintptr_t)param >> 4) & 0x07);
@@ -441,7 +441,7 @@ CUSTOM_INPUT_MEMBER( by35_state::outhole_x0 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-CUSTOM_INPUT_MEMBER( by35_state::kickback_x3 )
+ioport_value by35_state::kickback_x3(ioport_field &field, void *param)
 {
 	int bit_shift = ((uintptr_t)param & 0x07);
 	int port = (((uintptr_t)param >> 4) & 0x07);
@@ -454,7 +454,7 @@ CUSTOM_INPUT_MEMBER( by35_state::kickback_x3 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-CUSTOM_INPUT_MEMBER( by35_state::drop_target_x0 )
+ioport_value by35_state::drop_target_x0(ioport_field &field, void *param)
 {
 	/* Here we simulate the Drop Target switch states so the Drop Target Reset Solenoid can also release the switches */
 
@@ -482,37 +482,37 @@ CUSTOM_INPUT_MEMBER( by35_state::drop_target_x0 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-READ8_MEMBER(by35_state::nibble_nvram_r)
+uint8_t by35_state::nibble_nvram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_nvram[offset] | 0x0f);
 }
 
-WRITE8_MEMBER(by35_state::nibble_nvram_w)
+void by35_state::nibble_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram[offset] = (data | 0x0f);
 }
 
-INPUT_CHANGED_MEMBER( by35_state::activity_button )
+void by35_state::activity_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval != oldval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
 }
 
-INPUT_CHANGED_MEMBER( by35_state::self_test )
+void by35_state::self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_pia_u10->ca1_w(newval);
 }
 
-READ_LINE_MEMBER( by35_state::u10_ca1_r )
+int by35_state::u10_ca1_r()
 {
 	return m_io_test->read() & 0x01;
 }
-READ_LINE_MEMBER( by35_state::u10_cb1_r )
+int by35_state::u10_cb1_r()
 {
 	return m_u10_cb1;
 }
 
-WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
+void by35_state::u10_ca2_w(int state)
 {
 #if 0                   // Display Blanking - Out of sync with video redraw rate and causes flicker so it's disabled
 	if (state == 0)
@@ -533,7 +533,7 @@ WRITE_LINE_MEMBER( by35_state::u10_ca2_w )
 	m_u10_ca2 = state;
 }
 
-WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
+void by35_state::u10_cb2_w(int state)
 {
 //  logerror("New U10 CB2 state %01x, was %01x.   PIA=%02x\n", state, m_u10_cb2, m_u10a);
 
@@ -543,28 +543,28 @@ WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
 	m_u10_cb2 = state;
 }
 
-WRITE_LINE_MEMBER( by35_state::u11_ca2_w )
+void by35_state::u11_ca2_w(int state)
 {
 	output().set_value("led0", state);
 }
 
-READ_LINE_MEMBER( by35_state::u11_ca1_r )
+int by35_state::u11_ca1_r()
 {
 	return m_u11_ca1;
 }
 
-READ_LINE_MEMBER( by35_state::u11_cb1_r )
+int by35_state::u11_cb1_r()
 {
 	/* Pin 32 on MPU J5 AID connector tied low */
 	return 0;
 }
 
-WRITE_LINE_MEMBER( by35_state::u11_cb2_w )
+void by35_state::u11_cb2_w(int state)
 {
 	m_u11_cb2 = state;
 }
 
-WRITE_LINE_MEMBER( by35_state::u11_cb2_as2888_w )
+void by35_state::u11_cb2_as2888_w(int state)
 {
 	if (state)
 	{
@@ -580,12 +580,12 @@ WRITE_LINE_MEMBER( by35_state::u11_cb2_as2888_w )
 	m_u11_cb2 = state;
 }
 
-READ8_MEMBER( by35_state::u10_a_r )
+uint8_t by35_state::u10_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_u10a;
 }
 
-WRITE8_MEMBER( by35_state::u10_a_w )
+void by35_state::u10_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("Writing %02x to U10 PIA, CB2 state is %01x,  CA2 state is %01x, Lamp_Dec is %02x\n",data, m_u10_cb2, m_u10_ca2, (m_lamp_decode & 0x0f));
 
@@ -623,7 +623,7 @@ WRITE8_MEMBER( by35_state::u10_a_w )
 	m_u10a = data;
 }
 
-READ8_MEMBER( by35_state::u10_b_r )
+uint8_t by35_state::u10_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -657,17 +657,17 @@ READ8_MEMBER( by35_state::u10_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( by35_state::u10_b_w )
+void by35_state::u10_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u10b = data;
 }
 
-READ8_MEMBER( by35_state::u11_a_r )
+uint8_t by35_state::u11_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_u11a;
 }
 
-WRITE8_MEMBER( by35_state::u11_a_w )
+void by35_state::u11_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(data, 0)==0)            // Display Credit/Ball
 	{
@@ -709,7 +709,7 @@ WRITE8_MEMBER( by35_state::u11_a_w )
 	m_u11a = data;
 }
 
-WRITE8_MEMBER( by35_state::u11_b_w )
+void by35_state::u11_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_u11_cb2)
 	{
@@ -787,14 +787,14 @@ WRITE8_MEMBER( by35_state::u11_b_w )
 	m_u11b = data;
 }
 
-WRITE8_MEMBER( by35_state::u11_b_as2888_w )
+void by35_state::u11_b_as2888_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	u11_b_w( space, offset, data );
 }
 
 
 // zero-cross detection
-TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_z_freq )
+void by35_state::timer_z_freq(timer_device &timer, void *ptr, int32_t param)
 {
 /*  Zero Crossing Detector - this timing is based on 50Hz AC line power input converted to unregulated DC
 
@@ -820,7 +820,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_z_freq )
 	}
 
 }
-TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_z_pulse )
+void by35_state::timer_z_pulse(timer_device &timer, void *ptr, int32_t param)
 {
 	/*** Line Power to DC Zero Crossing has ended ***/
 
@@ -829,7 +829,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_z_pulse )
 }
 
 // 555 timer for display refresh
-TIMER_DEVICE_CALLBACK_MEMBER( by35_state::u11_timer )
+void by35_state::u11_timer(timer_device &timer, void *ptr, int32_t param)
 {
 /*   +--------------------------+   +-----
      |                          |   |
@@ -846,13 +846,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::u11_timer )
 	m_pia_u11->ca1_w(m_u11_ca1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_d_pulse )
+void by35_state::timer_d_pulse(timer_device &timer, void *ptr, int32_t param)
 {
 	m_u11_ca1 = false;
 	m_pia_u11->ca1_w(m_u11_ca1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_s )
+void by35_state::timer_s(timer_device &timer, void *ptr, int32_t param)
 {
 	m_snd_tone_gen--;
 
@@ -870,7 +870,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_s )
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_as2888 )
+void by35_state::timer_as2888(timer_device &timer, void *ptr, int32_t param)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -894,7 +894,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_as2888 )
 
 
 
-DRIVER_INIT_MEMBER( by35_state, by35_6 )
+void by35_state::init_by35_6()
 {
 	static const uint8_t solenoid_features_default[20][4] =
 	{
@@ -937,7 +937,7 @@ DRIVER_INIT_MEMBER( by35_state, by35_6 )
 	m_7d = 0;
 }
 
-DRIVER_INIT_MEMBER( by35_state, playboy )
+void by35_state::init_playboy()
 {
 	static const uint8_t solenoid_features_playboy[20][4] =
 	{
@@ -966,7 +966,7 @@ DRIVER_INIT_MEMBER( by35_state, playboy )
 	};
 
 
-	DRIVER_INIT_CALL( by35_6 );
+	init_by35_6();
 
 	for (int i=0; i<20; i++)
 	{
@@ -979,15 +979,15 @@ DRIVER_INIT_MEMBER( by35_state, playboy )
 }
 
 
-DRIVER_INIT_MEMBER( by35_state, by35_7 )
+void by35_state::init_by35_7()
 {
-	DRIVER_INIT_CALL(by35_6);
+	init_by35_6();
 
 	m_7d = 1;
 }
 
 
-MACHINE_RESET_MEMBER( by35_state, by35 )
+void by35_state::machine_reset_by35()
 {
 	render_target *target = machine().render().first_target();
 
@@ -1002,9 +1002,9 @@ MACHINE_RESET_MEMBER( by35_state, by35 )
 	m_io_hold_x[1] = m_io_hold_x[2] = m_io_hold_x[3] = m_io_hold_x[4] = m_io_hold_x[5] = 0;
 }
 
-MACHINE_START_MEMBER( by35_state, as2888 )
+void by35_state::machine_start_as2888()
 {
-	MACHINE_RESET_CALL_MEMBER( by35 );
+	machine_reset_by35();
 	m_snd_prom = memregion("sound1")->base();
 }
 

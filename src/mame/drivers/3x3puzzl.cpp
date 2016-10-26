@@ -83,16 +83,16 @@ public:
 	tilemap_t   *m_tilemap2;
 	tilemap_t   *m_tilemap3;
 
-	TILE_GET_INFO_MEMBER(get_tile1_info);
-	TILE_GET_INFO_MEMBER(get_tile2_info);
-	TILE_GET_INFO_MEMBER(get_tile3_info);
+	void get_tile1_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile2_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile3_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	int       m_oki_bank;
 	uint16_t  m_gfx_control;
 
-	DECLARE_WRITE16_MEMBER(gfx_ctrl_w);
-	DECLARE_WRITE16_MEMBER(tilemap1_scrollx_w);
-	DECLARE_WRITE16_MEMBER(tilemap1_scrolly_w);
+	void gfx_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tilemap1_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tilemap1_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void video_start() override;
@@ -102,7 +102,7 @@ protected:
 
 
 
-TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
+void _3x3puzzle_state::get_tile1_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram1_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -111,7 +111,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
+void _3x3puzzle_state::get_tile2_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram2_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile3_info)
+void _3x3puzzle_state::get_tile3_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram3_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(2,
@@ -129,7 +129,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile3_info)
 			0);
 }
 
-WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
+void _3x3puzzle_state::gfx_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// does this have registers to control when the actual tile/palette
 	// data is copied to a private buffer?
@@ -159,12 +159,12 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 	}
 }
 
-WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrollx_w)
+void _3x3puzzle_state::tilemap1_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tilemap1->set_scrollx(data);
 }
 
-WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrolly_w)
+void _3x3puzzle_state::tilemap1_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tilemap1->set_scrolly(data);
 }

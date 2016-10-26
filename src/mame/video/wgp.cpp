@@ -17,17 +17,17 @@ inline void wgp_state::common_get_piv_tile_info( tile_data &tileinfo, int tile_i
 			TILE_FLIPYX( (attr & 0xc0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(wgp_state::get_piv0_tile_info)
+void wgp_state::get_piv0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_piv_tile_info(tileinfo, tile_index, 0);
 }
 
-TILE_GET_INFO_MEMBER(wgp_state::get_piv1_tile_info)
+void wgp_state::get_piv1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_piv_tile_info(tileinfo, tile_index, 1);
 }
 
-TILE_GET_INFO_MEMBER(wgp_state::get_piv2_tile_info)
+void wgp_state::get_piv2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_piv_tile_info(tileinfo, tile_index, 2);
 }
@@ -69,7 +69,7 @@ void wgp_state::video_start()
 	wgp_core_vh_start(32, 16);
 }
 
-VIDEO_START_MEMBER(wgp_state,wgp2)
+void wgp_state::video_start_wgp2()
 {
 	wgp_core_vh_start(32, 16);
 }
@@ -119,12 +119,12 @@ custom chip capable of four rather than three tilemaps.)
 
 *******************************************************************/
 
-READ16_MEMBER(wgp_state::wgp_pivram_word_r)
+uint16_t wgp_state::wgp_pivram_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pivram[offset];
 }
 
-WRITE16_MEMBER(wgp_state::wgp_pivram_word_w)
+void wgp_state::wgp_pivram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pivram[offset]);
 
@@ -142,12 +142,12 @@ WRITE16_MEMBER(wgp_state::wgp_pivram_word_w)
 	}
 }
 
-READ16_MEMBER(wgp_state::wgp_piv_ctrl_word_r)
+uint16_t wgp_state::wgp_piv_ctrl_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_piv_ctrlram[offset];
 }
 
-WRITE16_MEMBER(wgp_state::wgp_piv_ctrl_word_w)
+void wgp_state::wgp_piv_ctrl_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t a, b;
 

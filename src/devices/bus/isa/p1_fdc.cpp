@@ -138,7 +138,7 @@ void p1_fdc_device::p1_wd17xx_aux_w(int data)
 	floppy1->mon_w(!(data & 8));
 }
 
-WRITE_LINE_MEMBER( p1_fdc_device::p1_fdc_irq_drq )
+void p1_fdc_device::p1_fdc_irq_drq(int state)
 {
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
 
@@ -146,7 +146,7 @@ WRITE_LINE_MEMBER( p1_fdc_device::p1_fdc_irq_drq )
 		maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
-READ8_MEMBER( p1_fdc_device::p1_fdc_r )
+uint8_t p1_fdc_device::p1_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -159,7 +159,7 @@ READ8_MEMBER( p1_fdc_device::p1_fdc_r )
 	return data;
 }
 
-WRITE8_MEMBER( p1_fdc_device::p1_fdc_w )
+void p1_fdc_device::p1_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset )
 	{
@@ -188,8 +188,8 @@ void p1_fdc_device::device_start()
 	set_isa_device();
 	m_isa->install_rom(this, 0xe0000, 0xe07ff, "XXX", "p1_fdc");
 	m_isa->install_device(0x00c0, 0x00c3,
-		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
-		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
+		read8_delegate(FUNC(fd1793_t::read), (fd1793_t *)m_fdc),
+		write8_delegate(FUNC(fd1793_t::write), (fd1793_t *)m_fdc) );
 	m_isa->install_device(0x00c4, 0x00c7, read8_delegate( FUNC(p1_fdc_device::p1_fdc_r), this ), write8_delegate( FUNC(p1_fdc_device::p1_fdc_w), this ) );
 }
 

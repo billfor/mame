@@ -49,16 +49,16 @@ public:
 	int         m_sprites_scrolldx;
 	int         m_sprites_scrolldy;
 
-	DECLARE_WRITE8_MEMBER(sound_bank_w);
-	DECLARE_WRITE16_MEMBER(magicbub_sound_command_w);
-	DECLARE_WRITE16_MEMBER(vram_0_w);
-	DECLARE_WRITE16_MEMBER(vram_1_w);
-	DECLARE_DRIVER_INIT(magicbub);
-	DECLARE_MACHINE_START(shocking);
-	DECLARE_MACHINE_RESET(shocking);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	void sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void magicbub_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void init_magicbub();
+	void machine_start_shocking();
+	void machine_reset_shocking();
+	tilemap_memory_index tilemap_scan_pages(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

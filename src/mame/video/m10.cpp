@@ -44,19 +44,19 @@ static const gfx_layout charlayout =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-TILEMAP_MAPPER_MEMBER(m10_state::tilemap_scan)
+tilemap_memory_index m10_state::tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (31 - col) * 32 + row;
 }
 
 
-TILE_GET_INFO_MEMBER(m10_state::get_tile_info)
+void m10_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], m_colorram[tile_index] & 0x07, 0);
 }
 
 
-WRITE8_MEMBER(m10_state::m10_colorram_w)
+void m10_state::m10_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_colorram[offset] != data)
 	{
@@ -66,7 +66,7 @@ WRITE8_MEMBER(m10_state::m10_colorram_w)
 }
 
 
-WRITE8_MEMBER(m10_state::m10_chargen_w)
+void m10_state::m10_chargen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_chargen[offset] != data)
 	{
@@ -76,7 +76,7 @@ WRITE8_MEMBER(m10_state::m10_chargen_w)
 }
 
 
-WRITE8_MEMBER(m10_state::m15_chargen_w)
+void m10_state::m15_chargen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_chargen[offset] != data)
 	{
@@ -95,7 +95,7 @@ inline void m10_state::plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col )
 				(IREMM10_HBSTART - 1) - (x - IREMM10_HBEND)) = col; // only when flip_screen(?)
 }
 
-VIDEO_START_MEMBER(m10_state,m10)
+void m10_state::video_start_m10()
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
 	m_tx_tilemap->set_transparent_pen(0);
@@ -105,7 +105,7 @@ VIDEO_START_MEMBER(m10_state,m10)
 	return ;
 }
 
-VIDEO_START_MEMBER(m10_state,m15)
+void m10_state::video_start_m15()
 {
 	m_gfxdecode->set_gfx(0,std::make_unique<gfx_element>(*m_palette, charlayout, m_chargen, 0, 8, 0));
 

@@ -71,14 +71,14 @@ public:
 
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(wallc_videoram_w);
-	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
-	DECLARE_DRIVER_INIT(wallc);
-	DECLARE_DRIVER_INIT(wallca);
-	DECLARE_DRIVER_INIT(sidam);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void wallc_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wallc_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_wallc();
+	void init_wallca();
+	void init_sidam();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(wallc);
+	void palette_init_wallc(palette_device &palette);
 	uint32_t screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -108,7 +108,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(wallc_state, wallc)
+void wallc_state::palette_init_wallc(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -146,13 +146,13 @@ PALETTE_INIT_MEMBER(wallc_state, wallc)
 	}
 }
 
-WRITE8_MEMBER(wallc_state::wallc_videoram_w)
+void wallc_state::wallc_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
+void wallc_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] + 0x100, 1, 0);
 }
@@ -168,7 +168,7 @@ uint32_t wallc_state::screen_update_wallc(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-WRITE8_MEMBER(wallc_state::wallc_coin_counter_w)
+void wallc_state::wallc_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 2);
 }
@@ -265,7 +265,7 @@ static GFXDECODE_START( wallc )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout, 0, 4 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(wallc_state,wallc)
+void wallc_state::init_wallc()
 {
 	uint8_t c;
 	uint32_t i;
@@ -280,7 +280,7 @@ DRIVER_INIT_MEMBER(wallc_state,wallc)
 	}
 }
 
-DRIVER_INIT_MEMBER(wallc_state,wallca)
+void wallc_state::init_wallca()
 {
 	uint8_t c;
 	uint32_t i;
@@ -443,7 +443,7 @@ ROM_START( sidampkr )
 	ROM_LOAD( "11607-74.288",  0x0000, 0x0020, CRC(e14bf545) SHA1(5e8c5a9ea6e4842f27a47c1d7224ed294bbaa40b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(wallc_state,sidam)
+void wallc_state::init_sidam()
 {
 	uint8_t c;
 	uint32_t i;

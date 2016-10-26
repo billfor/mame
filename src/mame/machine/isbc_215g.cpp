@@ -83,7 +83,7 @@ bool isbc_215g_device::write_sector(uint16_t data)
 	return false;
 }
 
-READ16_MEMBER(isbc_215g_device::io_r)
+uint16_t isbc_215g_device::io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 	switch(offset)
@@ -164,7 +164,7 @@ READ16_MEMBER(isbc_215g_device::io_r)
 	return data;
 }
 
-WRITE16_MEMBER(isbc_215g_device::io_w)
+void isbc_215g_device::io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -291,7 +291,7 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 	}
 }
 
-READ16_MEMBER(isbc_215g_device::mem_r)
+uint16_t isbc_215g_device::mem_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// XXX: hack to permit debugger to disassemble rom
 	if(space.debugger_access() && (offset < 0x1fff))
@@ -310,7 +310,7 @@ READ16_MEMBER(isbc_215g_device::mem_r)
 	}
 }
 
-WRITE16_MEMBER(isbc_215g_device::mem_w)
+void isbc_215g_device::mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu_mem->write_word_unaligned(offset*2, data, mem_mask);
 }
@@ -329,22 +329,22 @@ static ADDRESS_MAP_START(isbc_215g_io, AS_IO, 16, isbc_215g_device)
 	AM_RANGE(0xc0e0, 0xc0ef) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_00_w)
+void isbc_215g_device::isbx_irq_00_w(int state)
 {
 	m_isbx_irq[0] = state ? true : false;
 }
 
-WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_01_w)
+void isbc_215g_device::isbx_irq_01_w(int state)
 {
 	m_isbx_irq[1] = state ? true : false;
 }
 
-WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_10_w)
+void isbc_215g_device::isbx_irq_10_w(int state)
 {
 	m_isbx_irq[2] = state ? true : false;
 }
 
-WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_11_w)
+void isbc_215g_device::isbx_irq_11_w(int state)
 {
 	m_isbx_irq[3] = state ? true : false;
 }
@@ -418,7 +418,7 @@ void isbc_215g_device::device_start()
 
 }
 
-WRITE8_MEMBER(isbc_215g_device::write)
+void isbc_215g_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!offset)
 	{

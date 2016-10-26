@@ -14,26 +14,26 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(raiden_state::raiden_background_w)
+void raiden_state::raiden_background_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_data[offset]);
 	m_bg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden_state::raiden_foreground_w)
+void raiden_state::raiden_foreground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fore_data[offset]);
 	m_fg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden_state::raiden_text_w)
+void raiden_state::raiden_text_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_tx_layer->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(raiden_state::raiden_control_w)
+void raiden_state::raiden_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: back layer disable
 	// d1: fore layer disable
@@ -52,7 +52,7 @@ WRITE8_MEMBER(raiden_state::raiden_control_w)
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
-WRITE8_MEMBER(raiden_state::raidenb_control_w)
+void raiden_state::raidenb_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d1: flipscreen
 	// d2: toggles, maybe spriteram bank? (for buffering)
@@ -64,7 +64,7 @@ WRITE8_MEMBER(raiden_state::raidenb_control_w)
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
-WRITE16_MEMBER(raiden_state::raidenb_layer_enable_w)
+void raiden_state::raidenb_layer_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// d0: back layer disable
 	// d1: fore layer disable
@@ -195,7 +195,7 @@ uint32_t raiden_state::screen_update_raidenb(screen_device &screen, bitmap_ind16
 
 /******************************************************************************/
 
-TILE_GET_INFO_MEMBER(raiden_state::get_back_tile_info)
+void raiden_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tiledata = m_back_data[tile_index];
 	int tile = tiledata & 0x0fff;
@@ -204,7 +204,7 @@ TILE_GET_INFO_MEMBER(raiden_state::get_back_tile_info)
 	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(raiden_state::get_fore_tile_info)
+void raiden_state::get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tiledata = m_fore_data[tile_index];
 	int tile = tiledata & 0x0fff;
@@ -213,7 +213,7 @@ TILE_GET_INFO_MEMBER(raiden_state::get_fore_tile_info)
 	SET_TILE_INFO_MEMBER(2, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(raiden_state::get_text_tile_info)
+void raiden_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tiledata = m_videoram[tile_index];
 	int tile = (tiledata & 0xff) | ((tiledata >> 6) & 0x300);
@@ -238,7 +238,7 @@ void raiden_state::video_start()
 	save_item(NAME(m_flipscreen));
 }
 
-VIDEO_START_MEMBER(raiden_state,raidenb)
+void raiden_state::video_start_raidenb()
 {
 	m_bg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden_state::get_back_tile_info),this),TILEMAP_SCAN_COLS,16,16,32,32);
 	m_fg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden_state::get_fore_tile_info),this),TILEMAP_SCAN_COLS,16,16,32,32);

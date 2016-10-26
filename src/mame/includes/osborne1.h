@@ -61,27 +61,27 @@ public:
 	{ }
 
 
-	DECLARE_WRITE8_MEMBER(bank_0xxx_w);
-	DECLARE_WRITE8_MEMBER(bank_1xxx_w);
-	DECLARE_READ8_MEMBER(bank_2xxx_3xxx_r);
-	DECLARE_WRITE8_MEMBER(bank_2xxx_3xxx_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(opcode_r);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE_LINE_MEMBER(irqack_w);
+	void bank_0xxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank_1xxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bank_2xxx_3xxx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bank_2xxx_3xxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t opcode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irqack_w(int state);
 
-	DECLARE_READ8_MEMBER(ieee_pia_pb_r);
-	DECLARE_WRITE8_MEMBER(ieee_pia_pb_w);
-	DECLARE_WRITE_LINE_MEMBER(ieee_pia_irq_a_func);
+	uint8_t ieee_pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ieee_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ieee_pia_irq_a_func(int state);
 
-	DECLARE_WRITE8_MEMBER(video_pia_port_a_w);
-	DECLARE_WRITE8_MEMBER(video_pia_port_b_w);
-	DECLARE_WRITE_LINE_MEMBER(video_pia_out_cb2_dummy);
-	DECLARE_WRITE_LINE_MEMBER(video_pia_irq_a_func);
+	void video_pia_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_pia_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_pia_out_cb2_dummy(int state);
+	void video_pia_irq_a_func(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(serial_acia_irq_func);
+	void serial_acia_irq_func(int state);
 
-	DECLARE_DRIVER_INIT(osborne1);
+	void init_osborne1();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -100,9 +100,9 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	TIMER_CALLBACK_MEMBER(video_callback);
+	void video_callback(void *ptr, int32_t param);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	bool set_rom_mode(uint8_t value);
 	bool set_bit_9(uint8_t value);

@@ -14,7 +14,7 @@ Functions to emulate the video hardware of the machine.
 /* bit 3 and 7 of the char color PROMs are used for something -- not currently emulated -
    thus GAME_IMPERFECT_GRAPHICS */
 
-PALETTE_INIT_MEMBER(cheekyms_state, cheekyms)
+void cheekyms_state::palette_init_cheekyms(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, j, bit, r, g, b;
@@ -38,7 +38,7 @@ PALETTE_INIT_MEMBER(cheekyms_state, cheekyms)
 	}
 }
 
-WRITE8_MEMBER(cheekyms_state::port_40_w)
+void cheekyms_state::port_40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac0->write(BIT(data, 7)); // tune
 	m_dac1->write(BIT(data, 6)); // mouse eating cheese
@@ -51,7 +51,7 @@ WRITE8_MEMBER(cheekyms_state::port_40_w)
 }
 
 
-WRITE8_MEMBER(cheekyms_state::port_80_w)
+void cheekyms_state::port_80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* d0-d1 - sound enables, not sure which bit is which */
 	/* d3-d5 - man scroll amount */
@@ -65,7 +65,7 @@ WRITE8_MEMBER(cheekyms_state::port_80_w)
 
 
 
-TILE_GET_INFO_MEMBER(cheekyms_state::get_tile_info)
+void cheekyms_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color;
 

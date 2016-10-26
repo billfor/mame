@@ -666,7 +666,7 @@ const address_space_config *crt9007_t::memory_space_config(address_spacenum spac
 //  read - register read
 //-------------------------------------------------
 
-READ8_MEMBER( crt9007_t::read )
+uint8_t crt9007_t::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -722,7 +722,7 @@ READ8_MEMBER( crt9007_t::read )
 //  write - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( crt9007_t::write )
+void crt9007_t::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reg[offset] = data;
 
@@ -892,7 +892,7 @@ WRITE8_MEMBER( crt9007_t::write )
 //  ack_w - DMA acknowledge
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9007_t::ack_w )
+void crt9007_t::ack_w(int state)
 {
 	if (LOG) logerror("CRT9007 '%s' ACK: %u\n", tag(), state);
 
@@ -910,7 +910,7 @@ WRITE_LINE_MEMBER( crt9007_t::ack_w )
 //  lpstb_w - light pen strobe
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9007_t::lpstb_w )
+void crt9007_t::lpstb_w(int state)
 {
 	if (LOG) logerror("CRT9007 '%s' LPSTB: %u\n", tag(), state);
 

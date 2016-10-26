@@ -20,11 +20,11 @@ public:
 	/* video-related */
 	tilemap_t*             m_bg_tilemap;
 	int                  m_flipscreen;
-	DECLARE_WRITE8_MEMBER(m57_videoram_w);
-	DECLARE_WRITE8_MEMBER(m57_flipscreen_w);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void m57_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m57_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(m57);
+	void palette_init_m57(palette_device &palette);
 	uint32_t screen_update_m57(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

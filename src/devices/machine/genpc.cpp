@@ -35,7 +35,7 @@
  *
  *************************************************************************/
 
-WRITE8_MEMBER( ibm5160_mb_device::pc_page_w)
+void ibm5160_mb_device::pc_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset % 4)
 	{
@@ -52,7 +52,7 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_page_w)
 }
 
 
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma_hrq_changed )
+void ibm5160_mb_device::pc_dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -61,7 +61,7 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma_hrq_changed )
 }
 
 
-READ8_MEMBER( ibm5160_mb_device::pc_dma_read_byte )
+uint8_t ibm5160_mb_device::pc_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_dma_channel == -1)
 		return 0xff;
@@ -71,7 +71,7 @@ READ8_MEMBER( ibm5160_mb_device::pc_dma_read_byte )
 }
 
 
-WRITE8_MEMBER( ibm5160_mb_device::pc_dma_write_byte )
+void ibm5160_mb_device::pc_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_dma_channel == -1)
 		return;
@@ -82,48 +82,48 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_dma_write_byte )
 }
 
 
-READ8_MEMBER( ibm5160_mb_device::pc_dma8237_1_dack_r )
+uint8_t ibm5160_mb_device::pc_dma8237_1_dack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_isabus->dack_r(1);
 }
 
-READ8_MEMBER( ibm5160_mb_device::pc_dma8237_2_dack_r )
+uint8_t ibm5160_mb_device::pc_dma8237_2_dack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_isabus->dack_r(2);
 }
 
 
-READ8_MEMBER( ibm5160_mb_device::pc_dma8237_3_dack_r )
+uint8_t ibm5160_mb_device::pc_dma8237_3_dack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_isabus->dack_r(3);
 }
 
 
-WRITE8_MEMBER( ibm5160_mb_device::pc_dma8237_1_dack_w )
+void ibm5160_mb_device::pc_dma8237_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_isabus->dack_w(1,data);
 }
 
-WRITE8_MEMBER( ibm5160_mb_device::pc_dma8237_2_dack_w )
+void ibm5160_mb_device::pc_dma8237_2_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_isabus->dack_w(2,data);
 }
 
 
-WRITE8_MEMBER( ibm5160_mb_device::pc_dma8237_3_dack_w )
+void ibm5160_mb_device::pc_dma8237_3_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_isabus->dack_w(3,data);
 }
 
 
-WRITE8_MEMBER( ibm5160_mb_device::pc_dma8237_0_dack_w )
+void ibm5160_mb_device::pc_dma8237_0_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u73_q2 = 0;
 	m_dma8237->dreq0_w( m_u73_q2 );
 }
 
 
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma8237_out_eop )
+void ibm5160_mb_device::pc_dma8237_out_eop(int state)
 {
 	m_cur_eop = state == ASSERT_LINE;
 	if(m_dma_channel != -1 && m_cur_eop)
@@ -144,10 +144,10 @@ void ibm5160_mb_device::pc_select_dma_channel(int channel, bool state)
 	}
 }
 
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack0_w ) { pc_select_dma_channel(0, state); }
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack1_w ) { pc_select_dma_channel(1, state); }
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack2_w ) { pc_select_dma_channel(2, state); }
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack3_w ) { pc_select_dma_channel(3, state); }
+void ibm5160_mb_device::pc_dack0_w(int state) { pc_select_dma_channel(0, state); }
+void ibm5160_mb_device::pc_dack1_w(int state) { pc_select_dma_channel(1, state); }
+void ibm5160_mb_device::pc_dack2_w(int state) { pc_select_dma_channel(2, state); }
+void ibm5160_mb_device::pc_dack3_w(int state) { pc_select_dma_channel(3, state); }
 
 /*************************************************************
  *
@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dack3_w ) { pc_select_dma_channel(3, st
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER(ibm5160_mb_device::pc_speaker_set_spkrdata)
+void ibm5160_mb_device::pc_speaker_set_spkrdata(int state)
 {
 	m_pc_spkrdata = state ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
@@ -168,7 +168,7 @@ WRITE_LINE_MEMBER(ibm5160_mb_device::pc_speaker_set_spkrdata)
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out1_changed )
+void ibm5160_mb_device::pc_pit8253_out1_changed(int state)
 {
 	/* Trigger DMA channel #0 */
 	if ( m_out1 == 0 && state == 1 && m_u73_q2 == 0 )
@@ -180,7 +180,7 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out1_changed )
 }
 
 
-WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out2_changed )
+void ibm5160_mb_device::pc_pit8253_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
@@ -243,7 +243,7 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out2_changed )
  *       ON  ON  - one disk drive
  *
  **********************************************************/
-WRITE_LINE_MEMBER( ibm5150_mb_device::keyboard_clock_w )
+void ibm5150_mb_device::keyboard_clock_w(int state)
 {
 	if (!m_ppi_keyboard_clear && !state && !m_ppi_shift_enable)
 	{
@@ -257,7 +257,7 @@ WRITE_LINE_MEMBER( ibm5150_mb_device::keyboard_clock_w )
 	}
 }
 
-WRITE_LINE_MEMBER( ec1841_mb_device::keyboard_clock_w )
+void ec1841_mb_device::keyboard_clock_w(int state)
 {
 	if (!m_ppi_keyboard_clear && !state && !m_ppi_shift_enable)
 	{
@@ -271,7 +271,7 @@ WRITE_LINE_MEMBER( ec1841_mb_device::keyboard_clock_w )
 	}
 }
 
-WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_clock_w )
+void ibm5160_mb_device::keyboard_clock_w(int state)
 {
 	if (!m_ppi_keyboard_clear && !state && !m_ppi_shift_enable)
 	{
@@ -286,12 +286,12 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_clock_w )
 }
 
 
-WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_data_w )
+void ibm5160_mb_device::keyboard_data_w(int state)
 {
 	m_ppi_data_signal = state;
 }
 
-READ8_MEMBER (ibm5160_mb_device::pc_ppi_porta_r)
+uint8_t ibm5160_mb_device::pc_ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xFF;
 	/* KB port A */
@@ -317,7 +317,7 @@ READ8_MEMBER (ibm5160_mb_device::pc_ppi_porta_r)
 }
 
 
-READ8_MEMBER ( ibm5160_mb_device::pc_ppi_portc_r )
+uint8_t ibm5160_mb_device::pc_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data=0xff;
 
@@ -347,7 +347,7 @@ READ8_MEMBER ( ibm5160_mb_device::pc_ppi_portc_r )
 }
 
 
-WRITE8_MEMBER( ibm5160_mb_device::pc_ppi_portb_w )
+void ibm5160_mb_device::pc_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* PPI controller port B*/
 	m_ppi_portb = data;
@@ -377,7 +377,7 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_ppi_portb_w )
  *
  **********************************************************/
 
-WRITE8_MEMBER( ibm5160_mb_device::nmi_enable_w )
+void ibm5160_mb_device::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enabled = BIT(data,7);
 	m_isabus->set_nmi_state(m_nmi_enabled);
@@ -617,7 +617,7 @@ ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, const char *
 {
 }
 
-READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
+uint8_t ibm5150_mb_device::pc_ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xFF;
 	/* KB port A */
@@ -658,7 +658,7 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
 }
 
 
-READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
+uint8_t ibm5150_mb_device::pc_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data=0xff;
 
@@ -726,7 +726,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 }
 
 
-WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
+void ibm5150_mb_device::pc_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* KB controller port B */
 	m_ppi_portb = data;
@@ -836,7 +836,7 @@ void ec1841_mb_device::device_start()
 }
 
 // kbd interface is 5150-like but PB2 controls access to second bank of DIP switches (SA2).
-WRITE8_MEMBER( ec1841_mb_device::pc_ppi_portb_w )
+void ec1841_mb_device::pc_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* KB controller port B */
 	m_ppi_portb = data;
@@ -859,7 +859,7 @@ WRITE8_MEMBER( ec1841_mb_device::pc_ppi_portb_w )
 	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
 }
 
-READ8_MEMBER ( ec1841_mb_device::pc_ppi_portc_r )
+uint8_t ec1841_mb_device::pc_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data=0xff;
 

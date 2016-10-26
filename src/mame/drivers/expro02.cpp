@@ -240,21 +240,21 @@ public:
 	required_device<kaneko16_sprite_device> m_kaneko_spr;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	DECLARE_WRITE16_MEMBER(expro02_6295_bankswitch_w);
+	void expro02_6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DRIVER_INIT(expro02);
+	void init_expro02();
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(expro02);
+	void palette_init_expro02(palette_device &palette);
 
 	uint32_t screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zipzap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 
 	// comad
-	READ16_MEMBER(comad_timer_r);
-	READ8_MEMBER(comad_okim6295_r);
-	WRITE16_MEMBER(galpanica_6295_bankswitch_w);
+	uint16_t comad_timer_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	uint8_t comad_okim6295_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void galpanica_6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
 };
 
 
@@ -263,7 +263,7 @@ void expro02_state::machine_start()
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-PALETTE_INIT_MEMBER(expro02_state, expro02)
+void expro02_state::palette_init_expro02(palette_device &palette)
 {
 	int i;
 
@@ -623,7 +623,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE16_MEMBER(expro02_state::expro02_6295_bankswitch_w)
+void expro02_state::expro02_6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -808,7 +808,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(expro02_state::scanline)
+void expro02_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -826,13 +826,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(expro02_state::scanline)
  *
  *************************************/
 
-READ16_MEMBER(expro02_state::comad_timer_r)
+uint16_t expro02_state::comad_timer_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_screen->vpos() & 0x07) << 8;
 }
 
 /* a kludge! */
-READ8_MEMBER(expro02_state::comad_okim6295_r)
+uint8_t expro02_state::comad_okim6295_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t retvalue;
 //  retvalue = m_oki->read_status(); // doesn't work, causes lockups when girls change..
@@ -840,7 +840,7 @@ READ8_MEMBER(expro02_state::comad_okim6295_r)
 	return retvalue;
 }
 
-WRITE16_MEMBER(expro02_state::galpanica_6295_bankswitch_w)
+void expro02_state::galpanica_6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -1773,7 +1773,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(expro02_state,expro02)
+void expro02_state::init_expro02()
 {
 	uint32_t *src = (uint32_t *)memregion("gfx3" )->base();
 	uint32_t *dst = (uint32_t *)memregion("gfx2" )->base();

@@ -254,35 +254,35 @@ void cclimber_state::machine_start()
 	save_item(NAME(m_nmi_mask));
 }
 
-WRITE8_MEMBER(cclimber_state::swimmer_sh_soundlatch_w)
+void cclimber_state::swimmer_sh_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space,offset,data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 
-WRITE8_MEMBER(cclimber_state::yamato_p0_w)
+void cclimber_state::yamato_p0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_yamato_p0 = data;
 }
 
-WRITE8_MEMBER(cclimber_state::yamato_p1_w)
+void cclimber_state::yamato_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_yamato_p1 = data;
 }
 
-READ8_MEMBER(cclimber_state::yamato_p0_r)
+uint8_t cclimber_state::yamato_p0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_yamato_p0;
 }
 
-READ8_MEMBER(cclimber_state::yamato_p1_r)
+uint8_t cclimber_state::yamato_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_yamato_p1;
 }
 
 
-WRITE8_MEMBER(cclimber_state::toprollr_rombank_w)
+void cclimber_state::toprollr_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_toprollr_rombank &= ~(1 << offset);
 	m_toprollr_rombank |= (data & 1) << offset;
@@ -293,7 +293,7 @@ WRITE8_MEMBER(cclimber_state::toprollr_rombank_w)
 	}
 }
 
-MACHINE_RESET_MEMBER(cclimber_state,cclimber)
+void cclimber_state::machine_reset_cclimber()
 {
 	/* Disable interrupts, River Patrol / Silver Land needs this otherwise returns bad RAM on POST */
 	m_nmi_mask = 0;
@@ -302,7 +302,7 @@ MACHINE_RESET_MEMBER(cclimber_state,cclimber)
 }
 
 
-WRITE8_MEMBER(cclimber_state::nmi_mask_w)
+void cclimber_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }
@@ -1098,13 +1098,13 @@ static GFXDECODE_START( toprollr )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, cclimber_charlayout,   24*4, 16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(cclimber_state::vblank_irq)
+void cclimber_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(cclimber_state::bagmanf_vblank_irq)
+void cclimber_state::bagmanf_vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -2575,14 +2575,14 @@ ROM_START( toprollr )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cclimber_state,yamato)
+void cclimber_state::init_yamato()
 {
 	save_item(NAME(m_yamato_p0));
 	save_item(NAME(m_yamato_p1));
 }
 
 
-DRIVER_INIT_MEMBER(cclimber_state,toprollr)
+void cclimber_state::init_toprollr()
 {
 	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
 
@@ -2608,7 +2608,7 @@ DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 	save_item(NAME(m_toprollr_rombank));
 }
 
-DRIVER_INIT_MEMBER(cclimber_state,dking)
+void cclimber_state::init_dking()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
 	int i;
@@ -2622,7 +2622,7 @@ DRIVER_INIT_MEMBER(cclimber_state,dking)
 
 }
 
-DRIVER_INIT_MEMBER(cclimber_state,rpatrol)
+void cclimber_state::init_rpatrol()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
 

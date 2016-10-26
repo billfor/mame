@@ -90,7 +90,7 @@ void e05a03_device::device_reset()
     IMPLEMENTATION
 ***************************************************************************/
 
-WRITE8_MEMBER( e05a03_device::write )
+void e05a03_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: e05a03_w(%02x): %02x\n", space.machine().describe_context(), offset, data);
 
@@ -127,7 +127,7 @@ WRITE8_MEMBER( e05a03_device::write )
 	}
 }
 
-READ8_MEMBER( e05a03_device::read )
+uint8_t e05a03_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -155,25 +155,25 @@ READ8_MEMBER( e05a03_device::read )
 }
 
 /* home position signal */
-WRITE_LINE_MEMBER( e05a03_device::home_w )
+void e05a03_device::home_w(int state)
 {
 }
 
 /* printhead solenoids trigger */
-WRITE_LINE_MEMBER( e05a03_device::fire_w )
+void e05a03_device::fire_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( e05a03_device::strobe_w )
+void e05a03_device::strobe_w(int state)
 {
 }
 
-READ_LINE_MEMBER( e05a03_device::busy_r )
+int e05a03_device::busy_r()
 {
 	return 1;
 }
 
-WRITE_LINE_MEMBER( e05a03_device::resi_w )
+void e05a03_device::resi_w(int state)
 {
 	if (!state)
 	{
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER( e05a03_device::resi_w )
 	}
 }
 
-WRITE_LINE_MEMBER( e05a03_device::init_w )
+void e05a03_device::init_w(int state)
 {
 	resi_w(state);
 }

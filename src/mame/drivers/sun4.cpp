@@ -557,32 +557,32 @@ public:
 	static const device_timer_id TIMER_DMA = 2;
 	static const device_timer_id TIMER_RESET = 3;
 
-	DECLARE_READ32_MEMBER( sun4_mmu_r );
-	DECLARE_WRITE32_MEMBER( sun4_mmu_w );
-	DECLARE_READ32_MEMBER( sun4c_mmu_r );
-	DECLARE_WRITE32_MEMBER( sun4c_mmu_w );
-	DECLARE_READ32_MEMBER( ram_r );
-	DECLARE_WRITE32_MEMBER( ram_w );
-	DECLARE_READ32_MEMBER( ss1_sl0_id );
-	DECLARE_READ32_MEMBER( ss1_sl3_id );
-	DECLARE_READ32_MEMBER( timer_r );
-	DECLARE_WRITE32_MEMBER( timer_w );
-	DECLARE_READ8_MEMBER( irq_r );
-	DECLARE_WRITE8_MEMBER( irq_w );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
-	DECLARE_READ32_MEMBER( dma_r );
-	DECLARE_WRITE32_MEMBER( dma_w );
+	uint32_t sun4_mmu_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sun4_mmu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sun4c_mmu_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sun4c_mmu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ss1_sl0_id(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t ss1_sl3_id(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t timer_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void timer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t dma_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE_LINE_MEMBER( scsi_irq );
-	DECLARE_WRITE_LINE_MEMBER( scsi_drq );
+	void scsi_irq(int state);
+	void scsi_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( scc1_int );
-	DECLARE_WRITE_LINE_MEMBER( scc2_int );
+	void scc1_int(int state);
+	void scc2_int(int state);
 
-	DECLARE_DRIVER_INIT(sun4);
-	DECLARE_DRIVER_INIT(sun4c);
-	DECLARE_DRIVER_INIT(ss2);
+	void init_sun4();
+	void init_sun4c();
+	void init_ss2();
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -773,7 +773,7 @@ void sun4_state::write_insn_data_4c(uint8_t asi, address_space &space, uint32_t 
 }
 
 
-READ32_MEMBER( sun4_state::sun4c_mmu_r )
+uint32_t sun4_state::sun4c_mmu_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint8_t asi = m_maincpu->get_asi();
 	int page;
@@ -868,7 +868,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 	return 0;
 }
 
-WRITE32_MEMBER( sun4_state::sun4c_mmu_w )
+void sun4_state::sun4c_mmu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t asi = m_maincpu->get_asi();
 	int page;
@@ -1055,7 +1055,7 @@ void sun4_state::write_insn_data(uint8_t asi, address_space &space, uint32_t off
 	}
 }
 
-READ32_MEMBER( sun4_state::sun4_mmu_r )
+uint32_t sun4_state::sun4_mmu_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint8_t asi = m_maincpu->get_asi();
 	int page;
@@ -1149,7 +1149,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 	return 0;
 }
 
-WRITE32_MEMBER( sun4_state::sun4_mmu_w )
+void sun4_state::sun4_mmu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t asi = m_maincpu->get_asi();
 	int page;
@@ -1377,7 +1377,7 @@ void sun4_state::machine_start()
 	m_dma_timer->adjust(attotime::never);
 }
 
-READ32_MEMBER( sun4_state::ram_r )
+uint32_t sun4_state::ram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//printf("ram_r: @ %08x (mask %08x)\n", offset<<2, mem_mask);
 
@@ -1386,7 +1386,7 @@ READ32_MEMBER( sun4_state::ram_r )
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER( sun4_state::ram_w )
+void sun4_state::ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 #if 0
 	// if writing bad parity is enabled
@@ -1476,7 +1476,7 @@ static ADDRESS_MAP_START(type1space_s4_map, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x01000000, 0x0100000f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 ADDRESS_MAP_END
 
-READ8_MEMBER( sun4_state::fdc_r )
+uint8_t sun4_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 		return 0;
@@ -1498,7 +1498,7 @@ READ8_MEMBER( sun4_state::fdc_r )
 	return 0;
 }
 
-WRITE8_MEMBER( sun4_state::fdc_w )
+void sun4_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1515,12 +1515,12 @@ WRITE8_MEMBER( sun4_state::fdc_w )
 	}
 }
 
-READ8_MEMBER( sun4_state::irq_r )
+uint8_t sun4_state::irq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_irq_reg;
 }
 
-WRITE8_MEMBER( sun4_state::irq_w )
+void sun4_state::irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("%02x to IRQ\n", data);
 
@@ -1529,7 +1529,7 @@ WRITE8_MEMBER( sun4_state::irq_w )
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( sun4_state::scc1_int )
+void sun4_state::scc1_int(int state)
 {
 	printf("scc1 int: %d\n", state);
 	m_scc1_int = state;
@@ -1537,7 +1537,7 @@ WRITE_LINE_MEMBER( sun4_state::scc1_int )
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( sun4_state::scc2_int )
+void sun4_state::scc2_int(int state)
 {
 	printf("scc2 int: %d\n", state);
 	m_scc2_int = state;
@@ -1587,7 +1587,7 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-READ32_MEMBER( sun4_state::timer_r )
+uint32_t sun4_state::timer_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = m_counter[offset];
 
@@ -1636,7 +1636,7 @@ void sun4_state::start_timer(int num)
 	}
 }
 
-WRITE32_MEMBER( sun4_state::timer_w )
+void sun4_state::timer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_counter[offset]);
 
@@ -1837,12 +1837,12 @@ void sun4_state::dma_setup_timer(bool continuing)
 	}
 }
 
-READ32_MEMBER( sun4_state::dma_r )
+uint32_t sun4_state::dma_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_dma[offset];
 }
 
-WRITE32_MEMBER( sun4_state::dma_w )
+void sun4_state::dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1884,7 +1884,7 @@ WRITE32_MEMBER( sun4_state::dma_w )
 	}
 }
 
-WRITE_LINE_MEMBER( sun4_state::scsi_irq )
+void sun4_state::scsi_irq(int state)
 {
 	if (!(m_dma[DMA_CTRL] & DMA_TC))
 	{
@@ -1893,7 +1893,7 @@ WRITE_LINE_MEMBER( sun4_state::scsi_irq )
 	m_scsi_irq = state;
 }
 
-WRITE_LINE_MEMBER( sun4_state::scsi_drq )
+void sun4_state::scsi_drq(int state)
 {
 	if (state)
 	{
@@ -1906,13 +1906,13 @@ WRITE_LINE_MEMBER( sun4_state::scsi_drq )
 }
 
 // indicate 4/60 SCSI/DMA/Ethernet card exists
-READ32_MEMBER( sun4_state::ss1_sl0_id )
+uint32_t sun4_state::ss1_sl0_id(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xfe810101;
 }
 
 // indicate 4/60 color video card exists
-READ32_MEMBER( sun4_state::ss1_sl3_id )
+uint32_t sun4_state::ss1_sl3_id(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xfe010101;
 }
@@ -2317,19 +2317,19 @@ ROM_START( sun_s20 )
 	ROMX_LOAD( "ss10-20_v2.25r.rom", 0x0000, 0x80000, CRC(105ba132) SHA1(58530e88369d1d26ab11475c7884205f2299d255), ROM_BIOS(2))
 ROM_END
 
-DRIVER_INIT_MEMBER(sun4_state, sun4)
+void sun4_state::init_sun4()
 {
 	m_arch = ARCH_SUN4;
 }
 
-DRIVER_INIT_MEMBER(sun4_state, sun4c)
+void sun4_state::init_sun4c()
 {
 	m_ctx_mask = 0x7;
 	m_pmeg_mask = 0x7f;
 	m_arch = ARCH_SUN4C;
 }
 
-DRIVER_INIT_MEMBER(sun4_state, ss2)
+void sun4_state::init_ss2()
 {
 	m_ctx_mask = 0xf;
 	m_pmeg_mask = 0xff;

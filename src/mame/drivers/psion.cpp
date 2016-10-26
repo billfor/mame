@@ -25,7 +25,7 @@
 #include "rendlay.h"
 #include "softlist.h"
 
-TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
+void psion_state::nmi_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_enable_nmi)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -61,7 +61,7 @@ void psion_state::update_banks()
 		membank("rombank")->set_entry(m_rom_bank);
 }
 
-WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
+void psion_state::hd63701_int_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -104,7 +104,7 @@ WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
 	m_maincpu->m6801_io_w(space, offset, data);
 }
 
-READ8_MEMBER( psion_state::hd63701_int_reg_r )
+uint8_t psion_state::hd63701_int_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -191,7 +191,7 @@ void psion_state::io_rw(address_space &space, uint16_t offset)
 	}
 }
 
-WRITE8_MEMBER( psion_state::io_w )
+void psion_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x0ffc0)
 	{
@@ -203,7 +203,7 @@ WRITE8_MEMBER( psion_state::io_w )
 	}
 }
 
-READ8_MEMBER( psion_state::io_r )
+uint8_t psion_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 0xffc0)
 	{
@@ -216,26 +216,26 @@ READ8_MEMBER( psion_state::io_r )
 	return 0;
 }
 
-INPUT_CHANGED_MEMBER(psion_state::psion_on)
+void psion_state::psion_on(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* reset the CPU for resume from standby */
 	if (m_maincpu->suspended(SUSPEND_REASON_HALT))
 		m_maincpu->reset();
 }
 
-READ8_MEMBER( psion1_state::reset_kb_counter_r )
+uint8_t psion1_state::reset_kb_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_kb_counter = 0;
 	return 0;
 }
 
-READ8_MEMBER( psion1_state::inc_kb_counter_r )
+uint8_t psion1_state::inc_kb_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_kb_counter++;
 	return 0;
 }
 
-READ8_MEMBER( psion1_state::switchoff_r )
+uint8_t psion1_state::switchoff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!m_stby_pwr)
 	{
@@ -538,7 +538,7 @@ HD44780_PIXEL_UPDATE(psion1_state::psion1_pixel_update)
 		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
 }
 
-PALETTE_INIT_MEMBER(psion_state, psion)
+void psion_state::palette_init_psion(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

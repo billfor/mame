@@ -82,15 +82,15 @@ public:
 	tilemap_t *m_racetrack_tilemap;
 	uint8_t m_io_port[8];
 	int m_bg;
-	DECLARE_WRITE8_MEMBER(dderby_sound_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(output_w);
-	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
+	void dderby_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_dmndrby_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(dmndrby);
+	void palette_init_dmndrby(palette_device &palette);
 	uint32_t screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(dderby_irq);
-	INTERRUPT_GEN_MEMBER(dderby_timer_irq);
+	void dderby_irq(device_t &device);
+	void dderby_timer_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -99,14 +99,14 @@ public:
 };
 
 
-WRITE8_MEMBER(dmndrby_state::dderby_sound_w)
+void dmndrby_state::dderby_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space,0,data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
-READ8_MEMBER(dmndrby_state::input_r)
+uint8_t dmndrby_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset & 7)
 	{
@@ -123,7 +123,7 @@ READ8_MEMBER(dmndrby_state::input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(dmndrby_state::output_w)
+void dmndrby_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	---- x--- refill meter [4]
@@ -336,7 +336,7 @@ static GFXDECODE_START( dmndrby )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 16*16, 32 )
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER(dmndrby_state::get_dmndrby_tile_info)
+void dmndrby_state::get_dmndrby_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_racetrack_tilemap_rom[tile_index];
 	int attr = m_racetrack_tilemap_rom[tile_index+0x2000];
@@ -459,7 +459,7 @@ wouldnt like to say its the most effective way though...
 }
 
 // copied from elsewhere. surely incorrect
-PALETTE_INIT_MEMBER(dmndrby_state, dmndrby)
+void dmndrby_state::palette_init_dmndrby(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -511,12 +511,12 @@ PALETTE_INIT_MEMBER(dmndrby_state, dmndrby)
 }
 
 /*Main Z80 is IM 0,HW-latched irqs. */
-INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_irq)
+void dmndrby_state::dderby_irq(device_t &device)
 {
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
-INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
+void dmndrby_state::dderby_timer_irq(device_t &device)
 {
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
 }

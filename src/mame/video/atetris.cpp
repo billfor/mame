@@ -16,7 +16,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(atetris_state::get_tile_info)
+void atetris_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index * 2] | ((videoram[tile_index * 2 + 1] & 7) << 8);
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(atetris_state::get_tile_info)
  *
  *************************************/
 
-WRITE8_MEMBER(atetris_state::videoram_w)
+void atetris_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 

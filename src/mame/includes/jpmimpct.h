@@ -84,12 +84,12 @@ public:
 	int m_lamp_strobe;
 	uint8_t m_Lamps[256];
 	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
+	void reel0_optic_cb(int state) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	void reel1_optic_cb(int state) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	void reel2_optic_cb(int state) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	void reel3_optic_cb(int state) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	void reel4_optic_cb(int state) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	void reel5_optic_cb(int state) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	int m_payen;
 	int m_alpha_clock;
 	int m_hopinhibit;
@@ -99,43 +99,43 @@ public:
 	optional_device<s16lf01_t> m_vfd;
 	optional_shared_ptr<uint16_t> m_vram;
 	struct bt477_t m_bt477;
-	DECLARE_READ16_MEMBER(duart_1_r);
-	DECLARE_WRITE16_MEMBER(duart_1_w);
-	DECLARE_READ16_MEMBER(duart_2_r);
-	DECLARE_WRITE16_MEMBER(duart_2_w);
-	DECLARE_READ16_MEMBER(inputs1_r);
-	DECLARE_READ16_MEMBER(unk_r);
-	DECLARE_WRITE16_MEMBER(unk_w);
-	DECLARE_READ16_MEMBER(jpmio_r);
-	DECLARE_WRITE16_MEMBER(jpmio_w);
-	DECLARE_READ16_MEMBER(inputs1awp_r);
-	DECLARE_READ16_MEMBER(optos_r);
-	DECLARE_READ16_MEMBER(prot_1_r);
-	DECLARE_READ16_MEMBER(prot_0_r);
-	DECLARE_WRITE16_MEMBER(jpmioawp_w);
-	DECLARE_READ16_MEMBER(ump_r);
+	uint16_t duart_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void duart_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t duart_2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void duart_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t inputs1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void unk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t jpmio_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void jpmio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t inputs1awp_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t optos_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t prot_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t prot_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void jpmioawp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ump_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void jpm_draw_lamps(int data, int lamp_strobe);
-	DECLARE_WRITE16_MEMBER(jpmimpct_bt477_w);
-	DECLARE_READ16_MEMBER(jpmimpct_bt477_r);
-	DECLARE_WRITE16_MEMBER(volume_w);
-	DECLARE_WRITE16_MEMBER(upd7759_w);
-	DECLARE_READ16_MEMBER(upd7759_r);
-	DECLARE_READ8_MEMBER(hopper_b_r);
-	DECLARE_READ8_MEMBER(hopper_c_r);
-	DECLARE_WRITE8_MEMBER(payen_a_w);
-	DECLARE_WRITE8_MEMBER(display_c_w);
+	void jpmimpct_bt477_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t jpmimpct_bt477_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void volume_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void upd7759_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t upd7759_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t hopper_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hopper_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void payen_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void display_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(tms_irq);
+	void tms_irq(int state);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 
-	DECLARE_MACHINE_START(jpmimpct);
-	DECLARE_MACHINE_RESET(jpmimpct);
-	DECLARE_VIDEO_START(jpmimpct);
-	DECLARE_MACHINE_START(impctawp);
-	DECLARE_MACHINE_RESET(impctawp);
-	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_timer_event);
+	void machine_start_jpmimpct();
+	void machine_reset_jpmimpct();
+	void video_start_jpmimpct();
+	void machine_start_impctawp();
+	void machine_reset_impctawp();
+	void duart_1_timer_event(timer_device &timer, void *ptr, int32_t param);
 	void update_irqs();
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;

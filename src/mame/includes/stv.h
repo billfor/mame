@@ -17,79 +17,79 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(astrass);
-	DECLARE_DRIVER_INIT(batmanfr);
-	DECLARE_DRIVER_INIT(finlarch);
-	DECLARE_DRIVER_INIT(decathlt);
-	DECLARE_DRIVER_INIT(sanjeon);
-	DECLARE_DRIVER_INIT(puyosun);
-	DECLARE_DRIVER_INIT(winterht);
-	DECLARE_DRIVER_INIT(gaxeduel);
-	DECLARE_DRIVER_INIT(rsgun);
-	DECLARE_DRIVER_INIT(groovef);
-	DECLARE_DRIVER_INIT(sandor);
-	DECLARE_DRIVER_INIT(cottonbm);
-	DECLARE_DRIVER_INIT(smleague);
-	DECLARE_DRIVER_INIT(nameclv3);
-	DECLARE_DRIVER_INIT(danchiq);
-	DECLARE_DRIVER_INIT(hanagumi);
-	DECLARE_DRIVER_INIT(cotton2);
-	DECLARE_DRIVER_INIT(seabass);
-	DECLARE_DRIVER_INIT(stv);
-	DECLARE_DRIVER_INIT(thunt);
-	DECLARE_DRIVER_INIT(critcrsh);
-	DECLARE_DRIVER_INIT(stvmp);
-	DECLARE_DRIVER_INIT(sasissu);
-	DECLARE_DRIVER_INIT(dnmtdeka);
-	DECLARE_DRIVER_INIT(ffreveng);
-	DECLARE_DRIVER_INIT(fhboxers);
-	DECLARE_DRIVER_INIT(pblbeach);
-	DECLARE_DRIVER_INIT(sss);
-	DECLARE_DRIVER_INIT(diehard);
-	DECLARE_DRIVER_INIT(danchih);
-	DECLARE_DRIVER_INIT(shienryu);
-	DECLARE_DRIVER_INIT(elandore);
-	DECLARE_DRIVER_INIT(prikura);
-	DECLARE_DRIVER_INIT(maruchan);
-	DECLARE_DRIVER_INIT(colmns97);
-	DECLARE_DRIVER_INIT(grdforce);
-	DECLARE_DRIVER_INIT(suikoenb);
-	DECLARE_DRIVER_INIT(magzun);
-	DECLARE_DRIVER_INIT(shanhigw);
-	DECLARE_DRIVER_INIT(sokyugrt);
-	DECLARE_DRIVER_INIT(vfremix);
-	DECLARE_DRIVER_INIT(twcup98);
-	DECLARE_DRIVER_INIT(znpwfv);
-	DECLARE_DRIVER_INIT(othellos);
-	DECLARE_DRIVER_INIT(mausuke);
+	void init_astrass();
+	void init_batmanfr();
+	void init_finlarch();
+	void init_decathlt();
+	void init_sanjeon();
+	void init_puyosun();
+	void init_winterht();
+	void init_gaxeduel();
+	void init_rsgun();
+	void init_groovef();
+	void init_sandor();
+	void init_cottonbm();
+	void init_smleague();
+	void init_nameclv3();
+	void init_danchiq();
+	void init_hanagumi();
+	void init_cotton2();
+	void init_seabass();
+	void init_stv();
+	void init_thunt();
+	void init_critcrsh();
+	void init_stvmp();
+	void init_sasissu();
+	void init_dnmtdeka();
+	void init_ffreveng();
+	void init_fhboxers();
+	void init_pblbeach();
+	void init_sss();
+	void init_diehard();
+	void init_danchih();
+	void init_shienryu();
+	void init_elandore();
+	void init_prikura();
+	void init_maruchan();
+	void init_colmns97();
+	void init_grdforce();
+	void init_suikoenb();
+	void init_magzun();
+	void init_shanhigw();
+	void init_sokyugrt();
+	void init_vfremix();
+	void init_twcup98();
+	void init_znpwfv();
+	void init_othellos();
+	void init_mausuke();
 
-	DECLARE_READ8_MEMBER(stv_ioga_r);
-	DECLARE_WRITE8_MEMBER(stv_ioga_w);
-	DECLARE_READ8_MEMBER(critcrsh_ioga_r);
-	DECLARE_READ8_MEMBER(magzun_ioga_r);
-	DECLARE_WRITE8_MEMBER(magzun_ioga_w);
-	DECLARE_READ8_MEMBER(stvmp_ioga_r);
-	DECLARE_WRITE8_MEMBER(stvmp_ioga_w);
-	DECLARE_READ32_MEMBER(stv_ioga_r32);
-	DECLARE_WRITE32_MEMBER(stv_ioga_w32);
-	DECLARE_READ32_MEMBER(critcrsh_ioga_r32);
-	DECLARE_READ32_MEMBER(stvmp_ioga_r32);
-	DECLARE_WRITE32_MEMBER(stvmp_ioga_w32);
-	DECLARE_READ32_MEMBER(magzun_ioga_r32);
-	DECLARE_WRITE32_MEMBER(magzun_ioga_w32);
-	DECLARE_READ32_MEMBER(magzun_hef_hack_r);
-	DECLARE_READ32_MEMBER(magzun_rx_hack_r);
+	uint8_t stv_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void stv_ioga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t critcrsh_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t magzun_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void magzun_ioga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t stvmp_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void stvmp_ioga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t stv_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void stv_ioga_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t critcrsh_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t stvmp_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void stvmp_ioga_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t magzun_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void magzun_ioga_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t magzun_hef_hack_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t magzun_rx_hack_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart1 ) { return load_cart(image, m_cart1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart2 ) { return load_cart(image, m_cart2); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart3 ) { return load_cart(image, m_cart3); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart4 ) { return load_cart(image, m_cart4); }
+	image_init_result device_image_load_stv_cart1(device_image_interface &image) { return load_cart(image, m_cart1); }
+	image_init_result device_image_load_stv_cart2(device_image_interface &image) { return load_cart(image, m_cart2); }
+	image_init_result device_image_load_stv_cart3(device_image_interface &image) { return load_cart(image, m_cart3); }
+	image_init_result device_image_load_stv_cart4(device_image_interface &image) { return load_cart(image, m_cart4); }
 
 	void install_stvbios_speedups( void );
 
-	DECLARE_MACHINE_START(stv);
-	DECLARE_MACHINE_RESET(stv);
+	void machine_start_stv();
+	void machine_reset_stv();
 
 	/* Batman Forever specifics */
 	optional_device<adsp2181_device>    m_adsp;
@@ -103,10 +103,10 @@ public:
 		uint16_t bdma_word_count;
 	} m_adsp_regs;
 
-	DECLARE_MACHINE_RESET(batmanfr);
-	DECLARE_READ16_MEMBER( adsp_control_r );
-	DECLARE_WRITE16_MEMBER( adsp_control_w );
-	DECLARE_WRITE32_MEMBER(batmanfr_sound_comms_w);
+	void machine_reset_batmanfr();
+	uint16_t adsp_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void adsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void batmanfr_sound_comms_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// protection specific variables and functions (see machine/stvprot.c)
 	uint32_t m_abus_protenable;
@@ -114,8 +114,8 @@ public:
 
 	uint32_t m_a_bus[4];
 
-	DECLARE_READ32_MEMBER( common_prot_r );
-	DECLARE_WRITE32_MEMBER( common_prot_w );
+	uint32_t common_prot_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void common_prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void install_common_protection();
 	void stv_register_protection_savestates();

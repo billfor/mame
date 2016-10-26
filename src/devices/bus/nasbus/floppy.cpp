@@ -121,7 +121,7 @@ void nascom_fdc_device::device_reset_after_children()
 //  IMPLEMENTATION
 //**************************************************************************
 
-TIMER_CALLBACK_MEMBER( nascom_fdc_device::motor_off )
+void nascom_fdc_device::motor_off(void *ptr, int32_t param)
 {
 	if (m_floppy0->get_device())
 		m_floppy0->get_device()->mon_w(1);
@@ -136,7 +136,7 @@ TIMER_CALLBACK_MEMBER( nascom_fdc_device::motor_off )
 		m_floppy3->get_device()->mon_w(1);
 }
 
-READ8_MEMBER( nascom_fdc_device::select_r )
+uint8_t nascom_fdc_device::select_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_select |= (0x80 | 0x20);
 
@@ -160,7 +160,7 @@ READ8_MEMBER( nascom_fdc_device::select_r )
 	return m_select;
 }
 
-WRITE8_MEMBER( nascom_fdc_device::select_w )
+void nascom_fdc_device::select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("nascom_fdc_device::select_w: 0x%02x\n", data);
@@ -188,7 +188,7 @@ WRITE8_MEMBER( nascom_fdc_device::select_w )
 	m_select = data;
 }
 
-READ8_MEMBER( nascom_fdc_device::status_r )
+uint8_t nascom_fdc_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 

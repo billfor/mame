@@ -19,7 +19,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(gauntlet_state::get_alpha_tile_info)
+void gauntlet_state::get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(gauntlet_state::get_alpha_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(gauntlet_state::get_playfield_tile_info)
+void gauntlet_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = ((m_playfield_tile_bank * 0x1000) + (data & 0xfff)) ^ 0x800;
@@ -79,7 +79,7 @@ const atari_motion_objects_config gauntlet_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::video_start_gauntlet()
 {
 	/* modify the motion object code lookup table to account for the code XOR */
 	std::vector<uint16_t> &codelookup = m_mob->code_lookup();
@@ -102,7 +102,7 @@ VIDEO_START_MEMBER(gauntlet_state,gauntlet)
  *
  *************************************/
 
-WRITE16_MEMBER( gauntlet_state::gauntlet_xscroll_w )
+void gauntlet_state::gauntlet_xscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldxscroll = *m_xscroll;
 	COMBINE_DATA(m_xscroll);
@@ -126,7 +126,7 @@ WRITE16_MEMBER( gauntlet_state::gauntlet_xscroll_w )
  *
  *************************************/
 
-WRITE16_MEMBER( gauntlet_state::gauntlet_yscroll_w )
+void gauntlet_state::gauntlet_yscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldyscroll = *m_yscroll;
 	COMBINE_DATA(m_yscroll);

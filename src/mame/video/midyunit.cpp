@@ -39,7 +39,7 @@ enum
  *
  *************************************/
 
-VIDEO_START_MEMBER(midyunit_state,common)
+void midyunit_state::video_start_common()
 {
 	/* allocate memory */
 	m_cmos_ram = std::make_unique<uint16_t[]>((0x2000 * 4)/2);
@@ -66,11 +66,11 @@ VIDEO_START_MEMBER(midyunit_state,common)
 }
 
 
-VIDEO_START_MEMBER(midyunit_state,midyunit_4bit)
+void midyunit_state::video_start_midyunit_4bit()
 {
 	int i;
 
-	VIDEO_START_CALL_MEMBER(common);
+	video_start_common();
 
 	/* init for 4-bit */
 	for (i = 0; i < 65536; i++)
@@ -79,11 +79,11 @@ VIDEO_START_MEMBER(midyunit_state,midyunit_4bit)
 }
 
 
-VIDEO_START_MEMBER(midyunit_state,midyunit_6bit)
+void midyunit_state::video_start_midyunit_6bit()
 {
 	int i;
 
-	VIDEO_START_CALL_MEMBER(common);
+	video_start_common();
 
 	/* init for 6-bit */
 	for (i = 0; i < 65536; i++)
@@ -92,18 +92,18 @@ VIDEO_START_MEMBER(midyunit_state,midyunit_6bit)
 }
 
 
-VIDEO_START_MEMBER(midyunit_state,mkyawdim)
+void midyunit_state::video_start_mkyawdim()
 {
-	VIDEO_START_CALL_MEMBER(midyunit_6bit);
+	video_start_midyunit_6bit();
 	m_yawdim_dma = 1;
 }
 
 
-VIDEO_START_MEMBER(midyunit_state,midzunit)
+void midyunit_state::video_start_midzunit()
 {
 	int i;
 
-	VIDEO_START_CALL_MEMBER(common);
+	video_start_common();
 
 	/* init for 8-bit */
 	for (i = 0; i < 65536; i++)
@@ -119,7 +119,7 @@ VIDEO_START_MEMBER(midyunit_state,midzunit)
  *
  *************************************/
 
-READ16_MEMBER(midyunit_state::midyunit_gfxrom_r)
+uint16_t midyunit_state::midyunit_gfxrom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset *= 2;
 	if (m_palette_mask == 0x00ff)
@@ -137,7 +137,7 @@ READ16_MEMBER(midyunit_state::midyunit_gfxrom_r)
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::midyunit_vram_w)
+void midyunit_state::midyunit_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset *= 2;
 	if (m_videobank_select)
@@ -157,7 +157,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_vram_w)
 }
 
 
-READ16_MEMBER(midyunit_state::midyunit_vram_r)
+uint16_t midyunit_state::midyunit_vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset *= 2;
 	if (m_videobank_select)
@@ -193,7 +193,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(midyunit_state::from_shiftreg)
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::midyunit_control_w)
+void midyunit_state::midyunit_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	 * Narc system register
@@ -230,7 +230,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_control_w)
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::midyunit_paletteram_w)
+void midyunit_state::midyunit_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int newword;
 
@@ -373,7 +373,7 @@ void midyunit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-TIMER_CALLBACK_MEMBER(midyunit_state::dma_callback)
+void midyunit_state::dma_callback(void *ptr, int32_t param)
 {
 	m_dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
 	m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -387,7 +387,7 @@ TIMER_CALLBACK_MEMBER(midyunit_state::dma_callback)
  *
  *************************************/
 
-READ16_MEMBER(midyunit_state::midyunit_dma_r)
+uint16_t midyunit_state::midyunit_dma_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dma_register[offset];
 }
@@ -425,7 +425,7 @@ READ16_MEMBER(midyunit_state::midyunit_dma_r)
  *     9     | xxxxxxxxxxxxxxxx | color
  */
 
-WRITE16_MEMBER(midyunit_state::midyunit_dma_w)
+void midyunit_state::midyunit_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct dma_state_t &dma_state = m_dma_state;
 	uint32_t gfxoffset;
@@ -543,7 +543,7 @@ if (LOG_DMA)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(midyunit_state::autoerase_line)
+void midyunit_state::autoerase_line(void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -38,25 +38,25 @@ enum
 };
 
 
-WRITE16_MEMBER(twin16_state::fixram_w)
+void twin16_state::fixram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fixram[offset]);
 	m_fixed_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::videoram0_w)
+void twin16_state::videoram0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[0][offset]);
 	m_scroll_tmap[0]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::videoram1_w)
+void twin16_state::videoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[1][offset]);
 	m_scroll_tmap[1]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(twin16_state::zipram_w)
+void twin16_state::zipram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_zipram[offset];
 	COMBINE_DATA(&m_zipram[offset]);
@@ -69,7 +69,7 @@ void twin16_state::twin16_postload()
 	m_gfxdecode->gfx(1)->mark_all_dirty();
 }
 
-WRITE16_MEMBER(fround_state::gfx_bank_w)
+void fround_state::gfx_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int changed = 0;
 
@@ -96,7 +96,7 @@ WRITE16_MEMBER(fround_state::gfx_bank_w)
 	}
 }
 
-WRITE16_MEMBER(twin16_state::video_register_w)
+void twin16_state::video_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -189,13 +189,13 @@ WRITE16_MEMBER(twin16_state::video_register_w)
  *   3  | ------------xxxx | color
  */
 
-READ16_MEMBER(twin16_state::sprite_status_r)
+uint16_t twin16_state::sprite_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// bit 0: busy, other bits: dunno
 	return m_sprite_busy;
 }
 
-TIMER_CALLBACK_MEMBER(twin16_state::sprite_tick)
+void twin16_state::sprite_tick(void *ptr, int32_t param)
 {
 	m_sprite_busy = 0;
 }
@@ -374,7 +374,7 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
 }
 
 
-TILE_GET_INFO_MEMBER(twin16_state::fix_tile_info)
+void twin16_state::fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_fixram[tile_index];
 	/* fedcba9876543210
@@ -423,12 +423,12 @@ void fround_state::tile_get_info(tile_data &tileinfo, uint16_t data, int color_b
 	tileinfo.category = BIT(data, 15);
 }
 
-TILE_GET_INFO_MEMBER(twin16_state::layer0_tile_info)
+void twin16_state::layer0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tile_get_info(tileinfo, m_videoram[0][tile_index], 0);
 }
 
-TILE_GET_INFO_MEMBER(twin16_state::layer1_tile_info)
+void twin16_state::layer1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tile_get_info(tileinfo, m_videoram[1][tile_index], 8);
 }

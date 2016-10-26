@@ -456,46 +456,46 @@ or Fatal Fury for example).
 
 
 #ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(hng64_state::trap_write)
+void hng64_state::trap_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("Remapped write... %08x %08x\n",offset,data);
 }
 
-READ32_MEMBER(hng64_state::hng64_random_read)
+uint32_t hng64_state::hng64_random_read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand()&0xffffffff;
 }
 #endif
 
-READ32_MEMBER(hng64_state::hng64_com_r)
+uint32_t hng64_state::hng64_com_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//logerror("com read  (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, m_com_ram[offset]);
 	return m_com_ram[offset];
 }
 
-WRITE32_MEMBER(hng64_state::hng64_com_w)
+void hng64_state::hng64_com_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//logerror("com write (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&m_com_ram[offset]);
 }
 
 /* TODO: fully understand this */
-WRITE8_MEMBER(hng64_state::hng64_com_share_mips_w)
+void hng64_state::hng64_com_share_mips_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_com_shared[offset ^ 3] = data;
 }
 
-READ8_MEMBER(hng64_state::hng64_com_share_mips_r)
+uint8_t hng64_state::hng64_com_share_mips_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_com_shared[offset];
 }
 
-WRITE8_MEMBER(hng64_state::hng64_com_share_w)
+void hng64_state::hng64_com_share_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_com_shared[offset] = data;
 }
 
-READ8_MEMBER(hng64_state::hng64_com_share_r)
+uint8_t hng64_state::hng64_com_share_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset == 4)
 		return m_com_shared[offset] | 1; // some busy flag?
@@ -503,7 +503,7 @@ READ8_MEMBER(hng64_state::hng64_com_share_r)
 	return m_com_shared[offset];
 }
 
-READ32_MEMBER(hng64_state::hng64_sysregs_r)
+uint32_t hng64_state::hng64_sysregs_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t rtc_addr;
 
@@ -571,7 +571,7 @@ void hng64_state::do_dma(address_space &space)
 //  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITENOP        // ?? often
 */
 
-WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
+void hng64_state::hng64_sysregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA (&m_sysregs[offset]);
 
@@ -611,7 +611,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 **************************************/
 
 /* Fatal Fury Wild Ambition / Buriki One */
-READ32_MEMBER(hng64_state::fight_io_r)
+uint32_t hng64_state::fight_io_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/*
 	TODO: reads to i/o but coins doesn't work? Let's put a cheap hack for now
@@ -633,7 +633,7 @@ READ32_MEMBER(hng64_state::fight_io_r)
 }
 
 /* Samurai Shodown 64 / Samurai Shodown 64 2 */
-READ32_MEMBER(hng64_state::samsho_io_r)
+uint32_t hng64_state::samsho_io_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -662,7 +662,7 @@ READ32_MEMBER(hng64_state::samsho_io_r)
 
 /* Beast Busters 2 */
 /* FIXME: trigger input doesn't work? */
-READ32_MEMBER(hng64_state::shoot_io_r)
+uint32_t hng64_state::shoot_io_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -709,7 +709,7 @@ READ32_MEMBER(hng64_state::shoot_io_r)
 }
 
 /* Roads Edge / Xtreme Rally */
-READ32_MEMBER(hng64_state::racing_io_r)
+uint32_t hng64_state::racing_io_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -742,7 +742,7 @@ READ32_MEMBER(hng64_state::racing_io_r)
 	return m_dualport[offset];
 }
 
-READ32_MEMBER(hng64_state::hng64_dualport_r)
+uint32_t hng64_state::hng64_dualport_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], space.device().safe_pc());
 
@@ -780,7 +780,7 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 0x00004000 gun #3
 */
 
-WRITE32_MEMBER(hng64_state::hng64_dualport_w)
+void hng64_state::hng64_dualport_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], space.device().safe_pc());
 	COMBINE_DATA (&m_dualport[offset]);
@@ -788,7 +788,7 @@ WRITE32_MEMBER(hng64_state::hng64_dualport_w)
 
 
 // Transition Control memory.
-WRITE32_MEMBER(hng64_state::tcram_w)
+void hng64_state::tcram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *hng64_tcram = m_tcram;
 
@@ -817,7 +817,7 @@ WRITE32_MEMBER(hng64_state::tcram_w)
 	}
 }
 
-READ32_MEMBER(hng64_state::tcram_r)
+uint32_t hng64_state::tcram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
 	if(offset == 0x12)
@@ -832,7 +832,7 @@ READ32_MEMBER(hng64_state::tcram_r)
    bit 1 needs to be off, otherwise Fatal Fury WA locks up (FIFO full?)
    bit 0 is likely to be fifo empty (active low)
    */
-READ32_MEMBER(hng64_state::unk_vreg_r)
+uint32_t hng64_state::unk_vreg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  m_unk_vreg_toggle^=0x8000;
 
@@ -846,7 +846,7 @@ READ32_MEMBER(hng64_state::unk_vreg_r)
 /************************************************************************************************************/
 
 /* The following is guesswork, needs confirmation with a test on the real board. */
-WRITE32_MEMBER(hng64_state::hng64_sprite_clear_even_w)
+void hng64_state::hng64_sprite_clear_even_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t spr_offs;
 
@@ -868,7 +868,7 @@ WRITE32_MEMBER(hng64_state::hng64_sprite_clear_even_w)
 	}
 }
 
-WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
+void hng64_state::hng64_sprite_clear_odd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t spr_offs;
 
@@ -902,13 +902,13 @@ WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 <ElSemi> 0x60000000-0x60001000 Comm dualport ram
 */
 
-WRITE32_MEMBER(hng64_state::hng64_vregs_w)
+void hng64_state::hng64_vregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
 	COMBINE_DATA(&m_videoregs[offset]);
 }
 
-READ16_MEMBER(hng64_state::main_sound_comms_r)
+uint16_t hng64_state::main_sound_comms_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset *2)
 	{
@@ -923,7 +923,7 @@ READ16_MEMBER(hng64_state::main_sound_comms_r)
 	return 0;
 }
 
-WRITE16_MEMBER(hng64_state::main_sound_comms_w)
+void hng64_state::main_sound_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset * 2)
 	{
@@ -1079,22 +1079,22 @@ static INPUT_PORTS_START( hng64 )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(hng64_state::left_handle_r)
+ioport_value hng64_state::left_handle_r(ioport_field &field, void *param)
 {
 	return (ioport("HANDLE")->read() == 0);
 }
 
-CUSTOM_INPUT_MEMBER(hng64_state::right_handle_r)
+ioport_value hng64_state::right_handle_r(ioport_field &field, void *param)
 {
 	return (ioport("HANDLE")->read() == 0xff);
 }
 
-CUSTOM_INPUT_MEMBER(hng64_state::acc_down_r)
+ioport_value hng64_state::acc_down_r(ioport_field &field, void *param)
 {
 	return (ioport("ACCELERATOR")->read() == 0);
 }
 
-CUSTOM_INPUT_MEMBER(hng64_state::brake_down_r)
+ioport_value hng64_state::brake_down_r(ioport_field &field, void *param)
 {
 	return (ioport("BRAKE")->read() == 0);
 }
@@ -1385,12 +1385,12 @@ static void hng64_reorder( uint8_t* gfxregion, size_t gfxregionsize)
 	memcpy(gfxregion, &buffer[0], gfxregionsize);
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)
+void hng64_state::init_hng64_reorder_gfx()
 {
 	hng64_reorder(memregion("scrtile")->base(), memregion("scrtile")->bytes());
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64)
+void hng64_state::init_hng64()
 {
 	/* 1 meg of virtual address space for the com cpu */
 	m_com_virtual_mem = std::make_unique<uint8_t[]>(0x100000);
@@ -1399,46 +1399,46 @@ DRIVER_INIT_MEMBER(hng64_state,hng64)
 	m_soundram = std::make_unique<uint16_t[]>(0x200000/2);
 	m_soundram2 = std::make_unique<uint16_t[]>(0x200000/2);
 
-	DRIVER_INIT_CALL(hng64_reorder_gfx);
+	init_hng64_reorder_gfx();
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_fght)
+void hng64_state::init_hng64_fght()
 {
 	m_no_machine_error_code = 0x01000000;
-	DRIVER_INIT_CALL(hng64);
+	init_hng64();
 }
 
-DRIVER_INIT_MEMBER(hng64_state,fatfurwa)
+void hng64_state::init_fatfurwa()
 {
 	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memregion("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
-	DRIVER_INIT_CALL(hng64_fght);
+	init_hng64_fght();
 	m_mcu_type = FIGHT_MCU;
 }
 
-DRIVER_INIT_MEMBER(hng64_state,buriki)
+void hng64_state::init_buriki()
 {
-	DRIVER_INIT_CALL(hng64_fght);
+	init_hng64_fght();
 	m_mcu_type = BURIKI_MCU;
 }
 
-DRIVER_INIT_MEMBER(hng64_state,ss64)
+void hng64_state::init_ss64()
 {
-	DRIVER_INIT_CALL(hng64_fght);
+	init_hng64_fght();
 	m_mcu_type = SAMSHO_MCU;
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_race)
+void hng64_state::init_hng64_race()
 {
 	m_no_machine_error_code = 0x02000000;
 	m_mcu_type = RACING_MCU;
-	DRIVER_INIT_CALL(hng64);
+	init_hng64();
 }
 
-DRIVER_INIT_MEMBER(hng64_state,hng64_shoot)
+void hng64_state::init_hng64_shoot()
 {
 	m_mcu_type = SHOOT_MCU;
 	m_no_machine_error_code = 0x03000000;
-	DRIVER_INIT_CALL(hng64);
+	init_hng64();
 }
 
 void hng64_state::set_irq(uint32_t irq_vector)
@@ -1484,7 +1484,7 @@ void hng64_state::set_irq(uint32_t irq_vector)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
+void hng64_state::hng64_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

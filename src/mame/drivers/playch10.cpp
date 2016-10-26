@@ -306,12 +306,12 @@ Notes & Todo:
 /******************************************************************************/
 
 
-WRITE8_MEMBER(playch10_state::up8w_w)
+void playch10_state::up8w_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_up_8w = data & 1;
 }
 
-READ8_MEMBER(playch10_state::ram_8w_r)
+uint8_t playch10_state::ram_8w_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( offset >= 0x400 && m_up_8w )
 		return m_ram_8w[offset];
@@ -319,7 +319,7 @@ READ8_MEMBER(playch10_state::ram_8w_r)
 	return m_ram_8w[offset & 0x3ff];
 }
 
-WRITE8_MEMBER(playch10_state::ram_8w_w)
+void playch10_state::ram_8w_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( offset >= 0x400 && m_up_8w )
 		m_ram_8w[offset] = data;
@@ -327,7 +327,7 @@ WRITE8_MEMBER(playch10_state::ram_8w_w)
 		m_ram_8w[offset & 0x3ff] = data;
 }
 
-WRITE8_MEMBER(playch10_state::sprite_dma_w)
+void playch10_state::sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int source = ( data & 7 );
 	m_ppu->spriteram_dma(space, source);
@@ -335,7 +335,7 @@ WRITE8_MEMBER(playch10_state::sprite_dma_w)
 
 /* Only used in single monitor bios */
 
-WRITE8_MEMBER(playch10_state::time_w)
+void playch10_state::time_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data == 0xf)
 		data = 0;
@@ -634,7 +634,7 @@ static GFXDECODE_START( playch10 )
 	GFXDECODE_ENTRY( "gfx1", 0, bios_charlayout,   0,  32 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(playch10_state::playch10_interrupt){
+void playch10_state::playch10_interrupt(device_t &device){
 	/* LS161A, Sheet 1 - bottom left of Z80 */
 	if ( !m_pc10_dog_di && !m_pc10_nmi_enable ) {
 		device.execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE );
@@ -1661,7 +1661,7 @@ GAME( 1986, playch10, 0, playch10, playch10, playch10_state, playch10, ROT0, "Ni
 /******************************************************************************/
 
 
-DRIVER_INIT_MEMBER(playch10_state,virus)
+void playch10_state::init_virus()
 {
 	uint8_t *ROM = memregion("rp5h01")->base();
 	uint32_t len = memregion("rp5h01")->bytes();
@@ -1672,10 +1672,10 @@ DRIVER_INIT_MEMBER(playch10_state,virus)
 	}
 
 	/* common init */
-	DRIVER_INIT_CALL(pcfboard);
+	init_pcfboard();
 }
 
-DRIVER_INIT_MEMBER(playch10_state,ttoon)
+void playch10_state::init_ttoon()
 {
 	uint8_t *ROM = memregion("rp5h01")->base();
 	uint32_t len = memregion("rp5h01")->bytes();
@@ -1686,7 +1686,7 @@ DRIVER_INIT_MEMBER(playch10_state,ttoon)
 	}
 
 	/* common init */
-	DRIVER_INIT_CALL(pcgboard);
+	init_pcgboard();
 }
 
 /*     YEAR  NAME      PARENT    BIOS      MACHINE   INPUT     INIT      MONITOR  */

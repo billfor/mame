@@ -27,7 +27,7 @@ static const uint32_t sprite_expand[16] =
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(turbo_state,turbo)
+void turbo_state::palette_init_turbo(palette_device &palette)
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -66,7 +66,7 @@ PALETTE_INIT_MEMBER(turbo_state,turbo)
 }
 
 
-PALETTE_INIT_MEMBER(turbo_state,subroc3d)
+void turbo_state::palette_init_subroc3d(palette_device &palette)
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -105,7 +105,7 @@ PALETTE_INIT_MEMBER(turbo_state,subroc3d)
 }
 
 
-PALETTE_INIT_MEMBER(turbo_state,buckrog)
+void turbo_state::palette_init_buckrog(palette_device &palette)
 {
 	static const int resistances[4] = { 2200, 1000, 500, 250 };
 	double rweights[3], gweights[3], bweights[4];
@@ -153,21 +153,21 @@ PALETTE_INIT_MEMBER(turbo_state,buckrog)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(turbo_state::get_fg_tile_info)
+void turbo_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, code >> 2, 0);
 }
 
 
-VIDEO_START_MEMBER(turbo_state,turbo)
+void turbo_state::video_start_turbo()
 {
 	/* initialize the foreground tilemap */
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
 }
 
 
-VIDEO_START_MEMBER(turbo_state,buckrog)
+void turbo_state::video_start_buckrog()
 {
 	/* initialize the foreground tilemap */
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(turbo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
@@ -185,7 +185,7 @@ VIDEO_START_MEMBER(turbo_state,buckrog)
  *
  *************************************/
 
-WRITE8_MEMBER(turbo_state::turbo_videoram_w)
+void turbo_state::turbo_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	if (offset < 0x400)
@@ -196,7 +196,7 @@ WRITE8_MEMBER(turbo_state::turbo_videoram_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::buckrog_bitmap_w)
+void turbo_state::buckrog_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_buckrog_bitmap_ram[offset] = data & 1;
 }

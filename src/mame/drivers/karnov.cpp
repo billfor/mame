@@ -329,7 +329,7 @@ void karnov_state::chelnov_i8751_w( int data )
  *
  *************************************/
 
-WRITE16_MEMBER(karnov_state::karnov_control_w)
+void karnov_state::karnov_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Mnemonics filled in from the schematics, brackets are my comments */
 	switch (offset << 1)
@@ -401,7 +401,7 @@ WRITE16_MEMBER(karnov_state::karnov_control_w)
 	}
 }
 
-READ16_MEMBER(karnov_state::karnov_control_r)
+uint16_t karnov_state::karnov_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
@@ -724,7 +724,7 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
+void karnov_state::karnov_interrupt(device_t &device)
 {
 	uint8_t port = ioport("FAKE")->read();
 
@@ -1268,25 +1268,25 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(karnov_state,karnov)
+void karnov_state::init_karnov()
 {
 	m_microcontroller_id = KARNOV;
 	m_coin_mask = 0x07;
 }
 
-DRIVER_INIT_MEMBER(karnov_state,karnovj)
+void karnov_state::init_karnovj()
 {
 	m_microcontroller_id = KARNOVJ;
 	m_coin_mask = 0x07;
 }
 
-DRIVER_INIT_MEMBER(karnov_state,wndrplnt)
+void karnov_state::init_wndrplnt()
 {
 	m_microcontroller_id = WNDRPLNT;
 	m_coin_mask = 0x00;
 }
 
-DRIVER_INIT_MEMBER(karnov_state,chelnov)
+void karnov_state::init_chelnov()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1295,7 +1295,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnov)
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
 }
 
-DRIVER_INIT_MEMBER(karnov_state,chelnovu)
+void karnov_state::init_chelnovu()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1304,7 +1304,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnovu)
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
 }
 
-DRIVER_INIT_MEMBER(karnov_state,chelnovj)
+void karnov_state::init_chelnovj()
 {
 	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 

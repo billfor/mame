@@ -120,14 +120,14 @@ int thomson_state::to7_get_cassette()
 
 
 /* 1-bit cassette output */
-WRITE_LINE_MEMBER(thomson_state::to7_set_cassette)
+void thomson_state::to7_set_cassette(int state)
 {
 	m_cassette->output(state ? 1. : -1. );
 }
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_set_cassette_motor )
+void thomson_state::to7_set_cassette_motor(int state)
 {
 	cassette_state cassstate =  m_cassette->get_state();
 	double pos = m_cassette->get_position();
@@ -198,7 +198,7 @@ void thomson_state::mo5_set_cassette( int data )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::mo5_set_cassette_motor )
+void thomson_state::mo5_set_cassette_motor(int state)
 {
 	cassette_state cassstate = m_cassette->get_state();
 	double pos = m_cassette->get_position();
@@ -287,14 +287,14 @@ void thomson_state::thom_irq_0( int state )
 	thom_set_irq( 0, state );
 }
 
-WRITE_LINE_MEMBER( thomson_state::thom_dev_irq_0 )
+void thomson_state::thom_dev_irq_0(int state)
 {
 	thom_irq_0( state );
 }
 
 
 
-WRITE_LINE_MEMBER( thomson_state::thom_irq_1 )
+void thomson_state::thom_irq_1(int state)
 {
 	thom_set_irq  ( 1, state );
 }
@@ -304,7 +304,7 @@ void thomson_state::thom_irq_3( int state )
 	thom_set_irq  ( 3, state );
 }
 
-WRITE_LINE_MEMBER( thomson_state::thom_firq_1 )
+void thomson_state::thom_firq_1(int state)
 {
 	thom_set_firq ( 1, state );
 }
@@ -356,7 +356,7 @@ void thomson_state::thom_set_caps_led( int led )
 
 /***************************** TO7 / T9000 *************************/
 
-DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
+image_init_result thomson_state::device_image_load_to7_cartridge(device_image_interface &image)
 {
 	int i,j;
 	uint8_t* pos = memregion("maincpu" )->base() + 0x10000;
@@ -446,7 +446,7 @@ void thomson_state::to7_update_cart_bank_postload()
 
 
 /* write signal to 0000-1fff generates a bank switch */
-WRITE8_MEMBER( thomson_state::to7_cartridge_w )
+void thomson_state::to7_cartridge_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( offset >= 0x2000 )
 		return;
@@ -458,7 +458,7 @@ WRITE8_MEMBER( thomson_state::to7_cartridge_w )
 
 
 /* read signal to 0000-0003 generates a bank switch */
-READ8_MEMBER( thomson_state::to7_cartridge_r )
+uint8_t thomson_state::to7_cartridge_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
@@ -476,7 +476,7 @@ READ8_MEMBER( thomson_state::to7_cartridge_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_timer_port_out )
+void thomson_state::to7_timer_port_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	thom_set_mode_point( data & 1 );          /* bit 0: video bank switch */
 	thom_set_caps_led( (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
@@ -487,7 +487,7 @@ WRITE8_MEMBER( thomson_state::to7_timer_port_out )
 
 
 
-READ8_MEMBER( thomson_state::to7_timer_port_in )
+uint8_t thomson_state::to7_timer_port_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int lightpen = (m_io_lightpen_button->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
@@ -530,14 +530,14 @@ void thomson_state::to7_set_init( int init )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_sys_cb2_out )
+void thomson_state::to7_sys_cb2_out(int state)
 {
 	m_to7_lightpen = !state;
 }
 
 
 
-WRITE8_MEMBER( thomson_state::to7_sys_portb_out )
+void thomson_state::to7_sys_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* value fetched in to7_sys_porta_in */
 }
@@ -548,7 +548,7 @@ WRITE8_MEMBER( thomson_state::to7_sys_portb_out )
 
 
 
-READ8_MEMBER( thomson_state::to7_sys_porta_in )
+uint8_t thomson_state::to7_sys_porta_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( m_to7_lightpen )
 	{
@@ -573,7 +573,7 @@ READ8_MEMBER( thomson_state::to7_sys_porta_in )
 
 
 
-READ8_MEMBER( thomson_state::to7_sys_portb_in )
+uint8_t thomson_state::to7_sys_portb_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* lightpen low */
 	return to7_lightpen_gpl( TO7_LIGHTPEN_DECAL, m_to7_lightpen_step ) & 0xff;
@@ -640,7 +640,7 @@ void to7_io_line_device::device_start()
 	m_rs232->write_dtr(0);
 }
 
-WRITE8_MEMBER( to7_io_line_device::porta_out )
+void to7_io_line_device::porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int txd = (data >> 0) & 1;
 	int rts = (data >> 1) & 1;
@@ -653,25 +653,25 @@ WRITE8_MEMBER( to7_io_line_device::porta_out )
 
 
 
-WRITE_LINE_MEMBER(to7_io_line_device::write_rxd )
+void to7_io_line_device::write_rxd(int state)
 {
 	m_rxd = state;
 }
 
-WRITE_LINE_MEMBER(to7_io_line_device::write_dsr )
+void to7_io_line_device::write_dsr(int state)
 {
 	if (!state) m_last_low = 0;
 
 	m_dsr = state;
 }
 
-WRITE_LINE_MEMBER(to7_io_line_device::write_cts )
+void to7_io_line_device::write_cts(int state)
 {
 	m_pia_io->ca1_w(state);
 	m_cts = state;
 }
 
-WRITE_LINE_MEMBER(to7_io_line_device::write_centronics_busy )
+void to7_io_line_device::write_centronics_busy(int state)
 {
 	if (!state) m_last_low = 1;
 
@@ -679,7 +679,7 @@ WRITE_LINE_MEMBER(to7_io_line_device::write_centronics_busy )
 }
 
 
-READ8_MEMBER( to7_io_line_device::porta_in )
+uint8_t to7_io_line_device::porta_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_IO(( "%s %f to7_io_porta_in: select=%i cts=%i, dsr=%i, rd=%i\n", machine().describe_context(), machine().time().as_double(), m_centronics_busy, m_cts, m_dsr, m_rxd ));
 
@@ -717,20 +717,20 @@ READ8_MEMBER( to7_io_line_device::porta_in )
  */
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_modem_cb )
+void thomson_state::to7_modem_cb(int state)
 {
 	LOG(( "to7_modem_cb: called %i\n", state ));
 }
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_modem_tx_w )
+void thomson_state::to7_modem_tx_w(int state)
 {
 	m_to7_modem_tx = state;
 }
 
 
-WRITE_LINE_MEMBER( thomson_state::write_acia_clock )
+void thomson_state::write_acia_clock(int state)
 {
 	m_acia6850->write_txc(state);
 	m_acia6850->write_rxc(state);
@@ -757,7 +757,7 @@ void thomson_state::to7_modem_init()
 
 /* ------------  dispatch MODEM / speech extension ------------ */
 
-READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
+uint8_t thomson_state::to7_modem_mea8000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( space.debugger_access() )
 	{
@@ -786,7 +786,7 @@ READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_modem_mea8000_w )
+void thomson_state::to7_modem_mea8000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( m_io_mconfig->read() & 1 )
 	{
@@ -854,7 +854,7 @@ void thomson_state::to7_game_sound_update()
 
 
 
-READ8_MEMBER( thomson_state::to7_game_porta_in )
+uint8_t thomson_state::to7_game_porta_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 	if ( m_io_config->read() & 1 )
@@ -895,7 +895,7 @@ READ8_MEMBER( thomson_state::to7_game_porta_in )
 
 
 
-READ8_MEMBER( thomson_state::to7_game_portb_in )
+uint8_t thomson_state::to7_game_portb_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 	if ( m_io_config->read() & 1 )
@@ -922,7 +922,7 @@ READ8_MEMBER( thomson_state::to7_game_portb_in )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_game_portb_out )
+void thomson_state::to7_game_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 6-bit DAC sound */
 	m_to7_game_sound = data & 0x3f;
@@ -931,7 +931,7 @@ WRITE8_MEMBER( thomson_state::to7_game_portb_out )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_game_cb2_out )
+void thomson_state::to7_game_cb2_out(int state)
 {
 	/* undocumented */
 	/* some TO8 games (e.g.: F15) seem to write here a lot */
@@ -940,7 +940,7 @@ WRITE_LINE_MEMBER( thomson_state::to7_game_cb2_out )
 
 
 /* this should be called periodically */
-TIMER_CALLBACK_MEMBER(thomson_state::to7_game_update_cb)
+void thomson_state::to7_game_update_cb(void *ptr, int32_t param)
 {
 	if ( m_io_config->read() & 1 )
 	{
@@ -1018,7 +1018,7 @@ void thomson_state::to7_game_reset()
 */
 
 
-READ8_MEMBER( thomson_state::to7_midi_r )
+uint8_t thomson_state::to7_midi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror( "to7_midi_r: not implemented\n" );
 	return 0;
@@ -1026,7 +1026,7 @@ READ8_MEMBER( thomson_state::to7_midi_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_midi_w )
+void thomson_state::to7_midi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror( "to7_midi_w: not implemented\n" );
 }
@@ -1051,7 +1051,7 @@ void thomson_state::to7_midi_init()
 
 
 
-MACHINE_RESET_MEMBER( thomson_state, to7 )
+void thomson_state::machine_reset_to7()
 {
 	LOG (( "to7: machine reset called\n" ));
 
@@ -1082,7 +1082,7 @@ MACHINE_RESET_MEMBER( thomson_state, to7 )
 
 
 
-MACHINE_START_MEMBER( thomson_state, to7 )
+void thomson_state::machine_start_to7()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	uint8_t* mem = memregion("maincpu")->base();
@@ -1142,7 +1142,7 @@ MACHINE_START_MEMBER( thomson_state, to7 )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to770_sys_cb2_out )
+void thomson_state::to770_sys_cb2_out(int state)
 {
 	/* video overlay: black pixels are transparent and show TV image underneath */
 	LOG(( "$%04x to770_sys_cb2_out: video overlay %i\n", m_maincpu->pc(), state ));
@@ -1150,7 +1150,7 @@ WRITE_LINE_MEMBER( thomson_state::to770_sys_cb2_out )
 
 
 
-READ8_MEMBER( thomson_state::to770_sys_porta_in )
+uint8_t thomson_state::to770_sys_porta_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* keyboard */
 	int keyline = m_pia_sys->b_output() & 7;
@@ -1212,7 +1212,7 @@ void thomson_state::to770_update_ram_bank_postload()
 
 
 
-WRITE8_MEMBER( thomson_state::to770_sys_portb_out )
+void thomson_state::to770_sys_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	to770_update_ram_bank();
 }
@@ -1223,7 +1223,7 @@ WRITE8_MEMBER( thomson_state::to770_sys_portb_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to770_timer_port_out )
+void thomson_state::to770_timer_port_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	thom_set_mode_point( data & 1 );          /* bit 0: video bank switch */
 	thom_set_caps_led( (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
@@ -1238,7 +1238,7 @@ WRITE8_MEMBER( thomson_state::to770_timer_port_out )
 
 
 
-READ8_MEMBER( thomson_state::to770_gatearray_r )
+uint8_t thomson_state::to770_gatearray_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	struct thom_vsignal v = thom_get_vsignal();
 	struct thom_vsignal l = thom_get_lightpen_vsignal( TO7_LIGHTPEN_DECAL, m_to7_lightpen_step - 1, 0 );
@@ -1262,7 +1262,7 @@ READ8_MEMBER( thomson_state::to770_gatearray_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to770_gatearray_w )
+void thomson_state::to770_gatearray_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( ! offset )
 		m_to7_lightpen = data & 1;
@@ -1274,7 +1274,7 @@ WRITE8_MEMBER( thomson_state::to770_gatearray_w )
 
 
 
-MACHINE_RESET_MEMBER( thomson_state, to770 )
+void thomson_state::machine_reset_to770()
 {
 	LOG (( "to770: machine reset called\n" ));
 
@@ -1307,7 +1307,7 @@ MACHINE_RESET_MEMBER( thomson_state, to770 )
 
 
 
-MACHINE_START_MEMBER( thomson_state, to770 )
+void thomson_state::machine_start_to770()
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();
@@ -1372,7 +1372,7 @@ void thomson_state::mo5_lightpen_cb( int step )
 */
 
 
-TIMER_CALLBACK_MEMBER(thomson_state::mo5_periodic_cb)
+void thomson_state::mo5_periodic_cb(void *ptr, int32_t param)
 {
 	/* pulse */
 	m_pia_sys->cb1_w( 1 );
@@ -1393,7 +1393,7 @@ void thomson_state::mo5_init_timer()
 
 
 
-WRITE8_MEMBER( thomson_state::mo5_sys_porta_out )
+void thomson_state::mo5_sys_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	thom_set_mode_point( data & 1 );       /* bit 0: video bank switch */
 	thom_set_border_color( (data >> 1) & 15 ); /* bit 1-4: border color */
@@ -1402,7 +1402,7 @@ WRITE8_MEMBER( thomson_state::mo5_sys_porta_out )
 
 
 
-READ8_MEMBER( thomson_state::mo5_sys_porta_in )
+uint8_t thomson_state::mo5_sys_porta_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return
 		(mo5_get_cassette() ? 0x80 : 0) |     /* bit 7: cassette input */
@@ -1412,7 +1412,7 @@ READ8_MEMBER( thomson_state::mo5_sys_porta_in )
 
 
 
-READ8_MEMBER( thomson_state::mo5_sys_portb_in )
+uint8_t thomson_state::mo5_sys_portb_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t portb = m_pia_sys->b_output();
 	int col = (portb >> 1) & 7;       /* key column */
@@ -1431,7 +1431,7 @@ READ8_MEMBER( thomson_state::mo5_sys_portb_in )
 
 
 
-READ8_MEMBER( thomson_state::mo5_gatearray_r )
+uint8_t thomson_state::mo5_gatearray_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	struct thom_vsignal v = thom_get_vsignal();
 	struct thom_vsignal l = thom_get_lightpen_vsignal( MO5_LIGHTPEN_DECAL, m_to7_lightpen_step - 1, 0 );
@@ -1454,7 +1454,7 @@ READ8_MEMBER( thomson_state::mo5_gatearray_r )
 
 
 
-WRITE8_MEMBER( thomson_state::mo5_gatearray_w )
+void thomson_state::mo5_gatearray_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( ! offset )
 		m_to7_lightpen = data & 1;
@@ -1466,7 +1466,7 @@ WRITE8_MEMBER( thomson_state::mo5_gatearray_w )
 
 
 
-DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
+image_init_result thomson_state::device_image_load_mo5_cartridge(device_image_interface &image)
 {
 	uint8_t* pos = memregion("maincpu")->base() + 0x10000;
 	uint64_t size, i;
@@ -1616,7 +1616,7 @@ void thomson_state::mo5_update_cart_bank_postload()
 
 
 /* write signal to b000-cfff generates a bank switch */
-WRITE8_MEMBER( thomson_state::mo5_cartridge_w )
+void thomson_state::mo5_cartridge_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( offset >= 0x2000 )
 		return;
@@ -1628,7 +1628,7 @@ WRITE8_MEMBER( thomson_state::mo5_cartridge_w )
 
 
 /* read signal to bffc-bfff generates a bank switch */
-READ8_MEMBER( thomson_state::mo5_cartridge_r )
+uint8_t thomson_state::mo5_cartridge_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + 0xbffc + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
@@ -1643,7 +1643,7 @@ READ8_MEMBER( thomson_state::mo5_cartridge_r )
 
 
 /* 0xa7cb bank-switch register */
-WRITE8_MEMBER( thomson_state::mo5_ext_w )
+void thomson_state::mo5_ext_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mo5_reg_cart = data;
 	mo5_update_cart_bank();
@@ -1655,7 +1655,7 @@ WRITE8_MEMBER( thomson_state::mo5_ext_w )
 
 
 
-MACHINE_RESET_MEMBER( thomson_state, mo5 )
+void thomson_state::machine_reset_mo5()
 {
 	LOG (( "mo5: machine reset called\n" ));
 
@@ -1688,7 +1688,7 @@ MACHINE_RESET_MEMBER( thomson_state, mo5 )
 
 
 
-MACHINE_START_MEMBER( thomson_state, mo5 )
+void thomson_state::machine_start_mo5()
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();
@@ -1739,14 +1739,14 @@ MACHINE_START_MEMBER( thomson_state, mo5 )
 
 
 
-WRITE8_MEMBER( thomson_state::to9_ieee_w )
+void thomson_state::to9_ieee_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror( "$%04x %f to9_ieee_w: unhandled write $%02X to register %i\n", m_maincpu->pc(), machine().time().as_double(), data, offset );
 }
 
 
 
-READ8_MEMBER( thomson_state::to9_ieee_r )
+uint8_t thomson_state::to9_ieee_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror( "$%04x %f to9_ieee_r: unhandled read from register %i\n", m_maincpu->pc(), machine().time().as_double(), offset );
 	return 0;
@@ -1762,7 +1762,7 @@ READ8_MEMBER( thomson_state::to9_ieee_r )
 
 
 
-READ8_MEMBER( thomson_state::to9_gatearray_r )
+uint8_t thomson_state::to9_gatearray_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	struct thom_vsignal v = thom_get_vsignal();
 	struct thom_vsignal l = thom_get_lightpen_vsignal( TO9_LIGHTPEN_DECAL, m_to7_lightpen_step - 1, 0 );
@@ -1786,7 +1786,7 @@ READ8_MEMBER( thomson_state::to9_gatearray_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to9_gatearray_w )
+void thomson_state::to9_gatearray_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( ! offset )
 		m_to7_lightpen = data & 1;
@@ -1849,7 +1849,7 @@ void thomson_state::to9_set_video_mode( uint8_t data, int style )
 
 
 
-READ8_MEMBER( thomson_state::to9_vreg_r )
+uint8_t thomson_state::to9_vreg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch ( offset )
 	{
@@ -1878,7 +1878,7 @@ READ8_MEMBER( thomson_state::to9_vreg_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to9_vreg_w )
+void thomson_state::to9_vreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_VIDEO(( "$%04x %f to9_vreg_w: off=%i ($%04X) data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), offset, 0xe7da + offset, data ));
 
@@ -2015,7 +2015,7 @@ void thomson_state::to9_update_cart_bank_postload()
 
 
 /* write signal to 0000-1fff generates a bank switch */
-WRITE8_MEMBER( thomson_state::to9_cartridge_w )
+void thomson_state::to9_cartridge_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int slot = ( m_mc6846->get_output_port() >> 4 ) & 3; /* bits 4-5: ROM bank */
 
@@ -2032,7 +2032,7 @@ WRITE8_MEMBER( thomson_state::to9_cartridge_w )
 
 
 /* read signal to 0000-0003 generates a bank switch */
-READ8_MEMBER( thomson_state::to9_cartridge_r )
+uint8_t thomson_state::to9_cartridge_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
@@ -2164,7 +2164,7 @@ void thomson_state::to9_kbd_update_irq()
 
 
 
-READ8_MEMBER( thomson_state::to9_kbd_r )
+uint8_t thomson_state::to9_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* ACIA 6850 registers */
 
@@ -2211,7 +2211,7 @@ READ8_MEMBER( thomson_state::to9_kbd_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to9_kbd_w )
+void thomson_state::to9_kbd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* ACIA 6850 registers */
 
@@ -2442,7 +2442,7 @@ int thomson_state::to9_kbd_get_key()
 
 
 
-TIMER_CALLBACK_MEMBER(thomson_state::to9_kbd_timer_cb)
+void thomson_state::to9_kbd_timer_cb(void *ptr, int32_t param)
 {
 	if ( m_to9_kbd_periph )
 	{
@@ -2543,7 +2543,7 @@ void thomson_state::to9_kbd_init()
 /* afaik, P2-P7 are not connected, so, the warning about undefined 0xf0 can be safely ignored */
 
 
-READ8_MEMBER( thomson_state::to9_sys_porta_in )
+uint8_t thomson_state::to9_sys_porta_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ktest = to9_kbd_ktest();
 
@@ -2554,7 +2554,7 @@ READ8_MEMBER( thomson_state::to9_sys_porta_in )
 
 
 
-WRITE8_MEMBER( thomson_state::to9_sys_porta_out )
+void thomson_state::to9_sys_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics->write_data1(BIT(data, 1));
 	m_centronics->write_data2(BIT(data, 2));
@@ -2567,7 +2567,7 @@ WRITE8_MEMBER( thomson_state::to9_sys_porta_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to9_sys_portb_out )
+void thomson_state::to9_sys_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics->write_data0(BIT(data, 0));
 	m_centronics->write_strobe(BIT(data, 1));
@@ -2584,7 +2584,7 @@ WRITE8_MEMBER( thomson_state::to9_sys_portb_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to9_timer_port_out )
+void thomson_state::to9_timer_port_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	thom_set_mode_point( data & 1 ); /* bit 0: video bank */
 	to9_update_ram_bank();
@@ -2596,7 +2596,7 @@ WRITE8_MEMBER( thomson_state::to9_timer_port_out )
 
 
 
-MACHINE_RESET_MEMBER( thomson_state, to9 )
+void thomson_state::machine_reset_to9()
 {
 	LOG (( "to9: machine reset called\n" ));
 
@@ -2631,7 +2631,7 @@ MACHINE_RESET_MEMBER( thomson_state, to9 )
 
 
 
-MACHINE_START_MEMBER( thomson_state, to9 )
+void thomson_state::machine_start_to9()
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();
@@ -2880,7 +2880,7 @@ void thomson_state::to8_kbd_timer_func()
 
 
 
-TIMER_CALLBACK_MEMBER(thomson_state::to8_kbd_timer_cb)
+void thomson_state::to8_kbd_timer_cb(void *ptr, int32_t param)
 {
 	to8_kbd_timer_func();
 }
@@ -3221,7 +3221,7 @@ void thomson_state::to8_update_cart_bank_postload()
 
 
 /* ROM bank switch */
-WRITE8_MEMBER( thomson_state::to8_cartridge_w )
+void thomson_state::to8_cartridge_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( offset >= 0x2000 )
 		return;
@@ -3237,7 +3237,7 @@ WRITE8_MEMBER( thomson_state::to8_cartridge_w )
 
 
 /* read signal to 0000-0003 generates a bank switch */
-READ8_MEMBER( thomson_state::to8_cartridge_r )
+uint8_t thomson_state::to8_cartridge_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
@@ -3273,7 +3273,7 @@ void thomson_state::to8_floppy_reset()
 
 
 
-READ8_MEMBER( thomson_state::to8_floppy_r )
+uint8_t thomson_state::to8_floppy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( space.debugger_access() )
 		return 0;
@@ -3291,7 +3291,7 @@ READ8_MEMBER( thomson_state::to8_floppy_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_floppy_w )
+void thomson_state::to8_floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_EXT )
 		/* external controller */
@@ -3311,7 +3311,7 @@ WRITE8_MEMBER( thomson_state::to8_floppy_w )
 
 
 
-READ8_MEMBER( thomson_state::to8_gatearray_r )
+uint8_t thomson_state::to8_gatearray_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	struct thom_vsignal v = thom_get_vsignal();
 	struct thom_vsignal l = thom_get_lightpen_vsignal( TO8_LIGHTPEN_DECAL, m_to7_lightpen_step - 1, 6 );
@@ -3370,7 +3370,7 @@ READ8_MEMBER( thomson_state::to8_gatearray_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_gatearray_w )
+void thomson_state::to8_gatearray_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_VIDEO(( "$%04x %f to8_gatearray_w: off=%i ($%04X) data=$%02X\n",
 			m_maincpu->pc(), machine().time().as_double(),
@@ -3414,7 +3414,7 @@ WRITE8_MEMBER( thomson_state::to8_gatearray_w )
 
 
 
-READ8_MEMBER( thomson_state::to8_vreg_r )
+uint8_t thomson_state::to8_vreg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* 0xe7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) && ( m_to8_reg_sys1 & 0x80 ) )
@@ -3455,7 +3455,7 @@ READ8_MEMBER( thomson_state::to8_vreg_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_vreg_w )
+void thomson_state::to8_vreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_VIDEO(( "$%04x %f to8_vreg_w: off=%i ($%04X) data=$%02X\n",
 			m_maincpu->pc(), machine().time().as_double(),
@@ -3509,7 +3509,7 @@ WRITE8_MEMBER( thomson_state::to8_vreg_w )
 
 
 
-READ8_MEMBER( thomson_state::to8_sys_porta_in )
+uint8_t thomson_state::to8_sys_porta_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ktest = to8_kbd_ktest();
 
@@ -3520,7 +3520,7 @@ READ8_MEMBER( thomson_state::to8_sys_porta_in )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_sys_portb_out )
+void thomson_state::to8_sys_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics->write_data0(BIT(data, 0));
 	m_centronics->write_strobe(BIT(data, 1));
@@ -3536,12 +3536,12 @@ WRITE8_MEMBER( thomson_state::to8_sys_portb_out )
 /* ------------ 6846 (timer, I/O) ------------ */
 
 
-WRITE_LINE_MEMBER(thomson_state::write_centronics_busy )
+void thomson_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( thomson_state::to8_timer_port_in )
+uint8_t thomson_state::to8_timer_port_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int lightpen = (m_io_lightpen_button->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
@@ -3552,7 +3552,7 @@ READ8_MEMBER( thomson_state::to8_timer_port_in )
 
 
 
-WRITE8_MEMBER( thomson_state::to8_timer_port_out )
+void thomson_state::to8_timer_port_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ack = (data & 0x20) ? 1 : 0;       /* bit 5: keyboard ACK */
 	m_to8_bios_bank = (data & 0x10) ? 1 : 0; /* bit 4: BIOS bank*/
@@ -3566,7 +3566,7 @@ WRITE8_MEMBER( thomson_state::to8_timer_port_out )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to8_timer_cp2_out )
+void thomson_state::to8_timer_cp2_out(int state)
 {
 	/* mute */
 	m_to7_game_mute = state;
@@ -3594,7 +3594,7 @@ void thomson_state::to8_lightpen_cb( int step )
 
 
 
-MACHINE_RESET_MEMBER( thomson_state, to8 )
+void thomson_state::machine_reset_to8()
 {
 	LOG (( "to8: machine reset called\n" ));
 
@@ -3642,7 +3642,7 @@ MACHINE_RESET_MEMBER( thomson_state, to8 )
 
 
 
-MACHINE_START_MEMBER( thomson_state, to8 )
+void thomson_state::machine_start_to8()
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();
@@ -3724,7 +3724,7 @@ MACHINE_START_MEMBER( thomson_state, to8 )
 
 
 
-READ8_MEMBER( thomson_state::to9p_timer_port_in )
+uint8_t thomson_state::to9p_timer_port_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int lightpen = (m_io_lightpen_button->read() & 1) ? 2 : 0;
 	int cass = to7_get_cassette() ? 0x80 : 0;
@@ -3734,7 +3734,7 @@ READ8_MEMBER( thomson_state::to9p_timer_port_in )
 
 
 
-WRITE8_MEMBER( thomson_state::to9p_timer_port_out )
+void thomson_state::to9p_timer_port_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bios_bank = (data & 0x10) ? 1 : 0; /* bit 4: BIOS bank */
 	thom_set_mode_point( data & 1 );       /* bit 0: video bank switch */
@@ -3746,7 +3746,7 @@ WRITE8_MEMBER( thomson_state::to9p_timer_port_out )
 
 /* ------------ init / reset ------------ */
 
-MACHINE_RESET_MEMBER( thomson_state, to9p )
+void thomson_state::machine_reset_to9p()
 {
 	LOG (( "to9p: machine reset called\n" ));
 
@@ -3793,7 +3793,7 @@ MACHINE_RESET_MEMBER( thomson_state, to9p )
 
 
 
-MACHINE_START_MEMBER( thomson_state, to9p )
+void thomson_state::machine_start_to9p()
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();
@@ -4099,7 +4099,7 @@ void thomson_state::mo6_update_cart_bank_postload()
 
 
 /* write signal generates a bank switch */
-WRITE8_MEMBER( thomson_state::mo6_cartridge_w )
+void thomson_state::mo6_cartridge_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( offset >= 0x2000 )
 		return;
@@ -4111,7 +4111,7 @@ WRITE8_MEMBER( thomson_state::mo6_cartridge_w )
 
 
 /* read signal generates a bank switch */
-READ8_MEMBER( thomson_state::mo6_cartridge_r )
+uint8_t thomson_state::mo6_cartridge_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t* pos = memregion( "maincpu" )->base() + 0x10000;
 	uint8_t data = pos[offset + 0xbffc + (m_thom_cart_bank % m_thom_cart_nb_banks) * 0x4000];
@@ -4125,7 +4125,7 @@ READ8_MEMBER( thomson_state::mo6_cartridge_r )
 
 
 
-WRITE8_MEMBER( thomson_state::mo6_ext_w )
+void thomson_state::mo6_ext_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* MO5 network extension compatible */
 	m_mo5_reg_cart = data;
@@ -4139,13 +4139,13 @@ WRITE8_MEMBER( thomson_state::mo6_ext_w )
 /* similar to SX 90-018, but with a few differences: mute, printer */
 
 
-WRITE_LINE_MEMBER( thomson_state::mo6_centronics_busy )
+void thomson_state::mo6_centronics_busy(int state)
 {
 	m_pia_game->cb1_w(state);
 }
 
 
-WRITE8_MEMBER( thomson_state::mo6_game_porta_out )
+void thomson_state::mo6_game_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG (( "$%04x %f mo6_game_porta_out: CENTRONICS set data=$%02X\n", m_maincpu->pc(), machine().time().as_double(), data ));
 
@@ -4155,7 +4155,7 @@ WRITE8_MEMBER( thomson_state::mo6_game_porta_out )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::mo6_game_cb2_out )
+void thomson_state::mo6_game_cb2_out(int state)
 {
 	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", m_maincpu->pc(), machine().time().as_double(), state ));
 
@@ -4165,7 +4165,7 @@ WRITE_LINE_MEMBER( thomson_state::mo6_game_cb2_out )
 
 
 
-TIMER_CALLBACK_MEMBER(thomson_state::mo6_game_update_cb)
+void thomson_state::mo6_game_update_cb(void *ptr, int32_t param)
 {
 	/* unlike the TO8, CB1 & CB2 are not connected to buttons */
 	if ( m_io_config->read() & 1 )
@@ -4211,7 +4211,7 @@ void thomson_state::mo6_game_reset()
 
 
 
-READ8_MEMBER( thomson_state::mo6_sys_porta_in )
+uint8_t thomson_state::mo6_sys_porta_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return
 		(mo5_get_cassette() ? 0x80 : 0) |     /* bit 7: cassette input */
@@ -4222,7 +4222,7 @@ READ8_MEMBER( thomson_state::mo6_sys_porta_in )
 
 
 
-READ8_MEMBER( thomson_state::mo6_sys_portb_in )
+uint8_t thomson_state::mo6_sys_portb_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* keyboard: 9 lines of 8 keys */
 	uint8_t porta = m_pia_sys->a_output();
@@ -4240,7 +4240,7 @@ READ8_MEMBER( thomson_state::mo6_sys_portb_in )
 
 
 
-WRITE8_MEMBER( thomson_state::mo6_sys_porta_out )
+void thomson_state::mo6_sys_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	thom_set_mode_point( data & 1 );                /* bit 0: video bank switch */
 	m_to7_game_mute = data & 4;                       /* bit 2: sound mute */
@@ -4252,7 +4252,7 @@ WRITE8_MEMBER( thomson_state::mo6_sys_porta_out )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::mo6_sys_cb2_out )
+void thomson_state::mo6_sys_cb2_out(int state)
 {
 	/* SCART pin 8 = slow switch (?) */
 	LOG(( "mo6_sys_cb2_out: SCART slow switch set to %i\n", state ));
@@ -4266,7 +4266,7 @@ WRITE_LINE_MEMBER( thomson_state::mo6_sys_cb2_out )
 
 
 
-READ8_MEMBER( thomson_state::mo6_gatearray_r )
+uint8_t thomson_state::mo6_gatearray_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	struct thom_vsignal v = thom_get_vsignal();
 	struct thom_vsignal l = thom_get_lightpen_vsignal( MO6_LIGHTPEN_DECAL, m_to7_lightpen_step - 1, 6 );
@@ -4325,7 +4325,7 @@ READ8_MEMBER( thomson_state::mo6_gatearray_r )
 
 
 
-WRITE8_MEMBER( thomson_state::mo6_gatearray_w )
+void thomson_state::mo6_gatearray_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_VIDEO(( "$%04x %f mo6_gatearray_w: off=%i ($%04X) data=$%02X\n",
 			m_maincpu->pc(), machine().time().as_double(),
@@ -4366,7 +4366,7 @@ WRITE8_MEMBER( thomson_state::mo6_gatearray_w )
 
 
 
-READ8_MEMBER( thomson_state::mo6_vreg_r )
+uint8_t thomson_state::mo6_vreg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* 0xa7dc from external floppy drive aliases the video gate-array */
 	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) )
@@ -4393,7 +4393,7 @@ READ8_MEMBER( thomson_state::mo6_vreg_r )
 
 
 
-WRITE8_MEMBER( thomson_state::mo6_vreg_w )
+void thomson_state::mo6_vreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_VIDEO(( "$%04x %f mo6_vreg_w: off=%i ($%04X) data=$%02X\n",
 			m_maincpu->pc(), machine().time().as_double(),
@@ -4437,7 +4437,7 @@ WRITE8_MEMBER( thomson_state::mo6_vreg_w )
 
 
 
-MACHINE_RESET_MEMBER( thomson_state, mo6 )
+void thomson_state::machine_reset_mo6()
 {
 	LOG (( "mo6: machine reset called\n" ));
 
@@ -4479,7 +4479,7 @@ MACHINE_RESET_MEMBER( thomson_state, mo6 )
 
 
 
-MACHINE_START_MEMBER( thomson_state, mo6 )
+void thomson_state::machine_start_mo6()
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();
@@ -4550,7 +4550,7 @@ MACHINE_START_MEMBER( thomson_state, mo6 )
 
 
 
-READ8_MEMBER( thomson_state::mo5nr_net_r )
+uint8_t thomson_state::mo5nr_net_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( space.debugger_access() )
 		return 0;
@@ -4565,7 +4565,7 @@ READ8_MEMBER( thomson_state::mo5nr_net_r )
 
 
 
-WRITE8_MEMBER( thomson_state::mo5nr_net_w )
+void thomson_state::mo5nr_net_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( to7_controller_type )
 		to7_floppy_w ( space, offset, data );
@@ -4582,7 +4582,7 @@ WRITE8_MEMBER( thomson_state::mo5nr_net_w )
 */
 
 
-READ8_MEMBER( thomson_state::mo5nr_prn_r )
+uint8_t thomson_state::mo5nr_prn_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -4592,7 +4592,7 @@ READ8_MEMBER( thomson_state::mo5nr_prn_r )
 }
 
 
-WRITE8_MEMBER( thomson_state::mo5nr_prn_w )
+void thomson_state::mo5nr_prn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: understand other bits */
 	m_centronics->write_strobe(BIT(data, 3));
@@ -4604,7 +4604,7 @@ WRITE8_MEMBER( thomson_state::mo5nr_prn_w )
 
 
 
-READ8_MEMBER( thomson_state::mo5nr_sys_portb_in )
+uint8_t thomson_state::mo5nr_sys_portb_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* keyboard: only 8 lines of 8 keys (MO6 has 9 lines) */
 	uint8_t portb = m_pia_sys->b_output();
@@ -4617,7 +4617,7 @@ READ8_MEMBER( thomson_state::mo5nr_sys_portb_in )
 
 
 
-WRITE8_MEMBER( thomson_state::mo5nr_sys_porta_out )
+void thomson_state::mo5nr_sys_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* no keyboard LED */
 	thom_set_mode_point( data & 1 );           /* bit 0: video bank switch */
@@ -4661,7 +4661,7 @@ void thomson_state::mo5nr_game_reset()
 
 
 
-MACHINE_RESET_MEMBER( thomson_state, mo5nr )
+void thomson_state::machine_reset_mo5nr()
 {
 	LOG (( "mo5nr: machine reset called\n" ));
 
@@ -4703,7 +4703,7 @@ MACHINE_RESET_MEMBER( thomson_state, mo5nr )
 
 
 
-MACHINE_START_MEMBER( thomson_state, mo5nr )
+void thomson_state::machine_start_mo5nr()
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	uint8_t* ram = m_ram->pointer();

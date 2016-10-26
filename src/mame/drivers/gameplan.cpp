@@ -89,7 +89,7 @@ TODO:
  *
  *************************************/
 
-WRITE8_MEMBER(gameplan_state::io_select_w)
+void gameplan_state::io_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -103,7 +103,7 @@ WRITE8_MEMBER(gameplan_state::io_select_w)
 }
 
 
-READ8_MEMBER(gameplan_state::io_port_r)
+uint8_t gameplan_state::io_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
 
@@ -111,7 +111,7 @@ READ8_MEMBER(gameplan_state::io_port_r)
 }
 
 
-WRITE_LINE_MEMBER(gameplan_state::coin_w)
+void gameplan_state::coin_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, ~state & 1);
 }
@@ -124,7 +124,7 @@ WRITE_LINE_MEMBER(gameplan_state::coin_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(gameplan_state::audio_reset_w)
+void gameplan_state::audio_reset_w(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 
@@ -136,13 +136,13 @@ WRITE_LINE_MEMBER(gameplan_state::audio_reset_w)
 }
 
 
-WRITE8_MEMBER(gameplan_state::audio_cmd_w)
+void gameplan_state::audio_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_riot->porta_in_set(data, 0x7f);
 }
 
 
-WRITE_LINE_MEMBER(gameplan_state::audio_trigger_w)
+void gameplan_state::audio_trigger_w(int state)
 {
 	m_riot->porta_in_set(state << 7, 0x80);
 }
@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER(gameplan_state::audio_trigger_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(gameplan_state::r6532_irq)
+void gameplan_state::r6532_irq(int state)
 {
 	m_audiocpu->set_input_line(0, state);
 	if (state == ASSERT_LINE)
@@ -163,7 +163,7 @@ WRITE_LINE_MEMBER(gameplan_state::r6532_irq)
 }
 
 
-WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
+void gameplan_state::r6532_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &progspace = m_maincpu->space(AS_PROGRAM);
 	m_soundlatch->write(progspace, 0, data);
@@ -931,7 +931,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(gameplan_state,gameplan)
+void gameplan_state::machine_start_gameplan()
 {
 	/* register for save states */
 	save_item(NAME(m_current_port));
@@ -945,7 +945,7 @@ MACHINE_START_MEMBER(gameplan_state,gameplan)
 }
 
 
-MACHINE_RESET_MEMBER(gameplan_state,gameplan)
+void gameplan_state::machine_reset_gameplan()
 {
 	m_current_port = 0;
 	m_video_x = 0;

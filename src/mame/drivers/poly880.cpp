@@ -53,7 +53,7 @@ void poly880_state::update_display()
 	}
 }
 
-WRITE8_MEMBER( poly880_state::cldig_w )
+void poly880_state::cldig_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit = data;
 
@@ -81,12 +81,12 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_CHANGED_MEMBER( poly880_state::trigger_reset )
+void poly880_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( poly880_state::trigger_nmi )
+void poly880_state::trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -131,18 +131,18 @@ INPUT_PORTS_END
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( poly880_state::ctc_z0_w )
+void poly880_state::ctc_z0_w(int state)
 {
 	// SEND
 }
 
-WRITE_LINE_MEMBER( poly880_state::ctc_z1_w )
+void poly880_state::ctc_z1_w(int state)
 {
 }
 
 /* Z80-PIO Interface */
 
-WRITE8_MEMBER( poly880_state::pio1_pa_w )
+void poly880_state::pio1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -164,7 +164,7 @@ WRITE8_MEMBER( poly880_state::pio1_pa_w )
 	update_display();
 }
 
-READ8_MEMBER( poly880_state::pio1_pb_r )
+uint8_t poly880_state::pio1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -197,7 +197,7 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( poly880_state::pio1_pb_w )
+void poly880_state::pio1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

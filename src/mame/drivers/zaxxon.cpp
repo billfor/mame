@@ -292,7 +292,7 @@
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
+void zaxxon_state::service_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
@@ -300,14 +300,14 @@ INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 }
 
 
-INTERRUPT_GEN_MEMBER(zaxxon_state::vblank_int)
+void zaxxon_state::vblank_int(device_t &device)
 {
 	if (m_int_enabled)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(zaxxon_state::int_enable_w)
+void zaxxon_state::int_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_int_enabled = data & 1;
 	if (!m_int_enabled)
@@ -338,7 +338,7 @@ void zaxxon_state::machine_start()
  *
  *************************************/
 
-READ8_MEMBER(zaxxon_state::razmataz_counter_r)
+uint8_t zaxxon_state::razmataz_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* this behavior is really unknown; however, the code is using this */
 	/* counter as a sort of timeout when talking to the sound board */
@@ -348,7 +348,7 @@ READ8_MEMBER(zaxxon_state::razmataz_counter_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
+ioport_value zaxxon_state::razmataz_dial_r(ioport_field &field, void *param)
 {
 	int num = (uintptr_t)param;
 	int res;
@@ -379,7 +379,7 @@ CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_coin_counter_w)
+void zaxxon_state::zaxxon_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
@@ -387,7 +387,7 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_coin_counter_w)
 
 // There is no external coin lockout circuitry; instead, the pcb simply latches
 // the coin input, which then needs to be explicitly cleared by the game.
-WRITE8_MEMBER(zaxxon_state::zaxxon_coin_enable_w)
+void zaxxon_state::zaxxon_coin_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_coin_enable[offset] = data & 1;
 	if (!m_coin_enable[offset])
@@ -395,7 +395,7 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_coin_enable_w)
 }
 
 
-INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
+void zaxxon_state::zaxxon_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{
@@ -404,7 +404,7 @@ INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
 }
 
 
-CUSTOM_INPUT_MEMBER(zaxxon_state::zaxxon_coin_r)
+ioport_value zaxxon_state::zaxxon_coin_r(ioport_field &field, void *param)
 {
 	return m_coin_status[(int)(uintptr_t)param];
 }
@@ -1480,7 +1480,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
+void zaxxon_state::init_zaxxonj()
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -1553,7 +1553,7 @@ DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
 
 
 
-DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
+void zaxxon_state::init_razmataz()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 

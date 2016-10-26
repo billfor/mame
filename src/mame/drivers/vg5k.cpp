@@ -85,51 +85,51 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( printer_r );
-	DECLARE_WRITE8_MEMBER( printer_w );
-	DECLARE_WRITE8_MEMBER ( ef9345_offset_w );
-	DECLARE_READ8_MEMBER ( ef9345_io_r );
-	DECLARE_WRITE8_MEMBER ( ef9345_io_w );
-	DECLARE_READ8_MEMBER ( cassette_r );
-	DECLARE_WRITE8_MEMBER ( cassette_w );
-	DECLARE_DRIVER_INIT(vg5k);
-	TIMER_CALLBACK_MEMBER(z80_irq_clear);
-	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
+	uint8_t printer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ef9345_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ef9345_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ef9345_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cassette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_vg5k();
+	void z80_irq_clear(void *ptr, int32_t param);
+	void z80_irq(timer_device &timer, void *ptr, int32_t param);
+	void vg5k_scanline(timer_device &timer, void *ptr, int32_t param);
 };
 
 
-READ8_MEMBER( vg5k_state::printer_r )
+uint8_t vg5k_state::printer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_printer->is_ready() ? 0x00 : 0xff);
 }
 
 
-WRITE8_MEMBER( vg5k_state::printer_w )
+void vg5k_state::printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_printer->output(data);
 }
 
 
-WRITE8_MEMBER ( vg5k_state::ef9345_offset_w )
+void vg5k_state::ef9345_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ef9345_offset = data;
 }
 
 
-READ8_MEMBER ( vg5k_state::ef9345_io_r )
+uint8_t vg5k_state::ef9345_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ef9345->data_r(space, m_ef9345_offset, 0xff);
 }
 
 
-WRITE8_MEMBER ( vg5k_state::ef9345_io_w )
+void vg5k_state::ef9345_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ef9345->data_w(space, m_ef9345_offset, data, 0xff);
 }
 
 
-READ8_MEMBER ( vg5k_state::cassette_r )
+uint8_t vg5k_state::cassette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	double level = m_cassette->input();
 
@@ -137,7 +137,7 @@ READ8_MEMBER ( vg5k_state::cassette_r )
 }
 
 
-WRITE8_MEMBER ( vg5k_state::cassette_w )
+void vg5k_state::cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(BIT(data, 3));
 
@@ -282,20 +282,20 @@ static INPUT_PORTS_START( vg5k )
 INPUT_PORTS_END
 
 
-TIMER_CALLBACK_MEMBER(vg5k_state::z80_irq_clear)
+void vg5k_state::z80_irq_clear(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::z80_irq)
+void vg5k_state::z80_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(vg5k_state::z80_irq_clear),this));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::vg5k_scanline)
+void vg5k_state::vg5k_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ef9345->update_scanline((uint16_t)param);
 }
@@ -329,7 +329,7 @@ static GFXDECODE_START( vg5k )
 	GFXDECODE_ENTRY( "ef9345", 0x2000, vg5k_charlayout, 0, 4 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(vg5k_state,vg5k)
+void vg5k_state::init_vg5k()
 {
 	uint8_t *FNT = memregion("ef9345")->base();
 	uint16_t a,b,c,d,dest=0x2000;

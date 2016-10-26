@@ -100,20 +100,20 @@ Notes:
 #include "sound/3812intf.h"
 #include "includes/toki.h"
 
-WRITE16_MEMBER(toki_state::tokib_soundcommand_w)
+void toki_state::tokib_soundcommand_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-READ16_MEMBER(toki_state::pip_r)
+uint16_t toki_state::pip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ~0;
 }
 
 
 
-WRITE_LINE_MEMBER(toki_state::tokib_adpcm_int)
+void toki_state::tokib_adpcm_int(int state)
 {
 	m_msm->data_w(m_msm5205next);
 	m_msm5205next >>= 4;
@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER(toki_state::tokib_adpcm_int)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(toki_state::tokib_adpcm_control_w)
+void toki_state::tokib_adpcm_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the code writes either 2 or 3 in the bottom two bits */
 	membank("bank1")->set_entry(data & 1);
@@ -131,7 +131,7 @@ WRITE8_MEMBER(toki_state::tokib_adpcm_control_w)
 	m_msm->reset_w(data & 0x08);
 }
 
-WRITE8_MEMBER(toki_state::tokib_adpcm_data_w)
+void toki_state::tokib_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm5205next = data;
 }
@@ -854,7 +854,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(toki_state,toki)
+void toki_state::init_toki()
 {
 	uint8_t *ROM = memregion("oki")->base();
 	std::vector<uint8_t> buffer(0x20000);
@@ -868,7 +868,7 @@ DRIVER_INIT_MEMBER(toki_state,toki)
 }
 
 
-DRIVER_INIT_MEMBER(toki_state,tokib)
+void toki_state::init_tokib()
 {
 	std::vector<uint8_t> temp(65536 * 2);
 	int i, offs, len;
@@ -909,7 +909,7 @@ DRIVER_INIT_MEMBER(toki_state,tokib)
 	save_item(NAME(m_toggle));
 }
 
-DRIVER_INIT_MEMBER(toki_state,jujuba)
+void toki_state::init_jujuba()
 {
 	/* Program ROMs are bitswapped */
 	{

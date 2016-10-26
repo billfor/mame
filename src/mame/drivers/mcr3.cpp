@@ -119,7 +119,7 @@
 
 
 
-WRITE8_MEMBER(mcr3_state::mcrmono_control_port_w)
+void mcr3_state::mcrmono_control_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Bit layout is as follows:
@@ -144,21 +144,21 @@ WRITE8_MEMBER(mcr3_state::mcrmono_control_port_w)
  *
  *************************************/
 
-READ8_MEMBER(mcr3_state::demoderm_ip1_r)
+uint8_t mcr3_state::demoderm_ip1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("MONO.IP1")->read() |
 		(ioport(m_input_mux ? "MONO.IP1.ALT2" : "MONO.IP1.ALT1")->read() << 2);
 }
 
 
-READ8_MEMBER(mcr3_state::demoderm_ip2_r)
+uint8_t mcr3_state::demoderm_ip2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("MONO.IP2")->read() |
 		(ioport(m_input_mux ? "MONO.IP2.ALT2" : "MONO.IP2.ALT1")->read() << 2);
 }
 
 
-WRITE8_MEMBER(mcr3_state::demoderm_op6_w)
+void mcr3_state::demoderm_op6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* top 2 bits select the input */
 	if (data & 0x80) m_input_mux = 0;
@@ -176,13 +176,13 @@ WRITE8_MEMBER(mcr3_state::demoderm_op6_w)
  *
  *************************************/
 
-READ8_MEMBER(mcr3_state::maxrpm_ip1_r)
+uint8_t mcr3_state::maxrpm_ip1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_latched_input;
 }
 
 
-READ8_MEMBER(mcr3_state::maxrpm_ip2_r)
+uint8_t mcr3_state::maxrpm_ip2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* this is a blatant hack, should really do a better implementation */
 	static const uint8_t shift_bits[5] = { 0x00, 0x05, 0x06, 0x01, 0x02 };
@@ -227,7 +227,7 @@ READ8_MEMBER(mcr3_state::maxrpm_ip2_r)
 }
 
 
-WRITE8_MEMBER(mcr3_state::maxrpm_op5_w)
+void mcr3_state::maxrpm_op5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* latch the low 4 bits as input to the ADC0844 */
 	m_maxrpm_adc_control = data & 0x0f;
@@ -237,7 +237,7 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op5_w)
 }
 
 
-WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
+void mcr3_state::maxrpm_op6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char *const inputs[] = { "MONO.IP1", "MONO.IP1.ALT1", "MONO.IP1.ALT2", "MONO.IP1.ALT3" };
 	/*
@@ -280,13 +280,13 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
  *
  *************************************/
 
-READ8_MEMBER(mcr3_state::rampage_ip4_r)
+uint8_t mcr3_state::rampage_ip4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("MONO.IP4")->read() | (m_sounds_good->read(space,0) << 7);
 }
 
 
-WRITE8_MEMBER(mcr3_state::rampage_op6_w)
+void mcr3_state::rampage_op6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 5 controls reset of the Sounds Good board */
 	m_sounds_good->reset_write((~data >> 5) & 1);
@@ -303,13 +303,13 @@ WRITE8_MEMBER(mcr3_state::rampage_op6_w)
  *
  *************************************/
 
-READ8_MEMBER(mcr3_state::powerdrv_ip2_r)
+uint8_t mcr3_state::powerdrv_ip2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("MONO.IP2")->read() | (m_sounds_good->read(space, 0) << 7);
 }
 
 
-WRITE8_MEMBER(mcr3_state::powerdrv_op5_w)
+void mcr3_state::powerdrv_op5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Lamp Board:
@@ -330,7 +330,7 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op5_w)
 }
 
 
-WRITE8_MEMBER(mcr3_state::powerdrv_op6_w)
+void mcr3_state::powerdrv_op6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 5 controls reset of the Sounds Good board */
 	m_sounds_good->reset_write((~data >> 5) & 1);
@@ -347,7 +347,7 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op6_w)
  *
  *************************************/
 
-READ8_MEMBER(mcr3_state::stargrds_ip0_r)
+uint8_t mcr3_state::stargrds_ip0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = ioport("MONO.IP0")->read();
 	if (m_input_mux)
@@ -356,7 +356,7 @@ READ8_MEMBER(mcr3_state::stargrds_ip0_r)
 }
 
 
-WRITE8_MEMBER(mcr3_state::stargrds_op5_w)
+void mcr3_state::stargrds_op5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 1 controls input muxing on port 0 */
 	m_input_mux = (data >> 1) & 1;
@@ -373,7 +373,7 @@ WRITE8_MEMBER(mcr3_state::stargrds_op5_w)
 }
 
 
-WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
+void mcr3_state::stargrds_op6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 6 controls reset of the Sounds Good board */
 	m_sounds_good->reset_write((~data >> 6) & 1);
@@ -390,20 +390,20 @@ WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
  *
  *************************************/
 
-READ8_MEMBER(mcr3_state::spyhunt_ip1_r)
+uint8_t mcr3_state::spyhunt_ip1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("ssio:IP1")->read() | (m_chip_squeak_deluxe->read(space, 0) << 5);
 }
 
 
-READ8_MEMBER(mcr3_state::spyhunt_ip2_r)
+uint8_t mcr3_state::spyhunt_ip2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* multiplexed steering wheel/gas pedal */
 	return ioport(m_input_mux ? "ssio:IP2.ALT" : "ssio:IP2")->read();
 }
 
 
-WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
+void mcr3_state::spyhunt_op4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Spy Hunter uses port 4 for talking to the Chip Squeak Deluxe */
 	/* (and for toggling the lamps and muxing the analog inputs) */
@@ -447,7 +447,7 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
  *
  *************************************/
 
-READ8_MEMBER(mcr3_state::turbotag_ip2_r)
+uint8_t mcr3_state::turbotag_ip2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* multiplexed steering wheel/gas pedal */
 	if (m_input_mux)
@@ -457,7 +457,7 @@ READ8_MEMBER(mcr3_state::turbotag_ip2_r)
 }
 
 
-READ8_MEMBER(mcr3_state::turbotag_kludge_r)
+uint8_t mcr3_state::turbotag_kludge_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* The checksum on the ttprog1.bin ROM seems to be bad by 1 bit */
 	/* The checksum should come out to $82 but it should be $92     */
@@ -1551,7 +1551,7 @@ void mcr3_state::mcr_common_init()
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,demoderm)
+void mcr3_state::init_demoderm()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::demoderm_ip1_r),this));
@@ -1560,14 +1560,14 @@ DRIVER_INIT_MEMBER(mcr3_state,demoderm)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,sarge)
+void mcr3_state::init_sarge()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_chip_squeak_device::write),m_turbo_chip_squeak.target()));
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,maxrpm)
+void mcr3_state::init_maxrpm()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::maxrpm_ip1_r),this));
@@ -1583,7 +1583,7 @@ DRIVER_INIT_MEMBER(mcr3_state,maxrpm)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,rampage)
+void mcr3_state::init_rampage()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x04, read8_delegate(FUNC(mcr3_state::rampage_ip4_r),this));
@@ -1591,7 +1591,7 @@ DRIVER_INIT_MEMBER(mcr3_state,rampage)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,powerdrv)
+void mcr3_state::init_powerdrv()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::powerdrv_ip2_r),this));
@@ -1600,7 +1600,7 @@ DRIVER_INIT_MEMBER(mcr3_state,powerdrv)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,stargrds)
+void mcr3_state::init_stargrds()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(mcr3_state::stargrds_ip0_r),this));
@@ -1609,7 +1609,7 @@ DRIVER_INIT_MEMBER(mcr3_state,stargrds)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
+void mcr3_state::init_spyhunt()
 {
 	mcr_common_init();
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
@@ -1622,7 +1622,7 @@ DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 
 
 
-DRIVER_INIT_MEMBER(mcr3_state,crater)
+void mcr3_state::init_crater()
 {
 	mcr_common_init();
 
@@ -1631,7 +1631,7 @@ DRIVER_INIT_MEMBER(mcr3_state,crater)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,turbotag)
+void mcr3_state::init_turbotag()
 {
 	mcr_common_init();
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));

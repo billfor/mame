@@ -352,7 +352,7 @@ ADDRESS_MAP_END
 **************************************************************************/
 
 // ad stick read select
-READ16_MEMBER(cischeat_state::wildplt_xy_r)
+uint16_t cischeat_state::wildplt_xy_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_ip_select)
 	{
@@ -364,7 +364,7 @@ READ16_MEMBER(cischeat_state::wildplt_xy_r)
 }
 
 // buttons & sensors are muxed. bit 0 routes to coin chute (single according to test mode)
-READ16_MEMBER(cischeat_state::wildplt_mux_r)
+uint16_t cischeat_state::wildplt_mux_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t split_in = 0xffff;
 	switch(m_wildplt_output & 0xc)
@@ -377,7 +377,7 @@ READ16_MEMBER(cischeat_state::wildplt_mux_r)
 	return split_in & ioport("IN1_COMMON")->read();
 }
 
-WRITE16_MEMBER(cischeat_state::wildplt_mux_w)
+void cischeat_state::wildplt_mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_wildplt_output = data & 0xc;
 }
@@ -481,13 +481,13 @@ ADDRESS_MAP_END
     ---- ---- ---- --1-     Up Limit
     ---- ---- ---- ---0     Down Limit  */
 
-READ16_MEMBER(cischeat_state::scudhamm_motor_status_r)
+uint16_t cischeat_state::scudhamm_motor_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_scudhamm_motor_command;    // Motor Status
 }
 
 
-READ16_MEMBER(cischeat_state::scudhamm_motor_pos_r)
+uint16_t cischeat_state::scudhamm_motor_pos_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x00 << 8;
 }
@@ -501,13 +501,13 @@ READ16_MEMBER(cischeat_state::scudhamm_motor_pos_r)
 
     Within $20 vblanks the motor must reach the target. */
 
-WRITE16_MEMBER(cischeat_state::scudhamm_motor_command_w)
+void cischeat_state::scudhamm_motor_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_scudhamm_motor_command );
 }
 
 
-READ16_MEMBER(cischeat_state::scudhamm_analog_r)
+uint16_t cischeat_state::scudhamm_analog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int i=ioport("IN1")->read(),j;
 
@@ -533,7 +533,7 @@ READ16_MEMBER(cischeat_state::scudhamm_analog_r)
     port (coins, tilt, buttons, select etc.) triggers the corresponding bit
     in this word. I mapped the 3 buttons to the first 3 led.
 */
-WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
+void cischeat_state::scudhamm_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -554,12 +554,12 @@ WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
     $FFFC during self test, $FFFF onwards.
     It could be audio(L/R) or layers(0/2) enable.
 */
-WRITE16_MEMBER(cischeat_state::scudhamm_enable_w)
+void cischeat_state::scudhamm_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
 
-WRITE16_MEMBER(cischeat_state::scudhamm_oki_bank_w)
+void cischeat_state::scudhamm_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -594,17 +594,17 @@ ADDRESS_MAP_END
                             Arm Champs II
 **************************************************************************/
 
-READ16_MEMBER(cischeat_state::armchmp2_motor_status_r)
+uint16_t cischeat_state::armchmp2_motor_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x11;
 }
 
-WRITE16_MEMBER(cischeat_state::armchmp2_motor_command_w)
+void cischeat_state::armchmp2_motor_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_scudhamm_motor_command );
 }
 
-READ16_MEMBER(cischeat_state::armchmp2_analog_r)
+uint16_t cischeat_state::armchmp2_analog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int armdelta;
 
@@ -614,7 +614,7 @@ READ16_MEMBER(cischeat_state::armchmp2_analog_r)
 	return ~( m_scudhamm_motor_command + armdelta );    // + x : x<=0 and player loses, x>0 and player wins
 }
 
-READ16_MEMBER(cischeat_state::armchmp2_buttons_r)
+uint16_t cischeat_state::armchmp2_buttons_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int arm_x = ioport("IN1")->read();
 
@@ -635,7 +635,7 @@ READ16_MEMBER(cischeat_state::armchmp2_buttons_r)
     ---- ---- 76-- ----     Coin counters
     ---- ---- --54 3210
 */
-WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
+void cischeat_state::armchmp2_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -679,7 +679,7 @@ ADDRESS_MAP_END
 #define RIGHT 0
 #define LEFT  1
 
-WRITE16_MEMBER(cischeat_state::captflag_leds_w)
+void cischeat_state::captflag_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_captflag_leds );
 	if (ACCESSING_BITS_8_15)
@@ -696,7 +696,7 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 	}
 }
 
-WRITE16_MEMBER(cischeat_state::captflag_oki_bank_w)
+void cischeat_state::captflag_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -707,7 +707,7 @@ WRITE16_MEMBER(cischeat_state::captflag_oki_bank_w)
 
 // Motors
 
-WRITE16_MEMBER(cischeat_state::captflag_motor_command_right_w)
+void cischeat_state::captflag_motor_command_right_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Output check:
 	// e09a up
@@ -717,7 +717,7 @@ WRITE16_MEMBER(cischeat_state::captflag_motor_command_right_w)
 	data = COMBINE_DATA( &m_captflag_motor_command[RIGHT] );
 	captflag_motor_move(RIGHT, data);
 }
-WRITE16_MEMBER(cischeat_state::captflag_motor_command_left_w)
+void cischeat_state::captflag_motor_command_left_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Output check:
 	// e0ba up
@@ -783,13 +783,13 @@ void cischeat_state::captflag_motor_move(int side, uint16_t data)
 	output().set_value((side == RIGHT) ? "right" : "left", pos);
 }
 
-CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_pos_r)
+ioport_value cischeat_state::captflag_motor_pos_r(ioport_field &field, void *param)
 {
 	const uint8_t pos[4] = {1,0,2,3}; // -> 2,3,1,0 offsets -> 0123
 	return ~pos[m_captflag_motor_pos[(uintptr_t)param]];
 }
 
-CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_busy_r)
+ioport_value cischeat_state::captflag_motor_busy_r(ioport_field &field, void *param)
 {
 //  timer_device & dev = ((side == RIGHT) ? m_captflag_motor_right : m_captflag_motor_left);
 //  return (dev.time_left() == attotime::never) ? 0 : 1;
@@ -916,7 +916,7 @@ ADDRESS_MAP_END
                                 Big Run
 **************************************************************************/
 
-WRITE16_MEMBER(cischeat_state::bigrun_soundbank_w)
+void cischeat_state::bigrun_soundbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -940,12 +940,12 @@ ADDRESS_MAP_END
                                 Cisco Heat
 **************************************************************************/
 
-WRITE16_MEMBER(cischeat_state::cischeat_soundbank_1_w)
+void cischeat_state::cischeat_soundbank_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) m_oki1->set_rom_bank(data & 1);
 }
 
-WRITE16_MEMBER(cischeat_state::cischeat_soundbank_2_w)
+void cischeat_state::cischeat_soundbank_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) m_oki2->set_rom_bank(data & 1);
 }
@@ -1885,7 +1885,7 @@ GFXDECODE_END
  irq 1 is comms related, presumably the bridge chip is capable of sending the irq signal at given times. Wild Pilot of course doesn't need it.
  irq 2/4 controls gameplay speed, currently unknown about the timing
  */
-TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
+void cischeat_state::bigrun_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2074,7 +2074,7 @@ MACHINE_CONFIG_END
     4]          == 3
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
+void cischeat_state::scudhamm_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2129,7 +2129,7 @@ MACHINE_CONFIG_END
                             Arm Champs II
 **************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::armchamp2_scanline)
+void cischeat_state::armchamp2_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2161,7 +2161,7 @@ MACHINE_CONFIG_END
     4-7]        rte
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
+void cischeat_state::captflag_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2395,7 +2395,7 @@ ROM_START( bigrun )
 	ROM_LOAD( "br8951b.23",  0x000000, 0x010000, CRC(b9474fec) SHA1(f1f0eab014e8f52572484b83f56189e0ff6f2b0d) ) // 000xxxxxxxxxxxxx
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,bigrun)
+void cischeat_state::init_bigrun()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
 	phantasm_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
@@ -2514,7 +2514,7 @@ ROM_START( cischeat )
 	ROM_LOAD( "ch9072.03",  0x000000, 0x040000, CRC(7e79151a) SHA1(5a305cff8600446be426641ce112208b379094b9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,cischeat)
+void cischeat_state::init_cischeat()
 {
 	cischeat_untangle_sprites("sprites");   // Untangle sprites
 	astyanax_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
@@ -2728,7 +2728,7 @@ ROM_START( f1gpstar )
 	ROM_LOAD( "pr90015b",  0x000000, 0x000100, CRC(be240dac) SHA1(6203b73c1a5e09e525380a78b555c3818929d5eb) )   // FIXED BITS (000xxxxx000xxxx1)
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state,f1gpstar)
+void cischeat_state::init_f1gpstar()
 {
 	cischeat_untangle_sprites("sprites");
 }
@@ -3501,7 +3501,7 @@ ROM_START( captflag )
 	ROM_LOAD( "mr92027-09_w26.ic18", 0x000000, 0x100000, CRC(3aaa332a) SHA1(6c19364069e0b077a07ac4f9c4b0cf0c0985a42a) ) // 1 on the PCB
 ROM_END
 
-DRIVER_INIT_MEMBER(cischeat_state, captflag)
+void cischeat_state::init_captflag()
 {
 	m_oki1_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki1")->base(), 0x20000);
 	m_oki2_bank->configure_entries(0, 0x100000 / 0x20000, memregion("oki2")->base(), 0x20000);

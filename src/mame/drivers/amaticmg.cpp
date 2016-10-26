@@ -440,25 +440,25 @@ public:
 	required_shared_ptr<uint8_t> m_attr;
 	required_shared_ptr<uint8_t> m_vram;
 
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(unk80_w);
+	void rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unk80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(out_a_w);
-	DECLARE_WRITE8_MEMBER(out_c_w);
-	DECLARE_DRIVER_INIT(ama8000_3_o);
-	DECLARE_DRIVER_INIT(ama8000_2_i);
-	DECLARE_DRIVER_INIT(ama8000_2_v);
-	DECLARE_DRIVER_INIT(ama8000_1_x);
+	void out_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_ama8000_3_o();
+	void init_ama8000_2_i();
+	void init_ama8000_2_v();
+	void init_ama8000_1_x();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(amaticmg);
-	DECLARE_PALETTE_INIT(amaticmg2);
+	void palette_init_amaticmg(palette_device &palette);
+	void palette_init_amaticmg2(palette_device &palette);
 	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(amaticmg2_irq);
+	void amaticmg2_irq(device_t &device);
 	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
 	required_device<cpu_device> m_maincpu;
@@ -524,7 +524,7 @@ uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_i
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
+void amaticmg_state::palette_init_amaticmg(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
@@ -551,7 +551,7 @@ PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
 }
 
 
-PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
+void amaticmg_state::palette_init_amaticmg2(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int r, g, b;
@@ -572,17 +572,17 @@ PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
 *       Read/Write Handlers         *
 ************************************/
 
-WRITE8_MEMBER( amaticmg_state::rombank_w )
+void amaticmg_state::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0xf);
 }
 
-WRITE8_MEMBER( amaticmg_state::nmi_mask_w )
+void amaticmg_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = (data & 1) ^ 1;
 }
 
-WRITE8_MEMBER(amaticmg_state::out_a_w)
+void amaticmg_state::out_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  LAMPS A:
 
@@ -602,7 +602,7 @@ WRITE8_MEMBER(amaticmg_state::out_a_w)
 	logerror("port A: %2X\n", data);
 }
 
-WRITE8_MEMBER(amaticmg_state::out_c_w)
+void amaticmg_state::out_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  LAMPS B:
 
@@ -625,7 +625,7 @@ WRITE8_MEMBER(amaticmg_state::out_c_w)
 	logerror("port C: %2X\n", data);
 }
 
-WRITE8_MEMBER( amaticmg_state::unk80_w )
+void amaticmg_state::unk80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_dac->write(BIT(data, 0));       /* Sound DAC */
 }
@@ -865,7 +865,7 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 MACHINE_CONFIG_END
 
 
-INTERRUPT_GEN_MEMBER(amaticmg_state::amaticmg2_irq)
+void amaticmg_state::amaticmg2_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -1078,22 +1078,22 @@ void amaticmg_state::decrypt(int key1, int key2)
 	}
 }
 
-DRIVER_INIT_MEMBER(amaticmg_state,ama8000_1_x)
+void amaticmg_state::init_ama8000_1_x()
 {
 	decrypt(0x4d1, 0xf5);
 }
 
-DRIVER_INIT_MEMBER(amaticmg_state,ama8000_2_i)
+void amaticmg_state::init_ama8000_2_i()
 {
 	decrypt(0x436, 0x55);
 }
 
-DRIVER_INIT_MEMBER(amaticmg_state,ama8000_2_v)
+void amaticmg_state::init_ama8000_2_v()
 {
 	decrypt(0x703, 0xaf);
 }
 
-DRIVER_INIT_MEMBER(amaticmg_state,ama8000_3_o)
+void amaticmg_state::init_ama8000_3_o()
 {
 	decrypt(0x56e, 0xa7);
 }

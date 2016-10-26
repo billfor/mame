@@ -49,18 +49,18 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( dispon_r );
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_WRITE8_MEMBER( memory_w );
-	DECLARE_READ_LINE_MEMBER( wait_r );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( sc_w );
-	DECLARE_WRITE_LINE_MEMBER( da_w );
-	DECLARE_INPUT_CHANGED_MEMBER( input_w );
+	uint8_t dispon_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void memory_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int wait_r();
+	int clear_r();
+	int ef4_r();
+	void q_w(int state);
+	uint8_t dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void da_w(int state);
+	void input_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( elf );
 	// display state

@@ -39,11 +39,11 @@ public:
 		, m_p_ram(*this, "ram")
 	{ }
 
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(mute_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	uint8_t sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mute_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void timer_a(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
@@ -156,22 +156,22 @@ static INPUT_PORTS_START( rowamet )
 INPUT_PORTS_END
 
 
-READ8_MEMBER( rowamet_state::sound_r )
+uint8_t rowamet_state::sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sndcmd;
 }
 
-WRITE8_MEMBER( rowamet_state::mute_w )
+void rowamet_state::mute_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().sound().system_enable(~data);
 }
 
-READ8_MEMBER( rowamet_state::io_r )
+uint8_t rowamet_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_io[offset];
 }
 
-WRITE8_MEMBER( rowamet_state::io_w )
+void rowamet_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io[offset] = data;
 
@@ -195,7 +195,7 @@ void rowamet_state::machine_reset()
 		m_io[i] = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( rowamet_state::timer_a )
+void rowamet_state::timer_a(timer_device &timer, void *ptr, int32_t param)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446
 	m_out_offs &= 15;

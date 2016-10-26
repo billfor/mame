@@ -45,25 +45,25 @@ public:
 	static void set_pf12_16x16_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf12_16x16_gfx_bank = bank; }
 
 
-	DECLARE_WRITE16_MEMBER( pf1_data_w );
-	DECLARE_WRITE16_MEMBER( pf2_data_w );
+	void pf1_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pf2_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER( pf1_data_r );
-	DECLARE_READ16_MEMBER( pf2_data_r );
+	uint16_t pf1_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t pf2_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER( pf_control_w );
+	void pf_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER( pf_control_r );
+	uint16_t pf_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE32_MEMBER( pf1_data_dword_w );
-	DECLARE_WRITE32_MEMBER( pf2_data_dword_w );
+	void pf1_data_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void pf2_data_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER( pf1_data_dword_r );
-	DECLARE_READ32_MEMBER( pf2_data_dword_r );
+	uint32_t pf1_data_dword_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t pf2_data_dword_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER( pf_control_dword_w );
+	void pf_control_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER( pf_control_dword_r );
+	uint32_t pf_control_dword_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	void print_debug_info(bitmap_ind16 &bitmap);
 
@@ -148,11 +148,11 @@ private:
 	int m_pf1_colourmask, m_pf2_colourmask;
 	int m_pf12_8x8_gfx_bank, m_pf12_16x16_gfx_bank;
 
-	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
-	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf2_tile_info_b);
-	TILE_GET_INFO_MEMBER(get_pf1_tile_info_b);
+	tilemap_memory_index deco16_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf2_tile_info_b(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf1_tile_info_b(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

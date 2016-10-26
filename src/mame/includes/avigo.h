@@ -61,34 +61,34 @@ public:
 	void refresh_ints();
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
 
-	DECLARE_WRITE_LINE_MEMBER( tc8521_alarm_int );
-	DECLARE_WRITE_LINE_MEMBER( com_interrupt );
+	void tc8521_alarm_int(int state);
+	void com_interrupt(int state);
 
-	DECLARE_READ8_MEMBER(key_data_read_r);
-	DECLARE_WRITE8_MEMBER(set_key_line_w);
-	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_READ8_MEMBER(irq_r);
-	DECLARE_WRITE8_MEMBER(irq_w);
-	DECLARE_READ8_MEMBER(bank1_r);
-	DECLARE_READ8_MEMBER(bank2_r);
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank2_w);
-	DECLARE_READ8_MEMBER(ad_control_status_r);
-	DECLARE_WRITE8_MEMBER(ad_control_status_w);
-	DECLARE_READ8_MEMBER(ad_data_r);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_READ8_MEMBER(port_04_r);
+	uint8_t key_data_read_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void set_key_line_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bank1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bank2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ad_control_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ad_control_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ad_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_04_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(pen_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(pen_move_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(power_down_irq);
+	void pen_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void pen_move_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void kb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void power_down_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	// defined in video/avigo.c
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(vid_memory_r);
-	DECLARE_WRITE8_MEMBER(vid_memory_w);
+	uint8_t vid_memory_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vid_memory_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// driver state
 	uint8_t               m_key_line;
@@ -103,9 +103,9 @@ public:
 	uint8_t *             m_video_memory;
 	uint8_t               m_screen_column;
 	uint8_t               m_warm_start;
-	DECLARE_PALETTE_INIT(avigo);
-	TIMER_DEVICE_CALLBACK_MEMBER(avigo_scan_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);
+	void palette_init_avigo(palette_device &palette);
+	void avigo_scan_timer(timer_device &timer, void *ptr, int32_t param);
+	void avigo_1hz_timer(timer_device &timer, void *ptr, int32_t param);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( avigo);
 };

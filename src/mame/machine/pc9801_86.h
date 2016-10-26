@@ -32,15 +32,15 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_WRITE8_MEMBER(opn_portb_w);
-	DECLARE_READ8_MEMBER(opn_r);
-	DECLARE_WRITE8_MEMBER(opn_w);
-	DECLARE_READ8_MEMBER(id_r);
-	DECLARE_WRITE8_MEMBER(mask_w);
-	DECLARE_READ8_MEMBER(pcm_r);
-	DECLARE_WRITE8_MEMBER(pcm_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	uint8_t opn_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void opn_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t opn_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void opn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t id_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pcm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_irq(int state);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 protected:
 	// device-level overrides

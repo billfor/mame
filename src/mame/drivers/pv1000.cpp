@@ -19,7 +19,7 @@ class pv1000_sound_device : public device_t,
 public:
 	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(voice_w);
+	void voice_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -85,7 +85,7 @@ void pv1000_sound_device::device_start()
 	save_item(NAME(m_voice[3].val));
 }
 
-WRITE8_MEMBER(pv1000_sound_device::voice_w)
+void pv1000_sound_device::voice_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x03;
 	m_voice[offset].period = data;
@@ -153,9 +153,9 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(gfxram_w);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gfxram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t   m_io_regs[8];
 	uint8_t   m_fd_data;
 
@@ -176,9 +176,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
-	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pv1000_cart );
+	void d65010_irq_on_cb(void *ptr, int32_t param);
+	void d65010_irq_off_cb(void *ptr, int32_t param);
+	image_init_result device_image_load_pv1000_cart(device_image_interface &image);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( pv1000_io, AS_IO, 8, pv1000_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER( pv1000_state::gfxram_w )
+void pv1000_state::gfxram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *gfxram = memregion( "gfxram" )->base();
 
@@ -207,7 +207,7 @@ WRITE8_MEMBER( pv1000_state::gfxram_w )
 }
 
 
-WRITE8_MEMBER( pv1000_state::io_w )
+void pv1000_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -238,7 +238,7 @@ WRITE8_MEMBER( pv1000_state::io_w )
 }
 
 
-READ8_MEMBER( pv1000_state::io_r )
+uint8_t pv1000_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_io_regs[offset];
 
@@ -303,7 +303,7 @@ static INPUT_PORTS_START( pv1000 )
 INPUT_PORTS_END
 
 
-DEVICE_IMAGE_LOAD_MEMBER( pv1000_state, pv1000_cart )
+image_init_result pv1000_state::device_image_load_pv1000_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -352,7 +352,7 @@ uint32_t pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 
 
 /* Interrupt is triggering 16 times during vblank. */
 /* we have chosen to trigger on scanlines 195, 199, 203, 207, 211, 215, 219, 223, 227, 231, 235, 239, 243, 247, 251, 255 */
-TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
+void pv1000_state::d65010_irq_on_cb(void *ptr, int32_t param)
 {
 	int vpos = m_screen->vpos();
 	int next_vpos = vpos + 4;
@@ -373,7 +373,7 @@ TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 }
 
 
-TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_off_cb)
+void pv1000_state::d65010_irq_off_cb(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE );
 }

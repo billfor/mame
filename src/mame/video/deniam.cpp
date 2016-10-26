@@ -25,7 +25,7 @@ void deniam_state::deniam_common_init(  )
 	}
 }
 
-DRIVER_INIT_MEMBER(deniam_state,logicpro)
+void deniam_state::init_logicpro()
 {
 	deniam_common_init();
 
@@ -35,7 +35,7 @@ DRIVER_INIT_MEMBER(deniam_state,logicpro)
 	m_fg_scrolly_offs = 0x000;
 }
 
-DRIVER_INIT_MEMBER(deniam_state,karianx)
+void deniam_state::init_karianx()
 {
 	deniam_common_init();
 
@@ -53,13 +53,13 @@ DRIVER_INIT_MEMBER(deniam_state,karianx)
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(deniam_state::scan_pages)
+tilemap_memory_index deniam_state::scan_pages(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x3f) + ((row & 0x1f) << 6) + ((col & 0x40) << 5) + ((row & 0x20) << 7);
 }
 
-TILE_GET_INFO_MEMBER(deniam_state::get_bg_tile_info)
+void deniam_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int page = tile_index >> 11;
 	uint16_t attr = m_videoram[m_bg_page[page] * 0x0800 + (tile_index & 0x7ff)];
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(deniam_state::get_fg_tile_info)
+void deniam_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int page = tile_index >> 11;
 	uint16_t attr = m_videoram[m_fg_page[page] * 0x0800 + (tile_index & 0x7ff)];
@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(deniam_state::get_tx_tile_info)
+void deniam_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t attr = m_textram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -114,7 +114,7 @@ void deniam_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(deniam_state::deniam_videoram_w)
+void deniam_state::deniam_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int page, i;
 	COMBINE_DATA(&m_videoram[offset]);
@@ -130,14 +130,14 @@ WRITE16_MEMBER(deniam_state::deniam_videoram_w)
 }
 
 
-WRITE16_MEMBER(deniam_state::deniam_textram_w)
+void deniam_state::deniam_textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER(deniam_state::deniam_palette_w)
+void deniam_state::deniam_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r, g, b;
 
@@ -149,12 +149,12 @@ WRITE16_MEMBER(deniam_state::deniam_palette_w)
 	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-READ16_MEMBER(deniam_state::deniam_coinctrl_r)
+uint16_t deniam_state::deniam_coinctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_coinctrl;
 }
 
-WRITE16_MEMBER(deniam_state::deniam_coinctrl_w)
+void deniam_state::deniam_coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_coinctrl);
 

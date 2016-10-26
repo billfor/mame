@@ -19,24 +19,24 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
-READ8_MEMBER(flstory_state::from_snd_r)
+uint8_t flstory_state::from_snd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_snd_flag = 0;
 	return m_snd_data;
 }
 
-READ8_MEMBER(flstory_state::snd_flag_r)
+uint8_t flstory_state::snd_flag_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_snd_flag | 0xfd;
 }
 
-WRITE8_MEMBER(flstory_state::to_main_w)
+void flstory_state::to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_data = data;
 	m_snd_flag = 2;
 }
 
-TIMER_CALLBACK_MEMBER(flstory_state::nmi_callback)
+void flstory_state::nmi_callback(void *ptr, int32_t param)
 {
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -44,19 +44,19 @@ TIMER_CALLBACK_MEMBER(flstory_state::nmi_callback)
 		m_pending_nmi = 1;
 }
 
-WRITE8_MEMBER(flstory_state::sound_command_w)
+void flstory_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(flstory_state::nmi_callback),this), data);
 }
 
 
-WRITE8_MEMBER(flstory_state::nmi_disable_w)
+void flstory_state::nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(flstory_state::nmi_enable_w)
+void flstory_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
+ioport_value flstory_state::victnine_mcu_status_bit01_r(ioport_field &field, void *param)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(flstory_state::rumba_mcu_r)
+uint8_t flstory_state::rumba_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("PC=%04x R %02x\n",space.device().safe_pc(),m_mcu_cmd);
 
@@ -204,7 +204,7 @@ READ8_MEMBER(flstory_state::rumba_mcu_r)
 	return 0;
 }
 
-WRITE8_MEMBER(flstory_state::rumba_mcu_w)
+void flstory_state::rumba_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//if((m_mcu_cmd & 0xf0) == 0xc0)
 	//  printf("%02x ",data);
@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
 ADDRESS_MAP_END
 
 
-MACHINE_RESET_MEMBER(flstory_state,ta7630)
+void flstory_state::machine_reset_ta7630()
 {
 	int i;
 
@@ -384,7 +384,7 @@ MACHINE_RESET_MEMBER(flstory_state,ta7630)
 */
 }
 
-WRITE8_MEMBER(flstory_state::sound_control_0_w)
+void flstory_state::sound_control_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_ctrl0 = data & 0xff;
 	//  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -396,7 +396,7 @@ WRITE8_MEMBER(flstory_state::sound_control_0_w)
 	m_msm->set_output_gain(3, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
 
 }
-WRITE8_MEMBER(flstory_state::sound_control_1_w)
+void flstory_state::sound_control_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_ctrl1 = data & 0xff;
 	//  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -406,7 +406,7 @@ WRITE8_MEMBER(flstory_state::sound_control_1_w)
 	m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
 
-WRITE8_MEMBER(flstory_state::sound_control_2_w)
+void flstory_state::sound_control_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_t *device = machine().device("aysnd");
 	int i;
@@ -420,7 +420,7 @@ WRITE8_MEMBER(flstory_state::sound_control_2_w)
 		sound->set_output_gain(i, m_vol_ctrl[(m_snd_ctrl2 >> 4) & 15] / 100.0); /* ym2149f all */
 }
 
-WRITE8_MEMBER(flstory_state::sound_control_3_w)/* unknown */
+void flstory_state::sound_control_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)/* unknown */
 {
 	m_snd_ctrl3 = data & 0xff;
 	//  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -1008,9 +1008,9 @@ void flstory_state::machine_start()
 	save_item(NAME(m_mcu_select));
 }
 
-MACHINE_RESET_MEMBER(flstory_state,flstory)
+void flstory_state::machine_reset_flstory()
 {
-	MACHINE_RESET_CALL_MEMBER(ta7630);
+	machine_reset_ta7630();
 
 	/* video */
 	m_gfxctrl = 0;
@@ -1231,9 +1231,9 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_RESET_MEMBER(flstory_state,rumba)
+void flstory_state::machine_reset_rumba()
 {
-	MACHINE_RESET_CALL_MEMBER(flstory);
+	machine_reset_flstory();
 	m_mcu_cmd = 0;
 }
 

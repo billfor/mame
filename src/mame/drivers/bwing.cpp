@@ -36,7 +36,7 @@ Known issues:
 //****************************************************************************
 // Interrupt Handlers
 
-INTERRUPT_GEN_MEMBER(bwing_state::bwp3_interrupt)
+void bwing_state::bwp3_interrupt(device_t &device)
 {
 	if (!m_bwp3_nmimask)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -45,23 +45,23 @@ INTERRUPT_GEN_MEMBER(bwing_state::bwp3_interrupt)
 //****************************************************************************
 // Memory and I/O Handlers
 
-WRITE8_MEMBER(bwing_state::bwp3_u8F_w)
+void bwing_state::bwp3_u8F_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bwp3_u8F_d = data;  // prepares custom chip for various operations
 }
 
-WRITE8_MEMBER(bwing_state::bwp3_nmimask_w)
+void bwing_state::bwp3_nmimask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bwp3_nmimask = data & 0x80;
 }
 
-WRITE8_MEMBER(bwing_state::bwp3_nmiack_w)
+void bwing_state::bwp3_nmiack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(bwing_state::bwp1_ctrl_w)
+void bwing_state::bwp1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -100,7 +100,7 @@ WRITE8_MEMBER(bwing_state::bwp1_ctrl_w)
 }
 
 
-WRITE8_MEMBER(bwing_state::bwp2_ctrl_w)
+void bwing_state::bwp2_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -174,12 +174,12 @@ ADDRESS_MAP_END
 //****************************************************************************
 // I/O Port Maps
 
-INPUT_CHANGED_MEMBER(bwing_state::coin_inserted)
+void bwing_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER(bwing_state::tilt_pressed)
+void bwing_state::tilt_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -548,7 +548,7 @@ ROM_END
 //****************************************************************************
 // Initializations
 
-DRIVER_INIT_MEMBER(bwing_state,bwing)
+void bwing_state::init_bwing()
 {
 	uint8_t *rom = memregion("audiocpu")->base();
 	int j = memregion("audiocpu")->bytes();

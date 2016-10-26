@@ -38,31 +38,31 @@ public:
 	uint32_t m_fg_tile_offset;
 
 	// common
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(D7759_write_port_0_w);
-	DECLARE_WRITE8_MEMBER(D7759_upd_reset_w);
+	void sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void D7759_write_port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void D7759_upd_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// pow and streetsm
-	DECLARE_READ16_MEMBER(pow_fg_videoram_r);
-	DECLARE_WRITE16_MEMBER(pow_fg_videoram_w);
-	DECLARE_WRITE16_MEMBER(pow_flipscreen_w);
-	DECLARE_READ16_MEMBER(control_1_r);
+	uint16_t pow_fg_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pow_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pow_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t control_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	// searchar and ikari3
-	DECLARE_WRITE16_MEMBER(searchar_fg_videoram_w);
-	DECLARE_WRITE16_MEMBER(searchar_flipscreen_w);
-	DECLARE_READ16_MEMBER(protcontrols_r);
-	DECLARE_WRITE16_MEMBER(protection_w);
-	DECLARE_READ16_MEMBER(rotary_1_r);
-	DECLARE_READ16_MEMBER(rotary_2_r);
-	DECLARE_READ16_MEMBER(rotary_lsb_r);
+	void searchar_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void searchar_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t protcontrols_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t rotary_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t rotary_2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t rotary_lsb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_pow_tile_info);
-	TILE_GET_INFO_MEMBER(get_searchar_tile_info);
+	void get_pow_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_searchar_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(searchar);
+	void video_start_searchar();
 	void common_video_start();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

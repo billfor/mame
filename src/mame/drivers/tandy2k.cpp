@@ -64,17 +64,17 @@ void tandy2k_state::speaker_update()
 	m_speaker->level_w(level);
 }
 
-READ8_MEMBER( tandy2k_state::char_ram_r )
+uint8_t tandy2k_state::char_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_char_ram[offset];
 }
 
-WRITE8_MEMBER( tandy2k_state::char_ram_w )
+void tandy2k_state::char_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_char_ram[offset] = data;
 }
 
-READ8_MEMBER( tandy2k_state::videoram_r )
+uint8_t tandy2k_state::videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -90,7 +90,7 @@ READ8_MEMBER( tandy2k_state::videoram_r )
 	return data & 0xff;
 }
 
-READ8_MEMBER( tandy2k_state::enable_r )
+uint8_t tandy2k_state::enable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -115,7 +115,7 @@ READ8_MEMBER( tandy2k_state::enable_r )
 	return data;
 }
 
-WRITE8_MEMBER( tandy2k_state::enable_w )
+void tandy2k_state::enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -165,7 +165,7 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 	m_maincpu->tmrin1_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER( tandy2k_state::dma_mux_w )
+void tandy2k_state::dma_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -202,7 +202,7 @@ WRITE8_MEMBER( tandy2k_state::dma_mux_w )
 	update_drq();
 }
 
-READ8_MEMBER( tandy2k_state::kbint_clr_r )
+uint8_t tandy2k_state::kbint_clr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_pb_sel == KBDINEN)
 	{
@@ -215,7 +215,7 @@ READ8_MEMBER( tandy2k_state::kbint_clr_r )
 	return 0xff;
 }
 
-READ16_MEMBER( tandy2k_state::vpac_r )
+uint16_t tandy2k_state::vpac_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -227,7 +227,7 @@ READ16_MEMBER( tandy2k_state::vpac_r )
 	}
 }
 
-WRITE16_MEMBER( tandy2k_state::vpac_w )
+void tandy2k_state::vpac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -239,7 +239,7 @@ WRITE16_MEMBER( tandy2k_state::vpac_w )
 	}
 }
 
-READ8_MEMBER( tandy2k_state::fldtc_r )
+uint8_t tandy2k_state::fldtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("FLDTC\n");
 
@@ -248,13 +248,13 @@ READ8_MEMBER( tandy2k_state::fldtc_r )
 	return 0;
 }
 
-WRITE8_MEMBER( tandy2k_state::fldtc_w )
+void tandy2k_state::fldtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->tc_w(1);
 	m_fdc->tc_w(false);
 }
 
-WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
+void tandy2k_state::addr_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -381,7 +381,7 @@ uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::vpac_vlt_w )
+void tandy2k_state::vpac_vlt_w(int state)
 {
 	m_drb0->ren_w(state);
 	m_drb0->clrcnt_w(state);
@@ -390,43 +390,43 @@ WRITE_LINE_MEMBER( tandy2k_state::vpac_vlt_w )
 	m_drb1->clrcnt_w(state);
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::vpac_drb_w )
+void tandy2k_state::vpac_drb_w(int state)
 {
 	m_drb0->tog_w(state);
 	m_drb1->tog_w(state);
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::vpac_wben_w )
+void tandy2k_state::vpac_wben_w(int state)
 {
 	m_drb0->wen1_w(state);
 	m_drb1->wen1_w(state);
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::vpac_cblank_w )
+void tandy2k_state::vpac_cblank_w(int state)
 {
 	m_cblank = state;
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::vpac_slg_w )
+void tandy2k_state::vpac_slg_w(int state)
 {
 	m_slg = state;
 
 	m_vac->slg_w(state);
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::vpac_sld_w )
+void tandy2k_state::vpac_sld_w(int state)
 {
 	m_sld = state;
 
 	m_vac->sld_w(state);
 }
 
-WRITE8_MEMBER( tandy2k_state::vidla_w )
+void tandy2k_state::vidla_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vidla = data;
 }
 
-WRITE8_MEMBER( tandy2k_state::drb_attr_w )
+void tandy2k_state::drb_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -465,7 +465,7 @@ CRT9021_DRAW_CHARACTER_MEMBER( tandy2k_state::vac_draw_character )
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( tandy2k_state::vidldsh_tick )
+void tandy2k_state::vidldsh_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_drb0->rclk_w(0);
 	m_drb0->wclk_w(0);
@@ -504,13 +504,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( tandy2k_state::vidldsh_tick )
 
 // Intel 8251A Interface
 
-WRITE_LINE_MEMBER( tandy2k_state::rxrdy_w )
+void tandy2k_state::rxrdy_w(int state)
 {
 	m_rxrdy = state;
 	m_pic0->ir2_w(m_rxrdy || m_txrdy);
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::txrdy_w )
+void tandy2k_state::txrdy_w(int state)
 {
 	m_txrdy = state;
 	m_pic0->ir2_w(m_rxrdy || m_txrdy);
@@ -518,13 +518,13 @@ WRITE_LINE_MEMBER( tandy2k_state::txrdy_w )
 
 // Intel 8253 Interface
 
-WRITE_LINE_MEMBER( tandy2k_state::outspkr_w )
+void tandy2k_state::outspkr_w(int state)
 {
 	m_outspkr = state;
 	speaker_update();
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::intbrclk_w )
+void tandy2k_state::intbrclk_w(int state)
 {
 	if (!m_extclk)
 	{
@@ -533,40 +533,40 @@ WRITE_LINE_MEMBER( tandy2k_state::intbrclk_w )
 	}
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::rfrqpulse_w )
+void tandy2k_state::rfrqpulse_w(int state)
 {
 	// memory refresh counter up
 }
 
 // Intel 8255A Interface
 
-WRITE_LINE_MEMBER( tandy2k_state::write_centronics_ack )
+void tandy2k_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 	m_i8255a->pc6_w(state);
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::write_centronics_busy )
+void tandy2k_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::write_centronics_perror )
+void tandy2k_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::write_centronics_select )
+void tandy2k_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::write_centronics_fault )
+void tandy2k_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER( tandy2k_state::ppi_pb_r )
+uint8_t tandy2k_state::ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -618,7 +618,7 @@ READ8_MEMBER( tandy2k_state::ppi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( tandy2k_state::ppi_pc_w )
+void tandy2k_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -676,12 +676,12 @@ WRITE8_MEMBER( tandy2k_state::ppi_pc_w )
 
 // Intel 8272 Interface
 
-WRITE_LINE_MEMBER( tandy2k_state::fdc_drq_w )
+void tandy2k_state::fdc_drq_w(int state)
 {
 	dma_request(0, state);
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::fdc_hdl_w )
+void tandy2k_state::fdc_hdl_w(int state)
 {
 	m_floppy0->mon_w(!state);
 	m_floppy1->mon_w(!state);
@@ -697,7 +697,7 @@ SLOT_INTERFACE_END
 
 // Keyboard
 
-WRITE_LINE_MEMBER( tandy2k_state::kbdclk_w )
+void tandy2k_state::kbdclk_w(int state)
 {
 	if (!m_kbdclk && state)
 	{
@@ -708,7 +708,7 @@ WRITE_LINE_MEMBER( tandy2k_state::kbdclk_w )
 	m_kbdclk = state;
 }
 
-WRITE_LINE_MEMBER( tandy2k_state::kbddat_w )
+void tandy2k_state::kbddat_w(int state)
 {
 	if (!m_kbddat && state)
 	{
@@ -719,7 +719,7 @@ WRITE_LINE_MEMBER( tandy2k_state::kbddat_w )
 	m_kbddat = state;
 }
 
-READ8_MEMBER( tandy2k_state::irq_callback )
+uint8_t tandy2k_state::irq_callback(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (offset ? m_pic1 : m_pic0)->acknowledge();
 }

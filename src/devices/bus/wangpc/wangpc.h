@@ -128,37 +128,37 @@ public:
 	void add_card(device_wangpcbus_card_interface *card, int sid);
 
 	// computer interface
-	DECLARE_READ16_MEMBER( mrdc_r );
-	DECLARE_WRITE16_MEMBER( amwc_w );
+	uint16_t mrdc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void amwc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER( sad_r );
-	DECLARE_WRITE16_MEMBER( sad_w );
+	uint16_t sad_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sad_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint8_t dack_r(address_space &space, int line);
 	void dack_w(address_space &space, int line, uint8_t data);
 
-	DECLARE_READ8_MEMBER( dack0_r ) { return dack_r(space, 0); }
-	DECLARE_WRITE8_MEMBER( dack0_w ) { dack_w(space, 0, data); }
-	DECLARE_READ8_MEMBER( dack1_r ) { return dack_r(space, 1); }
-	DECLARE_WRITE8_MEMBER( dack1_w ) { dack_w(space, 1, data); }
-	DECLARE_READ8_MEMBER( dack2_r ) { return dack_r(space, 2); }
-	DECLARE_WRITE8_MEMBER( dack2_w ) { dack_w(space, 2, data); }
-	DECLARE_READ8_MEMBER( dack3_r ) { return dack_r(space, 3); }
-	DECLARE_WRITE8_MEMBER( dack3_w ) { dack_w(space, 3, data); }
+	uint8_t dack0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return dack_r(space, 0); }
+	void dack0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { dack_w(space, 0, data); }
+	uint8_t dack1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return dack_r(space, 1); }
+	void dack1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { dack_w(space, 1, data); }
+	uint8_t dack2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return dack_r(space, 2); }
+	void dack2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { dack_w(space, 2, data); }
+	uint8_t dack3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return dack_r(space, 3); }
+	void dack3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { dack_w(space, 3, data); }
 
-	DECLARE_WRITE_LINE_MEMBER( tc_w );
+	void tc_w(int state);
 
 	// peripheral interface
-	DECLARE_WRITE_LINE_MEMBER( irq2_w ) { m_write_irq2(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq3_w ) { m_write_irq3(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq4_w ) { m_write_irq4(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq5_w ) { m_write_irq5(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq6_w ) { m_write_irq6(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq7_w ) { m_write_irq7(state); }
-	DECLARE_WRITE_LINE_MEMBER( drq1_w ) { m_write_drq1(state); }
-	DECLARE_WRITE_LINE_MEMBER( drq2_w ) { m_write_drq2(state); }
-	DECLARE_WRITE_LINE_MEMBER( drq3_w ) { m_write_drq3(state); }
-	DECLARE_WRITE_LINE_MEMBER( ioerror_w ) { m_write_ioerror(state); }
+	void irq2_w(int state) { m_write_irq2(state); }
+	void irq3_w(int state) { m_write_irq3(state); }
+	void irq4_w(int state) { m_write_irq4(state); }
+	void irq5_w(int state) { m_write_irq5(state); }
+	void irq6_w(int state) { m_write_irq6(state); }
+	void irq7_w(int state) { m_write_irq7(state); }
+	void drq1_w(int state) { m_write_drq1(state); }
+	void drq2_w(int state) { m_write_drq2(state); }
+	void drq3_w(int state) { m_write_drq3(state); }
+	void ioerror_w(int state) { m_write_ioerror(state); }
 
 protected:
 	// device-level overrides

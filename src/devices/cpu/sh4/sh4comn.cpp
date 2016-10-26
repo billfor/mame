@@ -488,7 +488,7 @@ void sh34_base_device::sh4_refresh_timer_recompute()
 }
 
 
-TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_refresh_timer_callback )
+void sh34_base_device::sh4_refresh_timer_callback(void *ptr, int32_t param)
 {
 	if (m_cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_refresh_timer_callback uses m_m[] with SH3\n");
@@ -603,7 +603,7 @@ void sh34_base_device::increment_rtc_time(int mode)
 		m_m[RYRCNT] = 0;
 }
 
-TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_rtc_timer_callback )
+void sh34_base_device::sh4_rtc_timer_callback(void *ptr, int32_t param)
 {
 	if (m_cpu_type != CPU_TYPE_SH4)
 	{
@@ -662,7 +662,7 @@ void sh34_base_device::sh4_handler_ipra_w(uint32_t data, uint32_t mem_mask)
 }
 
 
-WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
+void sh4_base_device::sh4_internal_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int a;
 	uint32_t addr = (offset << 2) + 0xfe000000;
@@ -889,7 +889,7 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 	}
 }
 
-READ32_MEMBER( sh4_base_device::sh4_internal_r )
+uint32_t sh4_base_device::sh4_internal_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_internal_r uses m_m[] with SH3\n");
@@ -1205,7 +1205,7 @@ uint32_t sh34_base_device::sh4_getsqremap(uint32_t address)
 	return address;
 }
 
-READ64_MEMBER( sh4_base_device::sh4_tlb_r )
+uint64_t sh4_base_device::sh4_tlb_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	int offs = offset*8;
 
@@ -1221,7 +1221,7 @@ READ64_MEMBER( sh4_base_device::sh4_tlb_r )
 	}
 }
 
-WRITE64_MEMBER( sh4_base_device::sh4_tlb_w )
+void sh4_base_device::sh4_tlb_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int offs = offset*8;
 

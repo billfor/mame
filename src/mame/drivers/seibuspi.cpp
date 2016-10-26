@@ -876,7 +876,7 @@ Notes:
 
 /*****************************************************************************/
 
-READ8_MEMBER(seibuspi_state::sound_fifo_status_r)
+uint8_t seibuspi_state::sound_fifo_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0: fifo full flag (z80)
 	// d1: fifo empty flag (main)
@@ -885,27 +885,27 @@ READ8_MEMBER(seibuspi_state::sound_fifo_status_r)
 	return d1 | m_soundfifo1->ff_r();
 }
 
-READ8_MEMBER(seibuspi_state::spi_status_r)
+uint8_t seibuspi_state::spi_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0: unknown status, waits for it to be set, video/dma related?
 	// other bits: unused?
 	return 0x01;
 }
 
-READ8_MEMBER(seibuspi_state::spi_ds2404_unknown_r)
+uint8_t seibuspi_state::spi_ds2404_unknown_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0, d1, d2: unknown, waits for it to be cleared
 	return 0x00;
 }
 
-WRITE8_MEMBER(seibuspi_state::eeprom_w)
+void seibuspi_state::eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_eeprom->di_write((data & 0x80) ? 1 : 0);
 	m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(seibuspi_state::spi_layerbanks_eeprom_w)
+void seibuspi_state::spi_layerbanks_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// low bits: tile banks
 	rf2_layer_bank_w(space, 0, data);
@@ -914,12 +914,12 @@ WRITE8_MEMBER(seibuspi_state::spi_layerbanks_eeprom_w)
 	eeprom_w(space, 0, data);
 }
 
-WRITE8_MEMBER(seibuspi_state::oki_bank_w)
+void seibuspi_state::oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki2->set_rom_bank((data >> 2) & 1);
 }
 
-WRITE8_MEMBER(seibuspi_state::z80_prg_transfer_w)
+void seibuspi_state::z80_prg_transfer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_z80_prg_transfer_pos < m_z80_rom->bytes())
 	{
@@ -928,7 +928,7 @@ WRITE8_MEMBER(seibuspi_state::z80_prg_transfer_w)
 	}
 }
 
-WRITE8_MEMBER(seibuspi_state::z80_enable_w)
+void seibuspi_state::z80_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: reset z80
 	// other bits: unused
@@ -936,7 +936,7 @@ WRITE8_MEMBER(seibuspi_state::z80_enable_w)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ8_MEMBER(seibuspi_state::sb_coin_r)
+uint8_t seibuspi_state::sb_coin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_sb_coin_latch;
 
@@ -944,7 +944,7 @@ READ8_MEMBER(seibuspi_state::sb_coin_r)
 	return ret;
 }
 
-READ32_MEMBER(seibuspi_state::ejsakura_keyboard_r)
+uint32_t seibuspi_state::ejsakura_keyboard_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	// coins/eeprom data
 	uint32_t ret = m_special->read();
@@ -957,7 +957,7 @@ READ32_MEMBER(seibuspi_state::ejsakura_keyboard_r)
 	return ret;
 }
 
-WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
+void seibuspi_state::ejsakura_input_select_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ejsakura_input_port = data;
 }
@@ -1085,7 +1085,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-READ8_MEMBER(seibuspi_state::z80_soundfifo_status_r)
+uint8_t seibuspi_state::z80_soundfifo_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0: fifo full flag (main)
 	// d1: fifo empty flag (z80)
@@ -1094,7 +1094,7 @@ READ8_MEMBER(seibuspi_state::z80_soundfifo_status_r)
 	return d0 | m_soundfifo1->ef_r() << 1;
 }
 
-WRITE8_MEMBER(seibuspi_state::z80_bank_w)
+void seibuspi_state::z80_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d2: bank @ 8000
 	int bank = data & 7;
@@ -1108,7 +1108,7 @@ WRITE8_MEMBER(seibuspi_state::z80_bank_w)
 	// d3: watchdog?
 }
 
-WRITE8_MEMBER(seibuspi_state::spi_coin_w)
+void seibuspi_state::spi_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -1146,7 +1146,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-READ8_MEMBER(seibuspi_state::flashrom_read)
+uint8_t seibuspi_state::flashrom_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset &= 0x1fffff;
 	if (offset < 0x100000)
@@ -1155,7 +1155,7 @@ READ8_MEMBER(seibuspi_state::flashrom_read)
 		return m_soundflash2->read(offset & 0x0fffff);
 }
 
-WRITE8_MEMBER(seibuspi_state::flashrom_write)
+void seibuspi_state::flashrom_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x1fffff;
 	if (offset < 0x100000)
@@ -1164,7 +1164,7 @@ WRITE8_MEMBER(seibuspi_state::flashrom_write)
 		m_soundflash2->write(offset & 0x0fffff, data);
 }
 
-WRITE_LINE_MEMBER(seibuspi_state::ymf_irqhandler)
+void seibuspi_state::ymf_irqhandler(int state)
 {
 	if (state)
 		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, 0xd7); // IRQ is RST10
@@ -1172,7 +1172,7 @@ WRITE_LINE_MEMBER(seibuspi_state::ymf_irqhandler)
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
+ioport_value seibuspi_state::ejanhs_encode(ioport_field &field, void *param)
 {
 	/* E-Jan Highschool has a keyboard with the following keys
 	The keys are encoded with 3 bits for each input port
@@ -1780,12 +1780,12 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-INTERRUPT_GEN_MEMBER(seibuspi_state::spi_interrupt)
+void seibuspi_state::spi_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE); // where is ack?
 }
 
-IRQ_CALLBACK_MEMBER(seibuspi_state::spi_irq_callback)
+int seibuspi_state::spi_irq_callback(device_t &device, int irqline)
 {
 	return 0x20;
 }
@@ -1821,7 +1821,7 @@ void seibuspi_state::machine_start()
 	if (m_z80_rom != nullptr) save_pointer(NAME(m_z80_rom->base()), m_z80_rom->bytes());
 }
 
-MACHINE_RESET_MEMBER(seibuspi_state,spi)
+void seibuspi_state::machine_reset_spi()
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
@@ -1894,7 +1894,7 @@ MACHINE_CONFIG_END
 
 /* single boards */
 
-MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
+void seibuspi_state::machine_reset_sxx2e()
 {
 	membank("bank1")->set_entry(0);
 	m_z80_lastbank = 0;
@@ -1997,7 +1997,7 @@ MACHINE_CONFIG_END
 
 /* SYS386F */
 
-DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
+void seibuspi_state::init_sys386f()
 {
 	int i, j;
 	uint16_t *src = (uint16_t *)memregion("gfx3")->base();
@@ -2051,50 +2051,50 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(seibuspi_state,senkyu)
+void seibuspi_state::init_senkyu()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018cb4, 0x0018cb7, read32_delegate(FUNC(seibuspi_state::senkyu_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,senkyua)
+void seibuspi_state::init_senkyua()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018c9c, 0x0018c9f, read32_delegate(FUNC(seibuspi_state::senkyua_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,batlball)
+void seibuspi_state::init_batlball()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018db4, 0x0018db7, read32_delegate(FUNC(seibuspi_state::batlball_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,viprp1)
+void seibuspi_state::init_viprp1()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001e2e0, 0x001e2e3, read32_delegate(FUNC(seibuspi_state::viprp1_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,viprp1o)
+void seibuspi_state::init_viprp1o()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001d49c, 0x001d49f, read32_delegate(FUNC(seibuspi_state::viprp1o_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,ejanhs)
+void seibuspi_state::init_ejanhs()
 {
 //  idle skip doesn't work properly?
 //  if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32_delegate(FUNC(seibuspi_state::ejanhs_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,rdft)
+void seibuspi_state::init_rdft()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32_delegate(FUNC(seibuspi_state::rdft_speedup_r),this));
 	init_sei252();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,rdft2)
+void seibuspi_state::init_rdft2()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32_delegate(FUNC(seibuspi_state::rf2_speedup_r),this));
 
@@ -2104,7 +2104,7 @@ DRIVER_INIT_MEMBER(seibuspi_state,rdft2)
 	init_spi_common();
 }
 
-DRIVER_INIT_MEMBER(seibuspi_state,rfjet)
+void seibuspi_state::init_rfjet()
 {
 	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32_delegate(FUNC(seibuspi_state::rfjet_speedup_r),this));
 
@@ -2115,21 +2115,21 @@ DRIVER_INIT_MEMBER(seibuspi_state,rfjet)
 }
 
 
-READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
+uint32_t seibuspi_state::senkyu_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (space.device().safe_pc()==0x00305bb2) space.device().execute().spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018cb4/4];
 }
 
-READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
+uint32_t seibuspi_state::senkyua_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (space.device().safe_pc()== 0x30582e) space.device().execute().spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018c9c/4];
 }
 
-READ32_MEMBER(seibuspi_state::batlball_speedup_r)
+uint32_t seibuspi_state::batlball_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  printf("space.device().safe_pc() %06x\n", space.device().safe_pc());
 
@@ -2142,7 +2142,7 @@ READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 	return m_mainram[0x0018db4/4];
 }
 
-READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
+uint32_t seibuspi_state::viprp1_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* viprp1 */
 	if (space.device().safe_pc()==0x0202769) space.device().execute().spin_until_interrupt(); // idle
@@ -2158,7 +2158,7 @@ READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 	return m_mainram[0x001e2e0/4];
 }
 
-READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
+uint32_t seibuspi_state::viprp1o_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* viperp1o */
 	if (space.device().safe_pc()==0x0201f99) space.device().execute().spin_until_interrupt(); // idle
@@ -2168,7 +2168,7 @@ READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 
 #ifdef UNUSED_FUNCTION
 // causes input problems?
-READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
+uint32_t seibuspi_state::ejanhs_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 // osd_printf_debug("%08x\n",space.device().safe_pc());
 	if (space.device().safe_pc()==0x03032c7) space.device().execute().spin_until_interrupt(); // idle
@@ -2176,7 +2176,7 @@ READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 }
 #endif
 
-READ32_MEMBER(seibuspi_state::rdft_speedup_r)
+uint32_t seibuspi_state::rdft_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* rdft */
 	if (space.device().safe_pc()==0x0203f06) space.device().execute().spin_until_interrupt(); // idle
@@ -2204,7 +2204,7 @@ READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 	return m_mainram[0x00298d0/4];
 }
 
-READ32_MEMBER(seibuspi_state::rf2_speedup_r)
+uint32_t seibuspi_state::rf2_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* rdft22kc */
 	if (space.device().safe_pc()==0x0203926) space.device().execute().spin_until_interrupt(); // idle
@@ -2223,7 +2223,7 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 	return m_mainram[0x0282ac/4];
 }
 
-READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
+uint32_t seibuspi_state::rfjet_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* rfjet, rfjetu, rfjeta */
 	if (space.device().safe_pc()==0x0206082) space.device().execute().spin_until_interrupt(); // idle

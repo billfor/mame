@@ -27,7 +27,7 @@ static SLOT_INTERFACE_START( mp1802_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( bml3bus_mp1802_device::bml3_wd17xx_intrq_w )
+void bml3bus_mp1802_device::bml3_wd17xx_intrq_w(int state)
 {
 	if (state) {
 		m_bml3bus->set_nmi_line(PULSE_LINE);
@@ -75,12 +75,12 @@ const tiny_rom_entry *bml3bus_mp1802_device::device_rom_region() const
 	return ROM_NAME( mp1802 );
 }
 
-READ8_MEMBER( bml3bus_mp1802_device::bml3_mp1802_r)
+uint8_t bml3bus_mp1802_device::bml3_mp1802_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->drq_r() ? 0x00 : 0x80;
 }
 
-WRITE8_MEMBER( bml3bus_mp1802_device::bml3_mp1802_w)
+void bml3bus_mp1802_device::bml3_mp1802_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 

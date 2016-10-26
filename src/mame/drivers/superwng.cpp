@@ -69,44 +69,44 @@ public:
 	tilemap_t * m_bg_tilemap;
 	tilemap_t * m_fg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(superwng_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(superwng_sound_interrupt_w);
-	DECLARE_WRITE8_MEMBER(superwng_sound_nmi_clear_w);
-	DECLARE_WRITE8_MEMBER(superwng_bg_vram_w);
-	DECLARE_WRITE8_MEMBER(superwng_bg_cram_w);
-	DECLARE_WRITE8_MEMBER(superwng_fg_vram_w);
-	DECLARE_WRITE8_MEMBER(superwng_fg_cram_w);
-	DECLARE_WRITE8_MEMBER(superwng_tilebank_w);
-	DECLARE_WRITE8_MEMBER(superwng_flip_screen_w);
-	DECLARE_WRITE8_MEMBER(superwng_cointcnt1_w);
-	DECLARE_WRITE8_MEMBER(superwng_cointcnt2_w);
-	DECLARE_WRITE8_MEMBER(superwng_hopper_w);
-	DECLARE_READ8_MEMBER(superwng_sound_byte_r);
-	DECLARE_WRITE8_MEMBER(superwng_unk_a187_w);
-	DECLARE_WRITE8_MEMBER(superwng_unk_a185_w);
+	void superwng_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superwng_sound_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superwng_sound_nmi_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superwng_bg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superwng_bg_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superwng_fg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superwng_fg_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superwng_tilebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superwng_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superwng_cointcnt1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superwng_cointcnt2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superwng_hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t superwng_sound_byte_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void superwng_unk_a187_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superwng_unk_a185_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(superwng);
+	void palette_init_superwng(palette_device &palette);
 	uint32_t screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
-	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
+	void superwng_nmi_interrupt(device_t &device);
+	void superwng_sound_nmi_assert(device_t &device);
 };
 
-WRITE8_MEMBER(superwng_state::superwng_unk_a187_w)
+void superwng_state::superwng_unk_a187_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data&1);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_unk_a185_w)
+void superwng_state::superwng_unk_a185_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("superwng_unk_a185_w %02x\n", data);
 }
 
-TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
+void superwng_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram_bg[tile_index];
 	int attr = m_colorram_bg[tile_index];
@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, flipx|flipy);
 }
 
-TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
+void superwng_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram_fg[tile_index];
 	int attr = m_colorram_fg[tile_index];
@@ -200,7 +200,7 @@ static const uint8_t superwng_colors[]= /* temporary */
 	0x00, 0xc0, 0x07, 0x3f, 0x00, 0x1f, 0x3f, 0xff, 0x00, 0x86, 0x05, 0xff, 0x00, 0xc0, 0xe8, 0xff
 };
 
-PALETTE_INIT_MEMBER(superwng_state, superwng)
+void superwng_state::palette_init_superwng(palette_device &palette)
 {
 	int i;
 	const uint8_t * ptr=superwng_colors;
@@ -228,89 +228,89 @@ PALETTE_INIT_MEMBER(superwng_state, superwng)
 	}
 }
 
-WRITE8_MEMBER(superwng_state::superwng_nmi_enable_w)
+void superwng_state::superwng_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data;
 }
 
-INTERRUPT_GEN_MEMBER(superwng_state::superwng_nmi_interrupt)
+void superwng_state::superwng_nmi_interrupt(device_t &device)
 {
 	if (BIT(m_nmi_enable, 0))
 		nmi_line_pulse(device);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_sound_interrupt_w)
+void superwng_state::superwng_sound_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_byte = data;
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(superwng_state::superwng_sound_byte_r)
+uint8_t superwng_state::superwng_sound_byte_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_sound_byte;
 }
 
-WRITE8_MEMBER(superwng_state::superwng_sound_nmi_clear_w)
+void superwng_state::superwng_sound_nmi_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(superwng_state::superwng_sound_nmi_assert)
+void superwng_state::superwng_sound_nmi_assert(device_t &device)
 {
 	if (BIT(m_nmi_enable, 0))
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_bg_vram_w)
+void superwng_state::superwng_bg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram_bg[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_bg_cram_w)
+void superwng_state::superwng_bg_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram_bg[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_fg_vram_w)
+void superwng_state::superwng_fg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram_fg[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_fg_cram_w)
+void superwng_state::superwng_fg_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram_fg[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_tilebank_w)
+void superwng_state::superwng_tilebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tile_bank = data;
 	m_bg_tilemap->mark_all_dirty();
 	m_fg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(superwng_state::superwng_flip_screen_w)
+void superwng_state::superwng_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 0x01);
 	m_bg_tilemap->mark_all_dirty();
 	m_fg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(superwng_state::superwng_cointcnt1_w)
+void superwng_state::superwng_cointcnt1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_cointcnt2_w)
+void superwng_state::superwng_cointcnt2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(1, data);
 }
 
-WRITE8_MEMBER(superwng_state::superwng_hopper_w)
+void superwng_state::superwng_hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

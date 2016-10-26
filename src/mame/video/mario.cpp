@@ -64,7 +64,7 @@ static const res_net_info mario_net_info_std =
   bit 0 -- 470 ohm resistor -- inverter  -- BLUE
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(mario_state, mario)
+void mario_state::palette_init_mario(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -78,13 +78,13 @@ PALETTE_INIT_MEMBER(mario_state, mario)
 	palette.palette()->normalize_range(0, 255);
 }
 
-WRITE8_MEMBER(mario_state::mario_videoram_w)
+void mario_state::mario_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mario_state::mario_gfxbank_w)
+void mario_state::mario_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_gfx_bank != (data & 0x01))
 	{
@@ -93,7 +93,7 @@ WRITE8_MEMBER(mario_state::mario_gfxbank_w)
 	}
 }
 
-WRITE8_MEMBER(mario_state::mario_palettebank_w)
+void mario_state::mario_palettebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palette_bank != (data & 0x01))
 	{
@@ -102,17 +102,17 @@ WRITE8_MEMBER(mario_state::mario_palettebank_w)
 	}
 }
 
-WRITE8_MEMBER(mario_state::mario_scroll_w)
+void mario_state::mario_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx_scroll = data + 17;
 }
 
-WRITE8_MEMBER(mario_state::mariobl_scroll_w)
+void mario_state::mariobl_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx_scroll = data;
 }
 
-WRITE8_MEMBER(mario_state::mario_flip_w)
+void mario_state::mario_flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_flip != (data & 0x01))
 	{
@@ -125,7 +125,7 @@ WRITE8_MEMBER(mario_state::mario_flip_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(mario_state::get_bg_tile_info)
+void mario_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 256 * m_gfx_bank;
 	int color = 8 + (m_videoram[tile_index] >> 5) + 16 * m_palette_bank;
@@ -260,7 +260,7 @@ uint32_t mario_state::screen_update_common(screen_device &screen, bitmap_ind16 &
 	if (t != m_monitor)
 	{
 		m_monitor = t;
-		PALETTE_INIT_NAME(mario)(*m_palette);
+		palette_init_mario(*m_palette);
 	}
 
 	m_bg_tilemap->set_scrolly(0, m_gfx_scroll);

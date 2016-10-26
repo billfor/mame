@@ -143,20 +143,20 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank6_w);
-	DECLARE_WRITE8_MEMBER(port58_w); // drive select etc
-	DECLARE_WRITE8_MEMBER(port7f_w); // banking 48k
-	DECLARE_READ8_MEMBER(port80_r); // cassin for 48k
-	DECLARE_WRITE8_MEMBER(port80_w); // control port 48k
-	DECLARE_READ8_MEMBER(port82_r); // cassin for 128k
-	DECLARE_WRITE8_MEMBER(port82_w); // banking 128k
-	DECLARE_WRITE8_MEMBER(port84_w); // dac port 48k
-	DECLARE_INPUT_CHANGED_MEMBER(brk_key);
-	DECLARE_MACHINE_RESET(lynx48k);
-	DECLARE_MACHINE_RESET(lynx128k);
-	DECLARE_DRIVER_INIT(lynx48k);
-	DECLARE_DRIVER_INIT(lynx128k);
+	void bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port58_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // drive select etc
+	void port7f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // banking 48k
+	uint8_t port80_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); // cassin for 48k
+	void port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // control port 48k
+	uint8_t port82_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); // cassin for 128k
+	void port82_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // banking 128k
+	void port84_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // dac port 48k
+	void brk_key(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void machine_reset_lynx48k();
+	void machine_reset_lynx128k();
+	void init_lynx48k();
+	void init_lynx128k();
 	DECLARE_FLOPPY_FORMATS(camplynx_floppy_formats);
 	MC6845_UPDATE_ROW(lynx48k_update_row);
 	MC6845_UPDATE_ROW(lynx128k_update_row);
@@ -178,7 +178,7 @@ private:
 	optional_device<floppy_connector> m_floppy1;
 };
 
-WRITE8_MEMBER( camplynx_state::port7f_w )
+void camplynx_state::port7f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
 d0 = write to bank 1
@@ -299,7 +299,7 @@ d7 = read from bank 4 */
 	}
 }
 
-WRITE8_MEMBER( camplynx_state::port82_w )
+void camplynx_state::port82_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Almost the same as the 48k, except the bit order is reversed.
 d7 = write to bank 1
@@ -563,12 +563,12 @@ static INPUT_PORTS_START( lynx48k )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( camplynx_state::brk_key )
+void camplynx_state::brk_key(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER( camplynx_state::bank1_w )
+void camplynx_state::bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(m_wbyte, 0))
 		m_p_ram[offset+0x10000] = data;
@@ -580,7 +580,7 @@ WRITE8_MEMBER( camplynx_state::bank1_w )
 		m_p_ram[offset+0x40000] = data;
 }
 
-WRITE8_MEMBER( camplynx_state::bank6_w )
+void camplynx_state::bank6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(m_wbyte, 0))
 		m_p_ram[offset+0x10000] = data;
@@ -604,7 +604,7 @@ WRITE8_MEMBER( camplynx_state::bank6_w )
 	}
 }
 
-READ8_MEMBER( camplynx_state::port80_r )
+uint8_t camplynx_state::port80_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("LINE0")->read();
 	// when reading tape, bit 0 becomes cass-in signal
@@ -625,7 +625,7 @@ d3 = cass motor on
 d2 = cass enable
 d1 = serial h/s out
 d0 = speaker */
-WRITE8_MEMBER( camplynx_state::port80_w )
+void camplynx_state::port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port80 = data;
 	m_cass->change_state( BIT(data, (m_is_128k) ? 3 : 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -639,7 +639,7 @@ WRITE8_MEMBER( camplynx_state::port80_w )
    MESS can load PALE's wav files though.
    Currently square wave output is selected. */
 
-WRITE8_MEMBER( camplynx_state::port84_w )
+void camplynx_state::port84_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(m_port80, (m_is_128k) ? 3 : 1)) // for 128k, bit 2 might be ok too
 	{
@@ -659,14 +659,14 @@ d7 = clock
 d2 = cass-in
 d1 = serial data in
 d0 = serial h/s in */
-READ8_MEMBER( camplynx_state::port82_r )
+uint8_t camplynx_state::port82_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xfb; // guess
 	data |= (m_cass->input() > +0.02) ? 4 : 0;
 	return data;
 }
 
-MACHINE_RESET_MEMBER(camplynx_state, lynx48k)
+void camplynx_state::machine_reset_lynx48k()
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_port58 = 0;
@@ -675,7 +675,7 @@ MACHINE_RESET_MEMBER(camplynx_state, lynx48k)
 	m_maincpu->reset();
 }
 
-MACHINE_RESET_MEMBER(camplynx_state, lynx128k)
+void camplynx_state::machine_reset_lynx128k()
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_port58 = 0;
@@ -741,7 +741,7 @@ MC6845_UPDATE_ROW( camplynx_state::lynx128k_update_row )
 	}
 }
 
-WRITE8_MEMBER( camplynx_state::port58_w )
+void camplynx_state::port58_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
 d0,d1 = drive select
@@ -878,7 +878,7 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_FRAGMENT_ADD(lynx_disk)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(camplynx_state, lynx48k)
+void camplynx_state::init_lynx48k()
 {
 	m_is_128k = false;
 	m_p_ram = memregion("maincpu")->base();
@@ -892,7 +892,7 @@ DRIVER_INIT_MEMBER(camplynx_state, lynx48k)
 	membank("bankr8")->configure_entries(0, 32, &m_p_ram[0], 0x2000);
 }
 
-DRIVER_INIT_MEMBER(camplynx_state, lynx128k)
+void camplynx_state::init_lynx128k()
 {
 	m_is_128k = true;
 	m_p_ram = memregion("maincpu")->base();

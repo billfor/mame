@@ -52,7 +52,7 @@ void marineb_state::machine_reset()
 	m_marineb_active_low_flipscreen = 0;
 }
 
-MACHINE_RESET_MEMBER(marineb_state,springer)
+void marineb_state::machine_reset_springer()
 {
 	marineb_state::machine_reset();
 
@@ -64,7 +64,7 @@ void marineb_state::machine_start()
 	save_item(NAME(m_marineb_active_low_flipscreen));
 }
 
-WRITE8_MEMBER(marineb_state::irq_mask_w)
+void marineb_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }
@@ -518,13 +518,13 @@ static GFXDECODE_START( hopprobo )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(marineb_state::marineb_vblank_irq)
+void marineb_state::marineb_vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(marineb_state::wanted_vblank_irq)
+void marineb_state::wanted_vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

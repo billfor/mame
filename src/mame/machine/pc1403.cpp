@@ -19,7 +19,7 @@
      bits 0..6 keyboard output select matrix line
 */
 
-WRITE8_MEMBER(pc1403_state::pc1403_asic_write)
+void pc1403_state::pc1403_asic_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_asic[offset>>9]=data;
 	switch( (offset>>9) ){
@@ -38,7 +38,7 @@ WRITE8_MEMBER(pc1403_state::pc1403_asic_write)
 	}
 }
 
-READ8_MEMBER(pc1403_state::pc1403_asic_read)
+uint8_t pc1403_state::pc1403_asic_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data=m_asic[offset>>9];
 	switch( (offset>>9) ){
@@ -49,12 +49,12 @@ READ8_MEMBER(pc1403_state::pc1403_asic_read)
 	return data;
 }
 
-WRITE8_MEMBER(pc1403_state::pc1403_outa)
+void pc1403_state::pc1403_outa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outa=data;
 }
 
-READ8_MEMBER(pc1403_state::pc1403_ina)
+uint8_t pc1403_state::pc1403_ina(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data=m_outa;
 
@@ -110,7 +110,7 @@ READ8_MEMBER(pc1403_state::pc1403_ina)
 }
 
 #if 0
-READ8_MEMBER(pc1403_state::pc1403_inb)
+uint8_t pc1403_state::pc1403_inb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_outb;
 
@@ -121,19 +121,19 @@ READ8_MEMBER(pc1403_state::pc1403_inb)
 }
 #endif
 
-WRITE8_MEMBER(pc1403_state::pc1403_outc)
+void pc1403_state::pc1403_outc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portc = data;
 //    logerror("%g pc %.4x outc %.2x\n", device->machine().time().as_double(), device->m_maincpu->safe_pc(), data);
 }
 
 
-READ_LINE_MEMBER(pc1403_state::pc1403_brk)
+int pc1403_state::pc1403_brk()
 {
 	return (ioport("EXTRA")->read() & 0x01);
 }
 
-READ_LINE_MEMBER(pc1403_state::pc1403_reset)
+int pc1403_state::pc1403_reset()
 {
 	return (ioport("EXTRA")->read() & 0x02);
 }
@@ -159,7 +159,7 @@ void pc1403_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-DRIVER_INIT_MEMBER(pc1403_state,pc1403)
+void pc1403_state::init_pc1403()
 {
 	int i;
 	uint8_t *gfx=memregion("gfx1")->base();

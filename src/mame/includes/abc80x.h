@@ -117,15 +117,15 @@ public:
 	void bankswitch();
 	void clock_cassette(int state);
 
-	DECLARE_READ8_MEMBER( pling_r );
-	DECLARE_WRITE8_MEMBER( hrs_w );
-	DECLARE_WRITE8_MEMBER( hrc_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_txdb_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_dtrb_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_rtsb_w );
+	uint8_t pling_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hrs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hrc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void ctc_z2_w(int state);
+	void sio_txdb_w(int state);
+	void sio_dtrb_w(int state);
+	void sio_rtsb_w(int state);
 
 	// memory state
 	int m_fetch_charram;        // opcode fetched from character RAM region (0x7800-0x7fff)
@@ -171,13 +171,13 @@ public:
 	required_memory_region m_fgctl_prom;
 	required_memory_region m_char_rom;
 
-	DECLARE_DRIVER_INIT(driver_init);
+	void init_driver_init();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
+	offs_t direct_update_handler(direct_read_data &direct, offs_t address);
 	MC6845_UPDATE_ROW( abc800m_update_row );
 };
 
@@ -198,16 +198,16 @@ public:
 	required_device<palette_device> m_palette;
 	required_memory_region m_fgctl_prom;
 
-	DECLARE_DRIVER_INIT(driver_init);
+	void init_driver_init();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	offs_t translate_trom_offset(offs_t offset);
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( char_ram_r );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
-	DECLARE_PALETTE_INIT( abc800c );
+	uint8_t char_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	offs_t direct_update_handler(direct_read_data &direct, offs_t address);
+	void palette_init_abc800c(palette_device &palette);
 };
 
 
@@ -229,7 +229,7 @@ public:
 	required_memory_region m_char_rom;
 	required_ioport m_config;
 
-	DECLARE_DRIVER_INIT(driver_init);
+	void init_driver_init();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -238,11 +238,11 @@ public:
 
 	void bankswitch();
 
-	DECLARE_READ8_MEMBER( pling_r );
-	DECLARE_WRITE_LINE_MEMBER( lrs_w );
-	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
-	DECLARE_WRITE_LINE_MEMBER( vs_w );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
+	uint8_t pling_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lrs_w(int state);
+	void mux80_40_w(int state);
+	void vs_w(int state);
+	offs_t direct_update_handler(direct_read_data &direct, offs_t address);
 	MC6845_UPDATE_ROW( abc802_update_row );
 
 	// cpu state
@@ -279,7 +279,7 @@ public:
 	required_memory_region m_char_rom;
 	optional_shared_ptr<uint8_t> m_attr_ram;
 
-	DECLARE_DRIVER_INIT(driver_init);
+	void init_driver_init();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -289,23 +289,23 @@ public:
 	void bankswitch();
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( mai_r );
-	DECLARE_WRITE8_MEMBER( mao_w );
-	DECLARE_WRITE8_MEMBER( hrs_w );
-	DECLARE_WRITE8_MEMBER( hrc_w );
-	DECLARE_READ8_MEMBER( charram_r );
-	DECLARE_WRITE8_MEMBER( charram_w );
-	DECLARE_READ8_MEMBER( ami_r );
-	DECLARE_WRITE8_MEMBER( amo_w );
-	DECLARE_READ8_MEMBER( cli_r );
-	DECLARE_WRITE8_MEMBER( sso_w );
-	DECLARE_READ8_MEMBER( sti_r );
-	DECLARE_WRITE8_MEMBER( sto_w );
-	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
-	DECLARE_WRITE_LINE_MEMBER( hs_w );
-	DECLARE_WRITE_LINE_MEMBER( vs_w );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
-	DECLARE_PALETTE_INIT( abc806 );
+	uint8_t mai_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mao_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hrs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hrc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t charram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ami_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void amo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cli_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sso_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sti_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sto_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void keydtr_w(int state);
+	void hs_w(int state);
+	void vs_w(int state);
+	offs_t direct_update_handler(direct_read_data &direct, offs_t address);
+	void palette_init_abc806(palette_device &palette);
 	MC6845_UPDATE_ROW( abc806_update_row );
 
 	// memory state

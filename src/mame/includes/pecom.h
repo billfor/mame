@@ -38,23 +38,23 @@ public:
 	/* timers */
 	emu_timer *m_reset_timer;   /* power on reset timer */
 
-	DECLARE_READ8_MEMBER(pecom_cdp1869_charram_r);
-	DECLARE_WRITE8_MEMBER(pecom_cdp1869_charram_w);
-	DECLARE_READ8_MEMBER(pecom_cdp1869_pageram_r);
-	DECLARE_WRITE8_MEMBER(pecom_cdp1869_pageram_w);
-	DECLARE_WRITE8_MEMBER(pecom_bank_w);
-	DECLARE_READ8_MEMBER(pecom_keyboard_r);
-	DECLARE_WRITE8_MEMBER(pecom_cdp1869_w);
+	uint8_t pecom_cdp1869_charram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pecom_cdp1869_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pecom_cdp1869_pageram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pecom_cdp1869_pageram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pecom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pecom_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pecom_cdp1869_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(pecom);
-	DECLARE_INPUT_CHANGED_MEMBER(ef_w);
-	TIMER_CALLBACK_MEMBER(reset_tick);
-	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_READ_LINE_MEMBER(ef2_r);
-	DECLARE_WRITE_LINE_MEMBER(q_w);
-	DECLARE_WRITE8_MEMBER( sc_w );
-	DECLARE_WRITE_LINE_MEMBER(pecom_prd_w);
+	void video_start_pecom();
+	void ef_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void reset_tick(void *ptr, int32_t param);
+	int clear_r();
+	int ef2_r();
+	void q_w(int state);
+	void sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pecom_prd_w(int state);
 	CDP1869_CHAR_RAM_READ_MEMBER(pecom_char_ram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(pecom_char_ram_w);
 	CDP1869_PCB_READ_MEMBER(pecom_pcb_r);

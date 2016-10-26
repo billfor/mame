@@ -293,13 +293,13 @@ void deco16ic_device::device_reset()
 
 /*****************************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(deco16ic_device::deco16_scan_rows)
+tilemap_memory_index deco16ic_device::deco16_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
 }
 
-TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info)
+void deco16ic_device::get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_pf2_data[tile_index];
 	uint8_t colour = (tile >> 12) & 0xf;
@@ -325,7 +325,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info)
+void deco16ic_device::get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_pf1_data[tile_index];
 	uint8_t colour = (tile >> 12) & 0xf;
@@ -364,7 +364,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info)
 	}
 }
 
-TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info_b)
+void deco16ic_device::get_pf2_tile_info_b(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_pf2_data[tile_index];
 	uint8_t colour = (tile >> 12) & 0xf;
@@ -390,7 +390,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info_b)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info_b)
+void deco16ic_device::get_pf1_tile_info_b(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_pf1_data[tile_index];
 	uint8_t colour = (tile >> 12) & 0xf;
@@ -596,7 +596,7 @@ void deco16ic_device::set_enable( int tmap, int enable )
 
 /******************************************************************************/
 
-WRITE16_MEMBER( deco16ic_device::pf1_data_w )
+void deco16ic_device::pf1_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf1_data[offset]);
 
@@ -605,7 +605,7 @@ WRITE16_MEMBER( deco16ic_device::pf1_data_w )
 		m_pf1_tilemap_16x16->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( deco16ic_device::pf2_data_w )
+void deco16ic_device::pf2_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf2_data[offset]);
 
@@ -614,55 +614,55 @@ WRITE16_MEMBER( deco16ic_device::pf2_data_w )
 		m_pf2_tilemap_16x16->mark_tile_dirty(offset);
 }
 
-READ16_MEMBER( deco16ic_device::pf1_data_r )
+uint16_t deco16ic_device::pf1_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pf1_data[offset];
 }
 
-READ16_MEMBER( deco16ic_device::pf2_data_r )
+uint16_t deco16ic_device::pf2_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pf2_data[offset];
 }
 
-WRITE16_MEMBER( deco16ic_device::pf_control_w )
+void deco16ic_device::pf_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 
 	COMBINE_DATA(&m_pf12_control[offset]);
 }
 
-READ16_MEMBER( deco16ic_device::pf_control_r )
+uint16_t deco16ic_device::pf_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pf12_control[offset];
 }
 
 
-READ32_MEMBER( deco16ic_device::pf_control_dword_r )
+uint32_t deco16ic_device::pf_control_dword_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return pf_control_r(space, offset, 0xffff)^0xffff0000;
 }
 
-WRITE32_MEMBER( deco16ic_device::pf_control_dword_w )
+void deco16ic_device::pf_control_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	pf_control_w(space, offset, data & 0xffff, mem_mask & 0xffff);
 }
 
-READ32_MEMBER( deco16ic_device::pf1_data_dword_r )
+uint32_t deco16ic_device::pf1_data_dword_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return pf1_data_r(space, offset, 0xffff)^0xffff0000;
 }
 
-WRITE32_MEMBER( deco16ic_device::pf1_data_dword_w )
+void deco16ic_device::pf1_data_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	pf1_data_w(space, offset, data & 0xffff, mem_mask & 0xffff);
 }
 
-READ32_MEMBER( deco16ic_device::pf2_data_dword_r )
+uint32_t deco16ic_device::pf2_data_dword_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return pf2_data_r(space, offset, 0xffff)^0xffff0000;
 }
 
-WRITE32_MEMBER( deco16ic_device::pf2_data_dword_w )
+void deco16ic_device::pf2_data_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	pf2_data_w(space, offset, data & 0xffff, mem_mask & 0xffff);
 }

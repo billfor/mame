@@ -104,23 +104,23 @@ public:
 	uint8_t m_p2_hopper;
 	uint8_t m_mux_data;
 	required_shared_ptr<uint8_t> m_spriteram;
-	DECLARE_WRITE8_MEMBER(sc0_vram_w);
-	DECLARE_WRITE8_MEMBER(sc0_attr_w);
-	DECLARE_WRITE8_MEMBER(led_array_w);
-	DECLARE_WRITE8_MEMBER(kingdrbb_lamps_w);
-	DECLARE_READ8_MEMBER(hopper_io_r);
-	DECLARE_WRITE8_MEMBER(hopper_io_w);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(outport2_w);
-	DECLARE_READ8_MEMBER(input_mux_r);
-	DECLARE_READ8_MEMBER(key_matrix_r);
-	DECLARE_READ8_MEMBER(sound_cmd_r);
-	DECLARE_WRITE8_MEMBER(outportb_w);
-	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
+	void sc0_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sc0_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void led_array_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kingdrbb_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hopper_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hopper_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void outport2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t key_matrix_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void outportb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_sc0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_sc1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(kingdrby);
-	DECLARE_PALETTE_INIT(kingdrbb);
+	void palette_init_kingdrby(palette_device &palette);
+	void palette_init_kingdrbb(palette_device &palette);
 	uint32_t screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_soundcpu;
@@ -150,7 +150,7 @@ xxxx ---- basic color?
 ---- ---x tile bank
 */
 
-TILE_GET_INFO_MEMBER(kingdrby_state::get_sc0_tile_info)
+void kingdrby_state::get_sc0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_vram[tile_index] | m_attr[tile_index]<<8;
 	int color = (m_attr[tile_index] & 0x06)>>1;
@@ -163,7 +163,7 @@ TILE_GET_INFO_MEMBER(kingdrby_state::get_sc0_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(kingdrby_state::get_sc1_tile_info)
+void kingdrby_state::get_sc1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_vram[tile_index] | m_attr[tile_index]<<8;
 	int color = (m_attr[tile_index] & 0x06)>>1;
@@ -262,7 +262,7 @@ uint32_t kingdrby_state::screen_update_kingdrby(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(kingdrby_state::sc0_vram_w)
+void kingdrby_state::sc0_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
@@ -270,7 +270,7 @@ WRITE8_MEMBER(kingdrby_state::sc0_vram_w)
 	m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingdrby_state::sc0_attr_w)
+void kingdrby_state::sc0_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_attr[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
@@ -286,19 +286,19 @@ WRITE8_MEMBER(kingdrby_state::sc0_attr_w)
 
 /* hopper I/O */
 
-READ8_MEMBER(kingdrby_state::hopper_io_r)
+uint8_t kingdrby_state::hopper_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("HPIO")->read() & 0x3f) | m_p1_hopper | m_p2_hopper;
 }
 
-WRITE8_MEMBER(kingdrby_state::hopper_io_w)
+void kingdrby_state::hopper_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p1_hopper = (data & 0x8)<<3;
 	m_p2_hopper = (data & 0x4)<<5;
 //  printf("%02x\n",data);
 }
 
-WRITE8_MEMBER(kingdrby_state::sound_cmd_w)
+void kingdrby_state::sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	m_sound_cmd = data;
@@ -308,13 +308,13 @@ WRITE8_MEMBER(kingdrby_state::sound_cmd_w)
 
 
 /* No idea about what's this (if it's really a mux etc.)*/
-WRITE8_MEMBER(kingdrby_state::outport2_w)
+void kingdrby_state::outport2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("PPI1 port C(upper) out: %02X", data);
 	m_mux_data = data & 0x80;
 }
 
-READ8_MEMBER(kingdrby_state::input_mux_r)
+uint8_t kingdrby_state::input_mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_mux_data & 0x80)
 		return ioport("MUX0")->read();
@@ -322,7 +322,7 @@ READ8_MEMBER(kingdrby_state::input_mux_r)
 		return ioport("MUX1")->read();
 }
 
-READ8_MEMBER(kingdrby_state::key_matrix_r)
+uint8_t kingdrby_state::key_matrix_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t p1_val,p2_val;
 	uint8_t p1_res,p2_res;
@@ -374,7 +374,7 @@ READ8_MEMBER(kingdrby_state::key_matrix_r)
 	return p1_res | (p2_res<<4);
 }
 
-READ8_MEMBER(kingdrby_state::sound_cmd_r)
+uint8_t kingdrby_state::sound_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_cmd;
 }
@@ -382,7 +382,7 @@ READ8_MEMBER(kingdrby_state::sound_cmd_r)
 static const uint8_t led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
 
-WRITE8_MEMBER(kingdrby_state::led_array_w)
+void kingdrby_state::led_array_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	offset = directly tied with the button (i.e. offset 1 = 1-2, offset 2 = 1-3 etc.)
@@ -429,7 +429,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(kingdrby_state::kingdrbb_lamps_w)
+void kingdrby_state::kingdrbb_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// (same as the inputs but active high)
 }
@@ -480,7 +480,7 @@ static ADDRESS_MAP_START( cowrace_sound_io, AS_IO, 8, kingdrby_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(kingdrby_state::outportb_w)
+void kingdrby_state::outportb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//  printf("%02x B\n",data);
 }
@@ -864,7 +864,7 @@ GFXDECODE_END
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
+void kingdrby_state::palette_init_kingdrby(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
@@ -890,7 +890,7 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
 	}
 }
 
-PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
+void kingdrby_state::palette_init_kingdrbb(palette_device &palette)
 {
 	uint8_t *raw_prom = memregion("raw_prom")->base();
 	uint8_t *prom = memregion("proms")->base();

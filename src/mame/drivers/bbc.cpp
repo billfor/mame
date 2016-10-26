@@ -129,7 +129,7 @@ read:
 &E0-&FF Tube ULA        Tube system interface           32 (32 bytes x  1 ) 2MHz
 ******************************************************************************/
 
-READ8_MEMBER(bbc_state::bbc_fe_r)
+uint8_t bbc_state::bbc_fe_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xfe;
 }
@@ -284,7 +284,7 @@ static ADDRESS_MAP_START(bbcm_mem, AS_PROGRAM, 8, bbc_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
+void bbc_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 	if (newval)
@@ -646,13 +646,13 @@ static INPUT_PORTS_START(bbcbp_links)
 INPUT_PORTS_END
 
 
-INPUT_CHANGED_MEMBER(bbc_state::monitor_changed)
+void bbc_state::monitor_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_monitortype = m_bbcconfig.read_safe(0) &0x03;
 }
 
 
-INPUT_CHANGED_MEMBER(bbc_state::speech_changed)
+void bbc_state::speech_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Switchable during runtime as some games (Hyper Sports, Space Fighter) are not compatible with Speech
 	m_Speech = m_bbcconfig.read_safe(0) & 0x04;
@@ -748,7 +748,7 @@ static INPUT_PORTS_START(ltmpm)
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(bbc_state::bbcb_vsync)
+void bbc_state::bbcb_vsync(device_t &device)
 {
 	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 	via_0->write_ca1(1);
@@ -792,7 +792,7 @@ static SLOT_INTERFACE_START( bbc_floppies_35 )
 SLOT_INTERFACE_END
 
 
-WRITE_LINE_MEMBER(bbc_state::adlc_irq_w)
+void bbc_state::adlc_irq_w(int state)
 {
 	m_adlc_irq = state;
 
@@ -800,7 +800,7 @@ WRITE_LINE_MEMBER(bbc_state::adlc_irq_w)
 }
 
 
-WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
+void bbc_state::econet_clk_w(int state)
 {
 	m_adlc->rxc_w(state);
 	m_adlc->txc_w(state);

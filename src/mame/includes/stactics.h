@@ -50,24 +50,24 @@ public:
 	uint16_t m_old_beam_state;
 	uint16_t m_beam_states_per_frame;
 
-	DECLARE_READ8_MEMBER(vert_pos_r);
-	DECLARE_READ8_MEMBER(horiz_pos_r);
-	DECLARE_WRITE8_MEMBER(coinlockout_w);
-	DECLARE_WRITE8_MEMBER(scroll_ram_w);
-	DECLARE_WRITE8_MEMBER(speed_latch_w);
-	DECLARE_WRITE8_MEMBER(shot_trigger_w);
-	DECLARE_WRITE8_MEMBER(shot_flag_clear_w);
+	uint8_t vert_pos_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t horiz_pos_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void coinlockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void speed_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void shot_trigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void shot_flag_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_frame_count_d3);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_shot_standby);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_not_shot_arrive);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_motor_not_ready);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_rng);
-	INTERRUPT_GEN_MEMBER(interrupt);
+	ioport_value get_frame_count_d3(ioport_field &field, void *param);
+	ioport_value get_shot_standby(ioport_field &field, void *param);
+	ioport_value get_not_shot_arrive(ioport_field &field, void *param);
+	ioport_value get_motor_not_ready(ioport_field &field, void *param);
+	ioport_value get_rng(ioport_field &field, void *param);
+	void interrupt(device_t &device);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(stactics);
+	void palette_init_stactics(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_beam();

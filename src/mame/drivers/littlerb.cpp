@@ -94,13 +94,13 @@ public:
 	uint16_t m_sound_pointer_l,m_sound_pointer_r;
 	int m_soundframe;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(littlerb_frame_step_r);
-	DECLARE_WRITE16_MEMBER(littlerb_l_sound_w);
-	DECLARE_WRITE16_MEMBER(littlerb_r_sound_w);
+	ioport_value littlerb_frame_step_r(ioport_field &field, void *param);
+	void littlerb_l_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void littlerb_r_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t sound_data_shift();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_step_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_cb);
+	void littlerb_sound_step_cb(timer_device &timer, void *ptr, int32_t param);
+	void littlerb_sound_cb(timer_device &timer, void *ptr, int32_t param);
 
 };
 
@@ -112,14 +112,14 @@ uint8_t littlerb_state::sound_data_shift()
 }
 
 /* l is SFX, r is BGM (they doesn't seem to share the same data ROM) */
-WRITE16_MEMBER(littlerb_state::littlerb_l_sound_w)
+void littlerb_state::littlerb_l_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_sound_index_l = (data >> sound_data_shift()) & 0xff;
 	m_sound_pointer_l = 0;
 	//popmessage("%04x %04x",m_sound_index_l,m_sound_index_r);
 }
 
-WRITE16_MEMBER(littlerb_state::littlerb_r_sound_w)
+void littlerb_state::littlerb_r_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_sound_index_r = (data >> sound_data_shift()) & 0xff;
 	m_sound_pointer_r = 0;
@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16, littlerb_state )
 ADDRESS_MAP_END
 
 /* guess according to DASM code and checking the gameplay speed, could be different */
-CUSTOM_INPUT_MEMBER(littlerb_state::littlerb_frame_step_r)
+ioport_value littlerb_state::littlerb_frame_step_r(ioport_field &field, void *param)
 {
 	uint32_t ret = m_soundframe;
 
@@ -230,7 +230,7 @@ static INPUT_PORTS_START( littlerb )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_cb)
+void littlerb_state::littlerb_sound_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t *sample_rom = memregion("samples")->base();
 
@@ -242,7 +242,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_cb)
 	m_sound_pointer_r&=0x3ff;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_step_cb)
+void littlerb_state::littlerb_sound_step_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_soundframe++;
 }

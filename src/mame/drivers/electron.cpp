@@ -86,7 +86,7 @@ static const rgb_t electron_palette[8]=
 	rgb_t(0x000,0x000,0x000)
 };
 
-PALETTE_INIT_MEMBER(electron_state, electron)
+void electron_state::palette_init_electron(palette_device &palette)
 {
 	palette.set_pen_colors(0, electron_palette, ARRAY_LENGTH(electron_palette));
 }
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START(electron_mem, AS_PROGRAM, 8, electron_state )
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                     /* OS ROM continued */
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
+void electron_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 	if (newval)

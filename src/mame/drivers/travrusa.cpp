@@ -574,7 +574,7 @@ ROM_START( shtriderb )
 	ROM_LOAD( "prom2.12.h2",  0x0220, 0x0100, CRC(5db47092) SHA1(8e234ee88143755a4fd5ec86a03b55be5f9c5db8) )
 ROM_END
 
-DRIVER_INIT_MEMBER(travrusa_state,motorace)
+void travrusa_state::init_motorace()
 {
 	int A, j;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -590,7 +590,7 @@ DRIVER_INIT_MEMBER(travrusa_state,motorace)
 	}
 }
 
-DRIVER_INIT_MEMBER(travrusa_state,shtridra)
+void travrusa_state::init_shtridra()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -600,7 +600,7 @@ DRIVER_INIT_MEMBER(travrusa_state,shtridra)
 		rom[A] = BITSWAP8(rom[A],7,5,6,3,4,2,1,0);
 }
 
-READ8_MEMBER(travrusa_state::shtridrb_port11_r)
+uint8_t travrusa_state::shtridrb_port11_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("shtridrb_port11_r %04x\n", space.device().safe_pc());
 	// reads, masks with 0xa8, checks for 0x88, resets game if not happy with value?
@@ -608,7 +608,7 @@ READ8_MEMBER(travrusa_state::shtridrb_port11_r)
 }
 
 
-DRIVER_INIT_MEMBER(travrusa_state, shtridrb)
+void travrusa_state::init_shtridrb()
 {
 	m_maincpu->space(AS_IO).install_read_handler(0x11, 0x11, 0, 0xff00, 0, read8_delegate(FUNC(travrusa_state::shtridrb_port11_r),this));
 }

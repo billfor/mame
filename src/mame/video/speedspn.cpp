@@ -6,7 +6,7 @@
 #include "includes/speedspn.h"
 
 
-TILE_GET_INFO_MEMBER(speedspn_state::get_tile_info)
+void speedspn_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vidram[tile_index*2+1] | (m_vidram[tile_index*2] << 8);
 	int attr = m_attram[tile_index^0x400];
@@ -27,7 +27,7 @@ void speedspn_state::video_start()
 	save_item(NAME(m_vidram));
 }
 
-WRITE8_MEMBER(speedspn_state::vidram_w)
+void speedspn_state::vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vidram[offset + m_bank_vidram] = data;
 
@@ -35,26 +35,26 @@ WRITE8_MEMBER(speedspn_state::vidram_w)
 		m_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(speedspn_state::attram_w)
+void speedspn_state::attram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_attram[offset] = data;
 
 	m_tilemap->mark_tile_dirty(offset^0x400);
 }
 
-READ8_MEMBER(speedspn_state::vidram_r)
+uint8_t speedspn_state::vidram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vidram[offset + m_bank_vidram];
 }
 
-WRITE8_MEMBER(speedspn_state::vidram_bank_w)
+void speedspn_state::vidram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("VidRam Bank: %04x\n", data);
 	m_bank_vidram = data & 1;
 	m_bank_vidram *= 0x1000;
 }
 
-WRITE8_MEMBER(speedspn_state::display_disable_w)
+void speedspn_state::display_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("Global display: %u\n", data);
 	m_display_disable = data & 1;

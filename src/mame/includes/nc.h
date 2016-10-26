@@ -53,45 +53,45 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(nc_memory_management_r);
-	DECLARE_WRITE8_MEMBER(nc_memory_management_w);
-	DECLARE_WRITE8_MEMBER(nc_irq_mask_w);
-	DECLARE_WRITE8_MEMBER(nc_irq_status_w);
-	DECLARE_READ8_MEMBER(nc_irq_status_r);
-	DECLARE_READ8_MEMBER(nc_key_data_in_r);
-	DECLARE_WRITE8_MEMBER(nc_sound_w);
-	DECLARE_WRITE8_MEMBER(nc_uart_control_w);
-	DECLARE_WRITE8_MEMBER(nc100_display_memory_start_w);
-	DECLARE_WRITE8_MEMBER(nc100_uart_control_w);
-	DECLARE_WRITE8_MEMBER(nc100_poweroff_control_w);
-	DECLARE_READ8_MEMBER(nc100_card_battery_status_r);
-	DECLARE_WRITE8_MEMBER(nc100_memory_card_wait_state_w);
-	DECLARE_READ8_MEMBER(nc200_card_battery_status_r);
-	DECLARE_READ8_MEMBER(nc200_printer_status_r);
-	DECLARE_WRITE8_MEMBER(nc200_uart_control_w);
-	DECLARE_WRITE8_MEMBER(nc200_memory_card_wait_state_w);
-	DECLARE_WRITE8_MEMBER(nc200_poweroff_control_w);
+	uint8_t nc_memory_management_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nc_memory_management_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc_irq_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nc_irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t nc_key_data_in_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nc_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc_uart_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc100_display_memory_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc100_uart_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc100_poweroff_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nc100_card_battery_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nc100_memory_card_wait_state_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nc200_card_battery_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t nc200_printer_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nc200_uart_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc200_memory_card_wait_state_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc200_poweroff_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_INIT(nc);
-	DECLARE_MACHINE_START(nc200);
-	DECLARE_MACHINE_RESET(nc200);
+	void palette_init_nc(palette_device &palette);
+	void machine_start_nc200();
+	void machine_reset_nc200();
 	uint32_t screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(nc_keyboard_timer_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(dummy_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(nc100_tc8521_alarm_callback);
-	DECLARE_WRITE_LINE_MEMBER(nc100_txrdy_callback);
-	DECLARE_WRITE_LINE_MEMBER(nc100_rxrdy_callback);
-	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_nc100_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_nc200_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(nc200_txrdy_callback);
-	DECLARE_WRITE_LINE_MEMBER(nc200_rxrdy_callback);
-	DECLARE_WRITE_LINE_MEMBER(nc200_fdc_interrupt);
+	void nc_keyboard_timer_callback(void *ptr, int32_t param);
+	void dummy_timer_callback(timer_device &timer, void *ptr, int32_t param);
+	void nc100_tc8521_alarm_callback(int state);
+	void nc100_txrdy_callback(int state);
+	void nc100_rxrdy_callback(int state);
+	void write_uart_clock(int state);
+	void write_nc100_centronics_ack(int state);
+	void write_nc200_centronics_ack(int state);
+	void write_centronics_busy(int state);
+	void nc200_txrdy_callback(int state);
+	void nc200_rxrdy_callback(int state);
+	void nc200_fdc_interrupt(int state);
 
-	DECLARE_DRIVER_INIT( nc );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
+	void init_nc();
+	image_init_result device_image_load_nc_pcmcia_card(device_image_interface &image);
+	void device_image_unload_nc_pcmcia_card(device_image_interface &image);
 
 protected:
 	virtual void machine_start() override;

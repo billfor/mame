@@ -425,60 +425,60 @@ public:
 	optional_device<i8255_device> m_ppi8255;
 	optional_device<generic_slot_device> m_cart;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
+	void irq_on(timer_device &timer, void *ptr, int32_t param) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
+	void irq_off(timer_device &timer, void *ptr, int32_t param) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
 	
 	// CSC, SU9, RSC
 	void csc_prepare_display();
-	DECLARE_READ8_MEMBER(csc_speech_r);
-	DECLARE_WRITE8_MEMBER(csc_pia0_pa_w);
-	DECLARE_WRITE8_MEMBER(csc_pia0_pb_w);
-	DECLARE_READ8_MEMBER(csc_pia0_pb_r);
-	DECLARE_WRITE_LINE_MEMBER(csc_pia0_ca2_w);
-	DECLARE_WRITE8_MEMBER(csc_pia1_pa_w);
-	DECLARE_WRITE8_MEMBER(csc_pia1_pb_w);
-	DECLARE_READ8_MEMBER(csc_pia1_pa_r);
-	DECLARE_WRITE_LINE_MEMBER(csc_pia1_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(csc_pia1_cb2_w);
-	DECLARE_READ_LINE_MEMBER(csc_pia1_ca1_r);
-	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
+	uint8_t csc_speech_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void csc_pia0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void csc_pia0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t csc_pia0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void csc_pia0_ca2_w(int state);
+	void csc_pia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void csc_pia1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t csc_pia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void csc_pia1_ca2_w(int state);
+	void csc_pia1_cb2_w(int state);
+	int csc_pia1_ca1_r();
+	int csc_pia1_cb1_r();
 
 	// EAS, EAG
 	void eas_prepare_display();
-	DECLARE_WRITE8_MEMBER(eas_segment_w);
-	DECLARE_WRITE8_MEMBER(eas_led_w);
-	DECLARE_READ8_MEMBER(eas_input_r);
-	DECLARE_WRITE8_MEMBER(eas_ppi_porta_w);
-	DECLARE_READ8_MEMBER(eas_ppi_portb_r);
-	DECLARE_WRITE8_MEMBER(eas_ppi_portc_w);
+	void eas_segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void eas_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t eas_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void eas_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t eas_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void eas_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// SC9
 	void sc9_prepare_display();
-	DECLARE_WRITE8_MEMBER(sc9_control_w);
-	DECLARE_WRITE8_MEMBER(sc9_led_w);
-	DECLARE_READ8_MEMBER(sc9_input_r);
+	void sc9_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sc9_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sc9_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// SC12
-	DECLARE_WRITE8_MEMBER(sc12_control_w);
-	DECLARE_READ8_MEMBER(sc12_input_r);
-	DECLARE_READ8_MEMBER(sc12_cart_r);
+	void sc12_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sc12_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sc12_cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// Excellence
-	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
-	DECLARE_READ8_MEMBER(fexcelv_speech_r);
-	DECLARE_WRITE8_MEMBER(fexcel_ttl_w);
-	DECLARE_READ8_MEMBER(fexcelb_ttl_r);
-	DECLARE_READ8_MEMBER(fexcel_ttl_r);
+	void fexcelv_bankswitch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	uint8_t fexcelv_speech_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fexcel_ttl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fexcelb_ttl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t fexcel_ttl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// Designer Display
-	DECLARE_WRITE8_MEMBER(fdesdis_control_w);
-	DECLARE_WRITE8_MEMBER(fdesdis_lcd_w);
-	DECLARE_READ8_MEMBER(fdesdis_input_r);
-	DECLARE_DRIVER_INIT(fdesdis);
+	void fdesdis_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fdesdis_lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdesdis_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_fdesdis();
 
 	// Chesster
-	DECLARE_WRITE8_MEMBER(chesster_control_w);
-	DECLARE_DRIVER_INIT(chesster);
+	void chesster_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_chesster();
 };
 
 
@@ -504,7 +504,7 @@ void fidel6502_state::csc_prepare_display()
 	display_matrix(16, 9, m_led_data << 8 | m_7seg_data, m_inp_mux);
 }
 
-READ8_MEMBER(fidel6502_state::csc_speech_r)
+uint8_t fidel6502_state::csc_speech_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
@@ -512,7 +512,7 @@ READ8_MEMBER(fidel6502_state::csc_speech_r)
 
 // 6821 PIA 0
 
-WRITE8_MEMBER(fidel6502_state::csc_pia0_pa_w)
+void fidel6502_state::csc_pia0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d5: TSI C0-C5
 	m_speech->data_w(space, 0, data & 0x3f);
@@ -522,7 +522,7 @@ WRITE8_MEMBER(fidel6502_state::csc_pia0_pa_w)
 	csc_prepare_display();
 }
 
-WRITE8_MEMBER(fidel6502_state::csc_pia0_pb_w)
+void fidel6502_state::csc_pia0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: speech ROM A12
 	m_speech->force_update(); // update stream to now
@@ -535,7 +535,7 @@ WRITE8_MEMBER(fidel6502_state::csc_pia0_pb_w)
 	m_speech->set_output_gain(0, (data & 0x10) ? 0.5 : 1.0);
 }
 
-READ8_MEMBER(fidel6502_state::csc_pia0_pb_r)
+uint8_t fidel6502_state::csc_pia0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d2: printer?
 	uint8_t data = 0x04;
@@ -551,7 +551,7 @@ READ8_MEMBER(fidel6502_state::csc_pia0_pb_r)
 	return data;
 }
 
-WRITE_LINE_MEMBER(fidel6502_state::csc_pia0_ca2_w)
+void fidel6502_state::csc_pia0_ca2_w(int state)
 {
 	// printer?
 }
@@ -559,46 +559,46 @@ WRITE_LINE_MEMBER(fidel6502_state::csc_pia0_ca2_w)
 
 // 6821 PIA 1
 
-READ8_MEMBER(fidel6502_state::csc_pia1_pa_r)
+uint8_t fidel6502_state::csc_pia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0-d5: button row 0-5 (active low)
 	return (read_inputs(9) & 0x3f) ^ 0xff;
 }
 
-WRITE8_MEMBER(fidel6502_state::csc_pia1_pa_w)
+void fidel6502_state::csc_pia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d6,d7: 7442 A0,A1
 	m_led_select = (m_led_select & ~3) | (data >> 6 & 3);
 	csc_prepare_display();
 }
 
-WRITE8_MEMBER(fidel6502_state::csc_pia1_pb_w)
+void fidel6502_state::csc_pia1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d7: led row data
 	m_led_data = data;
 	csc_prepare_display();
 }
 
-READ_LINE_MEMBER(fidel6502_state::csc_pia1_ca1_r)
+int fidel6502_state::csc_pia1_ca1_r()
 {
 	// button row 6 (active low)
 	return ~read_inputs(9) >> 6 & 1;
 }
 
-READ_LINE_MEMBER(fidel6502_state::csc_pia1_cb1_r)
+int fidel6502_state::csc_pia1_cb1_r()
 {
 	// button row 7 (active low)
 	return ~read_inputs(9) >> 7 & 1;
 }
 
-WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_cb2_w)
+void fidel6502_state::csc_pia1_cb2_w(int state)
 {
 	// 7442 A2
 	m_led_select = (m_led_select & ~4) | (state ? 4 : 0);
 	csc_prepare_display();
 }
 
-WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_ca2_w)
+void fidel6502_state::csc_pia1_ca2_w(int state)
 {
 	// 7442 A3
 	m_led_select = (m_led_select & ~8) | (state ? 8 : 0);
@@ -620,7 +620,7 @@ void fidel6502_state::eas_prepare_display()
 	display_matrix(16, 9, m_led_data << 8 | m_7seg_data, m_led_select);
 }
 
-WRITE8_MEMBER(fidel6502_state::eas_segment_w)
+void fidel6502_state::eas_segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// a0-a2,d7: digit segment
 	m_7seg_data = (data & 0x80) >> offset;
@@ -628,14 +628,14 @@ WRITE8_MEMBER(fidel6502_state::eas_segment_w)
 	eas_prepare_display();
 }
 
-WRITE8_MEMBER(fidel6502_state::eas_led_w)
+void fidel6502_state::eas_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// a0-a2,d0: led data
 	m_led_data = (data & 1) << offset;
 	eas_prepare_display();
 }
 
-READ8_MEMBER(fidel6502_state::eas_input_r)
+uint8_t fidel6502_state::eas_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// multiplexed inputs (active low)
 	return read_inputs(9) ^ 0xff;
@@ -644,7 +644,7 @@ READ8_MEMBER(fidel6502_state::eas_input_r)
 
 // 8255 PPI
 
-WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
+void fidel6502_state::eas_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// pull output low during reset (see TODO)
 	if (machine().phase() == MACHINE_PHASE_RESET)
@@ -658,7 +658,7 @@ WRITE8_MEMBER(fidel6502_state::eas_ppi_porta_w)
 	// d7: printer? (black wire to LED pcb)
 }
 
-WRITE8_MEMBER(fidel6502_state::eas_ppi_portc_w)
+void fidel6502_state::eas_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d3: 7442 a0-a3
 	// 7442 0-8: led select, input mux
@@ -679,7 +679,7 @@ WRITE8_MEMBER(fidel6502_state::eas_ppi_portc_w)
 	// d6,d7: N/C?
 }
 
-READ8_MEMBER(fidel6502_state::eas_ppi_portb_r)
+uint8_t fidel6502_state::eas_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0: printer? white wire from LED pcb
 	uint8_t data = 1;
@@ -711,7 +711,7 @@ void fidel6502_state::sc9_prepare_display()
 	display_matrix(8, 9, m_led_data, m_inp_mux);
 }
 
-WRITE8_MEMBER(fidel6502_state::sc9_control_w)
+void fidel6502_state::sc9_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
@@ -726,14 +726,14 @@ WRITE8_MEMBER(fidel6502_state::sc9_control_w)
 	// d6,d7: N/C
 }
 
-WRITE8_MEMBER(fidel6502_state::sc9_led_w)
+void fidel6502_state::sc9_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// a0-a2,d0: led data via NE591N
 	m_led_data = (data & 1) << offset;
 	sc9_prepare_display();
 }
 
-READ8_MEMBER(fidel6502_state::sc9_input_r)
+uint8_t fidel6502_state::sc9_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// multiplexed inputs (active low)
 	return read_inputs(9) ^ 0xff;
@@ -747,7 +747,7 @@ READ8_MEMBER(fidel6502_state::sc9_input_r)
 
 // TTL/generic
 
-WRITE8_MEMBER(fidel6502_state::sc12_control_w)
+void fidel6502_state::sc12_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d3: 7442 a0-a3
 	// 7442 0-8: led data, input mux
@@ -764,13 +764,13 @@ WRITE8_MEMBER(fidel6502_state::sc12_control_w)
 	//..
 }
 
-READ8_MEMBER(fidel6502_state::sc12_input_r)
+uint8_t fidel6502_state::sc12_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// a0-a2,d7: multiplexed inputs (active low)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
 }
 
-READ8_MEMBER(fidel6502_state::sc12_cart_r)
+uint8_t fidel6502_state::sc12_cart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart->exists())
 		return m_cart->read_rom(space, offset);
@@ -786,14 +786,14 @@ READ8_MEMBER(fidel6502_state::sc12_cart_r)
 
 // misc handlers
 
-INPUT_CHANGED_MEMBER(fidel6502_state::fexcelv_bankswitch)
+void fidel6502_state::fexcelv_bankswitch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// tied to speech ROM highest bits
 	m_speech->force_update();
 	m_speech_bank = (m_speech_bank & 1) | newval << 1;
 }
 
-READ8_MEMBER(fidel6502_state::fexcelv_speech_r)
+uint8_t fidel6502_state::fexcelv_speech_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// TSI A11 is A12, program controls A11, user controls A13,A14(language switches)
 	offset = (offset & 0x7ff) | (offset << 1 & 0x1000);
@@ -803,7 +803,7 @@ READ8_MEMBER(fidel6502_state::fexcelv_speech_r)
 
 // TTL
 
-WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
+void fidel6502_state::fexcel_ttl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// a0-a2,d0: 74259(1)
 	uint8_t mask = 1 << offset;
@@ -850,7 +850,7 @@ WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 	}
 }
 
-READ8_MEMBER(fidel6502_state::fexcelb_ttl_r)
+uint8_t fidel6502_state::fexcelb_ttl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// a0-a2,d6: from speech board: language switches and TSI BUSY line, otherwise tied to VCC
 	uint8_t d6 = (m_inp_matrix[9].read_safe(0xff) >> offset & 1) ? 0x40 : 0;
@@ -859,7 +859,7 @@ READ8_MEMBER(fidel6502_state::fexcelb_ttl_r)
 	return d6 | ((read_inputs(9) >> offset & 1) ? 0 : 0x80);
 }
 
-READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
+uint8_t fidel6502_state::fexcel_ttl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t d7 = 0x80;
 
@@ -879,7 +879,7 @@ READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
 
 // TTL/generic
 
-WRITE8_MEMBER(fidel6502_state::fdesdis_control_w)
+void fidel6502_state::fdesdis_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t q3_old = m_led_select & 8;
 	
@@ -913,7 +913,7 @@ WRITE8_MEMBER(fidel6502_state::fdesdis_control_w)
 	display_update();
 }
 
-WRITE8_MEMBER(fidel6502_state::fdesdis_lcd_w)
+void fidel6502_state::fdesdis_lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// a0-a2,d0-d3: 4*74259 to lcd digit segments
 	uint32_t mask = BITSWAP8(1 << offset,3,7,6,0,1,2,4,5);
@@ -924,13 +924,13 @@ WRITE8_MEMBER(fidel6502_state::fdesdis_lcd_w)
 	}
 }
 
-READ8_MEMBER(fidel6502_state::fdesdis_input_r)
+uint8_t fidel6502_state::fdesdis_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// a0-a2,d7: multiplexed inputs (active low)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
 }
 
-DRIVER_INIT_MEMBER(fidel6502_state, fdesdis)
+void fidel6502_state::init_fdesdis()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
 }
@@ -943,7 +943,7 @@ DRIVER_INIT_MEMBER(fidel6502_state, fdesdis)
 
 // TTL/generic
 
-WRITE8_MEMBER(fidel6502_state::chesster_control_w)
+void fidel6502_state::chesster_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// a0-a2,d7: 74259(1)
 	uint8_t mask = 1 << offset;
@@ -963,7 +963,7 @@ WRITE8_MEMBER(fidel6502_state::chesster_control_w)
 	membank("bank1")->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4));
 }
 
-DRIVER_INIT_MEMBER(fidel6502_state, chesster)
+void fidel6502_state::init_chesster()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("user1")->base(), 0x4000);
 }

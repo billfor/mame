@@ -36,12 +36,12 @@ public:
 	template<class _Object> static devcb_base &set_sts_handler(device_t &device, _Object object) { return downcast<hp_taco_device &>(device).m_sts_handler.set_callback(object); }
 
 	// Register read/write
-	DECLARE_WRITE16_MEMBER(reg_w);
-	DECLARE_READ16_MEMBER(reg_r);
+	void reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t reg_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	// Flag & status read
-	DECLARE_READ_LINE_MEMBER(flg_r);
-	DECLARE_READ_LINE_MEMBER(sts_r);
+	int flg_r();
+	int sts_r();
 
 		// device_image_interface overrides
 	virtual image_init_result call_load() override;

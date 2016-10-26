@@ -101,25 +101,25 @@ public:
 	uint8_t m_fromMCU;
 	uint8_t m_ddrA;
 
-	DECLARE_WRITE8_MEMBER(vram2_w);
-	DECLARE_WRITE8_MEMBER(vram1_w);
-	DECLARE_WRITE8_MEMBER(mcu_portA_w);
-	DECLARE_READ8_MEMBER(mcu_portA_r);
-	DECLARE_WRITE8_MEMBER(mcu_ddrA_w);
-	DECLARE_WRITE8_MEMBER(vidctrl_w);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_WRITE8_MEMBER(protection_w);
+	void vram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_portA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_ddrA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vidctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pipeline);
+	void palette_init_pipeline(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(protection_deferred_w);
+	void protection_deferred_w(void *ptr, int32_t param);
 };
 
 
@@ -130,7 +130,7 @@ void pipeline_state::machine_start()
 	save_item(NAME(m_ddrA));
 }
 
-TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info)
+void pipeline_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vram2[tile_index]+m_vram2[tile_index+0x800]*256;
 	SET_TILE_INFO_MEMBER(0,
@@ -139,7 +139,7 @@ TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info)
 		0);
 }
 
-TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info2)
+void pipeline_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code =m_vram1[tile_index]+((m_vram1[tile_index+0x800]>>4))*256;
 	int color=((m_vram1[tile_index+0x800])&0xf);
@@ -168,12 +168,12 @@ uint32_t pipeline_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-WRITE8_MEMBER(pipeline_state::vidctrl_w)
+void pipeline_state::vidctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vidctrl=data;
 }
 
-WRITE8_MEMBER(pipeline_state::vram2_w)
+void pipeline_state::vram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!(m_vidctrl&1))
 	{
@@ -191,23 +191,23 @@ WRITE8_MEMBER(pipeline_state::vram2_w)
 	}
 }
 
-WRITE8_MEMBER(pipeline_state::vram1_w)
+void pipeline_state::vram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tilemap2->mark_tile_dirty(offset&0x7ff);
 	m_vram1[offset]=data;
 }
 
-READ8_MEMBER(pipeline_state::protection_r)
+uint8_t pipeline_state::protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fromMCU;
 }
 
-TIMER_CALLBACK_MEMBER(pipeline_state::protection_deferred_w)
+void pipeline_state::protection_deferred_w(void *ptr, int32_t param)
 {
 	m_toMCU = param;
 }
 
-WRITE8_MEMBER(pipeline_state::protection_w)
+void pipeline_state::protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipeline_state::protection_deferred_w),this), data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
@@ -236,17 +236,17 @@ static ADDRESS_MAP_START( sound_port, AS_IO, 8, pipeline_state )
 	AM_RANGE(0x06, 0x07) AM_NOP
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(pipeline_state::mcu_portA_w)
+void pipeline_state::mcu_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fromMCU=data;
 }
 
-READ8_MEMBER(pipeline_state::mcu_portA_r)
+uint8_t pipeline_state::mcu_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_fromMCU&m_ddrA)|(m_toMCU& ~m_ddrA);
 }
 
-WRITE8_MEMBER(pipeline_state::mcu_ddrA_w)
+void pipeline_state::mcu_ddrA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrA=data;
 }
@@ -342,7 +342,7 @@ static const z80_daisy_config daisy_chain_sound[] =
 	{ nullptr }
 };
 
-PALETTE_INIT_MEMBER(pipeline_state, pipeline)
+void pipeline_state::palette_init_pipeline(palette_device &palette)
 {
 	int r,g,b,i,c;
 	uint8_t *prom1 = &memregion("proms")->base()[0x000];

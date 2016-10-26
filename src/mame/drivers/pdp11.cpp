@@ -107,18 +107,18 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ16_MEMBER( teletype_ctrl_r );
-	DECLARE_WRITE16_MEMBER( teletype_ctrl_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	uint16_t teletype_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void teletype_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_teletype_data;
 	uint16_t m_teletype_status;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(pdp11ub2);
-	DECLARE_MACHINE_RESET(pdp11qb);
+	void machine_reset_pdp11ub2();
+	void machine_reset_pdp11qb();
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
 };
 
-READ16_MEMBER(pdp11_state::teletype_ctrl_r)
+uint16_t pdp11_state::teletype_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t res = 0;
 
@@ -146,7 +146,7 @@ READ16_MEMBER(pdp11_state::teletype_ctrl_r)
 	return res;
 }
 
-WRITE16_MEMBER(pdp11_state::teletype_ctrl_w)
+void pdp11_state::teletype_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -303,7 +303,7 @@ void pdp11_state::load9312prom(uint8_t *desc, uint8_t *src, int size)
 	}
 }
 
-MACHINE_RESET_MEMBER(pdp11_state,pdp11ub2)
+void pdp11_state::machine_reset_pdp11ub2()
 {
 	// Load M9312
 	uint8_t* user1 = memregion("consproms")->base() + ioport("CONSPROM")->read() * 0x0400;
@@ -334,13 +334,13 @@ MACHINE_RESET_MEMBER(pdp11_state,pdp11ub2)
 
 }
 
-MACHINE_RESET_MEMBER(pdp11_state,pdp11qb)
+void pdp11_state::machine_reset_pdp11qb()
 {
 	m_maincpu->set_state_int(T11_PC, 0xea00);
 }
 
 
-WRITE8_MEMBER( pdp11_state::kbd_put )
+void pdp11_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_teletype_data = data;
 	m_teletype_status |= 0x80;

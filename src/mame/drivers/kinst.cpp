@@ -164,18 +164,18 @@ public:
 	required_shared_ptr<uint32_t> m_rombase;
 	uint32_t *m_video_base;
 	const uint8_t *m_control_map;
-	DECLARE_READ32_MEMBER(kinst_control_r);
-	DECLARE_WRITE32_MEMBER(kinst_control_w);
-	DECLARE_READ32_MEMBER(kinst_ide_r);
-	DECLARE_WRITE32_MEMBER(kinst_ide_w);
-	DECLARE_READ32_MEMBER(kinst_ide_extra_r);
-	DECLARE_WRITE32_MEMBER(kinst_ide_extra_w);
-	DECLARE_DRIVER_INIT(kinst);
-	DECLARE_DRIVER_INIT(kinst2);
+	uint32_t kinst_control_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void kinst_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t kinst_ide_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void kinst_ide_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t kinst_ide_extra_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void kinst_ide_extra_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void init_kinst();
+	void init_kinst2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(irq0_start);
+	void irq0_start(device_t &device);
 	required_device<mips3_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_device<dcs_audio_2k_device> m_dcs;
@@ -297,7 +297,7 @@ void kinst_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 }
 
 
-INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
+void kinst_state::irq0_start(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 	timer_set(attotime::from_usec(50), TIMER_IRQ0_STOP);
@@ -310,25 +310,25 @@ INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
  *
  *************************************/
 
-READ32_MEMBER(kinst_state::kinst_ide_r)
+uint32_t kinst_state::kinst_ide_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_ata->read_cs0(space, offset / 2, mem_mask);
 }
 
 
-WRITE32_MEMBER(kinst_state::kinst_ide_w)
+void kinst_state::kinst_ide_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ata->write_cs0(space, offset / 2, data, mem_mask);
 }
 
 
-READ32_MEMBER(kinst_state::kinst_ide_extra_r)
+uint32_t kinst_state::kinst_ide_extra_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_ata->read_cs1(space, 6, 0xff);
 }
 
 
-WRITE32_MEMBER(kinst_state::kinst_ide_extra_w)
+void kinst_state::kinst_ide_extra_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ata->write_cs1(space, 6, data, 0xff);
 }
@@ -341,7 +341,7 @@ WRITE32_MEMBER(kinst_state::kinst_ide_extra_w)
  *
  *************************************/
 
-READ32_MEMBER(kinst_state::kinst_control_r)
+uint32_t kinst_state::kinst_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result;
 	static const char *const portnames[] = { "P1", "P2", "VOLUME", "UNUSED", "DSW" };
@@ -376,7 +376,7 @@ READ32_MEMBER(kinst_state::kinst_control_r)
 }
 
 
-WRITE32_MEMBER(kinst_state::kinst_control_w)
+void kinst_state::kinst_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t olddata;
 
@@ -895,7 +895,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(kinst_state,kinst)
+void kinst_state::init_kinst()
 {
 	static const uint8_t kinst_control_map[8] = { 0,1,2,3,4,5,6,7 };
 
@@ -904,7 +904,7 @@ DRIVER_INIT_MEMBER(kinst_state,kinst)
 }
 
 
-DRIVER_INIT_MEMBER(kinst_state,kinst2)
+void kinst_state::init_kinst2()
 {
 	static const uint8_t kinst2_control_map[8] = { 2,4,1,0,3,5,6,7 };
 

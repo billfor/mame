@@ -36,10 +36,10 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE8_MEMBER( bus_w );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( t1_r );
+	void bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -47,8 +47,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) override { };
-	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override { };
+	virtual void clock_write(int state) override { };
+	virtual void data_write(int state) override { };
 
 private:
 	required_device<cpu_device> m_maincpu;

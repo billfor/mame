@@ -238,12 +238,12 @@ void m72_state::machine_start()
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::scanline_interrupt),this));
 }
 
-MACHINE_START_MEMBER(m72_state,kengo)
+void m72_state::machine_start_kengo()
 {
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::kengo_scanline_interrupt),this));
 }
 
-TIMER_CALLBACK_MEMBER(m72_state::synch_callback)
+void m72_state::synch_callback(void *ptr, int32_t param)
 {
 	//machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(8000000));
 	machine().scheduler().boost_interleave(attotime::from_hz(MASTER_CLOCK/4/12), attotime::from_seconds(25));
@@ -258,12 +258,12 @@ void m72_state::machine_reset()
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::synch_callback),this));
 }
 
-MACHINE_RESET_MEMBER(m72_state,kengo)
+void m72_state::machine_reset_kengo()
 {
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
-TIMER_CALLBACK_MEMBER(m72_state::scanline_interrupt)
+void m72_state::scanline_interrupt(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -293,7 +293,7 @@ TIMER_CALLBACK_MEMBER(m72_state::scanline_interrupt)
 	m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
-TIMER_CALLBACK_MEMBER(m72_state::kengo_scanline_interrupt)
+void m72_state::kengo_scanline_interrupt(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -333,7 +333,7 @@ The protection device does
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
+void m72_state::delayed_ram16_w(void *ptr, int32_t param)
 {
 	uint16_t val = ((uint32_t) param) & 0xffff;
 	uint16_t offset = (((uint32_t) param) >> 16) & 0xffff;
@@ -343,7 +343,7 @@ TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 }
 
 
-WRITE16_MEMBER(m72_state::main_mcu_sound_w)
+void m72_state::main_mcu_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & 0xfff0)
 		logerror("sound_w: %04x %04x\n", mem_mask, data);
@@ -355,7 +355,7 @@ WRITE16_MEMBER(m72_state::main_mcu_sound_w)
 	}
 }
 
-WRITE16_MEMBER(m72_state::main_mcu_w)
+void m72_state::main_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t val = m_protection_ram[offset];
 
@@ -377,7 +377,7 @@ WRITE16_MEMBER(m72_state::main_mcu_w)
 		machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), (offset<<16) | val, m_protection_ram.get());
 }
 
-WRITE8_MEMBER(m72_state::mcu_data_w)
+void m72_state::mcu_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t val;
 	if (offset&1) val = (m_protection_ram[offset/2] & 0x00ff) | (data << 8);
@@ -386,7 +386,7 @@ WRITE8_MEMBER(m72_state::mcu_data_w)
 	machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), ((offset >>1 ) << 16) | val, m_protection_ram.get());
 }
 
-READ8_MEMBER(m72_state::mcu_data_r)
+uint8_t m72_state::mcu_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 
@@ -401,38 +401,38 @@ READ8_MEMBER(m72_state::mcu_data_r)
 	return ret;
 }
 
-INTERRUPT_GEN_MEMBER(m72_state::mcu_int)
+void m72_state::mcu_int(device_t &device)
 {
 	//m_mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
 	m_mcu_snd_cmd_latch = 0x11;// | (machine.rand() & 1); /* 0x10 is special as well - FIXME */
 	device.execute().set_input_line(1, ASSERT_LINE);
 }
 
-READ8_MEMBER(m72_state::mcu_sample_r)
+uint8_t m72_state::mcu_sample_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t sample;
 	sample = memregion("samples")->base()[m_mcu_sample_addr++];
 	return sample;
 }
 
-WRITE8_MEMBER(m72_state::mcu_ack_w)
+void m72_state::mcu_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu->set_input_line(1, CLEAR_LINE);
 	m_mcu_snd_cmd_latch = 0;
 }
 
-READ8_MEMBER(m72_state::mcu_snd_r)
+uint8_t m72_state::mcu_snd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mcu_snd_cmd_latch;
 }
 
-READ8_MEMBER(m72_state::mcu_port_r)
+uint8_t m72_state::mcu_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("port read: %02x\n", offset);
 	return 0;
 }
 
-WRITE8_MEMBER(m72_state::mcu_port_w)
+void m72_state::mcu_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 1)
 	{
@@ -444,24 +444,24 @@ WRITE8_MEMBER(m72_state::mcu_port_w)
 
 }
 
-WRITE8_MEMBER(m72_state::mcu_low_w)
+void m72_state::mcu_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_sample_addr = (m_mcu_sample_addr & 0xffe000) | (data<<5);
 	logerror("low: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
 }
 
-WRITE8_MEMBER(m72_state::mcu_high_w)
+void m72_state::mcu_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_sample_addr = (m_mcu_sample_addr & 0x1fff) | (data<<(8+5));
 	logerror("high: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
 }
 
-READ8_MEMBER(m72_state::snd_cpu_sample_r)
+uint8_t m72_state::snd_cpu_sample_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mcu_sample_latch;
 }
 
-DRIVER_INIT_MEMBER(m72_state,m72_8751)
+void m72_state::init_m72_8751()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	address_space &io = m_maincpu->space(AS_IO);
@@ -549,7 +549,7 @@ int m72_state::find_sample(int num)
 }
 #endif
 
-INTERRUPT_GEN_MEMBER(m72_state::fake_nmi)
+void m72_state::fake_nmi(device_t &device)
 {
 	address_space &space = generic_space();
 	int sample = m_audio->sample_r(space,0);
@@ -558,25 +558,25 @@ INTERRUPT_GEN_MEMBER(m72_state::fake_nmi)
 }
 
 
-WRITE16_MEMBER(m72_state::bchopper_sample_trigger_w)
+void m72_state::bchopper_sample_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int a[6] = { 0x0000, 0x0010, 0x2510, 0x6510, 0x8510, 0x9310 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 6) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-WRITE16_MEMBER(m72_state::nspirit_sample_trigger_w)
+void m72_state::nspirit_sample_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int a[9] = { 0x0000, 0x0020, 0x2020, 0, 0x5720, 0, 0x7b60, 0x9b60, 0xc360 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-WRITE16_MEMBER(m72_state::imgfight_sample_trigger_w)
+void m72_state::imgfight_sample_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int a[7] = { 0x0000, 0x0020, 0x44e0, 0x98a0, 0xc820, 0xf7a0, 0x108c0 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-WRITE16_MEMBER(m72_state::loht_sample_trigger_w)
+void m72_state::loht_sample_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int a[7] = { 0x0000, 0x0020, 0, 0x2c40, 0x4320, 0x7120, 0xb200 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m_audio->set_sample_start(a[data & 0xff]);
@@ -584,13 +584,13 @@ WRITE16_MEMBER(m72_state::loht_sample_trigger_w)
 
 
 
-WRITE16_MEMBER(m72_state::dbreedm72_sample_trigger_w)
+void m72_state::dbreedm72_sample_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-WRITE16_MEMBER(m72_state::airduelm72_sample_trigger_w)
+void m72_state::airduelm72_sample_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int a[16] = {
 		0x00000, 0x00020, 0x03ec0, 0x05640, 0x06dc0, 0x083a0, 0x0c000, 0x0eb60,
@@ -598,7 +598,7 @@ WRITE16_MEMBER(m72_state::airduelm72_sample_trigger_w)
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 16) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-WRITE16_MEMBER(m72_state::dkgenm72_sample_trigger_w)
+void m72_state::dkgenm72_sample_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int a[28] = {
 		0x00000, 0x00020, 0x01800, 0x02da0, 0x03be0, 0x05ae0, 0x06100, 0x06de0,
@@ -609,7 +609,7 @@ WRITE16_MEMBER(m72_state::dkgenm72_sample_trigger_w)
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 28) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-WRITE16_MEMBER(m72_state::gallop_sample_trigger_w)
+void m72_state::gallop_sample_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int a[31] = {
 		0x00000, 0x00020, 0x00040, 0x01360, 0x02580, 0x04f20, 0x06240, 0x076e0,
@@ -793,14 +793,14 @@ void m72_state::copy_le(uint16_t *dest, const uint8_t *src, uint8_t bytes)
 		dest[i/2] = src[i+0] | (src[i+1] << 8);
 }
 
-READ16_MEMBER(m72_state::protection_r)
+uint16_t m72_state::protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		copy_le(m_protection_ram.get(),m_protection_code,CODE_LEN);
 	return m_protection_ram[0xffa/2+offset];
 }
 
-WRITE16_MEMBER(m72_state::protection_w)
+void m72_state::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data ^= 0xffff;
 	COMBINE_DATA(&m_protection_ram[offset]);
@@ -823,26 +823,26 @@ void m72_state::install_protection_handler(const uint8_t *code,const uint8_t *cr
 	save_pointer(NAME(m_protection_ram.get()), 0x1000/2);
 }
 
-DRIVER_INIT_MEMBER(m72_state,bchopper)
+void m72_state::init_bchopper()
 {
 	install_protection_handler(bchopper_code,bchopper_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(m72_state,nspirit)
+void m72_state::init_nspirit()
 {
 	install_protection_handler(nspirit_code,nspirit_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::nspirit_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,imgfight)
+void m72_state::init_imgfight()
 {
 	install_protection_handler(imgfight_code,imgfightj_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::imgfight_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,loht)
+void m72_state::init_loht()
 {
 	install_protection_handler(loht_code,loht_crc);
 
@@ -853,25 +853,25 @@ DRIVER_INIT_MEMBER(m72_state,loht)
 }
 
 
-DRIVER_INIT_MEMBER(m72_state,dbreedm72)
+void m72_state::init_dbreedm72()
 {
 	install_protection_handler(dbreedm72_code,dbreedm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dbreedm72_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,airduelm72)
+void m72_state::init_airduelm72()
 {
 	install_protection_handler(airduelm72_code,airduelm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::airduelm72_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,dkgenm72)
+void m72_state::init_dkgenm72()
 {
 	install_protection_handler(dkgenm72_code,dkgenm72_crc);
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dkgenm72_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,gallop)
+void m72_state::init_gallop()
 {
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::gallop_sample_trigger_w),this));
 }
@@ -881,12 +881,12 @@ DRIVER_INIT_MEMBER(m72_state,gallop)
 
 
 
-READ16_MEMBER(m72_state::soundram_r)
+uint16_t m72_state::soundram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_soundram[offset * 2 + 0] | (m_soundram[offset * 2 + 1] << 8);
 }
 
-WRITE16_MEMBER(m72_state::soundram_w)
+void m72_state::soundram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundram[offset * 2 + 0] = data;
@@ -895,7 +895,7 @@ WRITE16_MEMBER(m72_state::soundram_w)
 }
 
 
-READ16_MEMBER(m72_state::poundfor_trackball_r)
+uint16_t m72_state::poundfor_trackball_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const axisnames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
 

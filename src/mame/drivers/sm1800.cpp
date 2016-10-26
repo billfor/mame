@@ -39,15 +39,15 @@ public:
 	required_device<i8255_device> m_ppi;
 	required_device<i8275_device> m_crtc;
 	required_device<palette_device> m_palette;
-	DECLARE_WRITE8_MEMBER(sm1800_8255_portb_w);
-	DECLARE_WRITE8_MEMBER(sm1800_8255_portc_w);
-	DECLARE_READ8_MEMBER(sm1800_8255_porta_r);
-	DECLARE_READ8_MEMBER(sm1800_8255_portc_r);
+	void sm1800_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sm1800_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sm1800_8255_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sm1800_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t m_irq_state;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(sm1800);
-	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
-	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
+	void palette_init_sm1800(palette_device &palette);
+	void sm1800_vblank_interrupt(device_t &device);
+	int sm1800_irq_callback(device_t &device, int irqline);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 };
 
@@ -73,7 +73,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( sm1800 )
 INPUT_PORTS_END
 
-IRQ_CALLBACK_MEMBER(sm1800_state::sm1800_irq_callback)
+int sm1800_state::sm1800_irq_callback(device_t &device, int irqline)
 {
 	return 0xff;
 }
@@ -82,7 +82,7 @@ void sm1800_state::machine_reset()
 {
 }
 
-INTERRUPT_GEN_MEMBER(sm1800_state::sm1800_vblank_interrupt)
+void sm1800_state::sm1800_vblank_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(0, m_irq_state ?  HOLD_LINE : CLEAR_LINE);
 	m_irq_state ^= 1;
@@ -107,25 +107,25 @@ I8275_DRAW_CHARACTER_MEMBER( sm1800_state::crtc_display_pixels )
 		bitmap.pix32(y, x + i) = palette[(pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
 
-WRITE8_MEMBER( sm1800_state::sm1800_8255_portb_w )
+void sm1800_state::sm1800_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( sm1800_state::sm1800_8255_portc_w )
+void sm1800_state::sm1800_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER( sm1800_state::sm1800_8255_porta_r )
+uint8_t sm1800_state::sm1800_8255_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER( sm1800_state::sm1800_8255_portc_r )
+uint8_t sm1800_state::sm1800_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(sm1800_state, sm1800)
+void sm1800_state::palette_init_sm1800(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black()); // black
 	palette.set_pen_color(1, 0xa0, 0xa0, 0xa0); // white

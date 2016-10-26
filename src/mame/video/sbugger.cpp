@@ -5,7 +5,7 @@
 #include "emu.h"
 #include "includes/sbugger.h"
 
-TILE_GET_INFO_MEMBER(sbugger_state::get_tile_info)
+void sbugger_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, color;
 
@@ -15,13 +15,13 @@ TILE_GET_INFO_MEMBER(sbugger_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,color,0);
 }
 
-WRITE8_MEMBER(sbugger_state::videoram_w)
+void sbugger_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sbugger_state::videoram_attr_w)
+void sbugger_state::videoram_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram_attr[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -39,7 +39,7 @@ uint32_t sbugger_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 /* not right but so we can see things ok */
-PALETTE_INIT_MEMBER(sbugger_state, sbugger)
+void sbugger_state::palette_init_sbugger(palette_device &palette)
 {
 	/* just some random colours for now */
 	int i;

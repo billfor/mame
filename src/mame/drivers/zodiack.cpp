@@ -105,36 +105,36 @@ Notes:
 #define VBSTART             (240)
 
 
-WRITE8_MEMBER( zodiack_state::nmi_mask_w )
+void zodiack_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_main_nmi_enabled = (data & 1) ^ 1;
 }
 
-WRITE8_MEMBER( zodiack_state::sound_nmi_enable_w )
+void zodiack_state::sound_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enabled = data & 1;
 }
 
-INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_main_nmi_gen)
+void zodiack_state::zodiack_main_nmi_gen(device_t &device)
 {
 	if (m_main_nmi_enabled)
 		nmi_line_pulse(device);
 }
 
-INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)
+void zodiack_state::zodiack_sound_nmi_gen(device_t &device)
 {
 	if (m_sound_nmi_enabled)
 		nmi_line_pulse(device);
 }
 
 
-WRITE8_MEMBER( zodiack_state::master_soundlatch_w )
+void zodiack_state::master_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER( zodiack_state::control_w )
+void zodiack_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Bit 0-1 - coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
@@ -702,12 +702,12 @@ ROM_START( bounty )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(zodiack_state,zodiack)
+void zodiack_state::init_zodiack()
 {
 	m_percuss_hardware = false;
 }
 
-DRIVER_INIT_MEMBER(zodiack_state,percuss)
+void zodiack_state::init_percuss()
 {
 	m_percuss_hardware = true;
 }

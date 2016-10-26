@@ -108,31 +108,31 @@ public:
 	tilemap_t   *m_starfield_tilemap;
 	uint8_t       m_regs[0x28];
 
-	DECLARE_WRITE8_MEMBER(hardware_w);
-	DECLARE_WRITE8_MEMBER(vidram_w);
+	void hardware_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	TILE_GET_INFO_MEMBER(get_starfield_tile_info);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_starfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(warpspeed);
+	void palette_init_warpspeed(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_circles(bitmap_ind16 &bitmap);
 };
 
-WRITE8_MEMBER(warpspeed_state::hardware_w)
+void warpspeed_state::hardware_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_regs[offset] = data;
 }
 
-TILE_GET_INFO_MEMBER(warpspeed_state::get_text_tile_info)
+void warpspeed_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_videoram[tile_index] & 0x3f;
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(warpspeed_state::get_starfield_tile_info)
+void warpspeed_state::get_starfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = 0x3f;
 	if ( tile_index & 1 )
@@ -142,7 +142,7 @@ TILE_GET_INFO_MEMBER(warpspeed_state::get_starfield_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
 
-WRITE8_MEMBER(warpspeed_state::vidram_w)
+void warpspeed_state::vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_text_tilemap->mark_tile_dirty(offset);
@@ -301,7 +301,7 @@ static GFXDECODE_START( warpspeed )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0, 1  )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(warpspeed_state, warpspeed)
+void warpspeed_state::palette_init_warpspeed(palette_device &palette)
 {
 	// tilemaps
 	palette.set_pen_color(0,rgb_t::black()); /* black */

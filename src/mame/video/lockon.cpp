@@ -23,12 +23,12 @@
  *
  *************************************/
 
-READ16_MEMBER(lockon_state::lockon_crtc_r)
+uint16_t lockon_state::lockon_crtc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(lockon_state::lockon_crtc_w)
+void lockon_state::lockon_crtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #if 0
 	data &= 0xff;
@@ -64,7 +64,7 @@ WRITE16_MEMBER(lockon_state::lockon_crtc_w)
 #endif
 }
 
-TIMER_CALLBACK_MEMBER(lockon_state::cursor_callback)
+void lockon_state::cursor_callback(void *ptr, int32_t param)
 {
 	if (m_main_inten)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
@@ -98,7 +98,7 @@ static const res_net_info lockon_pd_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(lockon_state, lockon)
+void lockon_state::palette_init_lockon(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -133,13 +133,13 @@ PALETTE_INIT_MEMBER(lockon_state, lockon)
  *
  *************************************/
 
-WRITE16_MEMBER(lockon_state::lockon_char_w)
+void lockon_state::lockon_char_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_char_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(lockon_state::get_lockon_tile_info)
+void lockon_state::get_lockon_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t tileno = m_char_ram[tile_index] & 0x03ff;
 	uint32_t col = (m_char_ram[tile_index] >> 10) & 0x3f;
@@ -155,12 +155,12 @@ TILE_GET_INFO_MEMBER(lockon_state::get_lockon_tile_info)
 
 *******************************************************************************************/
 
-WRITE16_MEMBER(lockon_state::lockon_scene_h_scr_w)
+void lockon_state::lockon_scene_h_scr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_scroll_h = data & 0x1ff;
 }
 
-WRITE16_MEMBER(lockon_state::lockon_scene_v_scr_w)
+void lockon_state::lockon_scene_v_scr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_scroll_v = data & 0x81ff;
 }
@@ -275,12 +275,12 @@ void lockon_state::scene_draw(  )
 
  *******************************************************************************************/
 
-WRITE16_MEMBER(lockon_state::lockon_ground_ctrl_w)
+void lockon_state::lockon_ground_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ground_ctrl = data & 0xff;
 }
 
-TIMER_CALLBACK_MEMBER(lockon_state::bufend_callback)
+void lockon_state::bufend_callback(void *ptr, int32_t param)
 {
 	m_ground->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	m_object->set_input_line(NEC_INPUT_LINE_POLL, ASSERT_LINE);
@@ -599,7 +599,7 @@ void lockon_state::objects_draw(  )
 }
 
 /* The mechanism used by the object CPU to update the object ASICs palette RAM */
-WRITE16_MEMBER(lockon_state::lockon_tza112_w)
+void lockon_state::lockon_tza112_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_iden)
 	{
@@ -609,13 +609,13 @@ WRITE16_MEMBER(lockon_state::lockon_tza112_w)
 	}
 }
 
-READ16_MEMBER(lockon_state::lockon_obj_4000_r)
+uint16_t lockon_state::lockon_obj_4000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_object->set_input_line(NEC_INPUT_LINE_POLL, CLEAR_LINE);
 	return 0xffff;
 }
 
-WRITE16_MEMBER(lockon_state::lockon_obj_4000_w)
+void lockon_state::lockon_obj_4000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_iden = data & 1;
 }
@@ -643,7 +643,7 @@ WRITE16_MEMBER(lockon_state::lockon_obj_4000_w)
 
 *******************************************************************************************/
 
-WRITE16_MEMBER(lockon_state::lockon_fb_clut_w)
+void lockon_state::lockon_fb_clut_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	rgb_t color;
 
@@ -652,7 +652,7 @@ WRITE16_MEMBER(lockon_state::lockon_fb_clut_w)
 }
 
 /* Rotation control register */
-WRITE16_MEMBER(lockon_state::lockon_rotate_w)
+void lockon_state::lockon_rotate_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset & 7)
 	{

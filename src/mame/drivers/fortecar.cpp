@@ -343,14 +343,14 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_shared_ptr<uint8_t> m_vram;
-	DECLARE_WRITE8_MEMBER(ppi0_portc_w);
-	DECLARE_READ8_MEMBER(ppi0_portc_r);
-	DECLARE_WRITE8_MEMBER(ayporta_w);
-	DECLARE_WRITE8_MEMBER(ayportb_w);
-	DECLARE_DRIVER_INIT(fortecar);
+	void ppi0_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi0_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ayporta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ayportb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_fortecar();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(fortecar);
+	void palette_init_fortecar(palette_device &palette);
 	uint32_t screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -393,7 +393,7 @@ uint32_t fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(fortecar_state, fortecar)
+void fortecar_state::palette_init_fortecar(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 /* Video resistors...
@@ -449,7 +449,7 @@ R = 82 Ohms Pull Down.
 *        Misc R/W Handlers         *
 ***********************************/
 
-WRITE8_MEMBER(fortecar_state::ppi0_portc_w)
+void fortecar_state::ppi0_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
 NM93CS56N Serial EEPROM
@@ -464,13 +464,13 @@ DOUT PPI_PC4
 	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(fortecar_state::ppi0_portc_r)
+uint8_t fortecar_state::ppi0_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  popmessage("%s",machine().describe_context());
 	return ((m_eeprom->do_read() << 4) & 0x10);
 }
 
-WRITE8_MEMBER(fortecar_state::ayporta_w)
+void fortecar_state::ayporta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  System Lamps...
 
@@ -502,7 +502,7 @@ WRITE8_MEMBER(fortecar_state::ayporta_w)
 }
 
 
-WRITE8_MEMBER(fortecar_state::ayportb_w)
+void fortecar_state::ayportb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
 
@@ -769,7 +769,7 @@ ROM_END
 *           Driver Init            *
 ***********************************/
 
-DRIVER_INIT_MEMBER(fortecar_state, fortecar)
+void fortecar_state::init_fortecar()
 {
 	// ...
 }

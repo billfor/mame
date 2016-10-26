@@ -358,7 +358,7 @@ void mc6854_device::tfifo_terminate( )
 
 
 /* call-back to refill the bit-stream from the FIFO */
-TIMER_CALLBACK_MEMBER(mc6854_device::tfifo_cb)
+void mc6854_device::tfifo_cb(void *ptr, int32_t param)
 {
 	int i, data = m_tfifo[ MC6854_FIFO_SIZE - 1 ];
 
@@ -605,7 +605,7 @@ uint8_t mc6854_device::rfifo_pop( )
 
 
 /* MC6854 makes fields from bits */
-WRITE_LINE_MEMBER( mc6854_device::set_rx )
+void mc6854_device::set_rx(int state)
 {
 	int fieldlen = ( m_rstate < 6 ) ? 8 : RWL;
 
@@ -717,7 +717,7 @@ int mc6854_device::send_frame( uint8_t* data, int len )
 
 
 
-WRITE_LINE_MEMBER( mc6854_device::set_cts )
+void mc6854_device::set_cts(int state)
 {
 	if ( ! m_cts && state )
 		m_sr1 |= CTS;
@@ -731,7 +731,7 @@ WRITE_LINE_MEMBER( mc6854_device::set_cts )
 
 
 
-WRITE_LINE_MEMBER( mc6854_device::set_dcd )
+void mc6854_device::set_dcd(int state)
 {
 	if ( ! m_dcd && state )
 	{
@@ -810,7 +810,7 @@ void mc6854_device::update_sr1( )
 
 
 
-READ8_MEMBER( mc6854_device::read )
+uint8_t mc6854_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch ( offset )
 	{
@@ -851,7 +851,7 @@ READ8_MEMBER( mc6854_device::read )
 
 
 
-WRITE8_MEMBER( mc6854_device::write )
+void mc6854_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( offset )
 	{
@@ -978,12 +978,12 @@ WRITE8_MEMBER( mc6854_device::write )
 	}
 }
 
-WRITE_LINE_MEMBER( mc6854_device::rxc_w )
+void mc6854_device::rxc_w(int state)
 {
 	// TODO
 }
 
-WRITE_LINE_MEMBER( mc6854_device::txc_w )
+void mc6854_device::txc_w(int state)
 {
 	// TODO
 }

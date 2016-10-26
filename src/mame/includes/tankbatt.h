@@ -25,29 +25,29 @@ public:
 	int m_sound_enable;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_READ8_MEMBER(in0_r);
-	DECLARE_READ8_MEMBER(in1_r);
-	DECLARE_READ8_MEMBER(dsw_r);
-	DECLARE_WRITE8_MEMBER(interrupt_enable_w);
-	DECLARE_WRITE8_MEMBER(demo_interrupt_enable_w);
-	DECLARE_WRITE8_MEMBER(sh_expl_w);
-	DECLARE_WRITE8_MEMBER(sh_engine_w);
-	DECLARE_WRITE8_MEMBER(sh_fire_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(coinlockout_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t in0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t in1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void interrupt_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void demo_interrupt_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sh_expl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sh_engine_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sh_fire_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coinlockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 
-	INTERRUPT_GEN_MEMBER(interrupt);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void interrupt(device_t &device);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tankbatt);
+	void palette_init_tankbatt(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);

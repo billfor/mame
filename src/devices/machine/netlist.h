@@ -360,18 +360,18 @@ public:
 		}
 	}
 
-	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed)
+	inline void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 	{
 		if (m_auto_port)
 			write(((double) newval - (double) field.minval())/((double) (field.maxval()-field.minval()) ) );
 		else
 			write(newval);
 	}
-	inline DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
-	inline DECLARE_WRITE8_MEMBER(write8)               { write(data);   }
-	inline DECLARE_WRITE16_MEMBER(write16)             { write(data);   }
-	inline DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
-	inline DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
+	inline void write_line(int state)       { write(state);  }
+	inline void write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)               { write(data);   }
+	inline void write16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)             { write(data);   }
+	inline void write32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff)             { write(data);   }
+	inline void write64(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff))             { write(data);   }
 
 protected:
 	// device-level overrides
@@ -433,12 +433,12 @@ public:
 			synchronize(0, v);
 	}
 
-	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
-	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
-	DECLARE_WRITE8_MEMBER(write8)               { write(data);   }
-	DECLARE_WRITE16_MEMBER(write16)             { write(data);   }
-	DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
-	DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
+	inline void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { write(newval); }
+	void write_line(int state)       { write(state);  }
+	void write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)               { write(data);   }
+	void write16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)             { write(data);   }
+	void write32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff)             { write(data);   }
+	void write64(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff))             { write(data);   }
 
 protected:
 	// device-level overrides
@@ -479,12 +479,12 @@ public:
 			synchronize(0, v);
 	}
 
-	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
-	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
-	DECLARE_WRITE8_MEMBER(write8)               { write(data);   }
-	DECLARE_WRITE16_MEMBER(write16)             { write(data);   }
-	DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
-	DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
+	inline void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { write(newval); }
+	void write_line(int state)       { write(state);  }
+	void write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)               { write(data);   }
+	void write16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)             { write(data);   }
+	void write32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff)             { write(data);   }
+	void write64(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff))             { write(data);   }
 
 protected:
 	// device-level overrides

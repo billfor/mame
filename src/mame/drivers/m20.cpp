@@ -90,14 +90,14 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(m20_i8259_r);
-	DECLARE_WRITE16_MEMBER(m20_i8259_w);
-	DECLARE_READ16_MEMBER(port21_r);
-	DECLARE_WRITE16_MEMBER(port21_w);
-	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(int_w);
+	uint16_t m20_i8259_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void m20_i8259_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t port21_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void port21_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tty_clock_tick_w(int state);
+	void kbd_clock_tick_w(int state);
+	void timer_tick_w(int state);
+	void int_w(int state);
 	MC6845_UPDATE_ROW(update_row);
 
 private:
@@ -107,7 +107,7 @@ private:
 
 public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	IRQ_CALLBACK_MEMBER(m20_irq_callback);
+	int m20_irq_callback(device_t &device, int irqline);
 };
 
 
@@ -157,13 +157,13 @@ port21      =   0x21        !TTL latch
 !   B7  See B3 input                0 => colour card present
 */
 
-READ16_MEMBER(m20_state::port21_r)
+uint16_t m20_state::port21_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//printf("port21 read: offset 0x%x\n", offset);
 	return m_port21;
 }
 
-WRITE16_MEMBER(m20_state::port21_w)
+void m20_state::port21_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("port21 write: offset 0x%x, data 0x%x\n", offset, data);
 	m_port21 = (m_port21 & 0xf8) | (data & 0x7);
@@ -190,29 +190,29 @@ WRITE16_MEMBER(m20_state::port21_w)
 	m_fd1797->dden_w(data & 8);
 }
 
-READ16_MEMBER(m20_state::m20_i8259_r)
+uint16_t m20_state::m20_i8259_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_i8259->read(space, offset)<<1;
 }
 
-WRITE16_MEMBER(m20_state::m20_i8259_w)
+void m20_state::m20_i8259_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_i8259->write(space, offset, (data>>1));
 }
 
-WRITE_LINE_MEMBER( m20_state::tty_clock_tick_w )
+void m20_state::tty_clock_tick_w(int state)
 {
 	m_ttyi8251->write_txc(state);
 	m_ttyi8251->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( m20_state::kbd_clock_tick_w )
+void m20_state::kbd_clock_tick_w(int state)
 {
 	m_kbdi8251->write_txc(state);
 	m_kbdi8251->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( m20_state::timer_tick_w )
+void m20_state::timer_tick_w(int state)
 {
 	/* Using HOLD_LINE is not completely correct:
 	 * The output of the 8253 is connected to a 74LS74 flop chip.
@@ -717,7 +717,7 @@ static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 	AM_RANGE(0x3ffa, 0x3ffd) AM_DEVWRITE("apb", m20_8086_device, handshake_w)
 ADDRESS_MAP_END
 
-IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
+int m20_state::m20_irq_callback(device_t &device, int irqline)
 {
 	if (! irqline)
 		return 0xff; // NVI, value ignored
@@ -725,7 +725,7 @@ IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
 		return m_i8259->acknowledge();
 }
 
-WRITE_LINE_MEMBER(m20_state::int_w)
+void m20_state::int_w(int state)
 {
 	if(m_apb && !m_apb->halted())
 		m_apb->vi_w(state);

@@ -92,7 +92,7 @@
  *
  *************************************/
 
-WRITE16_MEMBER(foodf_state::nvram_recall_w)
+void foodf_state::nvram_recall_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_nvram->recall(0);
 	m_nvram->recall(1);
@@ -115,7 +115,7 @@ void foodf_state::update_interrupts()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
+void foodf_state::scanline_update_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -137,14 +137,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 }
 
 
-MACHINE_START_MEMBER(foodf_state,foodf)
+void foodf_state::machine_start_foodf()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_whichport));
 }
 
 
-MACHINE_RESET_MEMBER(foodf_state,foodf)
+void foodf_state::machine_reset_foodf()
 {
 	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
 	scan_timer->adjust(m_screen->time_until_pos(0));
@@ -158,7 +158,7 @@ MACHINE_RESET_MEMBER(foodf_state,foodf)
  *
  *************************************/
 
-WRITE8_MEMBER(foodf_state::digital_w)
+void foodf_state::digital_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	foodf_set_flip(data & 0x01);
 
@@ -184,7 +184,7 @@ WRITE8_MEMBER(foodf_state::digital_w)
  *
  *************************************/
 
-READ16_MEMBER(foodf_state::analog_r)
+uint16_t foodf_state::analog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const portnames[] = { "STICK0_X", "STICK1_X", "STICK0_Y", "STICK1_Y" };
 
@@ -192,7 +192,7 @@ READ16_MEMBER(foodf_state::analog_r)
 }
 
 
-WRITE16_MEMBER(foodf_state::analog_w)
+void foodf_state::analog_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_whichport = offset ^ 3;
 }
@@ -323,7 +323,7 @@ GFXDECODE_END
  *
  *************************************/
 
-READ8_MEMBER(foodf_state::pot_r)
+uint8_t foodf_state::pot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW")->read() >> offset) << 7;
 }

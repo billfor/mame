@@ -28,17 +28,17 @@ public:
 	tilemap_t *m_foreground;
 	tilemap_t *m_background;
 
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(positive_scroll_w);
-	DECLARE_WRITE8_MEMBER(negative_scroll_w);
-	DECLARE_WRITE8_MEMBER(bgvideo_write);
-	DECLARE_WRITE8_MEMBER(fgvideo_write);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void positive_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void negative_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgvideo_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgvideo_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(portrait);
+	void palette_init_portrait(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, const uint8_t *source );

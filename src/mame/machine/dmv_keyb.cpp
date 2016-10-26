@@ -259,7 +259,7 @@ const tiny_rom_entry *dmv_keyboard_device::device_rom_region() const
 //  port1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( dmv_keyboard_device::port1_r )
+uint8_t dmv_keyboard_device::port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_keyboard[m_col]->read();
 }
@@ -268,7 +268,7 @@ READ8_MEMBER( dmv_keyboard_device::port1_r )
 //  port2_r
 //-------------------------------------------------
 
-READ8_MEMBER( dmv_keyboard_device::port2_r )
+uint8_t dmv_keyboard_device::port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_sd_data_state | m_sd_poll_state) << 7) | m_col;
 }
@@ -277,7 +277,7 @@ READ8_MEMBER( dmv_keyboard_device::port2_r )
 //  port2_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( dmv_keyboard_device::port2_w )
+void dmv_keyboard_device::port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	   P2.0    col 0
@@ -295,7 +295,7 @@ WRITE8_MEMBER( dmv_keyboard_device::port2_w )
 //  sd_poll_w
 //-------------------------------------------------
 
-DECLARE_WRITE_LINE_MEMBER(dmv_keyboard_device::sd_poll_w)
+void dmv_keyboard_device::sd_poll_w(int state)
 {
 	if (m_sd_poll_state && !state)
 		m_maincpu->upi41_master_w(m_maincpu->space(), 0, 0);
@@ -307,7 +307,7 @@ DECLARE_WRITE_LINE_MEMBER(dmv_keyboard_device::sd_poll_w)
 //  sd_poll_r
 //-------------------------------------------------
 
-DECLARE_READ_LINE_MEMBER(dmv_keyboard_device::sd_poll_r)
+int dmv_keyboard_device::sd_poll_r()
 {
 	return m_sd_data_state;
 }

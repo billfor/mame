@@ -53,18 +53,18 @@ public:
 	int m_pending_command;
 
 	/* devices */
-	DECLARE_WRITE8_MEMBER(crshrace_sh_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
-	DECLARE_WRITE16_MEMBER(crshrace_videoram1_w);
-	DECLARE_WRITE16_MEMBER(crshrace_videoram2_w);
-	DECLARE_WRITE16_MEMBER(crshrace_roz_bank_w);
-	DECLARE_WRITE16_MEMBER(crshrace_gfxctrl_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(country_sndpending_r);
-	DECLARE_DRIVER_INIT(crshrace2);
-	DECLARE_DRIVER_INIT(crshrace);
-	TILE_GET_INFO_MEMBER(get_tile_info1);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
+	void crshrace_sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void crshrace_videoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void crshrace_videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void crshrace_roz_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void crshrace_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	ioport_value country_sndpending_r(ioport_field &field, void *param);
+	void init_crshrace2();
+	void init_crshrace();
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

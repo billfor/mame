@@ -34,22 +34,22 @@ public:
 
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	DECLARE_DRIVER_INIT(powerbal);
-	DECLARE_DRIVER_INIT(magicstk);
-	TILE_GET_INFO_MEMBER(powerbal_get_bg_tile_info);
-	DECLARE_MACHINE_START(powerbal);
-	DECLARE_MACHINE_RESET(powerbal);
-	DECLARE_VIDEO_START(powerbal);
+	void init_powerbal();
+	void init_magicstk();
+	void powerbal_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void machine_start_powerbal();
+	void machine_reset_powerbal();
+	void video_start_powerbal();
 	uint32_t screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_powerbal( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE16_MEMBER(magicstk_coin_eeprom_w);
-	DECLARE_WRITE16_MEMBER(magicstk_bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(tile_banking_w);
-	DECLARE_WRITE16_MEMBER(oki_banking);
+	void magicstk_coin_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void magicstk_bgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tile_banking_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oki_banking(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };
 
 
-WRITE16_MEMBER(powerbal_state::magicstk_coin_eeprom_w)
+void powerbal_state::magicstk_coin_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -61,13 +61,13 @@ WRITE16_MEMBER(powerbal_state::magicstk_coin_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(powerbal_state::magicstk_bgvideoram_w)
+void powerbal_state::magicstk_bgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(powerbal_state::tile_banking_w)
+void powerbal_state::tile_banking_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (((data >> 12) & 0x0f) != m_tilebank)
 	{
@@ -76,7 +76,7 @@ WRITE16_MEMBER(powerbal_state::tile_banking_w)
 	}
 }
 
-WRITE16_MEMBER(powerbal_state::oki_banking)
+void powerbal_state::oki_banking(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & 3)
 	{
@@ -388,7 +388,7 @@ static INPUT_PORTS_START( hotminda )
 	PORT_DIPSETTING(    0xe0, "Easy 9" )
 INPUT_PORTS_END
 
-TILE_GET_INFO_MEMBER(powerbal_state::powerbal_get_bg_tile_info)
+void powerbal_state::powerbal_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = (m_videoram1[tile_index] & 0x07ff) + m_tilebank * 0x800;
 	int colr = m_videoram1[tile_index] & 0xf000;
@@ -427,7 +427,7 @@ void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-VIDEO_START_MEMBER(powerbal_state,powerbal)
+void powerbal_state::video_start_powerbal()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerbal_state::powerbal_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
@@ -476,12 +476,12 @@ GFXDECODE_END
 
 
 
-MACHINE_START_MEMBER(powerbal_state,powerbal)
+void powerbal_state::machine_start_powerbal()
 {
 	save_item(NAME(m_tilebank));
 }
 
-MACHINE_RESET_MEMBER(powerbal_state,powerbal)
+void powerbal_state::machine_reset_powerbal()
 {
 	m_tilebank = 0;
 }
@@ -685,13 +685,13 @@ ROM_START( hotminda )
 	ROM_LOAD( "rom10.rom",       0x00000, 0x40000,  CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
 ROM_END
 
-DRIVER_INIT_MEMBER(powerbal_state,powerbal)
+void powerbal_state::init_powerbal()
 {
 	m_bg_yoffset = 16;
 	m_yoffset = -8;
 }
 
-DRIVER_INIT_MEMBER(powerbal_state,magicstk)
+void powerbal_state::init_magicstk()
 {
 	m_bg_yoffset = 0;
 	m_yoffset = -5;

@@ -34,9 +34,9 @@ public:
 
 	required_shared_ptr<uint8_t> m_attr;
 	required_shared_ptr<uint8_t> m_vram;
-	DECLARE_WRITE8_MEMBER(out_w);
+	void out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(summit);
+	void palette_init_summit(palette_device &palette);
 	uint32_t screen_update_summit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -69,7 +69,7 @@ uint32_t summit_state::screen_update_summit(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE8_MEMBER(summit_state::out_w)
+void summit_state::out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -299,7 +299,7 @@ static GFXDECODE_START( summit )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(summit_state, summit)
+void summit_state::palette_init_summit(palette_device &palette)
 {
 }
 

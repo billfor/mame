@@ -64,7 +64,7 @@ inline void exidy_state::latch_condition(int collision)
 }
 
 
-INTERRUPT_GEN_MEMBER(exidy_state::exidy_vblank_interrupt)
+void exidy_state::exidy_vblank_interrupt(device_t &device)
 {
 	/* latch the current condition */
 	latch_condition(0);
@@ -76,7 +76,7 @@ INTERRUPT_GEN_MEMBER(exidy_state::exidy_vblank_interrupt)
 
 
 
-READ8_MEMBER(exidy_state::exidy_interrupt_r)
+uint8_t exidy_state::exidy_interrupt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* clear any interrupts */
 	m_maincpu->set_input_line(0, CLEAR_LINE);

@@ -56,21 +56,21 @@ public:
 	tilemap_t* m_tilemap;
 	int m_nmi;
 
-	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	void flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(skyarmy);
+	void palette_init_skyarmy(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(nmi_source);
+	void nmi_source(device_t &device);
 };
 
 void skyarmy_state::machine_start()
@@ -78,17 +78,17 @@ void skyarmy_state::machine_start()
 	save_item(NAME(m_nmi));
 }
 
-WRITE8_MEMBER(skyarmy_state::flip_screen_x_w)
+void skyarmy_state::flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_x_set(data & 0x01);
 }
 
-WRITE8_MEMBER(skyarmy_state::flip_screen_y_w)
+void skyarmy_state::flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_y_set(data & 0x01);
 }
 
-TILE_GET_INFO_MEMBER(skyarmy_state::get_tile_info)
+void skyarmy_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int attr = BITSWAP8(m_colorram[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
@@ -96,19 +96,19 @@ TILE_GET_INFO_MEMBER(skyarmy_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, attr, 0);
 }
 
-WRITE8_MEMBER(skyarmy_state::videoram_w)
+void skyarmy_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skyarmy_state::colorram_w)
+void skyarmy_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-PALETTE_INIT_MEMBER(skyarmy_state, skyarmy)
+void skyarmy_state::palette_init_skyarmy(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -173,13 +173,13 @@ uint32_t skyarmy_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(skyarmy_state::nmi_source)
+void skyarmy_state::nmi_source(device_t &device)
 {
 	if(m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-WRITE8_MEMBER(skyarmy_state::nmi_enable_w)
+void skyarmy_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi=data & 1;
 }

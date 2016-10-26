@@ -43,24 +43,24 @@ public:
 	int m_scrollx;
 	int m_scrolly;
 
-	DECLARE_WRITE8_MEMBER(homerun_control_w);
-	DECLARE_WRITE8_MEMBER(homerun_d7756_sample_w);
-	DECLARE_WRITE8_MEMBER(homerun_videoram_w);
-	DECLARE_WRITE8_MEMBER(homerun_color_w);
-	DECLARE_WRITE8_MEMBER(homerun_scrollhi_w);
-	DECLARE_WRITE8_MEMBER(homerun_scrolly_w);
-	DECLARE_WRITE8_MEMBER(homerun_scrollx_w);
+	void homerun_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void homerun_d7756_sample_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void homerun_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void homerun_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void homerun_scrollhi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void homerun_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void homerun_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(homerun_sprite0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(homerun_d7756_busy_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_d7756_busy_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_hopper_status_r);
+	ioport_value homerun_sprite0_r(ioport_field &field, void *param);
+	ioport_value homerun_d7756_busy_r(ioport_field &field, void *param);
+	ioport_value ganjaja_d7756_busy_r(ioport_field &field, void *param);
+	ioport_value ganjaja_hopper_status_r(ioport_field &field, void *param);
 
-	TILE_GET_INFO_MEMBER(get_homerun_tile_info);
+	void get_homerun_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_homerun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(homerun_banking_w);
+	void homerun_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

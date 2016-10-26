@@ -15,7 +15,7 @@ Ping Pong (c) 1985 Konami
 
 
 
-WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_high_w)
+void pingpong_state::cashquiz_question_bank_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( data != 0xff )
 	{
@@ -32,7 +32,7 @@ WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_high_w)
 	}
 }
 
-WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_low_w)
+void pingpong_state::cashquiz_question_bank_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data >= 0x60 && data <= 0xdf)
 	{
@@ -46,7 +46,7 @@ WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_low_w)
 }
 
 
-WRITE8_MEMBER(pingpong_state::coin_w)
+void pingpong_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 2 = irq enable, bit 3 = nmi enable */
 	m_intenable = data & 0x0c;
@@ -58,7 +58,7 @@ WRITE8_MEMBER(pingpong_state::coin_w)
 	/* other bits unknown */
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::pingpong_interrupt)
+void pingpong_state::pingpong_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -72,7 +72,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::pingpong_interrupt)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::merlinmm_interrupt)
+void pingpong_state::merlinmm_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -558,7 +558,7 @@ ROM_START( cashquiz )
 	ROM_LOAD( "pingpong.11j", 0x0120, 0x0100, CRC(09d96b08) SHA1(81405e33eacc47f91ea4c7221d122f7e6f5b1e5d) ) /* sprites */
 ROM_END
 
-DRIVER_INIT_MEMBER(pingpong_state,merlinmm)
+void pingpong_state::init_merlinmm()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
@@ -568,7 +568,7 @@ DRIVER_INIT_MEMBER(pingpong_state,merlinmm)
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 }
 
-DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
+void pingpong_state::init_cashquiz()
 {
 	uint8_t *ROM;
 	int i;

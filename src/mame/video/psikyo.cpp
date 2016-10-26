@@ -73,7 +73,7 @@ Offset:
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_0)
+void psikyo_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = ((uint16_t *)m_vram_0.target())[BYTE_XOR_BE(tile_index)];
 	SET_TILE_INFO_MEMBER(1,
@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_0)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_1)
+void psikyo_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = ((uint16_t *)m_vram_1.target())[BYTE_XOR_BE(tile_index)];
 	SET_TILE_INFO_MEMBER(1,
@@ -92,7 +92,7 @@ TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_1)
 }
 
 
-WRITE32_MEMBER(psikyo_state::psikyo_vram_0_w)
+void psikyo_state::psikyo_vram_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_0[offset]);
 	if (ACCESSING_BITS_16_31)
@@ -112,7 +112,7 @@ WRITE32_MEMBER(psikyo_state::psikyo_vram_0_w)
 	}
 }
 
-WRITE32_MEMBER(psikyo_state::psikyo_vram_1_w)
+void psikyo_state::psikyo_vram_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_1[offset]);
 	if (ACCESSING_BITS_16_31)
@@ -153,7 +153,7 @@ void psikyo_state::psikyo_switch_banks( int tmap, int bank )
 }
 
 
-VIDEO_START_MEMBER(psikyo_state,psikyo)
+void psikyo_state::video_start_psikyo()
 {
 	/* The Hardware is Capable of Changing the Dimensions of the Tilemaps, its safer to create
 	   the various sized tilemaps now as opposed to later */
@@ -199,9 +199,9 @@ VIDEO_START_MEMBER(psikyo_state,psikyo)
 	save_pointer(NAME(m_spritebuf2.get()), 0x2000 / 4);
 }
 
-VIDEO_START_MEMBER(psikyo_state,sngkace)
+void psikyo_state::video_start_sngkace()
 {
-	VIDEO_START_CALL_MEMBER( psikyo );
+	video_start_psikyo();
 
 	psikyo_switch_banks(0, 0); // sngkace / samuraia don't use banking
 	psikyo_switch_banks(1, 1); // They share "gfx2" to save memory on other boards

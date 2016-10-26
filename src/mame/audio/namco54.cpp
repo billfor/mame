@@ -52,22 +52,22 @@
 #include "emu.h"
 #include "namco54.h"
 
-TIMER_CALLBACK_MEMBER( namco_54xx_device::latch_callback )
+void namco_54xx_device::latch_callback(void *ptr, int32_t param)
 {
 	m_latched_cmd = param;
 }
 
-READ8_MEMBER( namco_54xx_device::K_r )
+uint8_t namco_54xx_device::K_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_latched_cmd >> 4;
 }
 
-READ8_MEMBER( namco_54xx_device::R0_r )
+uint8_t namco_54xx_device::R0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_latched_cmd & 0x0f;
 }
 
-WRITE8_MEMBER( namco_54xx_device::O_w )
+void namco_54xx_device::O_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t out = (data & 0x0f);
 	if (data & 0x10)
@@ -76,7 +76,7 @@ WRITE8_MEMBER( namco_54xx_device::O_w )
 		m_discrete->write(space, NAMCO_54XX_0_DATA(m_basenode), out);
 }
 
-WRITE8_MEMBER( namco_54xx_device::R1_w )
+void namco_54xx_device::R1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t out = (data & 0x0f);
 
@@ -84,12 +84,12 @@ WRITE8_MEMBER( namco_54xx_device::R1_w )
 }
 
 
-TIMER_CALLBACK_MEMBER( namco_54xx_device::irq_clear )
+void namco_54xx_device::irq_clear(void *ptr, int32_t param)
 {
 	m_cpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( namco_54xx_device::write )
+void namco_54xx_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_54xx_device::latch_callback),this), data);
 

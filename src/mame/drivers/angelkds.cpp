@@ -138,7 +138,7 @@ Dumped by Chackn
 
 */
 
-WRITE8_MEMBER(angelkds_state::angelkds_cpu_bank_write)
+void angelkds_state::angelkds_cpu_bank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);   // shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
 }
@@ -417,22 +417,22 @@ sound related ?
 
 */
 
-WRITE8_MEMBER(angelkds_state::angelkds_main_sound_w)
+void angelkds_state::angelkds_main_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound[offset] = data;
 }
 
-READ8_MEMBER(angelkds_state::angelkds_main_sound_r)
+uint8_t angelkds_state::angelkds_main_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound2[offset];
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_sub_sound_w)
+void angelkds_state::angelkds_sub_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound2[offset] = data;
 }
 
-READ8_MEMBER(angelkds_state::angelkds_sub_sound_r)
+uint8_t angelkds_state::angelkds_sub_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound[offset];
 }
@@ -672,7 +672,7 @@ ROM_START( spcpostn )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(angelkds_state,angelkds)
+void angelkds_state::init_angelkds()
 {
 	uint8_t *RAM = memregion("user1")->base();
 	membank("bank1")->configure_entries(0, 16, &RAM[0x0000], 0x4000);

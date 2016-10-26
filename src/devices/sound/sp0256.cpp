@@ -1155,7 +1155,7 @@ void sp0256_device::micro()
 
 
 
-WRITE8_MEMBER( sp0256_device::ald_w )
+void sp0256_device::ald_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* ---------------------------------------------------------------- */
 	/*  Drop writes to the ALD register if we're busy.                  */
@@ -1179,7 +1179,7 @@ WRITE8_MEMBER( sp0256_device::ald_w )
 	return;
 }
 
-READ_LINE_MEMBER( sp0256_device::lrq_r )
+int sp0256_device::lrq_r()
 {
 	// force stream update
 	m_stream->update();
@@ -1187,14 +1187,14 @@ READ_LINE_MEMBER( sp0256_device::lrq_r )
 	return m_lrq == 0x8000;
 }
 
-READ_LINE_MEMBER( sp0256_device::sby_r )
+int sp0256_device::sby_r()
 {
 	// TODO: force stream update??
 
 	return m_sby_line;
 }
 
-READ16_MEMBER( sp0256_device::spb640_r )
+uint16_t sp0256_device::spb640_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* -------------------------------------------------------------------- */
 	/*  Offset 0 returns the SP0256 LRQ status on bit 15.                   */
@@ -1218,7 +1218,7 @@ READ16_MEMBER( sp0256_device::spb640_r )
 	return 0x00ff;
 }
 
-WRITE16_MEMBER( sp0256_device::spb640_w )
+void sp0256_device::spb640_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1268,7 +1268,7 @@ void sp0256_device::set_clock(int clock)
 }
 
 
-TIMER_CALLBACK_MEMBER(sp0256_device::set_lrq_timer_proc)
+void sp0256_device::set_lrq_timer_proc(void *ptr, int32_t param)
 {
 	m_lrq = 0x8000;
 }

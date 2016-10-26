@@ -720,7 +720,7 @@ TODO:
 
 
 
-READ8_MEMBER(galaga_state::bosco_dsw_r)
+uint8_t galaga_state::bosco_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bit0,bit1;
 
@@ -730,18 +730,18 @@ READ8_MEMBER(galaga_state::bosco_dsw_r)
 	return bit0 | (bit1 << 1);
 }
 
-WRITE8_MEMBER(galaga_state::galaga_flip_screen_w)
+void galaga_state::galaga_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }
 
-WRITE8_MEMBER(bosco_state::bosco_flip_screen_w)
+void bosco_state::bosco_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 1);
 }
 
 
-WRITE8_MEMBER(galaga_state::bosco_latch_w)
+void galaga_state::bosco_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -783,9 +783,9 @@ WRITE8_MEMBER(galaga_state::bosco_latch_w)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(digdug_state::shifted_port_r){ return ioport((const char *)param)->read() >> 4; }
+ioport_value digdug_state::shifted_port_r(ioport_field &field, void *param){ return ioport((const char *)param)->read() >> 4; }
 
-WRITE8_MEMBER(galaga_state::out_0)
+void galaga_state::out_0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(1,data & 1);
 	output().set_led_value(0,data & 2);
@@ -793,12 +793,12 @@ WRITE8_MEMBER(galaga_state::out_0)
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
 
-WRITE8_MEMBER(galaga_state::out_1)
+void galaga_state::out_1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(data & 1);
 }
 
-READ8_MEMBER(galaga_state::namco_52xx_rom_r)
+uint8_t galaga_state::namco_52xx_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t length = memregion("52xx")->bytes();
 //printf("ROM read %04X\n", offset);
@@ -813,19 +813,19 @@ READ8_MEMBER(galaga_state::namco_52xx_rom_r)
 	return (offset < length) ? memregion("52xx")->base()[offset] : 0xff;
 }
 
-READ8_MEMBER(galaga_state::namco_52xx_si_r)
+uint8_t galaga_state::namco_52xx_si_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* pulled to GND */
 	return 0;
 }
 
-READ8_MEMBER(galaga_state::custom_mod_r)
+uint8_t galaga_state::custom_mod_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* MOD0-2 is connected to K1-3; K0 is left unconnected */
 	return m_custom_mod << 1;
 }
 
-TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
+void galaga_state::cpu3_interrupt_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -841,7 +841,7 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 }
 
 
-MACHINE_START_MEMBER(galaga_state,galaga)
+void galaga_state::machine_start_galaga()
 {
 	/* create the interrupt timer */
 	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaga_state::cpu3_interrupt_callback),this));
@@ -862,7 +862,7 @@ void galaga_state::bosco_latch_reset()
 		bosco_latch_w(space,i,0);
 }
 
-MACHINE_RESET_MEMBER(galaga_state,galaga)
+void galaga_state::machine_reset_galaga()
 {
 	/* Reset all latches */
 	bosco_latch_reset();
@@ -870,9 +870,9 @@ MACHINE_RESET_MEMBER(galaga_state,galaga)
 	m_cpu3_interrupt_timer->adjust(m_screen->time_until_pos(64), 64);
 }
 
-MACHINE_RESET_MEMBER(xevious_state,battles)
+void xevious_state::machine_reset_battles()
 {
-	MACHINE_RESET_CALL_MEMBER(galaga);
+	machine_reset_galaga();
 	battles_customio_init();
 }
 
@@ -1589,13 +1589,13 @@ static const char *const battles_sample_names[] =
 	nullptr   /* end of array */
 };
 
-INTERRUPT_GEN_MEMBER(galaga_state::main_vblank_irq)
+void galaga_state::main_vblank_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(galaga_state::sub_vblank_irq)
+void galaga_state::sub_vblank_irq(device_t &device)
 {
 	if(m_sub_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
@@ -3358,7 +3358,7 @@ ROM_START( digsid )
 	ROM_LOAD( "136007.109",   0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
 ROM_END
 
-DRIVER_INIT_MEMBER(galaga_state,galaga)
+void galaga_state::init_galaga()
 {
 	/* swap bytes for flipped character so we can decode them together with normal characters */
 	uint8_t *rom = memregion("gfx1")->base();
@@ -3375,16 +3375,16 @@ DRIVER_INIT_MEMBER(galaga_state,galaga)
 	}
 }
 
-DRIVER_INIT_MEMBER(galaga_state,gatsbee)
+void galaga_state::init_gatsbee()
 {
-	DRIVER_INIT_CALL(galaga);
+	init_galaga();
 
 	/* Gatsbee has a larger character ROM, we need a handler for banking */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1000, 0x1000, write8_delegate(FUNC(galaga_state::gatsbee_bank_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(xevious_state,xevious)
+void xevious_state::init_xevious()
 {
 	uint8_t *rom;
 	int i;
@@ -3394,7 +3394,7 @@ DRIVER_INIT_MEMBER(xevious_state,xevious)
 		rom[i + 0x2000] = rom[i] >> 4;
 }
 
-DRIVER_INIT_MEMBER(xevious_state,xevios)
+void xevious_state::init_xevios()
 {
 	int A;
 	uint8_t *rom;
@@ -3414,17 +3414,17 @@ DRIVER_INIT_MEMBER(xevious_state,xevios)
 		rom[A] = BITSWAP8(rom[A],3,7,5,1,2,6,4,0);
 	}
 
-	DRIVER_INIT_CALL(xevious);
+	init_xevious();
 }
 
 
-DRIVER_INIT_MEMBER(xevious_state,battles)
+void xevious_state::init_battles()
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7000, 0x700f, read8_delegate(FUNC(xevious_state::battles_customio_data0_r),this), write8_delegate(FUNC(xevious_state::battles_customio_data0_w),this) );
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7100, 0x7100, read8_delegate(FUNC(xevious_state::battles_customio0_r),this), write8_delegate(FUNC(xevious_state::battles_customio0_w),this) );
 
-	DRIVER_INIT_CALL(xevious);
+	init_xevious();
 }
 
 

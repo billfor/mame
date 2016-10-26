@@ -125,29 +125,29 @@ public:
 	template<class _Object> static devcb_base &set_out_vsync_callback(device_t &device, _Object object) { return downcast<mc6845_device &>(device).m_out_vsync_cb.set_callback(object); }
 
 	/* select one of the registers for reading or writing */
-	DECLARE_WRITE8_MEMBER( address_w );
+	void address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* read from the status register */
-	DECLARE_READ8_MEMBER( status_r );
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* read from the currently selected register */
-	DECLARE_READ8_MEMBER( register_r );
+	uint8_t register_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* write to the currently selected register */
-	DECLARE_WRITE8_MEMBER( register_w );
+	void register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// read display enable line state
-	DECLARE_READ_LINE_MEMBER( de_r );
+	int de_r();
 
 	// read cursor line state
-	DECLARE_READ_LINE_MEMBER( cursor_r );
-	DECLARE_READ_LINE_MEMBER( cursor_state_r );
+	int cursor_r();
+	int cursor_state_r();
 
 	// read horizontal sync line state
-	DECLARE_READ_LINE_MEMBER( hsync_r );
+	int hsync_r();
 
 	// read vertical sync line state
-	DECLARE_READ_LINE_MEMBER( vsync_r );
+	int vsync_r();
 
 	/* return the current value on the MA0-MA13 pins */
 	uint16_t get_ma();
@@ -436,12 +436,12 @@ public:
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
-	DECLARE_PALETTE_INIT(mos8563);
+	void palette_init_mos8563(palette_device &palette);
 
-	DECLARE_WRITE8_MEMBER( address_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_READ8_MEMBER( register_r );
-	DECLARE_WRITE8_MEMBER( register_w );
+	void address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t register_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	inline uint8_t read_videoram(offs_t offset);
 	inline void write_videoram(offs_t offset, uint8_t data);

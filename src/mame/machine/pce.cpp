@@ -79,22 +79,22 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 
 
 
-DRIVER_INIT_MEMBER(pce_state,mess_pce)
+void pce_state::init_mess_pce()
 {
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
-DRIVER_INIT_MEMBER(pce_state,tg16)
+void pce_state::init_tg16()
 {
 	m_io_port_options = TG_16_JOY_SIG | CONST_SIG;
 }
 
-DRIVER_INIT_MEMBER(pce_state,sgx)
+void pce_state::init_sgx()
 {
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
-MACHINE_START_MEMBER(pce_state,pce)
+void pce_state::machine_start_pce()
 {
 	if (m_cd)
 		m_cd->late_setup();
@@ -108,7 +108,7 @@ MACHINE_START_MEMBER(pce_state,pce)
 	save_item(NAME(m_joy_6b_packet));
 }
 
-MACHINE_RESET_MEMBER(pce_state,mess_pce)
+void pce_state::machine_reset_mess_pce()
 {
 	for (auto & elem : m_joy_6b_packet)
 		elem = 0;
@@ -131,7 +131,7 @@ MACHINE_RESET_MEMBER(pce_state,mess_pce)
 }
 
 /* todo: how many input ports does the PCE have? */
-WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
+void pce_state::mess_pce_joystick_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int joy_i;
 	uint8_t joy_type = m_joy_type->read();
@@ -160,7 +160,7 @@ WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
 	}
 }
 
-READ8_MEMBER(pce_state::mess_pce_joystick_r)
+uint8_t pce_state::mess_pce_joystick_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t joy_type = m_joy_type->read();
 	uint8_t ret, data;
@@ -203,7 +203,7 @@ READ8_MEMBER(pce_state::mess_pce_joystick_r)
 }
 
 
-WRITE8_MEMBER(pce_state::pce_cd_intf_w)
+void pce_state::pce_cd_intf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cd->update();
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 	m_cd->update();
 }
 
-READ8_MEMBER(pce_state::pce_cd_intf_r)
+uint8_t pce_state::pce_cd_intf_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_cd->update();
 
@@ -239,12 +239,12 @@ READ8_MEMBER(pce_state::pce_cd_intf_r)
 }
 
 
-READ8_MEMBER(pce_state::pce_cd_acard_wram_r)
+uint8_t pce_state::pce_cd_acard_wram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pce_cd_intf_r(space, 0x200 | (offset & 0x6000) >> 9);
 }
 
-WRITE8_MEMBER(pce_state::pce_cd_acard_wram_w)
+void pce_state::pce_cd_acard_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pce_cd_intf_w(space, 0x200 | (offset & 0x6000) >> 9, data);
 }

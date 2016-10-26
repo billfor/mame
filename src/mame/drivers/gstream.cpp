@@ -177,24 +177,24 @@ public:
 	int       m_toggle;
 	int       m_xoffset;
 
-	DECLARE_WRITE32_MEMBER(gstream_vram_w);
-	DECLARE_WRITE32_MEMBER(gstream_tilemap1_scrollx_w);
-	DECLARE_WRITE32_MEMBER(gstream_tilemap1_scrolly_w);
-	DECLARE_WRITE32_MEMBER(gstream_tilemap2_scrollx_w);
-	DECLARE_WRITE32_MEMBER(gstream_tilemap2_scrolly_w);
-	DECLARE_WRITE32_MEMBER(gstream_tilemap3_scrollx_w);
-	DECLARE_WRITE32_MEMBER(gstream_tilemap3_scrolly_w);
-	DECLARE_WRITE32_MEMBER(gstream_oki_banking_w);
-	DECLARE_WRITE32_MEMBER(gstream_oki_4040_w);
-	DECLARE_WRITE32_MEMBER(x2222_sound_w);
-	DECLARE_READ32_MEMBER(gstream_speedup_r);
-	DECLARE_READ32_MEMBER(x2222_speedup_r);
-	DECLARE_READ32_MEMBER(x2222_speedup2_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
-	DECLARE_DRIVER_INIT(gstream);
-	DECLARE_DRIVER_INIT(x2222);
+	void gstream_vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void gstream_tilemap1_scrollx_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void gstream_tilemap1_scrolly_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void gstream_tilemap2_scrollx_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void gstream_tilemap2_scrolly_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void gstream_tilemap3_scrollx_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void gstream_tilemap3_scrolly_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void gstream_oki_banking_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void gstream_oki_4040_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void x2222_sound_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gstream_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t x2222_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t x2222_speedup2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	ioport_value gstream_mirror_service_r(ioport_field &field, void *param);
+	ioport_value gstream_mirror_r(ioport_field &field, void *param);
+	ioport_value x2222_toggle_r(ioport_field &field, void *param);
+	void init_gstream();
+	void init_x2222();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -208,14 +208,14 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-CUSTOM_INPUT_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?
+ioport_value gstream_state::x2222_toggle_r(ioport_field &field, void *param) // or the game hangs when starting, might be a status flag for the sound?
 {
 	m_toggle ^= 0xffff;
 	return m_toggle;
 }
 
 
-CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_service_r)
+ioport_value gstream_state::gstream_mirror_service_r(ioport_field &field, void *param)
 {
 	int result;
 
@@ -225,7 +225,7 @@ CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_service_r)
 	return ~result;
 }
 
-CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
+ioport_value gstream_state::gstream_mirror_r(ioport_field &field, void *param)
 {
 	int result;
 
@@ -245,37 +245,37 @@ CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
 
 
 
-WRITE32_MEMBER(gstream_state::gstream_vram_w)
+void gstream_state::gstream_vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 }
 
-WRITE32_MEMBER(gstream_state::gstream_tilemap1_scrollx_w)
+void gstream_state::gstream_tilemap1_scrollx_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_tmap1_scrollx = data;
 }
 
-WRITE32_MEMBER(gstream_state::gstream_tilemap1_scrolly_w)
+void gstream_state::gstream_tilemap1_scrolly_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_tmap1_scrolly = data;
 }
 
-WRITE32_MEMBER(gstream_state::gstream_tilemap2_scrollx_w)
+void gstream_state::gstream_tilemap2_scrollx_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_tmap2_scrollx = data;
 }
 
-WRITE32_MEMBER(gstream_state::gstream_tilemap2_scrolly_w)
+void gstream_state::gstream_tilemap2_scrolly_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_tmap2_scrolly = data;
 }
 
-WRITE32_MEMBER(gstream_state::gstream_tilemap3_scrollx_w)
+void gstream_state::gstream_tilemap3_scrollx_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_tmap3_scrollx = data;
 }
 
-WRITE32_MEMBER(gstream_state::gstream_tilemap3_scrolly_w)
+void gstream_state::gstream_tilemap3_scrolly_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_tmap3_scrolly = data;
 }
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32, gstream_state )
 	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
 
-WRITE32_MEMBER(gstream_state::gstream_oki_banking_w)
+void gstream_state::gstream_oki_banking_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 /*
     ****OKI BANKING****
@@ -356,7 +356,7 @@ WRITE32_MEMBER(gstream_state::gstream_oki_banking_w)
 }
 
 // Some clocking?
-WRITE32_MEMBER(gstream_state::gstream_oki_4040_w)
+void gstream_state::gstream_oki_4040_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// data == 0 or data == 0x81
 }
@@ -390,7 +390,7 @@ static ADDRESS_MAP_START( x2222_32bit_map, AS_PROGRAM, 32, gstream_state )
 	AM_RANGE(0xFFF00000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
 
-WRITE32_MEMBER(gstream_state::x2222_sound_w)
+void gstream_state::x2222_sound_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// maybe sound in low 8-bits? but we have no samples anyway assuming it's an OKI
 	if (data & 0xffffff00)
@@ -1097,7 +1097,7 @@ ROM_START( x2222o )
 ROM_END
 
 
-READ32_MEMBER(gstream_state::gstream_speedup_r)
+uint32_t gstream_state::gstream_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_maincpu->pc() == 0xc0001592)
 	{
@@ -1108,7 +1108,7 @@ READ32_MEMBER(gstream_state::gstream_speedup_r)
 }
 
 
-READ32_MEMBER(gstream_state::x2222_speedup_r)
+uint32_t gstream_state::x2222_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_maincpu->pc() == 0x22064)
 	{
@@ -1118,7 +1118,7 @@ READ32_MEMBER(gstream_state::x2222_speedup_r)
 	return m_workram[0x7ffac / 4];
 }
 
-READ32_MEMBER(gstream_state::x2222_speedup2_r)
+uint32_t gstream_state::x2222_speedup2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_maincpu->pc() == 0x23f44)
 	{
@@ -1129,7 +1129,7 @@ READ32_MEMBER(gstream_state::x2222_speedup2_r)
 }
 
 
-DRIVER_INIT_MEMBER(gstream_state,gstream)
+void gstream_state::init_gstream()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), this));
 
@@ -1157,7 +1157,7 @@ void gstream_state::rearrange_sprite_data(uint8_t* ROM, uint32_t* NEW, uint32_t*
 	}
 }
 
-DRIVER_INIT_MEMBER(gstream_state,x2222)
+void gstream_state::init_x2222()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7ffac, 0x7ffaf, read32_delegate(FUNC(gstream_state::x2222_speedup_r), this)); // older
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x84e3c, 0x84e3f, read32_delegate(FUNC(gstream_state::x2222_speedup2_r), this)); // newer

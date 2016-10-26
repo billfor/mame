@@ -144,7 +144,7 @@ we have no way of knowing which is the later/corrected version.
 
 
 
-READ16_MEMBER(mystwarr_state::eeprom_r)
+uint16_t mystwarr_state::eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -156,7 +156,7 @@ READ16_MEMBER(mystwarr_state::eeprom_r)
 	return 0;
 }
 
-WRITE16_MEMBER(mystwarr_state::mweeprom_w)
+void mystwarr_state::mweeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -167,7 +167,7 @@ WRITE16_MEMBER(mystwarr_state::mweeprom_w)
 
 }
 
-READ16_MEMBER(mystwarr_state::dddeeprom_r)
+uint16_t mystwarr_state::dddeeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -177,7 +177,7 @@ READ16_MEMBER(mystwarr_state::dddeeprom_r)
 	return ioport("P2")->read();
 }
 
-WRITE16_MEMBER(mystwarr_state::mmeeprom_w)
+void mystwarr_state::mmeeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -189,7 +189,7 @@ WRITE16_MEMBER(mystwarr_state::mmeeprom_w)
 /**********************************************************************************/
 /* IRQ controllers */
 
-TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mystwarr_interrupt)
+void mystwarr_state::mystwarr_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -205,7 +205,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mystwarr_interrupt)
 //  m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::metamrph_interrupt)
+void mystwarr_state::metamrph_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -219,7 +219,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::metamrph_interrupt)
 		if (m_k055673->k053246_is_irq_enabled()) m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mchamp_interrupt)
+void mystwarr_state::mchamp_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -234,7 +234,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mchamp_interrupt)
 		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mystwarr_state::ddd_interrupt)
+void mystwarr_state::ddd_interrupt(device_t &device)
 {
 	device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
@@ -242,34 +242,34 @@ INTERRUPT_GEN_MEMBER(mystwarr_state::ddd_interrupt)
 
 /**********************************************************************************/
 
-WRITE16_MEMBER(mystwarr_state::sound_cmd1_w)
+void mystwarr_state::sound_cmd1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data&0xff);
 }
 
-WRITE16_MEMBER(mystwarr_state::sound_cmd1_msb_w)
+void mystwarr_state::sound_cmd1_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data>>8);
 }
 
-WRITE16_MEMBER(mystwarr_state::sound_cmd2_w)
+void mystwarr_state::sound_cmd2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch2->write(space, 0, data&0xff);
 	return;
 }
 
-WRITE16_MEMBER(mystwarr_state::sound_cmd2_msb_w)
+void mystwarr_state::sound_cmd2_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch2->write(space, 0, data>>8);
 	return;
 }
 
-WRITE16_MEMBER(mystwarr_state::sound_irq_w)
+void mystwarr_state::sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-READ16_MEMBER(mystwarr_state::sound_status_r)
+uint16_t mystwarr_state::sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int latch = m_soundlatch3->read(space,0);
 
@@ -278,7 +278,7 @@ READ16_MEMBER(mystwarr_state::sound_status_r)
 	return latch;
 }
 
-READ16_MEMBER(mystwarr_state::sound_status_msb_r)
+uint16_t mystwarr_state::sound_status_msb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int latch = m_soundlatch3->read(space,0);
 
@@ -287,7 +287,7 @@ READ16_MEMBER(mystwarr_state::sound_status_msb_r)
 	return latch<<8;
 }
 
-WRITE16_MEMBER(mystwarr_state::irq_ack_w)
+void mystwarr_state::irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_k056832->b_word_w(space, offset, data, mem_mask);
 
@@ -302,7 +302,7 @@ WRITE16_MEMBER(mystwarr_state::irq_ack_w)
 
 /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
-READ16_MEMBER(mystwarr_state::k053247_scattered_word_r)
+uint16_t mystwarr_state::k053247_scattered_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset & 0x0078)
 		return m_spriteram[offset];
@@ -313,7 +313,7 @@ READ16_MEMBER(mystwarr_state::k053247_scattered_word_r)
 	}
 }
 
-WRITE16_MEMBER(mystwarr_state::k053247_scattered_word_w)
+void mystwarr_state::k053247_scattered_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset & 0x0078)
 	{
@@ -429,7 +429,7 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 ADDRESS_MAP_END
 
 // Martial Champion specific interfaces
-READ16_MEMBER(mystwarr_state::k053247_martchmp_word_r)
+uint16_t mystwarr_state::k053247_martchmp_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset & 0x0018)
 		return m_spriteram[offset];
@@ -440,7 +440,7 @@ READ16_MEMBER(mystwarr_state::k053247_martchmp_word_r)
 	}
 }
 
-WRITE16_MEMBER(mystwarr_state::k053247_martchmp_word_w)
+void mystwarr_state::k053247_martchmp_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset & 0x0018)
 	{
@@ -454,12 +454,12 @@ WRITE16_MEMBER(mystwarr_state::k053247_martchmp_word_w)
 	}
 }
 
-READ16_MEMBER(mystwarr_state::mccontrol_r)
+uint16_t mystwarr_state::mccontrol_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_mw_irq_control<<8;
 }
 
-WRITE16_MEMBER(mystwarr_state::mccontrol_w)
+void mystwarr_state::mccontrol_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -587,7 +587,7 @@ ADDRESS_MAP_END
 
 /**********************************************************************************/
 
-WRITE8_MEMBER(mystwarr_state::sound_ctrl_w)
+void mystwarr_state::sound_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x10))
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -621,7 +621,7 @@ static ADDRESS_MAP_START( mystwarr_sound_map, AS_PROGRAM, 8, mystwarr_state )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER(mystwarr_state::k054539_nmi_gen)
+void mystwarr_state::k054539_nmi_gen(int state)
 {
 	if (m_sound_ctrl & 0x10)
 	{
@@ -876,7 +876,7 @@ static GFXDECODE_START( dadandrn )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x0000, 8 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(mystwarr_state,mystwarr)
+void mystwarr_state::machine_start_mystwarr()
 {
 	membank("z80bank")->configure_entries(0, 16, memregion("soundcpu")->base(), 0x4000);
 	membank("z80bank")->set_entry(2);
@@ -892,7 +892,7 @@ MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 	save_item(NAME(m_sound_nmi_clk));
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,mystwarr)
+void mystwarr_state::machine_reset_mystwarr()
 {
 	int i;
 
@@ -907,7 +907,7 @@ MACHINE_RESET_MEMBER(mystwarr_state,mystwarr)
 	for (i=0; i<=7; i++) m_k054539_2->set_gain(i, 0.5);
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,dadandrn)
+void mystwarr_state::machine_reset_dadandrn()
 {
 	int i;
 
@@ -915,7 +915,7 @@ MACHINE_RESET_MEMBER(mystwarr_state,dadandrn)
 	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,viostorm)
+void mystwarr_state::machine_reset_viostorm()
 {
 	int i;
 
@@ -923,7 +923,7 @@ MACHINE_RESET_MEMBER(mystwarr_state,viostorm)
 	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
+void mystwarr_state::machine_reset_metamrph()
 {
 	int i;
 
@@ -937,7 +937,7 @@ MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 	}
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
+void mystwarr_state::machine_reset_martchmp()
 {
 	int i;
 
@@ -947,7 +947,7 @@ MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 1.4);
 }
 
-MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
+void mystwarr_state::machine_reset_gaiapols()
 {
 	int i;
 

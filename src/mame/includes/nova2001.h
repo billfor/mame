@@ -24,37 +24,37 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(ninjakun_cpu1_io_A002_w);
-	DECLARE_WRITE8_MEMBER(ninjakun_cpu2_io_A002_w);
-	DECLARE_WRITE8_MEMBER(ninjakun_paletteram_w);
-	DECLARE_WRITE8_MEMBER(nova2001_fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(nova2001_bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(ninjakun_bg_videoram_w);
-	DECLARE_READ8_MEMBER(ninjakun_bg_videoram_r);
-	DECLARE_WRITE8_MEMBER(nova2001_scroll_x_w);
-	DECLARE_WRITE8_MEMBER(nova2001_scroll_y_w);
-	DECLARE_WRITE8_MEMBER(nova2001_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(pkunwar_flipscreen_w);
+	void ninjakun_cpu1_io_A002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ninjakun_cpu2_io_A002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ninjakun_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nova2001_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nova2001_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ninjakun_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ninjakun_bg_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nova2001_scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nova2001_scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nova2001_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pkunwar_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
+	ioport_value ninjakun_io_A002_ctrl_r(ioport_field &field, void *param);
 
-	DECLARE_DRIVER_INIT(raiders5);
-	DECLARE_DRIVER_INIT(pkunwar);
-	DECLARE_VIDEO_START(nova2001);
-	DECLARE_PALETTE_INIT(nova2001);
-	DECLARE_PALETTE_DECODER(BBGGRRII);
-	DECLARE_MACHINE_START(ninjakun);
-	DECLARE_VIDEO_START(ninjakun);
-	DECLARE_VIDEO_START(pkunwar);
-	DECLARE_VIDEO_START(raiders5);
+	void init_raiders5();
+	void init_pkunwar();
+	void video_start_nova2001();
+	void palette_init_nova2001(palette_device &palette);
+	static rgb_t BBGGRRII_decoder(uint32_t raw);
+	void machine_start_ninjakun();
+	void video_start_ninjakun();
+	void video_start_pkunwar();
+	void video_start_raiders5();
 
-	TILE_GET_INFO_MEMBER(nova2001_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(nova2001_get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(ninjakun_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(ninjakun_get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(pkunwar_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(raiders5_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(raiders5_get_fg_tile_info);
+	void nova2001_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void nova2001_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void ninjakun_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void ninjakun_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void pkunwar_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void raiders5_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void raiders5_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update_nova2001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ninjakun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

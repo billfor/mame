@@ -18,7 +18,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(klax_state::get_playfield_tile_info)
+void klax_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data1 = tilemap.basemem_read(tile_index);
 	uint16_t data2 = tilemap.extmem_read(tile_index) >> 8;
@@ -69,7 +69,7 @@ const atari_motion_objects_config klax_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(klax_state,klax)
+void klax_state::video_start_klax()
 {
 }
 
@@ -81,7 +81,7 @@ VIDEO_START_MEMBER(klax_state,klax)
  *
  *************************************/
 
-WRITE16_MEMBER( klax_state::klax_latch_w )
+void klax_state::klax_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 

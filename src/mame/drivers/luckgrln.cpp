@@ -132,44 +132,44 @@ public:
 
 	int m_palette_count;
 	uint8_t m_palette_ram[0x10000];
-	DECLARE_WRITE8_MEMBER(luckgrln_reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel1_attr_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel2_attr_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel3_attr_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel4_ram_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel4_attr_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(palette_offset_low_w);
-	DECLARE_WRITE8_MEMBER(palette_offset_high_w);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(lamps_a_w);
-	DECLARE_WRITE8_MEMBER(lamps_b_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
-	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_DRIVER_INIT(luckgrln);
-	TILE_GET_INFO_MEMBER(get_luckgrln_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_luckgrln_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_luckgrln_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_luckgrln_reel4_tile_info);
+	void luckgrln_reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel1_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel2_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel3_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel4_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel4_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_offset_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_offset_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lamps_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t test_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_luckgrln();
+	void get_luckgrln_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_luckgrln_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_luckgrln_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_luckgrln_reel4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(luckgrln_irq);
+	void luckgrln_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
 
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_ram_w)
+void luckgrln_state::luckgrln_reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_attr_w)
+void luckgrln_state::luckgrln_reel1_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel1_attr[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
@@ -177,7 +177,7 @@ WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_attr_w)
 
 
 
-TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel1_tile_info)
+void luckgrln_state::get_luckgrln_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel1_ram[tile_index];
 	int attr = m_reel1_attr[tile_index];
@@ -193,20 +193,20 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel1_tile_info)
 }
 
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_ram_w)
+void luckgrln_state::luckgrln_reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel2_ram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_attr_w)
+void luckgrln_state::luckgrln_reel2_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel2_attr[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel2_tile_info)
+void luckgrln_state::get_luckgrln_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel2_ram[tile_index];
 	int attr = m_reel2_attr[tile_index];
@@ -221,20 +221,20 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel2_tile_info)
 			0);
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_ram_w)
+void luckgrln_state::luckgrln_reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_attr_w)
+void luckgrln_state::luckgrln_reel3_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel3_attr[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel3_tile_info)
+void luckgrln_state::get_luckgrln_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel3_ram[tile_index];
 	int attr = m_reel3_attr[tile_index];
@@ -248,20 +248,20 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel3_tile_info)
 			0);
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_ram_w)
+void luckgrln_state::luckgrln_reel4_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel4_ram[offset] = data;
 	m_reel4_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_attr_w)
+void luckgrln_state::luckgrln_reel4_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel4_attr[offset] = data;
 	m_reel4_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel4_tile_info)
+void luckgrln_state::get_luckgrln_reel4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel4_ram[tile_index];
 	int attr = m_reel4_attr[tile_index];
@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( _7smash_map, AS_PROGRAM, 8, luckgrln_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_UNMAP
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(luckgrln_state::output_w)
+void luckgrln_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* correct? */
 	if (data==0x84)
@@ -444,17 +444,17 @@ WRITE8_MEMBER(luckgrln_state::output_w)
 
 
 
-WRITE8_MEMBER(luckgrln_state::palette_offset_low_w)
+void luckgrln_state::palette_offset_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_count = data<<1;
 }
-WRITE8_MEMBER(luckgrln_state::palette_offset_high_w)
+void luckgrln_state::palette_offset_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_count = m_palette_count | data<<9;
 }
 
 
-WRITE8_MEMBER(luckgrln_state::palette_w)
+void luckgrln_state::palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_ram[m_palette_count] = data;
 
@@ -479,7 +479,7 @@ WRITE8_MEMBER(luckgrln_state::palette_w)
 }
 
 // Oki M62X428 is a 4-bit RTC, doesn't seem to be millennium bug proof ...
-READ8_MEMBER(luckgrln_state::rtc_r)
+uint8_t luckgrln_state::rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	system_time systime;
 	machine().base_datetime(systime);
@@ -506,7 +506,7 @@ READ8_MEMBER(luckgrln_state::rtc_r)
 }
 
 /* Analizing the lamps, the game should has a 12-buttons control layout */
-WRITE8_MEMBER(luckgrln_state::lamps_a_w)
+void luckgrln_state::lamps_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  LAMPS A:
 
@@ -531,7 +531,7 @@ WRITE8_MEMBER(luckgrln_state::lamps_a_w)
 	output().set_lamp_value(7, (data >> 7) & 1);      /* TAKE */
 }
 
-WRITE8_MEMBER(luckgrln_state::lamps_b_w)
+void luckgrln_state::lamps_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  LAMPS B:
 
@@ -550,7 +550,7 @@ WRITE8_MEMBER(luckgrln_state::lamps_b_w)
 	output().set_lamp_value(11, (data >> 3) & 1);     /* CANCEL */
 }
 
-WRITE8_MEMBER(luckgrln_state::counters_w)
+void luckgrln_state::counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  COUNTERS:
 
@@ -625,7 +625,7 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8, luckgrln_state )
 ADDRESS_MAP_END
 
 /* reads a bit 1 status there after every round played */
-READ8_MEMBER(luckgrln_state::test_r)
+uint8_t luckgrln_state::test_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -977,7 +977,7 @@ static GFXDECODE_START( luckgrln )
 	GFXDECODE_ENTRY( "reels", 0, tiles8x32_layout, 0, 64 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
+void luckgrln_state::luckgrln_irq(device_t &device)
 {
 	if(m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -1014,7 +1014,7 @@ static MACHINE_CONFIG_DERIVED( _7smash, luckgrln )
 	MCFG_CPU_IO_MAP(_7smash_io)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(luckgrln_state,luckgrln)
+void luckgrln_state::init_luckgrln()
 {
 	int i;
 	uint8_t x,v;

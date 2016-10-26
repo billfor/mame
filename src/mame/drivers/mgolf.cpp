@@ -44,22 +44,22 @@ public:
 	attotime m_time_released;
 	emu_timer *m_interrupt_timer;
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(wram_r);
-	DECLARE_READ8_MEMBER(dial_r);
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_WRITE8_MEMBER(wram_w);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t wram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t misc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mgolf);
+	void palette_init_mgolf(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	void interrupt_callback(void *ptr, int32_t param);
 
 	void update_plunger(  );
 	double calc_plunger_pos();
@@ -69,7 +69,7 @@ protected:
 };
 
 
-TILE_GET_INFO_MEMBER(mgolf_state::get_tile_info)
+void mgolf_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 
@@ -77,7 +77,7 @@ TILE_GET_INFO_MEMBER(mgolf_state::get_tile_info)
 }
 
 
-WRITE8_MEMBER(mgolf_state::vram_w)
+void mgolf_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -152,7 +152,7 @@ void mgolf_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 }
 
 
-TIMER_CALLBACK_MEMBER(mgolf_state::interrupt_callback)
+void mgolf_state::interrupt_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -175,13 +175,13 @@ double mgolf_state::calc_plunger_pos()
 }
 
 
-READ8_MEMBER(mgolf_state::wram_r)
+uint8_t mgolf_state::wram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_video_ram[0x380 + offset];
 }
 
 
-READ8_MEMBER(mgolf_state::dial_r)
+uint8_t mgolf_state::dial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = ioport("41")->read();
 
@@ -198,7 +198,7 @@ READ8_MEMBER(mgolf_state::dial_r)
 }
 
 
-READ8_MEMBER(mgolf_state::misc_r)
+uint8_t mgolf_state::misc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	double plunger = calc_plunger_pos(); /* see Video Pinball */
 
@@ -217,7 +217,7 @@ READ8_MEMBER(mgolf_state::misc_r)
 }
 
 
-WRITE8_MEMBER(mgolf_state::wram_w)
+void mgolf_state::wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[0x380 + offset] = data;
 }
@@ -295,7 +295,7 @@ static INPUT_PORTS_START( mgolf )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(mgolf_state, mgolf)
+void mgolf_state::palette_init_mgolf(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80));
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));

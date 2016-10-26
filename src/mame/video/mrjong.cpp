@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(mrjong_state, mrjong)
+void mrjong_state::palette_init_mrjong(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -68,19 +68,19 @@ PALETTE_INIT_MEMBER(mrjong_state, mrjong)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mrjong_state::mrjong_videoram_w)
+void mrjong_state::mrjong_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mrjong_state::mrjong_colorram_w)
+void mrjong_state::mrjong_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mrjong_state::mrjong_flipscreen_w)
+void mrjong_state::mrjong_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != BIT(data, 2))
 	{
@@ -89,7 +89,7 @@ WRITE8_MEMBER(mrjong_state::mrjong_flipscreen_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(mrjong_state::get_bg_tile_info)
+void mrjong_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] | ((m_colorram[tile_index] & 0x20) << 3);
 	int color = m_colorram[tile_index] & 0x1f;

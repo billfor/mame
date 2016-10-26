@@ -33,10 +33,10 @@ public:
 
 	uint32_t screen_update_cupidon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(cupidon);
-	DECLARE_DRIVER_INIT(funnyfm);
+	void init_cupidon();
+	void init_funnyfm();
 
-	DECLARE_READ32_MEMBER( cupidon_return_ffffffff )
+	uint32_t cupidon_return_ffffffff(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff)
 	{
 		return -1; // or it hits an illegal opcode (sleep on the 68340?)
 	};
@@ -162,11 +162,11 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(cupidon_state,cupidon)
+void cupidon_state::init_cupidon()
 {
 }
 
-DRIVER_INIT_MEMBER(cupidon_state,funnyfm)
+void cupidon_state::init_funnyfm()
 {
 }
 

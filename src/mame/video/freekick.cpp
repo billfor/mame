@@ -6,7 +6,7 @@
 #include "includes/freekick.h"
 
 
-TILE_GET_INFO_MEMBER(freekick_state::get_freek_tile_info)
+void freekick_state::get_freek_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, palno;
 
@@ -22,7 +22,7 @@ void freekick_state::video_start()
 }
 
 
-WRITE8_MEMBER(freekick_state::freek_videoram_w)
+void freekick_state::freek_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_freek_tilemap->mark_tile_dirty(offset & 0x3ff);

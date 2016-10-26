@@ -125,22 +125,22 @@ public:
 	int m_layer2_offset[2];
 	required_shared_ptr<uint16_t> m_vregs;
 	uint16_t m_magic102_ret;
-	DECLARE_WRITE16_MEMBER(layer0_videoram_w);
-	DECLARE_WRITE16_MEMBER(layer1_videoram_w);
-	DECLARE_WRITE16_MEMBER(layer2_videoram_w);
-	DECLARE_READ16_MEMBER(magic102_r);
-	DECLARE_READ16_MEMBER(hotslot_copro_r);
-	DECLARE_WRITE16_MEMBER(hotslot_copro_w);
-	DECLARE_WRITE16_MEMBER(magic10_out_w);
-	DECLARE_DRIVER_INIT(sgsafari);
-	DECLARE_DRIVER_INIT(suprpool);
-	DECLARE_DRIVER_INIT(magic102);
-	DECLARE_DRIVER_INIT(magic10);
-	DECLARE_DRIVER_INIT(hotslot);
-	DECLARE_DRIVER_INIT(altaten);
-	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
-	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
-	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
+	void layer0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void layer1_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void layer2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t magic102_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t hotslot_copro_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void hotslot_copro_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void magic10_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void init_sgsafari();
+	void init_suprpool();
+	void init_magic102();
+	void init_magic10();
+	void init_hotslot();
+	void init_altaten();
+	void get_layer0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_layer1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_layer2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -153,25 +153,25 @@ public:
 *      Video Hardware      *
 ***************************/
 
-WRITE16_MEMBER(magic10_state::layer0_videoram_w)
+void magic10_state::layer0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_layer0_videoram[offset]);
 	m_layer0_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(magic10_state::layer1_videoram_w)
+void magic10_state::layer1_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_layer1_videoram[offset]);
 	m_layer1_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(magic10_state::layer2_videoram_w)
+void magic10_state::layer2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_layer2_videoram[offset]);
 	m_layer2_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-TILE_GET_INFO_MEMBER(magic10_state::get_layer0_tile_info)
+void magic10_state::get_layer0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1,
 		m_layer0_videoram[tile_index * 2],
@@ -179,7 +179,7 @@ TILE_GET_INFO_MEMBER(magic10_state::get_layer0_tile_info)
 		TILE_FLIPYX((m_layer0_videoram[tile_index * 2 + 1] & 0xc0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(magic10_state::get_layer1_tile_info)
+void magic10_state::get_layer1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1,
 		m_layer1_videoram[tile_index * 2],
@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(magic10_state::get_layer1_tile_info)
 		TILE_FLIPYX((m_layer1_videoram[tile_index * 2 + 1] & 0xc0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(magic10_state::get_layer2_tile_info)
+void magic10_state::get_layer2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0,
 		m_layer2_videoram[tile_index * 2],
@@ -230,23 +230,23 @@ uint32_t magic10_state::screen_update_magic10(screen_device &screen, bitmap_ind1
 *       R/W Handlers       *
 ***************************/
 
-READ16_MEMBER(magic10_state::magic102_r)
+uint16_t magic10_state::magic102_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_magic102_ret ^= 0x20;
 	return m_magic102_ret;
 }
 
-READ16_MEMBER(magic10_state::hotslot_copro_r)
+uint16_t magic10_state::hotslot_copro_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x80;
 }
 
-WRITE16_MEMBER(magic10_state::hotslot_copro_w)
+void magic10_state::hotslot_copro_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("Writing to copro: %d \n", data);
 }
 
-WRITE16_MEMBER(magic10_state::magic10_out_w)
+void magic10_state::magic10_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
   ----------------------------------------------
@@ -1438,25 +1438,25 @@ ROM_END
 *       Driver Init         *
 ****************************/
 
-DRIVER_INIT_MEMBER(magic10_state, magic10)
+void magic10_state::init_magic10()
 {
 	m_layer2_offset[0] = 32;
 	m_layer2_offset[1] = 2;
 }
 
-DRIVER_INIT_MEMBER(magic10_state, magic102)
+void magic10_state::init_magic102()
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 20;
 }
 
-DRIVER_INIT_MEMBER(magic10_state, suprpool)
+void magic10_state::init_suprpool()
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;
 }
 
-DRIVER_INIT_MEMBER(magic10_state, hotslot)
+void magic10_state::init_hotslot()
 {
 /*  a value of -56 center the playfield, but displace the intro and initial screen.
     a value of -64 center the intro and initial screen, but displace the playfield.
@@ -1465,13 +1465,13 @@ DRIVER_INIT_MEMBER(magic10_state, hotslot)
 	m_layer2_offset[1] = 0; // Y offset.
 }
 
-DRIVER_INIT_MEMBER(magic10_state, sgsafari)
+void magic10_state::init_sgsafari()
 {
 	m_layer2_offset[0] = 16;
 	m_layer2_offset[1] = 20;
 }
 
-DRIVER_INIT_MEMBER(magic10_state, altaten)
+void magic10_state::init_altaten()
 {
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;

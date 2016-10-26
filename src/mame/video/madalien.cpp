@@ -16,7 +16,7 @@
 #define PIXEL_CLOCK (MADALIEN_MAIN_CLOCK / 2)
 
 
-PALETTE_INIT_MEMBER(madalien_state,madalien)
+void madalien_state::palette_init_madalien(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -70,25 +70,25 @@ inline int madalien_state::scan_helper(int col, int row, int section)
 }
 
 
-TILEMAP_MAPPER_MEMBER(madalien_state::scan_mode0)
+tilemap_memory_index madalien_state::scan_mode0(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return scan_helper(col, row, 0);
 }
-TILEMAP_MAPPER_MEMBER(madalien_state::scan_mode1)
+tilemap_memory_index madalien_state::scan_mode1(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return scan_helper(col, row, 1);
 }
-TILEMAP_MAPPER_MEMBER(madalien_state::scan_mode2)
+tilemap_memory_index madalien_state::scan_mode2(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return scan_helper(col, row, BIT(col, 4) ? 1 : 0);
 }
-TILEMAP_MAPPER_MEMBER(madalien_state::scan_mode3)
+tilemap_memory_index madalien_state::scan_mode3(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return scan_helper(col, row, BIT(col, 4) ? 0 : 1);
 }
 
 
-TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_1)
+void madalien_state::get_tile_info_BG_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6);
 
@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_1)
 }
 
 
-TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_2)
+void madalien_state::get_tile_info_BG_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *map = memregion("user1")->base() + ((*m_video_flags & 0x08) << 6) + 0x80;
 
@@ -104,19 +104,19 @@ TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_BG_2)
 }
 
 
-TILE_GET_INFO_MEMBER(madalien_state::get_tile_info_FG)
+void madalien_state::get_tile_info_FG(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
 }
 
-WRITE8_MEMBER(madalien_state::madalien_videoram_w)
+void madalien_state::madalien_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap_fg->mark_tile_dirty(offset);
 }
 
 
-VIDEO_START_MEMBER(madalien_state,madalien)
+void madalien_state::video_start_madalien()
 {
 	int i;
 
@@ -232,7 +232,7 @@ void madalien_state::draw_foreground(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-WRITE8_MEMBER(madalien_state::madalien_charram_w)
+void madalien_state::madalien_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_charram[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty((offset/8) & 0xff);

@@ -758,54 +758,6 @@ private:
 //  MACROS
 //**************************************************************************
 
-// opcode base adjustment handler function macro
-#define DIRECT_UPDATE_MEMBER(name)      offs_t name(ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
-#define DECLARE_DIRECT_UPDATE_MEMBER(name)  offs_t name(ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
-
-
-
-// space read/write handler function macros
-#define READ8_MEMBER(name)              uint8_t  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t mem_mask)
-#define WRITE8_MEMBER(name)             void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data, ATTR_UNUSED uint8_t mem_mask)
-#define READ16_MEMBER(name)             uint16_t name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint16_t mem_mask)
-#define WRITE16_MEMBER(name)            void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint16_t data, ATTR_UNUSED uint16_t mem_mask)
-#define READ32_MEMBER(name)             uint32_t name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint32_t mem_mask)
-#define WRITE32_MEMBER(name)            void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint32_t data, ATTR_UNUSED uint32_t mem_mask)
-#define READ64_MEMBER(name)             uint64_t name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint64_t mem_mask)
-#define WRITE64_MEMBER(name)            void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint64_t data, ATTR_UNUSED uint64_t mem_mask)
-
-#define DECLARE_READ8_MEMBER(name)      uint8_t  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t mem_mask = 0xff)
-#define DECLARE_WRITE8_MEMBER(name)     void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data, ATTR_UNUSED uint8_t mem_mask = 0xff)
-#define DECLARE_READ16_MEMBER(name)     uint16_t name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint16_t mem_mask = 0xffff)
-#define DECLARE_WRITE16_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint16_t data, ATTR_UNUSED uint16_t mem_mask = 0xffff)
-#define DECLARE_READ32_MEMBER(name)     uint32_t name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint32_t mem_mask = 0xffffffff)
-#define DECLARE_WRITE32_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint32_t data, ATTR_UNUSED uint32_t mem_mask = 0xffffffff)
-#define DECLARE_READ64_MEMBER(name)     uint64_t name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint64_t mem_mask = U64(0xffffffffffffffff))
-#define DECLARE_WRITE64_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint64_t data, ATTR_UNUSED uint64_t mem_mask = U64(0xffffffffffffffff))
-
-#define SETOFFSET_MEMBER(name)          void  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset)
-#define DECLARE_SETOFFSET_MEMBER(name)      void  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset)
-
-// device delegate macros
-#define READ8_DELEGATE(_class, _member)                     read8_delegate(FUNC(_class::_member), this)
-#define WRITE8_DELEGATE(_class, _member)                    write8_delegate(FUNC(_class::_member), this)
-#define READ16_DELEGATE(_class, _member)                    read16_delegate(FUNC(_class::_member), this)
-#define WRITE16_DELEGATE(_class, _member)                   write16_delegate(FUNC(_class::_member), this)
-#define READ32_DELEGATE(_class, _member)                    read32_delegate(FUNC(_class::_member), this)
-#define WRITE32_DELEGATE(_class, _member)                   write32_delegate(FUNC(_class::_member), this)
-#define READ64_DELEGATE(_class, _member)                    read64_delegate(FUNC(_class::_member), this)
-#define WRITE64_DELEGATE(_class, _member)                   write64_delegate(FUNC(_class::_member), this)
-
-#define READ8_DEVICE_DELEGATE(_device, _class, _member)     read8_delegate(FUNC(_class::_member), (_class *)_device)
-#define WRITE8_DEVICE_DELEGATE(_device, _class, _member)    write8_delegate(FUNC(_class::_member), (_class *)_device)
-#define READ16_DEVICE_DELEGATE(_device, _class, _member)    read16_delegate(FUNC(_class::_member), (_class *)_device)
-#define WRITE16_DEVICE_DELEGATE(_device, _class, _member)   write16_delegate(FUNC(_class::_member), (_class *)_device)
-#define READ32_DEVICE_DELEGATE(_device, _class, _member)    read32_delegate(FUNC(_class::_member), (_class *)_device)
-#define WRITE32_DEVICE_DELEGATE(_device, _class, _member)   write32_delegate(FUNC(_class::_member), (_class *)_device)
-#define READ64_DEVICE_DELEGATE(_device, _class, _member)    read64_delegate(FUNC(_class::_member), (_class *)_device)
-#define WRITE64_DEVICE_DELEGATE(_device, _class, _member)   write64_delegate(FUNC(_class::_member), (_class *)_device)
-
-
 // helper macro for merging data with the memory mask
 #define COMBINE_DATA(varptr)            (*(varptr) = (*(varptr) & ~mem_mask) | (data & mem_mask))
 

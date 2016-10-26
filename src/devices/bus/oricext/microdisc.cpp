@@ -109,7 +109,7 @@ void microdisc_device::remap()
 	}
 }
 
-WRITE8_MEMBER(microdisc_device::port_314_w)
+void microdisc_device::port_314_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	port_314 = data;
 	remap();
@@ -123,28 +123,28 @@ WRITE8_MEMBER(microdisc_device::port_314_w)
 	irq_w(intrq_state && (port_314 & P_IRQEN));
 }
 
-READ8_MEMBER(microdisc_device::port_314_r)
+uint8_t microdisc_device::port_314_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (intrq_state && (port_314 & P_IRQEN)) ? 0x7f : 0xff;
 }
 
-READ8_MEMBER(microdisc_device::port_318_r)
+uint8_t microdisc_device::port_318_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return drq_state ? 0x7f : 0xff;
 }
 
-WRITE_LINE_MEMBER(microdisc_device::fdc_irq_w)
+void microdisc_device::fdc_irq_w(int state)
 {
 	intrq_state = state;
 	irq_w(intrq_state && (port_314 & P_IRQEN));
 }
 
-WRITE_LINE_MEMBER(microdisc_device::fdc_drq_w)
+void microdisc_device::fdc_drq_w(int state)
 {
 	drq_state = state;
 }
 
-WRITE_LINE_MEMBER(microdisc_device::fdc_hld_w)
+void microdisc_device::fdc_hld_w(int state)
 {
 	logerror("hld %d\n", state);
 	hld_state = state;

@@ -52,34 +52,34 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	// common
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(charbank_w);
-	DECLARE_WRITE8_MEMBER(videoctrl_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE8_MEMBER(adpcm_soundcommand_w);
-	DECLARE_WRITE8_MEMBER(nmi_set_w);
-	DECLARE_WRITE8_MEMBER(ay8910_control_port_0_w);
-	DECLARE_WRITE8_MEMBER(ay8910_control_port_1_w);
-	DECLARE_READ8_MEMBER(fake_0_r);
-	DECLARE_READ8_MEMBER(fake_1_r);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_soundcommand_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_control_port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_control_port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fake_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t fake_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// gsword specific
-	DECLARE_READ8_MEMBER(gsword_hack_r);
-	DECLARE_WRITE8_MEMBER(gsword_adpcm_data_w);
-	DECLARE_READ8_MEMBER(gsword_8741_2_r);
-	DECLARE_READ8_MEMBER(gsword_8741_3_r);
+	uint8_t gsword_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gsword_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gsword_8741_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gsword_8741_3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	DECLARE_DRIVER_INIT(gsword);
-	DECLARE_DRIVER_INIT(gsword2);
+	void init_gsword();
+	void init_gsword2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(gsword);
-	DECLARE_PALETTE_INIT(josvolly);
+	void palette_init_gsword(palette_device &palette);
+	void palette_init_josvolly(palette_device &palette);
 
 	uint32_t screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gsword_snd_interrupt);
+	void gsword_snd_interrupt(device_t &device);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

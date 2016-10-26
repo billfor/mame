@@ -42,14 +42,14 @@ public:
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
-	DECLARE_DRIVER_INIT(ampro);
-	DECLARE_MACHINE_RESET(ampro);
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void init_ampro();
+	void machine_reset_ampro();
+	void ctc_tick(timer_device &timer, void *ptr, int32_t param);
+	void ctc_z0_w(int state);
+	void port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clock_w(int state);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -66,7 +66,7 @@ d5     /DDEN
 d6     Banking 0=rom
 d7     FDC master clock 0=8MHz 1=16MHz (for 20cm disks, not emulated)
 */
-WRITE8_MEMBER( ampro_state::port00_w )
+void ampro_state::port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(BIT(data, 6));
 	m_fdc->dden_w(BIT(data, 5));
@@ -77,7 +77,7 @@ WRITE8_MEMBER( ampro_state::port00_w )
 		floppy->ss_w(BIT(data, 4));
 }
 
-READ8_MEMBER( ampro_state::io_r )
+uint8_t ampro_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x40)
 		return m_ctc->read(space, offset>>4);
@@ -85,7 +85,7 @@ READ8_MEMBER( ampro_state::io_r )
 		return m_dart->ba_cd_r(space, offset>>2);
 }
 
-WRITE8_MEMBER( ampro_state::io_w )
+void ampro_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x40)
 		m_ctc->write(space, offset>>4, data);
@@ -121,13 +121,13 @@ static const z80_daisy_config daisy_chain_intf[] =
 };
 
 // Baud rate generator. All inputs are 2MHz.
-WRITE_LINE_MEMBER( ampro_state::clock_w )
+void ampro_state::clock_w(int state)
 {
 	m_ctc->trg0(state);
 	m_ctc->trg1(state);
 }
 
-WRITE_LINE_MEMBER( ampro_state::ctc_z0_w )
+void ampro_state::ctc_z0_w(int state)
 {
 	m_dart->rxca_w(state);
 	m_dart->txca_w(state);
@@ -141,13 +141,13 @@ SLOT_INTERFACE_END
 static INPUT_PORTS_START( ampro )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( ampro_state, ampro )
+void ampro_state::machine_reset_ampro()
 {
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 }
 
-DRIVER_INIT_MEMBER( ampro_state, ampro )
+void ampro_state::init_ampro()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

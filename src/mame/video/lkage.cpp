@@ -43,7 +43,7 @@
 #include "includes/lkage.h"
 
 
-WRITE8_MEMBER(lkage_state::lkage_videoram_w)
+void lkage_state::lkage_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 
@@ -66,19 +66,19 @@ WRITE8_MEMBER(lkage_state::lkage_videoram_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(lkage_state::get_bg_tile_info)
+void lkage_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index + 0x800] + 256 * (m_bg_tile_bank ? 5 : 1);
 	SET_TILE_INFO_MEMBER(0/*gfx*/, code, 0/*color*/, 0/*flags*/ );
 }
 
-TILE_GET_INFO_MEMBER(lkage_state::get_fg_tile_info)
+void lkage_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index + 0x400] + 256 * (m_fg_tile_bank ? 1 : 0);
 	SET_TILE_INFO_MEMBER(0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
-TILE_GET_INFO_MEMBER(lkage_state::get_tx_tile_info)
+void lkage_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 256 * (m_tx_tile_bank ? 4 : 0);
 	SET_TILE_INFO_MEMBER(0/*gfx*/, code, 0/*color*/, 0/*flags*/);

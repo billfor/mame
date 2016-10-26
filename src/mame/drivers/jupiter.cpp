@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( jupiter3_io, AS_IO, 8, jupiter3_state )
 	AM_RANGE(0xb2, 0xb2) AM_READ(key_r)
 ADDRESS_MAP_END
 
-READ8_MEMBER( jupiter3_state::ff_r )
+uint8_t jupiter3_state::ff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xfd;
 }
@@ -108,19 +108,19 @@ READ8_MEMBER( jupiter3_state::ff_r )
 static INPUT_PORTS_START( jupiter )
 INPUT_PORTS_END
 
-READ8_MEMBER( jupiter3_state::key_r )
+uint8_t jupiter3_state::key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( jupiter3_state::status_r )
+uint8_t jupiter3_state::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 0x80 : 0x00;
 }
 
-WRITE8_MEMBER( jupiter3_state::kbd_put )
+void jupiter3_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 		m_term_data = data ^ 0x80;
@@ -317,7 +317,7 @@ ROM_END
 //  DRIVER_INIT( jupiter )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(jupiter2_state,jupiter)
+void jupiter2_state::init_jupiter()
 {
 	uint8_t *rom = memregion(MCM6571AP_TAG)->base();
 	uint8_t inverted[0x1000];
@@ -339,7 +339,7 @@ DRIVER_INIT_MEMBER(jupiter2_state,jupiter)
 //  DRIVER_INIT( jupiter3 )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(jupiter3_state,jupiter3)
+void jupiter3_state::init_jupiter3()
 {
 	uint8_t *rom = memregion(Z80_TAG)->base();
 	uint8_t inverted[0x1000];

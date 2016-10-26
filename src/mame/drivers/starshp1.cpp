@@ -16,14 +16,14 @@ Atari Starship 1 driver
 
 
 
-INTERRUPT_GEN_MEMBER(starshp1_state::starshp1_interrupt)
+void starshp1_state::starshp1_interrupt(device_t &device)
 {
 	if ((ioport("SYSTEM")->read() & 0x90) != 0x90)
 		generic_pulse_irq_line(device.execute(), 0, 1);
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_audio_w)
+void starshp1_state::starshp1_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 1;
 
@@ -59,13 +59,13 @@ WRITE8_MEMBER(starshp1_state::starshp1_audio_w)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_collision_reset_w)
+void starshp1_state::starshp1_collision_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_collision_latch = 0;
 }
 
 
-CUSTOM_INPUT_MEMBER(starshp1_state::starshp1_analog_r)
+ioport_value starshp1_state::starshp1_analog_r(ioport_field &field, void *param)
 {
 	int val = 0;
 
@@ -89,19 +89,19 @@ CUSTOM_INPUT_MEMBER(starshp1_state::starshp1_analog_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(starshp1_state::collision_latch_r)
+ioport_value starshp1_state::collision_latch_r(ioport_field &field, void *param)
 {
 	return m_collision_latch & 0x0f;
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_analog_in_w)
+void starshp1_state::starshp1_analog_in_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_analog_in_select = offset & 3;
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_analog_out_w)
+void starshp1_state::starshp1_analog_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 7)
 	{
@@ -130,7 +130,7 @@ WRITE8_MEMBER(starshp1_state::starshp1_analog_out_w)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_misc_w)
+void starshp1_state::starshp1_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 1;
 

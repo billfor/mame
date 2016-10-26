@@ -34,14 +34,14 @@ public:
 	int m_bg_pos;
 	int m_bg_ctrl;
 
-	DECLARE_WRITE8_MEMBER(skyfox_vregs_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(skyfox);
+	void skyfox_vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void init_skyfox();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(skyfox);
+	void palette_init_skyfox(palette_device &palette);
 	uint32_t screen_update_skyfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(skyfox_interrupt);
+	void skyfox_interrupt(device_t &device);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

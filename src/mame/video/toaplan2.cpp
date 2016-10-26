@@ -36,7 +36,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
+void toaplan2_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color, tile_number, attrib;
 
@@ -71,7 +71,7 @@ void toaplan2_state::truxton2_postload()
 	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
-VIDEO_START_MEMBER(toaplan2_state,toaplan2)
+void toaplan2_state::video_start_toaplan2()
 {
 	/* our current VDP implementation needs this bitmap to work with */
 	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
@@ -89,9 +89,9 @@ VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 	}
 }
 
-VIDEO_START_MEMBER(toaplan2_state,truxton2)
+void toaplan2_state::video_start_truxton2()
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	video_start_toaplan2();
 
 	/* Create the Text tilemap for this game */
 	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<uint8_t *>(m_tx_gfxram16.target()));
@@ -100,9 +100,9 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 	create_tx_tilemap(0x1d5, 0x16a);
 }
 
-VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
+void toaplan2_state::video_start_fixeightbl()
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	video_start_toaplan2();
 
 	/* Create the Text tilemap for this game */
 	create_tx_tilemap();
@@ -123,25 +123,25 @@ VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 	m_vdp0->init_scroll_regs();
 }
 
-VIDEO_START_MEMBER(toaplan2_state,bgaregga)
+void toaplan2_state::video_start_bgaregga()
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	video_start_toaplan2();
 
 	/* Create the Text tilemap for this game */
 	create_tx_tilemap(0x1d4, 0x16b);
 }
 
-VIDEO_START_MEMBER(toaplan2_state,bgareggabl)
+void toaplan2_state::video_start_bgareggabl()
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	video_start_toaplan2();
 
 	/* Create the Text tilemap for this game */
 	create_tx_tilemap(4, 4);
 }
 
-VIDEO_START_MEMBER(toaplan2_state,batrider)
+void toaplan2_state::video_start_batrider()
 {
-	VIDEO_START_CALL_MEMBER( toaplan2 );
+	video_start_toaplan2();
 
 	m_vdp0->sp.use_sprite_buffer = 0; // disable buffering on this game
 
@@ -156,14 +156,14 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 	m_vdp0->gp9001_gfxrom_is_banked = 1;
 }
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_tx_videoram_w)
+void toaplan2_state::toaplan2_tx_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_videoram[offset]);
 	if (offset < 64*32)
 		m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_tx_linescroll_w)
+void toaplan2_state::toaplan2_tx_linescroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*** Line-Scroll RAM for Text Layer ***/
 	COMBINE_DATA(&m_tx_linescroll[offset]);
@@ -171,7 +171,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_tx_linescroll_w)
 	m_tx_tilemap->set_scrollx(offset, m_tx_linescroll[offset]);
 }
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_tx_gfxram16_w)
+void toaplan2_state::toaplan2_tx_gfxram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*** Dynamic GFX decoding for Truxton 2 / FixEight ***/
 
@@ -184,7 +184,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_tx_gfxram16_w)
 	}
 }
 
-WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
+void toaplan2_state::batrider_textdata_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*** Dynamic Text GFX decoding for Batrider ***/
 	/*** Only done once during start-up ***/
@@ -204,14 +204,14 @@ WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
 	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
-WRITE16_MEMBER(toaplan2_state::batrider_unknown_dma_w)
+void toaplan2_state::batrider_unknown_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// FIXME: In batrider and bbakraid, the text layer and palette RAM
 	// are probably DMA'd from main RAM by writing here at every vblank,
 	// rather than being directly accessible to the 68K like the other games
 }
 
-WRITE16_MEMBER(toaplan2_state::batrider_objectbank_w)
+void toaplan2_state::batrider_objectbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

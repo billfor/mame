@@ -58,14 +58,14 @@ void thunderj_state::update_interrupts()
 }
 
 
-MACHINE_START_MEMBER(thunderj_state,thunderj)
+void thunderj_state::machine_start_thunderj()
 {
 	atarigen_state::machine_start();
 	save_item(NAME(m_alpha_tile_bank));
 }
 
 
-MACHINE_RESET_MEMBER(thunderj_state,thunderj)
+void thunderj_state::machine_reset_thunderj()
 {
 	atarigen_state::machine_reset();
 }
@@ -78,7 +78,7 @@ MACHINE_RESET_MEMBER(thunderj_state,thunderj)
  *
  *************************************/
 
-READ16_MEMBER(thunderj_state::special_port2_r)
+uint16_t thunderj_state::special_port2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = ioport("260012")->read();
 	result ^= 0x0010;
@@ -86,7 +86,7 @@ READ16_MEMBER(thunderj_state::special_port2_r)
 }
 
 
-WRITE16_MEMBER(thunderj_state::latch_w)
+void thunderj_state::latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* reset extra CPU */
 	if (ACCESSING_BITS_0_7)
@@ -462,7 +462,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(thunderj_state,thunderj)
+void thunderj_state::init_thunderj()
 {
 }
 

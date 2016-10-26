@@ -83,12 +83,12 @@ class ds1386_device : public device_t,
 public:
 	ds1386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, size_t size);
 
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( data_r );
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( ce_w );
-	DECLARE_WRITE_LINE_MEMBER( oe_w );
-	DECLARE_WRITE_LINE_MEMBER( we_w );
+	void ce_w(int state);
+	void oe_w(int state);
+	void we_w(int state);
 
 	template<class _Object> static devcb_base &set_inta_cb(device_t &device, _Object object) { return downcast<ds1386_device &>(device).m_inta_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_intb_cb(device_t &device, _Object object) { return downcast<ds1386_device &>(device).m_intb_cb.set_callback(object); }

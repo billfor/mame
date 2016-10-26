@@ -42,21 +42,21 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER(plan80_04_r);
-	DECLARE_WRITE8_MEMBER(plan80_09_w);
+	uint8_t plan80_04_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void plan80_09_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	const uint8_t* m_p_chargen;
 	uint8_t m_kbd_row;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(plan80);
+	void init_plan80();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-READ8_MEMBER( plan80_state::plan80_04_r )
+uint8_t plan80_state::plan80_04_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -78,7 +78,7 @@ READ8_MEMBER( plan80_state::plan80_04_r )
 	return data;
 }
 
-WRITE8_MEMBER( plan80_state::plan80_09_w )
+void plan80_state::plan80_09_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbd_row = data;
 }
@@ -168,7 +168,7 @@ void plan80_state::machine_reset()
 	timer_set(attotime::from_usec(10), TIMER_BOOT);
 }
 
-DRIVER_INIT_MEMBER(plan80_state,plan80)
+void plan80_state::init_plan80()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);

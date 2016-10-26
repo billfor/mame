@@ -139,13 +139,13 @@ void mc6845_device::call_on_update_address(int strobe)
 }
 
 
-WRITE8_MEMBER( mc6845_device::address_w )
+void mc6845_device::address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_register_address_latch = data & 0x1f;
 }
 
 
-READ8_MEMBER( mc6845_device::status_r )
+uint8_t mc6845_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -165,7 +165,7 @@ READ8_MEMBER( mc6845_device::status_r )
 }
 
 
-READ8_MEMBER( mc6845_device::register_r )
+uint8_t mc6845_device::register_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -206,7 +206,7 @@ READ8_MEMBER( mc6845_device::register_r )
 }
 
 
-WRITE8_MEMBER( mc6845_device::register_w )
+void mc6845_device::register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG)  logerror("%s:M6845 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
@@ -278,13 +278,13 @@ WRITE8_MEMBER( mc6845_device::register_w )
 }
 
 
-WRITE8_MEMBER( mos8563_device::address_w )
+void mos8563_device::address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_register_address_latch = data & 0x3f;
 }
 
 
-READ8_MEMBER( mos8563_device::status_r )
+uint8_t mos8563_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_revision;
 
@@ -304,7 +304,7 @@ READ8_MEMBER( mos8563_device::status_r )
 }
 
 
-READ8_MEMBER( mos8563_device::register_r )
+uint8_t mos8563_device::register_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0xff;
 
@@ -354,7 +354,7 @@ READ8_MEMBER( mos8563_device::register_r )
 }
 
 
-WRITE8_MEMBER( mos8563_device::register_w )
+void mos8563_device::register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG)  logerror("%s:MOS8563 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
@@ -429,31 +429,31 @@ inline void mos8563_device::write_videoram(offs_t offset, uint8_t data)
 }
 
 
-READ_LINE_MEMBER( mc6845_device::de_r )
+int mc6845_device::de_r()
 {
 	return m_de;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::cursor_r )
+int mc6845_device::cursor_r()
 {
 	return m_cur;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::cursor_state_r )
+int mc6845_device::cursor_state_r()
 {
 	return m_cursor_state;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::hsync_r )
+int mc6845_device::hsync_r()
 {
 	return m_hsync;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::vsync_r )
+int mc6845_device::vsync_r()
 {
 	return m_vsync;
 }
@@ -1499,7 +1499,7 @@ machine_config_constructor mos8563_device::device_mconfig_additions() const
 
 
 // VICE palette
-PALETTE_INIT_MEMBER(mos8563_device, mos8563)
+void mos8563_device::palette_init_mos8563(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0x55, 0x55, 0x55));

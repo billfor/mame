@@ -45,42 +45,42 @@ public:
 	uint8_t m_irq_mask;
 
 	// common
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(charram_w);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(scrollx_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(satansat_b002_w);
-	DECLARE_WRITE8_MEMBER(satansat_backcolor_w);
+	void scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void satansat_b002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void satansat_backcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(snk6502_music0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(sasuke_count_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	ioport_value snk6502_music0_r(ioport_field &field, void *param);
+	ioport_value sasuke_count_r(ioport_field &field, void *param);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(satansat_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(satansat_get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void satansat_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void satansat_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(sasuke);
-	DECLARE_VIDEO_START(satansat);
-	DECLARE_PALETTE_INIT(satansat);
-	DECLARE_MACHINE_RESET(vanguard);
-	DECLARE_VIDEO_START(snk6502);
-	DECLARE_PALETTE_INIT(snk6502);
-	DECLARE_MACHINE_RESET(satansat);
-	DECLARE_MACHINE_RESET(pballoon);
-	DECLARE_VIDEO_START(pballoon);
+	void machine_reset_sasuke();
+	void video_start_satansat();
+	void palette_init_satansat(palette_device &palette);
+	void machine_reset_vanguard();
+	void video_start_snk6502();
+	void palette_init_snk6502(palette_device &palette);
+	void machine_reset_satansat();
+	void machine_reset_pballoon();
+	void video_start_pballoon();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(satansat_interrupt);
-	INTERRUPT_GEN_MEMBER(snk6502_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(sasuke_update_counter);
+	void satansat_interrupt(device_t &device);
+	void snk6502_interrupt(device_t &device);
+	void sasuke_update_counter(timer_device &timer, void *ptr, int32_t param);
 
 	void sasuke_start_counter();
 	void postload();
@@ -110,12 +110,12 @@ public:
 	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~snk6502_sound_device() {}
 
-	DECLARE_WRITE8_MEMBER( sasuke_sound_w );
-	DECLARE_WRITE8_MEMBER( satansat_sound_w );
-	DECLARE_WRITE8_MEMBER( vanguard_sound_w );
-	DECLARE_WRITE8_MEMBER( vanguard_speech_w );
-	DECLARE_WRITE8_MEMBER( fantasy_sound_w );
-	DECLARE_WRITE8_MEMBER( fantasy_speech_w );
+	void sasuke_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void satansat_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vanguard_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vanguard_speech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fantasy_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fantasy_speech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void set_music_clock(double clock_time);
 	void set_music_freq(int freq);

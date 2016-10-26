@@ -85,7 +85,7 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(gberet_state::gberet_interrupt_tick)
+void gberet_state::gberet_interrupt_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t ticks_mask = ~m_interrupt_ticks & (m_interrupt_ticks + 1); // 0->1
 	m_interrupt_ticks++;
@@ -110,14 +110,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(gberet_state::gberet_interrupt_tick)
  *
  *************************************/
 
-WRITE8_MEMBER(gberet_state::gberet_coin_counter_w)
+void gberet_state::gberet_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-WRITE8_MEMBER(gberet_state::mrgoemon_coin_counter_w)
+void gberet_state::mrgoemon_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 1);
@@ -127,7 +127,7 @@ WRITE8_MEMBER(gberet_state::mrgoemon_coin_counter_w)
 	membank("bank1")->set_entry(((data & 0xe0) >> 5));
 }
 
-WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
+void gberet_state::gberet_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0/1/2 = interrupt enable */
 	uint8_t ack_mask = ~data & m_interrupt_mask; // 1->0
@@ -144,7 +144,7 @@ WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
 	flip_screen_set(data & 8);
 }
 
-WRITE8_MEMBER(gberet_state::gberet_sound_w)
+void gberet_state::gberet_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sn->write(space, 0, *m_soundlatch);
 }
@@ -191,18 +191,18 @@ static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8, gberet_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(gberet_state::gberetb_flipscreen_w)
+void gberet_state::gberetb_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 8);
 }
 
-READ8_MEMBER(gberet_state::gberetb_irq_ack_r)
+uint8_t gberet_state::gberetb_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 
-WRITE8_MEMBER(gberet_state::gberetb_nmi_ack_w)
+void gberet_state::gberetb_nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -386,14 +386,14 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(gberet_state,gberet)
+void gberet_state::machine_start_gberet()
 {
 	save_item(NAME(m_interrupt_mask));
 	save_item(NAME(m_interrupt_ticks));
 	save_item(NAME(m_spritebank));
 }
 
-MACHINE_RESET_MEMBER(gberet_state,gberet)
+void gberet_state::machine_reset_gberet()
 {
 	m_interrupt_mask = 0;
 	m_interrupt_ticks = 0;
@@ -571,7 +571,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(gberet_state,mrgoemon)
+void gberet_state::init_mrgoemon()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x800);

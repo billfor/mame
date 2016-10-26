@@ -115,12 +115,12 @@ Non-Bugs (happen on real PCB)
 
 
 
-MACHINE_RESET_MEMBER(kaneko16_state,gtmr)
+void kaneko16_state::machine_reset_gtmr()
 {
 	m_VIEW2_2_pri = 1;
 }
 
-MACHINE_RESET_MEMBER(kaneko16_state,mgcrystl)
+void kaneko16_state::machine_reset_mgcrystl()
 {
 	m_VIEW2_2_pri = 0;
 }
@@ -135,7 +135,7 @@ MACHINE_RESET_MEMBER(kaneko16_state,mgcrystl)
 ***************************************************************************/
 
 
-WRITE16_MEMBER(kaneko16_state::kaneko16_coin_lockout_w)
+void kaneko16_state::kaneko16_coin_lockout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -157,7 +157,7 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_coin_lockout_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
+void kaneko16_state::kaneko16_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -168,14 +168,14 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
 
 /* Two identically mapped YM2149 chips */
 
-READ16_MEMBER(kaneko16_state::kaneko16_ay1_YM2149_r)
+uint16_t kaneko16_state::kaneko16_ay1_YM2149_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* Each 2149 register is mapped to a different address */
 	m_ym2149_1->address_w(space,0,offset);
 	return m_ym2149_1->data_r(space,0);
 }
 
-WRITE16_MEMBER(kaneko16_state::kaneko16_ay1_YM2149_w)
+void kaneko16_state::kaneko16_ay1_YM2149_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Each 2149 register is mapped to a different address */
 	m_ym2149_1->address_w(space,0,offset);
@@ -184,14 +184,14 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_ay1_YM2149_w)
 	else                m_ym2149_1->data_w(space,0,(data >> 8) & 0xff);
 }
 
-READ16_MEMBER(kaneko16_state::kaneko16_ay2_YM2149_r)
+uint16_t kaneko16_state::kaneko16_ay2_YM2149_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* Each 2149 register is mapped to a different address */
 	m_ym2149_2->address_w(space,0,offset);
 	return m_ym2149_2->data_r(space,0);
 }
 
-WRITE16_MEMBER(kaneko16_state::kaneko16_ay2_YM2149_w)
+void kaneko16_state::kaneko16_ay2_YM2149_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Each 2149 register is mapped to a different address */
 	m_ym2149_2->address_w(space,0,offset);
@@ -209,7 +209,7 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_ay2_YM2149_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(kaneko16_state::kaneko16_eeprom_w)
+void kaneko16_state::kaneko16_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -225,12 +225,12 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_eeprom_w)
 	}
 }
 
-READ8_MEMBER(kaneko16_state::eeprom_r)
+uint8_t kaneko16_state::eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_eeprom->do_read();
 }
 
-WRITE8_MEMBER(kaneko16_state::eeprom_w)
+void kaneko16_state::eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_eeprom->cs_write(data);
 }
@@ -247,7 +247,7 @@ WRITE8_MEMBER(kaneko16_state::eeprom_w)
                                 The Berlin Wall
 ***************************************************************************/
 
-READ16_MEMBER(kaneko16_berlwall_state::berlwall_oki_r)
+uint16_t kaneko16_berlwall_state::berlwall_oki_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret;
 
@@ -262,7 +262,7 @@ READ16_MEMBER(kaneko16_berlwall_state::berlwall_oki_r)
 	return ret;
 }
 
-WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_oki_w)
+void kaneko16_berlwall_state::berlwall_oki_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask == 0xff00) // reads / writes to the upper byte only appear to act as a mirror to the lower byte, 16-bit reads/writes only access the lower byte.
 	{
@@ -273,21 +273,21 @@ WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_oki_w)
 	m_oki->write(space, offset, data, mem_mask);
 }
 
-READ16_MEMBER(kaneko16_berlwall_state::berlwall_spriteram_r)
+uint16_t kaneko16_berlwall_state::berlwall_spriteram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset = BITSWAP16(offset, 15, 14, 13, 12, 2, 11, 10, 9, 8, 7, 6, 5, 4, 3, 1, 0);
 	offset ^= 0x800;
 	return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_spriteram_w)
+void kaneko16_berlwall_state::berlwall_spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset = BITSWAP16(offset, 15, 14, 13, 12, 2, 11, 10, 9, 8, 7, 6, 5, 4, 3, 1, 0);
 	offset ^= 0x800;
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-READ16_MEMBER(kaneko16_berlwall_state::berlwall_spriteregs_r)
+uint16_t kaneko16_berlwall_state::berlwall_spriteregs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset & 0x4)
 		return 0;
@@ -295,7 +295,7 @@ READ16_MEMBER(kaneko16_berlwall_state::berlwall_spriteregs_r)
 	return m_kaneko_spr->kaneko16_sprites_regs_r(space, offset, mem_mask);
 }
 
-WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_spriteregs_w)
+void kaneko16_berlwall_state::berlwall_spriteregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset & 0x4)
 		return;
@@ -335,7 +335,7 @@ ADDRESS_MAP_END
 /* The two YM2149 chips are only used when entering high score initials, and */
 /* when the game is fully completed. Overkill??? */
 
-WRITE16_MEMBER(kaneko16_state::bakubrkr_oki_bank_w)
+void kaneko16_state::bakubrkr_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_oki->set_rom_bank(data & 0x7);
@@ -396,7 +396,7 @@ ADDRESS_MAP_END
                                 Blood Warrior
 ***************************************************************************/
 
-WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_0_bank_w)
+void kaneko16_gtmr_state::bloodwar_oki_0_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -405,7 +405,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_0_bank_w)
 	}
 }
 
-WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_1_bank_w)
+void kaneko16_gtmr_state::bloodwar_oki_1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -414,7 +414,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_1_bank_w)
 	}
 }
 
-WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_coin_lockout_w)
+void kaneko16_gtmr_state::bloodwar_coin_lockout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -460,7 +460,7 @@ ADDRESS_MAP_END
                                 Bonk's Adventure
 ***************************************************************************/
 
-WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_0_bank_w)
+void kaneko16_gtmr_state::bonkadv_oki_0_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -469,7 +469,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_0_bank_w)
 	}
 }
 
-WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_1_bank_w)
+void kaneko16_gtmr_state::bonkadv_oki_1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -515,7 +515,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-READ16_MEMBER(kaneko16_gtmr_state::gtmr_wheel_r)
+uint16_t kaneko16_gtmr_state::gtmr_wheel_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// check 'Controls' dip switch
 	switch (ioport("DSW1")->read() & 0x1000)
@@ -529,7 +529,7 @@ READ16_MEMBER(kaneko16_gtmr_state::gtmr_wheel_r)
 	}
 }
 
-WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_0_bank_w)
+void kaneko16_gtmr_state::gtmr_oki_0_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -538,7 +538,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_0_bank_w)
 	}
 }
 
-WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_1_bank_w)
+void kaneko16_gtmr_state::gtmr_oki_1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -595,7 +595,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-READ16_MEMBER(kaneko16_gtmr_state::gtmr2_wheel_r)
+uint16_t kaneko16_gtmr_state::gtmr2_wheel_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (ioport("DSW1")->read() & 0x1800)
 	{
@@ -611,7 +611,7 @@ READ16_MEMBER(kaneko16_gtmr_state::gtmr2_wheel_r)
 	}
 }
 
-READ16_MEMBER(kaneko16_gtmr_state::gtmr2_IN1_r)
+uint16_t kaneko16_gtmr_state::gtmr2_IN1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return  (ioport("P2")->read() & (ioport("FAKE")->read() | ~0x7100));
 }
@@ -702,7 +702,7 @@ void kaneko16_state::kaneko16_common_oki_bank_w(  const char *bankname, const ch
 	}
 }
 
-WRITE16_MEMBER(kaneko16_shogwarr_state::shogwarr_oki_bank_w)
+void kaneko16_shogwarr_state::shogwarr_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -711,7 +711,7 @@ WRITE16_MEMBER(kaneko16_shogwarr_state::shogwarr_oki_bank_w)
 	}
 }
 
-WRITE16_MEMBER(kaneko16_shogwarr_state::brapboys_oki_bank_w)
+void kaneko16_shogwarr_state::brapboys_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -775,7 +775,7 @@ ADDRESS_MAP_END
                                  Wing Force
 ***************************************************************************/
 
-WRITE8_MEMBER(kaneko16_state::wingforc_oki_bank_w)
+void kaneko16_state::wingforc_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data <= 2)
 		m_oki->set_rom_bank(data);
@@ -1829,7 +1829,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::kaneko16_interrupt)
+void kaneko16_state::kaneko16_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2314,7 +2314,7 @@ MACHINE_CONFIG_END
     other: busy loop
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::shogwarr_interrupt)
+void kaneko16_state::shogwarr_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2512,18 +2512,18 @@ void kaneko16_state::kaneko16_expand_sample_banks(const char *region)
 	}
 }
 
-DRIVER_INIT_MEMBER( kaneko16_state, kaneko16 )
+void kaneko16_state::init_kaneko16()
 {
 	kaneko16_unscramble_tiles("gfx2");
 	kaneko16_unscramble_tiles("gfx3");
 }
 
-DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwall )
+void kaneko16_berlwall_state::init_berlwall()
 {
 	kaneko16_unscramble_tiles("gfx2");
 }
 
-DRIVER_INIT_MEMBER( kaneko16_state, samplebank )
+void kaneko16_state::init_samplebank()
 {
 	kaneko16_unscramble_tiles("gfx2");
 	kaneko16_unscramble_tiles("gfx3");
@@ -4404,23 +4404,23 @@ ROM_START( bonkadv )
 ROM_END
 
 
-DRIVER_INIT_MEMBER( kaneko16_gtmr_state, gtmr )
+void kaneko16_gtmr_state::init_gtmr()
 {
-	DRIVER_INIT_CALL(samplebank);
+	init_samplebank();
 }
 
 
 
-DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, shogwarr )
+void kaneko16_shogwarr_state::init_shogwarr()
 {
 	// default sample banks
 	kaneko16_common_oki_bank_w("bank10", "oki1", 0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_w("bank11", "oki2", 0, 0x00000, 0x40000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 
-DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
+void kaneko16_shogwarr_state::init_brapboys()
 {
 	// sample banking is different on brap boys for the music, why? GALs / PALs ?
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe00000, 0xe00001, write16_delegate(FUNC(kaneko16_shogwarr_state::brapboys_oki_bank_w),this));
@@ -4428,7 +4428,7 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 	// default sample banks
 	kaneko16_common_oki_bank_w("bank10", "oki1", 0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_w("bank11", "oki2", 0, 0x20000, 0x20000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 

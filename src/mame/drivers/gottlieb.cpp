@@ -272,7 +272,7 @@ void gottlieb_state::machine_reset()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(gottlieb_state::analog_delta_r)
+ioport_value gottlieb_state::analog_delta_r(ioport_field &field, void *param)
 {
 	const char *string = (const char *)param;
 	int which = string[0] - '0';
@@ -281,7 +281,7 @@ CUSTOM_INPUT_MEMBER(gottlieb_state::analog_delta_r)
 }
 
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_analog_reset_w)
+void gottlieb_state::gottlieb_analog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* reset the trackball counters */
 	m_track[0] = m_track_x.read_safe(0);
@@ -289,7 +289,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_analog_reset_w)
 }
 
 
-CUSTOM_INPUT_MEMBER(gottlieb_state::stooges_joystick_r)
+ioport_value gottlieb_state::stooges_joystick_r(ioport_field &field, void *param)
 {
 	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", nullptr };
 	return (joyport[m_joystick_select & 3] != nullptr) ? ioport(joyport[m_joystick_select & 3])->read() : 0xff;
@@ -303,7 +303,7 @@ CUSTOM_INPUT_MEMBER(gottlieb_state::stooges_joystick_r)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::general_output_w)
+void gottlieb_state::general_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-3 control video features, and are different for laserdisc games */
 	if (m_laserdisc == nullptr)
@@ -320,7 +320,7 @@ WRITE8_MEMBER(gottlieb_state::general_output_w)
 }
 
 // custom overrides
-WRITE8_MEMBER(gottlieb_state::reactor_output_w)
+void gottlieb_state::reactor_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	general_output_w(space, offset, data & ~0xe0);
 
@@ -329,7 +329,7 @@ WRITE8_MEMBER(gottlieb_state::reactor_output_w)
 	output().set_led_value(2, data & 0x80);
 }
 
-WRITE8_MEMBER(gottlieb_state::qbert_output_w)
+void gottlieb_state::qbert_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	general_output_w(space, offset, data & ~0x20);
 
@@ -337,7 +337,7 @@ WRITE8_MEMBER(gottlieb_state::qbert_output_w)
 	qbert_knocker(data >> 5 & 1);
 }
 
-WRITE8_MEMBER(gottlieb_state::qbertqub_output_w)
+void gottlieb_state::qbertqub_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// coincounter is on bit 5 instead
 	general_output_w(space, offset, (data >> 1 & 0x10) | (data & ~0x30));
@@ -346,7 +346,7 @@ WRITE8_MEMBER(gottlieb_state::qbertqub_output_w)
 	m_spritebank = (data & 0x10) >> 4;
 }
 
-WRITE8_MEMBER(gottlieb_state::stooges_output_w)
+void gottlieb_state::stooges_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	general_output_w(space, offset, data & ~0x60);
 
@@ -362,7 +362,7 @@ WRITE8_MEMBER(gottlieb_state::stooges_output_w)
  *
  *************************************/
 
-READ8_MEMBER(gottlieb_state::laserdisc_status_r)
+uint8_t gottlieb_state::laserdisc_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* IP5 reads low 8 bits of philips code */
 	if (offset == 0)
@@ -392,14 +392,14 @@ READ8_MEMBER(gottlieb_state::laserdisc_status_r)
 }
 
 
-WRITE8_MEMBER(gottlieb_state::laserdisc_select_w)
+void gottlieb_state::laserdisc_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* selects between reading audio data and reading status */
 	m_laserdisc_select = data & 1;
 }
 
 
-WRITE8_MEMBER(gottlieb_state::laserdisc_command_w)
+void gottlieb_state::laserdisc_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* a write here latches data into a 8-bit register and starts
 	   a sequence of events that sends serial data to the player */
@@ -419,7 +419,7 @@ WRITE8_MEMBER(gottlieb_state::laserdisc_command_w)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_philips_callback)
+void gottlieb_state::laserdisc_philips_callback(void *ptr, int32_t param)
 {
 	uint32_t newcode = m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, true);
 
@@ -439,14 +439,14 @@ TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_philips_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_off_callback)
+void gottlieb_state::laserdisc_bit_off_callback(void *ptr, int32_t param)
 {
 	/* deassert the control line */
 	m_laserdisc->control_w(CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_callback)
+void gottlieb_state::laserdisc_bit_callback(void *ptr, int32_t param)
 {
 	uint8_t bitsleft = param >> 16;
 	uint8_t data = param;
@@ -707,13 +707,13 @@ void gottlieb_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gottlieb_state::nmi_clear)
+void gottlieb_state::nmi_clear(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
-INTERRUPT_GEN_MEMBER(gottlieb_state::gottlieb_interrupt)
+void gottlieb_state::gottlieb_interrupt(device_t &device)
 {
 	/* assert the NMI and set a timer to clear it at the first visible line */
 	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -738,7 +738,7 @@ INTERRUPT_GEN_MEMBER(gottlieb_state::gottlieb_interrupt)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_sh_w)
+void gottlieb_state::gottlieb_sh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_r1_sound != nullptr)
 		m_r1_sound->write(space, offset, data);
@@ -2590,47 +2590,47 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(gottlieb_state,ramtiles)
+void gottlieb_state::init_ramtiles()
 {
 	m_gfxcharlo = m_gfxcharhi = 0;
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,romtiles)
+void gottlieb_state::init_romtiles()
 {
 	m_gfxcharlo = m_gfxcharhi = 1;
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,qbert)
+void gottlieb_state::init_qbert()
 {
-	DRIVER_INIT_CALL(romtiles);
+	init_romtiles();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::qbert_output_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,qbertqub)
+void gottlieb_state::init_qbertqub()
 {
-	DRIVER_INIT_CALL(romtiles);
+	init_romtiles();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::qbertqub_output_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,stooges)
+void gottlieb_state::init_stooges()
 {
-	DRIVER_INIT_CALL(ramtiles);
+	init_ramtiles();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::stooges_output_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,screwloo)
+void gottlieb_state::init_screwloo()
 {
 	m_gfxcharlo = 0;
 	m_gfxcharhi = 1;
 }
 
 
-DRIVER_INIT_MEMBER(gottlieb_state,vidvince)
+void gottlieb_state::init_vidvince()
 {
 	m_gfxcharlo = 1;
 	m_gfxcharhi = 0;

@@ -34,15 +34,15 @@ public:
 	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<tmc0430_device &>(device).m_gromready.set_callback(object); }
 
 	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(m_line);
-	DECLARE_WRITE_LINE_MEMBER(mo_line);
-	DECLARE_WRITE_LINE_MEMBER(gsq_line);
+	void m_line(int state);
+	void mo_line(int state);
+	void gsq_line(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+	void gclock_in(int state);
 
-	DECLARE_WRITE8_MEMBER( set_lines );
+	void set_lines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	static void set_region_and_ident(device_t &device, const char *regionname, int offset, int ident)
 	{

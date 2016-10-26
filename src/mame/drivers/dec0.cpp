@@ -174,7 +174,7 @@ Notes:
 
 /******************************************************************************/
 
-WRITE16_MEMBER(dec0_state::dec0_control_w)
+void dec0_state::dec0_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
@@ -221,7 +221,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 }
 
 
-WRITE16_MEMBER(dec0_automat_state::automat_control_w)
+void dec0_automat_state::automat_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
@@ -254,7 +254,7 @@ WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 	}
 }
 
-WRITE16_MEMBER(dec0_state::slyspy_control_w)
+void dec0_state::slyspy_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
@@ -271,7 +271,7 @@ WRITE16_MEMBER(dec0_state::slyspy_control_w)
 	}
 }
 
-WRITE16_MEMBER(dec0_state::midres_sound_w)
+void dec0_state::midres_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -333,7 +333,7 @@ ADDRESS_MAP_END
 
 
 
-READ16_MEMBER(dec0_state::slyspy_controls_r)
+uint16_t dec0_state::slyspy_controls_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset<<1)
 	{
@@ -351,7 +351,7 @@ READ16_MEMBER(dec0_state::slyspy_controls_r)
 	return ~0;
 }
 
-READ16_MEMBER(dec0_state::slyspy_protection_r)
+uint16_t dec0_state::slyspy_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* These values are for Boulderdash, I have no idea what they do in Slyspy */
 	switch (offset<<1) {
@@ -399,13 +399,13 @@ READ16_MEMBER(dec0_state::slyspy_protection_r)
 
 */
 
-WRITE16_MEMBER(dec0_state::slyspy_state_w)
+void dec0_state::slyspy_state_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_slyspy_state = 0;
 	m_pfprotect->set_bank(m_slyspy_state);
 }
 
-READ16_MEMBER(dec0_state::slyspy_state_r)
+uint16_t dec0_state::slyspy_state_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_slyspy_state = (m_slyspy_state + 1) % 4;
 	m_pfprotect->set_bank(m_slyspy_state);
@@ -538,13 +538,13 @@ void dec0_automat_state::machine_start()
 
 
 /* swizzle the palette writes around so we can use the same gfx plane ordering as the originals */
-READ16_MEMBER( dec0_automat_state::automat_palette_r )
+uint16_t dec0_automat_state::automat_palette_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset ^=0xf;
 	return m_paletteram[offset];
 }
 
-WRITE16_MEMBER( dec0_automat_state::automat_palette_w )
+void dec0_automat_state::automat_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset ^=0xf;
 	m_palette->write(space, offset, data, mem_mask);
@@ -616,7 +616,7 @@ static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_automat_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(dec0_automat_state::automat_adpcm_w)
+void dec0_automat_state::automat_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_automat_adpcm_byte = data;
 }
@@ -1358,7 +1358,7 @@ static MACHINE_CONFIG_DERIVED( dec1, dec0_base )
 MACHINE_CONFIG_END
 
 
-WRITE_LINE_MEMBER(dec0_automat_state::automat_vclk_cb)
+void dec0_automat_state::automat_vclk_cb(int state)
 {
 	if (m_automat_msm5205_vclk_toggle == 0)
 	{
@@ -1568,7 +1568,7 @@ static MACHINE_CONFIG_DERIVED( ffantasybl, dec0 )
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hippodrm)
 MACHINE_CONFIG_END
 
-MACHINE_RESET_MEMBER(dec0_state,slyspy)
+void dec0_state::machine_reset_slyspy()
 {
 	// set initial memory map
 	m_slyspy_state = 0;
@@ -3258,7 +3258,7 @@ ROM_START( bouldashj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(dec0_state,midresb)
+void dec0_state::init_midresb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00180000, 0x0018000f, read16_delegate(FUNC(dec0_state::dec0_controls_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x001a0000, 0x001a000f, read16_delegate(FUNC(dec0_state::dec0_rotary_r),this));
@@ -3266,7 +3266,7 @@ DRIVER_INIT_MEMBER(dec0_state,midresb)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00180014, 0x00180015, write16_delegate(FUNC(dec0_state::midres_sound_w),this));
 }
 
-READ16_MEMBER(dec0_state::ffantasybl_242024_r)
+uint16_t dec0_state::ffantasybl_242024_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 /*
     000152: 41F9 0024 2020             lea     $242020.l, A0
@@ -3279,7 +3279,7 @@ READ16_MEMBER(dec0_state::ffantasybl_242024_r)
 	return 0xffff;
 }
 
-DRIVER_INIT_MEMBER(dec0_state,ffantasybl)
+void dec0_state::init_ffantasybl()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x24c880, 0x24cbff); // what is this? layer 3-related??
 

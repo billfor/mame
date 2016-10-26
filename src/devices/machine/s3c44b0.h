@@ -611,41 +611,41 @@ public:
 	template<class _Object> static devcb_base &set_adc_data_r_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_data_r_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_i2s_data_w_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_data_w_cb.set_callback(object); }
 
-	DECLARE_READ32_MEMBER(lcd_r);
-	DECLARE_READ32_MEMBER(clkpow_r);
-	DECLARE_READ32_MEMBER(irq_r);
-	DECLARE_READ32_MEMBER(pwm_r);
-	DECLARE_READ32_MEMBER(iic_r);
-	DECLARE_READ32_MEMBER(gpio_r);
-	DECLARE_READ32_MEMBER(uart_0_r);
-	DECLARE_READ32_MEMBER(uart_1_r);
-	DECLARE_READ32_MEMBER(wdt_r);
-	DECLARE_READ32_MEMBER(cpuwrap_r);
-	DECLARE_READ32_MEMBER(adc_r);
-	DECLARE_READ32_MEMBER(sio_r);
-	DECLARE_READ32_MEMBER(iis_r);
-	DECLARE_READ32_MEMBER(zdma_0_r);
-	DECLARE_READ32_MEMBER(zdma_1_r);
-	DECLARE_READ32_MEMBER(bdma_0_r);
-	DECLARE_READ32_MEMBER(bdma_1_r);
+	uint32_t lcd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t clkpow_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t irq_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t pwm_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t iic_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t gpio_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t uart_0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t uart_1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t wdt_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t cpuwrap_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t adc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t sio_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t iis_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t zdma_0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t zdma_1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t bdma_0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t bdma_1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER(lcd_w);
-	DECLARE_WRITE32_MEMBER(clkpow_w);
-	DECLARE_WRITE32_MEMBER(irq_w);
-	DECLARE_WRITE32_MEMBER(pwm_w);
-	DECLARE_WRITE32_MEMBER(iic_w);
-	DECLARE_WRITE32_MEMBER(gpio_w);
-	DECLARE_WRITE32_MEMBER(uart_0_w);
-	DECLARE_WRITE32_MEMBER(uart_1_w);
-	DECLARE_WRITE32_MEMBER(wdt_w);
-	DECLARE_WRITE32_MEMBER(cpuwrap_w);
-	DECLARE_WRITE32_MEMBER(adc_w);
-	DECLARE_WRITE32_MEMBER(sio_w);
-	DECLARE_WRITE32_MEMBER(iis_w);
-	DECLARE_WRITE32_MEMBER(zdma_0_w);
-	DECLARE_WRITE32_MEMBER(zdma_1_w);
-	DECLARE_WRITE32_MEMBER(bdma_0_w);
-	DECLARE_WRITE32_MEMBER(bdma_1_w);
+	void lcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void clkpow_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void irq_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void pwm_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void iic_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void gpio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void uart_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void uart_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void wdt_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void cpuwrap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void adc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void iis_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void zdma_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void zdma_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void bdma_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void bdma_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void request_eint(uint32_t number);
 	uint32_t video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -675,7 +675,7 @@ private:
 	void lcd_start();
 	void lcd_stop();
 	void lcd_recalc();
-	TIMER_CALLBACK_MEMBER(lcd_timer_exp);
+	void lcd_timer_exp(void *ptr, int32_t param);
 
 	// Clock & Power Management
 	uint32_t get_mclk();
@@ -690,7 +690,7 @@ private:
 	void pwm_start(int timer);
 	void pwm_stop(int timer);
 	void pwm_recalc(int timer);
-	TIMER_CALLBACK_MEMBER(pwm_timer_exp);
+	void pwm_timer_exp(void *ptr, int32_t param);
 	//void dma_request_pwm();
 
 	// IIC
@@ -704,7 +704,7 @@ private:
 	void iic_start();
 	void iic_stop();
 	void iic_resume();
-	TIMER_CALLBACK_MEMBER(iic_timer_exp);
+	void iic_timer_exp(void *ptr, int32_t param);
 
 	// I/O Port
 	inline uint32_t iface_gpio_port_r(int port);
@@ -714,39 +714,39 @@ private:
 	uint32_t uart_r(int ch, uint32_t offset);
 	void uart_w(int ch, uint32_t offset, uint32_t data, uint32_t mem_mask);
 	void uart_fifo_w(int uart, uint8_t data);
-	TIMER_CALLBACK_MEMBER(uart_timer_exp);
+	void uart_timer_exp(void *ptr, int32_t param);
 
 	// Watchdog Timer
 	uint16_t wdt_calc_current_count();
 	void wdt_start();
 	void wdt_stop();
 	void wdt_recalc();
-	TIMER_CALLBACK_MEMBER(wdt_timer_exp);
+	void wdt_timer_exp(void *ptr, int32_t param);
 
 	// A/D Converter
 	void adc_start();
 	void adc_stop();
 	void adc_recalc();
-	TIMER_CALLBACK_MEMBER(adc_timer_exp);
+	void adc_timer_exp(void *ptr, int32_t param);
 
 	// SIO
 	void sio_start();
 	void sio_stop();
 	void sio_recalc();
-	TIMER_CALLBACK_MEMBER(sio_timer_exp);
+	void sio_timer_exp(void *ptr, int32_t param);
 
 	// IIS
 	inline void iface_i2s_data_w(address_space &space, int ch, uint16_t data);
 	void iis_start();
 	void iis_stop();
-	TIMER_CALLBACK_MEMBER(iis_timer_exp);
+	void iis_timer_exp(void *ptr, int32_t param);
 
 	// ZDMA
 	void zdma_trigger(int ch);
 	void zdma_start(int ch);
 	uint32_t zdma_r(int ch, uint32_t offset);
 	void zdma_w(int ch, uint32_t offset, uint32_t data, uint32_t mem_mask);
-	TIMER_CALLBACK_MEMBER(zdma_timer_exp);
+	void zdma_timer_exp(void *ptr, int32_t param);
 
 	// BDMA
 	void bdma_trigger(int ch);
@@ -755,7 +755,7 @@ private:
 	void bdma_start(int ch);
 	void bdma_stop(int ch);
 	void bdma_w(int ch, uint32_t offset, uint32_t data, uint32_t mem_mask);
-	TIMER_CALLBACK_MEMBER(bdma_timer_exp);
+	void bdma_timer_exp(void *ptr, int32_t param);
 
 	cpu_device *m_cpu;
 	//s3c44b0_memcon_t m_memcon;

@@ -28,12 +28,12 @@
 Audio handlers
 ***************************************************************************/
 
-WRITE8_MEMBER(qix_state::qix_dac_w)
+void qix_state::qix_dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, QIX_DAC_DATA, data);
 }
 
-WRITE8_MEMBER(qix_state::qix_vol_w)
+void qix_state::qix_vol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, QIX_VOL_DATA, data);
 }
@@ -95,26 +95,26 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-WRITE8_MEMBER(qix_state::sndpia_2_warning_w)
+void qix_state::sndpia_2_warning_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	popmessage("PIA 5 write!!");
 }
 
 
-TIMER_CALLBACK_MEMBER(qix_state::deferred_sndpia1_porta_w)
+void qix_state::deferred_sndpia1_porta_w(void *ptr, int32_t param)
 {
 	m_sndpia1->porta_w(param);
 }
 
 
-WRITE8_MEMBER(qix_state::sync_sndpia1_porta_w)
+void qix_state::sync_sndpia1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(qix_state::deferred_sndpia1_porta_w), this), data);
 }
 
 
-WRITE8_MEMBER(qix_state::slither_coinctl_w)
+void qix_state::slither_coinctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0, (~data >> 6) & 1);
 	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 1);
@@ -128,7 +128,7 @@ WRITE8_MEMBER(qix_state::slither_coinctl_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(qix_state::qix_pia_dint)
+void qix_state::qix_pia_dint(int state)
 {
 	int combined_state = m_sndpia0->irq_a_state() | m_sndpia0->irq_b_state();
 
@@ -137,7 +137,7 @@ WRITE_LINE_MEMBER(qix_state::qix_pia_dint)
 }
 
 
-WRITE_LINE_MEMBER(qix_state::qix_pia_sint)
+void qix_state::qix_pia_sint(int state)
 {
 	int combined_state = m_sndpia1->irq_a_state() | m_sndpia1->irq_b_state();
 

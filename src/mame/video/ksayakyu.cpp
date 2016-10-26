@@ -4,13 +4,13 @@
 #include "includes/ksayakyu.h"
 
 
-WRITE8_MEMBER(ksayakyu_state::ksayakyu_videoram_w)
+void ksayakyu_state::ksayakyu_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset]=data;
 	m_textmap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(ksayakyu_state::ksayakyu_videoctrl_w)
+void ksayakyu_state::ksayakyu_videoctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    bits:
@@ -32,7 +32,7 @@ WRITE8_MEMBER(ksayakyu_state::ksayakyu_videoctrl_w)
 		m_tilemap->set_flip((data & 2) ? TILEMAP_FLIPX : 0);
 }
 
-PALETTE_INIT_MEMBER(ksayakyu_state, ksayakyu)
+void ksayakyu_state::palette_init_ksayakyu(palette_device &palette)
 {
 	const uint8_t *prom = memregion("proms")->base();
 	int r, g, b, i;
@@ -47,7 +47,7 @@ PALETTE_INIT_MEMBER(ksayakyu_state, ksayakyu)
 	}
 }
 
-TILE_GET_INFO_MEMBER(ksayakyu_state::get_ksayakyu_tile_info)
+void ksayakyu_state::get_ksayakyu_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = memregion("user1")->base()[tile_index];
 	int attr = memregion("user1")->base()[tile_index + 0x2000];
@@ -60,7 +60,7 @@ xy-- ---- flip bits
 --cc cc-- color
 ---- --bb bank select
 */
-TILE_GET_INFO_MEMBER(ksayakyu_state::get_text_tile_info)
+void ksayakyu_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index * 2 + 1];
 	int attr = m_videoram[tile_index * 2];

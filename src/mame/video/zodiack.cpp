@@ -11,19 +11,19 @@
 #include "emu.h"
 #include "includes/zodiack.h"
 
-WRITE8_MEMBER( zodiack_state::videoram_w )
+void zodiack_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( zodiack_state::videoram2_w )
+void zodiack_state::videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram_2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( zodiack_state::attributes_w )
+void zodiack_state::attributes_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 1) && m_attributeram[offset] != data)
 	{
@@ -39,12 +39,12 @@ WRITE8_MEMBER( zodiack_state::attributes_w )
 	m_attributeram[offset] = data;
 }
 
-WRITE8_MEMBER( zodiack_state::flipscreen_w )
+void zodiack_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 1);
 }
 
-PALETTE_INIT_MEMBER(zodiack_state,zodiack)
+void zodiack_state::palette_init_zodiack(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -93,7 +93,7 @@ PALETTE_INIT_MEMBER(zodiack_state,zodiack)
 	palette.set_pen_indirect(0x31, 0x30);
 }
 
-TILE_GET_INFO_MEMBER(zodiack_state::get_bg_tile_info)
+void zodiack_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram_2[tile_index];
 	int color = (m_attributeram[(tile_index & 0x1f) << 1 | 1] >> 4) & 0x07;
@@ -101,7 +101,7 @@ TILE_GET_INFO_MEMBER(zodiack_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(zodiack_state::get_fg_tile_info)
+void zodiack_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = (m_attributeram[(tile_index & 0x1f) << 1 | 1] >> 0) & 0x07;

@@ -16,7 +16,7 @@ enable / disable tilemap bits might be wrong
 
 */
 
-TILE_GET_INFO_MEMBER(angelkds_state::get_tx_tile_info)
+void angelkds_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno;
 
@@ -24,13 +24,13 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_tx_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_txvideoram_w)
+void angelkds_state::angelkds_txvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_txvideoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_txbank_write)
+void angelkds_state::angelkds_txbank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_txbank != data)
 	{
@@ -43,7 +43,7 @@ WRITE8_MEMBER(angelkds_state::angelkds_txbank_write)
 
 */
 
-TILE_GET_INFO_MEMBER(angelkds_state::get_bgtop_tile_info)
+void angelkds_state::get_bgtop_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno;
 
@@ -53,13 +53,13 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_bgtop_tile_info)
 	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_bgtopvideoram_w)
+void angelkds_state::angelkds_bgtopvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgtopvideoram[offset] = data;
 	m_bgtop_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_bgtopbank_write)
+void angelkds_state::angelkds_bgtopbank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bgtopbank != data)
 	{
@@ -68,7 +68,7 @@ WRITE8_MEMBER(angelkds_state::angelkds_bgtopbank_write)
 	}
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_bgtopscroll_write)
+void angelkds_state::angelkds_bgtopscroll_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgtop_tilemap->set_scrollx(0, data);
 }
@@ -77,7 +77,7 @@ WRITE8_MEMBER(angelkds_state::angelkds_bgtopscroll_write)
 
 */
 
-TILE_GET_INFO_MEMBER(angelkds_state::get_bgbot_tile_info)
+void angelkds_state::get_bgbot_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno;
 
@@ -87,14 +87,14 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_bgbot_tile_info)
 	SET_TILE_INFO_MEMBER(2, tileno, 1, 0);
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_bgbotvideoram_w)
+void angelkds_state::angelkds_bgbotvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgbotvideoram[offset] = data;
 	m_bgbot_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(angelkds_state::angelkds_bgbotbank_write)
+void angelkds_state::angelkds_bgbotbank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bgbotbank != data)
 	{
@@ -103,13 +103,13 @@ WRITE8_MEMBER(angelkds_state::angelkds_bgbotbank_write)
 	}
 }
 
-WRITE8_MEMBER(angelkds_state::angelkds_bgbotscroll_write)
+void angelkds_state::angelkds_bgbotscroll_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgbot_tilemap->set_scrollx(0, data);
 }
 
 
-WRITE8_MEMBER(angelkds_state::angelkds_layer_ctrl_write)
+void angelkds_state::angelkds_layer_ctrl_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layer_ctrl = data;
 }

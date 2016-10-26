@@ -61,9 +61,9 @@ public:
 
 	virtual void machine_reset() override;
 
-	DECLARE_DRIVER_INIT(asr);
-	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
-	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	void init_asr();
+	void esq5506_otto_irq(int state);
+	uint16_t esq5506_read_adc(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 };
 
 void esqasr_state::machine_reset()
@@ -81,11 +81,11 @@ static ADDRESS_MAP_START( asrx_map, AS_PROGRAM, 32, esqasr_state )
 	AM_RANGE(0x0be00000, 0x0befffff) AM_RAM
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER(esqasr_state::esq5506_otto_irq)
+void esqasr_state::esq5506_otto_irq(int state)
 {
 }
 
-READ16_MEMBER(esqasr_state::esq5506_read_adc)
+uint16_t esqasr_state::esq5506_read_adc(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
@@ -159,7 +159,7 @@ ROM_START( asrx )
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esqasr_state, asr)
+void esqasr_state::init_asr()
 {
 }
 

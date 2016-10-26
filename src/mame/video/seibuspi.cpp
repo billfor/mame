@@ -141,7 +141,7 @@ void seibuspi_state::rfjet_bg_decrypt(uint8_t *rom, int size)
 	decrypt_bg( rom, size, 0xaea754, 0xfe8530, 0xccb666);
 }
 
-WRITE16_MEMBER(seibuspi_state::tile_decrypt_key_w)
+void seibuspi_state::tile_decrypt_key_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data != 0 && data != 1)
 		logerror("Decryption key: %04X\n", data);
@@ -171,7 +171,7 @@ void seibuspi_state::set_layer_offsets()
 	m_fore_layer_d14 = m_rf2_layer_bank << 12 & 0x4000;
 }
 
-WRITE16_MEMBER(seibuspi_state::spi_layer_bank_w)
+void seibuspi_state::spi_layer_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("Writing %04X to layer register\n", data);
 
@@ -190,7 +190,7 @@ WRITE16_MEMBER(seibuspi_state::spi_layer_bank_w)
 }
 
 
-WRITE8_MEMBER(seibuspi_state::rf2_layer_bank_w)
+void seibuspi_state::rf2_layer_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 00000fmb
 	// f: fore layer d14
@@ -210,7 +210,7 @@ WRITE8_MEMBER(seibuspi_state::rf2_layer_bank_w)
 		m_fore_layer->mark_all_dirty();
 }
 
-WRITE16_MEMBER(seibuspi_state::spi_layer_enable_w)
+void seibuspi_state::spi_layer_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 00000000 000stfmb (0=on, 1=off)
 	// s: sprite layer
@@ -221,17 +221,17 @@ WRITE16_MEMBER(seibuspi_state::spi_layer_enable_w)
 	COMBINE_DATA(&m_layer_enable);
 }
 
-WRITE16_MEMBER(seibuspi_state::scroll_w)
+void seibuspi_state::scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
-WRITE32_MEMBER(seibuspi_state::video_dma_length_w)
+void seibuspi_state::video_dma_length_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_video_dma_length);
 }
 
-WRITE32_MEMBER(seibuspi_state::video_dma_address_w)
+void seibuspi_state::video_dma_address_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_video_dma_address);
 }
@@ -239,7 +239,7 @@ WRITE32_MEMBER(seibuspi_state::video_dma_address_w)
 
 /*****************************************************************************/
 
-WRITE32_MEMBER(seibuspi_state::tilemap_dma_start_w)
+void seibuspi_state::tilemap_dma_start_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (!m_tilemap_ram)
 		return;
@@ -331,7 +331,7 @@ WRITE32_MEMBER(seibuspi_state::tilemap_dma_start_w)
 }
 
 
-WRITE32_MEMBER(seibuspi_state::palette_dma_start_w)
+void seibuspi_state::palette_dma_start_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int dma_length = (m_video_dma_length + 1) * 2;
 
@@ -354,7 +354,7 @@ WRITE32_MEMBER(seibuspi_state::palette_dma_start_w)
 }
 
 
-WRITE16_MEMBER(seibuspi_state::sprite_dma_start_w)
+void seibuspi_state::sprite_dma_start_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// safety check
 	if (!DWORD_ALIGNED(m_video_dma_address) || (m_video_dma_address + m_sprite_ram_size) > 0x40000)
@@ -666,7 +666,7 @@ uint32_t seibuspi_state::screen_update_sys386f(screen_device &screen, bitmap_rgb
 
 /*****************************************************************************/
 
-TILE_GET_INFO_MEMBER(seibuspi_state::get_text_tile_info)
+void seibuspi_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index / 2;
 	int tile = (m_tilemap_ram[offs + m_text_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
@@ -677,7 +677,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_text_tile_info)
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
+void seibuspi_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index / 2;
 	int tile = (m_tilemap_ram[offs] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
@@ -689,7 +689,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
 	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
+void seibuspi_state::get_midl_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index / 2;
 	int tile = (m_tilemap_ram[offs + m_midl_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
@@ -702,7 +702,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
 	SET_TILE_INFO_MEMBER(1, tile, color + 16, 0);
 }
 
-TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
+void seibuspi_state::get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index / 2;
 	int tile = (m_tilemap_ram[offs + m_fore_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
@@ -789,14 +789,14 @@ void seibuspi_state::video_start()
 	register_video_state();
 }
 
-VIDEO_START_MEMBER(seibuspi_state,ejanhs)
+void seibuspi_state::video_start_ejanhs()
 {
 	video_start();
 
 	memset(m_alpha_table, 0, 0x2000); // no alpha blending
 }
 
-VIDEO_START_MEMBER(seibuspi_state,sys386f)
+void seibuspi_state::video_start_sys386f()
 {
 	m_video_dma_length = 0;
 	m_video_dma_address = 0;

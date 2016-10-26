@@ -35,21 +35,21 @@ public:
 
 	uint8_t      m_yiear_nmi_enable;
 	uint8_t      m_yiear_irq_enable;
-	DECLARE_WRITE8_MEMBER(yiear_videoram_w);
-	DECLARE_WRITE8_MEMBER(yiear_control_w);
-	DECLARE_READ8_MEMBER(yiear_speech_r);
-	DECLARE_WRITE8_MEMBER(yiear_VLM5030_control_w);
+	void yiear_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void yiear_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t yiear_speech_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void yiear_VLM5030_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_SN76496_latch;
-	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void konami_SN76496_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_SN76496_latch = data; };
+	void konami_SN76496_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_sn->write(space, offset, m_SN76496_latch); };
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(yiear);
+	void palette_init_yiear(palette_device &palette);
 	uint32_t screen_update_yiear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(yiear_vblank_interrupt);
-	INTERRUPT_GEN_MEMBER(yiear_nmi_interrupt);
+	void yiear_vblank_interrupt(device_t &device);
+	void yiear_nmi_interrupt(device_t &device);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

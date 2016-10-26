@@ -13,33 +13,33 @@
 #include "includes/galaxold.h"
 
 
-IRQ_CALLBACK_MEMBER(galaxold_state::hunchbkg_irq_callback)
+int galaxold_state::hunchbkg_irq_callback(device_t &device, int irqline)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0x03;
 }
 
 /* FIXME: remove trampoline */
-WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_2_q_callback)
+void galaxold_state::galaxold_7474_9m_2_q_callback(int state)
 {
 	/* Q bar clocks the other flip-flop,
 	   Q is VBLANK (not visible to the CPU) */
 	m_7474_9m_1->clock_w(state);
 }
 
-WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_1_callback)
+void galaxold_state::galaxold_7474_9m_1_callback(int state)
 {
 	/* Q goes to the NMI line */
 	m_maincpu->set_input_line(m_irq_line, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(galaxold_state::galaxold_nmi_enable_w)
+void galaxold_state::galaxold_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_7474_9m_1->preset_w(data ? 1 : 0);
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(galaxold_state::galaxold_interrupt_timer)
+void galaxold_state::galaxold_interrupt_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	/* 128V, 64V and 32V go to D */
 	m_7474_9m_2->d_w(((param & 0xe0) != 0xe0) ? 1 : 0);
@@ -70,49 +70,49 @@ void galaxold_state::machine_reset_common(int line)
 	int_timer->adjust(m_screen->time_until_pos(0));
 }
 
-MACHINE_RESET_MEMBER(galaxold_state,galaxold)
+void galaxold_state::machine_reset_galaxold()
 {
 	machine_reset_common(INPUT_LINE_NMI);
 }
 
-MACHINE_RESET_MEMBER(galaxold_state,devilfsg)
+void galaxold_state::machine_reset_devilfsg()
 {
 	machine_reset_common(0);
 }
 
-MACHINE_RESET_MEMBER(galaxold_state,hunchbkg)
+void galaxold_state::machine_reset_hunchbkg()
 {
 	machine_reset_common(0);
 }
 
-WRITE8_MEMBER(galaxold_state::galaxold_coin_lockout_w)
+void galaxold_state::galaxold_coin_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 }
 
 
-WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_w)
+void galaxold_state::galaxold_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
-WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_1_w)
+void galaxold_state::galaxold_coin_counter_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 0x01);
 }
 
-WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_2_w)
+void galaxold_state::galaxold_coin_counter_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(2, data & 0x01);
 }
 
 
-WRITE8_MEMBER(galaxold_state::galaxold_leds_w)
+void galaxold_state::galaxold_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(offset,data & 1);
 }
 
-READ8_MEMBER(galaxold_state::scramblb_protection_1_r)
+uint8_t galaxold_state::scramblb_protection_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (space.device().safe_pc())
 	{
@@ -124,7 +124,7 @@ READ8_MEMBER(galaxold_state::scramblb_protection_1_r)
 	}
 }
 
-READ8_MEMBER(galaxold_state::scramblb_protection_2_r)
+uint8_t galaxold_state::scramblb_protection_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (space.device().safe_pc())
 	{
@@ -136,14 +136,14 @@ READ8_MEMBER(galaxold_state::scramblb_protection_2_r)
 }
 
 
-WRITE8_MEMBER(galaxold_state::_4in1_bank_w)
+void galaxold_state::_4in1_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m__4in1_bank = data & 0x03;
 	galaxold_gfxbank_w(space, 0, m__4in1_bank);
 	membank("bank1")->set_entry(m__4in1_bank);
 }
 
-CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
+ioport_value galaxold_state::_4in1_fake_port_r(ioport_field &field, void *param)
 {
 	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
 	int bit_mask = (uintptr_t)param;
@@ -151,7 +151,7 @@ CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
 	return (ioport(portnames[m__4in1_bank])->read() & bit_mask) ? 0x01 : 0x00;
 }
 
-DRIVER_INIT_MEMBER(galaxold_state,4in1)
+void galaxold_state::init_4in1()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	offs_t i, len = memregion("maincpu")->bytes();
@@ -169,18 +169,18 @@ DRIVER_INIT_MEMBER(galaxold_state,4in1)
 	save_item(NAME(m__4in1_bank));
 }
 
-INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
+void galaxold_state::hunchbks_vh_interrupt(device_t &device)
 {
 	generic_pulse_irq_line_and_vector(device.execute(),0,0x03,1);
 }
 
-DRIVER_INIT_MEMBER(galaxold_state,ladybugg)
+void galaxold_state::init_ladybugg()
 {
 	/* Doesn't actually use the bank, but it mustn't have a coin lock! */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6002, 0x6002, write8_delegate(FUNC(galaxold_state::galaxold_gfxbank_w),this));
 }
 
-DRIVER_INIT_MEMBER(galaxold_state,bullsdrtg)
+void galaxold_state::init_bullsdrtg()
 {
 	int i;
 

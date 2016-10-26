@@ -67,7 +67,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(brkthru_state::brkthru_1803_w)
+void brkthru_state::brkthru_1803_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = NMI enable */
 	m_nmi_mask = ~data & 1;
@@ -78,7 +78,7 @@ WRITE8_MEMBER(brkthru_state::brkthru_1803_w)
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 
-WRITE8_MEMBER(brkthru_state::darwin_0803_w)
+void brkthru_state::darwin_0803_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = NMI enable */
 	m_nmi_mask = data & 1;
@@ -91,13 +91,13 @@ WRITE8_MEMBER(brkthru_state::darwin_0803_w)
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 
-WRITE8_MEMBER(brkthru_state::brkthru_soundlatch_w)
+void brkthru_state::brkthru_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER(brkthru_state::coin_inserted)
+void brkthru_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an IRQ */
 	if (oldval)
@@ -367,7 +367,7 @@ void brkthru_state::machine_reset()
 	m_nmi_mask = 0;
 }
 
-INTERRUPT_GEN_MEMBER(brkthru_state::vblank_irq)
+void brkthru_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -639,7 +639,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(brkthru_state,brkthru)
+void brkthru_state::init_brkthru()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);

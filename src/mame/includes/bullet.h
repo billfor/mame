@@ -78,27 +78,27 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_READ8_MEMBER( info_r );
-	DECLARE_READ8_MEMBER( brom_r );
-	DECLARE_WRITE8_MEMBER( brom_w );
-	DECLARE_READ8_MEMBER( win_r );
-	DECLARE_WRITE8_MEMBER( wstrobe_w );
-	DECLARE_WRITE8_MEMBER( exdsk_w );
-	DECLARE_WRITE8_MEMBER( exdma_w );
-	DECLARE_WRITE8_MEMBER( hdcon_w );
-	DECLARE_WRITE8_MEMBER( segst_w );
-	DECLARE_READ8_MEMBER( dma_mreq_r );
-	DECLARE_WRITE8_MEMBER( dma_mreq_w );
-	DECLARE_READ8_MEMBER( pio_pb_r );
-	DECLARE_WRITE_LINE_MEMBER( dartardy_w );
-	DECLARE_WRITE_LINE_MEMBER( dartbrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	uint8_t mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t info_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t brom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void brom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t win_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wstrobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exdsk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exdma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hdcon_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void segst_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dma_mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dartardy_w(int state);
+	void dartbrdy_w(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_perror(int state);
+	void write_centronics_select(int state);
+	void write_centronics_fault(int state);
+	void fdc_drq_w(int state);
 
 	void update_dma_rdy();
 	// memory state
@@ -122,10 +122,10 @@ public:
 	int m_centronics_select;
 	int m_centronics_fault;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
-	DECLARE_WRITE_LINE_MEMBER(dart_rxtxca_w);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	void ctc_tick(timer_device &timer, void *ptr, int32_t param);
+	void dart_rxtxca_w(int state);
+	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 class bulletf_state : public bullet_state
@@ -152,20 +152,20 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( mreq_r );
-	DECLARE_WRITE8_MEMBER( mreq_w );
-	DECLARE_WRITE8_MEMBER( xdma0_w );
-	DECLARE_WRITE8_MEMBER( xfdc_w );
-	DECLARE_WRITE8_MEMBER( mbank_w );
-	DECLARE_READ8_MEMBER( hwsts_r );
-	DECLARE_READ8_MEMBER( scsi_r );
-	DECLARE_WRITE8_MEMBER( scsi_w );
+	uint8_t mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void xdma0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void xfdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hwsts_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t scsi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scsi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( dma_mreq_r );
-	DECLARE_WRITE8_MEMBER( dma_mreq_w );
-	DECLARE_WRITE8_MEMBER( pio_pa_w );
-	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
-	DECLARE_WRITE_LINE_MEMBER( req_w );
+	uint8_t dma_mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cstrb_w(int state);
+	void req_w(int state);
 
 	void update_dma_rdy();
 

@@ -167,22 +167,22 @@ OSC3: 48.384MHz
 #include "includes/namcofl.h"
 
 
-READ32_MEMBER(namcofl_state::fl_unk1_r)
+uint32_t namcofl_state::fl_unk1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(namcofl_state::fl_network_r)
+uint32_t namcofl_state::fl_network_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(namcofl_state::namcofl_sysreg_r)
+uint32_t namcofl_state::namcofl_sysreg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
+void namcofl_state::namcofl_sysreg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ((offset == 2) && ACCESSING_BITS_0_7)  // address space configuration
 	{
@@ -200,7 +200,7 @@ WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
 }
 
 // FIXME: remove this trampoline once the IRQ is moved into the actual device
-WRITE8_MEMBER(namcofl_state::namcofl_c116_w)
+void namcofl_state::namcofl_c116_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_c116->write(space, offset, data);
 
@@ -211,12 +211,12 @@ WRITE8_MEMBER(namcofl_state::namcofl_c116_w)
 	}
 }
 
-READ32_MEMBER(namcofl_state::namcofl_share_r)
+uint32_t namcofl_state::namcofl_share_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (m_shareram[offset*2+1] << 16) | m_shareram[offset*2];
 }
 
-WRITE32_MEMBER(namcofl_state::namcofl_share_w)
+void namcofl_state::namcofl_share_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_shareram+offset*2);
 	data >>= 16;
@@ -245,7 +245,7 @@ static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32, namcofl_state )
 ADDRESS_MAP_END
 
 
-WRITE16_MEMBER(namcofl_state::mcu_shared_w)
+void namcofl_state::mcu_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
@@ -267,17 +267,17 @@ WRITE16_MEMBER(namcofl_state::mcu_shared_w)
 }
 
 
-READ8_MEMBER(namcofl_state::port6_r)
+uint8_t namcofl_state::port6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mcu_port6;
 }
 
-WRITE8_MEMBER(namcofl_state::port6_w)
+void namcofl_state::port6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_port6 = data;
 }
 
-READ8_MEMBER(namcofl_state::port7_r)
+uint8_t namcofl_state::port7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_mcu_port6 & 0xf0)
 	{
@@ -300,26 +300,26 @@ READ8_MEMBER(namcofl_state::port7_r)
 	return 0xff;
 }
 
-READ8_MEMBER(namcofl_state::dac7_r)
+uint8_t namcofl_state::dac7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_accel.read_safe(0xff);
 }
 
-READ8_MEMBER(namcofl_state::dac6_r)
+uint8_t namcofl_state::dac6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_brake.read_safe(0xff);
 }
 
-READ8_MEMBER(namcofl_state::dac5_r)
+uint8_t namcofl_state::dac5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_wheel.read_safe(0xff);
 }
 
-READ8_MEMBER(namcofl_state::dac4_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac3_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac2_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac1_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac0_r){ return 0xff; }
+uint8_t namcofl_state::dac4_r(address_space &space, offs_t offset, uint8_t mem_mask){ return 0xff; }
+uint8_t namcofl_state::dac3_r(address_space &space, offs_t offset, uint8_t mem_mask){ return 0xff; }
+uint8_t namcofl_state::dac2_r(address_space &space, offs_t offset, uint8_t mem_mask){ return 0xff; }
+uint8_t namcofl_state::dac1_r(address_space &space, offs_t offset, uint8_t mem_mask){ return 0xff; }
+uint8_t namcofl_state::dac0_r(address_space &space, offs_t offset, uint8_t mem_mask){ return 0xff; }
 
 static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16, namcofl_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
@@ -522,50 +522,50 @@ static GFXDECODE_START( 2 )
 GFXDECODE_END
 
 
-TIMER_CALLBACK_MEMBER(namcofl_state::network_interrupt_callback)
+void namcofl_state::network_interrupt_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 	machine().scheduler().timer_set(m_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
 }
 
 
-TIMER_CALLBACK_MEMBER(namcofl_state::vblank_interrupt_callback)
+void namcofl_state::vblank_interrupt_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
 	machine().scheduler().timer_set(m_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
 }
 
 
-TIMER_CALLBACK_MEMBER(namcofl_state::raster_interrupt_callback)
+void namcofl_state::raster_interrupt_callback(void *ptr, int32_t param)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_maincpu->set_input_line(I960_IRQ1, ASSERT_LINE);
 	m_raster_interrupt_timer->adjust(m_screen->frame_period());
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_irq0_cb)
+void namcofl_state::mcu_irq0_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_irq2_cb)
+void namcofl_state::mcu_irq2_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_adc_cb)
+void namcofl_state::mcu_adc_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }
 
 
-MACHINE_START_MEMBER(namcofl_state,namcofl)
+void namcofl_state::machine_start_namcofl()
 {
 	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::raster_interrupt_callback),this));
 }
 
 
-MACHINE_RESET_MEMBER(namcofl_state,namcofl)
+void namcofl_state::machine_reset_namcofl()
 {
 	machine().scheduler().timer_set(m_screen->time_until_pos(m_screen->visible_area().max_y + 3), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
 	machine().scheduler().timer_set(m_screen->time_until_pos(m_screen->visible_area().max_y + 1), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
@@ -796,13 +796,13 @@ void namcofl_state::common_init()
 	membank("bank2")->set_base(m_workram.get());
 }
 
-DRIVER_INIT_MEMBER(namcofl_state,speedrcr)
+void namcofl_state::init_speedrcr()
 {
 	common_init();
 	m_gametype = NAMCOFL_SPEED_RACER;
 }
 
-DRIVER_INIT_MEMBER(namcofl_state,finalapr)
+void namcofl_state::init_finalapr()
 {
 	common_init();
 	m_gametype = NAMCOFL_FINAL_LAP_R;

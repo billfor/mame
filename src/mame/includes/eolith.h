@@ -53,33 +53,33 @@ public:
 	int m_speedup_scanline;
 	void speedup_read();
 	void init_speedup();
-	DECLARE_CUSTOM_INPUT_MEMBER(eolith_speedup_getvblank);
-	DECLARE_CUSTOM_INPUT_MEMBER(stealsee_speedup_getvblank);
+	ioport_value eolith_speedup_getvblank(ioport_field &field, void *param);
+	ioport_value stealsee_speedup_getvblank(ioport_field &field, void *param);
 
-	DECLARE_READ32_MEMBER(eolith_custom_r);
-	DECLARE_WRITE32_MEMBER(systemcontrol_w);
-	DECLARE_WRITE32_MEMBER(sound_w);
-	DECLARE_READ32_MEMBER(hidctch3_pen1_r);
-	DECLARE_READ32_MEMBER(hidctch3_pen2_r);
-	DECLARE_WRITE32_MEMBER(eolith_vram_w);
-	DECLARE_READ32_MEMBER(eolith_vram_r);
-	DECLARE_READ8_MEMBER(sound_cmd_r);
-	DECLARE_WRITE8_MEMBER(sound_p1_w);
-	DECLARE_READ8_MEMBER(qs1000_p1_r);
-	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_to_qs1000);
+	uint32_t eolith_custom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void systemcontrol_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sound_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t hidctch3_pen1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t hidctch3_pen2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void eolith_vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t eolith_vram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint8_t sound_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t qs1000_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void qs1000_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void soundcpu_to_qs1000(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(eolith);
-	DECLARE_DRIVER_INIT(landbrk);
-	DECLARE_DRIVER_INIT(hidctch3);
-	DECLARE_DRIVER_INIT(hidctch2);
-	DECLARE_DRIVER_INIT(hidnc2k);
-	DECLARE_DRIVER_INIT(landbrka);
+	void init_eolith();
+	void init_landbrk();
+	void init_hidctch3();
+	void init_hidctch2();
+	void init_hidnc2k();
+	void init_landbrka();
 
-	DECLARE_MACHINE_RESET(eolith);
-	DECLARE_VIDEO_START(eolith);
+	void machine_reset_eolith();
+	void video_start_eolith();
 
 	uint32_t screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(eolith_speedup);
+	void eolith_speedup(timer_device &timer, void *ptr, int32_t param);
 };

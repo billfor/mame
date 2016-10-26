@@ -72,13 +72,13 @@ Mighty Guy board layout:
  *
  *************************************/
 
-WRITE8_MEMBER(cop01_state::cop01_sound_command_w)
+void cop01_state::cop01_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, ASSERT_LINE );
 }
 
-READ8_MEMBER(cop01_state::cop01_sound_command_r)
+uint8_t cop01_state::cop01_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = (m_soundlatch->read(space, offset) & 0x7f) << 1;
 
@@ -97,18 +97,18 @@ READ8_MEMBER(cop01_state::cop01_sound_command_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(cop01_state::mightguy_area_r)
+ioport_value cop01_state::mightguy_area_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
 
-WRITE8_MEMBER(cop01_state::cop01_irq_ack_w)
+void cop01_state::cop01_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE );
 }
 
-READ8_MEMBER(cop01_state::cop01_sound_irq_ack_w)
+uint8_t cop01_state::cop01_sound_irq_ack_w(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE );
 	return 0;
@@ -168,7 +168,7 @@ ADDRESS_MAP_END
 
 
 /* this just gets some garbage out of the YM3526 */
-READ8_MEMBER(cop01_state::kludge)
+uint8_t cop01_state::kludge(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_timer++;
 }
@@ -642,7 +642,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cop01_state,mightguy)
+void cop01_state::init_mightguy()
 {
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working

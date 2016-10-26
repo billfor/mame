@@ -30,26 +30,26 @@ public:
 	tilemap_t *m_background;
 
 	// shangkid and chinhero
-	DECLARE_WRITE8_MEMBER(maincpu_bank_w);
-	DECLARE_WRITE8_MEMBER(bbx_enable_w);
-	DECLARE_WRITE8_MEMBER(cpu_reset_w);
-	DECLARE_WRITE8_MEMBER(sound_enable_w);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
+	void maincpu_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbx_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cpu_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// game specific
-	DECLARE_WRITE8_MEMBER(chinhero_ay8910_porta_w);
-	DECLARE_WRITE8_MEMBER(shangkid_ay8910_porta_w);
+	void chinhero_ay8910_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void shangkid_ay8910_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	DECLARE_DRIVER_INIT(shangkid);
-	DECLARE_DRIVER_INIT(chinhero);
-	DECLARE_MACHINE_RESET(chinhero);
-	DECLARE_VIDEO_START(shangkid);
-	DECLARE_PALETTE_INIT(dynamski);
-	DECLARE_MACHINE_RESET(shangkid);
+	void init_shangkid();
+	void init_chinhero();
+	void machine_reset_chinhero();
+	void video_start_shangkid();
+	void palette_init_dynamski(palette_device &palette);
+	void machine_reset_shangkid();
 
 	uint32_t screen_update_shangkid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dynamski(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

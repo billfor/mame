@@ -437,20 +437,20 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(avt_6845_address_w);
-	DECLARE_WRITE8_MEMBER(avt_6845_data_w);
-	DECLARE_READ8_MEMBER( avt_6845_data_r );
-	DECLARE_WRITE8_MEMBER(avt_videoram_w);
-	DECLARE_WRITE8_MEMBER(avt_colorram_w);
+	void avt_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void avt_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t avt_6845_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void avt_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void avt_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(avt);
+	void palette_init_avt(palette_device &palette);
 	uint32_t screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(avt_vblank_irq);
+	void avt_vblank_irq(device_t &device);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -476,21 +476,21 @@ public:
 *********************************************/
 
 
-WRITE8_MEMBER( avt_state::avt_videoram_w )
+void avt_state::avt_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER( avt_state::avt_colorram_w )
+void avt_state::avt_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(avt_state::get_bg_tile_info)
+void avt_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -536,7 +536,7 @@ uint32_t avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-PALETTE_INIT_MEMBER(avt_state, avt)
+void avt_state::palette_init_avt(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 /*  prom bits
@@ -592,24 +592,24 @@ PALETTE_INIT_MEMBER(avt_state, avt)
 *            Read / Write Handlers            *
 **********************************************/
 
-//WRITE8_MEMBER(avt_state::debug_w)
+//void avt_state::debug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 //{
 //  popmessage("written : %02X", data);
 //}
 
-WRITE8_MEMBER( avt_state::avt_6845_address_w )
+void avt_state::avt_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_index = data;
 	m_crtc->address_w(space, offset, data);
 }
 
-WRITE8_MEMBER( avt_state::avt_6845_data_w )
+void avt_state::avt_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_vreg[m_crtc_index] = data;
 	m_crtc->register_w(space, offset, data);
 }
 
-READ8_MEMBER( avt_state::avt_6845_data_r )
+uint8_t avt_state::avt_6845_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//m_crtc_vreg[m_crtc_index] = data;
 	return m_crtc->register_r(space, offset);
@@ -852,7 +852,7 @@ GFXDECODE_END
 *********************************************/
 
 /* IM 2 */
-INTERRUPT_GEN_MEMBER(avt_state::avt_vblank_irq)
+void avt_state::avt_vblank_irq(device_t &device)
 {
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x06);
 }

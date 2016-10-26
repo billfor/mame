@@ -54,12 +54,12 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_READ8_MEMBER(mk1_f8_r);
-	DECLARE_WRITE8_MEMBER(mk1_f8_w);
+	uint8_t mk1_f8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mk1_f8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_f8[2];
 	uint8_t m_led[4];
 	virtual void machine_start() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
+	void mk1_update_leds(timer_device &timer, void *ptr, int32_t param);
 	F3853_INTERRUPT_REQ_CB(mk1_interrupt);
 	required_device<cpu_device> m_maincpu;
 };
@@ -68,7 +68,7 @@ public:
 #define MAIN_CLOCK  1000000
 
 
-READ8_MEMBER( mk1_state::mk1_f8_r )
+uint8_t mk1_state::mk1_f8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t i, data = m_f8[offset];
 
@@ -93,7 +93,7 @@ READ8_MEMBER( mk1_state::mk1_f8_r )
 	return data;
 }
 
-WRITE8_MEMBER( mk1_state::mk1_f8_w )
+void mk1_state::mk1_f8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 0 is high and allows also input */
 	m_f8[offset] = data;
@@ -152,7 +152,7 @@ static INPUT_PORTS_START( mk1 )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
+void mk1_state::mk1_update_leds(timer_device &timer, void *ptr, int32_t param)
 {
 	for (int i = 0; i < 4; i++)
 	{

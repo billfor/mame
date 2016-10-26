@@ -25,12 +25,12 @@
 /******************************************************************************/
 
 
-WRITE16_MEMBER(legionna_state::tilemap_enable_w)
+void legionna_state::tilemap_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_layer_disable);
 }
 
-WRITE16_MEMBER(legionna_state::tile_scroll_w)
+void legionna_state::tile_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(scrollvals + offset);
 	data = scrollvals[offset];
@@ -47,13 +47,13 @@ WRITE16_MEMBER(legionna_state::tile_scroll_w)
 		tm->set_scrollx(0, data);
 }
 
-WRITE16_MEMBER(legionna_state::tile_vreg_1a_w)
+void legionna_state::tile_vreg_1a_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	flip_screen_set(data & 1);
 	// TODO: other bits ...
 }
 
-WRITE16_MEMBER(legionna_state::tile_scroll_base_w)
+void legionna_state::tile_scroll_base_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// TODO: specific for Godzilla, needs visible area changes.
 	if(offset == 7)
@@ -62,13 +62,13 @@ WRITE16_MEMBER(legionna_state::tile_scroll_base_w)
 	printf("%02x %04x\n",offset,data);
 }
 
-WRITE16_MEMBER(legionna_state::heatbrl_setgfxbank)
+void legionna_state::heatbrl_setgfxbank(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_back_gfx_bank = (data &0x4000) >> 2;
 }
 
 /*xxx- --- ---- ---- banking*/
-WRITE16_MEMBER(legionna_state::denjinmk_setgfxbank)
+void legionna_state::denjinmk_setgfxbank(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_fore_gfx_bank = (data &0x2000) >> 1;//???
 	m_back_gfx_bank = (data &0x4000) >> 2;
@@ -80,7 +80,7 @@ WRITE16_MEMBER(legionna_state::denjinmk_setgfxbank)
 	m_text_layer->mark_all_dirty();
 }
 
-WRITE16_MEMBER(legionna_state::videowrite_cb_w)
+void legionna_state::videowrite_cb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//  AM_RANGE(0x101000, 0x1017ff) AM_RAM // _WRITE(legionna_background_w) AM_SHARE("back_data")
 	//  AM_RANGE(0x101800, 0x101fff) AM_RAM // _WRITE(legionna_foreground_w) AM_SHARE("fore_data")
@@ -109,37 +109,37 @@ WRITE16_MEMBER(legionna_state::videowrite_cb_w)
 }
 
 // TODO: move to COP device
-WRITE16_MEMBER(legionna_state::grainbow_layer_config_w)
+void legionna_state::grainbow_layer_config_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// (0x8000|0x1ff), 0x200, 0x1ff, 0x200 written in sequence at startup
 	COMBINE_DATA(&m_layer_config[offset]);
 }
 
-WRITE16_MEMBER(legionna_state::legionna_background_w)
+void legionna_state::legionna_background_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_data[offset]);
 	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(legionna_state::legionna_midground_w)
+void legionna_state::legionna_midground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mid_data[offset]);
 	m_midground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(legionna_state::legionna_foreground_w)
+void legionna_state::legionna_foreground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fore_data[offset]);
 	m_foreground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(legionna_state::legionna_text_w)
+void legionna_state::legionna_text_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_text_layer->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_back_tile_info)
+void legionna_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_back_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -150,7 +150,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_back_tile_info)
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info)
+void legionna_state::get_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -160,7 +160,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info)
 	SET_TILE_INFO_MEMBER(5,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_denji)
+void legionna_state::get_mid_tile_info_denji(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_denji)
 	SET_TILE_INFO_MEMBER(5,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_cupsoc)
+void legionna_state::get_mid_tile_info_cupsoc(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -184,7 +184,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_cupsoc)
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info)
+void legionna_state::get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_fore_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -194,7 +194,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info)
 	SET_TILE_INFO_MEMBER(4,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info_denji)
+void legionna_state::get_fore_tile_info_denji(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_fore_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -205,7 +205,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info_denji)
 	SET_TILE_INFO_MEMBER(4,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
+void legionna_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_textram[tile_index];
 	int color=(tile>>12)&0xf;
@@ -255,7 +255,7 @@ void legionna_state::common_video_start()
 	m_text_layer->set_transparent_pen(15);
 }
 
-VIDEO_START_MEMBER(legionna_state,legionna)
+void legionna_state::video_start_legionna()
 {
 	common_video_start();
 
@@ -265,7 +265,7 @@ VIDEO_START_MEMBER(legionna_state,legionna)
 	m_sprite_pri_mask[3] = 0xfffe;
 }
 
-VIDEO_START_MEMBER(legionna_state,heatbrl)
+void legionna_state::video_start_heatbrl()
 {
 	common_video_start();
 
@@ -276,9 +276,9 @@ VIDEO_START_MEMBER(legionna_state,heatbrl)
 	m_sprite_pri_mask[3] = 0xffff;
 }
 
-VIDEO_START_MEMBER(legionna_state,godzilla)
+void legionna_state::video_start_godzilla()
 {
-	VIDEO_START_CALL_MEMBER(legionna);
+	video_start_legionna();
 
 	m_has_extended_banking = 1;
 	m_has_extended_priority = 0;
@@ -290,7 +290,7 @@ VIDEO_START_MEMBER(legionna_state,godzilla)
 	m_sprite_pri_mask[3] = 0xffff;
 }
 
-VIDEO_START_MEMBER(legionna_state,denjinmk)
+void legionna_state::video_start_denjinmk()
 {
 	common_video_allocate_ptr();
 
@@ -313,7 +313,7 @@ VIDEO_START_MEMBER(legionna_state,denjinmk)
 	m_text_layer->set_transparent_pen(7);//?
 }
 
-VIDEO_START_MEMBER(legionna_state,cupsoc)
+void legionna_state::video_start_cupsoc()
 {
 	common_video_allocate_ptr();
 
@@ -331,9 +331,9 @@ VIDEO_START_MEMBER(legionna_state,cupsoc)
 	m_text_layer->set_transparent_pen(15);
 }
 
-VIDEO_START_MEMBER(legionna_state,grainbow)
+void legionna_state::video_start_grainbow()
 {
-	VIDEO_START_CALL_MEMBER(legionna);
+	video_start_legionna();
 	m_sprite_xoffs = m_sprite_yoffs = 16;
 
 	m_has_extended_banking = 0;

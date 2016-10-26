@@ -56,19 +56,19 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( key_r );
-	DECLARE_WRITE8_MEMBER( speaker_w );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
-	DECLARE_PALETTE_INIT(lcmate2);
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_init_lcmate2(palette_device &palette);
 };
 
-WRITE8_MEMBER( lcmate2_state::speaker_w )
+void lcmate2_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 6));
 }
 
 // offsets are FE,FD,FB,F7,EF,DF,BF,7F to scan a particular row, or 00 to check if any key pressed
-READ8_MEMBER( lcmate2_state::key_r )
+uint8_t lcmate2_state::key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t i,data = 0xff;
 	char kbdrow[8];
@@ -85,7 +85,7 @@ READ8_MEMBER( lcmate2_state::key_r )
 	return data;
 }
 
-WRITE8_MEMBER( lcmate2_state::bankswitch_w )
+void lcmate2_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("rombank")->set_entry(data&0x0f);
 }
@@ -194,7 +194,7 @@ static INPUT_PORTS_START( lcmate2 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(lcmate2_state, lcmate2)
+void lcmate2_state::palette_init_lcmate2(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

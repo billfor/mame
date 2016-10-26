@@ -166,7 +166,7 @@
         uint16_t *my_tmap_memory;
         required_device<gfxdecode_device> gfxdecode;
 
-        TILE_GET_INFO_MEMBER( my_state::my_get_info )
+        void my_state::my_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
         {
             uint16_t tiledata = my_tmap_memory[tile_index];
             uint8_t code = tiledata & 0xff;
@@ -189,7 +189,7 @@
             tileinfo.category = category;
         }
 
-        VIDEO_START_MEMBER( my_state, my_driver )
+        void my_state::video_start_my_driver()
         {
             // first create the tilemap
             tmap = &machine().tilemap().create(
@@ -748,12 +748,12 @@ public:
 	static void static_set_transparent_pen(device_t &device, pen_t pen);
 
 	// write handlers
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_WRITE32_MEMBER(write);
-	DECLARE_WRITE8_MEMBER(write_ext);
-	DECLARE_WRITE16_MEMBER(write_ext);
-	DECLARE_WRITE32_MEMBER(write_ext);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void write_ext(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_ext(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_ext(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// pick one to use to avoid ambiguity errors
 	using device_t::machine;
@@ -788,12 +788,6 @@ private:
 // macros to help form flags for tilemap_t::draw
 #define TILEMAP_DRAW_CATEGORY(x)        (x)     // specify category to draw
 #define TILEMAP_DRAW_ALPHA(x)           (TILEMAP_DRAW_ALPHA_FLAG | (rgb_t::clamp(x) << 24))
-
-// function definition for a get info callback
-#define TILE_GET_INFO_MEMBER(_name)     void _name(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
-
-// function definition for a logical-to-memory mapper
-#define TILEMAP_MAPPER_MEMBER(_name)    tilemap_memory_index _name(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 
 // useful macro inside of a TILE_GET_INFO callback to set tile information
 #define SET_TILE_INFO_MEMBER(GFX,CODE,COLOR,FLAGS)  tileinfo.set(GFX, CODE, COLOR, FLAGS)

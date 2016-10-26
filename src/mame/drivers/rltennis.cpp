@@ -72,17 +72,17 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 #define RLT_TIMER_FREQ     (RLT_REFRESH_RATE*256)
 #define RLT_XTAL           XTAL_12MHz
 
-READ16_MEMBER(rltennis_state::io_r)
+uint16_t rltennis_state::io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("P1" )->read()&0x1fff) | (m_unk_counter<<13); /* top 3 bits controls smaple address update */
 }
 
-WRITE16_MEMBER(rltennis_state::snd1_w)
+void rltennis_state::snd1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_data760000);
 }
 
-WRITE16_MEMBER(rltennis_state::snd2_w)
+void rltennis_state::snd2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_data740000);
 }
@@ -132,7 +132,7 @@ static INPUT_PORTS_START( rltennis )
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-TIMER_CALLBACK_MEMBER(rltennis_state::sample_player)
+void rltennis_state::sample_player(void *ptr, int32_t param)
 {
 	if((m_dac_counter&0x7ff) == 0x7ff) /* reload top address bits */
 	{
@@ -147,7 +147,7 @@ TIMER_CALLBACK_MEMBER(rltennis_state::sample_player)
 	m_timer->adjust(attotime::from_hz( RLT_TIMER_FREQ ));
 }
 
-INTERRUPT_GEN_MEMBER(rltennis_state::interrupt)
+void rltennis_state::interrupt(device_t &device)
 {
 	++m_unk_counter; /* frame counter? verify */
 	device.execute().set_input_line(4, HOLD_LINE);

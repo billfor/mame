@@ -365,7 +365,7 @@ void konamigx_state::daiskiss_esc(address_space &space, uint32_t p1, uint32_t p2
 	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
-WRITE32_MEMBER(konamigx_state::esc_w)
+void konamigx_state::esc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t opcode;
 	uint32_t params;
@@ -450,12 +450,12 @@ WRITE32_MEMBER(konamigx_state::esc_w)
 /**********************************************************************************/
 /* EEPROM handlers */
 
-CUSTOM_INPUT_MEMBER(konamigx_state::gx_rdport1_3_r)
+ioport_value konamigx_state::gx_rdport1_3_r(ioport_field &field, void *param)
 {
 	return (m_gx_rdport1_3 >> 1);
 }
 
-WRITE32_MEMBER(konamigx_state::eeprom_w)
+void konamigx_state::eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t odata;
 
@@ -503,7 +503,7 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 	}
 }
 
-WRITE32_MEMBER(konamigx_state::control_w)
+void konamigx_state::control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// TODO: derive from reported PCB XTALs
 	const uint32_t pixclock[4] = { XTAL_6MHz, XTAL_8MHz, XTAL_12MHz, XTAL_16MHz};
@@ -558,7 +558,7 @@ WRITE32_MEMBER(konamigx_state::control_w)
 /**********************************************************************************/
 /* IRQ controllers */
 
-TIMER_CALLBACK_MEMBER(konamigx_state::boothack_callback)
+void konamigx_state::boothack_callback(void *ptr, int32_t param)
 {
 	// Restore main CPU normal operating frequency
 	m_maincpu->set_clock_scale(1.0f);
@@ -572,7 +572,7 @@ TIMER_CALLBACK_MEMBER(konamigx_state::boothack_callback)
     12Mhz dotclock: 42.7us(clear) / 341.3us(transfer)
 */
 
-TIMER_CALLBACK_MEMBER(konamigx_state::dmaend_callback)
+void konamigx_state::dmaend_callback(void *ptr, int32_t param)
 {
 	// foul-proof (CPU0 could be deactivated while we wait)
 	if (m_resume_trigger && m_suspension_active)
@@ -620,7 +620,7 @@ void konamigx_state::dmastart_callback(int data)
 }
 
 
-INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_type2_vblank_irq)
+void konamigx_state::konamigx_type2_vblank_irq(device_t &device)
 {
 	// lift idle suspension
 	if (m_resume_trigger && m_suspension_active)
@@ -645,7 +645,7 @@ INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_type2_vblank_irq)
 	dmastart_callback(0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type2_scanline)
+void konamigx_state::konamigx_type2_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -666,7 +666,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type2_scanline)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type4_scanline)
+void konamigx_state::konamigx_type4_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -737,7 +737,7 @@ ADC083X_INPUT_CB(konamigx_state::adc0834_callback)
 }
 
 
-READ32_MEMBER(konamigx_state::le2_gun_H_r)
+uint32_t konamigx_state::le2_gun_H_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int p1x = m_light0_x->read()*290/0xff+20;
 	int p2x = m_light1_x->read()*290/0xff+20;
@@ -745,7 +745,7 @@ READ32_MEMBER(konamigx_state::le2_gun_H_r)
 	return (p1x<<16)|p2x;
 }
 
-READ32_MEMBER(konamigx_state::le2_gun_V_r)
+uint32_t konamigx_state::le2_gun_V_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int p1y = m_light0_y->read()*224/0xff;
 	int p2y = m_light1_y->read()*224/0xff;
@@ -760,14 +760,14 @@ READ32_MEMBER(konamigx_state::le2_gun_V_r)
 /**********************************************************************************/
 /* system or game dependent handlers */
 
-READ32_MEMBER(konamigx_state::type1_roz_r1)
+uint32_t konamigx_state::type1_roz_r1(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *ROM = (uint32_t *)memregion("gfx3")->base();
 
 	return ROM[offset];
 }
 
-READ32_MEMBER(konamigx_state::type1_roz_r2)
+uint32_t konamigx_state::type1_roz_r2(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *ROM = (uint32_t *)memregion("gfx3")->base();
 
@@ -776,7 +776,7 @@ READ32_MEMBER(konamigx_state::type1_roz_r2)
 	return ROM[offset];
 }
 
-READ32_MEMBER(konamigx_state::type3_sync_r)
+uint32_t konamigx_state::type3_sync_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(m_konamigx_current_frame==0)
 		return -1;  //  return 0xfffffffe | 1;
@@ -859,7 +859,7 @@ READ32_MEMBER(konamigx_state::type3_sync_r)
     move.l  #$C10400,($C102EC).l       move.l  #$C10400,($C102EC).l
 */
 
-WRITE32_MEMBER(konamigx_state::type4_prot_w)
+void konamigx_state::type4_prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int clk;
 	int i;
@@ -979,7 +979,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 }
 
 // cabinet lamps for type 1 games
-WRITE32_MEMBER(konamigx_state::type1_cablamps_w)
+void konamigx_state::type1_cablamps_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	output().set_led_value(0, (data>>24)&1);
 }
@@ -1073,25 +1073,25 @@ ADDRESS_MAP_END
 /**********************************************************************************/
 /* Sound handling */
 
-READ16_MEMBER(konamigx_state::tms57002_data_word_r)
+uint16_t konamigx_state::tms57002_data_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dasp->data_r(space, 0);
 }
 
-WRITE16_MEMBER(konamigx_state::tms57002_data_word_w)
+void konamigx_state::tms57002_data_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_dasp->data_w(space, 0, data);
 }
 
-READ16_MEMBER(konamigx_state::tms57002_status_word_r)
+uint16_t konamigx_state::tms57002_status_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_dasp->dready_r() ? 4 : 0) |
 		(m_dasp->pc0_r() ? 2 : 0) |
 		(m_dasp->empty_r() ? 1 : 0);
 }
 
-WRITE16_MEMBER(konamigx_state::tms57002_control_word_w)
+void konamigx_state::tms57002_control_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1123,7 +1123,7 @@ static ADDRESS_MAP_START( gxtmsmap, AS_DATA, 8, konamigx_state )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER(konamigx_state::k054539_irq_gen)
+void konamigx_state::k054539_irq_gen(int state)
 {
 	if (m_sound_ctrl & 1)
 	{
@@ -1594,13 +1594,13 @@ static GFXDECODE_START( type4 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(konamigx_state::vblank_irq_ack_w)
+void konamigx_state::vblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 	m_gx_syncen |= 0x20;
 }
 
-WRITE_LINE_MEMBER(konamigx_state::hblank_irq_ack_w)
+void konamigx_state::hblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 	m_gx_syncen |= 0x40;
@@ -3705,12 +3705,12 @@ ROM_END
 /**********************************************************************************/
 /* initializers */
 
-MACHINE_START_MEMBER(konamigx_state,konamigx)
+void konamigx_state::machine_start_konamigx()
 {
 	save_item(NAME(m_gx_wrport1_1));
 }
 
-MACHINE_RESET_MEMBER(konamigx_state,konamigx)
+void konamigx_state::machine_reset_konamigx()
 {
 	m_gx_wrport1_0 = m_gx_wrport1_1 = 0;
 	m_gx_wrport2 = 0;
@@ -3824,12 +3824,12 @@ static const GXGameInfoT gameDefs[] =
 	{ "",        0xff,0xff,0xff },
 };
 
-READ32_MEMBER( konamigx_state::k_6bpp_rom_long_r )
+uint32_t konamigx_state::k_6bpp_rom_long_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_k056832->k_6bpp_rom_long_r(space,offset,mem_mask);
 }
 
-DRIVER_INIT_MEMBER(konamigx_state,konamigx)
+void konamigx_state::init_konamigx()
 {
 	int i, match;
 	int readback = 0;
@@ -3917,10 +3917,10 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 #undef BPP66
 }
 
-DRIVER_INIT_MEMBER(konamigx_state,posthack)
+void konamigx_state::init_posthack()
 {
 	m_use_68020_post_clock_hack = 1;
-	DRIVER_INIT_CALL(konamigx);
+	init_konamigx();
 }
 
 

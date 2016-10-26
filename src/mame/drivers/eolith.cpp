@@ -114,7 +114,7 @@
  *
  *************************************/
 
-READ32_MEMBER(eolith_state::eolith_custom_r)
+uint32_t eolith_state::eolith_custom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/*
 	    bit 3 = eeprom bit
@@ -129,7 +129,7 @@ READ32_MEMBER(eolith_state::eolith_custom_r)
 	return (m_in0->read() & ~0x300) | (machine().rand() & 0x300);
 }
 
-WRITE32_MEMBER(eolith_state::systemcontrol_w)
+void eolith_state::systemcontrol_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_buffer = (data & 0x80) >> 7;
 	machine().bookkeeping().coin_counter_w(0, data & m_coin_counter_bit);
@@ -140,7 +140,7 @@ WRITE32_MEMBER(eolith_state::systemcontrol_w)
 	// bit 0x100 and 0x040 ?
 }
 
-READ32_MEMBER(eolith_state::hidctch3_pen1_r)
+uint32_t eolith_state::hidctch3_pen1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//320 x 240
 	int xpos = m_penx1port->read();
@@ -149,7 +149,7 @@ READ32_MEMBER(eolith_state::hidctch3_pen1_r)
 	return xpos + (ypos*168*2);
 }
 
-READ32_MEMBER(eolith_state::hidctch3_pen2_r)
+uint32_t eolith_state::hidctch3_pen2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//320 x 240
 	int xpos = m_penx2port->read();
@@ -158,7 +158,7 @@ READ32_MEMBER(eolith_state::hidctch3_pen2_r)
 	return xpos + (ypos*168*2);
 }
 
-WRITE32_MEMBER( eolith_state::sound_w )
+void eolith_state::sound_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("CPU Command: %x\n", m_sound_data);
 	m_sound_data = data;
@@ -174,13 +174,13 @@ WRITE32_MEMBER( eolith_state::sound_w )
  *
  *************************************/
 
-READ8_MEMBER( eolith_state::sound_cmd_r )
+uint8_t eolith_state::sound_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 	return m_sound_data;
 }
 
-WRITE8_MEMBER( eolith_state::sound_p1_w )
+void eolith_state::sound_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// .... xxxx - Data ROM bank (32kB)
 	// ...x .... - Unknown (Usually 1?)
@@ -207,13 +207,13 @@ WRITE8_MEMBER( eolith_state::sound_p1_w )
     P37 (O) RDB      (/RD)
 */
 
-READ8_MEMBER( eolith_state::qs1000_p1_r )
+uint8_t eolith_state::qs1000_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Sound banking? (must be 1)
 	return 1;
 }
 
-WRITE8_MEMBER( eolith_state::qs1000_p1_w )
+void eolith_state::qs1000_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -224,7 +224,7 @@ WRITE8_MEMBER( eolith_state::qs1000_p1_w )
  *
  *************************************/
 
-WRITE8_MEMBER(eolith_state::soundcpu_to_qs1000)
+void eolith_state::soundcpu_to_qs1000(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_qs1000->serial_in(data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
@@ -1485,12 +1485,12 @@ ROM_START( hidctch3 )
 ROM_END
 
 
-MACHINE_RESET_MEMBER(eolith_state,eolith)
+void eolith_state::machine_reset_eolith()
 {
 	m_soundcpu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER(eolith_state,eolith)
+void eolith_state::init_eolith()
 {
 	init_speedup();
 
@@ -1500,18 +1500,18 @@ DRIVER_INIT_MEMBER(eolith_state,eolith)
 	save_item(NAME(m_sound_data));
 }
 
-DRIVER_INIT_MEMBER(eolith_state,landbrk)
+void eolith_state::init_landbrk()
 {
 	m_coin_counter_bit = 0x1000;
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
 
 // the protected sets all have an extra startup check (to prevent you swapping in an external ROM?)
 // currently not fully understood, and possibly not possible to make work without the MCU dump so we patch it.
 // to work with the unprotected code.
-DRIVER_INIT_MEMBER(eolith_state,landbrka)
+void eolith_state::init_landbrka()
 {
 	//it fails compares with memories:
 	//$4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
@@ -1521,24 +1521,24 @@ DRIVER_INIT_MEMBER(eolith_state,landbrka)
 
 	m_coin_counter_bit = 0x2000;
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
-DRIVER_INIT_MEMBER(eolith_state,hidctch2)
+void eolith_state::init_hidctch2()
 {
 	//it fails compares in memory like in landbrka
 	uint32_t *rombase = (uint32_t*)memregion("maincpu")->base();
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
 
-DRIVER_INIT_MEMBER(eolith_state,hidnc2k)
+void eolith_state::init_hidnc2k()
 {
 	uint32_t *rombase = (uint32_t*)memregion("maincpu")->base();
 	rombase[0x17b2c/4] = (rombase[0x17b2c/4] & 0x0000ffff) | 0x03000000; /* Change BR to NOP */
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
 
@@ -1547,7 +1547,7 @@ DRIVER_INIT_MEMBER(eolith_state,hidnc2k)
 
 
 
-DRIVER_INIT_MEMBER(eolith_state,hidctch3)
+void eolith_state::init_hidctch3()
 {
 	m_maincpu->space(AS_PROGRAM).nop_write(0xfc200000, 0xfc200003); // this generates pens vibration
 
@@ -1559,7 +1559,7 @@ DRIVER_INIT_MEMBER(eolith_state,hidctch3)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfcf00000, 0xfcf00003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfcf80000, 0xfcf80003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),this));
 
-	DRIVER_INIT_CALL(eolith);
+	init_eolith();
 }
 
 /* Eolith Speedup Handling */
@@ -1650,7 +1650,7 @@ void eolith_state::init_speedup()
 }
 
 /* todo, use timers instead! */
-TIMER_DEVICE_CALLBACK_MEMBER(eolith_state::eolith_speedup)
+void eolith_state::eolith_speedup(timer_device &timer, void *ptr, int32_t param)
 {
 	if (param==0)
 	{
@@ -1668,7 +1668,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(eolith_state::eolith_speedup)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(eolith_state::eolith_speedup_getvblank)
+ioport_value eolith_state::eolith_speedup_getvblank(ioport_field &field, void *param)
 {
 //  printf("%s:eolith speedup_read data %02x\n",machine().describe_context(), m_speedup_vblank);
 
@@ -1677,7 +1677,7 @@ CUSTOM_INPUT_MEMBER(eolith_state::eolith_speedup_getvblank)
 }
 
 // StealSee doesn't use interrupts, just the vblank
-CUSTOM_INPUT_MEMBER(eolith_state::stealsee_speedup_getvblank)
+ioport_value eolith_state::stealsee_speedup_getvblank(ioport_field &field, void *param)
 {
 	int pc = m_maincpu->pc();
 

@@ -121,21 +121,21 @@ static INPUT_PORTS_START( s11c )
 INPUT_PORTS_END
 
 /*
-WRITE8_MEMBER( s11c_state::bgbank_w )
+void s11c_state::bgbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
     uint8_t bank = ((data & 0x04) >> 2) | ((data & 0x03) << 1);
     membank("bgbank")->set_entry(bank);
 //  popmessage("BG bank set to %02x (%i)",data,bank);
 }
 */
-MACHINE_RESET_MEMBER( s11c_state, s11c )
+void s11c_state::machine_reset_s11c()
 {
 //  membank("bgbank")->set_entry(0);
 	// reset the CPUs again, so that the CPUs are starting with the right vectors (otherwise sound may die on reset)
 //  m_bgcpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 }
 
-DRIVER_INIT_MEMBER(s11c_state,s11c)
+void s11c_state::init_s11c()
 {
 	emu_timer* timer = timer_alloc(TIMER_IRQ);
 //  uint8_t *BGROM = memregion("bgcpu")->base();

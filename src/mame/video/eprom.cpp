@@ -51,7 +51,7 @@ void eprom_state::update_palette()
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(eprom_state::get_alpha_tile_info)
+void eprom_state::get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(eprom_state::get_alpha_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(eprom_state::get_playfield_tile_info)
+void eprom_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data1 = tilemap.basemem_read(tile_index);
 	uint16_t data2 = tilemap.extmem_read(tile_index) >> 8;
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(eprom_state::get_playfield_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(eprom_state::guts_get_playfield_tile_info)
+void eprom_state::guts_get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data1 = tilemap.basemem_read(tile_index);
 	uint16_t data2 = tilemap.extmem_read(tile_index) >> 8;
@@ -122,7 +122,7 @@ const atari_motion_objects_config eprom_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(eprom_state,eprom)
+void eprom_state::video_start_eprom()
 {
 	/* save states */
 	save_item(NAME(m_screen_intensity));
@@ -164,7 +164,7 @@ const atari_motion_objects_config eprom_state::s_guts_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(eprom_state,guts)
+void eprom_state::video_start_guts()
 {
 	/* save states */
 	save_item(NAME(m_screen_intensity));

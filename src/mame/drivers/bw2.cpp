@@ -57,7 +57,7 @@ enum
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( bw2_state::read )
+uint8_t bw2_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int rom = 1, vram = 1, ram1 = 1, ram2 = 1, ram3 = 1, ram4 = 1, ram5 = 1, ram6 = 1;
 
@@ -130,7 +130,7 @@ READ8_MEMBER( bw2_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( bw2_state::write )
+void bw2_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int vram = 1, ram1 = 1, ram2 = 1, ram3 = 1, ram4 = 1, ram5 = 1, ram6 = 1;
 
@@ -387,7 +387,7 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( bw2_state::write_centronics_busy )
+void bw2_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -396,7 +396,7 @@ WRITE_LINE_MEMBER( bw2_state::write_centronics_busy )
 //  I8255A interface
 //-------------------------------------------------
 
-WRITE8_MEMBER( bw2_state::ppi_pa_w )
+void bw2_state::ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -426,7 +426,7 @@ WRITE8_MEMBER( bw2_state::ppi_pa_w )
 	m_centronics->write_strobe(BIT(data, 7));
 }
 
-READ8_MEMBER( bw2_state::ppi_pb_r )
+uint8_t bw2_state::ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -451,7 +451,7 @@ READ8_MEMBER( bw2_state::ppi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( bw2_state::ppi_pc_w )
+void bw2_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -465,7 +465,7 @@ WRITE8_MEMBER( bw2_state::ppi_pc_w )
 	m_bank = data & 0x07;
 }
 
-READ8_MEMBER( bw2_state::ppi_pc_r )
+uint8_t bw2_state::ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -494,13 +494,13 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 //  pit8253_config pit_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( bw2_state::pit_out0_w )
+void bw2_state::pit_out0_w(int state)
 {
 	m_uart->write_txc(state);
 	m_uart->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( bw2_state::mtron_w )
+void bw2_state::mtron_w(int state)
 {
 	m_mtron = state;
 	m_mfdbk = !state;
@@ -512,7 +512,7 @@ WRITE_LINE_MEMBER( bw2_state::mtron_w )
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )
+void bw2_state::fdc_drq_w(int state)
 {
 	if (state)
 	{
@@ -542,7 +542,7 @@ SLOT_INTERFACE_END
 //**************************************************************************
 
 
-PALETTE_INIT_MEMBER(bw2_state, bw2)
+void bw2_state::palette_init_bw2(palette_device &palette)
 {
 	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);

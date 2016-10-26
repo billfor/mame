@@ -67,26 +67,26 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
-	DECLARE_WRITE8_MEMBER(arcadia_cia_0_portb_w);
+	void arcadia_multibios_change_game(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	ioport_value coin_counter_r(ioport_field &field, void *param);
+	void coin_changed_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void arcadia_cia_0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(arcadia);
-	DECLARE_DRIVER_INIT(xeon);
-	DECLARE_DRIVER_INIT(sdwr);
-	DECLARE_DRIVER_INIT(dart);
-	DECLARE_DRIVER_INIT(bowl);
-	DECLARE_DRIVER_INIT(sprg);
-	DECLARE_DRIVER_INIT(rdwr);
-	DECLARE_DRIVER_INIT(ninj);
-	DECLARE_DRIVER_INIT(airh);
-	DECLARE_DRIVER_INIT(ldrb);
-	DECLARE_DRIVER_INIT(socc);
-	DECLARE_DRIVER_INIT(blast);
-	DECLARE_DRIVER_INIT(pm);
-	DECLARE_DRIVER_INIT(dlta);
-	DECLARE_DRIVER_INIT(argh);
+	void init_arcadia();
+	void init_xeon();
+	void init_sdwr();
+	void init_dart();
+	void init_bowl();
+	void init_sprg();
+	void init_rdwr();
+	void init_ninj();
+	void init_airh();
+	void init_ldrb();
+	void init_socc();
+	void init_blast();
+	void init_pm();
+	void init_dlta();
+	void init_argh();
 
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 
@@ -106,7 +106,7 @@ protected:
  *
  *************************************/
 
-WRITE16_MEMBER(arcadia_amiga_state::arcadia_multibios_change_game)
+void arcadia_amiga_state::arcadia_multibios_change_game(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data == 0)
 		space.install_read_bank(0x800000, 0x97ffff, "bank2");
@@ -132,7 +132,7 @@ WRITE16_MEMBER(arcadia_amiga_state::arcadia_multibios_change_game)
  *
  *************************************/
 
-WRITE8_MEMBER(arcadia_amiga_state::arcadia_cia_0_portb_w)
+void arcadia_amiga_state::arcadia_cia_0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* writing a 0 in the low bit clears one of the coins */
 	if ((data & 1) == 0)
@@ -152,7 +152,7 @@ WRITE8_MEMBER(arcadia_amiga_state::arcadia_cia_0_portb_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
+ioport_value arcadia_amiga_state::coin_counter_r(ioport_field &field, void *param)
 {
 	int coin = (uintptr_t)param;
 
@@ -161,7 +161,7 @@ CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
 }
 
 
-INPUT_CHANGED_MEMBER(arcadia_amiga_state::coin_changed_callback)
+void arcadia_amiga_state::coin_changed_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int coin = (uintptr_t)param;
 
@@ -922,7 +922,7 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
  *
  *************************************/
 
-DRIVER_INIT_MEMBER( arcadia_amiga_state, arcadia )
+void arcadia_amiga_state::init_arcadia()
 {
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;
@@ -948,20 +948,20 @@ DRIVER_INIT_MEMBER( arcadia_amiga_state, arcadia )
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(arcadia_amiga_state,airh) { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,bowl) { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 7, 6, 0, 1, 2, 3, 4, 5); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,blast){ DRIVER_INIT_CALL(arcadia); generic_decode("user3", 4, 1, 7, 6, 2, 0, 3, 5); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,dart) { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 4, 0, 7, 6, 3, 1, 2, 5); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,ldrb) { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 2, 3, 4, 1, 0, 7, 5, 6); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,ninj) { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 1, 6, 5, 7, 4, 2, 0, 3); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,rdwr) { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 3, 1, 6, 4, 0, 5, 2, 7); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,sdwr) { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 6, 3, 4, 5, 2, 1, 0, 7); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,socc) { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 0, 7, 1, 6, 5, 4, 3, 2); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,sprg) { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 4, 7, 3, 0, 6, 5, 2, 1); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,xeon) { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 3, 1, 2, 4, 0, 5, 6, 7); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,pm)   { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 7, 6, 5, 4, 3, 2, 1, 0); } // no scramble
-DRIVER_INIT_MEMBER(arcadia_amiga_state,dlta) { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 4, 1, 7, 6, 2, 0, 3, 5); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,argh) { DRIVER_INIT_CALL(arcadia); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
+void arcadia_amiga_state::init_airh() { init_arcadia(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
+void arcadia_amiga_state::init_bowl() { init_arcadia(); generic_decode("user3", 7, 6, 0, 1, 2, 3, 4, 5); }
+void arcadia_amiga_state::init_blast(){ init_arcadia(); generic_decode("user3", 4, 1, 7, 6, 2, 0, 3, 5); }
+void arcadia_amiga_state::init_dart() { init_arcadia(); generic_decode("user3", 4, 0, 7, 6, 3, 1, 2, 5); }
+void arcadia_amiga_state::init_ldrb() { init_arcadia(); generic_decode("user3", 2, 3, 4, 1, 0, 7, 5, 6); }
+void arcadia_amiga_state::init_ninj() { init_arcadia(); generic_decode("user3", 1, 6, 5, 7, 4, 2, 0, 3); }
+void arcadia_amiga_state::init_rdwr() { init_arcadia(); generic_decode("user3", 3, 1, 6, 4, 0, 5, 2, 7); }
+void arcadia_amiga_state::init_sdwr() { init_arcadia(); generic_decode("user3", 6, 3, 4, 5, 2, 1, 0, 7); }
+void arcadia_amiga_state::init_socc() { init_arcadia(); generic_decode("user3", 0, 7, 1, 6, 5, 4, 3, 2); }
+void arcadia_amiga_state::init_sprg() { init_arcadia(); generic_decode("user3", 4, 7, 3, 0, 6, 5, 2, 1); }
+void arcadia_amiga_state::init_xeon() { init_arcadia(); generic_decode("user3", 3, 1, 2, 4, 0, 5, 6, 7); }
+void arcadia_amiga_state::init_pm()   { init_arcadia(); generic_decode("user3", 7, 6, 5, 4, 3, 2, 1, 0); } // no scramble
+void arcadia_amiga_state::init_dlta() { init_arcadia(); generic_decode("user3", 4, 1, 7, 6, 2, 0, 3, 5); }
+void arcadia_amiga_state::init_argh() { init_arcadia(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
 
 
 /*************************************

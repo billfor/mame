@@ -161,7 +161,7 @@ void amiga_state::machine_start()
 	timer_set(m_screen->time_until_pos(0), TIMER_SCANLINE);
 }
 
-WRITE_LINE_MEMBER( amiga_state::m68k_reset )
+void amiga_state::m68k_reset(int state)
 {
 	logerror("%s: Executed RESET\n", machine().describe_context());
 	machine_reset();
@@ -183,7 +183,7 @@ void amiga_state::machine_reset()
 	m_overlay->set_bank(1);
 }
 
-WRITE_LINE_MEMBER( amiga_state::kbreset_w )
+void amiga_state::kbreset_w(int state)
 {
 	// this is connected to the gary chip, gary then resets the 68k, agnus, paula and the cias
 	if (!state)
@@ -195,12 +195,12 @@ WRITE_LINE_MEMBER( amiga_state::kbreset_w )
 }
 
 // simple mirror of region 0xf80000 to 0xfbffff
-READ16_MEMBER( amiga_state::rom_mirror_r )
+uint16_t amiga_state::rom_mirror_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_word(offset + 0xf80000, mem_mask);
 }
 
-READ32_MEMBER( amiga_state::rom_mirror32_r )
+uint32_t amiga_state::rom_mirror32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_dword(offset + 0xf80000, mem_mask);
 }
@@ -238,7 +238,7 @@ void amiga_state::vblank()
 }
 
 // todo: cia a clock can be connected to either a fixed 50/60hz signal from the power supply, or the vblank
-TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
+void amiga_state::scanline_callback(void *ptr, int32_t param)
 {
 	amiga_state *state = this;
 	int scanline = param;
@@ -367,7 +367,7 @@ void amiga_state::update_irqs()
 	}
 }
 
-TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
+void amiga_state::amiga_irq_proc(void *ptr, int32_t param)
 {
 	update_irqs();
 	m_irq_timer->reset();
@@ -394,7 +394,7 @@ uint16_t amiga_state::joy1dat_r()
 		return (m_p2_mouse_y.read_safe(0xff) << 8) | m_p2_mouse_x.read_safe(0xff);
 }
 
-CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
+ioport_value amiga_state::amiga_joystick_convert(ioport_field &field, void *param)
 {
 	uint8_t bits = m_joy_ports[(int)(uintptr_t)param].read_safe(0xff);
 
@@ -871,7 +871,7 @@ static uint32_t blit_line(amiga_state *state)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
+void amiga_state::amiga_blitter_proc(void *ptr, int32_t param)
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
 	uint32_t blitsum = 0;
@@ -995,24 +995,24 @@ static void blitter_setup(address_space &space)
 //  CENTRONICS
 //**************************************************************************
 
-WRITE_LINE_MEMBER( amiga_state::centronics_ack_w )
+void amiga_state::centronics_ack_w(int state)
 {
 	m_cia_0->flag_w(state);
 }
 
-WRITE_LINE_MEMBER( amiga_state::centronics_busy_w )
+void amiga_state::centronics_busy_w(int state)
 {
 	m_centronics_busy = state;
 	m_cia_1->sp_w(state);
 }
 
-WRITE_LINE_MEMBER( amiga_state::centronics_perror_w )
+void amiga_state::centronics_perror_w(int state)
 {
 	m_centronics_perror = state;
 	m_cia_1->cnt_w(state);
 }
 
-WRITE_LINE_MEMBER( amiga_state::centronics_select_w )
+void amiga_state::centronics_select_w(int state)
 {
 	m_centronics_select = state;
 }
@@ -1025,7 +1025,7 @@ WRITE_LINE_MEMBER( amiga_state::centronics_select_w )
 // CIA-A access: 101x xxxx xxx0 oooo xxxx xxx1
 // CIA-B access: 101x xxxx xx0x oooo xxxx xxx0
 
-READ16_MEMBER( amiga_state::cia_r )
+uint16_t amiga_state::cia_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -1041,7 +1041,7 @@ READ16_MEMBER( amiga_state::cia_r )
 	return data;
 }
 
-WRITE16_MEMBER( amiga_state::cia_w )
+void amiga_state::cia_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG_CIA)
 		logerror("%s: cia_w(%06x) = %04x & %04x\n", space.machine().describe_context(), offset, data, mem_mask);
@@ -1053,7 +1053,7 @@ WRITE16_MEMBER( amiga_state::cia_w )
 		m_cia_1->write(space, offset >> 7, data >> 8);
 }
 
-WRITE16_MEMBER( amiga_state::gayle_cia_w )
+void amiga_state::gayle_cia_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// the first write to cia 0 after a reset switches in chip ram
 	if (m_gayle_reset && (offset & 0x1000/2) == 0 && ACCESSING_BITS_0_7)
@@ -1066,12 +1066,12 @@ WRITE16_MEMBER( amiga_state::gayle_cia_w )
 	cia_w(space, offset, data, mem_mask);
 }
 
-CUSTOM_INPUT_MEMBER( amiga_state::floppy_drive_status )
+ioport_value amiga_state::floppy_drive_status(ioport_field &field, void *param)
 {
 	return m_fdc->ciaapra_r();
 }
 
-WRITE8_MEMBER( amiga_state::cia_0_port_a_write )
+void amiga_state::cia_0_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0, kickstart overlay
 	m_overlay->set_bank(BIT(data, 0));
@@ -1081,7 +1081,7 @@ WRITE8_MEMBER( amiga_state::cia_0_port_a_write )
 	output().set_value("power_led", !BIT(data, 1));
 }
 
-WRITE_LINE_MEMBER( amiga_state::cia_0_irq )
+void amiga_state::cia_0_irq(int state)
 {
 	if (LOG_CIA)
 		logerror("%s: cia_0_irq: %d\n", machine().describe_context(), state);
@@ -1090,7 +1090,7 @@ WRITE_LINE_MEMBER( amiga_state::cia_0_irq )
 	update_int2();
 }
 
-READ8_MEMBER( amiga_state::cia_1_port_a_read )
+uint8_t amiga_state::cia_1_port_a_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -1108,7 +1108,7 @@ READ8_MEMBER( amiga_state::cia_1_port_a_read )
 	return data;
 }
 
-WRITE8_MEMBER( amiga_state::cia_1_port_a_write )
+void amiga_state::cia_1_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_rs232)
 	{
@@ -1117,7 +1117,7 @@ WRITE8_MEMBER( amiga_state::cia_1_port_a_write )
 	}
 }
 
-WRITE_LINE_MEMBER( amiga_state::cia_1_irq )
+void amiga_state::cia_1_irq(int state)
 {
 	if (LOG_CIA)
 		logerror("%s: cia_1_irq: %d\n", machine().describe_context(), state);
@@ -1144,7 +1144,7 @@ void amiga_state::custom_chip_reset()
 	CUSTOM_REG(REG_BEAMCON0) = (m_agnus_id & 0x10) ? 0x0000 : 0x0020;
 }
 
-READ16_MEMBER( amiga_state::custom_chip_r )
+uint16_t amiga_state::custom_chip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	amiga_state *state = this;
 	uint16_t temp;
@@ -1258,7 +1258,7 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( amiga_state::custom_chip_w )
+void amiga_state::custom_chip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	amiga_state *state = space.machine().driver_data<amiga_state>();
 	uint16_t temp;
@@ -1700,7 +1700,7 @@ void amiga_state::rx_write(amiga_state *state, int level)
 	CUSTOM_REG(REG_SERDATR) |= level << 11;
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_rx_w )
+void amiga_state::rs232_rx_w(int state)
 {
 	rx_write(this, state);
 
@@ -1709,22 +1709,22 @@ WRITE_LINE_MEMBER( amiga_state::rs232_rx_w )
 		serial_adjust();
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_dcd_w )
+void amiga_state::rs232_dcd_w(int state)
 {
 	m_rs232_dcd = state;
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_dsr_w )
+void amiga_state::rs232_dsr_w(int state)
 {
 	m_rs232_dsr = state;
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_ri_w )
+void amiga_state::rs232_ri_w(int state)
 {
 	m_rs232_ri = state;
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_cts_w )
+void amiga_state::rs232_cts_w(int state)
 {
 	m_rs232_cts = state;
 }

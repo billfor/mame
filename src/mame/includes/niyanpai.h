@@ -60,34 +60,34 @@ public:
 	uint8_t m_motor_on;
 
 	// common
-	DECLARE_WRITE8_MEMBER(soundbank_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_clear_w);
-	DECLARE_READ16_MEMBER(dipsw_r);
-	DECLARE_READ16_MEMBER(palette_r);
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(blitter_0_w);
-	DECLARE_WRITE8_MEMBER(blitter_1_w);
-	DECLARE_WRITE8_MEMBER(blitter_2_w);
-	DECLARE_READ8_MEMBER(blitter_0_r);
-	DECLARE_READ8_MEMBER(blitter_1_r);
-	DECLARE_READ8_MEMBER(blitter_2_r);
-	DECLARE_WRITE8_MEMBER(clut_0_w);
-	DECLARE_WRITE8_MEMBER(clut_1_w);
-	DECLARE_WRITE8_MEMBER(clut_2_w);
-	DECLARE_WRITE8_MEMBER(clutsel_0_w);
-	DECLARE_WRITE8_MEMBER(clutsel_1_w);
-	DECLARE_WRITE8_MEMBER(clutsel_2_w);
-	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
+	void soundbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void soundlatch_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t dipsw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t palette_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blitter_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blitter_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t blitter_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t blitter_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t blitter_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void clut_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clut_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clut_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clutsel_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clutsel_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clutsel_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tmp68301_parallel_port_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// musobana and derived machine configs
-	DECLARE_READ16_MEMBER(musobana_inputport_0_r);
-	DECLARE_WRITE16_MEMBER(musobana_inputport_w);
+	uint16_t musobana_inputport_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void musobana_inputport_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
+	ioport_value musobana_outcoin_flag_r(ioport_field &field, void *param);
 
-	DECLARE_DRIVER_INIT(niyanpai);
+	void init_niyanpai();
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(musobana);
+	void machine_start_musobana();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int blitter_r(int vram, int offset);
@@ -98,7 +98,7 @@ public:
 	void update_pixel(int vram, int x, int y);
 	void gfxdraw(int vram);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void interrupt(device_t &device);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

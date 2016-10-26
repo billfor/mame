@@ -28,7 +28,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(champbas_state,champbas)
+void champbas_state::palette_init_champbas(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(champbas_state,champbas)
 }
 
 
-PALETTE_INIT_MEMBER(champbas_state,exctsccr)
+void champbas_state::palette_init_exctsccr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -135,7 +135,7 @@ PALETTE_INIT_MEMBER(champbas_state,exctsccr)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(champbas_state::champbas_get_bg_tile_info)
+void champbas_state::champbas_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vram[tile_index] | (m_gfx_bank << 8);
 	int color = (m_vram[tile_index + 0x400] & 0x1f) | 0x20;
@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(champbas_state::champbas_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(champbas_state::exctsccr_get_bg_tile_info)
+void champbas_state::exctsccr_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vram[tile_index] | (m_gfx_bank << 8);
 	int color = m_vram[tile_index + 0x400] & 0x0f;
@@ -159,12 +159,12 @@ TILE_GET_INFO_MEMBER(champbas_state::exctsccr_get_bg_tile_info)
  *
  *************************************/
 
-VIDEO_START_MEMBER(champbas_state,champbas)
+void champbas_state::video_start_champbas()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(champbas_state::champbas_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-VIDEO_START_MEMBER(champbas_state,exctsccr)
+void champbas_state::video_start_exctsccr()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(champbas_state::exctsccr_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
@@ -177,13 +177,13 @@ VIDEO_START_MEMBER(champbas_state,exctsccr)
  *
  *************************************/
 
-WRITE8_MEMBER(champbas_state::tilemap_w)
+void champbas_state::tilemap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(champbas_state::gfxbank_w)
+void champbas_state::gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 1;
 
@@ -194,13 +194,13 @@ WRITE8_MEMBER(champbas_state::gfxbank_w)
 	}
 }
 
-WRITE8_MEMBER(champbas_state::palette_bank_w)
+void champbas_state::palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_bank = data & 1;
 	m_bg_tilemap->set_palette_offset(m_palette_bank << 8);
 }
 
-WRITE8_MEMBER(champbas_state::flipscreen_w)
+void champbas_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 1);
 }

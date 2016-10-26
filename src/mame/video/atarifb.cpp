@@ -29,19 +29,19 @@ void atarifb_state::get_tile_info_common( tile_data &tileinfo, tilemap_memory_in
 }
 
 
-TILE_GET_INFO_MEMBER(atarifb_state::alpha1_get_tile_info)
+void atarifb_state::alpha1_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info_common(tileinfo, tile_index, m_alphap1_videoram);
 }
 
 
-TILE_GET_INFO_MEMBER(atarifb_state::alpha2_get_tile_info)
+void atarifb_state::alpha2_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info_common(tileinfo, tile_index, m_alphap2_videoram);
 }
 
 
-TILE_GET_INFO_MEMBER(atarifb_state::field_get_tile_info)
+void atarifb_state::field_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_field_videoram[tile_index] & 0x3f;
 	int flipyx = m_field_videoram[tile_index] >> 6;
@@ -58,21 +58,21 @@ TILE_GET_INFO_MEMBER(atarifb_state::field_get_tile_info)
  *
  *************************************/
 
-WRITE8_MEMBER(atarifb_state::atarifb_alpha1_videoram_w)
+void atarifb_state::atarifb_alpha1_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_alphap1_videoram[offset] = data;
 	m_alpha1_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(atarifb_state::atarifb_alpha2_videoram_w)
+void atarifb_state::atarifb_alpha2_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_alphap2_videoram[offset] = data;
 	m_alpha2_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(atarifb_state::atarifb_field_videoram_w)
+void atarifb_state::atarifb_field_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_field_videoram[offset] = data;
 	m_field_tilemap->mark_tile_dirty(offset);

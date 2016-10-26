@@ -43,16 +43,16 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_MACHINE_RESET(ec1841);
-	DECLARE_DRIVER_INIT(ec1841);
+	void machine_reset_ec1841();
+	void init_ec1841();
 
 	struct {
 		uint8_t enable[4];
 		int boards;
 	} m_memory;
 
-	DECLARE_READ8_MEMBER(memboard_r);
-	DECLARE_WRITE8_MEMBER(memboard_w);
+	uint8_t memboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 /*
@@ -74,7 +74,7 @@ public:
  * bit 3    enable write access
  */
 
-READ8_MEMBER(ec184x_state::memboard_r)
+uint8_t ec184x_state::memboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -88,7 +88,7 @@ READ8_MEMBER(ec184x_state::memboard_r)
 	return data;
 }
 
-WRITE8_MEMBER(ec184x_state::memboard_w)
+void ec184x_state::memboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
@@ -135,7 +135,7 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 	m_memory.enable[offset] = data;
 }
 
-DRIVER_INIT_MEMBER( ec184x_state, ec1841 )
+void ec184x_state::init_ec1841()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
@@ -160,7 +160,7 @@ DRIVER_INIT_MEMBER( ec184x_state, ec1841 )
 	}
 }
 
-MACHINE_RESET_MEMBER( ec184x_state, ec1841 )
+void ec184x_state::machine_reset_ec1841()
 {
 	memset(m_memory.enable, 0, sizeof(m_memory.enable));
 	// mark 1st board enabled

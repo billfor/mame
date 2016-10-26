@@ -57,15 +57,15 @@ public:
 	uint16_t m_display_cache[0x10];
 	uint8_t m_display_decay[0x100];
 
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE16_MEMBER(write_a);
-	DECLARE_WRITE_LINE_MEMBER(write_f);
+	void write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_a(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_f(int state);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_decay_tick(timer_device &timer, void *ptr, int32_t param);
 	bool index_is_7segled(int index);
 	void display_update();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(reset_q2);
+	void reset_q2(timer_device &timer, void *ptr, int32_t param);
 	void write_a12(int state);
 	void sound_update();
 
@@ -147,7 +147,7 @@ void wildfire_state::display_update()
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::display_decay_tick)
+void wildfire_state::display_decay_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	// slowly turn off unpowered segments
 	for (int i = 0; i < 0x100; i++)
@@ -177,14 +177,14 @@ void wildfire_state::sound_update()
 	m_speaker->level_w(m_q2 & m_q3);
 }
 
-WRITE_LINE_MEMBER(wildfire_state::write_f)
+void wildfire_state::write_f(int state)
 {
 	// F_out pin: speaker out
 	m_q3 = (state) ? 1 : 0;
 	sound_update();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(wildfire_state::reset_q2)
+void wildfire_state::reset_q2(timer_device &timer, void *ptr, int32_t param)
 {
 	m_q2 = 0;
 	sound_update();
@@ -213,14 +213,14 @@ void wildfire_state::write_a12(int state)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(wildfire_state::write_d)
+void wildfire_state::write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// D0-D7: leds out
 	m_d = data;
 	display_update();
 }
 
-WRITE16_MEMBER(wildfire_state::write_a)
+void wildfire_state::write_a(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data ^= 0x1fff; // active-low
 

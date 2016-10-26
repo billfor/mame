@@ -42,28 +42,28 @@ public:
 	int         m_retvalue; // waterball
 
 	// common
-	DECLARE_WRITE16_MEMBER(okibank_w);
-	DECLARE_WRITE16_MEMBER(vram_0_w);
-	DECLARE_WRITE16_MEMBER(vram_1_w);
+	void okibank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// blmbycar
-	DECLARE_WRITE16_MEMBER(blmbycar_pot_wheel_reset_w);
-	DECLARE_WRITE16_MEMBER(blmbycar_pot_wheel_shift_w);
-	DECLARE_READ16_MEMBER(blmbycar_pot_wheel_r);
-	DECLARE_READ16_MEMBER(blmbycar_opt_wheel_r);
+	void blmbycar_pot_wheel_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blmbycar_pot_wheel_shift_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t blmbycar_pot_wheel_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t blmbycar_opt_wheel_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	// waterball
-	DECLARE_READ16_MEMBER(waterball_unk_r);
+	uint16_t waterball_unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	DECLARE_DRIVER_INIT(blmbycar);
+	void init_blmbycar();
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(blmbycar);
-	DECLARE_MACHINE_RESET(blmbycar);
-	DECLARE_MACHINE_START(watrball);
-	DECLARE_MACHINE_RESET(watrball);
+	void machine_start_blmbycar();
+	void machine_reset_blmbycar();
+	void machine_start_watrball();
+	void machine_reset_watrball();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );

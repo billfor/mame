@@ -235,7 +235,7 @@ H=B0: 0C,0C,0D,0D,0E,0E,0F,0F 0C,0C,2D,2D,0E,0E,2F,2F
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(galaxian_state, galaxian)
+void galaxian_state::palette_init_galaxian(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int rgb_resistances[3] = { 1000, 470, 220 };
@@ -359,9 +359,9 @@ PALETTE_INIT_MEMBER(galaxian_state, galaxian)
 	m_bullet_color[7] = rgb_t(0xff,0xff,0x00);
 }
 
-PALETTE_INIT_MEMBER(galaxian_state,moonwar)
+void galaxian_state::palette_init_moonwar(palette_device &palette)
 {
-	PALETTE_INIT_NAME(galaxian)(palette);
+	palette_init_galaxian(palette);
 
 	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
 	m_bullet_color[7] = rgb_t(0xef,0xef,0x97);
@@ -460,7 +460,7 @@ uint32_t galaxian_state::screen_update_galaxian(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(galaxian_state::bg_get_tile_info)
+void galaxian_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	uint8_t x = tile_index & 0x1f;
@@ -476,7 +476,7 @@ TILE_GET_INFO_MEMBER(galaxian_state::bg_get_tile_info)
 }
 
 
-WRITE8_MEMBER(galaxian_state::galaxian_videoram_w)
+void galaxian_state::galaxian_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	/* update any video up to the current scanline */
@@ -489,7 +489,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_videoram_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::galaxian_objram_w)
+void galaxian_state::galaxian_objram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* update any video up to the current scanline */
 //  m_screen->update_now();
@@ -639,7 +639,7 @@ void galaxian_state::bullets_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_x_w)
+void galaxian_state::galaxian_flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_flipscreen_x != (data & 0x01))
 	{
@@ -656,7 +656,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_x_w)
 	}
 }
 
-WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_y_w)
+void galaxian_state::galaxian_flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_flipscreen_y != (data & 0x01))
 	{
@@ -668,7 +668,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_y_w)
 	}
 }
 
-WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_xy_w)
+void galaxian_state::galaxian_flip_screen_xy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	galaxian_flip_screen_x_w(space, offset, data);
 	galaxian_flip_screen_y_w(space, offset, data);
@@ -682,7 +682,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_xy_w)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::galaxian_stars_enable_w)
+void galaxian_state::galaxian_stars_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_stars_enabled ^ data) & 0x01)
 	{
@@ -702,7 +702,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_stars_enable_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scramble_background_enable_w)
+void galaxian_state::scramble_background_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_background_enable ^ data) & 0x01)
 	{
@@ -714,7 +714,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_enable_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scramble_background_red_w)
+void galaxian_state::scramble_background_red_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_background_red ^ data) & 0x01)
 	{
@@ -726,7 +726,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_red_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scramble_background_green_w)
+void galaxian_state::scramble_background_green_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_background_green ^ data) & 0x01)
 	{
@@ -738,7 +738,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_green_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scramble_background_blue_w)
+void galaxian_state::scramble_background_blue_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_background_blue ^ data) & 0x01)
 	{
@@ -757,7 +757,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_blue_w)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::galaxian_gfxbank_w)
+void galaxian_state::galaxian_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_gfxbank[offset] != data)
 	{
@@ -846,7 +846,7 @@ void galaxian_state::stars_update_origin()
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::galaxian_stars_blink_timer)
+void galaxian_state::galaxian_stars_blink_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_stars_blink_state++;
 }

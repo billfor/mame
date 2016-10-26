@@ -104,7 +104,7 @@ void gcpinbal_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
+void gcpinbal_state::gcpinbal_interrupt(device_t &device)
 {
 	/* Unsure of actual sequence */
 
@@ -118,7 +118,7 @@ INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
                           IOC
 ***********************************************************/
 
-READ16_MEMBER(gcpinbal_state::ioc_r)
+uint16_t gcpinbal_state::ioc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* 20 (only once), 76, a0 are read in log */
 
@@ -145,7 +145,7 @@ READ16_MEMBER(gcpinbal_state::ioc_r)
 }
 
 
-WRITE16_MEMBER(gcpinbal_state::ioc_w)
+void gcpinbal_state::ioc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ioc_ram[offset]);
 
@@ -243,7 +243,7 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 
 
 /* Controlled through ioc? */
-WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
+void gcpinbal_state::gcp_adpcm_int(int state)
 {
 	if (m_adpcm_idle)
 		m_msm->reset_w(1);

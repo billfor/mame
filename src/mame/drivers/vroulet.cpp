@@ -67,14 +67,14 @@ public:
 
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(ppi8255_a_w);
-	DECLARE_WRITE8_MEMBER(ppi8255_b_w);
-	DECLARE_WRITE8_MEMBER(ppi8255_c_w);
+	void paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi8255_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi8255_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 
@@ -85,7 +85,7 @@ public:
 /* video */
 
 
-WRITE8_MEMBER(vroulet_state::paletteram_w)
+void vroulet_state::paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	 paletteram_xxxxBBBBGGGGRRRR_byte_be_w
@@ -105,19 +105,19 @@ WRITE8_MEMBER(vroulet_state::paletteram_w)
 	}
 }
 
-WRITE8_MEMBER(vroulet_state::videoram_w)
+void vroulet_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(vroulet_state::colorram_w)
+void vroulet_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(vroulet_state::get_bg_tile_info)
+void vroulet_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0xc0) << 2);
@@ -263,9 +263,9 @@ GFXDECODE_END
 
 /* PPI8255 Interface */
 
-WRITE8_MEMBER(vroulet_state::ppi8255_a_w){}// watchdog ?
-WRITE8_MEMBER(vroulet_state::ppi8255_b_w){}// lamps ?
-WRITE8_MEMBER(vroulet_state::ppi8255_c_w){}
+void vroulet_state::ppi8255_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){}// watchdog ?
+void vroulet_state::ppi8255_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){}// lamps ?
+void vroulet_state::ppi8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){}
 
 /* Machine Driver */
 

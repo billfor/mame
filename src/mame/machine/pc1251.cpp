@@ -10,21 +10,21 @@
 
 
 
-WRITE8_MEMBER(pc1251_state::pc1251_outa)
+void pc1251_state::pc1251_outa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outa = data;
 }
 
-WRITE8_MEMBER(pc1251_state::pc1251_outb)
+void pc1251_state::pc1251_outb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outb = data;
 }
 
-WRITE8_MEMBER(pc1251_state::pc1251_outc)
+void pc1251_state::pc1251_outc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(pc1251_state::pc1251_ina)
+uint8_t pc1251_state::pc1251_ina(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_outa;
 
@@ -67,7 +67,7 @@ READ8_MEMBER(pc1251_state::pc1251_ina)
 	return data;
 }
 
-READ8_MEMBER(pc1251_state::pc1251_inb)
+uint8_t pc1251_state::pc1251_inb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_outb;
 
@@ -77,12 +77,12 @@ READ8_MEMBER(pc1251_state::pc1251_inb)
 	return data;
 }
 
-READ_LINE_MEMBER(pc1251_state::pc1251_brk)
+int pc1251_state::pc1251_brk()
 {
 	return (ioport("EXTRA")->read() & 0x01);
 }
 
-READ_LINE_MEMBER(pc1251_state::pc1251_reset)
+int pc1251_state::pc1251_reset()
 {
 	return (ioport("EXTRA")->read() & 0x02);
 }
@@ -96,7 +96,7 @@ void pc1251_state::machine_start()
 	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x4800);
 }
 
-MACHINE_START_MEMBER(pc1251_state,pc1260 )
+void pc1251_state::machine_start_pc1260()
 {
 	uint8_t *ram = memregion("maincpu")->base() + 0x4000;
 	uint8_t *cpu = m_maincpu->internal_ram();
@@ -117,7 +117,7 @@ void pc1251_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-DRIVER_INIT_MEMBER(pc1251_state,pc1251)
+void pc1251_state::init_pc1251()
 {
 	int i;
 	uint8_t *gfx = memregion("gfx1")->base();

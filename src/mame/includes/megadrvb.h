@@ -12,24 +12,24 @@ public:
 
 	int m_protcount;
 
-	DECLARE_DRIVER_INIT(aladmdb);
-	DECLARE_DRIVER_INIT(mk3mdb);
-	DECLARE_DRIVER_INIT(ssf2mdb);
-	DECLARE_DRIVER_INIT(srmdb);
-	DECLARE_DRIVER_INIT(topshoot);
-	DECLARE_DRIVER_INIT(puckpkmn);
-	DECLARE_DRIVER_INIT(hshavoc);
-	DECLARE_WRITE16_MEMBER(bl_710000_w);
-	DECLARE_READ16_MEMBER(bl_710000_r);
-	DECLARE_WRITE16_MEMBER(aladmdb_w);
-	DECLARE_READ16_MEMBER(aladmdb_r);
-	DECLARE_READ16_MEMBER(mk3mdb_dsw_r);
-	DECLARE_READ16_MEMBER(ssf2mdb_dsw_r);
-	DECLARE_READ16_MEMBER(srmdb_dsw_r);
-	DECLARE_READ16_MEMBER(topshoot_200051_r);
-	DECLARE_READ16_MEMBER(puckpkmna_70001c_r);
-	DECLARE_READ16_MEMBER(puckpkmna_4b2476_r);
+	void init_aladmdb();
+	void init_mk3mdb();
+	void init_ssf2mdb();
+	void init_srmdb();
+	void init_topshoot();
+	void init_puckpkmn();
+	void init_hshavoc();
+	void bl_710000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t bl_710000_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void aladmdb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t aladmdb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t mk3mdb_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t ssf2mdb_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t srmdb_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t topshoot_200051_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t puckpkmna_70001c_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t puckpkmna_4b2476_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_MACHINE_START(md_bootleg) { MACHINE_START_CALL_MEMBER(megadriv); m_vdp->stop_timers(); }
-	DECLARE_MACHINE_START(md_6button);
+	void machine_start_md_bootleg() { machine_start_megadriv(); m_vdp->stop_timers(); }
+	void machine_start_md_6button();
 };

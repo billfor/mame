@@ -108,20 +108,20 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 
-	DECLARE_READ8_MEMBER(apc_port_28_r);
-	DECLARE_WRITE8_MEMBER(apc_port_28_w);
-	DECLARE_READ8_MEMBER(apc_gdc_r);
-	DECLARE_WRITE8_MEMBER(apc_gdc_w);
-	DECLARE_READ8_MEMBER(apc_kbd_r);
-	DECLARE_WRITE8_MEMBER(apc_kbd_w);
-	DECLARE_WRITE8_MEMBER(apc_dma_segments_w);
-	DECLARE_READ8_MEMBER(apc_dma_r);
-	DECLARE_WRITE8_MEMBER(apc_dma_w);
-	DECLARE_WRITE8_MEMBER(apc_irq_ack_w);
-	DECLARE_READ8_MEMBER(apc_rtc_r);
-	DECLARE_WRITE8_MEMBER(apc_rtc_w);
-//  DECLARE_READ8_MEMBER(aux_pcg_r);
-//  DECLARE_WRITE8_MEMBER(aux_pcg_w);
+	uint8_t apc_port_28_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apc_port_28_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t apc_gdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apc_gdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t apc_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apc_kbd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apc_dma_segments_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t apc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apc_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t apc_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apc_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+//  uint8_t aux_pcg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+//  void aux_pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	struct {
 		uint8_t status; //status
@@ -129,21 +129,21 @@ public:
 		uint8_t sig; //switch signal port
 		uint8_t sh; //shift switches
 	}m_keyb;
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	void key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE_LINE_MEMBER(apc_dma_hrq_changed);
-	DECLARE_WRITE_LINE_MEMBER(apc_tc_w);
-	DECLARE_WRITE_LINE_MEMBER(apc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(apc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(apc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(apc_dack3_w);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(apc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
+	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apc_dma_hrq_changed(int state);
+	void apc_tc_w(int state);
+	void apc_dack0_w(int state);
+	void apc_dack1_w(int state);
+	void apc_dack2_w(int state);
+	void apc_dack3_w(int state);
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t apc_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apc_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(apc);
+	void init_apc();
 
 	int m_dack;
 	uint8_t m_dma_offset[4];
@@ -281,7 +281,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 	}
 }
 
-READ8_MEMBER(apc_state::apc_port_28_r)
+uint8_t apc_state::apc_port_28_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -301,7 +301,7 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 	return res;
 }
 
-WRITE8_MEMBER(apc_state::apc_port_28_w)
+void apc_state::apc_port_28_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset & 1)
 		m_pit->write(space, (offset & 6) >> 1, data);
@@ -315,7 +315,7 @@ WRITE8_MEMBER(apc_state::apc_port_28_w)
 }
 
 
-READ8_MEMBER(apc_state::apc_gdc_r)
+uint8_t apc_state::apc_gdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -327,7 +327,7 @@ READ8_MEMBER(apc_state::apc_gdc_r)
 	return res;
 }
 
-WRITE8_MEMBER(apc_state::apc_gdc_w)
+void apc_state::apc_gdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset & 1)
 		m_hgdc2->write(space, (offset & 2) >> 1,data); // upd7220 bitmap port
@@ -335,7 +335,7 @@ WRITE8_MEMBER(apc_state::apc_gdc_w)
 		m_hgdc1->write(space, (offset & 2) >> 1,data); // upd7220 character port
 }
 
-READ8_MEMBER(apc_state::apc_kbd_r)
+uint8_t apc_state::apc_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0;
 
@@ -350,12 +350,12 @@ READ8_MEMBER(apc_state::apc_kbd_r)
 	return res;
 }
 
-WRITE8_MEMBER(apc_state::apc_kbd_w)
+void apc_state::apc_kbd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("KEYB %08x %02x\n",offset,data);
 }
 
-WRITE8_MEMBER(apc_state::apc_dma_segments_w)
+void apc_state::apc_dma_segments_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma_offset[offset & 3] = data & 0x0f;
 }
@@ -390,17 +390,17 @@ CH3_EXA ==      0X3E                      ; CH-3 extended address (W)
 ... apparently, they rotated right the offset, compared to normal hook-up.
 */
 
-READ8_MEMBER(apc_state::apc_dma_r)
+uint8_t apc_state::apc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dmac->read(space, BITSWAP8(offset,7,6,5,4,2,1,0,3), 0xff);
 }
 
-WRITE8_MEMBER(apc_state::apc_dma_w)
+void apc_state::apc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dmac->write(space, BITSWAP8(offset,7,6,5,4,2,1,0,3), data, 0xff);
 }
 
-WRITE8_MEMBER(apc_state::apc_irq_ack_w)
+void apc_state::apc_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    x--- GDC
@@ -415,7 +415,7 @@ WRITE8_MEMBER(apc_state::apc_irq_ack_w)
 		logerror("IRQ ACK %02x\n",data);
 }
 
-READ8_MEMBER(apc_state::apc_rtc_r)
+uint8_t apc_state::apc_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	bit 1 high: low battery.
@@ -424,7 +424,7 @@ READ8_MEMBER(apc_state::apc_rtc_r)
 	return m_rtc->data_out_r();
 }
 
-WRITE8_MEMBER(apc_state::apc_rtc_w)
+void apc_state::apc_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
 RTC write: 0x01 0001
@@ -496,7 +496,7 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 ADDRESS_MAP_END
 
 /* TODO: key repeat, remove port impulse! */
-INPUT_CHANGED_MEMBER(apc_state::key_stroke)
+void apc_state::key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval && !oldval)
 	{
@@ -817,7 +817,7 @@ ir6 Option
 ir7 APU
 */
 
-READ8_MEMBER(apc_state::get_slave_ack)
+uint8_t apc_state::get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset==7) { // IRQ = 7
 		return machine().device<pic8259_device>( "pic8259_slave" )->acknowledge();
@@ -831,7 +831,7 @@ READ8_MEMBER(apc_state::get_slave_ack)
 *
 ****************************************/
 
-WRITE_LINE_MEMBER(apc_state::apc_dma_hrq_changed)
+void apc_state::apc_dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -840,7 +840,7 @@ WRITE_LINE_MEMBER(apc_state::apc_dma_hrq_changed)
 //  printf("%02x HLDA\n",state);
 }
 
-WRITE_LINE_MEMBER( apc_state::apc_tc_w )
+void apc_state::apc_tc_w(int state)
 {
 	/* floppy terminal count */
 	m_fdc->tc_w(state);
@@ -848,7 +848,7 @@ WRITE_LINE_MEMBER( apc_state::apc_tc_w )
 //  printf("TC %02x\n",state);
 }
 
-READ8_MEMBER(apc_state::apc_dma_read_byte)
+uint8_t apc_state::apc_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
@@ -859,7 +859,7 @@ READ8_MEMBER(apc_state::apc_dma_read_byte)
 }
 
 
-WRITE8_MEMBER(apc_state::apc_dma_write_byte)
+void apc_state::apc_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
@@ -874,17 +874,17 @@ inline void apc_state::set_dma_channel(int channel, int state)
 	if (!state) m_dack = channel;
 }
 
-WRITE_LINE_MEMBER(apc_state::apc_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma_channel(0, state); }
-WRITE_LINE_MEMBER(apc_state::apc_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(1, state); }
-WRITE_LINE_MEMBER(apc_state::apc_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(2, state); }
-WRITE_LINE_MEMBER(apc_state::apc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(3, state); }
+void apc_state::apc_dack0_w(int state){ /*printf("%02x 0\n",state);*/ set_dma_channel(0, state); }
+void apc_state::apc_dack1_w(int state){ /*printf("%02x 1\n",state);*/ set_dma_channel(1, state); }
+void apc_state::apc_dack2_w(int state){ /*printf("%02x 2\n",state);*/ set_dma_channel(2, state); }
+void apc_state::apc_dack3_w(int state){ /*printf("%02x 3\n",state);*/ set_dma_channel(3, state); }
 
-READ8_MEMBER(apc_state::fdc_r)
+uint8_t apc_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->dma_r();
 }
 
-WRITE8_MEMBER(apc_state::fdc_w)
+void apc_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->dma_w(data);
 }
@@ -992,7 +992,7 @@ ROM_START( apc )
 	ROM_REGION( 0x2000, "aux_pcg", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(apc_state,apc)
+void apc_state::init_apc()
 {
 	// ...
 }

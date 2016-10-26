@@ -375,7 +375,7 @@ void mos6551_device::write_command(uint8_t data)
 	update_divider();
 }
 
-READ8_MEMBER( mos6551_device::read )
+uint8_t mos6551_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 		return 0xff;
@@ -397,7 +397,7 @@ READ8_MEMBER( mos6551_device::read )
 	}
 }
 
-WRITE8_MEMBER( mos6551_device::write )
+void mos6551_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x03)
 	{
@@ -448,7 +448,7 @@ void mos6551_device::set_xtal(uint32_t xtal)
 	}
 }
 
-WRITE_LINE_MEMBER( mos6551_device::internal_clock )
+void mos6551_device::internal_clock(int state)
 {
 	if (m_tx_internal_clock)
 	{
@@ -456,7 +456,7 @@ WRITE_LINE_MEMBER( mos6551_device::internal_clock )
 	}
 }
 
-WRITE_LINE_MEMBER(mos6551_device::write_xtal1)
+void mos6551_device::write_xtal1(int state)
 {
 	if (!m_tx_internal_clock)
 	{
@@ -464,12 +464,12 @@ WRITE_LINE_MEMBER(mos6551_device::write_xtal1)
 	}
 }
 
-WRITE_LINE_MEMBER( mos6551_device::write_rxd )
+void mos6551_device::write_rxd(int state)
 {
 	m_rxd = state;
 }
 
-WRITE_LINE_MEMBER( mos6551_device::write_rxc )
+void mos6551_device::write_rxc(int state)
 {
 	if (!m_rx_internal_clock)
 	{
@@ -477,7 +477,7 @@ WRITE_LINE_MEMBER( mos6551_device::write_rxc )
 	}
 }
 
-WRITE_LINE_MEMBER( mos6551_device::write_cts )
+void mos6551_device::write_cts(int state)
 {
 	if (m_cts != state)
 	{
@@ -494,7 +494,7 @@ WRITE_LINE_MEMBER( mos6551_device::write_cts )
 	}
 }
 
-WRITE_LINE_MEMBER( mos6551_device::write_dsr )
+void mos6551_device::write_dsr(int state)
 {
 	if (m_dsr != state)
 	{
@@ -502,7 +502,7 @@ WRITE_LINE_MEMBER( mos6551_device::write_dsr )
 	}
 }
 
-WRITE_LINE_MEMBER( mos6551_device::write_dcd )
+void mos6551_device::write_dcd(int state)
 {
 	if (m_dcd != state)
 	{
@@ -510,7 +510,7 @@ WRITE_LINE_MEMBER( mos6551_device::write_dcd )
 	}
 }
 
-WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
+void mos6551_device::receiver_clock(int state)
 {
 	if (m_rx_clock != state)
 	{
@@ -662,7 +662,7 @@ WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
 	}
 }
 
-WRITE_LINE_MEMBER(mos6551_device::transmitter_clock)
+void mos6551_device::transmitter_clock(int state)
 {
 	if (m_rx_internal_clock)
 	{

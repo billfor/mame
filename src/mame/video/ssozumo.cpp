@@ -14,7 +14,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 
 /**************************************************************************/
 
-PALETTE_INIT_MEMBER(ssozumo_state, ssozumo)
+void ssozumo_state::palette_init_ssozumo(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2, bit3, r, g, b;
@@ -43,31 +43,31 @@ PALETTE_INIT_MEMBER(ssozumo_state, ssozumo)
 	}
 }
 
-WRITE8_MEMBER(ssozumo_state::videoram_w)
+void ssozumo_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ssozumo_state::colorram_w)
+void ssozumo_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ssozumo_state::videoram2_w)
+void ssozumo_state::videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ssozumo_state::colorram2_w)
+void ssozumo_state::colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ssozumo_state::paletteram_w)
+void ssozumo_state::paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit0, bit1, bit2, bit3, val;
 	int r, g, b;
@@ -100,17 +100,17 @@ WRITE8_MEMBER(ssozumo_state::paletteram_w)
 	m_palette->set_pen_color(offs2 + 64, rgb_t(r, g, b));
 }
 
-WRITE8_MEMBER(ssozumo_state::scroll_w)
+void ssozumo_state::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(ssozumo_state::flipscreen_w)
+void ssozumo_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x80);
 }
 
-TILE_GET_INFO_MEMBER(ssozumo_state::get_bg_tile_info)
+void ssozumo_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x08) << 5);
 	int color = (m_colorram[tile_index] & 0x30) >> 4;
@@ -119,7 +119,7 @@ TILE_GET_INFO_MEMBER(ssozumo_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(ssozumo_state::get_fg_tile_info)
+void ssozumo_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index] + 256 * (m_colorram2[tile_index] & 0x07);
 	int color = (m_colorram2[tile_index] & 0x30) >> 4;

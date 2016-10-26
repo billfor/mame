@@ -138,12 +138,12 @@ Dip locations verified with Service Mode.
 #define CRSHRACE_3P_HACK    0
 
 
-WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
+void crshrace_state::crshrace_sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80bank->set_entry(data & 0x03);
 }
 
-WRITE16_MEMBER(crshrace_state::sound_command_w)
+void crshrace_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -153,12 +153,12 @@ WRITE16_MEMBER(crshrace_state::sound_command_w)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(crshrace_state::country_sndpending_r)
+ioport_value crshrace_state::country_sndpending_r(ioport_field &field, void *param)
 {
 	return m_pending_command;
 }
 
-WRITE8_MEMBER(crshrace_state::pending_command_clear_w)
+void crshrace_state::pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pending_command = 0;
 }
@@ -552,14 +552,14 @@ void crshrace_state::crshrace_patch_code( uint16_t offset )
 #endif
 
 
-DRIVER_INIT_MEMBER(crshrace_state,crshrace)
+void crshrace_state::init_crshrace()
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003778);
 	#endif
 }
 
-DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
+void crshrace_state::init_crshrace2()
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003796);

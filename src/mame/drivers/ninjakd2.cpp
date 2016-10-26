@@ -191,7 +191,7 @@ SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 	m_sampledata = sampledata;
 }
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
+void ninjakd2_state::ninjakd2_pcm_play_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// only Ninja Kid II uses this
 	if (m_pcm_region == nullptr)
@@ -246,7 +246,7 @@ void ninjakd2_state::omegaf_io_protection_reset()
 	m_omegaf_io_protection_tic = 0;
 }
 
-READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
+uint8_t ninjakd2_state::omegaf_io_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -329,7 +329,7 @@ READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
 	return result;
 }
 
-WRITE8_MEMBER(ninjakd2_state::omegaf_io_protection_w)
+void ninjakd2_state::omegaf_io_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// load parameter on c006 bit 0 rise transition
 	if (offset == 2 && (data & 1) && !(m_omegaf_io_protection[2] & 1))
@@ -345,12 +345,12 @@ WRITE8_MEMBER(ninjakd2_state::omegaf_io_protection_w)
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_bankselect_w)
+void ninjakd2_state::ninjakd2_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & m_rom_bank_mask);
 }
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
+void ninjakd2_state::ninjakd2_soundreset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 4 resets sound CPU
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
@@ -889,7 +889,7 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(ninjakd2_state::ninjakd2_interrupt)
+void ninjakd2_state::ninjakd2_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
 }
@@ -908,14 +908,14 @@ void ninjakd2_state::machine_reset()
 	m_rom_bank_mask = num_banks - 1;
 }
 
-MACHINE_START_MEMBER(ninjakd2_state,omegaf)
+void ninjakd2_state::machine_start_omegaf()
 {
 	omegaf_io_protection_start();
 
 	machine_start();
 }
 
-MACHINE_RESET_MEMBER(ninjakd2_state,omegaf)
+void ninjakd2_state::machine_reset_omegaf()
 {
 	omegaf_io_protection_reset();
 
@@ -1623,28 +1623,28 @@ void ninjakd2_state::gfx_unscramble()
 }
 
 
-DRIVER_INIT_MEMBER(ninjakd2_state,ninjakd2)
+void ninjakd2_state::init_ninjakd2()
 {
 	mc8123_decode(memregion("soundcpu")->base(), m_decrypted_opcodes, memregion("user1")->base(), 0x8000);
 
 	gfx_unscramble();
 }
 
-DRIVER_INIT_MEMBER(ninjakd2_state,bootleg)
+void ninjakd2_state::init_bootleg()
 {
 	memcpy(m_decrypted_opcodes, memregion("soundcpu")->base() + 0x10000, 0x8000);
 
 	gfx_unscramble();
 }
 
-DRIVER_INIT_MEMBER(ninjakd2_state,mnight)
+void ninjakd2_state::init_mnight()
 {
 	gfx_unscramble();
 }
 
 /*****************************************************************************/
 
-READ8_MEMBER(ninjakd2_state::robokid_motion_error_verbose_r)
+uint8_t ninjakd2_state::robokid_motion_error_verbose_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	popmessage("%s MOTION ERROR, contact MAMEdev", machine().system().name);
 	logerror("maincpu %04x MOTION ERROR\n", space.device().safe_pc());
@@ -1668,12 +1668,12 @@ void ninjakd2_state::robokid_motion_error_kludge(uint16_t offset)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8_delegate(FUNC(ninjakd2_state::robokid_motion_error_verbose_r), this));
 }
 
-DRIVER_INIT_MEMBER(ninjakd2_state,robokid)
+void ninjakd2_state::init_robokid()
 {
 	robokid_motion_error_kludge(0x5247);
 }
 
-DRIVER_INIT_MEMBER(ninjakd2_state,robokidj)
+void ninjakd2_state::init_robokidj()
 {
 	robokid_motion_error_kludge(0x5266);
 }

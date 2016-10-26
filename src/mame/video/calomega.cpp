@@ -19,19 +19,19 @@
 #include "includes/calomega.h"
 
 
-WRITE8_MEMBER(calomega_state::calomega_videoram_w)
+void calomega_state::calomega_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(calomega_state::calomega_colorram_w)
+void calomega_state::calomega_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(calomega_state::get_bg_tile_info)
+void calomega_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -59,7 +59,7 @@ uint32_t calomega_state::screen_update_calomega(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(calomega_state, calomega)
+void calomega_state::palette_init_calomega(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 

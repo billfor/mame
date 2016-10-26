@@ -27,25 +27,25 @@ public:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_survival_input_latches[2];
 	uint8_t m_survival_input_readc;
-	DECLARE_WRITE8_MEMBER(phoenix_videoram_w);
-	DECLARE_WRITE8_MEMBER(phoenix_videoreg_w);
-	DECLARE_WRITE8_MEMBER(pleiads_videoreg_w);
-	DECLARE_WRITE8_MEMBER(phoenix_scroll_w);
-	DECLARE_READ8_MEMBER(survival_input_port_0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(pleiads_protection_r);
-	DECLARE_DRIVER_INIT(condor);
-	DECLARE_DRIVER_INIT(vautourza);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_MACHINE_RESET(phoenix);
-	DECLARE_VIDEO_START(phoenix);
-	DECLARE_PALETTE_INIT(phoenix);
-	DECLARE_PALETTE_INIT(survival);
-	DECLARE_PALETTE_INIT(pleiads);
+	void phoenix_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void phoenix_videoreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pleiads_videoreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void phoenix_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t survival_input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	ioport_value player_input_r(ioport_field &field, void *param);
+	ioport_value pleiads_protection_r(ioport_field &field, void *param);
+	void init_condor();
+	void init_vautourza();
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void machine_reset_phoenix();
+	void video_start_phoenix();
+	void palette_init_phoenix(palette_device &palette);
+	void palette_init_survival(palette_device &palette);
+	void palette_init_pleiads(palette_device &palette);
 	uint32_t screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(survival_protection_r);
-	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
+	uint8_t survival_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	int survival_sid_callback();
 };
 
 
@@ -86,8 +86,8 @@ public:
 	phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~phoenix_sound_device() {}
 
-	DECLARE_WRITE8_MEMBER( control_a_w );
-	DECLARE_WRITE8_MEMBER( control_b_w );
+	void control_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void control_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

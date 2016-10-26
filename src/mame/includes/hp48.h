@@ -80,26 +80,26 @@ public:
 	int m_cur_screen;
 	uint8_t* m_rom;
 
-	DECLARE_DRIVER_INIT(hp48);
+	void init_hp48();
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(hp48);
-	DECLARE_MACHINE_START(hp49g);
-	DECLARE_MACHINE_START(hp48gx);
-	DECLARE_MACHINE_START(hp48g);
-	DECLARE_MACHINE_START(hp48gp);
-	DECLARE_MACHINE_START(hp48sx);
-	DECLARE_MACHINE_START(hp48s);
+	void palette_init_hp48(palette_device &palette);
+	void machine_start_hp49g();
+	void machine_start_hp48gx();
+	void machine_start_hp48g();
+	void machine_start_hp48gp();
+	void machine_start_hp48sx();
+	void machine_start_hp48s();
 	uint32_t screen_update_hp48(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void hp48_machine_start(hp48_models model);
-	DECLARE_WRITE8_MEMBER(hp48_io_w);
-	DECLARE_READ8_MEMBER(hp48_io_r);
-	DECLARE_READ8_MEMBER(hp48_bank_r);
-	DECLARE_WRITE8_MEMBER(hp49_bank_w);
-	TIMER_CALLBACK_MEMBER(hp48_rs232_byte_recv_cb);
-	TIMER_CALLBACK_MEMBER(hp48_rs232_byte_sent_cb);
-	TIMER_CALLBACK_MEMBER(hp48_kbd_cb);
-	TIMER_CALLBACK_MEMBER(hp48_timer1_cb);
-	TIMER_CALLBACK_MEMBER(hp48_timer2_cb);
+	void hp48_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hp48_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hp48_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hp49_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hp48_rs232_byte_recv_cb(void *ptr, int32_t param);
+	void hp48_rs232_byte_sent_cb(void *ptr, int32_t param);
+	void hp48_kbd_cb(void *ptr, int32_t param);
+	void hp48_timer1_cb(void *ptr, int32_t param);
+	void hp48_timer2_cb(void *ptr, int32_t param);
 	void hp48_update_annunciators();
 	void hp48_apply_modules();
 	required_device<cpu_device> m_maincpu;
@@ -115,20 +115,20 @@ public:
 	void hp48_encode_nibble( uint8_t* dst, uint8_t* src, int size );
 
 	/* memory controller */
-	DECLARE_WRITE_LINE_MEMBER( hp48_mem_reset );
-	DECLARE_WRITE32_MEMBER( hp48_mem_config );
-	DECLARE_WRITE32_MEMBER( hp48_mem_unconfig );
-	DECLARE_READ32_MEMBER( hp48_mem_id );
+	void hp48_mem_reset(int state);
+	void hp48_mem_config(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void hp48_mem_unconfig(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t hp48_mem_id(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	/* CRC computation */
-	DECLARE_WRITE32_MEMBER( hp48_mem_crc );
+	void hp48_mem_crc(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	/* IN/OUT registers */
-	DECLARE_READ32_MEMBER( hp48_reg_in );
-	DECLARE_WRITE32_MEMBER( hp48_reg_out );
+	uint32_t hp48_reg_in(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hp48_reg_out(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	/* keybord interrupt system */
-	DECLARE_WRITE_LINE_MEMBER( hp48_rsi );
+	void hp48_rsi(int state);
 };
 
 

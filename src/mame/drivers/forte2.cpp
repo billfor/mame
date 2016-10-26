@@ -54,9 +54,9 @@ public:
 
 	uint8_t m_input_mask;
 
-	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
-	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
-	DECLARE_DRIVER_INIT(pesadelo);
+	uint8_t forte2_ay8910_read_input(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void forte2_ay8910_set_input_mask(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_pesadelo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -92,12 +92,12 @@ static INPUT_PORTS_START( pesadelo )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(forte2_state::forte2_ay8910_read_input)
+uint8_t forte2_state::forte2_ay8910_read_input(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("IN0")->read() | (m_input_mask & 0x3f);
 }
 
-WRITE8_MEMBER(forte2_state::forte2_ay8910_set_input_mask)
+void forte2_state::forte2_ay8910_set_input_mask(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* PSG reg 15, writes 0 at coin insert, 0xff at boot and game over */
 	m_input_mask = data;
@@ -137,7 +137,7 @@ static MACHINE_CONFIG_START( pesadelo, forte2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(forte2_state,pesadelo)
+void forte2_state::init_pesadelo()
 {
 	uint8_t *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();

@@ -62,28 +62,28 @@ public:
 	int m_reel_phase[4];
 	int m_reel_count[4];
 	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	void reel0_optic_cb(int state) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	void reel1_optic_cb(int state) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	void reel2_optic_cb(int state) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	void reel3_optic_cb(int state) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
-	DECLARE_READ8_MEMBER( aces1_unk_r )
+	uint8_t aces1_unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		return 0x00;
 	}
 
-	DECLARE_READ8_MEMBER( aces1_unk_port00_r )
+	uint8_t aces1_unk_port00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		return 0x00;
 	}
 
-	DECLARE_READ8_MEMBER( aces1_nmi_counter_reset_r )
+	uint8_t aces1_nmi_counter_reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		aces1_reset_nmi_timer();
 		return 0x00;
 	}
 
-	DECLARE_WRITE8_MEMBER( aces1_nmi_counter_reset_w )
+	void aces1_nmi_counter_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		aces1_reset_nmi_timer();
 	}
@@ -103,7 +103,7 @@ public:
 	emu_timer *m_aces1_nmi_timer;
 
 
-	DECLARE_WRITE8_MEMBER(ic24_write_a)
+	void ic24_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		if (m_led_strobe != m_input_strobe)
 		{
@@ -112,7 +112,7 @@ public:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(ic24_write_b)
+	void ic24_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 	//cheating a bit here, need persistence
 	int i;
@@ -130,22 +130,22 @@ public:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(ic24_write_c)
+	void ic24_write_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		m_input_strobe = (data & 0x0f);
 	}
 
-	DECLARE_WRITE8_MEMBER(ic25_write_a)
+	void ic25_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 	//  printf("extender lamps %02x\n", data);
 	}
 
-	DECLARE_WRITE8_MEMBER(ic25_write_b)
+	void ic25_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 	//  printf("meters, extender select %02x\n", data);
 	}
 
-	DECLARE_WRITE8_MEMBER(ic25_write_c)
+	void ic25_write_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		//There needs to be some way of connecting these values to stepper coils, or doing the MCU properly
 		// We should be able to see an enable clock, a sense and a full/half step selector, we don't have the half step visible it seems.
@@ -191,18 +191,18 @@ public:
 //    printf("reels, extender strobe %02x\n", data);
 	}
 
-	DECLARE_READ8_MEMBER( ic37_read_a )
+	uint8_t ic37_read_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		//Should be coins and doors
 		return ioport("COINS")->read();
 	}
 
-	DECLARE_READ8_MEMBER( ic37_read_b )
+	uint8_t ic37_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		return (m_io_ports[m_input_strobe & 7])->read();
 	}
 
-	DECLARE_READ8_MEMBER( ic37_read_c )
+	uint8_t ic37_read_c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int action =0;
 		for (int reel = 0; reel < 4; reel++)
@@ -221,25 +221,25 @@ public:
 	required_device<stepper_device> m_reel3;
 	required_ioport_array<8> m_io_ports;
 
-	DECLARE_DRIVER_INIT(aces1);
+	void init_aces1();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(m_aces1_irq_timer_callback);
-	TIMER_CALLBACK_MEMBER(m_aces1_nmi_timer_callback);
+	void m_aces1_irq_timer_callback(void *ptr, int32_t param);
+	void m_aces1_nmi_timer_callback(void *ptr, int32_t param);
 };
 
 
 
 
 
-TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_irq_timer_callback)
+void aces1_state::m_aces1_irq_timer_callback(void *ptr, int32_t param)
 {
 //  printf("irq\n");
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 	aces1_reset_irq_timer();
 }
 
-TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_nmi_timer_callback)
+void aces1_state::m_aces1_nmi_timer_callback(void *ptr, int32_t param)
 {
 //  printf("nmi\n");
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -828,7 +828,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(aces1_state,aces1)
+void aces1_state::init_aces1()
 {
 }
 

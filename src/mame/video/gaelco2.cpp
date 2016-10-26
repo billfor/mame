@@ -103,7 +103,7 @@ Multi monitor notes:
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen0)
+void gaelco2_state::get_tile_info_gaelco2_screen0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
 	int data2 = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
@@ -112,7 +112,7 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen0)
 	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1)
+void gaelco2_state::get_tile_info_gaelco2_screen1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
 	int data2 = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen0_dual)
+void gaelco2_state::get_tile_info_gaelco2_screen0_dual(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
 	int data2 = m_videoram[(((m_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
@@ -153,7 +153,7 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen0_dual)
 	SET_TILE_INFO_MEMBER(0, code, ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03));
 }
 
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1_dual)
+void gaelco2_state::get_tile_info_gaelco2_screen1_dual(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
 	int data2 = m_videoram[(((m_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
@@ -169,7 +169,7 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1_dual)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_vram_w)
+void gaelco2_state::gaelco2_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int pant0_start = ((m_vregs[0] >> 9) & 0x07)*0x1000;
 	int pant0_end = pant0_start + 0x1000;
@@ -219,7 +219,7 @@ static const int pen_color_adjust[16] = {
 };
 
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_palette_w)
+void gaelco2_state::gaelco2_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i, color, r, g, b, auxr, auxg, auxb;
 
@@ -258,7 +258,7 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_palette_w)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(gaelco2_state,gaelco2)
+void gaelco2_state::video_start_gaelco2()
 {
 	m_videoram = m_spriteram->live();
 
@@ -278,7 +278,7 @@ VIDEO_START_MEMBER(gaelco2_state,gaelco2)
 	m_dual_monitor = 0;
 }
 
-VIDEO_START_MEMBER(gaelco2_state,gaelco2_dual)
+void gaelco2_state::video_start_gaelco2_dual()
 {
 	m_videoram = m_spriteram->live();
 

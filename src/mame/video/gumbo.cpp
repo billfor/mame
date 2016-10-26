@@ -6,26 +6,26 @@
 #include "includes/gumbo.h"
 
 
-WRITE16_MEMBER(gumbo_state::gumbo_bg_videoram_w)
+void gumbo_state::gumbo_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(gumbo_state::get_gumbo_bg_tile_info)
+void gumbo_state::get_gumbo_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_bg_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
 
-WRITE16_MEMBER(gumbo_state::gumbo_fg_videoram_w)
+void gumbo_state::gumbo_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(gumbo_state::get_gumbo_fg_tile_info)
+void gumbo_state::get_gumbo_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_fg_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(1, tileno, 1, 0);

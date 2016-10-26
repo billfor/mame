@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/ddragon3.h"
 
-WRITE16_MEMBER(ddragon3_state::ddragon3_scroll_w)
+void ddragon3_state::ddragon3_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -27,7 +27,7 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_scroll_w)
 	}
 }
 
-READ16_MEMBER(ddragon3_state::ddragon3_scroll_r)
+uint16_t ddragon3_state::ddragon3_scroll_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -44,7 +44,7 @@ READ16_MEMBER(ddragon3_state::ddragon3_scroll_r)
 
 /*****************************************************************************************************************************************************/
 
-TILE_GET_INFO_MEMBER(ddragon3_state::get_bg_tile_info)
+void ddragon3_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t attr = m_bg_videoram[tile_index];
 	int code = (attr & 0x0fff) | ((m_bg_tilebase & 0x01) << 12);
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(ddragon3_state::get_bg_tile_info)
 
 
 
-WRITE16_MEMBER(ddragon3_state::ddragon3_bg_videoram_w)
+void ddragon3_state::ddragon3_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -68,7 +68,7 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_bg_videoram_w)
 
 
 
-TILE_GET_INFO_MEMBER(ddragon3_state::get_fg_tile_info)
+void ddragon3_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *tilebase;
 	int tileno,colbank;
@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(ddragon3_state::get_fg_tile_info)
 
 
 
-WRITE16_MEMBER(ddragon3_state::ddragon3_fg_videoram_w)
+void ddragon3_state::ddragon3_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
@@ -96,7 +96,7 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_fg_videoram_w)
 /*****************************************************************************************************************************************************/
 /* 8x8 text layer - wwfwfest only */
 
-TILE_GET_INFO_MEMBER(wwfwfest_state::get_fg0_tile_info)
+void wwfwfest_state::get_fg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *tilebase;
 	int tileno;
@@ -110,7 +110,7 @@ TILE_GET_INFO_MEMBER(wwfwfest_state::get_fg0_tile_info)
 			0);
 }
 
-WRITE16_MEMBER(wwfwfest_state::wwfwfest_fg0_videoram_w)
+void wwfwfest_state::wwfwfest_fg0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Videoram is 8 bit, upper & lower byte writes end up in the same place due to m68k byte smearing */
 	m_fg0_videoram[offset]=data&0xff;
@@ -144,7 +144,7 @@ void wwfwfest_state::video_start()
 
 }
 
-VIDEO_START_MEMBER(wwfwfest_state,wwfwfstb)
+void wwfwfest_state::video_start_wwfwfstb()
 {
 	wwfwfest_state::video_start();
 

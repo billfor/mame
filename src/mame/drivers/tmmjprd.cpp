@@ -64,19 +64,19 @@ public:
 	double m_old_brt1;
 	double m_old_brt2;
 
-	DECLARE_WRITE32_MEMBER(tilemap0_w);
-	DECLARE_WRITE32_MEMBER(tilemap1_w);
-	DECLARE_WRITE32_MEMBER(tilemap2_w);
-	DECLARE_WRITE32_MEMBER(tilemap3_w);
-	DECLARE_READ32_MEMBER(tilemap0_r);
-	DECLARE_READ32_MEMBER(tilemap1_r);
-	DECLARE_READ32_MEMBER(tilemap2_r);
-	DECLARE_READ32_MEMBER(tilemap3_r);
-	DECLARE_READ32_MEMBER(randomtmmjprds);
-	DECLARE_READ32_MEMBER(mux_r);
-	DECLARE_WRITE32_MEMBER(brt_1_w);
-	DECLARE_WRITE32_MEMBER(brt_2_w);
-	DECLARE_WRITE32_MEMBER(eeprom_write);
+	void tilemap0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void tilemap1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void tilemap2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void tilemap3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t tilemap0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t tilemap1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t tilemap2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t tilemap3_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t randomtmmjprds(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t mux_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void brt_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void brt_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void eeprom_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -84,7 +84,7 @@ public:
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int screen);
 	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, uint32_t tiledata, uint8_t* rom);
@@ -92,24 +92,24 @@ public:
 };
 
 
-WRITE32_MEMBER(tmmjprd_state::tilemap0_w)
+void tmmjprd_state::tilemap0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_ram[0][offset]);
 }
 
 
 
-WRITE32_MEMBER(tmmjprd_state::tilemap1_w)
+void tmmjprd_state::tilemap1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_ram[1][offset]);
 }
 
-WRITE32_MEMBER(tmmjprd_state::tilemap2_w)
+void tmmjprd_state::tilemap2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_ram[2][offset]);
 }
 
-WRITE32_MEMBER(tmmjprd_state::tilemap3_w)
+void tmmjprd_state::tilemap3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemap_ram[3][offset]);
 }
@@ -376,27 +376,27 @@ void tmmjprd_state::video_start()
 	save_item(NAME(m_old_brt2));
 }
 
-READ32_MEMBER(tmmjprd_state::tilemap0_r)
+uint32_t tmmjprd_state::tilemap0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_tilemap_ram[0][offset];
 }
 
-READ32_MEMBER(tmmjprd_state::tilemap1_r)
+uint32_t tmmjprd_state::tilemap1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_tilemap_ram[1][offset];
 }
 
-READ32_MEMBER(tmmjprd_state::tilemap2_r)
+uint32_t tmmjprd_state::tilemap2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_tilemap_ram[2][offset];
 }
 
-READ32_MEMBER(tmmjprd_state::tilemap3_r)
+uint32_t tmmjprd_state::tilemap3_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_tilemap_ram[3][offset];
 }
 
-READ32_MEMBER(tmmjprd_state::randomtmmjprds)
+uint32_t tmmjprd_state::randomtmmjprds(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x0000;//machine().rand();
 }
@@ -406,7 +406,7 @@ READ32_MEMBER(tmmjprd_state::randomtmmjprds)
 #define BLITLOG 0
 
 #if 0
-TIMER_CALLBACK_MEMBER(tmmjprd_state::blit_done)
+void tmmjprd_state::blit_done(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
@@ -506,7 +506,7 @@ void tmmjprd_state::do_blit()
 
 
 
-WRITE32_MEMBER(tmmjprd_state::blitter_w)
+void tmmjprd_state::blitter_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_blitterregs[offset]);
 
@@ -523,7 +523,7 @@ void tmmjprd_state::machine_start()
 	save_item(NAME(m_system_in));
 }
 
-WRITE32_MEMBER(tmmjprd_state::eeprom_write)
+void tmmjprd_state::eeprom_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// don't disturb the EEPROM if we're not actually writing to it
 	// (in particular, data & 0x100 here with mask = ffff00ff looks to be the watchdog)
@@ -543,7 +543,7 @@ WRITE32_MEMBER(tmmjprd_state::eeprom_write)
 	}
 }
 
-READ32_MEMBER(tmmjprd_state::mux_r)
+uint32_t tmmjprd_state::mux_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_system_in = ioport("SYSTEM")->read();
 
@@ -650,7 +650,7 @@ INPUT_PORTS_END
 
 /* notice that data & 0x4 is always cleared on brt_1 and set on brt_2.        *
  * My wild guess is that bits 0,1 and 2 controls what palette entries to dim. */
-WRITE32_MEMBER(tmmjprd_state::brt_1_w)
+void tmmjprd_state::brt_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int i;
 	double brt;
@@ -668,7 +668,7 @@ WRITE32_MEMBER(tmmjprd_state::brt_1_w)
 	}
 }
 
-WRITE32_MEMBER(tmmjprd_state::brt_2_w)
+void tmmjprd_state::brt_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int i;
 	double brt;
@@ -749,7 +749,7 @@ static GFXDECODE_START( tmmjprd )
 GFXDECODE_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
+void tmmjprd_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

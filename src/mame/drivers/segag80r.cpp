@@ -144,7 +144,7 @@
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(segag80r_state::service_switch)
+void segag80r_state::service_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
@@ -176,16 +176,16 @@ offs_t segag80r_state::decrypt_offset(address_space &space, offs_t offset)
 	return (offset & 0xff00) | (*m_decrypt)(pc, space.read_byte(pc + 1));
 }
 
-WRITE8_MEMBER(segag80r_state::mainram_w)
+void segag80r_state::mainram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mainram[decrypt_offset(space, offset)] = data;
 }
 
-WRITE8_MEMBER(segag80r_state::vidram_w){ segag80r_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::monsterb_vidram_w){ monsterb_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::pignewt_vidram_w){ pignewt_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::sindbadm_vidram_w){ sindbadm_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::usb_ram_w){ m_usbsnd->ram_w(space, decrypt_offset(m_maincpu->space(AS_PROGRAM), offset), data); }
+void segag80r_state::vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ segag80r_videoram_w(space, decrypt_offset(space, offset), data); }
+void segag80r_state::monsterb_vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ monsterb_videoram_w(space, decrypt_offset(space, offset), data); }
+void segag80r_state::pignewt_vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ pignewt_videoram_w(space, decrypt_offset(space, offset), data); }
+void segag80r_state::sindbadm_vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ sindbadm_videoram_w(space, decrypt_offset(space, offset), data); }
+void segag80r_state::usb_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_usbsnd->ram_w(space, decrypt_offset(m_maincpu->space(AS_PROGRAM), offset), data); }
 
 
 
@@ -204,7 +204,7 @@ inline uint8_t segag80r_state::demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2
 }
 
 
-READ8_MEMBER(segag80r_state::mangled_ports_r)
+uint8_t segag80r_state::mangled_ports_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* The input ports are odd. Neighboring lines are read via a mux chip  */
 	/* one bit at a time. This means that one bank of DIP switches will be */
@@ -220,7 +220,7 @@ READ8_MEMBER(segag80r_state::mangled_ports_r)
 }
 
 
-READ8_MEMBER(segag80r_state::spaceod_mangled_ports_r)
+uint8_t segag80r_state::spaceod_mangled_ports_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Space Odyssey has different (and conflicting) wiring for upright */
 	/* versus cocktail cabinets; we fix this here. The input ports are */
@@ -248,7 +248,7 @@ READ8_MEMBER(segag80r_state::spaceod_mangled_ports_r)
 }
 
 
-READ8_MEMBER(segag80r_state::spaceod_port_fc_r)
+uint8_t segag80r_state::spaceod_port_fc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t upright = ioport("D3D2")->read() & 0x04;
 	uint8_t fc = ioport("FC")->read();
@@ -265,7 +265,7 @@ READ8_MEMBER(segag80r_state::spaceod_port_fc_r)
 }
 
 
-WRITE8_MEMBER(segag80r_state::coin_count_w)
+void segag80r_state::coin_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
 	machine().bookkeeping().coin_counter_w(1, (data >> 6) & 1);
@@ -280,7 +280,7 @@ WRITE8_MEMBER(segag80r_state::coin_count_w)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::sindbadm_soundport_w)
+void segag80r_state::sindbadm_soundport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -288,7 +288,7 @@ WRITE8_MEMBER(segag80r_state::sindbadm_soundport_w)
 }
 
 
-WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
+void segag80r_state::sindbadm_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 //  osd_printf_debug("Unknown = %02X\n", data);
@@ -296,11 +296,11 @@ WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
 
 
 /* the data lines are flipped */
-WRITE8_MEMBER(segag80r_state::sindbadm_sn1_SN76496_w)
+void segag80r_state::sindbadm_sn1_SN76496_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		m_sn1->write(space, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
 }
-WRITE8_MEMBER(segag80r_state::sindbadm_sn2_SN76496_w)
+void segag80r_state::sindbadm_sn2_SN76496_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		m_sn2->write(space, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
 }
@@ -1429,7 +1429,7 @@ void segag80r_state::monsterb_expand_gfx(const char *region)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segag80r_state,astrob)
+void segag80r_state::init_astrob()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1451,7 +1451,7 @@ DRIVER_INIT_MEMBER(segag80r_state,astrob)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,005)
+void segag80r_state::init_005()
 {
 	/* configure the 315-0070 security chip */
 	m_decrypt = segag80_security(70);
@@ -1467,7 +1467,7 @@ DRIVER_INIT_MEMBER(segag80r_state,005)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,spaceod)
+void segag80r_state::init_spaceod()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1491,7 +1491,7 @@ DRIVER_INIT_MEMBER(segag80r_state,spaceod)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,monsterb)
+void segag80r_state::init_monsterb()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
@@ -1514,7 +1514,7 @@ DRIVER_INIT_MEMBER(segag80r_state,monsterb)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,monster2)
+void segag80r_state::init_monster2()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
@@ -1538,7 +1538,7 @@ DRIVER_INIT_MEMBER(segag80r_state,monster2)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,pignewt)
+void segag80r_state::init_pignewt()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
@@ -1562,7 +1562,7 @@ DRIVER_INIT_MEMBER(segag80r_state,pignewt)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,sindbadm)
+void segag80r_state::init_sindbadm()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);

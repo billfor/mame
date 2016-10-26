@@ -29,26 +29,26 @@ public:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_sound_nmi_mask;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(irq_clear_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_READ8_MEMBER(mirrorvideoram_r);
-	DECLARE_READ8_MEMBER(mirrorcolorram_r);
-	DECLARE_WRITE8_MEMBER(mirrorvideoram_w);
-	DECLARE_WRITE8_MEMBER(mirrorcolorram_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mirrorvideoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mirrorcolorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mirrorvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mirrorcolorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void sound_timer_irq(device_t &device);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tagteam);
+	void palette_init_tagteam(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

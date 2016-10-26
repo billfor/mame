@@ -219,7 +219,7 @@ void a2232_device::update_irqs()
 	m_iocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( a2232_device::int2_w )
+void a2232_device::int2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): int2_w %04x\n", shortname(), basetag(), data);
@@ -227,7 +227,7 @@ WRITE8_MEMBER( a2232_device::int2_w )
 	m_slot->int2_w(1);
 }
 
-WRITE8_MEMBER( a2232_device::irq_ack_w )
+void a2232_device::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): irq_ack_w %04x\n", shortname(), basetag(), data);
@@ -276,7 +276,7 @@ void a2232_device::autoconfig_base_address(offs_t address)
 	m_slot->cfgout_w(0);
 }
 
-WRITE_LINE_MEMBER( a2232_device::cfgin_w )
+void a2232_device::cfgin_w(int state)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
@@ -309,7 +309,7 @@ WRITE_LINE_MEMBER( a2232_device::cfgin_w )
 //  ZORRO
 //**************************************************************************
 
-READ16_MEMBER( a2232_device::shared_ram_r )
+uint16_t a2232_device::shared_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -329,7 +329,7 @@ READ16_MEMBER( a2232_device::shared_ram_r )
 	return data;
 }
 
-WRITE16_MEMBER( a2232_device::shared_ram_w )
+void a2232_device::shared_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (VERBOSE_DATA)
 		logerror("%s('%s'): shared_ram_w(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset << 1, data, mem_mask);
@@ -341,31 +341,31 @@ WRITE16_MEMBER( a2232_device::shared_ram_w )
 		m_shared_ram[offset << 1] = (data & 0xff00) >> 8;
 }
 
-READ16_MEMBER( a2232_device::irq_ack_r )
+uint16_t a2232_device::irq_ack_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_slot->int2_w(0);
 
 	return 0xffff;
 }
 
-WRITE16_MEMBER( a2232_device::irq_ack_w )
+void a2232_device::irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_slot->int2_w(0);
 }
 
-READ16_MEMBER( a2232_device::reset_low_r )
+uint16_t a2232_device::reset_low_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_iocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	return 0xffff;
 }
 
-WRITE16_MEMBER( a2232_device::reset_low_w )
+void a2232_device::reset_low_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_iocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-READ16_MEMBER( a2232_device::irq_r )
+uint16_t a2232_device::irq_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_irqs[IRQ_AMIGA] = ASSERT_LINE;
 	update_irqs();
@@ -373,13 +373,13 @@ READ16_MEMBER( a2232_device::irq_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( a2232_device::irq_w )
+void a2232_device::irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_irqs[IRQ_AMIGA] = ASSERT_LINE;
 	update_irqs();
 }
 
-READ16_MEMBER( a2232_device::reset_high_r )
+uint16_t a2232_device::reset_high_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -391,7 +391,7 @@ READ16_MEMBER( a2232_device::reset_high_r )
 	return data;
 }
 
-WRITE16_MEMBER( a2232_device::reset_high_w )
+void a2232_device::reset_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): reset_high_w %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
@@ -404,113 +404,113 @@ WRITE16_MEMBER( a2232_device::reset_high_w )
 //  ACIA
 //**************************************************************************
 
-READ8_MEMBER( a2232_device::acia_0_r )
+uint8_t a2232_device::acia_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_acia_0->read(space, offset >> 1);
 }
 
-WRITE8_MEMBER( a2232_device::acia_0_w )
+void a2232_device::acia_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_acia_0->write(space, offset >> 1, data);
 }
 
-WRITE_LINE_MEMBER( a2232_device::acia_0_irq_w )
+void a2232_device::acia_0_irq_w(int state)
 {
 	m_irqs[IRQ_ACIA_0] = state;
 	update_irqs();
 }
 
-READ8_MEMBER( a2232_device::acia_1_r )
+uint8_t a2232_device::acia_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_acia_1->read(space, offset >> 1);
 }
 
-WRITE8_MEMBER( a2232_device::acia_1_w )
+void a2232_device::acia_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_acia_1->write(space, offset >> 1, data);
 }
 
-WRITE_LINE_MEMBER( a2232_device::acia_1_irq_w )
+void a2232_device::acia_1_irq_w(int state)
 {
 	m_irqs[IRQ_ACIA_1] = state;
 	update_irqs();
 }
 
-READ8_MEMBER( a2232_device::acia_2_r )
+uint8_t a2232_device::acia_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_acia_2->read(space, offset >> 1);
 }
 
-WRITE8_MEMBER( a2232_device::acia_2_w )
+void a2232_device::acia_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_acia_2->write(space, offset >> 1, data);
 }
 
-WRITE_LINE_MEMBER( a2232_device::acia_2_irq_w )
+void a2232_device::acia_2_irq_w(int state)
 {
 	m_irqs[IRQ_ACIA_2] = state;
 	update_irqs();
 }
 
-READ8_MEMBER( a2232_device::acia_3_r )
+uint8_t a2232_device::acia_3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_acia_3->read(space, offset >> 1);
 }
 
-WRITE8_MEMBER( a2232_device::acia_3_w )
+void a2232_device::acia_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_acia_3->write(space, offset >> 1, data);
 }
 
-WRITE_LINE_MEMBER( a2232_device::acia_3_irq_w )
+void a2232_device::acia_3_irq_w(int state)
 {
 	m_irqs[IRQ_ACIA_3] = state;
 	update_irqs();
 }
 
-READ8_MEMBER( a2232_device::acia_4_r )
+uint8_t a2232_device::acia_4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_acia_4->read(space, offset >> 1);
 }
 
-WRITE8_MEMBER( a2232_device::acia_4_w )
+void a2232_device::acia_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_acia_4->write(space, offset >> 1, data);
 }
 
-WRITE_LINE_MEMBER( a2232_device::acia_4_irq_w )
+void a2232_device::acia_4_irq_w(int state)
 {
 	m_irqs[IRQ_ACIA_4] = state;
 	update_irqs();
 }
 
-READ8_MEMBER( a2232_device::acia_5_r )
+uint8_t a2232_device::acia_5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_acia_5->read(space, offset >> 1);
 }
 
-WRITE8_MEMBER( a2232_device::acia_5_w )
+void a2232_device::acia_5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_acia_5->write(space, offset >> 1, data);
 }
 
-WRITE_LINE_MEMBER( a2232_device::acia_5_irq_w )
+void a2232_device::acia_5_irq_w(int state)
 {
 	m_irqs[IRQ_ACIA_5] = state;
 	update_irqs();
 }
 
-READ8_MEMBER( a2232_device::acia_6_r )
+uint8_t a2232_device::acia_6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_acia_6->read(space, offset >> 1);
 }
 
-WRITE8_MEMBER( a2232_device::acia_6_w )
+void a2232_device::acia_6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_acia_6->write(space, offset >> 1, data);
 }
 
-WRITE_LINE_MEMBER( a2232_device::acia_6_irq_w )
+void a2232_device::acia_6_irq_w(int state)
 {
 	m_irqs[IRQ_ACIA_6] = state;
 	update_irqs();
@@ -521,33 +521,33 @@ WRITE_LINE_MEMBER( a2232_device::acia_6_irq_w )
 //  CIA
 //**************************************************************************
 
-READ8_MEMBER( a2232_device::cia_r )
+uint8_t a2232_device::cia_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cia->read(space, offset >> 1);
 }
 
-WRITE8_MEMBER( a2232_device::cia_w )
+void a2232_device::cia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cia->write(space, offset >> 1, data);
 }
 
-WRITE_LINE_MEMBER( a2232_device::cia_irq_w )
+void a2232_device::cia_irq_w(int state)
 {
 	m_irqs[IRQ_CIA] = state;
 	update_irqs();
 }
 
-READ8_MEMBER( a2232_device::cia_port_a_r )
+uint8_t a2232_device::cia_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cia_port_a;
 }
 
-READ8_MEMBER( a2232_device::cia_port_b_r )
+uint8_t a2232_device::cia_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cia_port_b;
 }
 
-WRITE8_MEMBER( a2232_device::cia_port_b_w )
+void a2232_device::cia_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// tod clock connected to pb7
 	m_cia->tod_w(BIT(data, 7));
@@ -558,19 +558,19 @@ WRITE8_MEMBER( a2232_device::cia_port_b_w )
 //  RS232
 //**************************************************************************
 
-WRITE_LINE_MEMBER( a2232_device::rs232_1_rxd_w )
+void a2232_device::rs232_1_rxd_w(int state)
 {
 	m_acia_0->write_rxd(state);
 	m_cia->sp_w(state);
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_1_dcd_w )
+void a2232_device::rs232_1_dcd_w(int state)
 {
 	m_cia_port_a &= ~0x01;
 	m_cia_port_a |= state << 0;
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_1_cts_w )
+void a2232_device::rs232_1_cts_w(int state)
 {
 	m_cia_port_b &= ~0x01;
 	m_cia_port_b |= state << 0;
@@ -578,73 +578,73 @@ WRITE_LINE_MEMBER( a2232_device::rs232_1_cts_w )
 	m_cia->cnt_w(state);
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_2_dcd_w )
+void a2232_device::rs232_2_dcd_w(int state)
 {
 	m_cia_port_a &= ~0x02;
 	m_cia_port_a |= state << 1;
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_2_cts_w )
+void a2232_device::rs232_2_cts_w(int state)
 {
 	m_cia_port_b &= ~0x02;
 	m_cia_port_b |= state << 1;
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_3_dcd_w )
+void a2232_device::rs232_3_dcd_w(int state)
 {
 	m_cia_port_a &= ~0x04;
 	m_cia_port_a |= state << 2;
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_3_cts_w )
+void a2232_device::rs232_3_cts_w(int state)
 {
 	m_cia_port_b &= ~0x04;
 	m_cia_port_b |= state << 2;
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_4_dcd_w )
+void a2232_device::rs232_4_dcd_w(int state)
 {
 	m_cia_port_a &= ~0x08;
 	m_cia_port_a |= state << 3;
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_4_cts_w )
+void a2232_device::rs232_4_cts_w(int state)
 {
 	m_cia_port_b &= ~0x08;
 	m_cia_port_b |= state << 3;
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_5_dcd_w )
+void a2232_device::rs232_5_dcd_w(int state)
 {
 	m_cia_port_a &= ~0x10;
 	m_cia_port_a |= state << 4;
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_5_cts_w )
+void a2232_device::rs232_5_cts_w(int state)
 {
 	m_cia_port_b &= ~0x10;
 	m_cia_port_b |= state << 4;
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_6_dcd_w )
+void a2232_device::rs232_6_dcd_w(int state)
 {
 	m_cia_port_a &= ~0x20;
 	m_cia_port_a |= state << 5;
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_6_cts_w )
+void a2232_device::rs232_6_cts_w(int state)
 {
 	m_cia_port_b &= ~0x20;
 	m_cia_port_b |= state << 5;
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_7_dcd_w )
+void a2232_device::rs232_7_dcd_w(int state)
 {
 	m_cia_port_a &= ~0x40;
 	m_cia_port_a |= state << 6;
 }
 
-WRITE_LINE_MEMBER( a2232_device::rs232_7_cts_w )
+void a2232_device::rs232_7_cts_w(int state)
 {
 	m_cia_port_b &= ~0x40;
 	m_cia_port_b |= state << 6;

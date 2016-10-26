@@ -81,13 +81,13 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(onetwo_fgram_w);
-	DECLARE_WRITE8_MEMBER(onetwo_cpubank_w);
-	DECLARE_WRITE8_MEMBER(onetwo_coin_counters_w);
-	DECLARE_WRITE8_MEMBER(onetwo_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(palette1_w);
-	DECLARE_WRITE8_MEMBER(palette2_w);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void onetwo_fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void onetwo_cpubank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void onetwo_coin_counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void onetwo_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -102,7 +102,7 @@ public:
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(onetwo_state::get_fg_tile_info)
+void onetwo_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = (m_fgram[tile_index * 2 + 1] << 8) | m_fgram[tile_index * 2];
 	int color = (m_fgram[tile_index * 2 + 1] & 0x80) >> 7;
@@ -129,25 +129,25 @@ uint32_t onetwo_state::screen_update_onetwo(screen_device &screen, bitmap_ind16 
  *
  *************************************/
 
-WRITE8_MEMBER(onetwo_state::onetwo_fgram_w)
+void onetwo_state::onetwo_fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(onetwo_state::onetwo_cpubank_w)
+void onetwo_state::onetwo_cpubank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data);
 }
 
-WRITE8_MEMBER(onetwo_state::onetwo_coin_counters_w)
+void onetwo_state::onetwo_coin_counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_watchdog->watchdog_reset();
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 }
 
-WRITE8_MEMBER(onetwo_state::onetwo_soundlatch_w)
+void onetwo_state::onetwo_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -163,13 +163,13 @@ void onetwo_state::set_color(int offset)
 	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-WRITE8_MEMBER(onetwo_state::palette1_w)
+void onetwo_state::palette1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 	set_color(offset);
 }
 
-WRITE8_MEMBER(onetwo_state::palette2_w)
+void onetwo_state::palette2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram2[offset] = data;
 	set_color(offset);

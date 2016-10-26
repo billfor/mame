@@ -37,10 +37,10 @@ public:
 	template<class _Object> static devcb_base &set_update_handler(device_t &device, _Object object) { return downcast<dl1416_device &>(device).m_update.set_callback(object); }
 
 	/* inputs */
-	DECLARE_WRITE_LINE_MEMBER( wr_w ); /* write enable */
-	DECLARE_WRITE_LINE_MEMBER( ce_w ); /* chip enable */
-	DECLARE_WRITE_LINE_MEMBER( cu_w ); /* cursor enable */
-	DECLARE_WRITE8_MEMBER( data_w );
+	void wr_w(int state); /* write enable */
+	void ce_w(int state); /* chip enable */
+	void cu_w(int state); /* cursor enable */
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

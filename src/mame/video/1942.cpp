@@ -58,7 +58,7 @@ void _1942_state::create_palette()
 	}
 }
 
-PALETTE_INIT_MEMBER(_1942_state,1942)
+void _1942_state::palette_init_1942(palette_device &palette)
 {
 	create_palette();
 
@@ -92,7 +92,7 @@ PALETTE_INIT_MEMBER(_1942_state,1942)
 		m_palette->set_pen_indirect(colorbase + i, 0x40 | *color_prom++);
 }
 
-PALETTE_INIT_MEMBER(_1942_state,1942p)
+void _1942_state::palette_init_1942p(palette_device &palette)
 {
 	for (int i = 0; i < 0x400; i++)
 	{
@@ -114,7 +114,7 @@ PALETTE_INIT_MEMBER(_1942_state,1942p)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(_1942_state::get_fg_tile_info)
+void _1942_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 
@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(_1942_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(_1942_state::get_bg_tile_info)
+void _1942_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 
@@ -169,20 +169,20 @@ void _1942_state::video_start_c1942p()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(_1942_state::c1942_fgvideoram_w)
+void _1942_state::c1942_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(_1942_state::c1942_bgvideoram_w)
+void _1942_state::c1942_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty((offset & 0x0f) | ((offset >> 1) & 0x01f0));
 }
 
 
-WRITE8_MEMBER(_1942_state::c1942_palette_bank_w)
+void _1942_state::c1942_palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palette_bank != data)
 	{
@@ -191,14 +191,14 @@ WRITE8_MEMBER(_1942_state::c1942_palette_bank_w)
 	}
 }
 
-WRITE8_MEMBER(_1942_state::c1942_scroll_w)
+void _1942_state::c1942_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll[0] | (m_scroll[1] << 8));
 }
 
 
-WRITE8_MEMBER(_1942_state::c1942_c804_w)
+void _1942_state::c1942_c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7: flip screen
 	   bit 4: cpu B reset

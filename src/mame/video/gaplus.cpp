@@ -25,7 +25,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(gaplus_state, gaplus)
+void gaplus_state::palette_init_gaplus(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -80,7 +80,7 @@ PALETTE_INIT_MEMBER(gaplus_state, gaplus)
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-TILEMAP_MAPPER_MEMBER(gaplus_state::tilemap_scan)
+tilemap_memory_index gaplus_state::tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -94,7 +94,7 @@ TILEMAP_MAPPER_MEMBER(gaplus_state::tilemap_scan)
 	return offs;
 }
 
-TILE_GET_INFO_MEMBER(gaplus_state::get_tile_info)
+void gaplus_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_videoram[tile_index + 0x400];
 	tileinfo.category = (attr & 0x40) >> 6;
@@ -202,13 +202,13 @@ void gaplus_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gaplus_state::videoram_w)
+void gaplus_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(gaplus_state::starfield_control_w)
+void gaplus_state::starfield_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 3;
 	m_starfield_control[offset] = data;

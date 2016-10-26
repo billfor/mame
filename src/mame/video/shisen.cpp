@@ -3,13 +3,13 @@
 #include "emu.h"
 #include "includes/shisen.h"
 
-WRITE8_MEMBER(shisen_state::videoram_w)
+void shisen_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(shisen_state::bankswitch_w)
+void shisen_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0xc0) logerror("bank switch %02x\n",data);
 
@@ -28,7 +28,7 @@ WRITE8_MEMBER(shisen_state::bankswitch_w)
 	/* bits 6-7 unknown */
 }
 
-WRITE8_MEMBER(shisen_state::paletteram_w)
+void shisen_state::paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 
@@ -37,7 +37,7 @@ WRITE8_MEMBER(shisen_state::paletteram_w)
 	m_palette->set_pen_color(offset, pal5bit(m_paletteram[offset + 0x000]), pal5bit(m_paletteram[offset + 0x100]), pal5bit(m_paletteram[offset + 0x200]));
 }
 
-TILE_GET_INFO_MEMBER(shisen_state::get_bg_tile_info)
+void shisen_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int code = m_videoram[offs] + ((m_videoram[offs + 1] & 0x0f) << 8) + (m_gfxbank << 12);

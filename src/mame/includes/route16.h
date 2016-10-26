@@ -26,21 +26,21 @@ public:
 	uint8_t m_palette_1;
 	uint8_t m_palette_2;
 
-	DECLARE_WRITE8_MEMBER(out0_w);
-	DECLARE_WRITE8_MEMBER(out1_w);
-	DECLARE_WRITE8_MEMBER(route16_sharedram_w);
-	DECLARE_READ8_MEMBER(routex_prot_read);
-	DECLARE_WRITE8_MEMBER(ttmahjng_input_port_matrix_w);
-	DECLARE_READ8_MEMBER(ttmahjng_input_port_matrix_r);
-	DECLARE_READ8_MEMBER(speakres_in3_r);
-	DECLARE_WRITE8_MEMBER(speakres_out2_w);
-	DECLARE_WRITE8_MEMBER(stratvox_sn76477_w);
+	void out0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void route16_sharedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t routex_prot_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ttmahjng_input_port_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ttmahjng_input_port_matrix_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t speakres_in3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void speakres_out2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stratvox_sn76477_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(route16);
-	DECLARE_DRIVER_INIT(route16a);
-	DECLARE_DRIVER_INIT(route16c);
-	DECLARE_MACHINE_START(speakres);
-	DECLARE_MACHINE_START(ttmahjng);
+	void init_route16();
+	void init_route16a();
+	void init_route16c();
+	void machine_start_speakres();
+	void machine_start_ttmahjng();
 	virtual void video_start() override;
 
 	uint32_t screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

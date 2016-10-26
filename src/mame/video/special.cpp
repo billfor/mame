@@ -12,7 +12,7 @@
 #include "includes/special.h"
 
 
-VIDEO_START_MEMBER(special_state,special)
+void special_state::video_start_special()
 {
 	m_palette->set_pen_color(0, rgb_t::black());
 	m_palette->set_pen_color(1, rgb_t::white());
@@ -34,7 +34,7 @@ uint32_t special_state::screen_update_special(screen_device &screen, bitmap_ind1
 	}
 	return 0;
 }
-VIDEO_START_MEMBER(special_state,specialp)
+void special_state::video_start_specialp()
 {
 }
 
@@ -75,13 +75,13 @@ static const rgb_t specimx_palette[16] = {
 	rgb_t(0xff, 0xff, 0xff)  // F
 };
 
-PALETTE_INIT_MEMBER(special_state,specimx)
+void special_state::palette_init_specimx(palette_device &palette)
 {
 	palette.set_pen_colors(0, specimx_palette, ARRAY_LENGTH(specimx_palette));
 }
 
 
-VIDEO_START_MEMBER(special_state,specimx)
+void special_state::video_start_specimx()
 {
 	m_specimx_colorram = std::make_unique<uint8_t[]>(0x3000);
 }
@@ -115,13 +115,13 @@ static const rgb_t erik_palette[8] = {
 	rgb_t(0xff, 0xff, 0xff)  // 7
 };
 
-PALETTE_INIT_MEMBER(special_state,erik)
+void special_state::palette_init_erik(palette_device &palette)
 {
 	palette.set_pen_colors(0, erik_palette, ARRAY_LENGTH(erik_palette));
 }
 
 
-VIDEO_START_MEMBER(special_state,erik)
+void special_state::video_start_erik()
 {
 }
 

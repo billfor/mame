@@ -203,7 +203,7 @@ QUICKLOAD_LOAD_MEMBER( comx35_state, comx35_comx )
 //  mem_r - memory read
 //-------------------------------------------------
 
-READ8_MEMBER( comx35_state::mem_r )
+uint8_t comx35_state::mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int extrom = 1;
 
@@ -230,7 +230,7 @@ READ8_MEMBER( comx35_state::mem_r )
 //  mem_w - memory write
 //-------------------------------------------------
 
-WRITE8_MEMBER( comx35_state::mem_w )
+void comx35_state::mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_exp->mwr_w(space, offset, data);
 
@@ -253,7 +253,7 @@ WRITE8_MEMBER( comx35_state::mem_w )
 //  io_r - I/O read
 //-------------------------------------------------
 
-READ8_MEMBER( comx35_state::io_r )
+uint8_t comx35_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_exp->io_r(space, offset);
 
@@ -270,7 +270,7 @@ READ8_MEMBER( comx35_state::io_r )
 //  io_w - I/O write
 //-------------------------------------------------
 
-WRITE8_MEMBER( comx35_state::io_w )
+void comx35_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_exp->io_w(space, offset, data);
 
@@ -312,10 +312,10 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( comx35_reset )
+//  void comx35_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( comx35_state::trigger_reset )
+void comx35_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval && BIT(m_d6->read(), 7))
 	{
@@ -435,12 +435,12 @@ void comx35_state::check_interrupt()
 	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, m_cr1 || m_int);
 }
 
-READ_LINE_MEMBER( comx35_state::clear_r )
+int comx35_state::clear_r()
 {
 	return m_clear;
 }
 
-READ_LINE_MEMBER( comx35_state::ef2_r )
+int comx35_state::ef2_r()
 {
 	if (m_iden)
 	{
@@ -454,12 +454,12 @@ READ_LINE_MEMBER( comx35_state::ef2_r )
 	}
 }
 
-READ_LINE_MEMBER( comx35_state::ef4_r )
+int comx35_state::ef4_r()
 {
 	return m_exp->ef4_r(); // | (m_cassette->input() > 0.0f);
 }
 
-WRITE_LINE_MEMBER( comx35_state::q_w )
+void comx35_state::q_w(int state)
 {
 	m_q = state;
 
@@ -476,7 +476,7 @@ WRITE_LINE_MEMBER( comx35_state::q_w )
 	m_exp->q_w(state);
 }
 
-WRITE8_MEMBER( comx35_state::sc_w )
+void comx35_state::sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -518,7 +518,7 @@ WRITE8_MEMBER( comx35_state::sc_w )
 //  COMX_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( comx35_state::irq_w )
+void comx35_state::irq_w(int state)
 {
 	m_int = state;
 	check_interrupt();

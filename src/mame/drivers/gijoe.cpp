@@ -116,12 +116,12 @@ Known Issues
 #define JOE_DMADELAY (attotime::from_nsec(42700 + 341300))
 
 
-READ16_MEMBER(gijoe_state::control2_r)
+uint16_t gijoe_state::control2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cur_control2;
 }
 
-WRITE16_MEMBER(gijoe_state::control2_w)
+void gijoe_state::control2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -164,13 +164,13 @@ void gijoe_state::gijoe_objdma(  )
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gijoe_state::dmaend_callback)
+void gijoe_state::dmaend_callback(void *ptr, int32_t param)
 {
 	if (m_cur_control2 & 0x0020)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
+void gijoe_state::gijoe_interrupt(device_t &device)
 {
 	// global interrupt masking (*this game only)
 	if (!m_k056832->is_irq_enabled(0))
@@ -189,7 +189,7 @@ INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
 		device.execute().set_input_line(5, HOLD_LINE);
 }
 
-WRITE16_MEMBER(gijoe_state::sound_cmd_w)
+void gijoe_state::sound_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -198,12 +198,12 @@ WRITE16_MEMBER(gijoe_state::sound_cmd_w)
 	}
 }
 
-WRITE16_MEMBER(gijoe_state::sound_irq_w)
+void gijoe_state::sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-READ16_MEMBER(gijoe_state::sound_status_r)
+uint16_t gijoe_state::sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_soundlatch2->read(space, 0);
 }

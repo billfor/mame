@@ -190,7 +190,7 @@ void aica_device::CheckPendingIRQ_SH4()
 		m_main_irq_cb(0);
 }
 
-TIMER_CALLBACK_MEMBER( aica_device::timerA_cb )
+void aica_device::timerA_cb(void *ptr, int32_t param)
 {
 	m_TimCnt[0] = 0xFFFF;
 	m_udata.data[0xa0/2]|=0x40;
@@ -203,7 +203,7 @@ TIMER_CALLBACK_MEMBER( aica_device::timerA_cb )
 
 }
 
-TIMER_CALLBACK_MEMBER( aica_device::timerB_cb )
+void aica_device::timerB_cb(void *ptr, int32_t param)
 {
 	m_TimCnt[1] = 0xFFFF;
 	m_udata.data[0xa0/2]|=0x80;
@@ -215,7 +215,7 @@ TIMER_CALLBACK_MEMBER( aica_device::timerB_cb )
 	CheckPendingIRQ_SH4();
 }
 
-TIMER_CALLBACK_MEMBER( aica_device::timerC_cb )
+void aica_device::timerC_cb(void *ptr, int32_t param)
 {
 	m_TimCnt[2] = 0xFFFF;
 	m_udata.data[0xa0/2]|=0x100;
@@ -1439,12 +1439,12 @@ void aica_device::set_ram_base(void *base, int size)
 	m_DSP.AICARAM_LENGTH = size;
 }
 
-READ16_MEMBER( aica_device::read )
+uint16_t aica_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return r16(space,offset*2);
 }
 
-WRITE16_MEMBER( aica_device::write )
+void aica_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t tmp;
 
@@ -1453,13 +1453,13 @@ WRITE16_MEMBER( aica_device::write )
 	w16(space, offset*2, tmp);
 }
 
-WRITE16_MEMBER( aica_device::midi_in )
+void aica_device::midi_in(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_MidiStack[m_MidiW++]=data;
 	m_MidiW &= 15;
 }
 
-READ16_MEMBER( aica_device::midi_out_r )
+uint16_t aica_device::midi_out_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	unsigned char val;
 

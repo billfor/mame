@@ -31,16 +31,16 @@ public:
 	required_device<m24_keyboard_device> m_keyboard;
 	optional_device<m24_z8000_device> m_z8000_apb;
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(pa_r);
-	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_READ8_MEMBER(kbcdata_r);
-	DECLARE_WRITE8_MEMBER(kbcdata_w);
-	DECLARE_WRITE_LINE_MEMBER(kbcin_w);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
-	DECLARE_WRITE_LINE_MEMBER(int_w);
-	DECLARE_WRITE_LINE_MEMBER(halt_i86_w);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kbcdata_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbcdata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbcin_w(int state);
+	void dma_hrq_w(int state);
+	void int_w(int state);
+	void halt_i86_w(int state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void machine_reset() override;
@@ -61,7 +61,7 @@ void m24_state::machine_reset()
 		m_z8000_apb->m_z8000->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-READ8_MEMBER(m24_state::keyboard_r)
+uint8_t m24_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -79,7 +79,7 @@ READ8_MEMBER(m24_state::keyboard_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(m24_state::keyboard_w)
+void m24_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -104,38 +104,38 @@ WRITE8_MEMBER(m24_state::keyboard_w)
 	}
 }
 
-READ8_MEMBER(m24_state::pa_r)
+uint8_t m24_state::pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pa & (m_kbdata ? 0xff : 0xfd);
 }
 
-WRITE8_MEMBER(m24_state::pb_w)
+void m24_state::pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyboard->clock_w(!BIT(data, 0));
 	m_keyboard->data_w(!BIT(data, 1));
 	m_pa = (m_pa & ~3) | (~data & 3);
 }
 
-READ8_MEMBER(m24_state::kbcdata_r)
+uint8_t m24_state::kbcdata_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_kbc->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
 	m_kbcibf = false;
 	return m_kbcin;
 }
 
-WRITE8_MEMBER(m24_state::kbcdata_w)
+void m24_state::kbcdata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pa &= ~0x40;
 	m_mb->m_pic8259->ir1_w(1);
 	m_kbcout = data;
 }
 
-WRITE_LINE_MEMBER(m24_state::kbcin_w)
+void m24_state::kbcin_w(int state)
 {
 	m_kbdata = state;
 }
 
-WRITE_LINE_MEMBER(m24_state::dma_hrq_w)
+void m24_state::dma_hrq_w(int state)
 {
 	if(!m_i86_halt)
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
@@ -146,7 +146,7 @@ WRITE_LINE_MEMBER(m24_state::dma_hrq_w)
 	m_mb->m_dma8237->hack_w(state);
 }
 
-WRITE_LINE_MEMBER(m24_state::int_w)
+void m24_state::int_w(int state)
 {
 	if(!m_i86_halt)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
@@ -154,7 +154,7 @@ WRITE_LINE_MEMBER(m24_state::int_w)
 		m_z8000_apb->m_z8000->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(m24_state::halt_i86_w)
+void m24_state::halt_i86_w(int state)
 {
 	if(m_i86_halt_perm)
 		return;

@@ -17,29 +17,29 @@ public:
 	required_device<ata_interface_device> m_ata;
 //  required_device<macronix_29lv160tmc_device> m_dcflash;
 
-	DECLARE_DRIVER_INIT(dc);
-	DECLARE_DRIVER_INIT(dcus);
-	DECLARE_DRIVER_INIT(dcjp);
+	void init_dc();
+	void init_dcus();
+	void init_dcjp();
 
-	DECLARE_READ64_MEMBER(dcus_idle_skip_r);
-	DECLARE_READ64_MEMBER(dcjp_idle_skip_r);
+	uint64_t dcus_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t dcjp_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 
-	DECLARE_MACHINE_RESET(dc_console);
-	DECLARE_READ64_MEMBER(dc_pdtra_r);
-	DECLARE_WRITE64_MEMBER(dc_pdtra_w);
-	DECLARE_READ64_MEMBER(dc_arm_r);
-	DECLARE_WRITE64_MEMBER(dc_arm_w);
-	DECLARE_WRITE_LINE_MEMBER(aica_irq);
-	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
-	DECLARE_WRITE_LINE_MEMBER(ata_interrupt);
+	void machine_reset_dc_console();
+	uint64_t dc_pdtra_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void dc_pdtra_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t dc_arm_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void dc_arm_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void aica_irq(int state);
+	void sh4_aica_irq(int state);
+	void ata_interrupt(int state);
 
-	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
+	void atapi_xfer_end(void *ptr, int32_t param);
 
 	void dreamcast_atapi_init();
-	DECLARE_READ32_MEMBER( dc_mess_g1_ctrl_r );
-	DECLARE_WRITE32_MEMBER( dc_mess_g1_ctrl_w );
-//  DECLARE_READ8_MEMBER( dc_flash_r );
-//  DECLARE_WRITE8_MEMBER( dc_flash_w );
+	uint32_t dc_mess_g1_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dc_mess_g1_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+//  uint8_t dc_flash_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+//  void dc_flash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	uint64_t PDTRA, PCTRA;

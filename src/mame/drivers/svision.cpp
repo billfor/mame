@@ -24,7 +24,7 @@
 #define YPOS m_reg[3]
 #define BANK m_reg[0x26]
 
-TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
+void svision_state::svision_pet_timer(void *ptr, int32_t param)
 {
 	switch (m_pet.state)
 	{
@@ -53,7 +53,7 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(svision_state::svision_pet_timer_dev)
+void svision_state::svision_pet_timer_dev(timer_device &timer, void *ptr, int32_t param)
 {
 	svision_pet_timer(ptr,param);
 }
@@ -66,14 +66,14 @@ void svision_state::svision_irq()
 	m_maincpu->set_input_line(M65C02_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(svision_state::svision_timer)
+void svision_state::svision_timer(void *ptr, int32_t param)
 {
 	m_svision.timer_shot = true;
 	m_svision.timer1->enable(false);
 	svision_irq();
 }
 
-READ8_MEMBER(svision_state::svision_r)
+uint8_t svision_state::svision_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_reg[offset];
 	switch (offset)
@@ -128,7 +128,7 @@ READ8_MEMBER(svision_state::svision_r)
 	return data;
 }
 
-WRITE8_MEMBER(svision_state::svision_w)
+void svision_state::svision_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int value, delay, bank;
 
@@ -187,7 +187,7 @@ WRITE8_MEMBER(svision_state::svision_w)
 	}
 }
 
-READ8_MEMBER(svision_state::tvlink_r)
+uint8_t svision_state::tvlink_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -204,7 +204,7 @@ READ8_MEMBER(svision_state::tvlink_r)
 	}
 }
 
-WRITE8_MEMBER(svision_state::tvlink_w)
+void svision_state::tvlink_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -351,17 +351,17 @@ static const unsigned char svisionn_palette[] =
 	245, 249, 248
 };
 
-PALETTE_INIT_MEMBER(svision_state, svision)
+void svision_state::palette_init_svision(palette_device &palette)
 {
 	for (int i = 0; i < sizeof(svision_palette) / 3; i++)
 		palette.set_pen_color(i, svision_palette[i*3], svision_palette[i*3+1], svision_palette[i*3+2]);
 }
-PALETTE_INIT_MEMBER(svision_state,svisionn)
+void svision_state::palette_init_svisionn(palette_device &palette)
 {
 	for (int i = 0; i < sizeof(svisionn_palette) / 3; i++)
 		palette.set_pen_color(i, svisionn_palette[i*3], svisionn_palette[i*3+1], svisionn_palette[i*3+2]);
 }
-PALETTE_INIT_MEMBER(svision_state,svisionp)
+void svision_state::palette_init_svisionp(palette_device &palette)
 {
 	for (int i = 0; i < sizeof(svisionn_palette) / 3; i++)
 		palette.set_pen_color(i, svisionp_palette[i*3], svisionp_palette[i*3+1], svisionp_palette[i*3+2]);
@@ -429,7 +429,7 @@ uint32_t svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(svision_state::svision_frame_int)
+void svision_state::svision_frame_int(device_t &device)
 {
 	if (BANK & 1)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -437,14 +437,14 @@ INTERRUPT_GEN_MEMBER(svision_state::svision_frame_int)
 	m_sound->sound_decrement();
 }
 
-DRIVER_INIT_MEMBER(svision_state, svision)
+void svision_state::init_svision()
 {
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_dma_finished = m_sound->dma_finished();
 	m_pet.on = false;
 }
 
-DRIVER_INIT_MEMBER(svision_state, svisions)
+void svision_state::init_svisions()
 {
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_dma_finished = m_sound->dma_finished();
@@ -452,7 +452,7 @@ DRIVER_INIT_MEMBER(svision_state, svisions)
 	m_pet.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_pet_timer),this));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( svision_state, svision_cart )
+image_init_result svision_state::device_image_load_svision_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -495,7 +495,7 @@ void svision_state::machine_reset()
 }
 
 
-MACHINE_RESET_MEMBER(svision_state,tvlink)
+void svision_state::machine_reset_tvlink()
 {
 	svision_state::machine_reset();
 	m_tvlink.palette_on = false;

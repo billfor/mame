@@ -9,14 +9,14 @@ Atari Orbit video emulation
 #include "emu.h"
 #include "includes/orbit.h"
 
-WRITE8_MEMBER(orbit_state::orbit_playfield_w)
+void orbit_state::orbit_playfield_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_playfield_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(orbit_state::get_tile_info)
+void orbit_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_playfield_ram[tile_index];
 	int flags = 0;

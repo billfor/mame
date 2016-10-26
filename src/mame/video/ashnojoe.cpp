@@ -11,7 +11,7 @@
 #include "includes/ashnojoe.h"
 
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info)
+void ashnojoe_state::get_joe_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram[tile_index];
 
@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_2)
+void ashnojoe_state::get_joe_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram_2[tile_index * 2];
 	int attr = m_tileram_2[tile_index * 2 + 1];
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_2)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_3)
+void ashnojoe_state::get_joe_tile_info_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram_3[tile_index];
 
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_3)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_4)
+void ashnojoe_state::get_joe_tile_info_4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram_4[tile_index];
 
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_4)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_5)
+void ashnojoe_state::get_joe_tile_info_5(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram_5[tile_index * 2];
 	int attr = m_tileram_5[tile_index * 2 + 1];
@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_5)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_6)
+void ashnojoe_state::get_joe_tile_info_6(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram_6[tile_index * 2];
 	int attr = m_tileram_6[tile_index * 2 + 1];
@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_6)
 }
 
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_7)
+void ashnojoe_state::get_joe_tile_info_7(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram_7[tile_index * 2];
 	int attr = m_tileram_7[tile_index * 2 + 1];
@@ -86,50 +86,50 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_7)
 			0);
 }
 
-WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram_w)
+void ashnojoe_state::ashnojoe_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tileram[offset] = data;
 	m_joetilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram2_w)
+void ashnojoe_state::ashnojoe_tileram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tileram_2[offset] = data;
 	m_joetilemap2->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram3_w)
+void ashnojoe_state::ashnojoe_tileram3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tileram_3[offset] = data;
 	m_joetilemap3->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram4_w)
+void ashnojoe_state::ashnojoe_tileram4_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tileram_4[offset] = data;
 	m_joetilemap4->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram5_w)
+void ashnojoe_state::ashnojoe_tileram5_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tileram_5[offset] = data;
 	m_joetilemap5->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram6_w)
+void ashnojoe_state::ashnojoe_tileram6_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tileram_6[offset] = data;
 	m_joetilemap6->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram7_w)
+void ashnojoe_state::ashnojoe_tileram7_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tileram_7[offset] = data;
 	m_joetilemap7->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(ashnojoe_state::joe_tilemaps_xscroll_w)
+void ashnojoe_state::joe_tilemaps_xscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -152,7 +152,7 @@ WRITE16_MEMBER(ashnojoe_state::joe_tilemaps_xscroll_w)
 	}
 }
 
-WRITE16_MEMBER(ashnojoe_state::joe_tilemaps_yscroll_w)
+void ashnojoe_state::joe_tilemaps_yscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch( offset )
 	{

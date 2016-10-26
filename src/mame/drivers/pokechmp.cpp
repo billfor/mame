@@ -47,7 +47,7 @@ ClawGrip, Jul 2006
 #include "sound/okim6295.h"
 #include "includes/pokechmp.h"
 
-WRITE8_MEMBER(pokechmp_state::pokechmp_bank_w)
+void pokechmp_state::pokechmp_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -60,14 +60,14 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_bank_w)
 }
 
 
-WRITE8_MEMBER(pokechmp_state::pokechmp_sound_bank_w)
+void pokechmp_state::pokechmp_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("oki")->base();
 	membank("okibank")->set_base(&ROM[data*0x8000]);
 }
 
 
-WRITE8_MEMBER(pokechmp_state::pokechmp_sound_w)
+void pokechmp_state::pokechmp_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, pokechmp_oki_map)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(pokechmp_state,pokechmp)
+void pokechmp_state::init_pokechmp()
 {
 	// default sound rom bank
 	membank("bank3")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);

@@ -42,7 +42,7 @@ public:
 	uint8_t read_inputs(int columns);
 	void refresh_interrupts(void);
 	void set_interrupt(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
+	void single_interrupt_line(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
@@ -57,7 +57,7 @@ public:
 	uint32_t m_display_cache[0x20];       // (internal use)
 	uint8_t m_display_decay[0x20][0x20];  // (internal use)
 
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_decay_tick(timer_device &timer, void *ptr, int32_t param);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);

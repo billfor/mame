@@ -68,24 +68,24 @@ public:
 
 public:
 	const uint8_t *m_p_chargen;
-	DECLARE_DRIVER_INIT(zorba);
-	DECLARE_MACHINE_RESET(zorba);
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_WRITE8_MEMBER(rom_w);
-	DECLARE_WRITE8_MEMBER(intmask_w);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
-	DECLARE_WRITE8_MEMBER(pia0_porta_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE_LINE_MEMBER(irq0_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	void init_zorba();
+	void machine_reset_zorba();
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void intmask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void busreq_w(int state);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia0_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq0_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_intrq_w(int state);
 	I8275_DRAW_CHARACTER_MEMBER(zorba_update_chr);
 	required_device<palette_device> m_palette;
 
@@ -137,29 +137,29 @@ static ADDRESS_MAP_START( zorba_io, AS_IO, 8, zorba_state )
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 ADDRESS_MAP_END
 
-READ8_MEMBER( zorba_state::ram_r )
+uint8_t zorba_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(0);
 	return 0;
 }
 
-WRITE8_MEMBER( zorba_state::ram_w )
+void zorba_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(0);
 }
 
-READ8_MEMBER( zorba_state::rom_r )
+uint8_t zorba_state::rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(1);
 	return 0;
 }
 
-WRITE8_MEMBER( zorba_state::rom_w )
+void zorba_state::rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(1);
 }
 
-WRITE_LINE_MEMBER( zorba_state::irq0_w )
+void zorba_state::irq0_w(int state)
 {
 	if (state)
 	{
@@ -170,7 +170,7 @@ WRITE_LINE_MEMBER( zorba_state::irq0_w )
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( zorba_state::fdc_intrq_w )
+void zorba_state::fdc_intrq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 2) | state;
 	if (m_fdc_rq == 1)
@@ -183,7 +183,7 @@ WRITE_LINE_MEMBER( zorba_state::fdc_intrq_w )
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( zorba_state::fdc_drq_w )
+void zorba_state::fdc_drq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 1) | (state << 1);
 	if (m_fdc_rq == 2)
@@ -196,14 +196,14 @@ WRITE_LINE_MEMBER( zorba_state::fdc_drq_w )
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( zorba_state::intmask_w )
+void zorba_state::intmask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 static INPUT_PORTS_START( zorba )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER( zorba_state, zorba )
+void zorba_state::init_zorba()
 {
 	uint8_t *main = memregion("maincpu")->base();
 
@@ -216,32 +216,32 @@ DRIVER_INIT_MEMBER( zorba_state, zorba )
 //  Z80DMA
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zorba_state::busreq_w )
+void zorba_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER(zorba_state::memory_read_byte)
+uint8_t zorba_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(zorba_state::memory_write_byte)
+void zorba_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(zorba_state::io_read_byte)
+uint8_t zorba_state::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(zorba_state::io_write_byte)
+void zorba_state::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 
@@ -260,7 +260,7 @@ static SLOT_INTERFACE_START( zorba_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-WRITE8_MEMBER( zorba_state::pia0_porta_w )
+void zorba_state::pia0_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_beep->set_state(BIT(data, 7));
 	m_fdc->dden_w(BIT(data, 6));
@@ -317,7 +317,7 @@ static GFXDECODE_START( zorba )
 	GFXDECODE_ENTRY( "chargen", 0x0000, u5_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_RESET_MEMBER( zorba_state, zorba )
+void zorba_state::machine_reset_zorba()
 {
 	m_fdc_rq = 0;
 	m_p_chargen = memregion("chargen")->base();
@@ -326,7 +326,7 @@ MACHINE_RESET_MEMBER( zorba_state, zorba )
 	m_maincpu->reset();
 }
 
-READ8_MEMBER( zorba_state::keyboard_r )
+uint8_t zorba_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset)
 		return (m_term_data) ? 0x87 : 0x85;
@@ -336,7 +336,7 @@ READ8_MEMBER( zorba_state::keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( zorba_state::kbd_put )
+void zorba_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

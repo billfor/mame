@@ -250,70 +250,70 @@ Stephh's log (2006.09.20) :
 
 
 
-READ16_MEMBER(cps_state::cps1_dsw_r)
+uint16_t cps_state::cps1_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
 	int in = ioport(dswname[offset])->read();
 	return (in << 8) | 0xff;
 }
 
-READ16_MEMBER(cps_state::cps1_hack_dsw_r)
+uint16_t cps_state::cps1_hack_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
 	int in = ioport(dswname[offset])->read();
 	return (in << 8) | in;
 }
 
-READ16_MEMBER(cps_state::cps1_in1_r)
+uint16_t cps_state::cps1_in1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int in = ioport("IN1")->read();
 	return (in << 8) | in;
 }
 
-READ16_MEMBER(cps_state::cps1_in2_r)
+uint16_t cps_state::cps1_in2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int in = ioport("IN2")->read();
 	return (in << 8) | in;
 }
 
-READ16_MEMBER(cps_state::cps1_in3_r)
+uint16_t cps_state::cps1_in3_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int in = ioport("IN3")->read();
 	return (in << 8) | in;
 }
 
-READ16_MEMBER(cps_state::forgottn_dial_0_r)
+uint16_t cps_state::forgottn_dial_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((ioport("DIAL0")->read() - m_dial[0]) >> (8 * offset)) & 0xff;
 }
 
-READ16_MEMBER(cps_state::forgottn_dial_1_r)
+uint16_t cps_state::forgottn_dial_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((ioport("DIAL1")->read() - m_dial[1]) >> (8 * offset)) & 0xff;
 }
 
-WRITE16_MEMBER(cps_state::forgottn_dial_0_reset_w)
+void cps_state::forgottn_dial_0_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dial[0] = ioport("DIAL0")->read();
 }
 
-WRITE16_MEMBER(cps_state::forgottn_dial_1_reset_w)
+void cps_state::forgottn_dial_1_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dial[1] = ioport("DIAL1")->read();
 }
 
 
-WRITE8_MEMBER(cps_state::cps1_snd_bankswitch_w)
+void cps_state::cps1_snd_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x01);
 }
 
-WRITE8_MEMBER(cps_state::cps1_oki_pin7_w)
+void cps_state::cps1_oki_pin7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_pin7(data & 1);
 }
 
-WRITE16_MEMBER(cps_state::cps1_soundlatch_w)
+void cps_state::cps1_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch->write(space, 0, data & 0xff);
@@ -321,13 +321,13 @@ WRITE16_MEMBER(cps_state::cps1_soundlatch_w)
 		m_soundlatch->write(space, 0, data >> 8);
 }
 
-WRITE16_MEMBER(cps_state::cps1_soundlatch2_w)
+void cps_state::cps1_soundlatch2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch2->write(space, 0, data & 0xff);
 }
 
-WRITE16_MEMBER(cps_state::cps1_coinctrl_w)
+void cps_state::cps1_coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -340,7 +340,7 @@ WRITE16_MEMBER(cps_state::cps1_coinctrl_w)
 	}
 }
 
-WRITE16_MEMBER(cps_state::cpsq_coinctrl2_w)
+void cps_state::cpsq_coinctrl2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -351,7 +351,7 @@ WRITE16_MEMBER(cps_state::cpsq_coinctrl2_w)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(cps_state::cps1_interrupt)
+void cps_state::cps1_interrupt(device_t &device)
 {
 	/* Strider also has a IRQ4 handler. It is input port related, but the game */
 	/* works without it. It is the *only* CPS1 game to have that. */
@@ -359,7 +359,7 @@ INTERRUPT_GEN_MEMBER(cps_state::cps1_interrupt)
 	device.execute().set_input_line(2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(cps_state::ganbare_interrupt)
+void cps_state::ganbare_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	/* not sure on the timing or source of this - the game needs it once per frame, */
 	/* otherwise you get a "HARD ERROR" after boot */
@@ -375,7 +375,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::ganbare_interrupt)
 *
 ********************************************************************/
 
-READ16_MEMBER(cps_state::qsound_rom_r)
+uint16_t cps_state::qsound_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (memregion("user1") != nullptr)
 	{
@@ -389,29 +389,29 @@ READ16_MEMBER(cps_state::qsound_rom_r)
 	}
 }
 
-READ16_MEMBER(cps_state::qsound_sharedram1_r)
+uint16_t cps_state::qsound_sharedram1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_qsound_sharedram1[offset] | 0xff00;
 }
 
-WRITE16_MEMBER(cps_state::qsound_sharedram1_w)
+void cps_state::qsound_sharedram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_qsound_sharedram1[offset] = data;
 }
 
-READ16_MEMBER(cps_state::qsound_sharedram2_r)
+uint16_t cps_state::qsound_sharedram2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_qsound_sharedram2[offset] | 0xff00;
 }
 
-WRITE16_MEMBER(cps_state::qsound_sharedram2_w)
+void cps_state::qsound_sharedram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_qsound_sharedram2[offset] = data;
 }
 
-WRITE8_MEMBER(cps_state::qsound_banksw_w)
+void cps_state::qsound_banksw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Z80 bank register for music note data. It's odd that it isn't encrypted though. */
 	int bank = data & 0x0f;
@@ -3280,19 +3280,19 @@ GFXDECODE_END
 *
 ********************************************************************/
 
-MACHINE_START_MEMBER(cps_state,common)
+void cps_state::machine_start_common()
 {
 }
 
-MACHINE_START_MEMBER(cps_state,cps1)
+void cps_state::machine_start_cps1()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
-MACHINE_START_MEMBER(cps_state,qsound)
+void cps_state::machine_start_qsound()
 {
-	MACHINE_START_CALL_MEMBER(common);
+	machine_start_common();
 	membank("bank1")->configure_entries(0, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
@@ -11900,7 +11900,7 @@ ROM_START( sfzbch )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cps_state,forgottn)
+void cps_state::init_forgottn()
 {
 	/* Forgotten Worlds has a NEC uPD4701AC on the B-board handling dial inputs from the CN-MOWS connector. */
 	/* The memory mapping is handled by PAL LWIO */
@@ -11914,10 +11914,10 @@ DRIVER_INIT_MEMBER(cps_state,forgottn)
 	m_dial[0] = 0;
 	m_dial[1] = 0;
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-READ16_MEMBER(cps_state::sf2rb_prot_r)
+uint16_t cps_state::sf2rb_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -11931,14 +11931,14 @@ READ16_MEMBER(cps_state::sf2rb_prot_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(cps_state,sf2rb)
+void cps_state::init_sf2rb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x2fffff, read16_delegate(FUNC(cps_state::sf2rb_prot_r),this));
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-READ16_MEMBER(cps_state::sf2rb2_prot_r)
+uint16_t cps_state::sf2rb2_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -11952,41 +11952,41 @@ READ16_MEMBER(cps_state::sf2rb2_prot_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(cps_state,sf2rb2)
+void cps_state::init_sf2rb2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x2fffff, read16_delegate(FUNC(cps_state::sf2rb2_prot_r),this));
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-DRIVER_INIT_MEMBER(cps_state,sf2ee)
+void cps_state::init_sf2ee()
 {
 	/* This specific revision of SF2 has the CPS-B custom mapped at a different address. */
 	/* The mapping is handled by the PAL IOB2 on the B-board */
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x800140, 0x80017f);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8001c0, 0x8001ff, read16_delegate(FUNC(cps_state::cps1_cps_b_r),this), write16_delegate(FUNC(cps_state::cps1_cps_b_w),this));
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-DRIVER_INIT_MEMBER(cps_state,sf2thndr)
+void cps_state::init_sf2thndr()
 {
 	/* This particular hack uses a modified B-board PAL which mirrors the CPS-B registers at an alternate address */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8001c0, 0x8001ff, read16_delegate(FUNC(cps_state::cps1_cps_b_r),this), write16_delegate(FUNC(cps_state::cps1_cps_b_w),this));
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-DRIVER_INIT_MEMBER(cps_state,sf2hack)
+void cps_state::init_sf2hack()
 {
 	/* some SF2 hacks have some inputs wired to the LSB instead of MSB */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800018, 0x80001f, read16_delegate(FUNC(cps_state::cps1_hack_dsw_r),this));
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
 
-READ16_MEMBER(cps_state::sf2dongb_prot_r)
+uint16_t cps_state::sf2dongb_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -11998,15 +11998,15 @@ READ16_MEMBER(cps_state::sf2dongb_prot_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(cps_state,sf2dongb)
+void cps_state::init_sf2dongb()
 {
 	// There is a hacked up Altera EP910PC-30 DIP in the 5f socket instead of a 4th eprom
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180000, 0x1fffff, read16_delegate(FUNC(cps_state::sf2dongb_prot_r),this));
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-READ16_MEMBER(cps_state::sf2ceblp_prot_r)
+uint16_t cps_state::sf2ceblp_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (sf2ceblp_prot == 0x0)
 		return 0x1992;
@@ -12015,21 +12015,21 @@ READ16_MEMBER(cps_state::sf2ceblp_prot_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(cps_state::sf2ceblp_prot_w)
+void cps_state::sf2ceblp_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sf2ceblp_prot = data;
 }
 
 
-DRIVER_INIT_MEMBER( cps_state, sf2ceblp )
+void cps_state::init_sf2ceblp()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5762b0, 0x5762b1, write16_delegate(FUNC(cps_state::sf2ceblp_prot_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x57A2b0, 0x57A2b1, read16_delegate(FUNC(cps_state::sf2ceblp_prot_r),this));
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-DRIVER_INIT_MEMBER( cps_state, sf2m8 )
+void cps_state::init_sf2m8()
 {
 	// unscramble gfx
 	uint8_t *grom = memregion("gfx")->base();
@@ -12048,7 +12048,7 @@ DRIVER_INIT_MEMBER( cps_state, sf2m8 )
 		grom[i++] = urom[j|0x180001];
 	}
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
 void cps_state::kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst))
@@ -12059,40 +12059,40 @@ void cps_state::kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst))
 	membank("decrypted")->set_base(m_decrypt_kabuki.get());
 }
 
-DRIVER_INIT_MEMBER(cps_state,wof)
+void cps_state::init_wof()
 {
 	kabuki_setup(wof_decode);
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-DRIVER_INIT_MEMBER(cps_state,dino)
+void cps_state::init_dino()
 {
 	kabuki_setup(dino_decode);
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-DRIVER_INIT_MEMBER(cps_state,punisher)
+void cps_state::init_punisher()
 {
 	kabuki_setup(punisher_decode);
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-DRIVER_INIT_MEMBER(cps_state,slammast)
+void cps_state::init_slammast()
 {
 	kabuki_setup(slammast_decode);
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-DRIVER_INIT_MEMBER(cps_state,pang3b)
+void cps_state::init_pang3b()
 {
 	/* Pang 3 is the only non-QSound game to have an EEPROM. */
 	/* It is mapped in the CPS-B address range so probably is on the C-board. */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_port(0x80017a, 0x80017b, "EEPROMIN", "EEPROMOUT");
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-DRIVER_INIT_MEMBER(cps_state,pang3)
+void cps_state::init_pang3()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	int A, src, dst;
@@ -12113,10 +12113,10 @@ DRIVER_INIT_MEMBER(cps_state,pang3)
 		rom[A/2] = dst;
 	}
 
-	DRIVER_INIT_CALL(pang3b);
+	init_pang3b();
 }
 
-READ16_MEMBER(cps_state::ganbare_ram_r)
+uint16_t cps_state::ganbare_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = 0xffff;
 
@@ -12128,7 +12128,7 @@ READ16_MEMBER(cps_state::ganbare_ram_r)
 	return result;
 }
 
-WRITE16_MEMBER(cps_state::ganbare_ram_w)
+void cps_state::ganbare_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mainram[offset]);
 
@@ -12136,15 +12136,15 @@ WRITE16_MEMBER(cps_state::ganbare_ram_w)
 		m_m48t35->write(space, offset, data & 0xff, 0xff);
 }
 
-DRIVER_INIT_MEMBER(cps_state, ganbare)
+void cps_state::init_ganbare()
 {
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 
 	/* ram is shared between the CPS work ram and the timekeeper ram */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff0000, 0xffffff, read16_delegate(FUNC(cps_state::ganbare_ram_r),this), write16_delegate(FUNC(cps_state::ganbare_ram_w),this));
 }
 
-READ16_MEMBER(cps_state::dinohunt_sound_r)
+uint16_t cps_state::dinohunt_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*TODO: understand what's really going on here. According to MT05805;
 	"I think that the values written are only qsound leftovers (after a lot of 0xFF values,
@@ -12152,17 +12152,17 @@ READ16_MEMBER(cps_state::dinohunt_sound_r)
 	return 0xff;
 }
 
-DRIVER_INIT_MEMBER(cps_state,dinohunt)
+void cps_state::init_dinohunt()
 {
 	// is this shared with the new sound hw?
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf18000, 0xf19fff, read16_delegate(FUNC(cps_state::dinohunt_sound_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0xfc0000, 0xfc0001, "IN2"); ;
 	// the ym2151 doesn't seem to be used. Is it actually on the PCB?
 
-	DRIVER_INIT_CALL(cps1);
+	init_cps1();
 }
 
-WRITE16_MEMBER( cps_state::sf2m3_layer_w )
+void cps_state::sf2m3_layer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cps1_cps_b_w(space,0x0a,data);
 }

@@ -89,12 +89,12 @@ Preliminary COP MCU memory map
 
 /*****************************************************************************/
 
-READ16_MEMBER(legionna_state::sound_comms_r)
+uint16_t legionna_state::sound_comms_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_seibu_sound->main_word_r(space,(offset >> 1) & 7,0xffff);
 }
 
-READ16_MEMBER(legionna_state::denjinmk_sound_comms_r)
+uint16_t legionna_state::denjinmk_sound_comms_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// Routine at 5FDC spins indefinitely until the lowest bit becomes 1
 	if (offset == 10) // ($100714)
@@ -103,7 +103,7 @@ READ16_MEMBER(legionna_state::denjinmk_sound_comms_r)
 	return m_seibu_sound->main_word_r(space,(offset >> 1) & 7,0xffff);
 }
 
-WRITE16_MEMBER(legionna_state::sound_comms_w)
+void legionna_state::sound_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_seibu_sound->main_word_w(space,(offset >> 1) & 7,data,0x00ff);
 }
@@ -2377,7 +2377,7 @@ ROM_END
 // debugging features.
 #define CUPSOC_DEBUG_MODE 0
 
-DRIVER_INIT_MEMBER(legionna_state, cupsoc_debug)
+void legionna_state::init_cupsoc_debug()
 {
 #if CUPSOC_DEBUG_MODE
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
@@ -2386,30 +2386,30 @@ DRIVER_INIT_MEMBER(legionna_state, cupsoc_debug)
 #endif
 }
 
-DRIVER_INIT_MEMBER(legionna_state, olysoc92)
+void legionna_state::init_olysoc92()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	ROM[0xffffe/2] ^= 0x0003; // show Olympic Soccer '92 title
 
-	DRIVER_INIT_CALL(cupsoc_debug);
+	init_cupsoc_debug();
 }
 
-DRIVER_INIT_MEMBER(legionna_state, cupsocs)
+void legionna_state::init_cupsocs()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 	ROM[0xffffa/2] = 0x00ff; // disable debug text (this is already 0x00ff in the bootleg sets for the same reason)
 
-	DRIVER_INIT_CALL(cupsoc_debug);
+	init_cupsoc_debug();
 }
 
-DRIVER_INIT_MEMBER(legionna_state,cupsoc)
+void legionna_state::init_cupsoc()
 {
-	DRIVER_INIT_CALL(cupsoc_debug);
+	init_cupsoc_debug();
 }
 
 
 
-DRIVER_INIT_MEMBER(legionna_state,legiongfx)
+void legionna_state::init_legiongfx()
 {
 	descramble_legionnaire_gfx(memregion("gfx5")->base() );
 }

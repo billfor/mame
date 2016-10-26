@@ -273,7 +273,7 @@ static uint8_t to7_5p14_select;
 
 
 
-READ8_MEMBER( thomson_state::to7_5p14_r )
+uint8_t thomson_state::to7_5p14_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	wd2793_t *fdc = machine().device<wd2793_t>("wd2793");
 
@@ -288,7 +288,7 @@ READ8_MEMBER( thomson_state::to7_5p14_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_5p14_w )
+void thomson_state::to7_5p14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	wd2793_t *fdc = machine().device<wd2793_t>("wd2793");
 	if ( offset < 4 )
@@ -348,7 +348,7 @@ static uint8_t to7_5p14sd_select;
 
 
 
-READ8_MEMBER( thomson_state::to7_5p14sd_r )
+uint8_t thomson_state::to7_5p14sd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( offset < 8 )
 		return m_mc6843->read( space, offset );
@@ -361,7 +361,7 @@ READ8_MEMBER( thomson_state::to7_5p14sd_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_5p14sd_w )
+void thomson_state::to7_5p14sd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( offset < 8 )
 		m_mc6843->write( space, offset, data );
@@ -675,7 +675,7 @@ void thomson_state::to7_qdd_write_byte( uint8_t data )
 
 
 
-READ8_MEMBER( thomson_state::to7_qdd_r )
+uint8_t thomson_state::to7_qdd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch ( offset )
 	{
@@ -717,7 +717,7 @@ READ8_MEMBER( thomson_state::to7_qdd_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_qdd_w )
+void thomson_state::to7_qdd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( offset )
 	{
@@ -1019,7 +1019,7 @@ void thomson_state::thmfc_floppy_cmd_complete()
 
 
 
-TIMER_CALLBACK_MEMBER( thomson_state::thmfc_floppy_cmd_complete_cb )
+void thomson_state::thmfc_floppy_cmd_complete_cb(void *ptr, int32_t param)
 {
 	thmfc_floppy_cmd_complete();
 }
@@ -1229,7 +1229,7 @@ void thomson_state::thmfc_floppy_format_byte( uint8_t data )
 
 
 
-READ8_MEMBER( thomson_state::thmfc_floppy_r )
+uint8_t thomson_state::thmfc_floppy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch ( offset )
 	{
@@ -1297,7 +1297,7 @@ READ8_MEMBER( thomson_state::thmfc_floppy_r )
 
 
 
-WRITE8_MEMBER( thomson_state::thmfc_floppy_w )
+void thomson_state::thmfc_floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( offset ) {
 	case 0: /* CMD0 */
@@ -1573,27 +1573,27 @@ void thomson_state::thmfc_floppy_init()
    no way to answer the request.
 */
 
-TIMER_CALLBACK_MEMBER( thomson_state::ans4 )
+void thomson_state::ans4(void *ptr, int32_t param)
 {
 	LOG(( "%f ans4\n", machine().time().as_double() ));
 	m_mc6854->set_cts( 0 );
 }
 
-TIMER_CALLBACK_MEMBER( thomson_state::ans3 )
+void thomson_state::ans3(void *ptr, int32_t param)
 {
 	LOG(( "%f ans3\n", machine().time().as_double() ));
 	m_mc6854->set_cts( 1 );
 	machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans4),this));
 }
 
-TIMER_CALLBACK_MEMBER( thomson_state::ans2 )
+void thomson_state::ans2(void *ptr, int32_t param)
 {
 	LOG(( "%f ans2\n", machine().time().as_double() ));
 	m_mc6854->set_cts( 0 );
 	machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans3),this));
 }
 
-TIMER_CALLBACK_MEMBER( thomson_state::ans )
+void thomson_state::ans(void *ptr, int32_t param)
 {
 	LOG(( "%f ans\n", machine().time().as_double() ));
 	m_mc6854->set_cts( 1 );
@@ -1675,7 +1675,7 @@ void thomson_state::to7_network_reset()
 
 
 
-READ8_MEMBER( thomson_state::to7_network_r )
+uint8_t thomson_state::to7_network_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( offset < 4 )
 		return m_mc6854->read( space, offset );
@@ -1694,7 +1694,7 @@ READ8_MEMBER( thomson_state::to7_network_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_network_w )
+void thomson_state::to7_network_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( offset < 4 )
 		m_mc6854->write( space, offset, data );
@@ -1780,7 +1780,7 @@ void thomson_state::to7_floppy_reset()
 
 
 
-READ8_MEMBER( thomson_state::to7_floppy_r )
+uint8_t thomson_state::to7_floppy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch ( to7_controller_type )
 	{
@@ -1805,7 +1805,7 @@ READ8_MEMBER( thomson_state::to7_floppy_r )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_floppy_w )
+void thomson_state::to7_floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( to7_controller_type )
 	{
@@ -1873,7 +1873,7 @@ void thomson_state::to9_floppy_reset()
 
 
 
-READ8_MEMBER( thomson_state::to9_floppy_r )
+uint8_t thomson_state::to9_floppy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( THOM_FLOPPY_EXT )
 		return to7_floppy_r( space, offset );
@@ -1881,7 +1881,7 @@ READ8_MEMBER( thomson_state::to9_floppy_r )
 		return  to7_5p14_r( space, offset, mem_mask );
 }
 
-WRITE8_MEMBER( thomson_state::to9_floppy_w )
+void thomson_state::to9_floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( THOM_FLOPPY_EXT )
 		to7_floppy_w( space, offset, data );

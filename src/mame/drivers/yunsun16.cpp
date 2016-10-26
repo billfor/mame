@@ -103,7 +103,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 ***************************************************************************/
 
-WRITE8_MEMBER(yunsun16_state::sound_bank_w)
+void yunsun16_state::sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("okibank")->set_entry(data & 3);
 }
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, yunsun16_state )
 ADDRESS_MAP_END
 
 
-WRITE16_MEMBER(yunsun16_state::magicbub_sound_command_w)
+void yunsun16_state::magicbub_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -149,7 +149,7 @@ number 0 on each voice. That sample is 00000-00000.
 	}
 }
 
-DRIVER_INIT_MEMBER(yunsun16_state,magicbub)
+void yunsun16_state::init_magicbub()
 {
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x800180, 0x800181);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800188, 0x800189, write16_delegate(FUNC(yunsun16_state::magicbub_sound_command_w), this));
@@ -567,14 +567,14 @@ void yunsun16_state::machine_reset()
 	m_sprites_scrolldy = -0x0f;
 }
 
-MACHINE_START_MEMBER(yunsun16_state, shocking)
+void yunsun16_state::machine_start_shocking()
 {
 	machine_start();
 	membank("okibank")->configure_entries(0, 0x80000 / 0x20000, memregion("oki")->base(), 0x20000);
 	membank("okibank")->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(yunsun16_state, shocking)
+void yunsun16_state::machine_reset_shocking()
 {
 	machine_reset();
 	membank("okibank")->set_entry(0);

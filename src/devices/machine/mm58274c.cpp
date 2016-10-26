@@ -149,7 +149,7 @@ attotime mm58274c_device::interrupt_period_table(int val)
 	}
 }
 
-READ8_MEMBER( mm58274c_device::read )
+uint8_t mm58274c_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int reply;
 
@@ -239,7 +239,7 @@ READ8_MEMBER( mm58274c_device::read )
 }
 
 
-WRITE8_MEMBER( mm58274c_device::write )
+void mm58274c_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0xf;
 	data &= 0xf;
@@ -340,14 +340,14 @@ WRITE8_MEMBER( mm58274c_device::write )
 
 
 // Set RTC interrupt flag
-TIMER_CALLBACK_MEMBER(mm58274c_device::rtc_interrupt_cb)
+void mm58274c_device::rtc_interrupt_cb(void *ptr, int32_t param)
 {
 	m_status |= st_if;
 }
 
 
 // Increment RTC clock (timed interrupt every 1/10s)
-TIMER_CALLBACK_MEMBER(mm58274c_device::rtc_increment_cb)
+void mm58274c_device::rtc_increment_cb(void *ptr, int32_t param)
 {
 	if (!(m_control & ctl_clkstop))
 	{

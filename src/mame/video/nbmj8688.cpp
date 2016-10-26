@@ -36,7 +36,7 @@ enum
 
 ******************************************************************************/
 
-PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_8bit)
+void nbmj8688_state::palette_init_mbmj8688_8bit(palette_device &palette)
 {
 	int i;
 	int bit0, bit1, bit2, r, g, b;
@@ -65,7 +65,7 @@ PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_8bit)
 	}
 }
 
-PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_12bit)
+void nbmj8688_state::palette_init_mbmj8688_12bit(palette_device &palette)
 {
 	int i;
 	int r, g, b;
@@ -82,7 +82,7 @@ PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_12bit)
 	}
 }
 
-PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_16bit)
+void nbmj8688_state::palette_init_mbmj8688_16bit(palette_device &palette)
 {
 	int i;
 	int r, g, b;
@@ -98,13 +98,13 @@ PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_16bit)
 	}
 }
 
-PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_lcd)
+void nbmj8688_state::palette_init_mbmj8688_lcd(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(28, 123, 57));
 	palette.set_pen_color(1, rgb_t(0, 0, 0));
 }
 
-WRITE8_MEMBER(nbmj8688_state::clut_w)
+void nbmj8688_state::clut_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_clut[offset] = (data ^ 0xff);
 }
@@ -114,7 +114,7 @@ WRITE8_MEMBER(nbmj8688_state::clut_w)
 
 ******************************************************************************/
 
-WRITE8_MEMBER(nbmj8688_state::blitter_w)
+void nbmj8688_state::blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -137,7 +137,7 @@ WRITE8_MEMBER(nbmj8688_state::blitter_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj8688_state::mjsikaku_gfxflag2_w)
+void nbmj8688_state::mjsikaku_gfxflag2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxflag2 = data;
 
@@ -152,17 +152,17 @@ WRITE8_MEMBER(nbmj8688_state::mjsikaku_gfxflag2_w)
 		m_gfxflag2 |= 0x20;
 }
 
-WRITE8_MEMBER(nbmj8688_state::mjsikaku_gfxflag3_w)
+void nbmj8688_state::mjsikaku_gfxflag3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxflag3 = (data & 0xe0);
 }
 
-WRITE8_MEMBER(nbmj8688_state::scrolly_w)
+void nbmj8688_state::scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrolly = data;
 }
 
-WRITE8_MEMBER(nbmj8688_state::mjsikaku_romsel_w)
+void nbmj8688_state::mjsikaku_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = (data & 0x0f);
@@ -176,7 +176,7 @@ WRITE8_MEMBER(nbmj8688_state::mjsikaku_romsel_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj8688_state::secolove_romsel_w)
+void nbmj8688_state::secolove_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = ((data & 0xc0) >> 4) + (data & 0x03);
@@ -191,7 +191,7 @@ WRITE8_MEMBER(nbmj8688_state::secolove_romsel_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj8688_state::crystalg_romsel_w)
+void nbmj8688_state::crystalg_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = (data & 0x03);
@@ -206,7 +206,7 @@ WRITE8_MEMBER(nbmj8688_state::crystalg_romsel_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj8688_state::seiha_romsel_w)
+void nbmj8688_state::seiha_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = (data & 0x1f);
@@ -582,49 +582,49 @@ void nbmj8688_state::postload()
 	m_screen_refresh = 1;
 }
 
-VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_8bit)
+void nbmj8688_state::video_start_mbmj8688_8bit()
 {
 	m_gfxmode = GFXTYPE_8BIT;
 	common_video_start();
 }
 
-VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_hybrid_12bit)
+void nbmj8688_state::video_start_mbmj8688_hybrid_12bit()
 {
 	m_gfxmode = GFXTYPE_HYBRID_12BIT;
 	common_video_start();
 }
 
-VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_12bit)
+void nbmj8688_state::video_start_mbmj8688_pure_12bit()
 {
 	m_gfxmode = GFXTYPE_PURE_12BIT;
 	common_video_start();
 }
 
-VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_hybrid_16bit)
+void nbmj8688_state::video_start_mbmj8688_hybrid_16bit()
 {
 	m_gfxmode = GFXTYPE_HYBRID_16BIT;
 	common_video_start();
 }
 
-VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_16bit)
+void nbmj8688_state::video_start_mbmj8688_pure_16bit()
 {
 	m_gfxmode = GFXTYPE_PURE_16BIT;
 	common_video_start();
 }
 
-VIDEO_START_MEMBER(nbmj8688_state,mbmj8688_pure_16bit_LCD)
+void nbmj8688_state::video_start_mbmj8688_pure_16bit_LCD()
 {
 	m_gfxmode = GFXTYPE_PURE_16BIT;
 	common_video_start();
 }
 
-WRITE8_MEMBER(nbmj8688_state::HD61830B_both_instr_w)
+void nbmj8688_state::HD61830B_both_instr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lcdc0->control_w(space, offset, data);
 	m_lcdc1->control_w(space, offset, data);
 }
 
-WRITE8_MEMBER(nbmj8688_state::HD61830B_both_data_w)
+void nbmj8688_state::HD61830B_both_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lcdc0->data_w(space, offset, data);
 	m_lcdc1->data_w(space, offset, data);

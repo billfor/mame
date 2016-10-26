@@ -40,18 +40,18 @@ public:
 	int m_RIGHT;
 	uint8_t m_reg[0x100];
 
-	DECLARE_DRIVER_INIT(pc1403);
+	void init_pc1403();
 	uint32_t screen_update_pc1403(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ_LINE_MEMBER(pc1403_reset);
-	DECLARE_READ_LINE_MEMBER(pc1403_brk);
-	DECLARE_WRITE8_MEMBER(pc1403_outa);
-	DECLARE_WRITE8_MEMBER(pc1403_outc);
-	DECLARE_READ8_MEMBER(pc1403_ina);
+	int pc1403_reset();
+	int pc1403_brk();
+	void pc1403_outa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc1403_outc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc1403_ina(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(pc1403_asic_read);
-	DECLARE_WRITE8_MEMBER(pc1403_asic_write);
-	DECLARE_READ8_MEMBER(pc1403_lcd_read);
-	DECLARE_WRITE8_MEMBER(pc1403_lcd_write);
+	uint8_t pc1403_asic_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc1403_asic_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc1403_lcd_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc1403_lcd_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	required_device<sc61860_device> m_maincpu;

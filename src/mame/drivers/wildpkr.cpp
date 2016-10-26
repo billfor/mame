@@ -180,10 +180,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_DRIVER_INIT(wildpkr);
+	void init_wildpkr();
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(wildpkr);
+	void palette_init_wildpkr(palette_device &palette);
 	uint32_t screen_update_wildpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -201,7 +201,7 @@ uint32_t wildpkr_state::screen_update_wildpkr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(wildpkr_state, wildpkr)
+void wildpkr_state::palette_init_wildpkr(palette_device &palette)
 {
 }
 
@@ -382,7 +382,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(wildpkr_state,wildpkr)
+void wildpkr_state::init_wildpkr()
 {
 }
 

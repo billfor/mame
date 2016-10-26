@@ -15,7 +15,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gaiden_state::get_bg_tile_info)
+void gaiden_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram1 = &m_videoram3[0x0800];
 	uint16_t *videoram2 = m_videoram3;
@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info)
+void gaiden_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram1 = &m_videoram2[0x0800];
 	uint16_t *videoram2 = m_videoram2;
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info_raiga)
+void gaiden_state::get_fg_tile_info_raiga(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram1 = &m_videoram2[0x0800];
 	uint16_t *videoram2 = m_videoram2;
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info_raiga)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(gaiden_state::get_tx_tile_info)
+void gaiden_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram1 = &m_videoram[0x0400];
 	uint16_t *videoram2 = m_videoram;
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(gaiden_state,gaiden)
+void gaiden_state::video_start_gaiden()
 {
 	/* set up tile layers */
 	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
@@ -96,7 +96,7 @@ VIDEO_START_MEMBER(gaiden_state,gaiden)
 }
 
 
-VIDEO_START_MEMBER(gaiden_state,raiga)
+void gaiden_state::video_start_raiga()
 {
 	/* set up tile layers */
 	m_screen->register_screen_bitmap(m_tile_bitmap_bg);
@@ -114,7 +114,7 @@ VIDEO_START_MEMBER(gaiden_state,raiga)
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 }
 
-VIDEO_START_MEMBER(gaiden_state,drgnbowl)
+void gaiden_state::video_start_drgnbowl()
 {
 	/* set up tile layers */
 	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
@@ -136,49 +136,49 @@ VIDEO_START_MEMBER(gaiden_state,drgnbowl)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(gaiden_state::gaiden_flip_w)
+void gaiden_state::gaiden_flip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		flip_screen_set(data & 1);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_txscrollx_w)
+void gaiden_state::gaiden_txscrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_scroll_x);
 	m_text_layer->set_scrollx(0, m_tx_scroll_x);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_txscrolly_w)
+void gaiden_state::gaiden_txscrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_scroll_y);
 	m_text_layer->set_scrolly(0, (m_tx_scroll_y - m_tx_offset_y) & 0xffff);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_fgscrollx_w)
+void gaiden_state::gaiden_fgscrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_scroll_x);
 	m_foreground->set_scrollx(0, m_fg_scroll_x);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_fgscrolly_w)
+void gaiden_state::gaiden_fgscrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_scroll_y);
 	m_foreground->set_scrolly(0, (m_fg_scroll_y - m_fg_offset_y) & 0xffff);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_bgscrollx_w)
+void gaiden_state::gaiden_bgscrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_scroll_x);
 	m_background->set_scrollx(0, m_bg_scroll_x);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_bgscrolly_w)
+void gaiden_state::gaiden_bgscrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_scroll_y);
 	m_background->set_scrolly(0, (m_bg_scroll_y - m_bg_offset_y) & 0xffff);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_txoffsety_w)
+void gaiden_state::gaiden_txoffsety_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_tx_offset_y = data;
@@ -186,7 +186,7 @@ WRITE16_MEMBER(gaiden_state::gaiden_txoffsety_w)
 	}
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_fgoffsety_w)
+void gaiden_state::gaiden_fgoffsety_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_fg_offset_y = data;
@@ -194,7 +194,7 @@ WRITE16_MEMBER(gaiden_state::gaiden_fgoffsety_w)
 	}
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_bgoffsety_w)
+void gaiden_state::gaiden_bgoffsety_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_bg_offset_y = data;
@@ -202,7 +202,7 @@ WRITE16_MEMBER(gaiden_state::gaiden_bgoffsety_w)
 	}
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_sproffsety_w)
+void gaiden_state::gaiden_sproffsety_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_spr_offset_y = data;
@@ -211,18 +211,18 @@ WRITE16_MEMBER(gaiden_state::gaiden_sproffsety_w)
 }
 
 
-WRITE16_MEMBER(gaiden_state::gaiden_videoram3_w)
+void gaiden_state::gaiden_videoram3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram3[offset]);
 	m_background->mark_tile_dirty(offset & 0x07ff);
 }
 
-WRITE16_MEMBER(gaiden_state::gaiden_videoram2_w)
+void gaiden_state::gaiden_videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_foreground->mark_tile_dirty(offset & 0x07ff);
 }
-WRITE16_MEMBER(gaiden_state::gaiden_videoram_w)
+void gaiden_state::gaiden_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_text_layer->mark_tile_dirty(offset & 0x03ff);

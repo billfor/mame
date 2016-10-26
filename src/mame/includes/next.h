@@ -49,32 +49,32 @@ public:
 
 	void setup(uint32_t scr1, int size_x, int size_y, int skip, bool color);
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
-	DECLARE_READ32_MEMBER( rom_map_r );
-	DECLARE_READ32_MEMBER( scr2_r );
-	DECLARE_WRITE32_MEMBER( scr2_w );
-	DECLARE_READ32_MEMBER( scr1_r );
-	DECLARE_READ32_MEMBER( irq_status_r );
-	DECLARE_READ32_MEMBER( irq_mask_r );
-	DECLARE_WRITE32_MEMBER( irq_mask_w );
-	DECLARE_READ32_MEMBER( event_counter_r );
-	DECLARE_READ32_MEMBER( dsp_r );
-	DECLARE_READ32_MEMBER( fdc_control_r );
-	DECLARE_WRITE32_MEMBER( fdc_control_w );
-	DECLARE_READ32_MEMBER( dma_ctrl_r );
-	DECLARE_WRITE32_MEMBER( dma_ctrl_w );
-	DECLARE_READ32_MEMBER( dma_regs_r );
-	DECLARE_WRITE32_MEMBER( dma_regs_w );
-	DECLARE_READ32_MEMBER( scsictrl_r );
-	DECLARE_WRITE32_MEMBER( scsictrl_w );
-	DECLARE_READ32_MEMBER( phy_r );
-	DECLARE_WRITE32_MEMBER( phy_w );
-	DECLARE_READ32_MEMBER( timer_data_r );
-	DECLARE_WRITE32_MEMBER( timer_data_w );
-	DECLARE_READ32_MEMBER( timer_ctrl_r );
-	DECLARE_WRITE32_MEMBER( timer_ctrl_w );
-	DECLARE_WRITE8_MEMBER( ramdac_w );
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t rom_map_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t scr2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void scr2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t scr1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t irq_status_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t irq_mask_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void irq_mask_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t event_counter_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t dsp_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t fdc_control_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void fdc_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t dma_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dma_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t dma_regs_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dma_regs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t scsictrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void scsictrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t phy_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void phy_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t timer_data_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void timer_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t timer_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void timer_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ramdac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t scr1;
 	uint32_t scr2;
@@ -94,24 +94,24 @@ public:
 
 	uint32_t eventc_latch;
 
-	DECLARE_WRITE_LINE_MEMBER(scc_irq);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
-	DECLARE_WRITE_LINE_MEMBER(power_irq);
-	DECLARE_WRITE_LINE_MEMBER(nmi_irq);
+	void scc_irq(int state);
+	void keyboard_irq(int state);
+	void power_irq(int state);
+	void nmi_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
+	void scsi_irq(int state);
+	void scsi_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
+	void fdc_irq(int state);
+	void fdc_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(net_tx_irq);
-	DECLARE_WRITE_LINE_MEMBER(net_rx_irq);
-	DECLARE_WRITE_LINE_MEMBER(net_tx_drq);
-	DECLARE_WRITE_LINE_MEMBER(net_rx_drq);
+	void net_tx_irq(int state);
+	void net_rx_irq(int state);
+	void net_tx_drq(int state);
+	void net_rx_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(mo_irq);
-	DECLARE_WRITE_LINE_MEMBER(mo_drq);
+	void mo_irq(int state);
+	void mo_drq(int state);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	void vblank_w(screen_device &screen, bool vblank_state);
@@ -172,14 +172,14 @@ protected:
 	void dma_end(int slot);
 
 public:
-	DECLARE_DRIVER_INIT(nexts2);
-	DECLARE_DRIVER_INIT(next);
-	DECLARE_DRIVER_INIT(nextsc);
-	DECLARE_DRIVER_INIT(nextst);
-	DECLARE_DRIVER_INIT(nextct);
-	DECLARE_DRIVER_INIT(nextstc);
-	DECLARE_DRIVER_INIT(nextctc);
-	DECLARE_DRIVER_INIT(nexts);
+	void init_nexts2();
+	void init_next();
+	void init_nextsc();
+	void init_nextst();
+	void init_nextct();
+	void init_nextstc();
+	void init_nextctc();
+	void init_nexts();
 	required_device<cpu_device> m_maincpu;
 };
 

@@ -65,17 +65,17 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_READ8_MEMBER( dispon_r );
-	DECLARE_WRITE8_MEMBER( dispoff_w );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	void keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dispon_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dispoff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 
 	/* keyboard state */
 	int m_keylatch;         /* key latch */
-	DECLARE_DRIVER_INIT(tmc1800);
+	void init_tmc1800();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -94,11 +94,11 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	void keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 
 	/* keyboard state */
 	int m_keylatch;
@@ -121,17 +121,17 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE8_MEMBER( dma_w );
-	DECLARE_READ_LINE_MEMBER( rdata_r );
-	DECLARE_READ_LINE_MEMBER( bdata_r );
-	DECLARE_READ_LINE_MEMBER( gdata_r );
-	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
+	void keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
+	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int rdata_r();
+	int bdata_r();
+	int gdata_r();
+	void run_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void bankswitch();
 
@@ -171,14 +171,14 @@ public:
 		TIMER_ID_EF4
 	};
 
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
-	DECLARE_INPUT_CHANGED_MEMBER( monitor_pressed );
+	void keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
+	void run_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void monitor_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	/* keyboard state */
 	int m_keylatch;         /* key latch */

@@ -99,7 +99,7 @@ int ddragon_state::scanline_to_vcount( int scanline )
 		return (vcount - 0x18) | 0x100;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ddragon_state::ddragon_scanline)
+void ddragon_state::ddragon_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	int screen_height = m_screen->height();
@@ -127,7 +127,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddragon_state::ddragon_scanline)
  *
  *************************************/
 
-MACHINE_START_MEMBER(ddragon_state,ddragon)
+void ddragon_state::machine_start_ddragon()
 {
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
@@ -143,7 +143,7 @@ MACHINE_START_MEMBER(ddragon_state,ddragon)
 }
 
 
-MACHINE_RESET_MEMBER(ddragon_state,ddragon)
+void ddragon_state::machine_reset_ddragon()
 {
 	m_scrollx_hi = 0;
 	m_scrolly_hi = 0;
@@ -162,7 +162,7 @@ MACHINE_RESET_MEMBER(ddragon_state,ddragon)
  *
  *************************************/
 
-WRITE8_MEMBER(ddragon_state::ddragon_bankswitch_w)
+void ddragon_state::ddragon_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    76543210
@@ -183,7 +183,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_bankswitch_w)
 }
 
 
-WRITE8_MEMBER(ddragon_state::toffy_bankswitch_w)
+void ddragon_state::toffy_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx_hi = data & 0x01;
 	m_scrolly_hi = (data & 0x02) >> 1;
@@ -195,7 +195,7 @@ WRITE8_MEMBER(ddragon_state::toffy_bankswitch_w)
 }
 
 
-READ8_MEMBER(ddragon_state::darktowr_mcu_bank_r)
+uint8_t ddragon_state::darktowr_mcu_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// logerror("BankRead %05x %08x\n",space.device().safe_pc(),offset);
 
@@ -223,7 +223,7 @@ READ8_MEMBER(ddragon_state::darktowr_mcu_bank_r)
 }
 
 
-WRITE8_MEMBER(ddragon_state::darktowr_mcu_bank_w)
+void ddragon_state::darktowr_mcu_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("BankWrite %05x %08x %08x\n", space.device().safe_pc(), offset, data);
 
@@ -235,7 +235,7 @@ WRITE8_MEMBER(ddragon_state::darktowr_mcu_bank_w)
 }
 
 
-WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
+void ddragon_state::darktowr_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx_hi = (data & 0x01);
 	m_scrolly_hi = ((data & 0x02) >> 1);
@@ -292,45 +292,45 @@ void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, u
 }
 
 
-READ8_MEMBER(ddragon_state::ddragon_interrupt_r)
+uint8_t ddragon_state::ddragon_interrupt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	ddragon_interrupt_ack(space, offset, 0xff);
 	return 0xff;
 }
 
 
-WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
+void ddragon_state::ddragon_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ddragon_interrupt_ack(space, offset, data);
 }
 
 
-WRITE8_MEMBER(ddragon_state::ddragon2_sub_irq_ack_w)
+void ddragon_state::ddragon2_sub_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(ddragon_state::ddragon2_sub_irq_w)
+void ddragon_state::ddragon2_sub_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
-WRITE_LINE_MEMBER(ddragon_state::irq_handler)
+void ddragon_state::irq_handler(int state)
 {
 	m_soundcpu->set_input_line(m_ym_irq, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-READ8_MEMBER(ddragon_state::soundlatch_ack_r)
+uint8_t ddragon_state::soundlatch_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(m_sound_irq, CLEAR_LINE);
 	return m_soundlatch->read(space, 0);
 }
 
 
-WRITE8_MEMBER(ddragon_state::ddragonba_port_w)
+void ddragon_state::ddragonba_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x8) == 0)
 		m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE);
@@ -349,7 +349,7 @@ WRITE8_MEMBER(ddragon_state::ddragonba_port_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(ddragon_state::subcpu_bus_free)
+ioport_value ddragon_state::subcpu_bus_free(ioport_field &field, void *param)
 {
 	// Corresponds to BA (Bus Available) on the HD63701
 	if (m_subcpu)
@@ -359,21 +359,21 @@ CUSTOM_INPUT_MEMBER(ddragon_state::subcpu_bus_free)
 }
 
 
-WRITE8_MEMBER(ddragon_state::darktowr_mcu_w)
+void ddragon_state::darktowr_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("McuWrite %05x %08x %08x\n",space.device().safe_pc(), offset, data);
 	m_darktowr_mcu_ports[offset] = data;
 }
 
 
-READ8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_r)
+uint8_t ddragon_state::ddragon_hd63701_internal_registers_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%04x: read %d\n", space.device().safe_pc(), offset);
 	return 0;
 }
 
 
-WRITE8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_w)
+void ddragon_state::ddragon_hd63701_internal_registers_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Port 6
 	if (offset == 0x17)
@@ -396,7 +396,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_w)
  *
  *************************************/
 
-READ8_MEMBER(ddragon_state::ddragon_comram_r)
+uint8_t ddragon_state::ddragon_comram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Access to shared RAM is prevented when the sub CPU is active
 	if (!m_subcpu->suspended(SUSPEND_REASON_RESET | SUSPEND_REASON_HALT))
@@ -406,7 +406,7 @@ READ8_MEMBER(ddragon_state::ddragon_comram_r)
 }
 
 
-WRITE8_MEMBER(ddragon_state::ddragon_comram_w)
+void ddragon_state::ddragon_comram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_subcpu->suspended(SUSPEND_REASON_RESET | SUSPEND_REASON_HALT))
 		return;
@@ -422,7 +422,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_comram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(ddragon_state::dd_adpcm_w)
+void ddragon_state::dd_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int chip = offset & 1;
 	msm5205_device *adpcm = chip ? m_adpcm2 : m_adpcm1;
@@ -470,18 +470,18 @@ void ddragon_state::dd_adpcm_int( msm5205_device *device, int chip )
 	}
 }
 
-WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_1)
+void ddragon_state::dd_adpcm_int_1(int state)
 {
 	dd_adpcm_int(m_adpcm1, 0);
 }
 
-WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_2)
+void ddragon_state::dd_adpcm_int_2(int state)
 {
 	dd_adpcm_int(m_adpcm2, 1);
 }
 
 
-READ8_MEMBER(ddragon_state::dd_adpcm_status_r)
+uint8_t ddragon_state::dd_adpcm_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_adpcm_idle[0] + (m_adpcm_idle[1] << 1);
 }
@@ -2079,7 +2079,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(ddragon_state,ddragon)
+void ddragon_state::init_ddragon()
 {
 	m_sprite_irq = INPUT_LINE_NMI;
 	m_sound_irq = M6809_IRQ_LINE;
@@ -2088,7 +2088,7 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon)
 }
 
 
-DRIVER_INIT_MEMBER(ddragon_state,ddragon2)
+void ddragon_state::init_ddragon2()
 {
 	m_sprite_irq = INPUT_LINE_NMI;
 	m_sound_irq = INPUT_LINE_NMI;
@@ -2097,7 +2097,7 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon2)
 }
 
 
-DRIVER_INIT_MEMBER(ddragon_state,darktowr)
+void ddragon_state::init_darktowr()
 {
 	m_sprite_irq = INPUT_LINE_NMI;
 	m_sound_irq = M6809_IRQ_LINE;
@@ -2107,7 +2107,7 @@ DRIVER_INIT_MEMBER(ddragon_state,darktowr)
 }
 
 
-DRIVER_INIT_MEMBER(ddragon_state,toffy)
+void ddragon_state::init_toffy()
 {
 	int i, length;
 	uint8_t *rom;
@@ -2147,7 +2147,7 @@ DRIVER_INIT_MEMBER(ddragon_state,toffy)
 	/* should the sound rom be bitswapped too? */
 }
 
-DRIVER_INIT_MEMBER(ddragon_state,ddragon6809)
+void ddragon_state::init_ddragon6809()
 {
 	int i;
 	uint8_t *dst,*src;

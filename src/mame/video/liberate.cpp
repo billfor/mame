@@ -28,19 +28,19 @@ void liberate_state::debug_print(bitmap_ind16 &bitmap)
 }
 #endif
 
-TILEMAP_MAPPER_MEMBER(liberate_state::back_scan)
+tilemap_memory_index liberate_state::back_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return ((row & 0xf)) + ((15 - (col & 0xf)) << 4) + ((row & 0x10) << 5) + ((col & 0x10) << 4);
 }
 
-TILEMAP_MAPPER_MEMBER(liberate_state::fix_scan)
+tilemap_memory_index liberate_state::fix_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x1f) + ((31 - (col & 0x1f)) << 5);
 }
 
-TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
+void liberate_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint8_t *RAM = memregion("user1")->base();
 	int tile, bank;
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
 	SET_TILE_INFO_MEMBER(bank, tile & 0x7f, m_background_color, 0);
 }
 
-TILE_GET_INFO_MEMBER(liberate_state::get_fix_tile_info)
+void liberate_state::get_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	uint8_t *colorram = m_colorram;
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(liberate_state::get_fix_tile_info)
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(liberate_state::prosport_get_back_tile_info)
+void liberate_state::prosport_get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile;
 
@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(liberate_state::prosport_get_back_tile_info)
 
 /***************************************************************************/
 
-WRITE8_MEMBER(liberate_state::deco16_io_w)
+void liberate_state::deco16_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
@@ -132,7 +132,7 @@ WRITE8_MEMBER(liberate_state::deco16_io_w)
 	}
 }
 
-WRITE8_MEMBER(liberate_state::prosoccr_io_w)
+void liberate_state::prosoccr_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
@@ -161,7 +161,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_w)
 }
 
 /* completely different i/o...*/
-WRITE8_MEMBER(liberate_state::prosport_io_w)
+void liberate_state::prosport_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io_ram[offset] = data;
 
@@ -182,19 +182,19 @@ WRITE8_MEMBER(liberate_state::prosport_io_w)
 	}
 }
 
-WRITE8_MEMBER(liberate_state::liberate_videoram_w)
+void liberate_state::liberate_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(liberate_state::liberate_colorram_w)
+void liberate_state::liberate_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(liberate_state::prosport_bg_vram_w)
+void liberate_state::prosport_bg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_vram[offset] = data;
 	m_back_tilemap->mark_tile_dirty(offset);
@@ -202,7 +202,7 @@ WRITE8_MEMBER(liberate_state::prosport_bg_vram_w)
 
 /***************************************************************************/
 
-VIDEO_START_MEMBER(liberate_state,prosoccr)
+void liberate_state::video_start_prosoccr()
 {
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
@@ -216,7 +216,7 @@ VIDEO_START_MEMBER(liberate_state,prosoccr)
 	save_pointer(NAME(m_fg_gfx), 0x6000);
 }
 
-VIDEO_START_MEMBER(liberate_state,boomrang)
+void liberate_state::video_start_boomrang()
 {
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
@@ -225,7 +225,7 @@ VIDEO_START_MEMBER(liberate_state,boomrang)
 	m_fix_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(liberate_state,liberate)
+void liberate_state::video_start_liberate()
 {
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
@@ -233,7 +233,7 @@ VIDEO_START_MEMBER(liberate_state,liberate)
 	m_fix_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(liberate_state,prosport)
+void liberate_state::video_start_prosport()
 {
 	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::prosport_get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
@@ -243,7 +243,7 @@ VIDEO_START_MEMBER(liberate_state,prosport)
 
 /***************************************************************************/
 
-PALETTE_INIT_MEMBER(liberate_state,liberate)
+void liberate_state::palette_init_liberate(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, bit0, bit1, bit2, g, r, b;

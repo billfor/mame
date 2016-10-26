@@ -85,25 +85,25 @@ public:
 	required_region_ptr<uint16_t> m_kanji_rom;
 	required_region_ptr<uint16_t> m_vram;
 
-	DECLARE_READ16_MEMBER(pc100_vram_r);
-	DECLARE_WRITE16_MEMBER(pc100_vram_w);
-	DECLARE_READ16_MEMBER(pc100_kanji_r);
-	DECLARE_WRITE16_MEMBER(pc100_kanji_w);
-	DECLARE_READ8_MEMBER(pc100_key_r);
-	DECLARE_WRITE8_MEMBER(pc100_output_w);
-	DECLARE_WRITE8_MEMBER(pc100_tc_w);
-	DECLARE_READ8_MEMBER(pc100_shift_r);
-	DECLARE_WRITE8_MEMBER(pc100_shift_w);
-	DECLARE_READ8_MEMBER(pc100_vs_vreg_r);
-	DECLARE_WRITE8_MEMBER(pc100_vs_vreg_w);
-	DECLARE_WRITE8_MEMBER(pc100_crtc_addr_w);
-	DECLARE_WRITE8_MEMBER(pc100_crtc_data_w);
-	DECLARE_WRITE8_MEMBER(lower_mask_w);
-	DECLARE_WRITE8_MEMBER(upper_mask_w);
-	DECLARE_WRITE8_MEMBER(crtc_bank_w);
-	DECLARE_WRITE8_MEMBER(rtc_porta_w);
-	DECLARE_READ8_MEMBER(rtc_portc_r);
-	DECLARE_WRITE8_MEMBER(rtc_portc_w);
+	uint16_t pc100_vram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pc100_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pc100_kanji_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pc100_kanji_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t pc100_key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc100_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc100_tc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc100_shift_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc100_shift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc100_vs_vreg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc100_vs_vreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc100_crtc_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc100_crtc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lower_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void upper_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void crtc_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rtc_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rtc_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rtc_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint16_t m_kanji_addr;
 	uint8_t m_timer_mode;
 
@@ -120,17 +120,17 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pc100_vblank_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(pc100_600hz_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(pc100_100hz_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(pc100_50hz_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(pc100_10hz_irq);
+	void pc100_vblank_irq(device_t &device);
+	void pc100_600hz_irq(timer_device &timer, void *ptr, int32_t param);
+	void pc100_100hz_irq(timer_device &timer, void *ptr, int32_t param);
+	void pc100_50hz_irq(timer_device &timer, void *ptr, int32_t param);
+	void pc100_10hz_irq(timer_device &timer, void *ptr, int32_t param);
 
 
-	WRITE_LINE_MEMBER(rtc_portc_0_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 0)) | ((state & 1) << 0); }
-	WRITE_LINE_MEMBER(rtc_portc_1_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 1)) | ((state & 1) << 1); }
-	WRITE_LINE_MEMBER(rtc_portc_2_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 2)) | ((state & 1) << 2); }
-	WRITE_LINE_MEMBER(rtc_portc_3_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 3)) | ((state & 1) << 3); }
+	void rtc_portc_0_w(int state) { m_rtc_portc = (m_rtc_portc & ~(1 << 0)) | ((state & 1) << 0); }
+	void rtc_portc_1_w(int state) { m_rtc_portc = (m_rtc_portc & ~(1 << 1)) | ((state & 1) << 1); }
+	void rtc_portc_2_w(int state) { m_rtc_portc = (m_rtc_portc & ~(1 << 2)) | ((state & 1) << 2); }
+	void rtc_portc_3_w(int state) { m_rtc_portc = (m_rtc_portc & ~(1 << 3)) | ((state & 1) << 3); }
 	uint8_t m_rtc_portc;
 };
 
@@ -174,12 +174,12 @@ uint32_t pc100_state::screen_update_pc100(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-READ16_MEMBER( pc100_state::pc100_vram_r )
+uint16_t pc100_state::pc100_vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_vram[offset+m_bank_r*0x10000];
 }
 
-WRITE16_MEMBER( pc100_state::pc100_vram_w )
+void pc100_state::pc100_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old_vram;
 	int i;
@@ -209,18 +209,18 @@ static ADDRESS_MAP_START(pc100_map, AS_PROGRAM, 16, pc100_state)
 	AM_RANGE(0xf8000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-READ16_MEMBER( pc100_state::pc100_kanji_r )
+uint16_t pc100_state::pc100_kanji_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_kanji_rom[m_kanji_addr];
 }
 
 
-WRITE16_MEMBER( pc100_state::pc100_kanji_w )
+void pc100_state::pc100_kanji_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_kanji_addr);
 }
 
-READ8_MEMBER( pc100_state::pc100_key_r )
+uint8_t pc100_state::pc100_key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset)
 		return ioport("DSW")->read(); // bit 5: horizontal/vertical monitor dsw
@@ -228,7 +228,7 @@ READ8_MEMBER( pc100_state::pc100_key_r )
 	return 0;
 }
 
-WRITE8_MEMBER( pc100_state::pc100_output_w )
+void pc100_state::pc100_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0)
 	{
@@ -238,22 +238,22 @@ WRITE8_MEMBER( pc100_state::pc100_output_w )
 	}
 }
 
-WRITE8_MEMBER( pc100_state::pc100_tc_w )
+void pc100_state::pc100_tc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().device<upd765a_device>("upd765")->tc_w(data & 0x40);
 }
 
-READ8_MEMBER( pc100_state::pc100_shift_r )
+uint8_t pc100_state::pc100_shift_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_crtc.shift;
 }
 
-WRITE8_MEMBER( pc100_state::pc100_shift_w )
+void pc100_state::pc100_shift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc.shift = data & 0xf;
 }
 
-READ8_MEMBER( pc100_state::pc100_vs_vreg_r )
+uint8_t pc100_state::pc100_vs_vreg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset)
 		return m_crtc.vstart >> 8;
@@ -261,7 +261,7 @@ READ8_MEMBER( pc100_state::pc100_vs_vreg_r )
 	return m_crtc.vstart & 0xff;
 }
 
-WRITE8_MEMBER( pc100_state::pc100_vs_vreg_w )
+void pc100_state::pc100_vs_vreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset)
 		m_crtc.vstart = (m_crtc.vstart & 0xff) | (data << 8);
@@ -269,12 +269,12 @@ WRITE8_MEMBER( pc100_state::pc100_vs_vreg_w )
 		m_crtc.vstart = (m_crtc.vstart & 0xff00) | (data & 0xff);
 }
 
-WRITE8_MEMBER( pc100_state::pc100_crtc_addr_w )
+void pc100_state::pc100_crtc_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc.addr = data & 7;
 }
 
-WRITE8_MEMBER( pc100_state::pc100_crtc_data_w )
+void pc100_state::pc100_crtc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc.reg[m_crtc.addr] = data;
 	printf("%02x %02x\n",m_crtc.addr,data);
@@ -350,7 +350,7 @@ static GFXDECODE_START( pc100 )
 GFXDECODE_END
 
 /* TODO: untested */
-WRITE8_MEMBER( pc100_state::rtc_porta_w )
+void pc100_state::rtc_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     ---- -x-- chip select
@@ -363,7 +363,7 @@ WRITE8_MEMBER( pc100_state::rtc_porta_w )
 	m_rtc->cs1_w((data >> 2) & 1);
 }
 
-WRITE8_MEMBER( pc100_state::rtc_portc_w )
+void pc100_state::rtc_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->d0_w((data >> 0) & 1);
 	m_rtc->d1_w((data >> 1) & 1);
@@ -371,22 +371,22 @@ WRITE8_MEMBER( pc100_state::rtc_portc_w )
 	m_rtc->d3_w((data >> 3) & 1);
 }
 
-READ8_MEMBER( pc100_state::rtc_portc_r )
+uint8_t pc100_state::rtc_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc_portc;
 }
 
-WRITE8_MEMBER( pc100_state::lower_mask_w )
+void pc100_state::lower_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc.mask = (m_crtc.mask & 0xff00) | data;
 }
 
-WRITE8_MEMBER( pc100_state::upper_mask_w )
+void pc100_state::upper_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc.mask = (m_crtc.mask & 0xff) | (data << 8);
 }
 
-WRITE8_MEMBER( pc100_state::crtc_bank_w )
+void pc100_state::crtc_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank_w = data & 0xf;
 	m_bank_r = (data & 0x30) >> 4;
@@ -401,13 +401,13 @@ void pc100_state::machine_reset()
 	m_beeper->set_state(0);
 }
 
-INTERRUPT_GEN_MEMBER(pc100_state::pc100_vblank_irq)
+void pc100_state::pc100_vblank_irq(device_t &device)
 {
 	machine().device<pic8259_device>("pic8259")->ir4_w(0);
 	machine().device<pic8259_device>("pic8259")->ir4_w(1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_600hz_irq)
+void pc100_state::pc100_600hz_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_timer_mode == 0)
 	{
@@ -416,7 +416,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_600hz_irq)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_100hz_irq)
+void pc100_state::pc100_100hz_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_timer_mode == 1)
 	{
@@ -425,7 +425,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_100hz_irq)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_50hz_irq)
+void pc100_state::pc100_50hz_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_timer_mode == 2)
 	{
@@ -434,7 +434,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_50hz_irq)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_10hz_irq)
+void pc100_state::pc100_10hz_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_timer_mode == 3)
 	{

@@ -14,7 +14,7 @@ public:
 
 	template<class _Object> static devcb_base &set_drq_callback(device_t &device, _Object object) { return downcast<sp0250_device &>(device).m_drq.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t drq_r();
 
 protected:
@@ -45,7 +45,7 @@ private:
 	} m_filter[6];
 
 	void load_values();
-	TIMER_CALLBACK_MEMBER( timer_tick );
+	void timer_tick(void *ptr, int32_t param);
 };
 
 extern const device_type SP0250;

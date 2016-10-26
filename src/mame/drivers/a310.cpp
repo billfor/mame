@@ -89,14 +89,14 @@ public:
 
 	required_shared_ptr<uint32_t> m_physram;
 
-	DECLARE_READ32_MEMBER(a310_psy_wram_r);
-	DECLARE_WRITE32_MEMBER(a310_psy_wram_w);
-	DECLARE_WRITE_LINE_MEMBER(a310_wd177x_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(a310_wd177x_drq_w);
-	DECLARE_DRIVER_INIT(a310);
+	uint32_t a310_psy_wram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void a310_psy_wram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void a310_wd177x_intrq_w(int state);
+	void a310_wd177x_drq_w(int state);
+	void init_a310();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	void key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 
@@ -105,7 +105,7 @@ protected:
 };
 
 
-WRITE_LINE_MEMBER(a310_state::a310_wd177x_intrq_w)
+void a310_state::a310_wd177x_intrq_w(int state)
 {
 	printf("%d IRQ\n",state);
 	if (state)
@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(a310_state::a310_wd177x_intrq_w)
 		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY);
 }
 
-WRITE_LINE_MEMBER(a310_state::a310_wd177x_drq_w)
+void a310_state::a310_wd177x_drq_w(int state)
 {
 	printf("%d DRQ\n",state);
 	if (state)
@@ -127,18 +127,18 @@ WRITE_LINE_MEMBER(a310_state::a310_wd177x_drq_w)
 		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
 }
 
-READ32_MEMBER(a310_state::a310_psy_wram_r)
+uint32_t a310_state::a310_psy_wram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_physram[offset];
 }
 
-WRITE32_MEMBER(a310_state::a310_psy_wram_w)
+void a310_state::a310_psy_wram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_physram[offset]);
 }
 
 
-DRIVER_INIT_MEMBER(a310_state,a310)
+void a310_state::init_a310()
 {
 	uint32_t ram_size = m_ram->size();
 
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( a310_mem, AS_PROGRAM, 32, a310_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(a310_state::key_stroke)
+void a310_state::key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t row_val = (uint8_t)(uintptr_t)(param) >> 4;
 	uint8_t col_val = (uint8_t)(uintptr_t)(param) & 0xf;
@@ -338,7 +338,7 @@ static SLOT_INTERFACE_START( a310_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( archimedes_state::a310_kart_tx_w )
+void archimedes_state::a310_kart_tx_w(int state)
 {
 	if(state)
 		archimedes_request_irq_b(ARCHIMEDES_IRQB_KBD_RECV_FULL);
@@ -346,7 +346,7 @@ WRITE_LINE_MEMBER( archimedes_state::a310_kart_tx_w )
 		archimedes_clear_irq_b(ARCHIMEDES_IRQB_KBD_RECV_FULL);
 }
 
-WRITE_LINE_MEMBER( archimedes_state::a310_kart_rx_w )
+void archimedes_state::a310_kart_rx_w(int state)
 {
 	if(state)
 		archimedes_request_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);

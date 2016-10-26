@@ -144,14 +144,14 @@ void warpwarp_state::machine_start()
 }
 
 /* Interrupt Gen */
-INTERRUPT_GEN_MEMBER(warpwarp_state::vblank_irq)
+void warpwarp_state::vblank_irq(device_t &device)
 {
 	if (m_ball_on)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 /* B&W Games I/O */
-READ8_MEMBER(warpwarp_state::geebee_in_r)
+uint8_t warpwarp_state::geebee_in_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res;
 
@@ -171,7 +171,7 @@ READ8_MEMBER(warpwarp_state::geebee_in_r)
 	return res;
 }
 
-WRITE8_MEMBER(warpwarp_state::geebee_out6_w)
+void warpwarp_state::geebee_out6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 3)
 	{
@@ -190,7 +190,7 @@ WRITE8_MEMBER(warpwarp_state::geebee_out6_w)
 	}
 }
 
-WRITE8_MEMBER(warpwarp_state::geebee_out7_w)
+void warpwarp_state::geebee_out7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 7)
 	{
@@ -230,19 +230,19 @@ WRITE8_MEMBER(warpwarp_state::geebee_out7_w)
 /* Color Games I/O */
 
 /* Read Switch Inputs */
-READ8_MEMBER(warpwarp_state::warpwarp_sw_r)
+uint8_t warpwarp_state::warpwarp_sw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_in0->read() >> (offset & 7)) & 1;
 }
 
 /* Read Dipswitches */
-READ8_MEMBER(warpwarp_state::warpwarp_dsw1_r)
+uint8_t warpwarp_state::warpwarp_dsw1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_dsw1->read() >> (offset & 7)) & 1;
 }
 
 /* Read mux Controller Inputs */
-READ8_MEMBER(warpwarp_state::warpwarp_vol_r)
+uint8_t warpwarp_state::warpwarp_vol_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res;
 
@@ -258,7 +258,7 @@ READ8_MEMBER(warpwarp_state::warpwarp_vol_r)
 	return res;
 }
 
-WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
+void warpwarp_state::warpwarp_out0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 3)
 	{
@@ -277,7 +277,7 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
 	}
 }
 
-WRITE8_MEMBER(warpwarp_state::warpwarp_out3_w)
+void warpwarp_state::warpwarp_out3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 7)
 	{
@@ -928,7 +928,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(warpwarp_state,geebee)
+void warpwarp_state::init_geebee()
 {
 	m_handle_joystick = 0;
 
@@ -937,7 +937,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,geebee)
 	m_ball_sizey = 4;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,navarone)
+void warpwarp_state::init_navarone()
 {
 	m_handle_joystick = 1;
 
@@ -946,7 +946,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,navarone)
 	m_ball_sizey = 4;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,kaitein)
+void warpwarp_state::init_kaitein()
 {
 	m_handle_joystick = 1;
 
@@ -955,7 +955,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,kaitein)
 	m_ball_sizey = 16;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,kaitei)
+void warpwarp_state::init_kaitei()
 {
 	m_handle_joystick = 0;
 
@@ -964,7 +964,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,kaitei)
 	m_ball_sizey = 16;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,sos)
+void warpwarp_state::init_sos()
 {
 	m_handle_joystick = 1;
 
@@ -973,7 +973,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,sos)
 	m_ball_sizey = 2;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,bombbee)
+void warpwarp_state::init_bombbee()
 {
 	m_handle_joystick = 0;
 
@@ -982,7 +982,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,bombbee)
 	m_ball_sizey = 4;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,warpwarp)
+void warpwarp_state::init_warpwarp()
 {
 	m_handle_joystick = 1;
 

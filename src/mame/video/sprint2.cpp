@@ -10,7 +10,7 @@
 #include "includes/sprint2.h"
 
 
-PALETTE_INIT_MEMBER(sprint2_state, sprint2)
+void sprint2_state::palette_init_sprint2(palette_device &palette)
 {
 	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_indirect_color(1, rgb_t(0x5b, 0x5b, 0x5b));
@@ -33,7 +33,7 @@ PALETTE_INIT_MEMBER(sprint2_state, sprint2)
 }
 
 
-TILE_GET_INFO_MEMBER(sprint2_state::get_tile_info)
+void sprint2_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 
@@ -49,27 +49,27 @@ void sprint2_state::video_start()
 }
 
 
-READ8_MEMBER(sprint2_state::sprint2_collision1_r)
+uint8_t sprint2_state::sprint2_collision1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_collision[0];
 }
-READ8_MEMBER(sprint2_state::sprint2_collision2_r)
+uint8_t sprint2_state::sprint2_collision2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_collision[1];
 }
 
 
-WRITE8_MEMBER(sprint2_state::sprint2_collision_reset1_w)
+void sprint2_state::sprint2_collision_reset1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_collision[0] = 0;
 }
-WRITE8_MEMBER(sprint2_state::sprint2_collision_reset2_w)
+void sprint2_state::sprint2_collision_reset2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_collision[1] = 0;
 }
 
 
-WRITE8_MEMBER(sprint2_state::sprint2_video_ram_w)
+void sprint2_state::sprint2_video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

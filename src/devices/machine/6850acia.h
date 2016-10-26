@@ -35,16 +35,16 @@ public:
 	template<class _Object> static devcb_base &set_rts_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_rts_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_irq_handler.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER( control_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( data_r );
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_cts );
-	DECLARE_WRITE_LINE_MEMBER( write_dcd );
-	DECLARE_WRITE_LINE_MEMBER( write_rxd );
-	DECLARE_WRITE_LINE_MEMBER( write_rxc );
-	DECLARE_WRITE_LINE_MEMBER( write_txc );
+	void write_cts(int state);
+	void write_dcd(int state);
+	void write_rxd(int state);
+	void write_rxc(int state);
+	void write_txc(int state);
 
 protected:
 	acia6850_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);

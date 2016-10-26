@@ -17,22 +17,22 @@ public:
 	uint8_t m_bank[8];
 	uint16_t m_pal_base;
 	void reg_written( int num_reg);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void set_pal_base( int m_pal_base);
 	void draw( screen_device &screen, bitmap_ind16& bitmap, const rectangle &cliprect, int priority);
 	tilemap_t* get_tilemap();
 
 	std::unique_ptr<uint16_t[]> m_lineram;
 
-	TILEMAP_MAPPER_MEMBER(twc94_scan);
+	tilemap_memory_index twc94_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
-	DECLARE_WRITE16_MEMBER(regs_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(line_w);
+	void regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void line_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(regs_r);
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_READ16_MEMBER(line_r);
+	uint16_t regs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t vram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t line_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	void draw_roz_core(screen_device &screen, bitmap_ind16 &destbitmap, const rectangle &cliprect,
 		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, bool wraparound);

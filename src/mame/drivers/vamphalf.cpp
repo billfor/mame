@@ -113,81 +113,81 @@ public:
 	std::unique_ptr<uint8_t[]> m_finalgdr_backupram;
 	uint8_t m_qs1000_data;
 
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE32_MEMBER(flipscreen32_w);
-	DECLARE_WRITE16_MEMBER(jmpbreak_flipscreen_w);
-	DECLARE_READ32_MEMBER(wyvernwg_prot_r);
-	DECLARE_WRITE32_MEMBER(wyvernwg_prot_w);
-	DECLARE_READ32_MEMBER(finalgdr_prot_r);
-	DECLARE_WRITE32_MEMBER(finalgdr_prot_w);
-	DECLARE_WRITE32_MEMBER(finalgdr_prize_w);
-	DECLARE_WRITE16_MEMBER(boonggab_prize_w);
-	DECLARE_WRITE16_MEMBER(boonggab_lamps_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(boonggab_photo_sensors_r);
+	void flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void flipscreen32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void jmpbreak_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint32_t wyvernwg_prot_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void wyvernwg_prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t finalgdr_prot_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void finalgdr_prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void finalgdr_prize_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void boonggab_prize_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void boonggab_lamps_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	ioport_value boonggab_photo_sensors_r(ioport_field &field, void *param);
 
-	DECLARE_READ16_MEMBER(vamphalf_speedup_r);
-	DECLARE_READ16_MEMBER(vamphafk_speedup_r);
-	DECLARE_READ16_MEMBER(misncrft_speedup_r);
-	DECLARE_READ16_MEMBER(misncrfta_speedup_r);
-	DECLARE_READ16_MEMBER(coolmini_speedup_r);
-	DECLARE_READ16_MEMBER(suplup_speedup_r);
-	DECLARE_READ16_MEMBER(luplup_speedup_r);
-	DECLARE_READ16_MEMBER(luplup29_speedup_r);
-	DECLARE_READ16_MEMBER(puzlbang_speedup_r);
-	DECLARE_READ16_MEMBER(puzlbanga_speedup_r);
-	DECLARE_READ32_MEMBER(wivernwg_speedup_r);
-	DECLARE_READ32_MEMBER(wyvernwg_speedup_r);
-	DECLARE_READ32_MEMBER(wyvernwga_speedup_r);
-	DECLARE_READ32_MEMBER(finalgdr_speedup_r);
-	DECLARE_READ32_MEMBER(mrkickera_speedup_r);
-	DECLARE_READ16_MEMBER(mrkicker_speedup_r);
-	DECLARE_READ16_MEMBER(dquizgo2_speedup_r);
-	DECLARE_READ32_MEMBER(aoh_speedup_r);
-	DECLARE_READ16_MEMBER(jmpbreak_speedup_r);
-	DECLARE_READ16_MEMBER(mrdig_speedup_r);
-	DECLARE_READ16_MEMBER(dtfamily_speedup_r);
-	DECLARE_READ16_MEMBER(toyland_speedup_r);
-	DECLARE_READ16_MEMBER(boonggab_speedup_r);
+	uint16_t vamphalf_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t vamphafk_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t misncrft_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t misncrfta_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t coolmini_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t suplup_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t luplup_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t luplup29_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t puzlbang_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t puzlbanga_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint32_t wivernwg_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t wyvernwg_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t wyvernwga_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t finalgdr_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t mrkickera_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t mrkicker_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dquizgo2_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint32_t aoh_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t jmpbreak_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t mrdig_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dtfamily_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t toyland_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t boonggab_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(eeprom_r);
-	DECLARE_READ32_MEMBER(eeprom32_r);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE32_MEMBER(eeprom32_w);
-	DECLARE_WRITE32_MEMBER(finalgdr_eeprom_w);
-	DECLARE_WRITE32_MEMBER(finalgdr_backupram_bank_w);
-	DECLARE_READ32_MEMBER(finalgdr_backupram_r);
-	DECLARE_WRITE32_MEMBER(finalgdr_backupram_w);
+	uint16_t eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint32_t eeprom32_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void eeprom32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void finalgdr_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void finalgdr_backupram_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t finalgdr_backupram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void finalgdr_backupram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER(finalgdr_oki_bank_w);
-	DECLARE_WRITE32_MEMBER(aoh_oki_bank_w);
-	DECLARE_WRITE16_MEMBER(boonggab_oki_bank_w);
-	DECLARE_WRITE16_MEMBER(mrkicker_oki_bank_w);
-	DECLARE_WRITE32_MEMBER(wyvernwg_snd_w);
-	DECLARE_WRITE16_MEMBER(misncrft_snd_w);
-	DECLARE_READ8_MEMBER(qs1000_p1_r);
-	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+	void finalgdr_oki_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void aoh_oki_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void boonggab_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mrkicker_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void wyvernwg_snd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void misncrft_snd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t qs1000_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void qs1000_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(vamphalf);
-	DECLARE_DRIVER_INIT(vamphafk);
-	DECLARE_DRIVER_INIT(coolmini);
-	DECLARE_DRIVER_INIT(mrkickera);
-	DECLARE_DRIVER_INIT(mrdig);
-	DECLARE_DRIVER_INIT(jmpbreak);
-	DECLARE_DRIVER_INIT(dtfamily);
-	DECLARE_DRIVER_INIT(dquizgo2);
-	DECLARE_DRIVER_INIT(suplup);
-	DECLARE_DRIVER_INIT(luplup);
-	DECLARE_DRIVER_INIT(luplup29);
-	DECLARE_DRIVER_INIT(puzlbang);
-	DECLARE_DRIVER_INIT(toyland);
-	DECLARE_DRIVER_INIT(aoh);
-	DECLARE_DRIVER_INIT(finalgdr);
-	DECLARE_DRIVER_INIT(misncrft);
-	DECLARE_DRIVER_INIT(boonggab);
-	DECLARE_DRIVER_INIT(wyvernwg);
-	DECLARE_DRIVER_INIT(yorijori);
-	DECLARE_DRIVER_INIT(mrkicker);
+	void init_vamphalf();
+	void init_vamphafk();
+	void init_coolmini();
+	void init_mrkickera();
+	void init_mrdig();
+	void init_jmpbreak();
+	void init_dtfamily();
+	void init_dquizgo2();
+	void init_suplup();
+	void init_luplup();
+	void init_luplup29();
+	void init_puzlbang();
+	void init_toyland();
+	void init_aoh();
+	void init_finalgdr();
+	void init_misncrft();
+	void init_boonggab();
+	void init_wyvernwg();
+	void init_yorijori();
+	void init_mrkicker();
 
 	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -196,7 +196,7 @@ public:
 	void handle_flipped_visible_area(screen_device &screen);
 };
 
-READ16_MEMBER(vamphalf_state::eeprom_r)
+uint16_t vamphalf_state::eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(offset)
 	{
@@ -206,12 +206,12 @@ READ16_MEMBER(vamphalf_state::eeprom_r)
 		return 0;
 }
 
-READ32_MEMBER(vamphalf_state::eeprom32_r)
+uint32_t vamphalf_state::eeprom32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_eeprom->do_read();
 }
 
-WRITE16_MEMBER(vamphalf_state::eeprom_w)
+void vamphalf_state::eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset)
 	{
@@ -223,21 +223,21 @@ WRITE16_MEMBER(vamphalf_state::eeprom_w)
 	}
 }
 
-WRITE32_MEMBER(vamphalf_state::eeprom32_w)
+void vamphalf_state::eeprom32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_eeprom->di_write(data & 0x01);
 	m_eeprom->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE32_MEMBER(vamphalf_state::finalgdr_eeprom_w)
+void vamphalf_state::finalgdr_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_eeprom->di_write((data & 0x4000) >> 14);
 	m_eeprom->cs_write((data & 0x1000) ? ASSERT_LINE : CLEAR_LINE );
 	m_eeprom->clk_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE16_MEMBER(vamphalf_state::flipscreen_w)
+void vamphalf_state::flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset)
 	{
@@ -245,37 +245,37 @@ WRITE16_MEMBER(vamphalf_state::flipscreen_w)
 	}
 }
 
-WRITE32_MEMBER(vamphalf_state::flipscreen32_w)
+void vamphalf_state::flipscreen32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_flipscreen = data & m_flip_bit;
 }
 
-WRITE16_MEMBER(vamphalf_state::jmpbreak_flipscreen_w)
+void vamphalf_state::jmpbreak_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_flipscreen = data & 0x8000;
 }
 
 
 
-READ32_MEMBER(vamphalf_state::wyvernwg_prot_r)
+uint32_t vamphalf_state::wyvernwg_prot_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_semicom_prot_idx--;
 	return (m_semicom_prot_data[m_semicom_prot_which] & (1 << m_semicom_prot_idx)) >> m_semicom_prot_idx;
 }
 
-WRITE32_MEMBER(vamphalf_state::wyvernwg_prot_w)
+void vamphalf_state::wyvernwg_prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_semicom_prot_which = data & 1;
 	m_semicom_prot_idx = 8;
 }
 
-READ32_MEMBER(vamphalf_state::finalgdr_prot_r)
+uint32_t vamphalf_state::finalgdr_prot_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_semicom_prot_idx--;
 	return (m_semicom_prot_data[m_semicom_prot_which] & (1 << m_semicom_prot_idx)) ? 0x8000 : 0;
 }
 
-WRITE32_MEMBER(vamphalf_state::finalgdr_prot_w)
+void vamphalf_state::finalgdr_prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 /*
 41C6
@@ -291,27 +291,27 @@ F94B
 	m_semicom_prot_idx = 8;
 }
 
-WRITE32_MEMBER(vamphalf_state::finalgdr_oki_bank_w)
+void vamphalf_state::finalgdr_oki_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_oki->set_rom_bank((data & 0x300) >> 8);
 }
 
-WRITE32_MEMBER(vamphalf_state::finalgdr_backupram_bank_w)
+void vamphalf_state::finalgdr_backupram_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_finalgdr_backupram_bank = (data & 0xff000000) >> 24;
 }
 
-READ32_MEMBER(vamphalf_state::finalgdr_backupram_r)
+uint32_t vamphalf_state::finalgdr_backupram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_finalgdr_backupram[offset + m_finalgdr_backupram_bank * 0x80] << 24;
 }
 
-WRITE32_MEMBER(vamphalf_state::finalgdr_backupram_w)
+void vamphalf_state::finalgdr_backupram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_finalgdr_backupram[offset + m_finalgdr_backupram_bank * 0x80] = data >> 24;
 }
 
-WRITE32_MEMBER(vamphalf_state::finalgdr_prize_w)
+void vamphalf_state::finalgdr_prize_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(data & 0x1000000)
 	{
@@ -329,24 +329,24 @@ WRITE32_MEMBER(vamphalf_state::finalgdr_prize_w)
 	}
 }
 
-WRITE32_MEMBER(vamphalf_state::aoh_oki_bank_w)
+void vamphalf_state::aoh_oki_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_oki2->set_rom_bank(data & 0x3);
 }
 
-WRITE16_MEMBER(vamphalf_state::boonggab_oki_bank_w)
+void vamphalf_state::boonggab_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset)
 		m_oki->set_rom_bank(data & 0x7);
 }
 
 
-WRITE16_MEMBER(vamphalf_state::mrkicker_oki_bank_w)
+void vamphalf_state::mrkicker_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_oki->set_rom_bank(data & 0x3);
 }
 
-WRITE16_MEMBER(vamphalf_state::boonggab_prize_w)
+void vamphalf_state::boonggab_prize_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset)
 	{
@@ -360,7 +360,7 @@ WRITE16_MEMBER(vamphalf_state::boonggab_prize_w)
 	}
 }
 
-WRITE16_MEMBER(vamphalf_state::boonggab_lamps_w)
+void vamphalf_state::boonggab_lamps_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset == 1)
 	{
@@ -386,26 +386,26 @@ WRITE16_MEMBER(vamphalf_state::boonggab_lamps_w)
 
 
 
-WRITE32_MEMBER( vamphalf_state::wyvernwg_snd_w )
+void vamphalf_state::wyvernwg_snd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_qs1000_data = data & 0xff;
 	m_qs1000->set_irq(ASSERT_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
-WRITE16_MEMBER( vamphalf_state::misncrft_snd_w )
+void vamphalf_state::misncrft_snd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_qs1000_data = data & 0xff;
 	m_qs1000->set_irq(ASSERT_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
-READ8_MEMBER( vamphalf_state::qs1000_p1_r )
+uint8_t vamphalf_state::qs1000_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_qs1000_data;
 }
 
-WRITE8_MEMBER( vamphalf_state::qs1000_p3_w )
+void vamphalf_state::qs1000_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!BIT(data, 5))
 		m_qs1000->set_irq(CLEAR_LINE);
@@ -789,7 +789,7 @@ uint32_t vamphalf_state::screen_update_aoh(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(vamphalf_state::boonggab_photo_sensors_r)
+ioport_value vamphalf_state::boonggab_photo_sensors_r(ioport_field &field, void *param)
 {
 	static const uint16_t photo_sensors_table[8] = { 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 };
 	uint8_t res = ioport("PHOTO_SENSORS")->read();
@@ -2472,7 +2472,7 @@ static int irq_active(address_space &space)
 		return 0;
 }
 
-READ16_MEMBER(vamphalf_state::vamphalf_speedup_r)
+uint16_t vamphalf_state::vamphalf_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x82de)
 	{
@@ -2485,7 +2485,7 @@ READ16_MEMBER(vamphalf_state::vamphalf_speedup_r)
 	return m_wram[(0x4a840/2)+offset];
 }
 
-READ16_MEMBER(vamphalf_state::vamphafk_speedup_r)
+uint16_t vamphalf_state::vamphafk_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x82de)
 	{
@@ -2498,7 +2498,7 @@ READ16_MEMBER(vamphalf_state::vamphafk_speedup_r)
 	return m_wram[(0x4a6d0/2)+offset];
 }
 
-READ16_MEMBER(vamphalf_state::misncrft_speedup_r)
+uint16_t vamphalf_state::misncrft_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0xff4c)
 	{
@@ -2511,7 +2511,7 @@ READ16_MEMBER(vamphalf_state::misncrft_speedup_r)
 	return m_wram[(0x74270/2)+offset];
 }
 
-READ16_MEMBER(vamphalf_state::misncrfta_speedup_r)
+uint16_t vamphalf_state::misncrfta_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0xecc8)
 	{
@@ -2525,7 +2525,7 @@ READ16_MEMBER(vamphalf_state::misncrfta_speedup_r)
 }
 
 
-READ16_MEMBER(vamphalf_state::coolmini_speedup_r)
+uint16_t vamphalf_state::coolmini_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x75f7a)
 	{
@@ -2538,7 +2538,7 @@ READ16_MEMBER(vamphalf_state::coolmini_speedup_r)
 	return m_wram[(0xd2e80/2)+offset];
 }
 
-READ16_MEMBER(vamphalf_state::suplup_speedup_r)
+uint16_t vamphalf_state::suplup_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0xaf18a )
 	{
@@ -2551,7 +2551,7 @@ READ16_MEMBER(vamphalf_state::suplup_speedup_r)
 	return m_wram[(0x11605c/2)+offset];
 }
 
-READ16_MEMBER(vamphalf_state::luplup_speedup_r)
+uint16_t vamphalf_state::luplup_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0xaefac )
 	{
@@ -2564,7 +2564,7 @@ READ16_MEMBER(vamphalf_state::luplup_speedup_r)
 	return m_wram[(0x115e84/2)+offset];
 }
 
-READ16_MEMBER(vamphalf_state::luplup29_speedup_r)
+uint16_t vamphalf_state::luplup29_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0xae6c0 )
 	{
@@ -2577,7 +2577,7 @@ READ16_MEMBER(vamphalf_state::luplup29_speedup_r)
 	return m_wram[(0x113f08/2)+offset];
 }
 
-READ16_MEMBER(vamphalf_state::puzlbang_speedup_r)
+uint16_t vamphalf_state::puzlbang_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0xae6d2 )
 	{
@@ -2590,7 +2590,7 @@ READ16_MEMBER(vamphalf_state::puzlbang_speedup_r)
 	return m_wram[(0x113f14/2)+offset];
 }
 
-READ16_MEMBER(vamphalf_state::puzlbanga_speedup_r)
+uint16_t vamphalf_state::puzlbanga_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0xae6d2 )
 	{
@@ -2603,7 +2603,7 @@ READ16_MEMBER(vamphalf_state::puzlbanga_speedup_r)
 	return m_wram[(0x113ecc/2)+offset];
 }
 
-READ32_MEMBER(vamphalf_state::wivernwg_speedup_r)
+uint32_t vamphalf_state::wivernwg_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x10758 )
 	{
@@ -2616,7 +2616,7 @@ READ32_MEMBER(vamphalf_state::wivernwg_speedup_r)
 	return m_wram32[0x00b4ccc/4];
 }
 
-READ32_MEMBER(vamphalf_state::wyvernwg_speedup_r)
+uint32_t vamphalf_state::wyvernwg_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x10758 )
 	{
@@ -2629,7 +2629,7 @@ READ32_MEMBER(vamphalf_state::wyvernwg_speedup_r)
 	return m_wram32[0x00b56fc/4];
 }
 
-READ32_MEMBER(vamphalf_state::wyvernwga_speedup_r)
+uint32_t vamphalf_state::wyvernwga_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x10758 )
 	{
@@ -2642,7 +2642,7 @@ READ32_MEMBER(vamphalf_state::wyvernwga_speedup_r)
 	return m_wram32[0x00b74f8/4];
 }
 
-READ32_MEMBER(vamphalf_state::finalgdr_speedup_r)
+uint32_t vamphalf_state::finalgdr_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x1c212)
 	{
@@ -2655,7 +2655,7 @@ READ32_MEMBER(vamphalf_state::finalgdr_speedup_r)
 	return m_wram32[0x005e874/4];
 }
 
-READ32_MEMBER(vamphalf_state::mrkickera_speedup_r)
+uint32_t vamphalf_state::mrkickera_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t pc = space.device().safe_pc();
 	if(pc == 0x469de || pc == 0x46a36)
@@ -2669,7 +2669,7 @@ READ32_MEMBER(vamphalf_state::mrkickera_speedup_r)
 	return m_wram32[0x00701a4/4];
 }
 
-READ16_MEMBER(vamphalf_state::mrkicker_speedup_r)
+uint16_t vamphalf_state::mrkicker_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t pc = space.device().safe_pc();
 	if(pc == 0x41ec6)
@@ -2681,7 +2681,7 @@ READ16_MEMBER(vamphalf_state::mrkicker_speedup_r)
 }
 
 
-READ16_MEMBER(vamphalf_state::dquizgo2_speedup_r)
+uint16_t vamphalf_state::dquizgo2_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0xaa622)
 	{
@@ -2694,7 +2694,7 @@ READ16_MEMBER(vamphalf_state::dquizgo2_speedup_r)
 	return m_wram[(0xcde70/2)+offset];
 }
 
-READ32_MEMBER(vamphalf_state::aoh_speedup_r)
+uint32_t vamphalf_state::aoh_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(space.device().safe_pc() == 0xb994 )
 	{
@@ -2709,7 +2709,7 @@ READ32_MEMBER(vamphalf_state::aoh_speedup_r)
 	return m_wram32[0x28a09c/4];
 }
 
-READ16_MEMBER(vamphalf_state::jmpbreak_speedup_r)
+uint16_t vamphalf_state::jmpbreak_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x983c)
 	{
@@ -2722,7 +2722,7 @@ READ16_MEMBER(vamphalf_state::jmpbreak_speedup_r)
 	return m_wram[(0x00906fc / 2)+offset];
 }
 
-READ16_MEMBER(vamphalf_state::mrdig_speedup_r)
+uint16_t vamphalf_state::mrdig_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x1710)
 	{
@@ -2735,7 +2735,7 @@ READ16_MEMBER(vamphalf_state::mrdig_speedup_r)
 	return m_wram[(0x00a99c / 2)+offset];
 }
 
-READ16_MEMBER(vamphalf_state::dtfamily_speedup_r)
+uint16_t vamphalf_state::dtfamily_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x12fa6 )
 		space.device().execute().spin_until_interrupt();
@@ -2744,7 +2744,7 @@ READ16_MEMBER(vamphalf_state::dtfamily_speedup_r)
 
 }
 
-READ16_MEMBER(vamphalf_state::toyland_speedup_r)
+uint16_t vamphalf_state::toyland_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (space.device().safe_pc() == 0x130c2)
 		space.device().execute().spin_until_interrupt();
@@ -2753,7 +2753,7 @@ READ16_MEMBER(vamphalf_state::toyland_speedup_r)
 
 }
 
-READ16_MEMBER(vamphalf_state::boonggab_speedup_r)
+uint16_t vamphalf_state::boonggab_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x13198)
 	{
@@ -2764,7 +2764,7 @@ READ16_MEMBER(vamphalf_state::boonggab_speedup_r)
 	return m_wram[(0xf1b7c / 2)+offset];
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,vamphalf)
+void vamphalf_state::init_vamphalf()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a840, 0x0004a843, read16_delegate(FUNC(vamphalf_state::vamphalf_speedup_r), this));
 
@@ -2772,7 +2772,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,vamphalf)
 	m_flip_bit = 0x80;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,vamphafk)
+void vamphalf_state::init_vamphafk()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a6d0, 0x0004a6d3, read16_delegate(FUNC(vamphalf_state::vamphafk_speedup_r), this));
 
@@ -2780,7 +2780,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,vamphafk)
 	m_flip_bit = 0x80;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,misncrft)
+void vamphalf_state::init_misncrft()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00074270, 0x00074273, read16_delegate(FUNC(vamphalf_state::misncrft_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00072eb4, 0x00072eb7, read16_delegate(FUNC(vamphalf_state::misncrfta_speedup_r), this));
@@ -2794,7 +2794,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,misncrft)
 	save_item(NAME(m_qs1000_data));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
+void vamphalf_state::init_coolmini()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d2e80, 0x000d2e83, read16_delegate(FUNC(vamphalf_state::coolmini_speedup_r), this));
 
@@ -2802,7 +2802,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
+void vamphalf_state::init_mrkicker()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00063fc0, 0x00063fc1, read16_delegate(FUNC(vamphalf_state::mrkicker_speedup_r), this));
 	m_maincpu->space(AS_IO).install_write_handler(0x002, 0x003, write16_delegate(FUNC(vamphalf_state::mrkicker_oki_bank_w), this));
@@ -2811,7 +2811,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,suplup)
+void vamphalf_state::init_suplup()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0011605c, 0x0011605f, read16_delegate(FUNC(vamphalf_state::suplup_speedup_r), this));
 
@@ -2819,7 +2819,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,suplup)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,luplup)
+void vamphalf_state::init_luplup()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00115e84, 0x00115e87, read16_delegate(FUNC(vamphalf_state::luplup_speedup_r), this));
 
@@ -2827,7 +2827,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,luplup)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,luplup29)
+void vamphalf_state::init_luplup29()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113f08, 0x00113f0b, read16_delegate(FUNC(vamphalf_state::luplup29_speedup_r), this));
 
@@ -2835,7 +2835,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,luplup29)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,puzlbang)
+void vamphalf_state::init_puzlbang()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113f14, 0x00113f17, read16_delegate(FUNC(vamphalf_state::puzlbang_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113ecc, 0x00113ecf, read16_delegate(FUNC(vamphalf_state::puzlbanga_speedup_r), this));
@@ -2844,7 +2844,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,puzlbang)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
+void vamphalf_state::init_wyvernwg()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b4ccc, 0x00b4ccf, read32_delegate(FUNC(vamphalf_state::wivernwg_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b56fc, 0x00b56ff, read32_delegate(FUNC(vamphalf_state::wyvernwg_speedup_r), this));
@@ -2865,7 +2865,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
 	save_item(NAME(m_semicom_prot_which));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
+void vamphalf_state::init_yorijori()
 {
 	// seems close to Final Godori in terms of port mappings, possibly a SemiCom game?
 
@@ -2888,7 +2888,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 	save_item(NAME(m_qs1000_data));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
+void vamphalf_state::init_finalgdr()
 {
 	m_finalgdr_backupram_bank = 1;
 	m_finalgdr_backupram = std::make_unique<uint8_t[]>(0x80*0x100);
@@ -2908,7 +2908,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 	save_item(NAME(m_semicom_prot_which));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
+void vamphalf_state::init_mrkickera()
 {
 	// backup ram isn't used
 	m_finalgdr_backupram_bank = 1;
@@ -2927,7 +2927,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
 	save_item(NAME(m_semicom_prot_which));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,dquizgo2)
+void vamphalf_state::init_dquizgo2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00cde70, 0x00cde73, read16_delegate(FUNC(vamphalf_state::dquizgo2_speedup_r), this));
 
@@ -2935,7 +2935,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,dquizgo2)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,dtfamily)
+void vamphalf_state::init_dtfamily()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xcc2a8, 0xcc2a9, read16_delegate(FUNC(vamphalf_state::dtfamily_speedup_r), this));
 
@@ -2944,7 +2944,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,dtfamily)
 }
 
 
-DRIVER_INIT_MEMBER(vamphalf_state,toyland)
+void vamphalf_state::init_toyland()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x780d8, 0x780d9, read16_delegate(FUNC(vamphalf_state::toyland_speedup_r), this));
 
@@ -2952,7 +2952,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,toyland)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,aoh)
+void vamphalf_state::init_aoh()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x028a09c, 0x028a09f, read32_delegate(FUNC(vamphalf_state::aoh_speedup_r), this));
 
@@ -2960,7 +2960,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,aoh)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,jmpbreak)
+void vamphalf_state::init_jmpbreak()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00906fc, 0x00906ff, read16_delegate(FUNC(vamphalf_state::jmpbreak_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
@@ -2968,7 +2968,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,jmpbreak)
 	m_palshift = 0;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,mrdig)
+void vamphalf_state::init_mrdig()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00a99c, 0x00a99f, read16_delegate(FUNC(vamphalf_state::mrdig_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
@@ -2977,7 +2977,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrdig)
 }
 
 
-DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
+void vamphalf_state::init_boonggab()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000f1b7c, 0x000f1b7f, read16_delegate(FUNC(vamphalf_state::boonggab_speedup_r), this));
 

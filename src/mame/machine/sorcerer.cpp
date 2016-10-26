@@ -12,7 +12,7 @@
 
 /* timer for sorcerer serial chip transmit and receive */
 
-TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_serial_tc)
+void sorcerer_state::sorcerer_serial_tc(void *ptr, int32_t param)
 {
 	/* if rs232 is enabled, uart is connected to clock defined by bit6 of port fe.
 	Transmit and receive clocks are connected to the same clock. */
@@ -48,7 +48,7 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 /* timer to read cassette waveforms */
 
-TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
+void sorcerer_state::sorcerer_cassette_tc(void *ptr, int32_t param)
 {
 	uint8_t cass_ws = 0;
 	switch (m_fe & 0xc0)        /*/ bit 7 low indicates cassette */
@@ -138,18 +138,18 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_reset)
+void sorcerer_state::sorcerer_reset(void *ptr, int32_t param)
 {
 	membank("boot")->set_entry(0);
 }
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_fc_w)
+void sorcerer_state::sorcerer_fc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_uart->set_transmit_data(data);
 }
 
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_fd_w)
+void sorcerer_state::sorcerer_fd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Translate data to control signals */
 
@@ -162,7 +162,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fd_w)
 	m_uart->set_input_pin(AY31015_CS, 1);
 }
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
+void sorcerer_state::sorcerer_fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t changed_bits = (m_fe ^ data) & 0xf0;
 	m_fe = data;
@@ -214,7 +214,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 	}
 }
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
+void sorcerer_state::sorcerer_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/// TODO: create a sorcerer parallel slot with a 7 bit and 8 bit centronics adapter as two of the options
 	/// TODO: figure out what role FE plays http://www.trailingedge.com/exidy/exidych7.html
@@ -244,7 +244,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 	}
 }
 
-READ8_MEMBER(sorcerer_state::sorcerer_fc_r)
+uint8_t sorcerer_state::sorcerer_fc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_uart->get_received_data();
 	m_uart->set_input_pin(AY31015_RDAV, 0);
@@ -252,7 +252,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_fc_r)
 	return data;
 }
 
-READ8_MEMBER(sorcerer_state::sorcerer_fd_r)
+uint8_t sorcerer_state::sorcerer_fd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* set unused bits high */
 	uint8_t data = 0xe0;
@@ -268,7 +268,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_fd_r)
 	return data;
 }
 
-READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
+uint8_t sorcerer_state::sorcerer_fe_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bits 6..7
 	 - hardware handshakes from user port
@@ -366,7 +366,7 @@ void sorcerer_state::machine_start()
 		space.install_read_handler(0xc000, 0xdfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
-MACHINE_START_MEMBER(sorcerer_state,sorcererd)
+void sorcerer_state::machine_start_sorcererd()
 {
 	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
 	m_serial_timer = timer_alloc(TIMER_SERIAL);

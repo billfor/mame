@@ -19,28 +19,28 @@ revised by Alex W. Jackson
 // Exports
 
 
-WRITE8_MEMBER(bwing_state::videoram_w)
+void bwing_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_charmap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(bwing_state::fgscrollram_w)
+void bwing_state::fgscrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgscrollram[offset] = data;
 	m_fgmap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(bwing_state::bgscrollram_w)
+void bwing_state::bgscrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgscrollram[offset] = data;
 	m_bgmap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(bwing_state::gfxram_w)
+void bwing_state::gfxram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxram[offset] = data;
 	int whichgfx = (offset & 0x1000) ? 3 : 2;
@@ -48,7 +48,7 @@ WRITE8_MEMBER(bwing_state::gfxram_w)
 }
 
 
-WRITE8_MEMBER(bwing_state::scrollreg_w)
+void bwing_state::scrollreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sreg[offset] = data;
 
@@ -64,7 +64,7 @@ WRITE8_MEMBER(bwing_state::scrollreg_w)
 }
 
 
-WRITE8_MEMBER(bwing_state::paletteram_w)
+void bwing_state::paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const float rgb[4][3] = {
 		{0.85f, 0.95f, 1.00f},
@@ -100,22 +100,22 @@ WRITE8_MEMBER(bwing_state::paletteram_w)
 //****************************************************************************
 // Initializations
 
-TILE_GET_INFO_MEMBER(bwing_state::get_fgtileinfo)
+void bwing_state::get_fgtileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(2, m_fgscrollram[tile_index] & 0x7f, m_fgscrollram[tile_index] >> 7, 0);
 }
 
-TILE_GET_INFO_MEMBER(bwing_state::get_bgtileinfo)
+void bwing_state::get_bgtileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(3, m_bgscrollram[tile_index] & 0x7f, m_bgscrollram[tile_index] >> 7, 0);
 }
 
-TILE_GET_INFO_MEMBER(bwing_state::get_charinfo)
+void bwing_state::get_charinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(bwing_state::scan_cols)
+tilemap_memory_index bwing_state::scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (row & 0xf) | ((col & 0xf) << 4) | ((row & 0x30) << 4) | ((col & 0x30) << 6);
 }

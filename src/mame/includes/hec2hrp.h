@@ -140,33 +140,33 @@ public:
 	int m_print;
 	uint8_t m_hector_videoram_hrx[0x04000];
 
-	DECLARE_WRITE8_MEMBER(minidisc_control_w);
+	void minidisc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(hector_switch_bank_w);
-	DECLARE_WRITE8_MEMBER(hector_keyboard_w);
-	DECLARE_READ8_MEMBER(hector_keyboard_r);
-	DECLARE_WRITE8_MEMBER(hector_sn_2000_w);
-	DECLARE_WRITE8_MEMBER(hector_sn_2800_w);
-	DECLARE_READ8_MEMBER(hector_cassette_r);
-	DECLARE_WRITE8_MEMBER(hector_sn_3000_w);
-	DECLARE_WRITE8_MEMBER(hector_color_a_w);
-	DECLARE_WRITE8_MEMBER(hector_color_b_w);
-	DECLARE_READ8_MEMBER(hector_io_8255_r);
-	DECLARE_WRITE8_MEMBER(hector_io_8255_w);
-	DECLARE_WRITE8_MEMBER(hector_mx40_io_port_w);
-	DECLARE_WRITE8_MEMBER(hector_mx80_io_port_w);
-	DECLARE_MACHINE_START(hec2hrp);
-	DECLARE_MACHINE_RESET(hec2hrp);
-	DECLARE_VIDEO_START(hec2hrp);
-	DECLARE_MACHINE_START(hec2hrx);
-	DECLARE_MACHINE_RESET(hec2hrx);
-	DECLARE_MACHINE_START(hec2mdhrx);
-	DECLARE_MACHINE_RESET(hec2mdhrx);
+	void hector_switch_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hector_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hector_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hector_sn_2000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hector_sn_2800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hector_cassette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hector_sn_3000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hector_color_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hector_color_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hector_io_8255_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hector_io_8255_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hector_mx40_io_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hector_mx80_io_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void machine_start_hec2hrp();
+	void machine_reset_hec2hrp();
+	void video_start_hec2hrp();
+	void machine_start_hec2hrx();
+	void machine_reset_hec2hrx();
+	void machine_start_hec2mdhrx();
+	void machine_reset_hec2mdhrx();
 	uint32_t screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(Callback_CK);
+	void Callback_CK(void *ptr, int32_t param);
 
-	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_dma_irq );
+	void disc2_fdc_interrupt(int state);
+	void disc2_fdc_dma_irq(int state);
 	int isHectorWithDisc2();
 	int isHectorWithMiniDisc();
 	int isHectorHR();
@@ -182,16 +182,16 @@ public:
 	/*----------- defined in machine/hecdisk2.c -----------*/
 
 	// disc2 handling
-	DECLARE_READ8_MEMBER(  hector_disc2_io00_port_r);
-	DECLARE_WRITE8_MEMBER( hector_disc2_io00_port_w);
-	DECLARE_READ8_MEMBER(  hector_disc2_io20_port_r);
-	DECLARE_WRITE8_MEMBER( hector_disc2_io20_port_w);
-	DECLARE_READ8_MEMBER(  hector_disc2_io30_port_r);
-	DECLARE_WRITE8_MEMBER( hector_disc2_io30_port_w);
-	DECLARE_READ8_MEMBER(  hector_disc2_io40_port_r);
-	DECLARE_WRITE8_MEMBER( hector_disc2_io40_port_w);
-	DECLARE_READ8_MEMBER(  hector_disc2_io50_port_r);
-	DECLARE_WRITE8_MEMBER( hector_disc2_io50_port_w);
+	uint8_t hector_disc2_io00_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hector_disc2_io00_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hector_disc2_io20_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hector_disc2_io20_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hector_disc2_io30_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hector_disc2_io30_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hector_disc2_io40_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hector_disc2_io40_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hector_disc2_io50_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hector_disc2_io50_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void hector_disc2_reset();
 };

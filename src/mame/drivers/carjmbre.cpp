@@ -69,16 +69,16 @@ public:
 	uint8_t m_bgcolor;
 	tilemap_t *m_tilemap;
 
-	DECLARE_WRITE8_MEMBER(bgcolor_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	INTERRUPT_GEN_MEMBER(vblank_nmi);
+	void bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vblank_nmi(device_t &device);
 
-	DECLARE_PALETTE_INIT(carjmbre);
+	void palette_init_carjmbre(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 protected:
 	virtual void machine_start() override;
@@ -124,7 +124,7 @@ static const res_net_info carjmbre_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(carjmbre_state, carjmbre)
+void carjmbre_state::palette_init_carjmbre(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -134,7 +134,7 @@ PALETTE_INIT_MEMBER(carjmbre_state, carjmbre)
 	palette.palette()->normalize_range(0, 63);
 }
 
-WRITE8_MEMBER(carjmbre_state::bgcolor_w)
+void carjmbre_state::bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// guessed, seems to match with flyer
 	m_bgcolor = ~data & 0x3f;
@@ -143,13 +143,13 @@ WRITE8_MEMBER(carjmbre_state::bgcolor_w)
 
 // tilemap
 
-WRITE8_MEMBER(carjmbre_state::videoram_w)
+void carjmbre_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-TILE_GET_INFO_MEMBER(carjmbre_state::get_tile_info)
+void carjmbre_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[tile_index | 0x400];
 	int code = (m_videoram[tile_index] & 0xff) | (attr << 1 & 0x100);
@@ -213,20 +213,20 @@ void carjmbre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 // maincpu side
 
-INTERRUPT_GEN_MEMBER(carjmbre_state::vblank_nmi)
+void carjmbre_state::vblank_nmi(device_t &device)
 {
 	if (m_nmi_enabled)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(carjmbre_state::nmi_enable_w)
+void carjmbre_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: enable/clear vblank nmi
 	m_nmi_enabled = bool(data & 1);
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(carjmbre_state::flipscreen_w)
+void carjmbre_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: flip screen (cocktail mode)
 	flip_screen_set(data & 1);

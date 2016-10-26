@@ -16,7 +16,7 @@
 #include "includes/rungun.h"
 
 /* TTL text plane stuff */
-TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
+void rungun_state::ttl_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t base_addr = (uintptr_t)tilemap.user_data();
 	uint8_t *lvram = (uint8_t *)m_ttl_vram.get() + base_addr;
@@ -33,30 +33,30 @@ K055673_CB_MEMBER(rungun_state::sprite_callback)
 	*color = m_sprite_colorbase | (*color & 0x001f);
 }
 
-READ16_MEMBER(rungun_state::rng_ttl_ram_r)
+uint16_t rungun_state::rng_ttl_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ttl_vram[offset+(m_video_mux_bank*0x1000)];
 }
 
-WRITE16_MEMBER(rungun_state::rng_ttl_ram_w)
+void rungun_state::rng_ttl_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ttl_vram[offset+(m_video_mux_bank*0x1000)]);
 	m_ttl_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
 }
 
 /* 53936 (PSAC2) rotation/zoom plane */
-READ16_MEMBER(rungun_state::rng_psac2_videoram_r)
+uint16_t rungun_state::rng_psac2_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_psac2_vram[offset+(m_video_mux_bank*0x80000)];
 }
 
-WRITE16_MEMBER(rungun_state::rng_psac2_videoram_w)
+void rungun_state::rng_psac2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_psac2_vram[offset+(m_video_mux_bank*0x80000)]);
 	m_936_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(rungun_state::get_rng_936_tile_info)
+void rungun_state::get_rng_936_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t base_addr = (uintptr_t)tilemap.user_data();
 	int tileno, colour, flipx;

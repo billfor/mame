@@ -38,13 +38,13 @@ public:
 	required_shared_ptr<uint16_t> m_vram;
 	uint8_t m_map_vreg;
 	required_shared_ptr<uint16_t> m_io;
-	DECLARE_READ16_MEMBER(jackpool_ff_r);
-	DECLARE_READ16_MEMBER(jackpool_io_r);
-	DECLARE_WRITE16_MEMBER(jackpool_io_w);
-	DECLARE_DRIVER_INIT(jackpool);
+	uint16_t jackpool_ff_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t jackpool_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void jackpool_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void init_jackpool();
 	virtual void video_start() override;
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
+	void jackpool_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -101,12 +101,12 @@ uint32_t jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_in
 }
 
 /*Communication ram*/
-READ16_MEMBER(jackpool_state::jackpool_ff_r)
+uint16_t jackpool_state::jackpool_ff_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-READ16_MEMBER(jackpool_state::jackpool_io_r)
+uint16_t jackpool_state::jackpool_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset*2)
 	{
@@ -135,7 +135,7 @@ READ16_MEMBER(jackpool_state::jackpool_io_r)
 	return m_io[offset];
 }
 
-WRITE16_MEMBER(jackpool_state::jackpool_io_w)
+void jackpool_state::jackpool_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_io[offset]);
 
@@ -259,7 +259,7 @@ GFXDECODE_END
 
 
 /*irq 2 used for communication stuff.3 is just a rte*/
-INTERRUPT_GEN_MEMBER(jackpool_state::jackpool_interrupt)
+void jackpool_state::jackpool_interrupt(device_t &device)
 {
 	device.execute().set_input_line(1, HOLD_LINE);
 }
@@ -307,7 +307,7 @@ ROM_START( jackpool )
 	ROM_LOAD( "jpc7", 0xc0000, 0x40000,  CRC(b1d40623) SHA1(fb76ae6b53474bd4bee19dbce9537da0f2b63ff4) )
 ROM_END
 
-DRIVER_INIT_MEMBER(jackpool_state,jackpool)
+void jackpool_state::init_jackpool()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 

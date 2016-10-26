@@ -23,11 +23,11 @@ public:
 	{ }
 
 	// in drivers/zerozone.c
-	DECLARE_WRITE16_MEMBER(sound_w);
+	void sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// in video/zerozone.c
-	DECLARE_WRITE16_MEMBER(tilemap_w);
-	DECLARE_WRITE16_MEMBER(tilebank_w);
+	void tilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -53,5 +53,5 @@ protected:
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	TILE_GET_INFO_MEMBER(get_zerozone_tile_info);
+	void get_zerozone_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 };

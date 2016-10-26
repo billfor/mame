@@ -37,7 +37,7 @@ DIP-SWs
       1  irq7
 */
 
-WRITE_LINE_MEMBER( isa8_mpu401_device::mpu_irq_out )
+void isa8_mpu401_device::mpu_irq_out(int state)
 {
 }
 
@@ -81,7 +81,7 @@ void isa8_mpu401_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_device(0x330, 0x0331, READ8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_r), WRITE8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_w));
+	m_isa->install_device(0x330, 0x0331, read8_delegate(FUNC(mpu401_device::mpu_r), (mpu401_device *)m_mpu401), write8_delegate(FUNC(mpu401_device::mpu_w), (mpu401_device *)m_mpu401));
 }
 
 //-------------------------------------------------

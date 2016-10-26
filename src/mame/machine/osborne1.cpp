@@ -12,19 +12,19 @@ There are three IRQ sources:
 #include "includes/osborne1.h"
 
 
-WRITE8_MEMBER( osborne1_state::bank_0xxx_w )
+void osborne1_state::bank_0xxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_rom_mode)
 		m_ram->pointer()[offset] = data;
 }
 
-WRITE8_MEMBER( osborne1_state::bank_1xxx_w )
+void osborne1_state::bank_1xxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_rom_mode)
 		m_ram->pointer()[0x1000 + offset] = data;
 }
 
-READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
+uint8_t osborne1_state::bank_2xxx_3xxx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!m_rom_mode)
 		return m_ram->pointer()[0x2000 + offset];
@@ -62,7 +62,7 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 	return data;
 }
 
-WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
+void osborne1_state::bank_2xxx_3xxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_rom_mode)
 	{
@@ -90,7 +90,7 @@ WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
 	}
 }
 
-WRITE8_MEMBER( osborne1_state::videoram_w )
+void osborne1_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Attribute RAM is only one bit wide - low seven bits are discarded and read back high
 	if (m_bit_9)
@@ -100,7 +100,7 @@ WRITE8_MEMBER( osborne1_state::videoram_w )
 	reinterpret_cast<uint8_t *>(m_bank_fxxx->base())[offset] = data;
 }
 
-READ8_MEMBER( osborne1_state::opcode_r )
+uint8_t osborne1_state::opcode_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!space.debugger_access())
 	{
@@ -124,7 +124,7 @@ READ8_MEMBER( osborne1_state::opcode_r )
 	return data;
 }
 
-WRITE8_MEMBER( osborne1_state::bankswitch_w )
+void osborne1_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -147,7 +147,7 @@ WRITE8_MEMBER( osborne1_state::bankswitch_w )
 	}
 }
 
-WRITE_LINE_MEMBER( osborne1_state::irqack_w )
+void osborne1_state::irqack_w(int state)
 {
 	// Update the flipflops that control bank selection and NMI
 	if (!m_rom_mode) set_rom_mode(m_ub4a_q ? 0 : 1);
@@ -157,7 +157,7 @@ WRITE_LINE_MEMBER( osborne1_state::irqack_w )
 }
 
 
-READ8_MEMBER( osborne1_state::ieee_pia_pb_r )
+uint8_t osborne1_state::ieee_pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    bit     description
@@ -181,7 +181,7 @@ READ8_MEMBER( osborne1_state::ieee_pia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( osborne1_state::ieee_pia_pb_w )
+void osborne1_state::ieee_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    bit     description
@@ -202,20 +202,20 @@ WRITE8_MEMBER( osborne1_state::ieee_pia_pb_w )
 	m_ieee->nrfd_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( osborne1_state::ieee_pia_irq_a_func )
+void osborne1_state::ieee_pia_irq_a_func(int state)
 {
 	update_irq();
 }
 
 
-WRITE8_MEMBER( osborne1_state::video_pia_port_a_w )
+void osborne1_state::video_pia_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_x = data >> 1;
 
 	m_fdc->dden_w(BIT(data, 0));
 }
 
-WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
+void osborne1_state::video_pia_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w((BIT(data, 5) && m_beep_state) ? 1 : 0);
 
@@ -235,24 +235,24 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 	}
 }
 
-WRITE_LINE_MEMBER( osborne1_state::video_pia_out_cb2_dummy )
+void osborne1_state::video_pia_out_cb2_dummy(int state)
 {
 }
 
-WRITE_LINE_MEMBER( osborne1_state::video_pia_irq_a_func )
+void osborne1_state::video_pia_irq_a_func(int state)
 {
 	update_irq();
 }
 
 
-WRITE_LINE_MEMBER( osborne1_state::serial_acia_irq_func )
+void osborne1_state::serial_acia_irq_func(int state)
 {
 	m_acia_irq_state = state;
 	update_irq();
 }
 
 
-DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
+void osborne1_state::init_osborne1()
 {
 	m_bank_0xxx->configure_entries(0, 1, m_ram->pointer(), 0);
 	m_bank_0xxx->configure_entries(1, 1, m_region_maincpu->base(), 0);
@@ -368,7 +368,7 @@ void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
+void osborne1_state::video_callback(void *ptr, int32_t param)
 {
 	int const y = machine().first_screen()->vpos();
 	uint8_t const ra = y % 10;
@@ -451,7 +451,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 }
 
 
-TILE_GET_INFO_MEMBER(osborne1_state::get_tile_info)
+void osborne1_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	// The gfxdecode and tilemap aren't actually used for drawing, they just look nice in the F4 GFX viewer
 	tileinfo.set(0, m_ram->pointer()[0xF000 | tile_index] & 0x7F, 0, 0);

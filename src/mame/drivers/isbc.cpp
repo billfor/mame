@@ -48,13 +48,13 @@ public:
 	optional_device<centronics_device> m_centronics;
 	optional_device<input_buffer_device> m_cent_status_in;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	void write_centronics_ack(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
-	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
-	DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE8_MEMBER(ppi_c_w);
+	void isbc86_tmr2_w(int state);
+	void isbc286_tmr2_w(int state);
+	void isbc_uart8274_irq(int state);
+	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 protected:
 	void machine_reset() override;
 };
@@ -162,13 +162,13 @@ static DEVICE_INPUT_DEFAULTS_START( isbc286_terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-WRITE_LINE_MEMBER( isbc_state::isbc86_tmr2_w )
+void isbc_state::isbc86_tmr2_w(int state)
 {
 	m_uart8251->write_rxc(state);
 	m_uart8251->write_txc(state);
 }
 
-READ8_MEMBER( isbc_state::get_slave_ack )
+uint8_t isbc_state::get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 7)
 		return m_pic_1->acknowledge();
@@ -176,13 +176,13 @@ READ8_MEMBER( isbc_state::get_slave_ack )
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER( isbc_state::isbc286_tmr2_w )
+void isbc_state::isbc286_tmr2_w(int state)
 {
 	m_uart8274->rxca_w(state);
 	m_uart8274->txca_w(state);
 }
 
-WRITE_LINE_MEMBER( isbc_state::write_centronics_ack )
+void isbc_state::write_centronics_ack(int state)
 {
 	m_cent_status_in->write_bit4(state);
 
@@ -190,7 +190,7 @@ WRITE_LINE_MEMBER( isbc_state::write_centronics_ack )
 		m_pic_1->ir7_w(1);
 }
 
-WRITE8_MEMBER( isbc_state::ppi_c_w )
+void isbc_state::ppi_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics->write_strobe(data & 1);
 
@@ -198,7 +198,7 @@ WRITE8_MEMBER( isbc_state::ppi_c_w )
 		m_pic_1->ir7_w(0);
 }
 
-WRITE_LINE_MEMBER(isbc_state::isbc_uart8274_irq)
+void isbc_state::isbc_uart8274_irq(int state)
 {
 	m_uart8274->m1_r(); // always set
 	m_pic_0->ir6_w(state);

@@ -476,55 +476,55 @@ public:
 	uint32_t m_cmos_write_enabled;
 	uint32_t m_output;
 	uint8_t m_output_mode;
-	DECLARE_READ32_MEMBER(interrupt_state_r);
-	DECLARE_READ32_MEMBER(interrupt_state2_r);
-	DECLARE_WRITE32_MEMBER(interrupt_config_w);
-	DECLARE_WRITE32_MEMBER(seattle_interrupt_enable_w);
-	DECLARE_WRITE32_MEMBER(vblank_clear_w);
-	DECLARE_READ32_MEMBER(galileo_r);
-	DECLARE_WRITE32_MEMBER(galileo_w);
-	DECLARE_WRITE32_MEMBER(seattle_voodoo_w);
-	DECLARE_READ32_MEMBER(analog_port_r);
-	DECLARE_WRITE32_MEMBER(analog_port_w);
-	DECLARE_READ32_MEMBER(carnevil_gun_r);
-	DECLARE_WRITE32_MEMBER(carnevil_gun_w);
-	DECLARE_WRITE32_MEMBER(cmos_w);
-	DECLARE_READ32_MEMBER(cmos_r);
-	DECLARE_WRITE32_MEMBER(cmos_protect_w);
-	DECLARE_READ32_MEMBER(cmos_protect_r);
-	DECLARE_WRITE32_MEMBER(seattle_watchdog_w);
-	DECLARE_WRITE32_MEMBER(asic_reset_w);
-	DECLARE_WRITE32_MEMBER(asic_fifo_w);
-	DECLARE_READ32_MEMBER(status_leds_r);
-	DECLARE_WRITE32_MEMBER(status_leds_w);
-	DECLARE_READ32_MEMBER(ethernet_r);
-	DECLARE_WRITE32_MEMBER(ethernet_w);
-	DECLARE_READ32_MEMBER(output_r);
-	DECLARE_WRITE32_MEMBER(output_w);
-	DECLARE_READ32_MEMBER(widget_r);
-	DECLARE_WRITE32_MEMBER(widget_w);
-	DECLARE_READ32_MEMBER(seattle_ide_r);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_stall);
-	DECLARE_DRIVER_INIT(sfrush);
-	DECLARE_DRIVER_INIT(blitz2k);
-	DECLARE_DRIVER_INIT(carnevil);
-	DECLARE_DRIVER_INIT(biofreak);
-	DECLARE_DRIVER_INIT(calspeed);
-	DECLARE_DRIVER_INIT(sfrushrk);
-	DECLARE_DRIVER_INIT(vaportrx);
-	DECLARE_DRIVER_INIT(hyprdriv);
-	DECLARE_DRIVER_INIT(blitz);
-	DECLARE_DRIVER_INIT(wg3dh);
-	DECLARE_DRIVER_INIT(mace);
-	DECLARE_DRIVER_INIT(blitz99);
+	uint32_t interrupt_state_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t interrupt_state2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void interrupt_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void seattle_interrupt_enable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void vblank_clear_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t galileo_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void galileo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void seattle_voodoo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t analog_port_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void analog_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t carnevil_gun_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void carnevil_gun_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void cmos_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cmos_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cmos_protect_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cmos_protect_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void seattle_watchdog_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void asic_reset_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void asic_fifo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t status_leds_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void status_leds_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ethernet_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ethernet_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t output_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void output_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t widget_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void widget_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t seattle_ide_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ide_interrupt(int state);
+	void vblank_assert(int state);
+	void voodoo_stall(int state);
+	void init_sfrush();
+	void init_blitz2k();
+	void init_carnevil();
+	void init_biofreak();
+	void init_calspeed();
+	void init_sfrushrk();
+	void init_vaportrx();
+	void init_hyprdriv();
+	void init_blitz();
+	void init_wg3dh();
+	void init_mace();
+	void init_blitz99();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(galileo_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
+	void galileo_timer_callback(void *ptr, int32_t param);
+	void ethernet_interrupt(int state);
+	void ioasic_irq(int state);
 	void update_vblank_irq();
 	uint32_t pci_bridge_r(address_space &space, uint8_t reg, uint8_t type);
 	void pci_bridge_w(address_space &space, uint8_t reg, uint8_t type, uint32_t data);
@@ -647,7 +647,7 @@ void seattle_state::machine_reset()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(seattle_state::ide_interrupt)
+void seattle_state::ide_interrupt(int state)
 {
 	m_maincpu->set_input_line(IDE_IRQ_NUM, state);
 }
@@ -660,7 +660,7 @@ WRITE_LINE_MEMBER(seattle_state::ide_interrupt)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(seattle_state::ethernet_interrupt)
+void seattle_state::ethernet_interrupt(int state)
 {
 	m_ethernet_irq_state = state;
 	if (m_board_config == FLAGSTAFF_CONFIG)
@@ -680,7 +680,7 @@ WRITE_LINE_MEMBER(seattle_state::ethernet_interrupt)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(seattle_state::ioasic_irq)
+void seattle_state::ioasic_irq(int state)
 {
 	m_maincpu->set_input_line(IOASIC_IRQ_NUM, state);
 }
@@ -692,7 +692,7 @@ WRITE_LINE_MEMBER(seattle_state::ioasic_irq)
  *
  *************************************/
 
-READ32_MEMBER(seattle_state::interrupt_state_r)
+uint32_t seattle_state::interrupt_state_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	result |= m_ethernet_irq_state << ETHERNET_IRQ_SHIFT;
@@ -701,7 +701,7 @@ READ32_MEMBER(seattle_state::interrupt_state_r)
 }
 
 
-READ32_MEMBER(seattle_state::interrupt_state2_r)
+uint32_t seattle_state::interrupt_state2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = interrupt_state_r(space, offset, mem_mask);
 	result |= m_vblank_state << 8;
@@ -709,7 +709,7 @@ READ32_MEMBER(seattle_state::interrupt_state2_r)
 }
 
 
-WRITE32_MEMBER(seattle_state::interrupt_config_w)
+void seattle_state::interrupt_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int irq;
 	COMBINE_DATA(m_interrupt_config);
@@ -752,7 +752,7 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 }
 
 
-WRITE32_MEMBER(seattle_state::seattle_interrupt_enable_w)
+void seattle_state::seattle_interrupt_enable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = *m_interrupt_enable;
 	COMBINE_DATA(m_interrupt_enable);
@@ -788,7 +788,7 @@ void seattle_state::update_vblank_irq()
 }
 
 
-WRITE32_MEMBER(seattle_state::vblank_clear_w)
+void seattle_state::vblank_clear_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* clear the latch and update the IRQ */
 	m_vblank_latch = 0;
@@ -796,7 +796,7 @@ WRITE32_MEMBER(seattle_state::vblank_clear_w)
 }
 
 
-WRITE_LINE_MEMBER(seattle_state::vblank_assert)
+void seattle_state::vblank_assert(int state)
 {
 	/* cache the raw state */
 	m_vblank_state = state;
@@ -952,7 +952,7 @@ void seattle_state::update_galileo_irqs()
 }
 
 
-TIMER_CALLBACK_MEMBER(seattle_state::galileo_timer_callback)
+void seattle_state::galileo_timer_callback(void *ptr, int32_t param)
 {
 	int which = param;
 	galileo_timer *timer = &m_galileo.timer[which];
@@ -1131,7 +1131,7 @@ void seattle_state::galileo_reset()
 }
 
 
-READ32_MEMBER(seattle_state::galileo_r)
+uint32_t seattle_state::galileo_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	galileo_data &galileo = m_galileo;
 	uint32_t result = galileo.reg[offset];
@@ -1213,7 +1213,7 @@ READ32_MEMBER(seattle_state::galileo_r)
 }
 
 
-WRITE32_MEMBER(seattle_state::galileo_w)
+void seattle_state::galileo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	galileo_data &galileo = m_galileo;
 	uint32_t oldata = galileo.reg[offset];
@@ -1356,7 +1356,7 @@ WRITE32_MEMBER(seattle_state::galileo_w)
  *
  *************************************/
 
-WRITE32_MEMBER(seattle_state::seattle_voodoo_w)
+void seattle_state::seattle_voodoo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* if we're not stalled, just write and get out */
 	if (!m_voodoo_stalled)
@@ -1381,7 +1381,7 @@ WRITE32_MEMBER(seattle_state::seattle_voodoo_w)
 }
 
 
-WRITE_LINE_MEMBER(seattle_state::voodoo_stall)
+void seattle_state::voodoo_stall(int state)
 {
 	/* set the new state */
 	m_voodoo_stalled = state;
@@ -1447,13 +1447,13 @@ WRITE_LINE_MEMBER(seattle_state::voodoo_stall)
  *
  *************************************/
 
-READ32_MEMBER(seattle_state::analog_port_r)
+uint32_t seattle_state::analog_port_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_pending_analog_read;
 }
 
 
-WRITE32_MEMBER(seattle_state::analog_port_w)
+void seattle_state::analog_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
 
@@ -1470,7 +1470,7 @@ WRITE32_MEMBER(seattle_state::analog_port_w)
  *
  *************************************/
 
-READ32_MEMBER(seattle_state::carnevil_gun_r)
+uint32_t seattle_state::carnevil_gun_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
@@ -1516,7 +1516,7 @@ READ32_MEMBER(seattle_state::carnevil_gun_r)
 }
 
 
-WRITE32_MEMBER(seattle_state::carnevil_gun_w)
+void seattle_state::carnevil_gun_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("carnevil_gun_w(%d) = %02X\n", offset, data);
 }
@@ -1529,7 +1529,7 @@ WRITE32_MEMBER(seattle_state::carnevil_gun_w)
  *
  *************************************/
 
-READ32_MEMBER(seattle_state::ethernet_r)
+uint32_t seattle_state::ethernet_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (!(offset & 8))
 		return m_ethernet->read(space, offset & 7, mem_mask & 0xffff);
@@ -1538,7 +1538,7 @@ READ32_MEMBER(seattle_state::ethernet_r)
 }
 
 
-WRITE32_MEMBER(seattle_state::ethernet_w)
+void seattle_state::ethernet_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (!(offset & 8))
 		m_ethernet->write(space, offset & 7, data & 0xffff, mem_mask | 0xffff);
@@ -1574,13 +1574,13 @@ void seattle_state::update_widget_irq()
 }
 
 
-READ32_MEMBER(seattle_state::output_r)
+uint32_t seattle_state::output_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_output;
 }
 
 
-WRITE32_MEMBER(seattle_state::output_w)
+void seattle_state::output_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t op = (data >> 8) & 0xF;
 	uint8_t arg = data & 0xFF;
@@ -1633,7 +1633,7 @@ WRITE32_MEMBER(seattle_state::output_w)
 }
 
 
-READ32_MEMBER(seattle_state::widget_r)
+uint32_t seattle_state::widget_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = ~0;
 
@@ -1667,7 +1667,7 @@ READ32_MEMBER(seattle_state::widget_r)
 }
 
 
-WRITE32_MEMBER(seattle_state::widget_w)
+void seattle_state::widget_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (LOG_WIDGET)
 		logerror("Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
@@ -1705,7 +1705,7 @@ WRITE32_MEMBER(seattle_state::widget_w)
  *
  *************************************/
 
-WRITE32_MEMBER(seattle_state::cmos_w)
+void seattle_state::cmos_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cmos_write_enabled)
 		COMBINE_DATA(m_nvram + offset);
@@ -1713,19 +1713,19 @@ WRITE32_MEMBER(seattle_state::cmos_w)
 }
 
 
-READ32_MEMBER(seattle_state::cmos_r)
+uint32_t seattle_state::cmos_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_nvram[offset];
 }
 
 
-WRITE32_MEMBER(seattle_state::cmos_protect_w)
+void seattle_state::cmos_protect_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_cmos_write_enabled = true;
 }
 
 
-READ32_MEMBER(seattle_state::cmos_protect_r)
+uint32_t seattle_state::cmos_protect_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_cmos_write_enabled;
 }
@@ -1738,13 +1738,13 @@ READ32_MEMBER(seattle_state::cmos_protect_r)
  *
  *************************************/
 
-WRITE32_MEMBER(seattle_state::seattle_watchdog_w)
+void seattle_state::seattle_watchdog_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	space.device().execute().eat_cycles(100);
 }
 
 
-WRITE32_MEMBER(seattle_state::asic_reset_w)
+void seattle_state::asic_reset_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_asic_reset);
 	if (!(*m_asic_reset & 0x0002))
@@ -1752,19 +1752,19 @@ WRITE32_MEMBER(seattle_state::asic_reset_w)
 }
 
 
-WRITE32_MEMBER(seattle_state::asic_fifo_w)
+void seattle_state::asic_fifo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ioasic->fifo_w(data);
 }
 
 
-READ32_MEMBER(seattle_state::status_leds_r)
+uint32_t seattle_state::status_leds_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_status_leds | 0xffffff00;
 }
 
 
-WRITE32_MEMBER(seattle_state::status_leds_w)
+void seattle_state::status_leds_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_status_leds = data;
@@ -1849,7 +1849,7 @@ PCI Mem  = 08000000-09FFFFFF
 
 */
 
-READ32_MEMBER(seattle_state::seattle_ide_r)
+uint32_t seattle_state::seattle_ide_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* note that blitz times out if we don't have this cycle stealing */
 	if (offset == 6/4)
@@ -3169,7 +3169,7 @@ void seattle_state::init_common(int config)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,wg3dh)
+void seattle_state::init_wg3dh()
 {
 	init_common(PHOENIX_CONFIG);
 
@@ -3180,7 +3180,7 @@ DRIVER_INIT_MEMBER(seattle_state,wg3dh)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,mace)
+void seattle_state::init_mace()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -3189,7 +3189,7 @@ DRIVER_INIT_MEMBER(seattle_state,mace)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,sfrush)
+void seattle_state::init_sfrush()
 {
 	init_common(FLAGSTAFF_CONFIG);
 
@@ -3200,7 +3200,7 @@ DRIVER_INIT_MEMBER(seattle_state,sfrush)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
+void seattle_state::init_sfrushrk()
 {
 	init_common(FLAGSTAFF_CONFIG);
 
@@ -3212,7 +3212,7 @@ DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,calspeed)
+void seattle_state::init_calspeed()
 {
 	init_common(SEATTLE_WIDGET_CONFIG);
 
@@ -3222,7 +3222,7 @@ DRIVER_INIT_MEMBER(seattle_state,calspeed)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,vaportrx)
+void seattle_state::init_vaportrx()
 {
 	init_common(SEATTLE_WIDGET_CONFIG);
 
@@ -3233,13 +3233,13 @@ DRIVER_INIT_MEMBER(seattle_state,vaportrx)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,biofreak)
+void seattle_state::init_biofreak()
 {
 	init_common(SEATTLE_CONFIG);
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,blitz)
+void seattle_state::init_blitz()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -3252,7 +3252,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,blitz99)
+void seattle_state::init_blitz99()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -3262,7 +3262,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz99)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,blitz2k)
+void seattle_state::init_blitz2k()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -3272,7 +3272,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz2k)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,carnevil)
+void seattle_state::init_carnevil()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -3285,7 +3285,7 @@ DRIVER_INIT_MEMBER(seattle_state,carnevil)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
+void seattle_state::init_hyprdriv()
 {
 	init_common(SEATTLE_WIDGET_CONFIG);
 

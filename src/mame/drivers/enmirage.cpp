@@ -74,13 +74,13 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_DRIVER_INIT(mirage);
+	void init_mirage();
 	virtual void video_start() override;
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
-	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);
-	DECLARE_WRITE_LINE_MEMBER(mirage_doc_irq);
-	DECLARE_READ8_MEMBER(mirage_adc_read);
+	void mirage_via_write_porta(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mirage_via_write_portb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mirage_doc_irq(int state);
+	uint8_t mirage_adc_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	uint8_t m_l_segs, m_r_segs;
 	int   m_l_hi, m_r_hi;
@@ -94,12 +94,12 @@ static SLOT_INTERFACE_START( ensoniq_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER(mirage_state::mirage_doc_irq)
+void mirage_state::mirage_doc_irq(int state)
 {
 //    m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
-READ8_MEMBER(mirage_state::mirage_adc_read)
+uint8_t mirage_state::mirage_adc_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
@@ -136,7 +136,7 @@ ADDRESS_MAP_END
 // bits 0-2: column select from 0-7
 // bits 3/4 = right and left LED enable
 // bits 5/6/7 keypad rows 0/1/2 return
-WRITE8_MEMBER(mirage_state::mirage_via_write_porta)
+void mirage_state::mirage_via_write_porta(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t seg = data & 7;
 	static const int segconv[8] =
@@ -192,7 +192,7 @@ WRITE8_MEMBER(mirage_state::mirage_via_write_porta)
 //  bit 1: OUT upper/lower bank (64k halves)
 //  bit 0: OUT bank 0/bank 1 (32k halves)
 
-WRITE8_MEMBER(mirage_state::mirage_via_write_portb)
+void mirage_state::mirage_via_write_portb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = 0;
 
@@ -246,7 +246,7 @@ ROM_START( enmirage )
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE)
 ROM_END
 
-DRIVER_INIT_MEMBER(mirage_state,mirage)
+void mirage_state::init_mirage()
 {
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : nullptr;

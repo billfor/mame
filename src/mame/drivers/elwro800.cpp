@@ -54,15 +54,15 @@ public:
 	uint8_t m_NR;
 	uint8_t m_df_on_databus;
 
-	DECLARE_DIRECT_UPDATE_MEMBER(elwro800_direct_handler);
-	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
-	DECLARE_READ8_MEMBER(elwro800jr_io_r);
-	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
-	DECLARE_MACHINE_RESET(elwro800);
-	INTERRUPT_GEN_MEMBER(elwro800jr_interrupt);
-	DECLARE_READ8_MEMBER(i8255_port_c_r);
-	DECLARE_WRITE8_MEMBER(i8255_port_c_w);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	offs_t elwro800_direct_handler(direct_read_data &direct, offs_t address);
+	void elwro800jr_fdc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t elwro800jr_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void elwro800jr_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void machine_reset_elwro800();
+	void elwro800jr_interrupt(device_t &device);
+	uint8_t i8255_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8255_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_centronics_ack(int state);
 
 protected:
 	required_device<i8251_device> m_i8251;
@@ -85,7 +85,7 @@ protected:
  * (note that in CP/J mode address 66 is used for FCB)
  *
  *************************************/
-DIRECT_UPDATE_MEMBER(elwro800_state::elwro800_direct_handler)
+offs_t elwro800_state::elwro800_direct_handler(direct_read_data &direct, offs_t address)
 {
 	if (m_ram_at_0000 && address == 0x66)
 	{
@@ -101,7 +101,7 @@ DIRECT_UPDATE_MEMBER(elwro800_state::elwro800_direct_handler)
  *
  *************************************/
 
-WRITE8_MEMBER(elwro800_state::elwro800jr_fdc_control_w)
+void elwro800_state::elwro800jr_fdc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd765_0->get_device()->mon_w(!BIT(data, 0));
 	m_upd765_1->get_device()->mon_w(!BIT(data, 1));
@@ -185,18 +185,18 @@ void elwro800_state::elwro800jr_mmu_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(elwro800_state::write_centronics_ack)
+void elwro800_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 	m_i8255->pc2_w(state);
 }
 
-READ8_MEMBER(elwro800_state::i8255_port_c_r)
+uint8_t elwro800_state::i8255_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_centronics_ack << 2;
 }
 
-WRITE8_MEMBER(elwro800_state::i8255_port_c_w)
+void elwro800_state::i8255_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics->write_strobe((data >> 7) & 0x01);
 }
@@ -223,7 +223,7 @@ WRITE8_MEMBER(elwro800_state::i8255_port_c_w)
  *  0x??FE, 0x??7F, 0x??7B (read): keyboard reading
  *************************************/
 
-READ8_MEMBER(elwro800_state::elwro800jr_io_r)
+uint8_t elwro800_state::elwro800jr_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *prom = memregion("proms")->base();
 	uint8_t cs = prom[offset & 0x1ff];
@@ -307,7 +307,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
+void elwro800_state::elwro800jr_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *prom = memregion("proms")->base();
 	uint8_t cs = prom[offset & 0x1ff];
@@ -492,7 +492,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(elwro800_state,elwro800)
+void elwro800_state::machine_reset_elwro800()
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -510,7 +510,7 @@ MACHINE_RESET_MEMBER(elwro800_state,elwro800)
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(elwro800_state::elwro800_direct_handler), this));
 }
 
-INTERRUPT_GEN_MEMBER(elwro800_state::elwro800jr_interrupt)
+void elwro800_state::elwro800jr_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }

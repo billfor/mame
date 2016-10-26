@@ -84,16 +84,16 @@ public:
 	required_memory_region m_char_rom;
 	required_shared_ptr<uint8_t> m_video_ram;
 
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
-	DECLARE_WRITE8_MEMBER( scroll_w );
-	//DECLARE_WRITE8_MEMBER( x120_system_w );
-	DECLARE_READ8_MEMBER( kbpio_pa_r );
-	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
-	DECLARE_READ8_MEMBER( kbpio_pb_r );
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	//void x120_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kbpio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbpio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kbpio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fr_w(int state);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	virtual void bankswitch(int bank);
 	void update_nmi();
@@ -112,7 +112,7 @@ public:
 	int m_8n5;                          /* 5.25" / 8" drive select */
 	int m_400_460;                      /* double sided disk detect */
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+	void ctc_tick(timer_device &timer, void *ptr, int32_t param);
 };
 
 class bigboard_state : public xerox820_state
@@ -127,11 +127,11 @@ public:
 
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( kbpio_pa_w );
+	void kbpio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	bool m_bit5;
 
-	TIMER_CALLBACK_MEMBER(bigboard_beepoff);
+	void bigboard_beepoff(void *ptr, int32_t param);
 };
 
 class xerox820ii_state : public xerox820_state
@@ -149,14 +149,14 @@ public:
 
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( bell_w );
-	DECLARE_WRITE8_MEMBER( slden_w );
-	DECLARE_WRITE8_MEMBER( chrom_w );
-	DECLARE_WRITE8_MEMBER( lowlite_w );
-	DECLARE_WRITE8_MEMBER( sync_w );
+	void bell_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void slden_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chrom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lowlite_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sync_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( rdpio_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( rdpio_pardy_w );
+	void rdpio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rdpio_pardy_w(int state);
 
 	void bankswitch(int bank) override;
 };

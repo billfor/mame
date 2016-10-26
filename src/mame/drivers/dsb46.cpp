@@ -34,12 +34,12 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE8_MEMBER(port1a_w);
-	DECLARE_DRIVER_INIT(dsb46);
-	DECLARE_MACHINE_RESET(dsb46);
+	uint8_t port00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port01_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port1a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_dsb46();
+	void machine_reset_dsb46();
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -71,7 +71,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( dsb46 )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(dsb46_state, dsb46)
+void dsb46_state::init_dsb46()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("read")->configure_entry(0, &RAM[0x10000]);
@@ -79,7 +79,7 @@ DRIVER_INIT_MEMBER(dsb46_state, dsb46)
 	membank("write")->configure_entry(0, &RAM[0x00000]);
 }
 
-MACHINE_RESET_MEMBER( dsb46_state,dsb46 )
+void dsb46_state::machine_reset_dsb46()
 {
 	membank("read")->set_entry(0);
 	membank("write")->set_entry(0);
@@ -87,24 +87,24 @@ MACHINE_RESET_MEMBER( dsb46_state,dsb46 )
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( dsb46_state::port1a_w )
+void dsb46_state::port1a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("read")->set_entry(data & 1);
 }
 
-READ8_MEMBER( dsb46_state::port01_r )
+uint8_t dsb46_state::port01_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 5 : 4;
 }
 
-READ8_MEMBER( dsb46_state::port00_r )
+uint8_t dsb46_state::port00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( dsb46_state::kbd_put )
+void dsb46_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

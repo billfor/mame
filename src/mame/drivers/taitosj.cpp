@@ -172,7 +172,7 @@ TODO:
 #include "machine/watchdog.h"
 
 
-WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
+void taitosj_state::taitosj_sndnmi_msk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sndnmi_disable = (data & 1);
 	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
@@ -181,7 +181,7 @@ WRITE8_MEMBER(taitosj_state::taitosj_sndnmi_msk_w)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(taitosj_state::sound_command_w)
+void taitosj_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_cmd_written = true;
 	m_soundlatch->write(space,0,data);
@@ -192,13 +192,13 @@ WRITE8_MEMBER(taitosj_state::sound_command_w)
 }
 
 
-WRITE8_MEMBER(taitosj_state::input_port_4_f0_w)
+void taitosj_state::input_port_4_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_port_4_f0 = data >> 4;
 }
 
 // EPORT2
-WRITE8_MEMBER(taitosj_state::sound_semaphore_w)
+void taitosj_state::sound_semaphore_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_semaphore = (data & 1);
 	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
@@ -207,7 +207,7 @@ WRITE8_MEMBER(taitosj_state::sound_semaphore_w)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(taitosj_state::input_port_4_f0_r)
+ioport_value taitosj_state::input_port_4_f0_r(ioport_field &field, void *param)
 {
 	return m_input_port_4_f0;
 }
@@ -264,7 +264,7 @@ ADDRESS_MAP_END
 
 /* seems the most logical way to do the gears */
 
-CUSTOM_INPUT_MEMBER(taitosj_state::kikstart_gear_r)
+ioport_value taitosj_state::kikstart_gear_r(ioport_field &field, void *param)
 {
 	const char *port_tag;
 
@@ -324,26 +324,26 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 ADDRESS_MAP_END
 
 // RD5000
-READ8_MEMBER(taitosj_state::sound_command_r)
+uint8_t taitosj_state::sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sound_cmd_written = false;
 	return m_soundlatch->read(space,0);
 }
 
 // RD5001
-READ8_MEMBER(taitosj_state::sound_status_r)
+uint8_t taitosj_state::sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_sound_cmd_written == true ? 8 : 0) | (m_sound_semaphore == true ? 4 : 0) | 3;
 }
 
 // WR5000
-WRITE8_MEMBER(taitosj_state::sound_command_ack_w)
+void taitosj_state::sound_command_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space,0, m_soundlatch->read(space,0) & 0x7f);
 }
 
 // WR5001
-WRITE8_MEMBER(taitosj_state::sound_semaphore_clear_w)
+void taitosj_state::sound_semaphore_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_semaphore = false;
 	if ((m_sound_cmd_written && (!m_sndnmi_disable)) || m_sound_semaphore)
@@ -1742,7 +1742,7 @@ DISCRETE_SOUND_START(taitosj_dacvol)
 	DISCRETE_OUTPUT(NODE_02, 9637)
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(taitosj_state::taitosj_dacvol_w)
+void taitosj_state::taitosj_dacvol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dacvol->write(space, NODE_01, data ^ 0xff); // 7416 hex inverter
 }
@@ -2791,12 +2791,12 @@ void taitosj_state::init_common()
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(taitosj_state::reset_common), this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,taitosj)
+void taitosj_state::init_taitosj()
 {
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,spacecr)
+void taitosj_state::init_spacecr()
 {
 	init_common();
 
@@ -2804,7 +2804,7 @@ DRIVER_INIT_MEMBER(taitosj_state,spacecr)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd48b, 0xd48b, read8_delegate(FUNC(taitosj_state::spacecr_prot_r),this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,alpine)
+void taitosj_state::init_alpine()
 {
 	init_common();
 
@@ -2813,7 +2813,7 @@ DRIVER_INIT_MEMBER(taitosj_state,alpine)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50f, 0xd50f, write8_delegate(FUNC(taitosj_state::alpine_protection_w),this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,alpinea)
+void taitosj_state::init_alpinea()
 {
 	init_common();
 
@@ -2822,7 +2822,7 @@ DRIVER_INIT_MEMBER(taitosj_state,alpinea)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50e, 0xd50e, write8_delegate(FUNC(taitosj_state::alpinea_bankswitch_w),this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,junglhbr)
+void taitosj_state::init_junglhbr()
 {
 	init_common();
 

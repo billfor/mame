@@ -78,7 +78,7 @@ const tiny_rom_entry *mc1502_fdc_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-TIMER_CALLBACK_MEMBER(mc1502_fdc_device::motor_callback)
+void mc1502_fdc_device::motor_callback(void *ptr, int32_t param)
 {
 	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(ASSERT_LINE);
 	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(ASSERT_LINE);
@@ -141,7 +141,7 @@ uint8_t mc1502_fdc_device::mc1502_wd17xx_motor_r()
 	return motor_on;
 }
 
-WRITE_LINE_MEMBER( mc1502_fdc_device::mc1502_fdc_irq_drq )
+void mc1502_fdc_device::mc1502_fdc_irq_drq(int state)
 {
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
 
@@ -149,7 +149,7 @@ WRITE_LINE_MEMBER( mc1502_fdc_device::mc1502_fdc_irq_drq )
 		maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
-READ8_MEMBER( mc1502_fdc_device::mc1502_fdc_r )
+uint8_t mc1502_fdc_device::mc1502_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -163,7 +163,7 @@ READ8_MEMBER( mc1502_fdc_device::mc1502_fdc_r )
 	return data;
 }
 
-READ8_MEMBER( mc1502_fdc_device::mc1502_fdcv2_r )
+uint8_t mc1502_fdc_device::mc1502_fdcv2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -177,7 +177,7 @@ READ8_MEMBER( mc1502_fdc_device::mc1502_fdcv2_r )
 	return data;
 }
 
-WRITE8_MEMBER( mc1502_fdc_device::mc1502_fdc_w )
+void mc1502_fdc_device::mc1502_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset )
 	{
@@ -206,14 +206,14 @@ void mc1502_fdc_device::device_start()
 
 	// BIOS 5.0-5.2x
 	m_isa->install_device(0x010c, 0x010f,
-		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
-		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
+		read8_delegate(FUNC(fd1793_t::read), (fd1793_t *)m_fdc),
+		write8_delegate(FUNC(fd1793_t::write), (fd1793_t *)m_fdc) );
 	m_isa->install_device(0x0100, 0x010b, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
 
 	// BIOS 5.3x
 	m_isa->install_device(0x0048, 0x004b,
-		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
-		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
+		read8_delegate(FUNC(fd1793_t::read), (fd1793_t *)m_fdc),
+		write8_delegate(FUNC(fd1793_t::write), (fd1793_t *)m_fdc) );
 	m_isa->install_device(0x004c, 0x004f, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdcv2_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
 
 	motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc1502_fdc_device::motor_callback),this));

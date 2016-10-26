@@ -97,15 +97,15 @@ public:
 	int m_ROM_paged;
 	int m_irq_state;
 	int m_KeyRow;
-	DECLARE_WRITE8_MEMBER(ti99_2_write_kbd);
-	DECLARE_WRITE8_MEMBER(ti99_2_write_misc_cru);
-	DECLARE_READ8_MEMBER(ti99_2_read_kbd);
-	DECLARE_READ8_MEMBER(ti99_2_read_misc_cru);
-	DECLARE_DRIVER_INIT(ti99_2_24);
-	DECLARE_DRIVER_INIT(ti99_2_32);
+	void ti99_2_write_kbd(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ti99_2_write_misc_cru(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ti99_2_read_kbd(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ti99_2_read_misc_cru(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_ti99_2_24();
+	void init_ti99_2_32();
 	virtual void machine_reset() override;
 	uint32_t screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ti99_2_vblank_interrupt);
+	void ti99_2_vblank_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -113,13 +113,13 @@ public:
 
 
 
-DRIVER_INIT_MEMBER(ti99_2_state,ti99_2_24)
+void ti99_2_state::init_ti99_2_24()
 {
 	/* no ROM paging */
 	m_ROM_paged = 0;
 }
 
-DRIVER_INIT_MEMBER(ti99_2_state,ti99_2_32)
+void ti99_2_state::init_ti99_2_32()
 {
 	/* ROM paging enabled */
 	m_ROM_paged = 1;
@@ -142,7 +142,7 @@ void ti99_2_state::machine_reset()
 	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
+void ti99_2_state::ti99_2_vblank_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(INT_9995_INT1, m_irq_state);
 	m_irq_state = (m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
 /* current keyboard row */
 
 /* write the current keyboard row */
-WRITE8_MEMBER(ti99_2_state::ti99_2_write_kbd)
+void ti99_2_state::ti99_2_write_kbd(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x7;  /* other address lines are not decoded */
 
@@ -247,7 +247,7 @@ WRITE8_MEMBER(ti99_2_state::ti99_2_write_kbd)
 	}
 }
 
-WRITE8_MEMBER(ti99_2_state::ti99_2_write_misc_cru)
+void ti99_2_state::ti99_2_write_misc_cru(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x7;  /* other address lines are not decoded */
 
@@ -275,14 +275,14 @@ WRITE8_MEMBER(ti99_2_state::ti99_2_write_misc_cru)
 }
 
 /* read keys in the current row */
-READ8_MEMBER(ti99_2_state::ti99_2_read_kbd)
+uint8_t ti99_2_state::ti99_2_read_kbd(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	return ioport(keynames[m_KeyRow])->read();
 }
 
-READ8_MEMBER(ti99_2_state::ti99_2_read_misc_cru)
+uint8_t ti99_2_state::ti99_2_read_misc_cru(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }

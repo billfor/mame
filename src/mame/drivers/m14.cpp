@@ -78,20 +78,20 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(m14_vram_w);
-	DECLARE_WRITE8_MEMBER(m14_cram_w);
-	DECLARE_READ8_MEMBER(m14_rng_r);
-	DECLARE_READ8_MEMBER(input_buttons_r);
-	DECLARE_WRITE8_MEMBER(hopper_w);
-	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
-	TILE_GET_INFO_MEMBER(m14_get_tile_info);
+	void m14_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m14_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m14_rng_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t input_buttons_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void left_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void right_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void m14_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(m14);
+	void palette_init_m14(palette_device &palette);
 	uint32_t screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(m14_irq);
+	void m14_irq(device_t &device);
 };
 
 
@@ -102,7 +102,7 @@ public:
  *************************************/
 
 /* guess, might not be 100% accurate. */
-PALETTE_INIT_MEMBER(m14_state, m14)
+void m14_state::palette_init_m14(palette_device &palette)
 {
 	int i;
 
@@ -119,7 +119,7 @@ PALETTE_INIT_MEMBER(m14_state, m14)
 	}
 }
 
-TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
+void m14_state::m14_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_video_ram[tile_index];
 	int color = m_color_ram[tile_index] & 0x0f;
@@ -144,13 +144,13 @@ uint32_t m14_state::screen_update_m14(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE8_MEMBER(m14_state::m14_vram_w)
+void m14_state::m14_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[offset] = data;
 	m_m14_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(m14_state::m14_cram_w)
+void m14_state::m14_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color_ram[offset] = data;
 	m_m14_tilemap->mark_tile_dirty(offset);
@@ -162,14 +162,14 @@ WRITE8_MEMBER(m14_state::m14_cram_w)
  *
  *************************************/
 
-READ8_MEMBER(m14_state::m14_rng_r)
+uint8_t m14_state::m14_rng_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* graphic artifacts happens if this doesn't return random values. */
 	return (machine().rand() & 0x0f) | 0xf0; /* | (ioport("IN1")->read() & 0x80)*/;
 }
 
 /* Here routes the hopper & the inputs */
-READ8_MEMBER(m14_state::input_buttons_r)
+uint8_t m14_state::input_buttons_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_hop_mux)
 	{
@@ -181,7 +181,7 @@ READ8_MEMBER(m14_state::input_buttons_r)
 }
 
 #if 0
-WRITE8_MEMBER(m14_state::test_w)
+void m14_state::test_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static uint8_t x[5];
 
@@ -191,7 +191,7 @@ WRITE8_MEMBER(m14_state::test_w)
 }
 #endif
 
-WRITE8_MEMBER(m14_state::hopper_w)
+void m14_state::hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* ---- x--- coin out */
 	/* ---- --x- hopper/input mux? */
@@ -227,14 +227,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(m14_state::left_coin_inserted)
+void m14_state::left_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
 		m_maincpu->set_input_line(I8085_RST65_LINE, HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(m14_state::right_coin_inserted)
+void m14_state::right_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
@@ -311,7 +311,7 @@ static GFXDECODE_START( m14 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(m14_state::m14_irq)
+void m14_state::m14_irq(device_t &device)
 {
 	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);

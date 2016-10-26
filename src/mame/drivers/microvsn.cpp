@@ -41,24 +41,24 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_PALETTE_INIT(microvision);
-	DECLARE_MACHINE_START(microvision);
-	DECLARE_MACHINE_RESET(microvision);
+	void palette_init_microvision(palette_device &palette);
+	void machine_start_microvision();
+	void machine_reset_microvision();
 
 	void screen_vblank(screen_device &screen, bool state);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( microvsn_cart );
+	image_init_result device_image_load_microvsn_cart(device_image_interface &image);
 
 	// i8021 interface
-	DECLARE_WRITE8_MEMBER(i8021_p0_write);
-	DECLARE_WRITE8_MEMBER(i8021_p1_write);
-	DECLARE_WRITE8_MEMBER(i8021_p2_write);
-	DECLARE_READ8_MEMBER(i8021_t1_read);
-	DECLARE_READ8_MEMBER(i8021_bus_read);
+	void i8021_p0_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8021_p1_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8021_p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8021_t1_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t i8021_bus_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// TMS1100 interface
-	DECLARE_READ8_MEMBER(tms1100_read_k);
-	DECLARE_WRITE16_MEMBER(tms1100_write_o);
-	DECLARE_WRITE16_MEMBER(tms1100_write_r);
+	uint8_t tms1100_read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tms1100_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tms1100_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// enums
 	enum cpu_type
@@ -121,7 +121,7 @@ protected:
 };
 
 
-PALETTE_INIT_MEMBER(microvision_state,microvision)
+void microvision_state::palette_init_microvision(palette_device &palette)
 {
 	palette.set_pen_color( 15, 0x00, 0x00, 0x00 );
 	palette.set_pen_color( 14, 0x11, 0x11, 0x11 );
@@ -142,7 +142,7 @@ PALETTE_INIT_MEMBER(microvision_state,microvision)
 }
 
 
-MACHINE_START_MEMBER(microvision_state, microvision)
+void microvision_state::machine_start_microvision()
 {
 	m_paddle_timer = timer_alloc(TIMER_PADDLE);
 
@@ -160,7 +160,7 @@ MACHINE_START_MEMBER(microvision_state, microvision)
 }
 
 
-MACHINE_RESET_MEMBER(microvision_state, microvision)
+void microvision_state::machine_reset_microvision()
 {
 	for(auto & elem : m_lcd_latch)
 	{
@@ -334,7 +334,7 @@ void microvision_state::device_timer(emu_timer &timer, device_timer_id id, int p
  ---- --x- KEY1
  ---- ---x KEY2
 */
-WRITE8_MEMBER( microvision_state::i8021_p0_write )
+void microvision_state::i8021_p0_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror( "p0_write: %02x\n", data );
 
@@ -350,7 +350,7 @@ WRITE8_MEMBER( microvision_state::i8021_p0_write )
  ---- --x- LCD5
  ---- ---x LCD4
 */
-WRITE8_MEMBER( microvision_state::i8021_p1_write )
+void microvision_state::i8021_p1_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror( "p1_write: %02x\n", data );
 
@@ -363,7 +363,7 @@ WRITE8_MEMBER( microvision_state::i8021_p1_write )
 ---- --x- SPKR1
 ---- ---x SPKR0
 */
-WRITE8_MEMBER( microvision_state::i8021_p2_write )
+void microvision_state::i8021_p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror( "p2_write: %02x\n", data );
 
@@ -386,13 +386,13 @@ WRITE8_MEMBER( microvision_state::i8021_p2_write )
 }
 
 
-READ8_MEMBER( microvision_state::i8021_t1_read )
+uint8_t microvision_state::i8021_t1_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_t1;
 }
 
 
-READ8_MEMBER( microvision_state::i8021_bus_read )
+uint8_t microvision_state::i8021_bus_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_p0;
 
@@ -429,7 +429,7 @@ READ8_MEMBER( microvision_state::i8021_bus_read )
 }
 
 
-READ8_MEMBER( microvision_state::tms1100_read_k )
+uint8_t microvision_state::tms1100_read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -451,7 +451,7 @@ READ8_MEMBER( microvision_state::tms1100_read_k )
 }
 
 
-WRITE16_MEMBER( microvision_state::tms1100_write_o )
+void microvision_state::tms1100_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG) logerror("write_o: %04x\n", data);
 
@@ -470,7 +470,7 @@ x-- ---- ---- KEY2
 --- ---- --x- SPKR0
 --- ---- ---x SPKR1
 */
-WRITE16_MEMBER( microvision_state::tms1100_write_r )
+void microvision_state::tms1100_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG) logerror("write_r: %04x\n", data);
 
@@ -502,7 +502,7 @@ static const uint16_t microvision_output_pla_1[0x20] =
 };
 
 
-DEVICE_IMAGE_LOAD_MEMBER(microvision_state, microvsn_cart)
+image_init_result microvision_state::device_image_load_microvsn_cart(device_image_interface &image)
 {
 	uint8_t *rom1 = memregion("maincpu1")->base();
 	uint8_t *rom2 = memregion("maincpu2")->base();

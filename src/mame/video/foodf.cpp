@@ -17,7 +17,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(foodf_state::get_playfield_tile_info)
+void foodf_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = (data & 0xff) | ((data >> 7) & 0x100);
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(foodf_state::get_playfield_tile_info)
  *
  *************************************/
 
-VIDEO_START_MEMBER(foodf_state,foodf)
+void foodf_state::video_start_foodf()
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 
@@ -73,7 +73,7 @@ void foodf_state::foodf_set_flip(int flip)
  *
  *************************************/
 
-WRITE16_MEMBER(foodf_state::foodf_paletteram_w)
+void foodf_state::foodf_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int newword, r, g, b, bit0, bit1, bit2;
 

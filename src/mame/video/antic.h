@@ -375,8 +375,8 @@ public:
 
 	static void set_gtia_tag(device_t &device, const char *tag) { downcast<antic_device &>(device).m_gtia_tag = tag; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void generic_interrupt(int button_count);
@@ -468,10 +468,10 @@ private:
 	void linerefresh();
 	int cycle();
 
-	TIMER_CALLBACK_MEMBER( issue_dli );
-	TIMER_CALLBACK_MEMBER( line_done );
-	TIMER_CALLBACK_MEMBER( steal_cycles );
-	TIMER_CALLBACK_MEMBER( scanline_render );
+	void issue_dli(void *ptr, int32_t param);
+	void line_done(void *ptr, int32_t param);
+	void steal_cycles(void *ptr, int32_t param);
+	void scanline_render(void *ptr, int32_t param);
 
 	void render(address_space &space, int param1, int param2, int param3);
 

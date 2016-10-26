@@ -30,19 +30,19 @@ public:
 	tilemap_t *m_tilemap4;
 	std::unique_ptr<uint8_t[]> m_buffer_spriteram;
 
-	DECLARE_READ8_MEMBER(wheel_r);
-	DECLARE_WRITE8_MEMBER(vram1_w);
-	DECLARE_WRITE8_MEMBER(vram2_w);
-	DECLARE_WRITE8_MEMBER(vram4_w);
+	uint8_t wheel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info1);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
-	TILE_GET_INFO_MEMBER(get_tile_info4);
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ssrj);
+	void palette_init_ssrj(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);

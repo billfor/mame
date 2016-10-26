@@ -96,7 +96,7 @@ sticker from Jan 95 and factory sticker 94*41.
 
 ***************************************************************************/
 
-WRITE8_MEMBER(paradise_state::rombank_w)
+void paradise_state::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = data;
 	int bank_n = memregion("maincpu")->bytes() / 0x4000;
@@ -110,7 +110,7 @@ WRITE8_MEMBER(paradise_state::rombank_w)
 	membank("prgbank")->set_entry(bank);
 }
 
-WRITE8_MEMBER(paradise_state::paradise_okibank_w)
+void paradise_state::paradise_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & ~0x02)
 		logerror("%s: unknown oki bank bits %02X\n", machine().describe_context(), data);
@@ -118,7 +118,7 @@ WRITE8_MEMBER(paradise_state::paradise_okibank_w)
 	m_oki2->set_rom_bank((data & 0x02) >> 1);
 }
 
-WRITE8_MEMBER(paradise_state::torus_coin_counter_w)
+void paradise_state::torus_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data ^ 0xff);
 }
@@ -680,7 +680,7 @@ void paradise_state::machine_reset()
 	m_irq_count = 0;
 }
 
-INTERRUPT_GEN_MEMBER(paradise_state::irq)
+void paradise_state::irq(device_t &device)
 {
 	if (m_irq_count<300)
 		m_irq_count++;
@@ -1282,20 +1282,20 @@ ROM_START( madballn ) /* Even numbered stages show topless models.  Is nudity co
 	ROM_LOAD( "s.u28", 0x00000, 0x80000, CRC(78f02584) SHA1(70542e126db73a573db9ef41399d3a07fb7ea94b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(paradise_state,paradise)
+void paradise_state::init_paradise()
 {
 	m_sprite_inc = 0x20;
 }
 
 // Inverted flipscreen and sprites are packed in less memory (same number though)
-DRIVER_INIT_MEMBER(paradise_state,tgtball)
+void paradise_state::init_tgtball()
 {
 	m_sprite_inc = 4;
 	m_maincpu->space(AS_IO).install_write_handler(0x2001, 0x2001, write8_delegate(FUNC(paradise_state::tgtball_flipscreen_w),this));
 
 }
 
-DRIVER_INIT_MEMBER(paradise_state,torus)
+void paradise_state::init_torus()
 {
 	m_sprite_inc = 4;
 	m_maincpu->space(AS_IO).install_write_handler(0x2070, 0x2070, write8_delegate(FUNC(paradise_state::torus_coin_counter_w),this));

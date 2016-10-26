@@ -47,7 +47,7 @@
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(mystston_state::interrupt_callback)
+void mystston_state::interrupt_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -124,7 +124,7 @@ void mystston_state::set_palette()
  *
  *************************************/
 
-WRITE8_MEMBER(mystston_state::mystston_video_control_w)
+void mystston_state::mystston_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	*m_video_control = data;
 
@@ -148,7 +148,7 @@ WRITE8_MEMBER(mystston_state::mystston_video_control_w)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(mystston_state::get_bg_tile_info)
+void mystston_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int page = (*m_video_control & 0x04) << 8;
 	int code = ((m_bg_videoram[page | 0x200 | tile_index] & 0x01) << 8) | m_bg_videoram[page | tile_index];
@@ -158,7 +158,7 @@ TILE_GET_INFO_MEMBER(mystston_state::get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(mystston_state::get_fg_tile_info)
+void mystston_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_fg_videoram[0x400 | tile_index] & 0x07) << 8) | m_fg_videoram[tile_index];
 	int color = ((*m_video_control & 0x01) << 1) | ((*m_video_control & 0x02) >> 1);
@@ -212,7 +212,7 @@ void mystston_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-VIDEO_START_MEMBER(mystston_state,mystston)
+void mystston_state::video_start_mystston()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mystston_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 16, 16, 16, 32);
 
@@ -231,7 +231,7 @@ VIDEO_START_MEMBER(mystston_state,mystston)
  *
  *************************************/
 
-VIDEO_RESET_MEMBER(mystston_state,mystston)
+void mystston_state::video_reset_mystston()
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
 }

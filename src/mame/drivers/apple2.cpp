@@ -130,35 +130,35 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
+	void apple2_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void ay3600_repeat(timer_device &timer, void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(apple2);
+	void palette_init_apple2(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_WRITE8_MEMBER(c000_w);
-	DECLARE_READ8_MEMBER(c080_r);
-	DECLARE_WRITE8_MEMBER(c080_w);
-	DECLARE_READ8_MEMBER(c100_r);
-	DECLARE_WRITE8_MEMBER(c100_w);
-	DECLARE_READ8_MEMBER(c800_r);
-	DECLARE_WRITE8_MEMBER(c800_w);
-	DECLARE_READ8_MEMBER(inh_r);
-	DECLARE_WRITE8_MEMBER(inh_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t c000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t c080_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c080_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t c100_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t c800_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t inh_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void inh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void a2bus_inh_w(int state);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
+	void ay3600_ako_w(int state);
 
 private:
 	int m_speaker_state;
@@ -200,18 +200,18 @@ private:
 #define JOYSTICK_SENSITIVITY    50
 #define JOYSTICK_AUTOCENTER     80
 
-WRITE_LINE_MEMBER(napple2_state::a2bus_irq_w)
+void napple2_state::a2bus_irq_w(int state)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, state);
 }
 
-WRITE_LINE_MEMBER(napple2_state::a2bus_nmi_w)
+void napple2_state::a2bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 // This code makes a ton of assumptions because we can guarantee a pre-IIe machine!
-WRITE_LINE_MEMBER(napple2_state::a2bus_inh_w)
+void napple2_state::a2bus_inh_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -324,7 +324,7 @@ void napple2_state::machine_reset()
     VIDEO
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(napple2_state::apple2_interrupt)
+void napple2_state::apple2_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -361,7 +361,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(napple2_state::apple2_interrupt)
 	}
 }
 
-PALETTE_INIT_MEMBER(napple2_state, apple2)
+void napple2_state::palette_init_apple2(palette_device &palette)
 {
 	m_video->palette_init_apple2(palette);
 }
@@ -567,7 +567,7 @@ void napple2_state::do_io(address_space &space, int offset)
 	}
 }
 
-READ8_MEMBER(napple2_state::c000_r)
+uint8_t napple2_state::c000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -626,7 +626,7 @@ READ8_MEMBER(napple2_state::c000_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(napple2_state::c000_w)
+void napple2_state::c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -640,7 +640,7 @@ WRITE8_MEMBER(napple2_state::c000_w)
 	}
 }
 
-READ8_MEMBER(napple2_state::c080_r)
+uint8_t napple2_state::c080_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -658,7 +658,7 @@ READ8_MEMBER(napple2_state::c080_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(napple2_state::c080_w)
+void napple2_state::c080_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int slot;
 
@@ -671,7 +671,7 @@ WRITE8_MEMBER(napple2_state::c080_w)
 	}
 }
 
-READ8_MEMBER(napple2_state::c100_r)
+uint8_t napple2_state::c100_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int slotnum;
 
@@ -690,7 +690,7 @@ READ8_MEMBER(napple2_state::c100_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(napple2_state::c100_w)
+void napple2_state::c100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int slotnum;
 
@@ -707,7 +707,7 @@ WRITE8_MEMBER(napple2_state::c100_w)
 	}
 }
 
-READ8_MEMBER(napple2_state::c800_r)
+uint8_t napple2_state::c800_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0x7ff)
 	{
@@ -727,7 +727,7 @@ READ8_MEMBER(napple2_state::c800_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(napple2_state::c800_w)
+void napple2_state::c800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0x7ff)
 	{
@@ -745,7 +745,7 @@ WRITE8_MEMBER(napple2_state::c800_w)
 	}
 }
 
-READ8_MEMBER(napple2_state::inh_r)
+uint8_t napple2_state::inh_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_inh_slot != -1)
 	{
@@ -756,7 +756,7 @@ READ8_MEMBER(napple2_state::inh_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(napple2_state::inh_w)
+void napple2_state::inh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_inh_slot != -1)
 	{
@@ -898,7 +898,7 @@ uint8_t napple2_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-READ8_MEMBER(napple2_state::ram_r)
+uint8_t napple2_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < m_ram_size)
 	{
@@ -908,7 +908,7 @@ READ8_MEMBER(napple2_state::ram_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(napple2_state::ram_w)
+void napple2_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < m_ram_size)
 	{
@@ -934,7 +934,7 @@ ADDRESS_MAP_END
     KEYBOARD
 ***************************************************************************/
 
-READ_LINE_MEMBER(napple2_state::ay3600_shift_r)
+int napple2_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -945,7 +945,7 @@ READ_LINE_MEMBER(napple2_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(napple2_state::ay3600_control_r)
+int napple2_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -1010,7 +1010,7 @@ static const uint8_t a2_key_remap[0x32][4] =
 	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
 };
 
-WRITE_LINE_MEMBER(napple2_state::ay3600_data_ready_w)
+void napple2_state::ay3600_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -1030,12 +1030,12 @@ WRITE_LINE_MEMBER(napple2_state::ay3600_data_ready_w)
 	}
 }
 
-WRITE_LINE_MEMBER(napple2_state::ay3600_ako_w)
+void napple2_state::ay3600_ako_w(int state)
 {
 	m_anykeydown = (state == ASSERT_LINE) ? true : false;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(napple2_state::ay3600_repeat)
+void napple2_state::ay3600_repeat(timer_device &timer, void *ptr, int32_t param)
 {
 	// is the key still down?
 	if (m_anykeydown)

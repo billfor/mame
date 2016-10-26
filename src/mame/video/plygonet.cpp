@@ -15,7 +15,7 @@
 
 /* TTL text plane */
 
-TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
+void polygonet_state::ttl_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr, code;
 
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(polygonet_state::ttl_get_tile_info)
 	SET_TILE_INFO_MEMBER(m_ttl_gfx_index, code, attr, 0);
 }
 
-TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
+void polygonet_state::roz_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr, code;
 
@@ -36,14 +36,14 @@ TILE_GET_INFO_MEMBER(polygonet_state::roz_get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, attr, 0);
 }
 
-READ32_MEMBER(polygonet_state::polygonet_ttl_ram_r)
+uint32_t polygonet_state::polygonet_ttl_ram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *vram = (uint32_t *)m_ttl_vram;
 
 	return vram[offset];
 }
 
-WRITE32_MEMBER(polygonet_state::polygonet_ttl_ram_w)
+void polygonet_state::polygonet_ttl_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *vram = (uint32_t *)m_ttl_vram;
 
@@ -53,14 +53,14 @@ WRITE32_MEMBER(polygonet_state::polygonet_ttl_ram_w)
 	m_ttl_tilemap->mark_tile_dirty(offset*2+1);
 }
 
-READ32_MEMBER(polygonet_state::polygonet_roz_ram_r)
+uint32_t polygonet_state::polygonet_roz_ram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *vram = (uint32_t *)m_roz_vram;
 
 	return vram[offset];
 }
 
-WRITE32_MEMBER(polygonet_state::polygonet_roz_ram_w)
+void polygonet_state::polygonet_roz_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *vram = (uint32_t *)m_roz_vram;
 
@@ -70,12 +70,12 @@ WRITE32_MEMBER(polygonet_state::polygonet_roz_ram_w)
 	m_roz_tilemap->mark_tile_dirty(offset*2+1);
 }
 
-TILEMAP_MAPPER_MEMBER(polygonet_state::plygonet_scan)
+tilemap_memory_index polygonet_state::plygonet_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return row * num_cols + (col^1);
 }
 
-TILEMAP_MAPPER_MEMBER(polygonet_state::plygonet_scan_cols)
+tilemap_memory_index polygonet_state::plygonet_scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return col * num_rows + (row^1);
 }

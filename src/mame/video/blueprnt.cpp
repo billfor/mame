@@ -22,7 +22,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(blueprnt_state, blueprnt)
+void blueprnt_state::palette_init_blueprnt(palette_device &palette)
 {
 	int i;
 
@@ -48,13 +48,13 @@ PALETTE_INIT_MEMBER(blueprnt_state, blueprnt)
 	}
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_videoram_w)
+void blueprnt_state::blueprnt_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
+void blueprnt_state::blueprnt_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -70,7 +70,7 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
 
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
+void blueprnt_state::blueprnt_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 0x02);
 
@@ -83,7 +83,7 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
 
 
 
-TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
+void blueprnt_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int bank;
@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 
 
 
-VIDEO_START_MEMBER(blueprnt_state,blueprnt)
+void blueprnt_state::video_start_blueprnt()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);

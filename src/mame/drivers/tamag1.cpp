@@ -27,10 +27,10 @@ public:
 	required_device<e0c6s46_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_INIT(tama);
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void palette_init_tama(palette_device &palette);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 
@@ -73,7 +73,7 @@ static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 	device.machine().output().set_value(buf, state);
 }
 
-PALETTE_INIT_MEMBER(tamag1_state, tama)
+void tamag1_state::palette_init_tama(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0xf1, 0xf0, 0xf9)); // background
 	palette.set_pen_color(1, rgb_t(0x3c, 0x38, 0x38)); // lcd pixel
@@ -87,7 +87,7 @@ PALETTE_INIT_MEMBER(tamag1_state, tama)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tamag1_state::speaker_w)
+void tamag1_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// R43: speaker out
 	m_speaker->level_w(data >> 3 & 1);
@@ -101,7 +101,7 @@ WRITE8_MEMBER(tamag1_state::speaker_w)
 
 ***************************************************************************/
 
-INPUT_CHANGED_MEMBER(tamag1_state::input_changed)
+void tamag1_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// inputs are hooked up backwards here, because MCU input
 	// ports are all tied to its interrupt controller

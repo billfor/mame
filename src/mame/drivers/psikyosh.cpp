@@ -309,7 +309,7 @@ static GFXDECODE_START( psikyosh )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x100 ) // 8bpp tiles
 GFXDECODE_END
 
-WRITE32_MEMBER(psikyosh_state::psh_eeprom_w)
+void psikyosh_state::psh_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -323,7 +323,7 @@ WRITE32_MEMBER(psikyosh_state::psh_eeprom_w)
 	logerror("Unk EEPROM write %x mask %x\n", data, mem_mask);
 }
 
-READ32_MEMBER(psikyosh_state::psh_eeprom_r)
+uint32_t psikyosh_state::psh_eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -335,14 +335,14 @@ READ32_MEMBER(psikyosh_state::psh_eeprom_r)
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(psikyosh_state::psikyosh_interrupt)
+void psikyosh_state::psikyosh_interrupt(device_t &device)
 {
 	device.execute().set_input_line(4, ASSERT_LINE);
 }
 
 // VBL handler writes 0x00 on entry, 0xc0 on exit
 // bit 0 controls game speed on readback, mechanism is a little weird
-WRITE32_MEMBER(psikyosh_state::psikyosh_irqctrl_w)
+void psikyosh_state::psikyosh_irqctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (!(data & 0x00c00000))
 	{
@@ -351,7 +351,7 @@ WRITE32_MEMBER(psikyosh_state::psikyosh_irqctrl_w)
 }
 
 
-WRITE32_MEMBER(psikyosh_state::psikyosh_vidregs_w)
+void psikyosh_state::psikyosh_vidregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vidregs[offset]);
 
@@ -363,7 +363,7 @@ WRITE32_MEMBER(psikyosh_state::psikyosh_vidregs_w)
 }
 
 /* Mahjong Panel */
-READ32_MEMBER(psikyosh_state::mjgtaste_input_r)
+uint32_t psikyosh_state::mjgtaste_input_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 /*
 Mahjong keyboard encoder -> JAMMA adapter (SK-G001). Created to allow the use of a Mahjong panel with the existing, recycled Dragon Blaze boards.
@@ -1166,7 +1166,7 @@ ROM_START( tgm2p )
 	ROM_LOAD( "tgm2p.default.nv", 0x000, 0x100, CRC(b2328b40) SHA1(e6cda4d6f4e91b9f78d2ca84a5eee6c3bd03fe02) )
 ROM_END
 
-DRIVER_INIT_MEMBER(psikyosh_state,ps3)
+void psikyosh_state::init_ps3()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_maincpu->sh2drc_add_fastram(0x03004000, 0x0300ffff, 0, &m_bgram[0]);
@@ -1174,7 +1174,7 @@ DRIVER_INIT_MEMBER(psikyosh_state,ps3)
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }
 
-DRIVER_INIT_MEMBER(psikyosh_state,ps5)
+void psikyosh_state::init_ps5()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_maincpu->sh2drc_add_fastram(0x04004000, 0x0400ffff, 0, &m_bgram[0]);
@@ -1182,11 +1182,11 @@ DRIVER_INIT_MEMBER(psikyosh_state,ps5)
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }
 
-DRIVER_INIT_MEMBER(psikyosh_state,mjgtaste)
+void psikyosh_state::init_mjgtaste()
 {
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x03000000, 0x03000003, read32_delegate(FUNC(psikyosh_state::mjgtaste_input_r),this));
-	DRIVER_INIT_CALL(ps5);
+	init_ps5();
 }
 
 

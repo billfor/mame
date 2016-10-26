@@ -9,12 +9,12 @@
 #include "emu.h"
 #include "includes/goal92.h"
 
-READ16_MEMBER(goal92_state::goal92_fg_bank_r)
+uint16_t goal92_state::goal92_fg_bank_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_fg_bank;
 }
 
-WRITE16_MEMBER(goal92_state::goal92_fg_bank_w)
+void goal92_state::goal92_fg_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_bank);
 
@@ -24,25 +24,25 @@ WRITE16_MEMBER(goal92_state::goal92_fg_bank_w)
 	}
 }
 
-WRITE16_MEMBER(goal92_state::goal92_text_w)
+void goal92_state::goal92_text_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_data[offset]);
 	m_tx_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(goal92_state::goal92_background_w)
+void goal92_state::goal92_background_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_data[offset]);
 	m_bg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(goal92_state::goal92_foreground_w)
+void goal92_state::goal92_foreground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_data[offset]);
 	m_fg_layer->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(goal92_state::get_text_tile_info)
+void goal92_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_tx_data[tile_index];
 	int color = (tile >> 12) & 0xf;
@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(goal92_state::get_text_tile_info)
 	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(goal92_state::get_back_tile_info)
+void goal92_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_bg_data[tile_index];
 	int color = (tile >> 12) & 0xf;
@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(goal92_state::get_back_tile_info)
 	SET_TILE_INFO_MEMBER(2, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(goal92_state::get_fore_tile_info)
+void goal92_state::get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_fg_data[tile_index];
 	int color = (tile >> 12) & 0xf;

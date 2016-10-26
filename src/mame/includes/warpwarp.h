@@ -52,42 +52,42 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	// warpwarp and bombbee
-	DECLARE_READ8_MEMBER(warpwarp_sw_r);
-	DECLARE_WRITE8_MEMBER(warpwarp_out0_w);
-	DECLARE_WRITE8_MEMBER(warpwarp_out3_w);
-	DECLARE_WRITE8_MEMBER(warpwarp_videoram_w);
-	DECLARE_READ8_MEMBER(warpwarp_dsw1_r);
-	DECLARE_READ8_MEMBER(warpwarp_vol_r);
+	uint8_t warpwarp_sw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void warpwarp_out0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void warpwarp_out3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void warpwarp_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t warpwarp_dsw1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t warpwarp_vol_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	//geebee and navarone
-	DECLARE_READ8_MEMBER(geebee_in_r);
-	DECLARE_WRITE8_MEMBER(geebee_out6_w);
-	DECLARE_WRITE8_MEMBER(geebee_out7_w);
-	DECLARE_WRITE8_MEMBER(geebee_videoram_w);
+	uint8_t geebee_in_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void geebee_out6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void geebee_out7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void geebee_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(navarone);
-	DECLARE_DRIVER_INIT(geebee);
-	DECLARE_DRIVER_INIT(kaitein);
-	DECLARE_DRIVER_INIT(warpwarp);
-	DECLARE_DRIVER_INIT(sos);
-	DECLARE_DRIVER_INIT(kaitei);
-	DECLARE_DRIVER_INIT(bombbee);
-	DECLARE_VIDEO_START(geebee);
-	DECLARE_PALETTE_INIT(geebee);
-	DECLARE_VIDEO_START(warpwarp);
-	DECLARE_PALETTE_INIT(warpwarp);
-	DECLARE_VIDEO_START(navarone);
-	DECLARE_PALETTE_INIT(navarone);
+	void init_navarone();
+	void init_geebee();
+	void init_kaitein();
+	void init_warpwarp();
+	void init_sos();
+	void init_kaitei();
+	void init_bombbee();
+	void video_start_geebee();
+	void palette_init_geebee(palette_device &palette);
+	void video_start_warpwarp();
+	void palette_init_warpwarp(palette_device &palette);
+	void video_start_navarone();
+	void palette_init_navarone(palette_device &palette);
 
-	TILEMAP_MAPPER_MEMBER(tilemap_scan);
-	TILE_GET_INFO_MEMBER(geebee_get_tile_info);
-	TILE_GET_INFO_MEMBER(navarone_get_tile_info);
-	TILE_GET_INFO_MEMBER(warpwarp_get_tile_info);
+	tilemap_memory_index tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void geebee_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void navarone_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void warpwarp_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen);
 	void draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 };

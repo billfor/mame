@@ -87,12 +87,12 @@ public:
 	template<class _Object> static devcb_base &set_main_irq_callback(device_t &device, _Object object) { return downcast<aica_device &>(device).m_main_irq_cb.set_callback(object); }
 
 	// AICA register access
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// MIDI I/O access
-	DECLARE_WRITE16_MEMBER( midi_in );
-	DECLARE_READ16_MEMBER( midi_out_r );
+	void midi_in(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t midi_out_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	void set_ram_base(void *base, int size);
 
@@ -108,9 +108,9 @@ private:
 
 	void CheckPendingIRQ();
 	void CheckPendingIRQ_SH4();
-	TIMER_CALLBACK_MEMBER( timerA_cb );
-	TIMER_CALLBACK_MEMBER( timerB_cb );
-	TIMER_CALLBACK_MEMBER( timerC_cb );
+	void timerA_cb(void *ptr, int32_t param);
+	void timerB_cb(void *ptr, int32_t param);
+	void timerC_cb(void *ptr, int32_t param);
 	int Get_AR(int base,int R);
 	int Get_DR(int base,int R);
 	int Get_RR(int base,int R);

@@ -42,13 +42,13 @@
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(xain_state::back_scan)
+tilemap_memory_index xain_state::back_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-TILE_GET_INFO_MEMBER(xain_state::get_bgram0_tile_info)
+void xain_state::get_bgram0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bgram0[tile_index | 0x400];
 	SET_TILE_INFO_MEMBER(2,
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(xain_state::get_bgram0_tile_info)
 			(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(xain_state::get_bgram1_tile_info)
+void xain_state::get_bgram1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bgram1[tile_index | 0x400];
 	SET_TILE_INFO_MEMBER(1,
@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(xain_state::get_bgram1_tile_info)
 			(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(xain_state::get_char_tile_info)
+void xain_state::get_char_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_charram[tile_index | 0x400];
 	SET_TILE_INFO_MEMBER(0,
@@ -107,50 +107,50 @@ void xain_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(xain_state::bgram0_w)
+void xain_state::bgram0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgram0[offset] = data;
 	m_bgram0_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(xain_state::bgram1_w)
+void xain_state::bgram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgram1[offset] = data;
 	m_bgram1_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(xain_state::charram_w)
+void xain_state::charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_charram[offset] = data;
 	m_char_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(xain_state::scrollxP0_w)
+void xain_state::scrollxP0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollxP0[offset] = data;
 	m_bgram0_tilemap->set_scrollx(0, m_scrollxP0[0]|(m_scrollxP0[1]<<8));
 }
 
-WRITE8_MEMBER(xain_state::scrollyP0_w)
+void xain_state::scrollyP0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollyP0[offset] = data;
 	m_bgram0_tilemap->set_scrolly(0, m_scrollyP0[0]|(m_scrollyP0[1]<<8));
 }
 
-WRITE8_MEMBER(xain_state::scrollxP1_w)
+void xain_state::scrollxP1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollxP1[offset] = data;
 	m_bgram1_tilemap->set_scrollx(0, m_scrollxP1[0]|(m_scrollxP1[1]<<8));
 }
 
-WRITE8_MEMBER(xain_state::scrollyP1_w)
+void xain_state::scrollyP1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollyP1[offset] = data;
 	m_bgram1_tilemap->set_scrolly(0, m_scrollyP1[0]|(m_scrollyP1[1]<<8));
 }
 
 
-WRITE8_MEMBER(xain_state::flipscreen_w)
+void xain_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }

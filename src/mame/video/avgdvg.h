@@ -30,19 +30,19 @@ public:
 
 	static void static_set_vector_tag(device_t &device, const char *tag);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(done_r);
-	DECLARE_WRITE8_MEMBER(go_w);
-	DECLARE_WRITE8_MEMBER(reset_w);
+	ioport_value done_r(ioport_field &field, void *param);
+	void go_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE16_MEMBER(go_word_w);
-	DECLARE_WRITE16_MEMBER(reset_word_w);
+	void go_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void reset_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	/* Tempest and Quantum use this capability */
 	void set_flip_x(int flip);
 	void set_flip_y(int flip);
 
-	TIMER_CALLBACK_MEMBER(vg_set_halt_callback);
-	TIMER_CALLBACK_MEMBER(run_state_machine);
+	void vg_set_halt_callback(void *ptr, int32_t param);
+	void run_state_machine(void *ptr, int32_t param);
 protected:
 	void apply_flipping(int *x, int *y);
 	void vg_set_halt(int dummy);

@@ -214,18 +214,18 @@ public:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t m_videobank;
 
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(vbank_w);
-	DECLARE_WRITE8_MEMBER(vram_clear_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	DECLARE_DRIVER_INIT(cocob);
+	void init_cocob();
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cocoloco);
+	void palette_init_cocoloco(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -281,7 +281,7 @@ NETLIST_END()
 *          Video Hardware          *
 ***********************************/
 
-PALETTE_INIT_MEMBER(cocoloco_state, cocoloco)
+void cocoloco_state::palette_init_cocoloco(palette_device &palette)
 {
 	for(int i = 0; i < 0x10; i += 2)
 	{
@@ -346,12 +346,12 @@ uint32_t cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-READ8_MEMBER( cocoloco_state::vram_r )
+uint8_t cocoloco_state::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[offset|0x0000] | m_videoram[offset|0x2000] | m_videoram[offset|0x4000] | m_videoram[offset|0x6000];
 }
 
-WRITE8_MEMBER( cocoloco_state::vram_w )
+void cocoloco_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset|0x0000] = (m_videobank == 0) ? data : 0;
 	m_videoram[offset|0x2000] = (m_videobank & 2) ? data : 0;
@@ -359,12 +359,12 @@ WRITE8_MEMBER( cocoloco_state::vram_w )
 	m_videoram[offset|0x6000] = (m_videobank & 8) ? data : 0;
 }
 
-WRITE8_MEMBER( cocoloco_state::vbank_w )
+void cocoloco_state::vbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videobank = data;
 }
 
-WRITE8_MEMBER( cocoloco_state::vram_clear_w )
+void cocoloco_state::vram_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* ??? */
 //  for(int i=0;i<0x8000;i++)
@@ -374,7 +374,7 @@ WRITE8_MEMBER( cocoloco_state::vram_clear_w )
 }
 
 
-WRITE8_MEMBER( cocoloco_state::coincounter_w )
+void cocoloco_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  - bits -
     7654 3210
@@ -445,7 +445,7 @@ ADDRESS_MAP_END
 *           Input Ports            *
 ***********************************/
 
-INPUT_CHANGED_MEMBER(cocoloco_state::coin_inserted)
+void cocoloco_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -610,7 +610,7 @@ ROM_END
 *           Driver Init            *
 ***********************************/
 
-DRIVER_INIT_MEMBER(cocoloco_state, cocob)
+void cocoloco_state::init_cocob()
 {
 //  Just for testing...
 

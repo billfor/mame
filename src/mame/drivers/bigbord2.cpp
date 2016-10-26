@@ -105,23 +105,23 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(portc0_w );
-	DECLARE_WRITE8_MEMBER(portc8_w );
-	DECLARE_WRITE8_MEMBER(portcc_w );
-	DECLARE_READ8_MEMBER(portc4_r);
-	DECLARE_READ8_MEMBER(portd0_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(sio_wrdya_w);
-	DECLARE_WRITE_LINE_MEMBER(sio_wrdyb_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_DRIVER_INIT(bigbord2);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	void portc0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portc8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portcc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portc4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portd0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clock_w(int state);
+	void busreq_w(int state);
+	void ctc_z1_w(int state);
+	void sio_wrdya_w(int state);
+	void sio_wrdyb_w(int state);
+	void fdc_drq_w(int state);
+	void init_bigbord2();
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	required_device<palette_device> m_palette;
 
@@ -157,7 +157,7 @@ private:
 };
 
 // Eprom programming port
-WRITE8_MEMBER( bigbord2_state::portc0_w )
+void bigbord2_state::portc0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -171,7 +171,7 @@ WRITE8_MEMBER( bigbord2_state::portc0_w )
     6 = DIPSW 3
     7 = DIPSW 4 */
 
-READ8_MEMBER( bigbord2_state::portc4_r )
+uint8_t bigbord2_state::portc4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_status | 3 | (m_c8[6]<<2) | m_dsw->read();
 	m_term_status = 0;
@@ -180,14 +180,14 @@ READ8_MEMBER( bigbord2_state::portc4_r )
 
 // KBD port - read ascii value of key pressed
 
-READ8_MEMBER( bigbord2_state::portd0_r )
+uint8_t bigbord2_state::portd0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( bigbord2_state::kbd_put )
+void bigbord2_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 	{
@@ -198,17 +198,17 @@ WRITE8_MEMBER( bigbord2_state::kbd_put )
 	}
 }
 
-WRITE_LINE_MEMBER( bigbord2_state::sio_wrdya_w )
+void bigbord2_state::sio_wrdya_w(int state)
 {
 	m_cc[0] = state;
 }
 
-WRITE_LINE_MEMBER( bigbord2_state::sio_wrdyb_w )
+void bigbord2_state::sio_wrdyb_w(int state)
 {
 	m_cc[1] = state;
 }
 
-WRITE_LINE_MEMBER( bigbord2_state::fdc_drq_w )
+void bigbord2_state::fdc_drq_w(int state)
 {
 	m_cc[2] = state;
 }
@@ -217,29 +217,29 @@ WRITE_LINE_MEMBER( bigbord2_state::fdc_drq_w )
 /* Z80 DMA */
 
 
-WRITE_LINE_MEMBER( bigbord2_state::busreq_w )
+void bigbord2_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER( bigbord2_state::memory_read_byte )
+uint8_t bigbord2_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mem->read_byte(offset);
 }
 
-WRITE8_MEMBER( bigbord2_state::memory_write_byte )
+void bigbord2_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mem->write_byte(offset, data);
 }
 
-READ8_MEMBER( bigbord2_state::io_read_byte )
+uint8_t bigbord2_state::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_io->read_byte(offset);
 }
 
-WRITE8_MEMBER( bigbord2_state::io_write_byte )
+void bigbord2_state::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io->write_byte(offset, data);
 }
@@ -248,7 +248,7 @@ WRITE8_MEMBER( bigbord2_state::io_write_byte )
 /* Read/Write Handlers */
 
 
-WRITE8_MEMBER( bigbord2_state::portc8_w )
+void bigbord2_state::portc8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -313,7 +313,7 @@ WRITE8_MEMBER( bigbord2_state::portc8_w )
 	}
 }
 
-WRITE8_MEMBER( bigbord2_state::portcc_w )
+void bigbord2_state::portcc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -402,7 +402,7 @@ INPUT_PORTS_END
 
 /* Z80 CTC */
 
-WRITE_LINE_MEMBER( bigbord2_state::clock_w )
+void bigbord2_state::clock_w(int state)
 {
 	m_ctc2->trg0(state);
 	m_ctc2->trg1(state);
@@ -411,7 +411,7 @@ WRITE_LINE_MEMBER( bigbord2_state::clock_w )
 }
 
 // there's a multitude of optional jumpers in this area, but this will do
-WRITE_LINE_MEMBER( bigbord2_state::ctc_z1_w )
+void bigbord2_state::ctc_z1_w(int state)
 {
 	m_sio->rxca_w(state);
 	m_sio->txca_w(state);
@@ -471,7 +471,7 @@ void bigbord2_state::machine_reset()
 	m_banka->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(bigbord2_state,bigbord2)
+void bigbord2_state::init_bigbord2()
 {
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 	m_io = &m_maincpu->space(AS_IO);

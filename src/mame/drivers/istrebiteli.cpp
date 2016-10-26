@@ -133,19 +133,19 @@ public:
 	{
 	}
 
-	DECLARE_PALETTE_INIT(istrebiteli);
-	DECLARE_READ8_MEMBER(ppi0_r);
-	DECLARE_WRITE8_MEMBER(ppi0_w);
-	DECLARE_READ8_MEMBER(ppi1_r);
-	DECLARE_WRITE8_MEMBER(ppi1_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(spr0_ctrl_w);
-	DECLARE_WRITE8_MEMBER(spr1_ctrl_w);
-	DECLARE_WRITE8_MEMBER(spr_xy_w);
-	DECLARE_WRITE8_MEMBER(tileram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(collision_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
+	void palette_init_istrebiteli(palette_device &palette);
+	uint8_t ppi0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spr0_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spr1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spr_xy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value collision_r(ioport_field &field, void *param);
+	ioport_value coin_r(ioport_field &field, void *param);
+	void coin_inc(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
@@ -157,7 +157,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	tilemap_t *m_tilemap;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -193,12 +193,12 @@ static const rgb_t istreb_palette[4] = {
 	rgb_t(0x00, 0x00, 0xff)
 };
 
-PALETTE_INIT_MEMBER(istrebiteli_state,istrebiteli)
+void istrebiteli_state::palette_init_istrebiteli(palette_device &palette)
 {
 	palette.set_pen_colors(0, istreb_palette, ARRAY_LENGTH(istreb_palette));
 }
 
-TILE_GET_INFO_MEMBER(istrebiteli_state::get_tile_info)
+void istrebiteli_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index] & 0x1f, 0, 0);
 }
@@ -244,31 +244,31 @@ uint32_t istrebiteli_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-WRITE8_MEMBER(istrebiteli_state::tileram_w)
+void istrebiteli_state::tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset ^= 15;
 	m_tileram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(istrebiteli_state::ppi0_r)
+uint8_t istrebiteli_state::ppi0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi0->read(space, offset ^ 3) ^ 0xff;
 }
-WRITE8_MEMBER(istrebiteli_state::ppi0_w)
+void istrebiteli_state::ppi0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi0->write(space, offset ^ 3, data ^ 0xff);
 }
-READ8_MEMBER(istrebiteli_state::ppi1_r)
+uint8_t istrebiteli_state::ppi1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi1->read(space, offset ^ 3) ^ 0xff;
 }
-WRITE8_MEMBER(istrebiteli_state::ppi1_w)
+void istrebiteli_state::ppi1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi1->write(space, offset ^ 3, data ^ 0xff);
 }
 
-WRITE8_MEMBER(istrebiteli_state::sound_w)
+void istrebiteli_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0, data & 1);
 	if (data & 1)
@@ -276,21 +276,21 @@ WRITE8_MEMBER(istrebiteli_state::sound_w)
 	m_sound_dev->sound_w(data);
 }
 
-WRITE8_MEMBER(istrebiteli_state::spr0_ctrl_w)
+void istrebiteli_state::spr0_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spr_ctrl[0] = data;
 	if (data & 0x80)
 		m_spr_collision[0] = 0;
 }
 
-WRITE8_MEMBER(istrebiteli_state::spr1_ctrl_w)
+void istrebiteli_state::spr1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spr_ctrl[1] = data;
 	if (data & 0x80)
 		m_spr_collision[1] = 0;
 }
 
-WRITE8_MEMBER(istrebiteli_state::spr_xy_w)
+void istrebiteli_state::spr_xy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spr_xy[offset ^ 7] = data;
 }
@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, istrebiteli_state)
 	AM_RANGE(0xc8, 0xcf) AM_WRITE(spr_xy_w)
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
+ioport_value istrebiteli_state::collision_r(ioport_field &field, void *param)
 {
 	// piece of HACK
 	// real hardware does per-pixel sprite collision detection
@@ -328,12 +328,12 @@ CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
 	return m_spr_collision[id];
 }
 
-CUSTOM_INPUT_MEMBER(istrebiteli_state::coin_r)
+ioport_value istrebiteli_state::coin_r(ioport_field &field, void *param)
 {
 	return coin_count;
 }
 
-INPUT_CHANGED_MEMBER(istrebiteli_state::coin_inc)
+void istrebiteli_state::coin_inc(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval == 0 && newval == 1)
 		++coin_count;

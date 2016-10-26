@@ -33,13 +33,13 @@
 #include "includes/f1gp.h"
 
 
-WRITE8_MEMBER(f1gp_state::f1gp_sh_bankswitch_w)
+void f1gp_state::f1gp_sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80bank->set_entry(data & 0x01);
 }
 
 
-WRITE16_MEMBER(f1gp_state::sound_command_w)
+void f1gp_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -49,12 +49,12 @@ WRITE16_MEMBER(f1gp_state::sound_command_w)
 	}
 }
 
-READ16_MEMBER(f1gp_state::command_pending_r)
+uint16_t f1gp_state::command_pending_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_pending_command ? 0xff : 0);
 }
 
-WRITE8_MEMBER(f1gp_state::pending_command_clear_w)
+void f1gp_state::pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pending_command = 0;
 }
@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, f1gp_state )
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(f1gp_state::f1gpb_misc_w)
+void f1gp_state::f1gpb_misc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	static int old=-1;
@@ -363,7 +363,7 @@ static GFXDECODE_START( f1gp2 )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(f1gp_state,f1gpb)
+void f1gp_state::machine_start_f1gpb()
 {
 	save_item(NAME(m_pending_command));
 	save_item(NAME(m_roz_bank));
@@ -372,14 +372,14 @@ MACHINE_START_MEMBER(f1gp_state,f1gpb)
 	save_item(NAME(m_scroll));
 }
 
-MACHINE_START_MEMBER(f1gp_state,f1gp)
+void f1gp_state::machine_start_f1gp()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x8000);
 
-	MACHINE_START_CALL_MEMBER(f1gpb);
+	machine_start_f1gpb();
 }
 
-MACHINE_RESET_MEMBER(f1gp_state,f1gp)
+void f1gp_state::machine_reset_f1gp()
 {
 	m_pending_command = 0;
 	m_roz_bank = 0;

@@ -145,14 +145,14 @@ public:
 
 	uint8_t m_nmi_en;
 
-	DECLARE_WRITE8_MEMBER(to_sound_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	void to_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(sub);
+	void palette_init_sub(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_irq);
+	void sound_irq(device_t &device);
 };
 
 void sub_state::machine_start()
@@ -264,13 +264,13 @@ static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8, sub_state )
 	AM_RANGE(0xf060, 0xf060) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(sub_state::to_sound_w)
+void sub_state::to_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(sub_state::nmi_mask_w)
+void sub_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_en = data & 1;
 }
@@ -405,7 +405,7 @@ static GFXDECODE_START( sub )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x32_layout, 0, 0x80 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(sub_state, sub)
+void sub_state::palette_init_sub(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -434,7 +434,7 @@ PALETTE_INIT_MEMBER(sub_state, sub)
 }
 
 
-INTERRUPT_GEN_MEMBER(sub_state::sound_irq)
+void sub_state::sound_irq(device_t &device)
 {
 	if(m_nmi_en)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

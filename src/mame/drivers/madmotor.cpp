@@ -25,7 +25,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(madmotor_state::madmotor_sound_w)
+void madmotor_state::madmotor_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -336,7 +336,7 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(madmotor_state,madmotor)
+void madmotor_state::init_madmotor()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i;

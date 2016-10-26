@@ -53,26 +53,26 @@ public:
 	svision_pet_t m_pet;
 	tvlink_t m_tvlink;
 
-	DECLARE_READ8_MEMBER(svision_r);
-	DECLARE_WRITE8_MEMBER(svision_w);
-	DECLARE_READ8_MEMBER(tvlink_r);
-	DECLARE_WRITE8_MEMBER(tvlink_w);
-	DECLARE_DRIVER_INIT(svisions);
-	DECLARE_DRIVER_INIT(svision);
+	uint8_t svision_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void svision_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tvlink_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tvlink_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_svisions();
+	void init_svision();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(svision);
-	DECLARE_PALETTE_INIT(svisionp);
-	DECLARE_PALETTE_INIT(svisionn);
-	DECLARE_MACHINE_RESET(tvlink);
+	void palette_init_svision(palette_device &palette);
+	void palette_init_svisionp(palette_device &palette);
+	void palette_init_svisionn(palette_device &palette);
+	void machine_reset_tvlink();
 	uint32_t screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(svision_frame_int);
-	TIMER_CALLBACK_MEMBER(svision_pet_timer);
-	TIMER_CALLBACK_MEMBER(svision_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(svision_pet_timer_dev);
+	void svision_frame_int(device_t &device);
+	void svision_pet_timer(void *ptr, int32_t param);
+	void svision_timer(void *ptr, int32_t param);
+	void svision_pet_timer_dev(timer_device &timer, void *ptr, int32_t param);
 	void svision_irq();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svision_cart);
+	image_init_result device_image_load_svision_cart(device_image_interface &image);
 
 protected:
 	required_device<cpu_device> m_maincpu;

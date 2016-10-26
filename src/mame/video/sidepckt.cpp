@@ -12,7 +12,7 @@
 #include "includes/sidepckt.h"
 
 
-PALETTE_INIT_MEMBER(sidepckt_state, sidepckt)
+void sidepckt_state::palette_init_sidepckt(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -52,7 +52,7 @@ PALETTE_INIT_MEMBER(sidepckt_state, sidepckt)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(sidepckt_state::get_tile_info)
+void sidepckt_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_colorram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -88,19 +88,19 @@ void sidepckt_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(sidepckt_state::videoram_w)
+void sidepckt_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidepckt_state::colorram_w)
+void sidepckt_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidepckt_state::flipscreen_w)
+void sidepckt_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int flipscreen = data;
 	machine().tilemap().set_flip_all(flipscreen ? TILEMAP_FLIPY : TILEMAP_FLIPX);

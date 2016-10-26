@@ -53,40 +53,40 @@ public:
 		m_cass(*this, "cassette")
 	{ }
 
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(cass_w);
-	DECLARE_READ8_MEMBER(cass2_r);
-	DECLARE_READ8_MEMBER(exxx_r);
-	DECLARE_WRITE8_MEMBER(port7f_w);
-	DECLARE_WRITE8_MEMBER(portff_w);
-	DECLARE_WRITE8_MEMBER(brailab4_port7f_w);
-	DECLARE_WRITE8_MEMBER(brailab4_portff_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cass_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cass2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t exxx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port7f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void brailab4_port7f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void brailab4_portff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value cass3_r(ioport_field &field, void *param);
 	const uint8_t *m_p_chargen;
 	const uint8_t *m_p_videoram;
 	bool m_nmi;
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<cassette_image_device> m_cass;
-	DECLARE_DRIVER_INIT(brailab4);
-	DECLARE_VIDEO_START(homelab2);
-	DECLARE_MACHINE_RESET(homelab3);
-	DECLARE_VIDEO_START(homelab3);
-	DECLARE_MACHINE_RESET(brailab4);
-	DECLARE_VIDEO_START(brailab4);
+	void init_brailab4();
+	void video_start_homelab2();
+	void machine_reset_homelab3();
+	void video_start_homelab3();
+	void machine_reset_brailab4();
+	void video_start_brailab4();
 	uint32_t screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(homelab_frame);
+	void homelab_frame(device_t &device);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(homelab);
 };
 
-INTERRUPT_GEN_MEMBER(homelab_state::homelab_frame)
+void homelab_state::homelab_frame(device_t &device)
 {
 	if (m_nmi)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
+uint8_t homelab_state::key_r(address_space &space, offs_t offset, uint8_t mem_mask) // offset 27F-2FE
 {
 	if (offset == 0x38) // 0x3838
 	{
@@ -109,12 +109,12 @@ READ8_MEMBER( homelab_state::key_r ) // offset 27F-2FE
 	return data;
 }
 
-READ8_MEMBER( homelab_state::cass2_r )
+uint8_t homelab_state::cass2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_cass->input() > 0.03) ? 0xff : 0;
 }
 
-WRITE8_MEMBER( homelab_state::cass_w )
+void homelab_state::cass_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0x73f) // 0x3f3f
 		m_nmi = true;
@@ -126,40 +126,40 @@ WRITE8_MEMBER( homelab_state::cass_w )
 		m_cass->output(BIT(data, 0) ? -1.0 : +1.0); // FIXME
 }
 
-MACHINE_RESET_MEMBER(homelab_state,homelab3)
+void homelab_state::machine_reset_homelab3()
 {
 }
 
-MACHINE_RESET_MEMBER(homelab_state,brailab4)
-{
-	membank("bank1")->set_entry(0);
-}
-
-WRITE8_MEMBER( homelab_state::port7f_w )
-{
-}
-
-WRITE8_MEMBER( homelab_state::portff_w )
-{
-}
-
-WRITE8_MEMBER( homelab_state::brailab4_port7f_w )
+void homelab_state::machine_reset_brailab4()
 {
 	membank("bank1")->set_entry(0);
 }
 
-WRITE8_MEMBER( homelab_state::brailab4_portff_w )
+void homelab_state::port7f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+}
+
+void homelab_state::portff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+}
+
+void homelab_state::brailab4_port7f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+	membank("bank1")->set_entry(0);
+}
+
+void homelab_state::brailab4_portff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(1);
 }
 
-CUSTOM_INPUT_MEMBER( homelab_state::cass3_r )
+ioport_value homelab_state::cass3_r(ioport_field &field, void *param)
 {
 	return (m_cass->input() > 0.03);
 }
 
 
-READ8_MEMBER( homelab_state::exxx_r )
+uint8_t homelab_state::exxx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // keys E800-E813 but E810-E813 are not connected
 // cassin E883
@@ -543,19 +543,19 @@ static INPUT_PORTS_START( brailab4 ) // F4 to F8 are foreign characters
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-VIDEO_START_MEMBER(homelab_state,homelab2)
+void homelab_state::video_start_homelab2()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("maincpu")->base()+0xc000;
 }
 
-VIDEO_START_MEMBER(homelab_state,homelab3)
+void homelab_state::video_start_homelab3()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("maincpu")->base()+0xf800;
 }
 
-VIDEO_START_MEMBER(homelab_state,brailab4)
+void homelab_state::video_start_brailab4()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("maincpu")->base()+0x17800;
@@ -831,7 +831,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 18)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(homelab_state,brailab4)
+void homelab_state::init_brailab4()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &RAM[0xf800], 0x8000);

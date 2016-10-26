@@ -110,87 +110,87 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats_bbcm);
 	DECLARE_FLOPPY_FORMATS(floppy_formats_bbcmc);
 
-	DECLARE_WRITE8_MEMBER(bbc_page_selecta_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorya1_w);
-	DECLARE_WRITE8_MEMBER(bbc_page_selectb_w);
-	DECLARE_WRITE8_MEMBER(bbc_memoryb3_w);
-	DECLARE_WRITE8_MEMBER(bbc_memoryb4_w);
-	DECLARE_WRITE8_MEMBER(bbc_page_selectbp_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp1_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp2_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp4_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp4_128_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybp6_128_w);
-	DECLARE_READ8_MEMBER(bbcm_ACCCON_read);
-	DECLARE_WRITE8_MEMBER(bbcm_ACCCON_write);
-	DECLARE_WRITE8_MEMBER(page_selectbm_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybm1_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybm2_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybm4_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybm5_w);
-	DECLARE_WRITE8_MEMBER(bbc_memorybm7_w);
-	DECLARE_READ8_MEMBER(bbcm_r);
-	DECLARE_WRITE8_MEMBER(bbcm_w);
-	DECLARE_WRITE8_MEMBER(bbc_SerialULA_w);
+	void bbc_page_selecta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memorya1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_page_selectb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memoryb3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memoryb4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_page_selectbp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memorybp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memorybp2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memorybp4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memorybp4_128_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memorybp6_128_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bbcm_ACCCON_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bbcm_ACCCON_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void page_selectbm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memorybm1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memorybm2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memorybm4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memorybm5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_memorybm7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bbcm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bbcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_SerialULA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(bbc_wd1770_status_w);
-	DECLARE_READ8_MEMBER(bbcm_wd177xl_read);
-	DECLARE_WRITE8_MEMBER(bbcm_wd1770l_write);
-	DECLARE_WRITE8_MEMBER(bbcm_wd1772l_write);
-	DECLARE_WRITE8_MEMBER(bbc_videoULA_w);
-	DECLARE_READ8_MEMBER(bbc_fe_r);
-	DECLARE_DIRECT_UPDATE_MEMBER(bbcbp_direct_handler);
-	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
+	void bbc_wd1770_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bbcm_wd177xl_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bbcm_wd1770l_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbcm_wd1772l_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_videoULA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bbc_fe_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	offs_t bbcbp_direct_handler(direct_read_data &direct, offs_t address);
+	offs_t bbcm_direct_handler(direct_read_data &direct, offs_t address);
 
-	DECLARE_DRIVER_INIT(bbc);
-	DECLARE_VIDEO_START(bbc);
+	void init_bbc();
+	void video_start_bbc();
 
-	DECLARE_MACHINE_START(bbca);
-	DECLARE_MACHINE_RESET(bbca);
-	DECLARE_MACHINE_START(bbcb);
-	DECLARE_MACHINE_RESET(bbcb);
-	DECLARE_MACHINE_RESET(torch);
-	DECLARE_MACHINE_START(bbcbp);
-	DECLARE_MACHINE_RESET(bbcbp);
-	DECLARE_MACHINE_START(bbcm);
-	DECLARE_MACHINE_RESET(bbcm);
-	DECLARE_MACHINE_START(bbcmc);
-	DECLARE_MACHINE_RESET(bbcmc);
-	DECLARE_MACHINE_RESET(ltmpbp);
-	DECLARE_MACHINE_RESET(ltmpm);
+	void machine_start_bbca();
+	void machine_reset_bbca();
+	void machine_start_bbcb();
+	void machine_reset_bbcb();
+	void machine_reset_torch();
+	void machine_start_bbcbp();
+	void machine_reset_bbcbp();
+	void machine_start_bbcm();
+	void machine_reset_bbcm();
+	void machine_start_bbcmc();
+	void machine_reset_bbcmc();
+	void machine_reset_ltmpbp();
+	void machine_reset_ltmpm();
 
-	DECLARE_PALETTE_INIT(bbc);
-	INTERRUPT_GEN_MEMBER(bbcb_vsync);
-	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
-	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_WRITE_LINE_MEMBER(adlc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(econet_clk_w);
-	DECLARE_WRITE_LINE_MEMBER(bus_nmi_w);
-	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_porta);
-	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_portb);
-	DECLARE_READ8_MEMBER(bbcb_via_system_read_porta);
-	DECLARE_READ8_MEMBER(bbcb_via_system_read_portb);
-	DECLARE_READ8_MEMBER(bbcb_via_user_read_portb);
-	DECLARE_WRITE8_MEMBER(bbcb_via_user_write_portb);
-	DECLARE_WRITE_LINE_MEMBER(bbc_hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(bbc_vsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(bbc_de_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(speech_changed);
+	void palette_init_bbc(palette_device &palette);
+	void bbcb_vsync(device_t &device);
+	void bbcb_keyscan(device_t &device);
+	void bbc_tape_timer_cb(void *ptr, int32_t param);
+	void write_acia_clock(int state);
+	void adlc_irq_w(int state);
+	void econet_clk_w(int state);
+	void bus_nmi_w(int state);
+	void bbcb_via_system_write_porta(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbcb_via_system_write_portb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bbcb_via_system_read_porta(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bbcb_via_system_read_portb(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bbcb_via_user_read_portb(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bbcb_via_user_write_portb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbc_hsync_changed(int state);
+	void bbc_vsync_changed(int state);
+	void bbc_de_changed(int state);
+	void monitor_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void speech_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void update_acia_rxd();
 	void update_acia_dcd();
 	void update_acia_cts();
-	DECLARE_WRITE_LINE_MEMBER(bbc_rts_w);
-	DECLARE_WRITE_LINE_MEMBER(bbc_txd_w);
-	DECLARE_WRITE_LINE_MEMBER(write_rxd_serial);
-	DECLARE_WRITE_LINE_MEMBER(write_dcd_serial);
-	DECLARE_WRITE_LINE_MEMBER(write_cts_serial);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(side_w);
+	void bbc_rts_w(int state);
+	void bbc_txd_w(int state);
+	void write_rxd_serial(int state);
+	void write_dcd_serial(int state);
+	void write_cts_serial(int state);
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
+	void motor_w(int state);
+	void side_w(int state);
 
 	UPD7002_GET_ANALOGUE(BBC_get_analogue_input);
 	UPD7002_EOC(BBC_uPD7002_EOC);
@@ -199,14 +199,14 @@ public:
 	void bbcm_setup_banks(memory_bank *membank, int banks, uint32_t shift, uint32_t size);
 
 	image_init_result bbc_load_rom(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp1_load) { return bbc_load_rom(image, m_exp1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp2_load) { return bbc_load_rom(image, m_exp2); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp3_load) { return bbc_load_rom(image, m_exp3); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp4_load) { return bbc_load_rom(image, m_exp4); }
+	image_init_result device_image_load_exp1_load(device_image_interface &image) { return bbc_load_rom(image, m_exp1); }
+	image_init_result device_image_load_exp2_load(device_image_interface &image) { return bbc_load_rom(image, m_exp2); }
+	image_init_result device_image_load_exp3_load(device_image_interface &image) { return bbc_load_rom(image, m_exp3); }
+	image_init_result device_image_load_exp4_load(device_image_interface &image) { return bbc_load_rom(image, m_exp4); }
 
 	image_init_result bbcm_load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_exp1_load) { return bbcm_load_cart(image, m_exp1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_exp2_load) { return bbcm_load_cart(image, m_exp2); }
+	image_init_result device_image_load_bbcm_exp1_load(device_image_interface &image) { return bbcm_load_cart(image, m_exp1); }
+	image_init_result device_image_load_bbcm_exp2_load(device_image_interface &image) { return bbcm_load_cart(image, m_exp2); }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 

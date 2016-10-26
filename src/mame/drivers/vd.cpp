@@ -25,12 +25,12 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ8_MEMBER(dsw_r) { return 0; }
-	DECLARE_WRITE8_MEMBER(col_w);
-	DECLARE_WRITE8_MEMBER(disp_w);
-	DECLARE_WRITE8_MEMBER(lamp_w) { };
-	DECLARE_WRITE8_MEMBER(sol_w) { };
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	uint8_t dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0; }
+	void col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void sol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void irq(timer_device &timer, void *ptr, int32_t param);
 protected:
 
 	// devices
@@ -109,7 +109,7 @@ static INPUT_PORTS_START( vd )
 	PORT_START("X5")
 INPUT_PORTS_END
 
-TIMER_DEVICE_CALLBACK_MEMBER( vd_state::irq )
+void vd_state::irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_t_c > 40)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
@@ -117,14 +117,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( vd_state::irq )
 		m_t_c++;
 }
 
-WRITE8_MEMBER( vd_state::disp_w )
+void vd_state::disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	segment[offset] = data;
 	if (!offset)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( vd_state::col_w )
+void vd_state::col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != 0x3f)
 	{

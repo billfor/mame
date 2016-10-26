@@ -240,11 +240,11 @@ public:
 	required_ioport_array<10> m_row;
 	required_ioport m_lock;
 
-	DECLARE_MACHINE_START( pet );
-	DECLARE_MACHINE_START( pet2001 );
-	DECLARE_MACHINE_RESET( pet );
-	DECLARE_MACHINE_START( pet40 );
-	DECLARE_MACHINE_RESET( pet40 );
+	void machine_start_pet();
+	void machine_start_pet2001();
+	void machine_reset_pet();
+	void machine_start_pet40();
+	void machine_reset_pet40();
 
 	MC6845_BEGIN_UPDATE( pet_begin_update );
 	MC6845_UPDATE_ROW( pet40_update_row );
@@ -254,29 +254,29 @@ public:
 	void check_interrupts();
 	void update_speaker();
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
-	DECLARE_WRITE8_MEMBER( via_pa_w );
-	DECLARE_READ8_MEMBER( via_pb_r );
-	DECLARE_WRITE8_MEMBER( via_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
+	void via_irq_w(int state);
+	void via_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via_ca2_w(int state);
+	void via_cb2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( pia1_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_irqb_w );
-	DECLARE_READ8_MEMBER( pia1_pa_r );
-	DECLARE_READ8_MEMBER( pia1_pb_r );
-	DECLARE_WRITE8_MEMBER( pia1_pa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
+	void pia1_irqa_w(int state);
+	void pia1_irqb_w(int state);
+	uint8_t pia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia1_ca2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( pia2_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia2_irqb_w );
+	void pia2_irqa_w(int state);
+	void pia2_irqb_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
+	void user_diag_w(int state);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( sync_tick );
+	void sync_tick(timer_device &timer, void *ptr, int32_t param);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_pet );
 
@@ -333,7 +333,7 @@ public:
 		pet_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( pia1_pb_r );
+	uint8_t pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 
@@ -344,8 +344,8 @@ public:
 		pet2001b_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_MACHINE_START( pet80 );
-	DECLARE_MACHINE_RESET( pet80 );
+	void machine_start_pet80();
+	void machine_reset_pet80();
 
 	MC6845_UPDATE_ROW( pet80_update_row );
 	MC6845_UPDATE_ROW( cbm8296_update_row );
@@ -390,8 +390,8 @@ public:
 	required_device<pla_device> m_pla1;
 	required_device<pla_device> m_pla2;
 
-	DECLARE_MACHINE_START( cbm8296 );
-	DECLARE_MACHINE_RESET( cbm8296 );
+	void machine_start_cbm8296();
+	void machine_reset_cbm8296();
 
 	void read_pla1(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
 		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
@@ -401,8 +401,8 @@ public:
 		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
 	void read_pla2_eprom(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_cr;
 };
@@ -461,7 +461,7 @@ void pet_state::update_speaker()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( pet_state::read )
+uint8_t pet_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int sel = offset >> 12;
 	int norom = m_exp->norom_r(space, offset, sel);
@@ -556,7 +556,7 @@ READ8_MEMBER( pet_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pet_state::write )
+void pet_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sel = offset >> 12;
 
@@ -684,7 +684,7 @@ void cbm8296_state::read_pla2_eprom(offs_t offset, int phi2, int brw, int casena
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( cbm8296_state::read )
+uint8_t cbm8296_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int norom = m_exp->norom_r(space, offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 1, noscreen = 1, noio = BIT(m_cr, 6);
@@ -765,7 +765,7 @@ READ8_MEMBER( cbm8296_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cbm8296_state::write )
+void cbm8296_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int norom = m_exp->norom_r(space, offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 0, noscreen = 1, noio = BIT(m_cr, 6);
@@ -1108,14 +1108,14 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( pet_state::via_irq_w )
+void pet_state::via_irq_w(int state)
 {
 	m_via_irq = state;
 
 	check_interrupts();
 }
 
-WRITE8_MEMBER( pet_state::via_pa_w )
+void pet_state::via_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_user->write_c((data>>0)&1);
 	m_user->write_d((data>>1)&1);
@@ -1129,7 +1129,7 @@ WRITE8_MEMBER( pet_state::via_pa_w )
 	m_via_pa = data;
 }
 
-READ8_MEMBER( pet_state::via_pb_r )
+uint8_t pet_state::via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -1159,7 +1159,7 @@ READ8_MEMBER( pet_state::via_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( pet_state::via_pb_w )
+void pet_state::via_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1186,12 +1186,12 @@ WRITE8_MEMBER( pet_state::via_pb_w )
 	m_cassette2->motor_w(BIT(data, 4));
 }
 
-WRITE_LINE_MEMBER( pet_state::via_ca2_w )
+void pet_state::via_ca2_w(int state)
 {
 	m_graphic = state;
 }
 
-WRITE_LINE_MEMBER( pet_state::via_cb2_w )
+void pet_state::via_cb2_w(int state)
 {
 	m_via_cb2 = state;
 	update_speaker();
@@ -1200,21 +1200,21 @@ WRITE_LINE_MEMBER( pet_state::via_cb2_w )
 }
 
 
-WRITE_LINE_MEMBER( pet_state::pia1_irqa_w )
+void pet_state::pia1_irqa_w(int state)
 {
 	m_pia1a_irq = state;
 
 	check_interrupts();
 }
 
-WRITE_LINE_MEMBER( pet_state::pia1_irqb_w )
+void pet_state::pia1_irqb_w(int state)
 {
 	m_pia1b_irq = state;
 
 	check_interrupts();
 }
 
-READ8_MEMBER( pet_state::pia1_pa_r )
+uint8_t pet_state::pia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -1249,7 +1249,7 @@ READ8_MEMBER( pet_state::pia1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( pet_state::pia1_pa_w )
+void pet_state::pia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1274,7 +1274,7 @@ WRITE8_MEMBER( pet_state::pia1_pa_w )
 	update_speaker();
 }
 
-READ8_MEMBER( pet_state::pia1_pb_r )
+uint8_t pet_state::pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -1295,7 +1295,7 @@ READ8_MEMBER( pet_state::pia1_pb_r )
 	return data;
 }
 
-READ8_MEMBER( pet2001b_state::pia1_pb_r )
+uint8_t pet2001b_state::pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -1316,7 +1316,7 @@ READ8_MEMBER( pet2001b_state::pia1_pb_r )
 	return data;
 }
 
-WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
+void pet_state::pia1_ca2_w(int state)
 {
 	m_ieee->eoi_w(state);
 
@@ -1324,21 +1324,21 @@ WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
 }
 
 
-WRITE_LINE_MEMBER( pet_state::pia2_irqa_w )
+void pet_state::pia2_irqa_w(int state)
 {
 	m_pia2a_irq = state;
 
 	check_interrupts();
 }
 
-WRITE_LINE_MEMBER( pet_state::pia2_irqb_w )
+void pet_state::pia2_irqb_w(int state)
 {
 	m_pia2b_irq = state;
 
 	check_interrupts();
 }
 
-WRITE_LINE_MEMBER( pet_state::user_diag_w )
+void pet_state::user_diag_w(int state)
 {
 	m_user_diag = state;
 }
@@ -1353,7 +1353,7 @@ WRITE_LINE_MEMBER( pet_state::user_diag_w )
 //  TIMER_DEVICE_CALLBACK( sync_tick )
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER( pet_state::sync_tick )
+void pet_state::sync_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_sync = !m_sync;
 
@@ -1546,7 +1546,7 @@ SLOT_INTERFACE_END
 //  MACHINE_START( pet )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( pet_state, pet )
+void pet_state::machine_start_pet()
 {
 	// allocate memory
 	m_video_ram.allocate(m_video_ram_size);
@@ -1587,15 +1587,15 @@ MACHINE_START_MEMBER( pet_state, pet )
 //  MACHINE_START( pet2001 )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( pet_state, pet2001 )
+void pet_state::machine_start_pet2001()
 {
 	m_video_ram_size = 0x400;
 
-	MACHINE_START_CALL_MEMBER(pet);
+	machine_start_pet();
 }
 
 
-MACHINE_RESET_MEMBER( pet_state, pet )
+void pet_state::machine_reset_pet()
 {
 	m_maincpu->reset();
 
@@ -1613,17 +1613,17 @@ MACHINE_RESET_MEMBER( pet_state, pet )
 //  MACHINE_START( pet40 )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( pet_state, pet40 )
+void pet_state::machine_start_pet40()
 {
 	m_video_ram_size = 0x400;
 
-	MACHINE_START_CALL_MEMBER(pet);
+	machine_start_pet();
 }
 
 
-MACHINE_RESET_MEMBER( pet_state, pet40 )
+void pet_state::machine_reset_pet40()
 {
-	MACHINE_RESET_CALL_MEMBER(pet);
+	machine_reset_pet();
 
 	m_crtc->reset();
 }
@@ -1633,17 +1633,17 @@ MACHINE_RESET_MEMBER( pet_state, pet40 )
 //  MACHINE_START( pet80 )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( pet80_state, pet80 )
+void pet80_state::machine_start_pet80()
 {
 	m_video_ram_size = 0x800;
 
-	MACHINE_START_CALL_MEMBER(pet);
+	machine_start_pet();
 }
 
 
-MACHINE_RESET_MEMBER( pet80_state, pet80 )
+void pet80_state::machine_reset_pet80()
 {
-	MACHINE_RESET_CALL_MEMBER(pet);
+	machine_reset_pet();
 
 	m_crtc->reset();
 }
@@ -1653,9 +1653,9 @@ MACHINE_RESET_MEMBER( pet80_state, pet80 )
 //  MACHINE_START( cbm8296 )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( cbm8296_state, cbm8296 )
+void cbm8296_state::machine_start_cbm8296()
 {
-	MACHINE_START_CALL_MEMBER(pet80);
+	machine_start_pet80();
 
 	// state saving
 	save_item(NAME(m_cr));
@@ -1663,9 +1663,9 @@ MACHINE_START_MEMBER( cbm8296_state, cbm8296 )
 }
 
 
-MACHINE_RESET_MEMBER( cbm8296_state, cbm8296 )
+void cbm8296_state::machine_reset_cbm8296()
 {
-	MACHINE_RESET_CALL_MEMBER(pet80);
+	machine_reset_pet80();
 
 	m_cr = 0;
 	m_via_pa = 0xff;

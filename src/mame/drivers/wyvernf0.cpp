@@ -62,11 +62,11 @@ public:
 	tilemap_t  *m_fg_tilemap;
 	std::unique_ptr<uint8_t[]>      m_objram;
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	DECLARE_WRITE8_MEMBER(bgram_w);
-	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_VIDEO_START(wyvernf0);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_start_wyvernf0();
 	uint32_t screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground );
 
@@ -76,21 +76,21 @@ public:
 	uint8_t       m_rombank;
 	uint8_t       m_rambank;
 
-	DECLARE_WRITE8_MEMBER(rambank_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(nmi_disable_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_MACHINE_START(wyvernf0);
-	DECLARE_MACHINE_RESET(wyvernf0);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
+	void rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void machine_start_wyvernf0();
+	void machine_reset_wyvernf0();
+	void nmi_callback(void *ptr, int32_t param);
 
 	// MCU
 	uint8_t       m_mcu_val, m_mcu_ready;
 
-	DECLARE_READ8_MEMBER(fake_mcu_r);
-	DECLARE_WRITE8_MEMBER(fake_mcu_w);
-	DECLARE_READ8_MEMBER(fake_status_r);
+	uint8_t fake_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fake_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fake_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -117,19 +117,19 @@ public:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(wyvernf0_state::bgram_w)
+void wyvernf0_state::bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(wyvernf0_state::fgram_w)
+void wyvernf0_state::fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(wyvernf0_state::get_bg_tile_info)
+void wyvernf0_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int code = m_bgram[offs] + (m_bgram[offs+1] << 8);
@@ -137,7 +137,7 @@ TILE_GET_INFO_MEMBER(wyvernf0_state::get_bg_tile_info)
 
 	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
 }
-TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
+void wyvernf0_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int code = m_fgram[offs] + (m_fgram[offs+1] << 8);
@@ -146,7 +146,7 @@ TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
 }
 
-VIDEO_START_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::video_start_wyvernf0()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wyvernf0_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wyvernf0_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -284,7 +284,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 ***************************************************************************/
 
-READ8_MEMBER(wyvernf0_state::fake_mcu_r)
+uint8_t wyvernf0_state::fake_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = 0;
 
@@ -294,12 +294,12 @@ READ8_MEMBER(wyvernf0_state::fake_mcu_r)
 	return result;
 }
 
-WRITE8_MEMBER(wyvernf0_state::fake_mcu_w)
+void wyvernf0_state::fake_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_val = data;
 }
 
-READ8_MEMBER(wyvernf0_state::fake_status_r)
+uint8_t wyvernf0_state::fake_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// bit 0 = ok to write
 	// bit 1 = ok to read
@@ -314,7 +314,7 @@ READ8_MEMBER(wyvernf0_state::fake_status_r)
 ***************************************************************************/
 
 // D100
-WRITE8_MEMBER(wyvernf0_state::rambank_w)
+void wyvernf0_state::rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0 Flip X/Y
 	// bit 1 Flip X/Y
@@ -335,7 +335,7 @@ WRITE8_MEMBER(wyvernf0_state::rambank_w)
 }
 
 // D200
-WRITE8_MEMBER(wyvernf0_state::rombank_w)
+void wyvernf0_state::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0-2 ROM bank
 	m_rombank = data;
@@ -345,7 +345,7 @@ WRITE8_MEMBER(wyvernf0_state::rombank_w)
 		logerror("%s: unknown rombank bits %02x\n", machine().describe_context(), data);
 }
 
-TIMER_CALLBACK_MEMBER(wyvernf0_state::nmi_callback)
+void wyvernf0_state::nmi_callback(void *ptr, int32_t param)
 {
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -353,18 +353,18 @@ TIMER_CALLBACK_MEMBER(wyvernf0_state::nmi_callback)
 		m_pending_nmi = 1;
 }
 
-WRITE8_MEMBER(wyvernf0_state::sound_command_w)
+void wyvernf0_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(wyvernf0_state::nmi_callback),this), data);
 }
 
-WRITE8_MEMBER(wyvernf0_state::nmi_disable_w)
+void wyvernf0_state::nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(wyvernf0_state::nmi_enable_w)
+void wyvernf0_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
@@ -600,7 +600,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::machine_start_wyvernf0()
 {
 	uint8_t *ROM = memregion("rombank")->base();
 	membank("rombank")->configure_entries(0, 8, ROM, 0x2000);
@@ -618,7 +618,7 @@ MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 	save_item(NAME(m_mcu_ready));
 }
 
-MACHINE_RESET_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::machine_reset_wyvernf0()
 {
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;

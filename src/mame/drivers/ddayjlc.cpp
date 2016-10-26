@@ -99,28 +99,28 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(prot_w);
-	DECLARE_WRITE8_MEMBER(char_bank_w);
-	DECLARE_WRITE8_MEMBER(ddayjlc_bgram_w);
-	DECLARE_WRITE8_MEMBER(ddayjlc_videoram_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_w);
-	DECLARE_WRITE8_MEMBER(main_nmi_w);
-	DECLARE_WRITE8_MEMBER(bg0_w);
-	DECLARE_WRITE8_MEMBER(bg1_w);
-	DECLARE_WRITE8_MEMBER(bg2_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(i8257_CH0_w);
-	DECLARE_WRITE8_MEMBER(i8257_LMSR_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
-	DECLARE_DRIVER_INIT(ddayjlc);
-	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+	void prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void char_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddayjlc_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddayjlc_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void main_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8257_CH0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8257_LMSR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value prot_r(ioport_field &field, void *param);
+	void init_ddayjlc();
+	void get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ddayjlc);
+	void palette_init_ddayjlc(palette_device &palette);
 	uint32_t screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ddayjlc_interrupt);
-	INTERRUPT_GEN_MEMBER(ddayjlc_snd_interrupt);
+	void ddayjlc_interrupt(device_t &device);
+	void ddayjlc_snd_interrupt(device_t &device);
 };
 
 
@@ -167,22 +167,22 @@ static const uint8_t prot_data[0x10] =
 	0x03, 0x01, 0x00, 0x03
 };
 
-CUSTOM_INPUT_MEMBER(ddayjlc_state::prot_r)
+ioport_value ddayjlc_state::prot_r(ioport_field &field, void *param)
 {
 	return prot_data[m_prot_addr];
 }
 
-WRITE8_MEMBER(ddayjlc_state::prot_w)
+void ddayjlc_state::prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot_addr = (m_prot_addr & (~(1 << offset))) | ((data & 1) << offset);
 }
 
-WRITE8_MEMBER(ddayjlc_state::char_bank_w)
+void ddayjlc_state::char_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_char_bank = data;
 }
 
-WRITE8_MEMBER(ddayjlc_state::ddayjlc_bgram_w)
+void ddayjlc_state::ddayjlc_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!offset)
 		m_bg_tilemap->set_scrollx(0, data + 8);
@@ -191,33 +191,33 @@ WRITE8_MEMBER(ddayjlc_state::ddayjlc_bgram_w)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(ddayjlc_state::ddayjlc_videoram_w)
+void ddayjlc_state::ddayjlc_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 }
 
 
-WRITE8_MEMBER(ddayjlc_state::sound_nmi_w)
+void ddayjlc_state::sound_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = data;
 }
 
-WRITE8_MEMBER(ddayjlc_state::main_nmi_w)
+void ddayjlc_state::main_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_main_nmi_enable = data;
 }
 
-WRITE8_MEMBER(ddayjlc_state::bg0_w)
+void ddayjlc_state::bg0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgadr = (m_bgadr & 0xfe) | (data & 1);
 }
 
-WRITE8_MEMBER(ddayjlc_state::bg1_w)
+void ddayjlc_state::bg1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgadr = (m_bgadr & 0xfd) | ((data & 1) << 1);
 }
 
-WRITE8_MEMBER(ddayjlc_state::bg2_w)
+void ddayjlc_state::bg2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgadr = (m_bgadr & 0xfb) | ((data & 1) << 2);
 	if (m_bgadr > 2)
@@ -226,19 +226,19 @@ WRITE8_MEMBER(ddayjlc_state::bg2_w)
 	membank("bank1")->set_entry(m_bgadr);
 }
 
-WRITE8_MEMBER(ddayjlc_state::sound_w)
+void ddayjlc_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(ddayjlc_state::i8257_CH0_w)
+void ddayjlc_state::i8257_CH0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_e00x_d[offset][m_e00x_l[offset]] = data;
 	m_e00x_l[offset] ^= 1;
 }
 
-WRITE8_MEMBER(ddayjlc_state::i8257_LMSR_w)
+void ddayjlc_state::i8257_LMSR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!data)
 	{
@@ -385,7 +385,7 @@ static GFXDECODE_START( ddayjlc )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0x100, 16 )
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_bg)
+void ddayjlc_state::get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bgram[tile_index] + ((m_bgram[tile_index + 0x400] & 0x08) << 5);
 	int color = (m_bgram[tile_index + 0x400] & 0x7);
@@ -435,13 +435,13 @@ uint32_t ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_interrupt)
+void ddayjlc_state::ddayjlc_interrupt(device_t &device)
 {
 	if(m_main_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_snd_interrupt)
+void ddayjlc_state::ddayjlc_snd_interrupt(device_t &device)
 {
 	if(m_sound_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -481,7 +481,7 @@ void ddayjlc_state::machine_reset()
 	}
 }
 
-PALETTE_INIT_MEMBER(ddayjlc_state, ddayjlc)
+void ddayjlc_state::palette_init_ddayjlc(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
@@ -630,7 +630,7 @@ ROM_START( ddayjlca )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
+void ddayjlc_state::init_ddayjlc()
 {
 #define repack(n)\
 		dst[newadr+0+n] = src[oldaddr+0+n];\

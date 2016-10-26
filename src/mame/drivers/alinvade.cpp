@@ -34,11 +34,11 @@ public:
 		, m_discrete(*this, "discrete")
 	{ }
 
-	DECLARE_READ8_MEMBER(irqmask_r);
-	DECLARE_WRITE8_MEMBER(irqmask_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sounden_w);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	uint8_t irqmask_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irqmask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sounden_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vblank_irq(device_t &device);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
@@ -72,23 +72,23 @@ DISCRETE_SOUND_START(alinvade)
 
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER( alinvade_state::sound_w )
+void alinvade_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, NODE_01, (data^0x3f)<<2);
 }
 
-WRITE8_MEMBER( alinvade_state::sounden_w )
+void alinvade_state::sounden_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().sound().system_enable(data == 4);
 }
 
-READ8_MEMBER(alinvade_state::irqmask_r)
+uint8_t alinvade_state::irqmask_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0; // TODO: might be anything
 }
 
 
-WRITE8_MEMBER(alinvade_state::irqmask_w)
+void alinvade_state::irqmask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((!(m_irqff & 1)) && (data & 1)) // f/f, active high? If the above actually returns 0xff this could be active low ...
 		m_irqmask^= 1;
@@ -192,7 +192,7 @@ uint32_t alinvade_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(alinvade_state::vblank_irq)
+void alinvade_state::vblank_irq(device_t &device)
 {
 	if(m_irqmask & 1)
 		m_maincpu->set_input_line(0,HOLD_LINE);

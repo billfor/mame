@@ -132,18 +132,18 @@ static const uint16_t mHoreKidProtData[] =
 	0x1800 /* checksum */
 };
 
-WRITE16_MEMBER(terracre_state::amazon_sound_w)
+void terracre_state::amazon_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space,0,((data & 0x7f) << 1) | 1);
 }
 
-READ8_MEMBER(terracre_state::soundlatch_clear_r)
+uint8_t terracre_state::soundlatch_clear_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundlatch->clear_w(space,0,0);
 	return 0;
 }
 
-READ16_MEMBER(terracre_state::amazon_protection_r)
+uint16_t terracre_state::amazon_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset = m_mAmazonProtReg[2];
 	if( offset<=0x56 )
@@ -156,7 +156,7 @@ READ16_MEMBER(terracre_state::amazon_protection_r)
 	return 0;
 }
 
-WRITE16_MEMBER(terracre_state::amazon_protection_w)
+void terracre_state::amazon_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -174,7 +174,7 @@ WRITE16_MEMBER(terracre_state::amazon_protection_w)
 	}
 }
 
-MACHINE_START_MEMBER(terracre_state,amazon)
+void terracre_state::machine_start_amazon()
 {
 	/* set up for save */
 	save_item(NAME(m_mAmazonProtCmd));
@@ -940,17 +940,17 @@ ROM_START( boobhack )
 	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, BAD_DUMP CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
 ROM_END
 
-DRIVER_INIT_MEMBER(terracre_state,amazon)
+void terracre_state::init_amazon()
 {
 	m_mpProtData = mAmazonProtData;
 }
 
-DRIVER_INIT_MEMBER(terracre_state,amatelas)
+void terracre_state::init_amatelas()
 {
 	m_mpProtData = mAmatelasProtData;
 }
 
-DRIVER_INIT_MEMBER(terracre_state,horekid)
+void terracre_state::init_horekid()
 {
 	m_mpProtData = mHoreKidProtData;
 }

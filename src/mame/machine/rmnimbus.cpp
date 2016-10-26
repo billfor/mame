@@ -195,7 +195,7 @@ void rmnimbus_state::external_int(uint8_t vector, bool state)
 	m_maincpu->int0_w(state);
 }
 
-READ8_MEMBER(rmnimbus_state::cascade_callback)
+uint8_t rmnimbus_state::cascade_callback(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->int0_w(0);
 	return m_vector;
@@ -978,12 +978,12 @@ void rmnimbus_state::nimbus_bank_memory()
 	}
 }
 
-READ8_MEMBER(rmnimbus_state::nimbus_mcu_r)
+uint8_t rmnimbus_state::nimbus_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mcu_reg080;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_mcu_w)
+void rmnimbus_state::nimbus_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_reg080=data;
 
@@ -1004,7 +1004,7 @@ Z80SIO, used for the keyboard interface
 
 /* Z80 SIO/2 */
 
-WRITE_LINE_MEMBER(rmnimbus_state::sio_interrupt)
+void rmnimbus_state::sio_interrupt(int state)
 {
 	if(LOG_SIO)
 		logerror("SIO Interrupt state=%02X\n",state);
@@ -1020,7 +1020,7 @@ void rmnimbus_state::fdc_reset()
 	m_scsi_ctrl_out->write(0);
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
+void rmnimbus_state::nimbus_fdc_intrq_w(int state)
 {
 	if(LOG_DISK)
 		logerror("nimbus_drives_intrq = %d\n",state);
@@ -1031,7 +1031,7 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
+void rmnimbus_state::nimbus_fdc_drq_w(int state)
 {
 	if(LOG_DISK)
 		logerror("nimbus_drives_drq_w(%d)\n", state);
@@ -1068,7 +1068,7 @@ uint8_t rmnimbus_state::fdc_driveno(uint8_t drivesel)
     7   !REQ from HDD
 */
 
-READ8_MEMBER(rmnimbus_state::scsi_r)
+uint8_t rmnimbus_state::scsi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = 0;
 
@@ -1119,7 +1119,7 @@ READ8_MEMBER(rmnimbus_state::scsi_r)
     6   hdc drq enabled
     7   fdc drq enabled
 */
-WRITE8_MEMBER(rmnimbus_state::fdc_ctl_w)
+void rmnimbus_state::fdc_ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t reg400_old = m_nimbus_drives.reg400;
 	char drive[5];
@@ -1150,7 +1150,7 @@ WRITE8_MEMBER(rmnimbus_state::fdc_ctl_w)
     2   SCSI IRQ Enable
 */
 
-WRITE8_MEMBER(rmnimbus_state::scsi_w)
+void rmnimbus_state::scsi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int pc=space.device().safe_pc();
 
@@ -1185,7 +1185,7 @@ void rmnimbus_state::check_scsi_irq()
 	nimbus_fdc_intrq_w(m_scsi_io && m_scsi_cd && m_scsi_req && m_scsi_iena);
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::write_scsi_iena)
+void rmnimbus_state::write_scsi_iena(int state)
 {
 	m_scsi_iena = state;
 	check_scsi_irq();
@@ -1202,18 +1202,18 @@ void rmnimbus_state::hdc_drq(bool state)
 	m_maincpu->drq1_w(HDC_DRQ_ENABLED() && !m_scsi_cd && state);
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_bsy )
+void rmnimbus_state::write_scsi_bsy(int state)
 {
 	m_scsi_bsy = state;
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
+void rmnimbus_state::write_scsi_cd(int state)
 {
 	m_scsi_cd = state;
 	check_scsi_irq();
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_io )
+void rmnimbus_state::write_scsi_io(int state)
 {
 	m_scsi_io = state;
 
@@ -1224,12 +1224,12 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_io )
 	check_scsi_irq();
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_msg )
+void rmnimbus_state::write_scsi_msg(int state)
 {
 	m_scsi_msg = state;
 }
 
-WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
+void rmnimbus_state::write_scsi_req(int state)
 {
 	int last = m_scsi_req;
 	m_scsi_req = state;
@@ -1269,7 +1269,7 @@ void rmnimbus_state::ipc_dumpregs()
 }
 #endif
 
-READ8_MEMBER(rmnimbus_state::nimbus_pc8031_r)
+uint8_t rmnimbus_state::nimbus_pc8031_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int pc=space.device().safe_pc();
 	uint8_t   result;
@@ -1293,7 +1293,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_r)
 	return result;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_w)
+void rmnimbus_state::nimbus_pc8031_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int pc=space.device().safe_pc();
 
@@ -1319,7 +1319,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_w)
 
 /* 8031/8051 Peripheral controller 8031/8051 side */
 
-READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
+uint8_t rmnimbus_state::nimbus_pc8031_iou_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int pc=space.device().safe_pc();
 	uint8_t   result = 0;
@@ -1344,7 +1344,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
 	return result;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
+void rmnimbus_state::nimbus_pc8031_iou_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int pc=space.device().safe_pc();
 
@@ -1383,7 +1383,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 	}
 }
 
-READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
+uint8_t rmnimbus_state::nimbus_pc8031_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int pc=space.device().safe_pc();
 	uint8_t   result = 0;
@@ -1401,7 +1401,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
 	return result;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port_w)
+void rmnimbus_state::nimbus_pc8031_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int pc=space.device().safe_pc();
 
@@ -1432,7 +1432,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port_w)
 
 
 /* IO Unit */
-READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
+uint8_t rmnimbus_state::nimbus_iou_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int pc=space.device().safe_pc();
 	uint8_t   result=0;
@@ -1448,7 +1448,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
 	return result;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_iou_w)
+void rmnimbus_state::nimbus_iou_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int pc=space.device().safe_pc();
 
@@ -1492,7 +1492,7 @@ void rmnimbus_state::rmni_sound_reset()
 	m_ay8910_a=0;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_porta_w)
+void rmnimbus_state::nimbus_sound_ay8910_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->data_w(data);
 
@@ -1500,7 +1500,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_porta_w)
 	m_ay8910_a=data;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_portb_w)
+void rmnimbus_state::nimbus_sound_ay8910_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x07) != m_last_playmode)
 	{
@@ -1509,7 +1509,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_portb_w)
 	}
 }
 
-WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
+void rmnimbus_state::nimbus_msm5205_vck(int state)
 {
 	if(m_iou_reg092 & MSM5205_INT_ENABLE)
 		external_int(EXTERNAL_INT_MSM5205,state);
@@ -1666,7 +1666,7 @@ void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	m_nimbus_mouse.m_intstate_y=intstate_y;
 }
 
-READ8_MEMBER(rmnimbus_state::nimbus_mouse_js_r)
+uint8_t rmnimbus_state::nimbus_mouse_js_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -1698,7 +1698,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_mouse_js_r)
 	return result;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_mouse_js_w)
+void rmnimbus_state::nimbus_mouse_js_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -1715,6 +1715,6 @@ collector output only. It usially acts as the printer strobe line.
 ***********************************************************************/
 
 /* USER VIA 6522 port B is connected to the BBC user port */
-WRITE8_MEMBER(rmnimbus_state::nimbus_via_write_portb)
+void rmnimbus_state::nimbus_via_write_portb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }

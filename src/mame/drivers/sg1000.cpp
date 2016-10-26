@@ -76,7 +76,7 @@ Notes:
 // TODO: not sure if the OMV bios actually detects the presence of a cart,
 // or if the cart data simply overwrites the internal bios...
 // for the moment let assume the latter!
-READ8_MEMBER( sg1000_state::omv_r )
+uint8_t sg1000_state::omv_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart && m_cart->exists())
 		return m_cart->read_cart(space, offset);
@@ -84,13 +84,13 @@ READ8_MEMBER( sg1000_state::omv_r )
 		return m_rom->base()[offset];
 }
 
-WRITE8_MEMBER( sg1000_state::omv_w )
+void sg1000_state::omv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart && m_cart->exists())
 		m_cart->write_cart(space, offset, data);
 }
 
-READ8_MEMBER( sg1000_state::peripheral_r )
+uint8_t sg1000_state::peripheral_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	bool joy_ports_disabled = m_sgexpslot->is_readable(offset);
 
@@ -107,7 +107,7 @@ READ8_MEMBER( sg1000_state::peripheral_r )
 	}
 }
 
-WRITE8_MEMBER( sg1000_state::peripheral_w )
+void sg1000_state::peripheral_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bool joy_ports_disabled = m_sgexpslot->is_writeable(offset);
 
@@ -226,10 +226,10 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    INPUT_CHANGED_MEMBER( trigger_nmi )
+    void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 -------------------------------------------------*/
 
-INPUT_CHANGED_MEMBER( sg1000_state::trigger_nmi )
+void sg1000_state::trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -364,12 +364,12 @@ INPUT_PORTS_END
     I8255 INTERFACE
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( sf7000_state::write_centronics_busy )
+void sf7000_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( sf7000_state::ppi_pa_r )
+uint8_t sf7000_state::ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description
@@ -393,7 +393,7 @@ READ8_MEMBER( sf7000_state::ppi_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( sf7000_state::ppi_pc_w )
+void sf7000_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description

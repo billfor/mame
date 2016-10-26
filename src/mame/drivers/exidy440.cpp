@@ -253,7 +253,7 @@ Who Dunit            1988  6809
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(exidy440_state::coin_inserted)
+void exidy440_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* if we got a coin, set the IRQ on the main CPU */
 	if (oldval)
@@ -268,19 +268,19 @@ INPUT_CHANGED_MEMBER(exidy440_state::coin_inserted)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(exidy440_state::firq_beam_r)
+ioport_value exidy440_state::firq_beam_r(ioport_field &field, void *param)
 {
 	return m_firq_beam;
 }
 
 
-CUSTOM_INPUT_MEMBER(exidy440_state::firq_vblank_r)
+ioport_value exidy440_state::firq_vblank_r(ioport_field &field, void *param)
 {
 	return m_firq_vblank;
 }
 
 
-CUSTOM_INPUT_MEMBER(exidy440_state::hitnmiss_button1_r)
+ioport_value exidy440_state::hitnmiss_button1_r(ioport_field &field, void *param)
 {
 	/* button 1 shows up in two bits */
 	uint32_t button1 = ioport("HITNMISS_BUTTON1")->read();
@@ -312,7 +312,7 @@ void exidy440_state::exidy440_bank_select(uint8_t bank)
 }
 
 
-WRITE8_MEMBER(exidy440_state::bankram_w)
+void exidy440_state::bankram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* EEROM lives in the upper 8k of bank 15 */
 	if (m_bank == 15 && offset >= 0x2000)
@@ -332,7 +332,7 @@ WRITE8_MEMBER(exidy440_state::bankram_w)
  *
  *************************************/
 
-READ8_MEMBER(exidy440_state::exidy440_input_port_3_r)
+uint8_t exidy440_state::exidy440_input_port_3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -340,7 +340,7 @@ READ8_MEMBER(exidy440_state::exidy440_input_port_3_r)
 }
 
 
-READ8_MEMBER(exidy440_state::sound_command_ack_r)
+uint8_t exidy440_state::sound_command_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* sound command acknowledgements come on bit 3 here */
 	return m_custom->exidy440_sound_command_ack() ? 0xf7 : 0xff;
@@ -354,26 +354,26 @@ READ8_MEMBER(exidy440_state::sound_command_ack_r)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(exidy440_state::delayed_sound_command_w)
+void exidy440_state::delayed_sound_command_w(void *ptr, int32_t param)
 {
 	m_custom->exidy440_sound_command(param);
 }
 
 
-WRITE8_MEMBER(exidy440_state::sound_command_w)
+void exidy440_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(exidy440_state::delayed_sound_command_w),this), data);
 }
 
 
-WRITE8_MEMBER(exidy440_state::exidy440_input_port_3_w)
+void exidy440_state::exidy440_input_port_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(exidy440_state::exidy440_coin_counter_w)
+void exidy440_state::exidy440_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -386,7 +386,7 @@ WRITE8_MEMBER(exidy440_state::exidy440_coin_counter_w)
  *
  *************************************/
 
-READ8_MEMBER(exidy440_state::showdown_bank0_r)
+uint8_t exidy440_state::showdown_bank0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* showdown relies on different values from different memory locations */
 	/* yukon relies on multiple reads from the same location returning different values */
@@ -415,19 +415,19 @@ READ8_MEMBER(exidy440_state::showdown_bank0_r)
 }
 
 
-READ8_MEMBER(exidy440_state::claypign_protection_r)
+uint8_t exidy440_state::claypign_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x76;
 }
 
 
-READ8_MEMBER(exidy440_state::topsecex_input_port_5_r)
+uint8_t exidy440_state::topsecex_input_port_5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("AN1")->read() & 1) ? 0x01 : 0x02;
 }
 
 
-WRITE8_MEMBER(exidy440_state::topsecex_yscroll_w)
+void exidy440_state::topsecex_yscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_topsecex_yscroll = data;
 }
@@ -1992,22 +1992,22 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(exidy440_state,exidy440)
+void exidy440_state::init_exidy440()
 {
 	m_showdown_bank_data[0] = m_showdown_bank_data[1] = nullptr;
 }
 
 
-DRIVER_INIT_MEMBER(exidy440_state,claypign)
+void exidy440_state::init_claypign()
 {
-	DRIVER_INIT_CALL(exidy440);
+	init_exidy440();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec0, 0x2ec3, read8_delegate(FUNC(exidy440_state::claypign_protection_r),this));
 }
 
 
-DRIVER_INIT_MEMBER(exidy440_state,topsecex)
+void exidy440_state::init_topsecex()
 {
-	DRIVER_INIT_CALL(exidy440);
+	init_exidy440();
 
 	/* extra input ports and scrolling */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(exidy440_state::topsecex_input_port_5_r),this));
@@ -2018,7 +2018,7 @@ DRIVER_INIT_MEMBER(exidy440_state,topsecex)
 }
 
 
-DRIVER_INIT_MEMBER(exidy440_state,showdown)
+void exidy440_state::init_showdown()
 {
 	static const uint8_t bankdata0[0x18] =
 	{
@@ -2033,7 +2033,7 @@ DRIVER_INIT_MEMBER(exidy440_state,showdown)
 		0xc5,0x8c,0x4e,0x86,0x1a,0xda,0x50,0xd1
 	};
 
-	DRIVER_INIT_CALL(exidy440);
+	init_exidy440();
 
 	/* set up the fake PLD */
 	m_showdown_bank_data[0] = bankdata0;
@@ -2041,7 +2041,7 @@ DRIVER_INIT_MEMBER(exidy440_state,showdown)
 }
 
 
-DRIVER_INIT_MEMBER(exidy440_state,yukon)
+void exidy440_state::init_yukon()
 {
 	static const uint8_t bankdata0[0x18] =
 	{
@@ -2056,7 +2056,7 @@ DRIVER_INIT_MEMBER(exidy440_state,yukon)
 		0xd1,0x94,0x56,0x92,0x26,0xe6,0x60,0xe1
 	};
 
-	DRIVER_INIT_CALL(exidy440);
+	init_exidy440();
 
 	/* set up the fake PLD */
 	m_showdown_bank_data[0] = bankdata0;

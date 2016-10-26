@@ -19,7 +19,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(mcr68_state::get_bg_tile_info)
+void mcr68_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int data = LOW_BYTE(videoram[tile_index * 2]) | (LOW_BYTE(videoram[tile_index * 2 + 1]) << 8);
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_bg_tile_info)
+void mcr68_state::zwackery_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_fg_tile_info)
+void mcr68_state::zwackery_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_fg_tile_info)
  *
  *************************************/
 
-VIDEO_START_MEMBER(mcr68_state,mcr68)
+void mcr68_state::video_start_mcr68()
 {
 	/* initialize the background tilemap */
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr68_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,32);
@@ -65,7 +65,7 @@ VIDEO_START_MEMBER(mcr68_state,mcr68)
 }
 
 
-VIDEO_START_MEMBER(mcr68_state,zwackery)
+void mcr68_state::video_start_zwackery()
 {
 	const uint8_t *colordatabase = (const uint8_t *)memregion("gfx3")->base();
 	gfx_element *gfx0 = m_gfxdecode->gfx(0);
@@ -136,7 +136,7 @@ VIDEO_START_MEMBER(mcr68_state,zwackery)
  *
  *************************************/
 
-WRITE16_MEMBER(mcr68_state::mcr68_videoram_w)
+void mcr68_state::mcr68_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
@@ -144,7 +144,7 @@ WRITE16_MEMBER(mcr68_state::mcr68_videoram_w)
 }
 
 
-WRITE16_MEMBER(mcr68_state::zwackery_videoram_w)
+void mcr68_state::zwackery_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
@@ -153,7 +153,7 @@ WRITE16_MEMBER(mcr68_state::zwackery_videoram_w)
 }
 
 
-WRITE16_MEMBER(mcr68_state::zwackery_spriteram_w)
+void mcr68_state::zwackery_spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* yech -- Zwackery relies on the upper 8 bits of a spriteram read being $ff! */
 	/* to make this happen we always write $ff in the upper 8 bits */

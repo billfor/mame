@@ -94,45 +94,45 @@ public:
 	emu_timer *m_delayed_z80_control_timer;
 
 	// common
-	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
-	DECLARE_WRITE8_MEMBER(nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(blitter_bank_w);
-	DECLARE_WRITE8_MEMBER(rimrockn_bank_w);
-	DECLARE_WRITE8_MEMBER(pia_portb_out);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_WRITE8_MEMBER(gtg2_sound_data_w);
-	DECLARE_READ8_MEMBER(sound_data_r);
-	DECLARE_WRITE8_MEMBER(grom_bank_w);
-	DECLARE_WRITE16_MEMBER(grom_bank16_w);
-	DECLARE_WRITE16_MEMBER(display_page16_w);
-	DECLARE_WRITE16_MEMBER(palette16_w);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(page_w);
-	DECLARE_READ8_MEMBER(blitter_r);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_WRITE8_MEMBER(tms34061_w);
-	DECLARE_READ8_MEMBER(tms34061_r);
-	DECLARE_WRITE8_MEMBER(grmatch_palette_w);
-	DECLARE_WRITE8_MEMBER(grmatch_xscroll_w);
-	DECLARE_WRITE8_MEMBER(pia_porta_out);
-	DECLARE_WRITE8_MEMBER(ym2203_portb_out);
+	void generate_tms34061_interrupt(int state);
+	void nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blitter_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rimrockn_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gtg2_sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void grom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void grom_bank16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void display_page16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void palette16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t blitter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tms34061_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tms34061_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void grmatch_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void grmatch_xscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ym2203_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
+	ioport_value special_r(ioport_field &field, void *param);
+	ioport_value gtg_mux(ioport_field &field, void *param);
 
-	DECLARE_DRIVER_INIT(rimrockn);
-	DECLARE_DRIVER_INIT(grmatch);
-	DECLARE_DRIVER_INIT(peggle);
-	DECLARE_DRIVER_INIT(slikshot);
-	DECLARE_DRIVER_INIT(neckneck);
-	DECLARE_DRIVER_INIT(arligntn);
-	DECLARE_DRIVER_INIT(hstennis);
-	DECLARE_DRIVER_INIT(sstrike);
+	void init_rimrockn();
+	void init_grmatch();
+	void init_peggle();
+	void init_slikshot();
+	void init_neckneck();
+	void init_arligntn();
+	void init_hstennis();
+	void init_sstrike();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(slikshot);
-	DECLARE_MACHINE_START(sstrike);
+	void video_start_slikshot();
+	void machine_start_sstrike();
 
 	uint32_t screen_update_2layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_grmatch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -140,12 +140,12 @@ public:
 	uint32_t screen_update_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(generate_nmi);
-	TIMER_CALLBACK_MEMBER(irq_off);
-	TIMER_CALLBACK_MEMBER(behind_the_beam_update);
-	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
-	TIMER_CALLBACK_MEMBER(blitter_done);
-	TIMER_DEVICE_CALLBACK_MEMBER(grmatch_palette_update);
+	void generate_nmi(device_t &device);
+	void irq_off(void *ptr, int32_t param);
+	void behind_the_beam_update(void *ptr, int32_t param);
+	void delayed_sound_data_w(void *ptr, int32_t param);
+	void blitter_done(void *ptr, int32_t param);
+	void grmatch_palette_update(timer_device &timer, void *ptr, int32_t param);
 
 	inline uint8_t fetch_next_raw();
 	inline void consume_raw(int count);
@@ -156,12 +156,12 @@ public:
 
 	/*----------- defined in machine/slikshot.c -----------*/
 
-	DECLARE_READ8_MEMBER( slikz80_port_r );
-	DECLARE_WRITE8_MEMBER( slikz80_port_w );
+	uint8_t slikz80_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slikz80_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( slikshot_z80_r );
-	DECLARE_READ8_MEMBER( slikshot_z80_control_r );
-	DECLARE_WRITE8_MEMBER( slikshot_z80_control_w );
+	uint8_t slikshot_z80_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t slikshot_z80_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slikshot_z80_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void inters_to_vels(uint16_t inter1, uint16_t inter2, uint16_t inter3, uint8_t beams,
 							uint8_t *xres, uint8_t *vxres, uint8_t *vyres);
@@ -173,7 +173,7 @@ public:
 	void words_to_sensors(uint16_t word1, uint16_t word2, uint16_t word3, uint8_t beams,
 							uint16_t *sens0, uint16_t *sens1, uint16_t *sens2, uint16_t *sens3);
 	void compute_sensors();
-	TIMER_CALLBACK_MEMBER( delayed_z80_control_w );
+	void delayed_z80_control_w(void *ptr, int32_t param);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

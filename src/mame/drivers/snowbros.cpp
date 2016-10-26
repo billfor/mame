@@ -84,7 +84,7 @@ a joystick.  This is not an emulation bug.
 #include "machine/watchdog.h"
 
 
-WRITE16_MEMBER(snowbros_state::snowbros_flipscreen_w)
+void snowbros_state::snowbros_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		flip_screen_set(~data & 0x8000);
@@ -111,22 +111,22 @@ void snowbros_state::screen_eof_snowbros(screen_device &screen, bool state)
 
 
 
-WRITE16_MEMBER(snowbros_state::snowbros_irq4_ack_w)
+void snowbros_state::snowbros_irq4_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(snowbros_state::snowbros_irq3_ack_w)
+void snowbros_state::snowbros_irq3_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(3, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(snowbros_state::snowbros_irq2_ack_w)
+void snowbros_state::snowbros_irq2_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros_irq)
+void snowbros_state::snowbros_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -140,7 +140,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros_irq)
 		m_maincpu->set_input_line(4, ASSERT_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
+void snowbros_state::snowbros3_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int status = m_oki->read_status();
 	int scanline = param;
@@ -176,13 +176,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
 
 /* Sound Routines */
 
-READ16_MEMBER(snowbros_state::snowbros_68000_sound_r)
+uint16_t snowbros_state::snowbros_68000_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_soundlatch->read(space,offset);
 }
 
 
-WRITE16_MEMBER(snowbros_state::snowbros_68000_sound_w)
+void snowbros_state::snowbros_68000_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -191,12 +191,12 @@ WRITE16_MEMBER(snowbros_state::snowbros_68000_sound_w)
 	}
 }
 
-WRITE16_MEMBER(snowbros_state::semicom_soundcmd_w)
+void snowbros_state::semicom_soundcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) m_soundlatch->write(space,0,data & 0xff);
 }
 
-READ16_MEMBER(snowbros_state::toto_read)
+uint16_t snowbros_state::toto_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	if ((pc!= 0x3f010) && (pc!= 0x38008)) printf("toto prot %08x %04x\n", pc, mem_mask);
@@ -234,7 +234,7 @@ ADDRESS_MAP_END
 
 
 
-READ8_MEMBER(snowbros_state::prot_io_r)
+uint8_t snowbros_state::prot_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// never read?
 	return 0x00;
@@ -242,7 +242,7 @@ READ8_MEMBER(snowbros_state::prot_io_r)
 
 
 // probably not endian safe
-WRITE8_MEMBER(snowbros_state::prot_io_w)
+void snowbros_state::prot_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -335,7 +335,7 @@ ADDRESS_MAP_END
 
 /* Twin Adventure */
 
-WRITE16_MEMBER(snowbros_state::twinadv_68000_sound_w)
+void snowbros_state::twinadv_68000_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -361,7 +361,7 @@ static ADDRESS_MAP_START( twinadv_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)  /* IRQ 2 acknowledge */
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(snowbros_state::twinadv_oki_bank_w)
+void snowbros_state::twinadv_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = (data &0x02)>>1;
 
@@ -415,7 +415,7 @@ ADDRESS_MAP_END
 
 /* Same volume used for all samples at the Moment, could be right, we have no
    way of knowing .. */
-READ16_MEMBER(snowbros_state::sb3_sound_r)
+uint16_t snowbros_state::sb3_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0003;
 }
@@ -484,7 +484,7 @@ void snowbros_state::sb3_play_sound (int data)
 
 }
 
-WRITE16_MEMBER(snowbros_state::sb3_sound_w)
+void snowbros_state::sb3_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data == 0x00fe)
 	{
@@ -1741,7 +1741,7 @@ static GFXDECODE_START( hyperpac )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperpac_tilelayout,  0, 16 )
 GFXDECODE_END
 
-MACHINE_RESET_MEMBER(snowbros_state,semiprot)
+void snowbros_state::machine_reset_semiprot()
 {
 	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i;
@@ -1750,7 +1750,7 @@ MACHINE_RESET_MEMBER(snowbros_state,semiprot)
 		m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 }
 
-MACHINE_RESET_MEMBER(snowbros_state,finalttr)
+void snowbros_state::machine_reset_finalttr()
 {
 	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i;
@@ -2771,17 +2771,17 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(snowbros_state,cookbib2)
+void snowbros_state::init_cookbib2()
 {
 }
 
 
-READ16_MEMBER(snowbros_state::_4in1_02_read)
+uint16_t snowbros_state::_4in1_02_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0202;
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
+void snowbros_state::init_4in1boot()
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
@@ -2811,7 +2811,7 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_4in1_02_read),this));
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
+void snowbros_state::init_snowbro3()
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
@@ -2829,35 +2829,35 @@ DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 	save_item(NAME(m_sb3_music));
 }
 
-READ16_MEMBER(snowbros_state::_3in1_read)
+uint16_t snowbros_state::_3in1_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x000a;
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,3in1semi)
+void snowbros_state::init_3in1semi()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_3in1_read),this));
 }
 
 
-READ16_MEMBER(snowbros_state::cookbib3_read)
+uint16_t snowbros_state::cookbib3_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x2a2a;
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,cookbib3)
+void snowbros_state::init_cookbib3()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::cookbib3_read),this));
 }
 
-DRIVER_INIT_MEMBER(snowbros_state,pzlbreak)
+void snowbros_state::init_pzlbreak()
 {
 	m_pandora->set_bg_pen(0xc0);
 }
 
 
 
-DRIVER_INIT_MEMBER(snowbros_state,toto)
+void snowbros_state::init_toto()
 {
 	// every single rom has bits 0x10 and 0x08 swapped
 	uint8_t *src = memregion("maincpu")->base();
@@ -2888,13 +2888,13 @@ DRIVER_INIT_MEMBER(snowbros_state,toto)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x500006, 0x500007, read16_delegate(FUNC(snowbros_state::toto_read),this));
 }
 
-DRIVER_INIT_MEMBER(snowbros_state, hyperpac)
+void snowbros_state::init_hyperpac()
 {
 	save_item(NAME(m_semicom_prot_offset));
 }
 
 
-DRIVER_INIT_MEMBER(snowbros_state, yutnori)
+void snowbros_state::init_yutnori()
 {
 	// presumably related to the PIC protection
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();

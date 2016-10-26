@@ -24,18 +24,18 @@ public:
 
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE16_MEMBER(irq2_ack_w);
-	DECLARE_WRITE16_MEMBER(irq6_ack_w);
-	DECLARE_WRITE16_MEMBER(videoram_w);
-	DECLARE_WRITE16_MEMBER(eeprom_chip_select_w);
-	DECLARE_WRITE16_MEMBER(eeprom_serial_clock_w);
-	DECLARE_WRITE16_MEMBER(eeprom_data_w);
+	void irq2_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void irq6_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void eeprom_chip_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void eeprom_serial_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void eeprom_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	DECLARE_DRIVER_INIT(xorworld);
+	void init_xorworld();
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(xorworld);
+	void palette_init_xorworld(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );

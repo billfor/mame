@@ -16,18 +16,18 @@ XX Mission (c) 1986 UPL
 #include "includes/xxmissio.h"
 
 
-WRITE8_MEMBER(xxmissio_state::bank_sel_w)
+void xxmissio_state::bank_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 7);
 }
 
-CUSTOM_INPUT_MEMBER(xxmissio_state::status_r)
+ioport_value xxmissio_state::status_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 	return (m_status & bit_mask) ? 1 : 0;
 }
 
-WRITE8_MEMBER(xxmissio_state::status_m_w)
+void xxmissio_state::status_m_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -46,7 +46,7 @@ WRITE8_MEMBER(xxmissio_state::status_m_w)
 	}
 }
 
-WRITE8_MEMBER(xxmissio_state::status_s_w)
+void xxmissio_state::status_s_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -65,13 +65,13 @@ WRITE8_MEMBER(xxmissio_state::status_s_w)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(xxmissio_state::interrupt_m)
+void xxmissio_state::interrupt_m(device_t &device)
 {
 	m_status &= ~0x20;
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(xxmissio_state::interrupt_s)
+void xxmissio_state::interrupt_s(device_t &device)
 {
 	m_status &= ~0x10;
 	m_subcpu->set_input_line(0, HOLD_LINE);

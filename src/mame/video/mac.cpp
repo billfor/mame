@@ -59,14 +59,14 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 #include "machine/ram.h"
 #include "render.h"
 
-PALETTE_INIT_MEMBER(mac_state,mac)
+void mac_state::palette_init_mac(palette_device &palette)
 {
 	palette.set_pen_color(0, 0xff, 0xff, 0xff);
 	palette.set_pen_color(1, 0x00, 0x00, 0x00);
 }
 
 // 4-level grayscale
-PALETTE_INIT_MEMBER(mac_state,macgsc)
+void mac_state::palette_init_macgsc(palette_device &palette)
 {
 	palette.set_pen_color(0, 0xff, 0xff, 0xff);
 	palette.set_pen_color(1, 0x7f, 0x7f, 0x7f);
@@ -74,7 +74,7 @@ PALETTE_INIT_MEMBER(mac_state,macgsc)
 	palette.set_pen_color(3, 0x00, 0x00, 0x00);
 }
 
-VIDEO_START_MEMBER(mac_state,mac)
+void mac_state::video_start_mac()
 {
 }
 
@@ -213,18 +213,18 @@ uint32_t mac_state::screen_update_macpb160(screen_device &screen, bitmap_ind16 &
 
 // IIci/IIsi RAM-Based Video (RBV) and children: V8, Eagle, Spice, VASP, Sonora
 
-VIDEO_START_MEMBER(mac_state,macrbv)
+void mac_state::video_start_macrbv()
 {
 }
 
-VIDEO_RESET_MEMBER(mac_state,maceagle)
+void mac_state::video_reset_maceagle()
 {
 	m_rbv_montype = 32;
 	m_rbv_palette[0xfe] = 0xffffff;
 	m_rbv_palette[0xff] = 0;
 }
 
-VIDEO_RESET_MEMBER(mac_state,macrbv)
+void mac_state::video_reset_macrbv()
 {
 	rectangle visarea;
 	int htotal, vtotal;
@@ -282,7 +282,7 @@ VIDEO_RESET_MEMBER(mac_state,macrbv)
 	target->set_view(view);
 }
 
-VIDEO_RESET_MEMBER(mac_state,macsonora)
+void mac_state::video_reset_macsonora()
 {
 	rectangle visarea;
 	int htotal, vtotal;
@@ -339,7 +339,7 @@ VIDEO_RESET_MEMBER(mac_state,macsonora)
 	target->set_view(view);
 }
 
-VIDEO_START_MEMBER(mac_state,macsonora)
+void mac_state::video_start_macsonora()
 {
 	memset(m_rbv_regs, 0, sizeof(m_rbv_regs));
 
@@ -359,7 +359,7 @@ VIDEO_START_MEMBER(mac_state,macsonora)
 	m_rbv_type = RBV_TYPE_SONORA;
 }
 
-VIDEO_START_MEMBER(mac_state,macv8)
+void mac_state::video_start_macv8()
 {
 	memset(m_rbv_regs, 0, sizeof(m_rbv_regs));
 
@@ -869,7 +869,7 @@ void mac_state::dafb_recalc_ints()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mac_state::dafb_vbl_tick)
+void mac_state::dafb_vbl_tick(void *ptr, int32_t param)
 {
 	m_dafb_int_status |= 1;
 	dafb_recalc_ints();
@@ -877,7 +877,7 @@ TIMER_CALLBACK_MEMBER(mac_state::dafb_vbl_tick)
 	m_vbl_timer->adjust(m_screen->time_until_pos(480, 0), 0);
 }
 
-TIMER_CALLBACK_MEMBER(mac_state::dafb_cursor_tick)
+void mac_state::dafb_cursor_tick(void *ptr, int32_t param)
 {
 	m_dafb_int_status |= 4;
 	dafb_recalc_ints();
@@ -885,7 +885,7 @@ TIMER_CALLBACK_MEMBER(mac_state::dafb_cursor_tick)
 	m_cursor_timer->adjust(m_screen->time_until_pos(m_cursor_line, 0), 0);
 }
 
-VIDEO_START_MEMBER(mac_state,macdafb)
+void mac_state::video_start_macdafb()
 {
 	m_vbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::dafb_vbl_tick),this));
 	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::dafb_cursor_tick),this));
@@ -894,7 +894,7 @@ VIDEO_START_MEMBER(mac_state,macdafb)
 	m_cursor_timer->adjust(attotime::never);
 }
 
-VIDEO_RESET_MEMBER(mac_state,macdafb)
+void mac_state::video_reset_macdafb()
 {
 	m_rbv_count = 0;
 	m_rbv_clutoffs = 0;
@@ -909,7 +909,7 @@ VIDEO_RESET_MEMBER(mac_state,macdafb)
 	memset(m_rbv_palette, 0, sizeof(m_rbv_palette));
 }
 
-READ32_MEMBER(mac_state::dafb_r)
+uint32_t mac_state::dafb_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  if (offset != 0x108/4) printf("DAFB: Read @ %x (mask %x PC=%x)\n", offset*4, mem_mask, m_maincpu->pc());
 
@@ -940,7 +940,7 @@ READ32_MEMBER(mac_state::dafb_r)
 	return 0;
 }
 
-WRITE32_MEMBER(mac_state::dafb_w)
+void mac_state::dafb_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  if (offset != 0x10c/4) printf("DAFB: Write %08x @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, m_maincpu->pc());
 
@@ -1004,14 +1004,14 @@ WRITE32_MEMBER(mac_state::dafb_w)
 	}
 }
 
-READ32_MEMBER(mac_state::dafb_dac_r)
+uint32_t mac_state::dafb_dac_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  printf("DAFB: Read DAC @ %x (mask %x PC=%x)\n", offset*4, mem_mask, m_maincpu->pc());
 
 	return 0;
 }
 
-WRITE32_MEMBER(mac_state::dafb_dac_w)
+void mac_state::dafb_dac_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  if ((offset > 0) && (offset != 0x10/4)) printf("DAFB: Write %08x to DAC @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, m_maincpu->pc());
 
@@ -1197,7 +1197,7 @@ uint32_t mac_state::screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-READ32_MEMBER(mac_state::macwd_r)
+uint32_t mac_state::macwd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1218,7 +1218,7 @@ READ32_MEMBER(mac_state::macwd_r)
 	return 0;
 }
 
-WRITE32_MEMBER(mac_state::macwd_w)
+void mac_state::macwd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{

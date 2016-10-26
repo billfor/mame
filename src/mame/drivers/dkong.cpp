@@ -431,13 +431,13 @@ Donkey Kong Notes
  *
  *************************************/
 
-READ8_MEMBER(dkong_state::memory_read_byte)
+uint8_t dkong_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(dkong_state::memory_write_byte)
+void dkong_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
@@ -449,7 +449,7 @@ WRITE8_MEMBER(dkong_state::memory_write_byte)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(dkong_state::s2650_interrupt)
+void dkong_state::s2650_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
@@ -460,7 +460,7 @@ INTERRUPT_GEN_MEMBER(dkong_state::s2650_interrupt)
  *
  *************************************/
 
-MACHINE_START_MEMBER(dkong_state,dkong2b)
+void dkong_state::machine_start_dkong2b()
 {
 	m_hardware_type = HARDWARE_TKG04;
 
@@ -468,13 +468,13 @@ MACHINE_START_MEMBER(dkong_state,dkong2b)
 	save_item(NAME(m_dma_latch));
 }
 
-MACHINE_START_MEMBER(dkong_state,s2650)
+void dkong_state::machine_start_s2650()
 {
 	uint8_t   *p = memregion("user1")->base();
 	const char *game_name = machine().system().name;
 	int i;
 
-	MACHINE_START_CALL_MEMBER(dkong2b);
+	machine_start_dkong2b();
 
 	for (i = 0; i < 0x200; i++)
 		m_rev_map[i] = -1;
@@ -501,35 +501,35 @@ MACHINE_START_MEMBER(dkong_state,s2650)
 		fatalerror("Unknown game <%s> in S2650 start.\n", game_name);
 }
 
-MACHINE_START_MEMBER(dkong_state,radarscp)
+void dkong_state::machine_start_radarscp()
 {
-	MACHINE_START_CALL_MEMBER(dkong2b);
+	machine_start_dkong2b();
 	m_hardware_type = HARDWARE_TRS02;
 	m_vidhw = DKONG_BOARD;
 }
 
-MACHINE_START_MEMBER(dkong_state,radarscp1)
+void dkong_state::machine_start_radarscp1()
 {
-	MACHINE_START_CALL_MEMBER(dkong2b);
+	machine_start_dkong2b();
 	m_hardware_type = HARDWARE_TRS01;
 	m_vidhw = DKONG_BOARD;
 }
 
-MACHINE_START_MEMBER(dkong_state,dkong3)
+void dkong_state::machine_start_dkong3()
 {
 	m_hardware_type = HARDWARE_TKG04;
 }
 
-MACHINE_RESET_MEMBER(dkong_state,dkong)
+void dkong_state::machine_reset_dkong()
 {
 	/* nothing */
 }
 
-MACHINE_RESET_MEMBER(dkong_state,strtheat)
+void dkong_state::machine_reset_strtheat()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	MACHINE_RESET_CALL_MEMBER(dkong);
+	machine_reset_dkong();
 
 	/* The initial state of the counter is 0x08 */
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
@@ -537,11 +537,11 @@ MACHINE_RESET_MEMBER(dkong_state,strtheat)
 	membank("bank1")->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(dkong_state,drakton)
+void dkong_state::machine_reset_drakton()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	MACHINE_RESET_CALL_MEMBER(dkong);
+	machine_reset_dkong();
 
 	/* The initial state of the counter is 0x09 */
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
@@ -556,7 +556,7 @@ MACHINE_RESET_MEMBER(dkong_state,drakton)
  *
  *************************************/
 
-READ8_MEMBER(dkong_state::hb_dma_read_byte)
+uint8_t dkong_state::hb_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int   bucket = m_rev_map[(offset>>10) & 0x1ff];
 	int   addr;
@@ -569,7 +569,7 @@ READ8_MEMBER(dkong_state::hb_dma_read_byte)
 	return prog_space.read_byte(addr);
 }
 
-WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
+void dkong_state::hb_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int   bucket = m_rev_map[(offset>>10) & 0x1ff];
 	int   addr;
@@ -582,12 +582,12 @@ WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
 	prog_space.write_byte(addr, data);
 }
 
-READ8_MEMBER(dkong_state::p8257_ctl_r)
+uint8_t dkong_state::p8257_ctl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dma_latch;
 }
 
-WRITE8_MEMBER(dkong_state::p8257_ctl_w)
+void dkong_state::p8257_ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma_latch = data;
 }
@@ -599,12 +599,12 @@ WRITE8_MEMBER(dkong_state::p8257_ctl_w)
  *
  *************************************/
 
-WRITE8_MEMBER(dkong_state::dkong3_coin_counter_w)
+void dkong_state::dkong3_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
-WRITE8_MEMBER(dkong_state::p8257_drq_w)
+void dkong_state::p8257_drq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma8257->dreq0_w(data & 0x01);
 	m_dma8257->dreq1_w(data & 0x01);
@@ -612,7 +612,7 @@ WRITE8_MEMBER(dkong_state::p8257_drq_w)
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100)); // smooth things out a bit
 }
 
-READ8_MEMBER(dkong_state::dkong_in2_r)
+uint8_t dkong_state::dkong_in2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* mcu status (sound feedback) is inverted bit4 from port B (8039) */
 	uint8_t mcustatus = m_dev_vp2->bit4_q_r(space, 0);
@@ -625,7 +625,7 @@ READ8_MEMBER(dkong_state::dkong_in2_r)
 	return r;
 }
 
-READ8_MEMBER(dkong_state::dkongjr_in2_r)
+uint8_t dkong_state::dkongjr_in2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* dkongjr does not have the mcu line connected */
 
@@ -638,19 +638,19 @@ READ8_MEMBER(dkong_state::dkongjr_in2_r)
 	return r;
 }
 
-READ8_MEMBER(dkong_state::s2650_mirror_r)
+uint8_t dkong_state::s2650_mirror_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return space.read_byte(0x1000 + offset);
 }
 
 
-WRITE8_MEMBER(dkong_state::s2650_mirror_w)
+void dkong_state::s2650_mirror_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	space.write_byte(0x1000 + offset, data);
 }
 
 
-READ8_MEMBER(dkong_state::epos_decrypt_rom)
+uint8_t dkong_state::epos_decrypt_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 0x01)
 	{
@@ -678,7 +678,7 @@ READ8_MEMBER(dkong_state::epos_decrypt_rom)
 }
 
 
-WRITE8_MEMBER(dkong_state::s2650_data_w)
+void dkong_state::s2650_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if DEBUG_PROTECTION
 	logerror("write : pc = %04x, loopback = %02x\n",space.device().safe_pc(), data);
@@ -687,7 +687,7 @@ WRITE8_MEMBER(dkong_state::s2650_data_w)
 	m_hunchloopback = data;
 }
 
-WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
+void dkong_state::s2650_fo_w(int state)
 {
 #if DEBUG_PROTECTION
 	logerror("write : pc = %04x, FO = %02x\n",space.device().safe_pc(), data);
@@ -699,7 +699,7 @@ WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
 		m_hunchloopback = 0xfb;
 }
 
-READ8_MEMBER(dkong_state::s2650_port0_r)
+uint8_t dkong_state::s2650_port0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 #if DEBUG_PROTECTION
 	logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",space.device().safe_pc(), m_hunchloopback, m_main_fo);
@@ -723,7 +723,7 @@ READ8_MEMBER(dkong_state::s2650_port0_r)
 }
 
 
-READ8_MEMBER(dkong_state::s2650_port1_r)
+uint8_t dkong_state::s2650_port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 #if DEBUG_PROTECTION
 	logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",space.device().safe_pc(), m_hunchloopback, m_main_fo);
@@ -744,7 +744,7 @@ READ8_MEMBER(dkong_state::s2650_port1_r)
 }
 
 
-WRITE8_MEMBER(dkong_state::dkong3_2a03_reset_w)
+void dkong_state::dkong3_2a03_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 1)
 	{
@@ -758,7 +758,7 @@ WRITE8_MEMBER(dkong_state::dkong3_2a03_reset_w)
 	}
 }
 
-READ8_MEMBER(dkong_state::strtheat_inputport_0_r)
+uint8_t dkong_state::strtheat_inputport_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(ioport("DSW0")->read() & 0x40)
 	{
@@ -773,7 +773,7 @@ READ8_MEMBER(dkong_state::strtheat_inputport_0_r)
 }
 
 
-READ8_MEMBER(dkong_state::strtheat_inputport_1_r)
+uint8_t dkong_state::strtheat_inputport_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(ioport("DSW0")->read() & 0x40)
 	{
@@ -787,12 +787,12 @@ READ8_MEMBER(dkong_state::strtheat_inputport_1_r)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::dkong_z80dma_rdy_w)
+void dkong_state::dkong_z80dma_rdy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80dma->rdy_w(data & 0x01);
 }
 
-WRITE8_MEMBER(dkong_state::nmi_mask_w)
+void dkong_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }
@@ -1641,18 +1641,18 @@ GFXDECODE_END
  *
  *************************************/
 
-READ8_MEMBER(dkong_state::braze_eeprom_r)
+uint8_t dkong_state::braze_eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_eeprom->do_read();
 }
 
-WRITE8_MEMBER(dkong_state::braze_a15_w)
+void dkong_state::braze_a15_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x01);
 	membank("bank2")->set_entry(data & 0x01);
 }
 
-WRITE8_MEMBER(dkong_state::braze_eeprom_w)
+void dkong_state::braze_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_eeprom->di_write(data & 0x01);
 	m_eeprom->cs_write(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
@@ -1685,13 +1685,13 @@ void dkong_state::braze_decrypt_rom(uint8_t *dest)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(dkong_state::vblank_irq)
+void dkong_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE_LINE_MEMBER(dkong_state::busreq_w )
+void dkong_state::busreq_w(int state)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
@@ -3226,7 +3226,7 @@ void dkong_state::drakton_decrypt_rom(uint8_t mod, int offs, int *bs)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(dkong_state,herodk)
+void dkong_state::init_herodk()
 {
 	int A;
 	uint8_t *rom = memregion("maincpu")->base();
@@ -3245,7 +3245,7 @@ DRIVER_INIT_MEMBER(dkong_state,herodk)
 }
 
 
-DRIVER_INIT_MEMBER(dkong_state,drakton)
+void dkong_state::init_drakton()
 {
 	int bs[4][8] = {
 			{7,6,1,3,0,4,2,5},
@@ -3267,7 +3267,7 @@ DRIVER_INIT_MEMBER(dkong_state,drakton)
 }
 
 
-DRIVER_INIT_MEMBER(dkong_state,strtheat)
+void dkong_state::init_strtheat()
 {
 	int bs[4][8] = {
 			{0,6,1,7,3,4,2,5},
@@ -3292,7 +3292,7 @@ DRIVER_INIT_MEMBER(dkong_state,strtheat)
 }
 
 
-DRIVER_INIT_MEMBER(dkong_state,dkongx)
+void dkong_state::init_dkongx()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -3314,7 +3314,7 @@ DRIVER_INIT_MEMBER(dkong_state,dkongx)
 	membank("bank2")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(dkong_state,dkingjr)
+void dkong_state::init_dkingjr()
 {
 	uint8_t *prom = memregion("proms")->base();
 	for( int i=0; i<0x200; ++i)

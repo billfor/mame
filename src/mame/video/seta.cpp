@@ -252,7 +252,7 @@ void seta_state::seta_coin_lockout_w(int data)
 }
 
 
-WRITE16_MEMBER(seta_state::seta_vregs_w)
+void seta_state::seta_vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vregs[offset]);
 	switch (offset)
@@ -377,8 +377,8 @@ inline void seta_state::twineagl_tile_info( tile_data &tileinfo, int tile_index,
 	SET_TILE_INFO_MEMBER(1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_0){ twineagl_tile_info(tileinfo, tile_index, 0x0000 ); }
-TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_1){ twineagl_tile_info(tileinfo, tile_index, 0x1000 ); }
+void seta_state::twineagl_get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ twineagl_tile_info(tileinfo, tile_index, 0x0000 ); }
+void seta_state::twineagl_get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ twineagl_tile_info(tileinfo, tile_index, 0x1000 ); }
 
 
 inline void seta_state::get_tile_info( tile_data &tileinfo, int tile_index, int layer, int offset )
@@ -401,13 +401,13 @@ inline void seta_state::get_tile_info( tile_data &tileinfo, int tile_index, int 
 	SET_TILE_INFO_MEMBER(gfx, m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-TILE_GET_INFO_MEMBER(seta_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0, 0x0000 ); }
-TILE_GET_INFO_MEMBER(seta_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 0, 0x1000 ); }
-TILE_GET_INFO_MEMBER(seta_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 1, 0x0000 ); }
-TILE_GET_INFO_MEMBER(seta_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 1, 0x1000 ); }
+void seta_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 0, 0x0000 ); }
+void seta_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 0, 0x1000 ); }
+void seta_state::get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 1, 0x0000 ); }
+void seta_state::get_tile_info_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 1, 0x1000 ); }
 
 
-WRITE16_MEMBER(seta_state::seta_vram_0_w)
+void seta_state::seta_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_0[offset]);
 	if (offset & 0x1000)
@@ -416,7 +416,7 @@ WRITE16_MEMBER(seta_state::seta_vram_0_w)
 		m_tilemap_0->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_MEMBER(seta_state::seta_vram_2_w)
+void seta_state::seta_vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_2[offset]);
 	if (offset & 0x1000)
@@ -425,7 +425,7 @@ WRITE16_MEMBER(seta_state::seta_vram_2_w)
 		m_tilemap_2->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_MEMBER(seta_state::twineagl_tilebank_w)
+void seta_state::twineagl_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -441,9 +441,9 @@ WRITE16_MEMBER(seta_state::twineagl_tilebank_w)
 
 
 /* 2 layers */
-VIDEO_START_MEMBER(seta_state,seta_2_layers)
+void seta_state::video_start_seta_2_layers()
 {
-	VIDEO_START_CALL_MEMBER( seta_no_layers );
+	video_start_seta_no_layers();
 
 	/* Each layer consists of 2 tilemaps: only one can be displayed
 	   at any given time */
@@ -476,9 +476,9 @@ VIDEO_START_MEMBER(seta_state,seta_2_layers)
 	m_tilemap_3->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(seta_state,oisipuzl_2_layers)
+void seta_state::video_start_oisipuzl_2_layers()
 {
-	VIDEO_START_CALL_MEMBER(seta_2_layers);
+	video_start_seta_2_layers();
 	m_tilemaps_flip = 1;
 
 	// position kludges
@@ -487,9 +487,9 @@ VIDEO_START_MEMBER(seta_state,oisipuzl_2_layers)
 
 
 /* 1 layer */
-VIDEO_START_MEMBER(seta_state,seta_1_layer)
+void seta_state::video_start_seta_1_layer()
 {
-	VIDEO_START_CALL_MEMBER( seta_no_layers );
+	video_start_seta_no_layers();
 
 	/* Each layer consists of 2 tilemaps: only one can be displayed
 	   at any given time */
@@ -509,18 +509,18 @@ VIDEO_START_MEMBER(seta_state,seta_1_layer)
 	m_tilemap_1->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(seta_state,setaroul_1_layer)
+void seta_state::video_start_setaroul_1_layer()
 {
-	VIDEO_START_CALL_MEMBER(seta_1_layer);
+	video_start_seta_1_layer();
 
 	// position kludges
 	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
 	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 }
 
-VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
+void seta_state::video_start_twineagl_1_layer()
 {
-	VIDEO_START_CALL_MEMBER( seta_no_layers );
+	video_start_seta_no_layers();
 
 	/* Each layer consists of 2 tilemaps: only one can be displayed
 	   at any given time */
@@ -547,7 +547,7 @@ SETA001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
 }
 
 /* NO layers, only sprites */
-VIDEO_START_MEMBER(seta_state,seta_no_layers)
+void seta_state::video_start_seta_no_layers()
 {
 	m_tilemap_0 = nullptr;
 	m_tilemap_1 = nullptr;
@@ -567,9 +567,9 @@ VIDEO_START_MEMBER(seta_state,seta_no_layers)
 	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 }
 
-VIDEO_START_MEMBER(seta_state,kyustrkr_no_layers)
+void seta_state::video_start_kyustrkr_no_layers()
 {
-	VIDEO_START_CALL_MEMBER(seta_no_layers);
+	video_start_seta_no_layers();
 
 	// position kludges
 	m_seta001->set_fg_yoffsets( -0x0a, 0x0e );
@@ -592,7 +592,7 @@ VIDEO_START_MEMBER(seta_state,kyustrkr_no_layers)
    The game can select to repeat every 16 colors to fill the 64 colors for the 6bpp gfx
    or to use the first 64 colors of the palette regardless of the color code!
 */
-PALETTE_INIT_MEMBER(seta_state,blandia)
+void seta_state::palette_init_blandia(palette_device &palette)
 {
 	int color, pen;
 
@@ -622,7 +622,7 @@ PALETTE_INIT_MEMBER(seta_state,blandia)
 
 /* layers have 6 bits per pixel, but the color code has a 16 colors granularity,
    even if the low 2 bits are ignored (so there are only 4 different palettes) */
-PALETTE_INIT_MEMBER(seta_state,gundhara)
+void seta_state::palette_init_gundhara(palette_device &palette)
 {
 	int color, pen;
 
@@ -640,7 +640,7 @@ PALETTE_INIT_MEMBER(seta_state,gundhara)
 
 
 /* layers have 6 bits per pixel, but the color code has a 16 colors granularity */
-PALETTE_INIT_MEMBER(seta_state,jjsquawk)
+void seta_state::palette_init_jjsquawk(palette_device &palette)
 {
 	int color, pen;
 
@@ -657,7 +657,7 @@ PALETTE_INIT_MEMBER(seta_state,jjsquawk)
 
 
 /* layer 0 is 6 bit per pixel, but the color code has a 16 colors granularity */
-PALETTE_INIT_MEMBER(seta_state,zingzip)
+void seta_state::palette_init_zingzip(palette_device &palette)
 {
 	int color, pen;
 
@@ -670,7 +670,7 @@ PALETTE_INIT_MEMBER(seta_state,zingzip)
 }
 
 // color prom
-PALETTE_INIT_MEMBER(seta_state,inttoote)
+void seta_state::palette_init_inttoote(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int x;
@@ -681,15 +681,15 @@ PALETTE_INIT_MEMBER(seta_state,inttoote)
 	}
 }
 
-PALETTE_INIT_MEMBER(seta_state,setaroul)
+void seta_state::palette_init_setaroul(palette_device &palette)
 {
 	m_gfxdecode->gfx(0)->set_granularity(16);
 	m_gfxdecode->gfx(1)->set_granularity(16);
 
-	PALETTE_INIT_NAME(inttoote)(palette);
+	palette_init_inttoote(palette);
 }
 
-PALETTE_INIT_MEMBER(seta_state,usclssic)
+void seta_state::palette_init_usclssic(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int color, pen;

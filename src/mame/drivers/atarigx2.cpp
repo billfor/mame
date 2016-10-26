@@ -44,7 +44,7 @@ void atarigx2_state::update_interrupts()
 }
 
 
-MACHINE_RESET_MEMBER(atarigx2_state,atarigx2)
+void atarigx2_state::machine_reset_atarigx2()
 {
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*m_screen, 8);
@@ -58,7 +58,7 @@ MACHINE_RESET_MEMBER(atarigx2_state,atarigx2)
  *
  *************************************/
 
-READ32_MEMBER(atarigx2_state::special_port2_r)
+uint32_t atarigx2_state::special_port2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int temp = ioport("SERVICE")->read();
 	temp ^= 0x0008;     /* A2D.EOC always high for now */
@@ -66,7 +66,7 @@ READ32_MEMBER(atarigx2_state::special_port2_r)
 }
 
 
-READ32_MEMBER(atarigx2_state::special_port3_r)
+uint32_t atarigx2_state::special_port3_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int temp = ioport("SPECIAL")->read();
 	return (temp << 16) | temp;
@@ -74,7 +74,7 @@ READ32_MEMBER(atarigx2_state::special_port3_r)
 
 
 
-READ32_MEMBER(atarigx2_state::a2d_data_r)
+uint32_t atarigx2_state::a2d_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* otherwise, assume it's hydra */
 	switch (offset)
@@ -89,7 +89,7 @@ READ32_MEMBER(atarigx2_state::a2d_data_r)
 }
 
 
-WRITE32_MEMBER(atarigx2_state::latch_w)
+void atarigx2_state::latch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	    D13 = 68.DISA
@@ -117,7 +117,7 @@ WRITE32_MEMBER(atarigx2_state::latch_w)
 }
 
 
-WRITE32_MEMBER(atarigx2_state::mo_command_w)
+void atarigx2_state::mo_command_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
@@ -134,7 +134,7 @@ WRITE32_MEMBER(atarigx2_state::mo_command_w)
 
 /* Note: Will all eventually be handled in machine/atarixga.cpp */
 
-WRITE32_MEMBER(atarigx2_state::atarigx2_protection_w)
+void atarigx2_state::atarigx2_protection_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	{
 		int pc = space.device().safe_pcbase();
@@ -211,7 +211,7 @@ uint32_t ftest4(uint32_t num)
 
 *********************/
 
-READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
+uint32_t atarigx2_state::atarigx2_protection_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	static const uint32_t lookup_table[][2] =
 	{
@@ -1179,7 +1179,7 @@ READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
 }
 
 
-READ32_MEMBER( atarigx2_state::rrreveng_prot_r )
+uint32_t atarigx2_state::rrreveng_prot_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
@@ -2217,14 +2217,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarigx2_state,spclords)
+void atarigx2_state::init_spclords()
 {
 	m_playfield_base = 0x000;
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atarigx2_state::atarigx2_protection_r),this), write32_delegate(FUNC(atarigx2_state::atarigx2_protection_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(atarigx2_state,motofren)
+void atarigx2_state::init_motofren()
 {
 	m_playfield_base = 0x400;
 /*
@@ -2252,7 +2252,7 @@ XMEM=68.A23*E.A22*!E.A21*68.A20                                 = 1101 xxxx = d0
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atari_xga_device::read),&(*m_xga)), write32_delegate(FUNC(atari_xga_device::write),&(*m_xga)));
 }
 
-DRIVER_INIT_MEMBER(atarigx2_state,rrreveng)
+void atarigx2_state::init_rrreveng()
 {
 	m_playfield_base = 0x000;
 

@@ -49,12 +49,12 @@ public:
 	cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// external callbacks
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_update );
+	void mouse_update(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	uint8_t* get_lcd_state() { return m_lcd_state; }
 
-	DECLARE_READ16_MEMBER( slave_r );
-	DECLARE_WRITE16_MEMBER( slave_w );
+	uint16_t slave_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void slave_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides
@@ -64,7 +64,7 @@ protected:
 	virtual void device_clock_changed() override { }
 
 	// internal callbacks
-	TIMER_CALLBACK_MEMBER( trigger_readback_int );
+	void trigger_readback_int(void *ptr, int32_t param);
 
 private:
 	// internal state

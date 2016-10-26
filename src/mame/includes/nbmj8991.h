@@ -51,19 +51,19 @@ public:
 	int m_flipscreen_old;
 	emu_timer *m_blitter_timer;
 
-	DECLARE_WRITE8_MEMBER(soundbank_w);
-	DECLARE_WRITE8_MEMBER(palette_type1_w);
-	DECLARE_WRITE8_MEMBER(palette_type2_w);
-	DECLARE_WRITE8_MEMBER(palette_type3_w);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_READ8_MEMBER(clut_r);
-	DECLARE_WRITE8_MEMBER(clut_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
+	void soundbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_type1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_type2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_type3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t clut_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void clut_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value nb1413m3_busyflag_r(ioport_field &field, void *param);
 
-	DECLARE_DRIVER_INIT(galkaika);
-	DECLARE_DRIVER_INIT(tokimbsj);
-	DECLARE_DRIVER_INIT(tokyogal);
-	DECLARE_DRIVER_INIT(finalbny);
+	void init_galkaika();
+	void init_tokimbsj();
+	void init_tokyogal();
+	void init_finalbny();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 

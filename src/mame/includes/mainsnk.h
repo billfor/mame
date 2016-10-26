@@ -32,21 +32,21 @@ public:
 	int m_sound_cpu_busy;
 	uint32_t m_bg_tile_offset;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_READ8_MEMBER(sound_ack_r);
-	DECLARE_WRITE8_MEMBER(c600_w);
-	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_WRITE8_MEMBER(bgram_w);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c600_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_r);
+	ioport_value sound_r(ioport_field &field, void *param);
 
-	TILEMAP_MAPPER_MEMBER(marvins_tx_scan_cols);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	tilemap_memory_index marvins_tx_scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mainsnk);
+	void palette_init_mainsnk(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scrollx, int scrolly );

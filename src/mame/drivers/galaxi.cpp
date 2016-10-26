@@ -83,21 +83,21 @@ public:
 	int       m_ticket;
 	uint16_t    m_out;
 
-	DECLARE_WRITE16_MEMBER(galaxi_bg1_w);
-	DECLARE_WRITE16_MEMBER(galaxi_bg2_w);
-	DECLARE_WRITE16_MEMBER(galaxi_bg3_w);
-	DECLARE_WRITE16_MEMBER(galaxi_bg4_w);
-	DECLARE_WRITE16_MEMBER(galaxi_fg_w);
-	DECLARE_WRITE16_MEMBER(galaxi_500000_w);
-	DECLARE_WRITE16_MEMBER(galaxi_500002_w);
-	DECLARE_WRITE16_MEMBER(galaxi_500004_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg4_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void galaxi_bg1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galaxi_bg2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galaxi_bg3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galaxi_bg4_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galaxi_fg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galaxi_500000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galaxi_500002_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galaxi_500004_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	ioport_value ticket_r(ioport_field &field, void *param);
+	ioport_value hopper_r(ioport_field &field, void *param);
+	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -114,61 +114,61 @@ public:
                                 Video Hardware
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(galaxi_state::get_bg1_tile_info)
+void galaxi_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg1_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
 }
 
-TILE_GET_INFO_MEMBER(galaxi_state::get_bg2_tile_info)
+void galaxi_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg2_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
 }
 
-TILE_GET_INFO_MEMBER(galaxi_state::get_bg3_tile_info)
+void galaxi_state::get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg3_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
 }
 
-TILE_GET_INFO_MEMBER(galaxi_state::get_bg4_tile_info)
+void galaxi_state::get_bg4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg4_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
 }
 
-TILE_GET_INFO_MEMBER(galaxi_state::get_fg_tile_info)
+void galaxi_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_fg_ram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0x20 + (code >> 12), 0);
 }
 
-WRITE16_MEMBER(galaxi_state::galaxi_bg1_w)
+void galaxi_state::galaxi_bg1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg1_ram[offset]);
 	m_bg1_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(galaxi_state::galaxi_bg2_w)
+void galaxi_state::galaxi_bg2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2_ram[offset]);
 	m_bg2_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(galaxi_state::galaxi_bg3_w)
+void galaxi_state::galaxi_bg3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg3_ram[offset]);
 	m_bg3_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(galaxi_state::galaxi_bg4_w)
+void galaxi_state::galaxi_bg4_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg4_ram[offset]);
 	m_bg4_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(galaxi_state::galaxi_fg_w)
+void galaxi_state::galaxi_fg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_ram[offset]);
 	m_fg_tmap->mark_tile_dirty(offset);
@@ -232,19 +232,19 @@ void galaxi_state::show_out(  )
 //  popmessage("%04x", m_out);
 }
 
-WRITE16_MEMBER(galaxi_state::galaxi_500000_w)
+void galaxi_state::galaxi_500000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg3_yscroll);
 	show_out();
 }
 
-WRITE16_MEMBER(galaxi_state::galaxi_500002_w)
+void galaxi_state::galaxi_500002_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg3_xscroll);
 	show_out();
 }
 
-WRITE16_MEMBER(galaxi_state::galaxi_500004_w)
+void galaxi_state::galaxi_500004_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -279,12 +279,12 @@ WRITE16_MEMBER(galaxi_state::galaxi_500004_w)
 	show_out();
 }
 
-CUSTOM_INPUT_MEMBER(galaxi_state::ticket_r)
+ioport_value galaxi_state::ticket_r(ioport_field &field, void *param)
 {
 	return m_ticket && !(m_screen->frame_number() % 10);
 }
 
-CUSTOM_INPUT_MEMBER(galaxi_state::hopper_r)
+ioport_value galaxi_state::hopper_r(ioport_field &field, void *param)
 {
 	return m_hopper && !(m_screen->frame_number() % 10);
 }

@@ -50,29 +50,29 @@ public:
 	uint32_t m_vcount_191;
 	uint32_t m_latch_374;
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(c804_w);
-	DECLARE_WRITE8_MEMBER(gfxctrl_w);
-	DECLARE_WRITE8_MEMBER(star_scrollx_w);
-	DECLARE_WRITE8_MEMBER(star_scrolly_w);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void star_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void star_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(turtship_ports_r);
+	uint8_t turtship_ports_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(whizz_bankswitch_w);
+	void whizz_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(dyger);
-	DECLARE_DRIVER_INIT(sidearms);
-	DECLARE_DRIVER_INIT(whizz);
-	DECLARE_DRIVER_INIT(turtship);
+	void init_dyger();
+	void init_sidearms();
+	void init_whizz();
+	void init_turtship();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	TILE_GET_INFO_MEMBER(get_sidearms_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_philko_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	void get_sidearms_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_philko_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset );

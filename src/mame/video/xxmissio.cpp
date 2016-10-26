@@ -14,28 +14,28 @@ Video hardware driver by Uki
 #include "includes/xxmissio.h"
 
 
-WRITE8_MEMBER(xxmissio_state::scroll_x_w)
+void xxmissio_state::scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xscroll = data;
 }
-WRITE8_MEMBER(xxmissio_state::scroll_y_w)
+void xxmissio_state::scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_yscroll = data;
 }
 
-WRITE8_MEMBER(xxmissio_state::flipscreen_w)
+void xxmissio_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data & 0x01;
 }
 
-WRITE8_MEMBER(xxmissio_state::bgram_w)
+void xxmissio_state::bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x = (offset + (m_xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
 
 	m_bgram[offset] = data;
 }
-READ8_MEMBER(xxmissio_state::bgram_r)
+uint8_t xxmissio_state::bgram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int x = (offset + (m_xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
@@ -45,7 +45,7 @@ READ8_MEMBER(xxmissio_state::bgram_r)
 
 /****************************************************************************/
 
-TILE_GET_INFO_MEMBER(xxmissio_state::get_bg_tile_info)
+void xxmissio_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_bgram[0x400 | tile_index] & 0xc0) << 2) | m_bgram[0x000 | tile_index];
 	int color =  m_bgram[0x400 | tile_index] & 0x0f;
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(xxmissio_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(xxmissio_state::get_fg_tile_info)
+void xxmissio_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fgram[0x000 | tile_index];
 	int color = m_fgram[0x400 | tile_index] & 0x07;
@@ -77,7 +77,7 @@ void xxmissio_state::video_start()
 	save_item(NAME(m_flipscreen));
 }
 
-PALETTE_DECODER_MEMBER( xxmissio_state, BBGGRRII )
+rgb_t xxmissio_state::BBGGRRII_decoder(uint32_t raw)
 {
 	uint8_t i = raw & 3;
 	uint8_t r = (raw >> 0) & 0x0c;

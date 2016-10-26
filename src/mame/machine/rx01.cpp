@@ -95,7 +95,7 @@ void rx01_device::device_reset()
 //  read
 //-------------------------------------------------
 
-READ16_MEMBER( rx01_device::read )
+uint16_t rx01_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset & 1) {
 		case 0: return status_read();
@@ -109,7 +109,7 @@ READ16_MEMBER( rx01_device::read )
 //  write
 //-------------------------------------------------
 
-WRITE16_MEMBER( rx01_device::write )
+void rx01_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset & 1) {
 		case 0: command_write(data); break;
@@ -187,7 +187,7 @@ uint16_t rx01_device::data_read()
 	return m_rxdb;
 }
 
-TIMER_CALLBACK_MEMBER(rx01_device::service_command)
+void rx01_device::service_command(void *ptr, int32_t param)
 {
 	printf("service_command %d\n",m_state);
 	m_rxes |= m_image[m_unit]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY) << 7;

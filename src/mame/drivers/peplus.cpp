@@ -303,35 +303,35 @@ public:
 	uint8_t m_bv_loop_count;
 	uint16_t id023_data;
 
-	DECLARE_WRITE8_MEMBER(peplus_bgcolor_w);
-	DECLARE_WRITE8_MEMBER(peplus_crtc_display_w);
-	DECLARE_WRITE8_MEMBER(peplus_duart_w);
-	DECLARE_WRITE8_MEMBER(peplus_cmos_w);
-	DECLARE_WRITE8_MEMBER(peplus_output_bank_a_w);
-	DECLARE_WRITE8_MEMBER(peplus_output_bank_b_w);
-	DECLARE_WRITE8_MEMBER(peplus_output_bank_c_w);
-	DECLARE_READ8_MEMBER(peplus_duart_r);
-	DECLARE_READ8_MEMBER(peplus_bgcolor_r);
-	DECLARE_READ8_MEMBER(peplus_dropdoor_r);
-	DECLARE_READ8_MEMBER(peplus_watchdog_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(peplus_input_r);
-	DECLARE_WRITE8_MEMBER(peplus_crtc_mode_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
-	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
-	DECLARE_READ8_MEMBER(peplus_input_bank_a_r);
-	DECLARE_READ8_MEMBER(peplus_input0_r);
-	DECLARE_DRIVER_INIT(nonplus);
-	DECLARE_DRIVER_INIT(peplus);
-	DECLARE_DRIVER_INIT(peplussb);
-	DECLARE_DRIVER_INIT(pepluss64);
-	DECLARE_DRIVER_INIT(peplussbw);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void peplus_bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void peplus_crtc_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void peplus_duart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void peplus_cmos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void peplus_output_bank_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void peplus_output_bank_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void peplus_output_bank_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t peplus_duart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t peplus_bgcolor_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t peplus_dropdoor_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t peplus_watchdog_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	ioport_value peplus_input_r(ioport_field &field, void *param);
+	void peplus_crtc_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void crtc_vsync(int state);
+	void i2c_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t peplus_input_bank_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t peplus_input0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_nonplus();
+	void init_peplus();
+	void init_peplussb();
+	void init_pepluss64();
+	void init_peplussbw();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void peplus_load_superdata(const char *bank_name);
-	DECLARE_PALETTE_INIT(peplus);
+	void palette_init_peplus(palette_device &palette);
 	void handle_lightpen();
 
 protected:
@@ -364,7 +364,7 @@ void peplus_state::peplus_load_superdata(const char *bank_name)
 * Write Handlers *
 ******************/
 
-WRITE8_MEMBER(peplus_state::peplus_bgcolor_w)
+void peplus_state::peplus_bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -403,7 +403,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED(peplus_state::crtc_addr)
 }
 
 
-WRITE8_MEMBER(peplus_state::peplus_crtc_mode_w)
+void peplus_state::peplus_crtc_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Reset timing logic */
 }
@@ -434,13 +434,13 @@ void peplus_state::handle_lightpen()
 	timer_set(m_screen->time_until_pos(yt, xt), TIMER_ASSERT_LP, 0);
 }
 
-WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
+void peplus_state::crtc_vsync(int state)
 {
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 	handle_lightpen();
 }
 
-WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
+void peplus_state::peplus_crtc_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[m_vid_address] = data;
 	m_palette_ram[m_vid_address] = m_io_port[1];
@@ -452,12 +452,12 @@ WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
 	m_crtc->register_r(space, 0);
 }
 
-WRITE8_MEMBER(peplus_state::peplus_duart_w)
+void peplus_state::peplus_duart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Used for Slot Accounting System Communication
 }
 
-WRITE8_MEMBER(peplus_state::peplus_cmos_w)
+void peplus_state::peplus_cmos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	char bank_name[6];
 
@@ -471,7 +471,7 @@ WRITE8_MEMBER(peplus_state::peplus_cmos_w)
 	m_cmos_ram[offset] = data;
 }
 
-WRITE8_MEMBER(peplus_state::peplus_output_bank_a_w)
+void peplus_state::peplus_output_bank_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("pe_bnka0",(data >> 0) & 1); /* Coin Lockout */
 	output().set_value("pe_bnka1",(data >> 1) & 1); /* Diverter */
@@ -487,7 +487,7 @@ WRITE8_MEMBER(peplus_state::peplus_output_bank_a_w)
 		m_coin_out_state = 3;
 }
 
-WRITE8_MEMBER(peplus_state::peplus_output_bank_b_w)
+void peplus_state::peplus_output_bank_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("pe_bnkb0",(data >> 0) & 1); /* specific to a kind of machine */
 	output().set_value("pe_bnkb1",(data >> 1) & 1); /* Deal Spin Start */
@@ -499,7 +499,7 @@ WRITE8_MEMBER(peplus_state::peplus_output_bank_b_w)
 	output().set_value("pe_bnkb7",(data >> 7) & 1); /* specific to a kind of machine */
 }
 
-WRITE8_MEMBER(peplus_state::peplus_output_bank_c_w)
+void peplus_state::peplus_output_bank_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("pe_bnkc0",(data >> 0) & 1); /* Coin In Meter */
 	output().set_value("pe_bnkc1",(data >> 1) & 1); /* Coin Out Meter */
@@ -513,7 +513,7 @@ WRITE8_MEMBER(peplus_state::peplus_output_bank_c_w)
 	m_bv_enable_state = (data >> 4) & 1;
 }
 
-WRITE8_MEMBER(peplus_state::i2c_nvram_w)
+void peplus_state::i2c_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_i2cmem->write_scl(BIT(data, 2));
 	m_sda_dir = BIT(data, 1);
@@ -525,29 +525,29 @@ WRITE8_MEMBER(peplus_state::i2c_nvram_w)
 * Read Handlers *
 ****************/
 
-READ8_MEMBER(peplus_state::peplus_duart_r)
+uint8_t peplus_state::peplus_duart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Used for Slot Accounting System Communication
 	return 0x00;
 }
 
 /* Last Color in Every Palette is bgcolor */
-READ8_MEMBER(peplus_state::peplus_bgcolor_r)
+uint8_t peplus_state::peplus_bgcolor_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_palette->pen_color(15); // Return bgcolor from First Palette
 }
 
-READ8_MEMBER(peplus_state::peplus_dropdoor_r)
+uint8_t peplus_state::peplus_dropdoor_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00; // Drop Door 0x00=Closed 0x02=Open
 }
 
-READ8_MEMBER(peplus_state::peplus_watchdog_r)
+uint8_t peplus_state::peplus_watchdog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00; // Watchdog
 }
 
-READ8_MEMBER(peplus_state::peplus_input0_r)
+uint8_t peplus_state::peplus_input0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
         PE+ bill validators have a dip switch setting to switch between ID-022 and ID-023 protocols.
@@ -798,7 +798,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 	}
 }
 
-READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
+uint8_t peplus_state::peplus_input_bank_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
         Bit 0 = COIN DETECTOR A
@@ -905,7 +905,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 * Video/Character functions *
 ****************************/
 
-TILE_GET_INFO_MEMBER(peplus_state::get_bg_tile_info)
+void peplus_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int pr = m_palette_ram[tile_index];
@@ -941,7 +941,7 @@ uint32_t peplus_state::screen_update_peplus(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(peplus_state, peplus)
+void peplus_state::palette_init_peplus(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	uint32_t proms_size = memregion("proms")->bytes();
@@ -1059,7 +1059,7 @@ ADDRESS_MAP_END
 *      Input ports       *
 *************************/
 
-CUSTOM_INPUT_MEMBER(peplus_state::peplus_input_r)
+ioport_value peplus_state::peplus_input_r(ioport_field &field, void *param)
 {
 	uint8_t inp_ret = 0x00;
 	uint8_t inp_read = ioport((const char *)param)->read();
@@ -1364,7 +1364,7 @@ MACHINE_CONFIG_END
 *************************/
 
 /* Non Plus board */
-DRIVER_INIT_MEMBER(peplus_state,nonplus)
+void peplus_state::init_nonplus()
 {
 	door_wait = 500;
 	m_doorcycle = false;
@@ -1373,7 +1373,7 @@ DRIVER_INIT_MEMBER(peplus_state,nonplus)
 }
 
 /* Normal board */
-DRIVER_INIT_MEMBER(peplus_state,peplus)
+void peplus_state::init_peplus()
 {
 	door_wait = 500;
 	m_doorcycle = true;
@@ -1382,7 +1382,7 @@ DRIVER_INIT_MEMBER(peplus_state,peplus)
 }
 
 /* Superboard */
-DRIVER_INIT_MEMBER(peplus_state,peplussb)
+void peplus_state::init_peplussb()
 {
 	door_wait = 500;
 	m_doorcycle = true;
@@ -1392,7 +1392,7 @@ DRIVER_INIT_MEMBER(peplus_state,peplussb)
 }
 
 /* Superboard with 64K CG rom set */
-DRIVER_INIT_MEMBER(peplus_state,pepluss64)
+void peplus_state::init_pepluss64()
 {
 	door_wait = 500;
 	m_doorcycle = true;
@@ -1402,7 +1402,7 @@ DRIVER_INIT_MEMBER(peplus_state,pepluss64)
 }
 
 /* Superboard with Attached Wingboard */
-DRIVER_INIT_MEMBER(peplus_state,peplussbw)
+void peplus_state::init_peplussbw()
 {
 	door_wait = 12345;
 	m_doorcycle = true;

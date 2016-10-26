@@ -39,13 +39,13 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(yunsung8_state::videobank_w)
+void yunsung8_state::videobank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videobank = data;
 }
 
 
-READ8_MEMBER(yunsung8_state::videoram_r)
+uint8_t yunsung8_state::videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank;
 
@@ -64,7 +64,7 @@ READ8_MEMBER(yunsung8_state::videoram_r)
 }
 
 
-WRITE8_MEMBER(yunsung8_state::videoram_w)
+void yunsung8_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x0800)        // c000-c7ff    Banked Palette RAM
 	{
@@ -107,7 +107,7 @@ WRITE8_MEMBER(yunsung8_state::videoram_w)
 }
 
 
-WRITE8_MEMBER(yunsung8_state::flipscreen_w)
+void yunsung8_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().tilemap().set_flip_all((data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
@@ -132,7 +132,7 @@ WRITE8_MEMBER(yunsung8_state::flipscreen_w)
 #define DIM_NX_0            (0x40)
 #define DIM_NY_0            (0x20)
 
-TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_0)
+void yunsung8_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code  =  m_videoram_0[0x1000 + tile_index * 2 + 0] + m_videoram_0[0x1000 + tile_index * 2 + 1] * 256;
 	int color =  m_videoram_0[0x0800 + tile_index] & 0x07;
@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_0)
 #define DIM_NX_1            (0x40)
 #define DIM_NY_1            (0x20)
 
-TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_1)
+void yunsung8_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code  =  m_videoram_1[0x1000 + tile_index * 2 + 0] + m_videoram_1[0x1000 + tile_index * 2 + 1] * 256;
 	int color =  m_videoram_1[0x0800 + tile_index] & 0x3f;

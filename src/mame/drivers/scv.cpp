@@ -27,18 +27,18 @@ public:
 		m_pc0(*this, "PC0"),
 		m_charrom(*this, "charrom") { }
 
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_WRITE_LINE_MEMBER(upd1771_ack_w);
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void upd1771_ack_w(int state);
 	required_shared_ptr<uint8_t> m_videoram;
 	uint8_t m_porta;
 	uint8_t m_portc;
 	emu_timer *m_vb_timer;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(scv);
+	void palette_init_scv(palette_device &palette);
 	uint32_t screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -169,13 +169,13 @@ static INPUT_PORTS_START( scv )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( scv_state::porta_w )
+void scv_state::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_porta = data;
 }
 
 
-READ8_MEMBER( scv_state::portb_r )
+uint8_t scv_state::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -189,7 +189,7 @@ READ8_MEMBER( scv_state::portb_r )
 }
 
 
-READ8_MEMBER( scv_state::portc_r )
+uint8_t scv_state::portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_portc;
 
@@ -199,7 +199,7 @@ READ8_MEMBER( scv_state::portc_r )
 }
 
 
-WRITE8_MEMBER( scv_state::portc_w )
+void scv_state::portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: scv_portc_w: data = 0x%02x\n", m_maincpu->pc(), data );
 	m_portc = data;
@@ -208,7 +208,7 @@ WRITE8_MEMBER( scv_state::portc_w )
 }
 
 
-PALETTE_INIT_MEMBER(scv_state, scv)
+void scv_state::palette_init_scv(palette_device &palette)
 {
 	/*
 	  SCV Epoch-1A chip RGB voltage readouts from paused Bios color test:
@@ -604,7 +604,7 @@ uint32_t scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE_LINE_MEMBER( scv_state::upd1771_ack_w )
+void scv_state::upd1771_ack_w(int state)
 {
 	m_maincpu->set_input_line(UPD7810_INTF1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }

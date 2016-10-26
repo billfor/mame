@@ -19,7 +19,7 @@
  *************************************/
 
 #ifdef UNUSED_FUNCTION
-TILE_GET_INFO_MEMBER(mcr3_state::get_bg_tile_info)
+void mcr3_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(mcr3_state::get_bg_tile_info)
 #endif
 
 
-TILE_GET_INFO_MEMBER(mcr3_state::mcrmono_get_bg_tile_info)
+void mcr3_state::mcrmono_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
@@ -40,14 +40,14 @@ TILE_GET_INFO_MEMBER(mcr3_state::mcrmono_get_bg_tile_info)
 }
 
 
-TILEMAP_MAPPER_MEMBER(mcr3_state::spyhunt_bg_scan)
+tilemap_memory_index mcr3_state::spyhunt_bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) | ((col & 0x3f) << 4) | ((row & 0x10) << 6);
 }
 
 
-TILE_GET_INFO_MEMBER(mcr3_state::spyhunt_get_bg_tile_info)
+void mcr3_state::spyhunt_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -56,7 +56,7 @@ TILE_GET_INFO_MEMBER(mcr3_state::spyhunt_get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(mcr3_state::spyhunt_get_alpha_tile_info)
+void mcr3_state::spyhunt_get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(2, m_spyhunt_alpharam[tile_index], 0, 0);
 }
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(mcr3_state::spyhunt_get_alpha_tile_info)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(mcr3_state,spyhunt)
+void mcr3_state::palette_init_spyhunt(palette_device &palette)
 {
 	int i;
 
@@ -94,7 +94,7 @@ PALETTE_INIT_MEMBER(mcr3_state,spyhunt)
  *************************************/
 
 #ifdef UNUSED_FUNCTION
-VIDEO_START_MEMBER(mcr3_state,mcr3)
+void mcr3_state::video_start_mcr3()
 {
 	// initialize the background tilemap
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
@@ -102,14 +102,14 @@ VIDEO_START_MEMBER(mcr3_state,mcr3)
 #endif
 
 
-VIDEO_START_MEMBER(mcr3_state,mcrmono)
+void mcr3_state::video_start_mcrmono()
 {
 	// initialize the background tilemap
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::mcrmono_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
 }
 
 
-VIDEO_START_MEMBER(mcr3_state,spyhunt)
+void mcr3_state::video_start_spyhunt()
 {
 	// initialize the background tilemap
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(mcr3_state::spyhunt_bg_scan),this),  64,32, 64,32);
@@ -135,7 +135,7 @@ VIDEO_START_MEMBER(mcr3_state,spyhunt)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr3_state::mcr3_videoram_w)
+void mcr3_state::mcr3_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -143,7 +143,7 @@ WRITE8_MEMBER(mcr3_state::mcr3_videoram_w)
 }
 
 
-WRITE8_MEMBER(mcr3_state::spyhunt_videoram_w)
+void mcr3_state::spyhunt_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -151,14 +151,14 @@ WRITE8_MEMBER(mcr3_state::spyhunt_videoram_w)
 }
 
 
-WRITE8_MEMBER(mcr3_state::spyhunt_alpharam_w)
+void mcr3_state::spyhunt_alpharam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spyhunt_alpharam[offset] = data;
 	m_alpha_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(mcr3_state::spyhunt_scroll_value_w)
+void mcr3_state::spyhunt_scroll_value_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

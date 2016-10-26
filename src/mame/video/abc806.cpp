@@ -19,7 +19,7 @@
 //  hrs_w - high resolution memory banking
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::hrs_w )
+void abc806_state::hrs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -44,7 +44,7 @@ WRITE8_MEMBER( abc806_state::hrs_w )
 //  hrc_w - high resolution color write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::hrc_w )
+void abc806_state::hrc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int reg = (offset >> 8) & 0x0f;
 
@@ -56,7 +56,7 @@ WRITE8_MEMBER( abc806_state::hrc_w )
 //  charram_r - character RAM read
 //-------------------------------------------------
 
-READ8_MEMBER( abc806_state::charram_r )
+uint8_t abc806_state::charram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_attr_data = m_attr_ram[offset];
 
@@ -68,7 +68,7 @@ READ8_MEMBER( abc806_state::charram_r )
 //  charram_w - character RAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::charram_w )
+void abc806_state::charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_attr_ram[offset] = m_attr_data;
 
@@ -80,7 +80,7 @@ WRITE8_MEMBER( abc806_state::charram_w )
 //  ami_r - attribute memory read
 //-------------------------------------------------
 
-READ8_MEMBER( abc806_state::ami_r )
+uint8_t abc806_state::ami_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_attr_data;
 }
@@ -90,7 +90,7 @@ READ8_MEMBER( abc806_state::ami_r )
 //  amo_w - attribute memory write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::amo_w )
+void abc806_state::amo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_attr_data = data;
 }
@@ -100,7 +100,7 @@ WRITE8_MEMBER( abc806_state::amo_w )
 //  cli_r - palette PROM read
 //-------------------------------------------------
 
-READ8_MEMBER( abc806_state::cli_r )
+uint8_t abc806_state::cli_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -132,7 +132,7 @@ READ8_MEMBER( abc806_state::cli_r )
 //  sti_r - protection device read
 //-------------------------------------------------
 
-READ8_MEMBER( abc806_state::sti_r )
+uint8_t abc806_state::sti_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -157,7 +157,7 @@ READ8_MEMBER( abc806_state::sti_r )
 //  sto_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::sto_w )
+void abc806_state::sto_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int level = BIT(data, 7);
 
@@ -202,7 +202,7 @@ WRITE8_MEMBER( abc806_state::sto_w )
 //  sso_w - sync offset write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::sso_w )
+void abc806_state::sso_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sync = data & 0x3f;
 }
@@ -323,7 +323,7 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 //  hs_w - horizontal sync write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc806_state::hs_w )
+void abc806_state::hs_w(int state)
 {
 	int vsync;
 
@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER( abc806_state::hs_w )
 //  vs_w - vertical sync write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc806_state::vs_w )
+void abc806_state::vs_w(int state)
 {
 	m_vsync = state;
 }
@@ -470,7 +470,7 @@ uint32_t abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 //  PALETTE_INIT( abc806 )
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER( abc806_state, abc806 )
+void abc806_state::palette_init_abc806(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // black
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red

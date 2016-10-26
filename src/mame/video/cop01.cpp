@@ -12,7 +12,7 @@
 #include "includes/cop01.h"
 
 
-PALETTE_INIT_MEMBER(cop01_state, cop01)
+void cop01_state::palette_init_cop01(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -60,7 +60,7 @@ PALETTE_INIT_MEMBER(cop01_state, cop01)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(cop01_state::get_bg_tile_info)
+void cop01_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_bgvideoram[tile_index];
 	int attr = m_bgvideoram[tile_index + 0x800];
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(cop01_state::get_bg_tile_info)
 	tileinfo.group = pri;
 }
 
-TILE_GET_INFO_MEMBER(cop01_state::get_fg_tile_info)
+void cop01_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_fgvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(0, tile, 0, 0);
@@ -117,19 +117,19 @@ void cop01_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(cop01_state::cop01_background_w)
+void cop01_state::cop01_background_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(cop01_state::cop01_foreground_w)
+void cop01_state::cop01_foreground_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(cop01_state::cop01_vreg_w)
+void cop01_state::cop01_vreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*  0x40: --xx---- sprite bank, coin counters, flip screen
 	 *        -----x-- flip screen

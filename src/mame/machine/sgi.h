@@ -17,8 +17,8 @@ public:
 	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~sgi_mc_device() {}
 
-DECLARE_READ32_MEMBER(read);
-DECLARE_WRITE32_MEMBER(write);
+uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	// device-level overrides
@@ -70,7 +70,7 @@ private:
 	uint32_t m_nDMARunning;
 
 	void update();
-	TIMER_CALLBACK_MEMBER(update_callback);
+	void update_callback(void *ptr, int32_t param);
 	void timer_init();
 };
 

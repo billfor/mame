@@ -46,7 +46,7 @@ To Do:
 ***************************************************************************/
 
 
-WRITE8_MEMBER(yunsung8_state::bankswitch_w)
+void yunsung8_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layers_ctrl = data & 0x30;    // Layers enable
 
@@ -95,7 +95,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(yunsung8_state::sound_bankswitch_w)
+void yunsung8_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(data & 0x20);
 
@@ -105,7 +105,7 @@ WRITE8_MEMBER(yunsung8_state::sound_bankswitch_w)
 		logerror("%s: Bank %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(yunsung8_state::adpcm_w)
+void yunsung8_state::adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Swap the nibbles */
 	m_adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
@@ -444,7 +444,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-WRITE_LINE_MEMBER(yunsung8_state::adpcm_int)
+void yunsung8_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_adpcm >> 4);
 	m_adpcm <<= 4;

@@ -39,19 +39,19 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_md_tilemap;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE16_MEMBER(pkscramble_fgtilemap_w);
-	DECLARE_WRITE16_MEMBER(pkscramble_mdtilemap_w);
-	DECLARE_WRITE16_MEMBER(pkscramble_bgtilemap_w);
-	DECLARE_WRITE16_MEMBER(pkscramble_output_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_md_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void pkscramble_fgtilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pkscramble_mdtilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pkscramble_bgtilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pkscramble_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_md_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void scanline_callback(timer_device &timer, void *ptr, int32_t param);
+	void irqhandler(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -61,19 +61,19 @@ public:
 enum { interrupt_scanline=192 };
 
 
-WRITE16_MEMBER(pkscram_state::pkscramble_fgtilemap_w)
+void pkscram_state::pkscramble_fgtilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pkscramble_fgtilemap_ram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(pkscram_state::pkscramble_mdtilemap_w)
+void pkscram_state::pkscramble_mdtilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pkscramble_mdtilemap_ram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(pkscram_state::pkscramble_bgtilemap_w)
+void pkscram_state::pkscramble_bgtilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pkscramble_bgtilemap_ram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
@@ -81,7 +81,7 @@ WRITE16_MEMBER(pkscram_state::pkscramble_bgtilemap_w)
 
 // input bit 0x20 in port1 should stay low until bit 0x20 is written here, then
 // it should stay high for some time (currently we cheat keeping the input always active)
-WRITE16_MEMBER(pkscram_state::pkscramble_output_w)
+void pkscram_state::pkscramble_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// OUTPUT
 	// BIT
@@ -201,7 +201,7 @@ static INPUT_PORTS_START( pkscramble )
 INPUT_PORTS_END
 
 
-TILE_GET_INFO_MEMBER(pkscram_state::get_bg_tile_info)
+void pkscram_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile  = m_pkscramble_bgtilemap_ram[tile_index*2];
 	int color = m_pkscramble_bgtilemap_ram[tile_index*2 + 1] & 0x7f;
@@ -209,7 +209,7 @@ TILE_GET_INFO_MEMBER(pkscram_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(pkscram_state::get_md_tile_info)
+void pkscram_state::get_md_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile  = m_pkscramble_mdtilemap_ram[tile_index*2];
 	int color = m_pkscramble_mdtilemap_ram[tile_index*2 + 1] & 0x7f;
@@ -217,7 +217,7 @@ TILE_GET_INFO_MEMBER(pkscram_state::get_md_tile_info)
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(pkscram_state::get_fg_tile_info)
+void pkscram_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile  = m_pkscramble_fgtilemap_ram[tile_index*2];
 	int color = m_pkscramble_fgtilemap_ram[tile_index*2 + 1] & 0x7f;
@@ -225,7 +225,7 @@ TILE_GET_INFO_MEMBER(pkscram_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pkscram_state::scanline_callback)
+void pkscram_state::scanline_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	if (param == interrupt_scanline)
 	{
@@ -277,7 +277,7 @@ static GFXDECODE_START( pkscram )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(pkscram_state::irqhandler)
+void pkscram_state::irqhandler(int state)
 {
 	if(m_out & 0x10)
 		m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);

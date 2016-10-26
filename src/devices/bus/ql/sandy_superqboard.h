@@ -36,12 +36,12 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	WRITE_LINE_MEMBER( busy_w );
+	void busy_w(int state);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );
+	void mouse_x_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void mouse_y_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	// device-level overrides

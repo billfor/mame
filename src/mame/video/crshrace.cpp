@@ -11,14 +11,14 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info1)
+void crshrace_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram1[tile_index];
 
 	SET_TILE_INFO_MEMBER(1, (code & 0xfff) + (m_roz_bank << 12), code >> 12, 0);
 }
 
-TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info2)
+void crshrace_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index];
 
@@ -56,19 +56,19 @@ void crshrace_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(crshrace_state::crshrace_videoram1_w)
+void crshrace_state::crshrace_videoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tilemap1->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(crshrace_state::crshrace_videoram2_w)
+void crshrace_state::crshrace_videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_tilemap2->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(crshrace_state::crshrace_roz_bank_w)
+void crshrace_state::crshrace_roz_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -81,7 +81,7 @@ WRITE16_MEMBER(crshrace_state::crshrace_roz_bank_w)
 }
 
 
-WRITE16_MEMBER(crshrace_state::crshrace_gfxctrl_w)
+void crshrace_state::crshrace_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

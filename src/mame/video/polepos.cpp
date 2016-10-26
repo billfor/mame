@@ -27,7 +27,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(polepos_state,polepos)
+void polepos_state::palette_init_polepos(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, j;
@@ -143,7 +143,7 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(polepos_state::bg_get_tile_info)
+void polepos_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t word = m_view16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);
@@ -154,7 +154,7 @@ TILE_GET_INFO_MEMBER(polepos_state::bg_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(polepos_state::tx_get_tile_info)
+void polepos_state::tx_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t word = m_alpha16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);
@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(polepos_state::tx_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(polepos_state,polepos)
+void polepos_state::video_start_polepos()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(polepos_state::bg_get_tile_info),this),TILEMAP_SCAN_COLS,8,8,64,16);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(polepos_state::tx_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
@@ -202,22 +202,22 @@ VIDEO_START_MEMBER(polepos_state,polepos)
 
 ***************************************************************************/
 
-READ16_MEMBER(polepos_state::polepos_sprite16_r)
+uint16_t polepos_state::polepos_sprite16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sprite16_memory[offset];
 }
 
-WRITE16_MEMBER(polepos_state::polepos_sprite16_w)
+void polepos_state::polepos_sprite16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sprite16_memory[offset]);
 }
 
-READ8_MEMBER(polepos_state::polepos_sprite_r)
+uint8_t polepos_state::polepos_sprite_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sprite16_memory[offset] & 0xff;
 }
 
-WRITE8_MEMBER(polepos_state::polepos_sprite_w)
+void polepos_state::polepos_sprite_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sprite16_memory[offset] = (m_sprite16_memory[offset] & 0xff00) | data;
 }
@@ -229,27 +229,27 @@ WRITE8_MEMBER(polepos_state::polepos_sprite_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(polepos_state::polepos_road16_r)
+uint16_t polepos_state::polepos_road16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_road16_memory[offset];
 }
 
-WRITE16_MEMBER(polepos_state::polepos_road16_w)
+void polepos_state::polepos_road16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_road16_memory[offset]);
 }
 
-READ8_MEMBER(polepos_state::polepos_road_r)
+uint8_t polepos_state::polepos_road_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_road16_memory[offset] & 0xff;
 }
 
-WRITE8_MEMBER(polepos_state::polepos_road_w)
+void polepos_state::polepos_road_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_road16_memory[offset] = (m_road16_memory[offset] & 0xff00) | data;
 }
 
-WRITE16_MEMBER(polepos_state::polepos_road16_vscroll_w)
+void polepos_state::polepos_road16_vscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_road16_vscroll);
 }
@@ -261,37 +261,37 @@ WRITE16_MEMBER(polepos_state::polepos_road16_vscroll_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(polepos_state::polepos_view16_r)
+uint16_t polepos_state::polepos_view16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_view16_memory[offset];
 }
 
-WRITE16_MEMBER(polepos_state::polepos_view16_w)
+void polepos_state::polepos_view16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_view16_memory[offset]);
 	if (offset < 0x400)
 		m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(polepos_state::polepos_view_r)
+uint8_t polepos_state::polepos_view_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_view16_memory[offset] & 0xff;
 }
 
-WRITE8_MEMBER(polepos_state::polepos_view_w)
+void polepos_state::polepos_view_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_view16_memory[offset] = (m_view16_memory[offset] & 0xff00) | data;
 	if (offset < 0x400)
 		m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(polepos_state::polepos_view16_hscroll_w)
+void polepos_state::polepos_view16_hscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll);
 	m_bg_tilemap->set_scrollx(0,m_scroll);
 }
 
-WRITE8_MEMBER(polepos_state::polepos_chacl_w)
+void polepos_state::polepos_chacl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_chacl != (data & 1))
 	{
@@ -307,23 +307,23 @@ WRITE8_MEMBER(polepos_state::polepos_chacl_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(polepos_state::polepos_alpha16_r)
+uint16_t polepos_state::polepos_alpha16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_alpha16_memory[offset];
 }
 
-WRITE16_MEMBER(polepos_state::polepos_alpha16_w)
+void polepos_state::polepos_alpha16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_alpha16_memory[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(polepos_state::polepos_alpha_r)
+uint8_t polepos_state::polepos_alpha_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_alpha16_memory[offset] & 0xff;
 }
 
-WRITE8_MEMBER(polepos_state::polepos_alpha_w)
+void polepos_state::polepos_alpha_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_alpha16_memory[offset] = (m_alpha16_memory[offset] & 0xff00) | data;
 	m_tx_tilemap->mark_tile_dirty(offset);

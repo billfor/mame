@@ -18,7 +18,7 @@
 #include "includes/amspdwy.h"
 
 
-WRITE8_MEMBER(amspdwy_state::amspdwy_flipscreen_w)
+void amspdwy_state::amspdwy_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen ^= 1;
 	flip_screen_set(m_flipscreen);
@@ -37,7 +37,7 @@ WRITE8_MEMBER(amspdwy_state::amspdwy_flipscreen_w)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(amspdwy_state::get_tile_info)
+void amspdwy_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_videoram[tile_index];
 	uint8_t color = m_colorram[tile_index];
@@ -47,13 +47,13 @@ TILE_GET_INFO_MEMBER(amspdwy_state::get_tile_info)
 			0);
 }
 
-WRITE8_MEMBER(amspdwy_state::amspdwy_videoram_w)
+void amspdwy_state::amspdwy_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(amspdwy_state::amspdwy_colorram_w)
+void amspdwy_state::amspdwy_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -61,7 +61,7 @@ WRITE8_MEMBER(amspdwy_state::amspdwy_colorram_w)
 
 
 /* logical (col,row) -> memory offset */
-TILEMAP_MAPPER_MEMBER(amspdwy_state::tilemap_scan_cols_back)
+tilemap_memory_index amspdwy_state::tilemap_scan_cols_back(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return col * num_rows + (num_rows - row - 1);
 }

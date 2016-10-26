@@ -37,14 +37,14 @@ public:
 	emu_timer *m_analog_timer_1, *m_analog_timer_2;
 	uint8_t m_input_port_select;
 	uint8_t m_analog_port_val;
-	DECLARE_WRITE8_MEMBER(analog_reset_w);
-	DECLARE_READ8_MEMBER(analog_r);
-	DECLARE_WRITE8_MEMBER(input_port_select_w);
-	DECLARE_READ8_MEMBER(input_port_r);
+	void analog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t analog_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void input_port_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(reset_analog_bit);
+	void reset_analog_bit(void *ptr, int32_t param);
 	uint8_t difficulty_input_port_r( int bit );
 	void create_analog_timers(  );
 	required_device<cpu_device> m_maincpu;
@@ -57,7 +57,7 @@ public:
  *
  *************************************/
 
-WRITE8_MEMBER(clayshoo_state::input_port_select_w)
+void clayshoo_state::input_port_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_port_select = data;
 }
@@ -81,7 +81,7 @@ uint8_t clayshoo_state::difficulty_input_port_r( int bit )
 }
 
 
-READ8_MEMBER(clayshoo_state::input_port_r)
+uint8_t clayshoo_state::input_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -107,7 +107,7 @@ READ8_MEMBER(clayshoo_state::input_port_r)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(clayshoo_state::reset_analog_bit)
+void clayshoo_state::reset_analog_bit(void *ptr, int32_t param)
 {
 	m_analog_port_val &= ~param;
 }
@@ -121,7 +121,7 @@ static attotime compute_duration( device_t *device, int analog_pos )
 }
 
 
-WRITE8_MEMBER(clayshoo_state::analog_reset_w)
+void clayshoo_state::analog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* reset the analog value, and start the two times that will fire
 	   off in a short period proportional to the position of the
@@ -134,7 +134,7 @@ WRITE8_MEMBER(clayshoo_state::analog_reset_w)
 }
 
 
-READ8_MEMBER(clayshoo_state::analog_r)
+uint8_t clayshoo_state::analog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_analog_port_val;
 }

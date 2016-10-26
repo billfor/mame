@@ -75,56 +75,56 @@ public:
 	m_centronics_busy(0), m_centronics_perror(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( px4 );
+	void init_px4();
 
-	DECLARE_PALETTE_INIT( px4 );
+	void palette_init_px4(palette_device &palette);
 	uint32_t screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( icrlc_r );
-	DECLARE_WRITE8_MEMBER( ctrl1_w );
-	DECLARE_READ8_MEMBER( icrhc_r );
-	DECLARE_WRITE8_MEMBER( cmdr_w );
-	DECLARE_READ8_MEMBER( icrlb_r );
-	DECLARE_WRITE8_MEMBER( ctrl2_w );
-	DECLARE_READ8_MEMBER( icrhb_r );
-	DECLARE_READ8_MEMBER( isr_r );
-	DECLARE_WRITE8_MEMBER( ier_w );
-	DECLARE_READ8_MEMBER( str_r );
-	DECLARE_WRITE8_MEMBER( bankr_w );
-	DECLARE_READ8_MEMBER( sior_r );
-	DECLARE_WRITE8_MEMBER( sior_w );
-	DECLARE_WRITE8_MEMBER( vadr_w );
-	DECLARE_WRITE8_MEMBER( yoff_w );
-	DECLARE_WRITE8_MEMBER( fr_w );
-	DECLARE_WRITE8_MEMBER( spur_w );
-	DECLARE_READ8_MEMBER( ctgif_r );
-	DECLARE_WRITE8_MEMBER( ctgif_w );
-	DECLARE_READ8_MEMBER( artdir_r );
-	DECLARE_WRITE8_MEMBER( artdor_w );
-	DECLARE_READ8_MEMBER( artsr_r );
-	DECLARE_WRITE8_MEMBER( artmr_w );
-	DECLARE_READ8_MEMBER( iostr_r );
-	DECLARE_WRITE8_MEMBER( artcr_w );
-	DECLARE_WRITE8_MEMBER( swr_w );
-	DECLARE_WRITE8_MEMBER( ioctlr_w );
+	uint8_t icrlc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t icrhc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cmdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t icrlb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t icrhb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t isr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ier_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t str_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bankr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sior_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sior_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vadr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void yoff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spur_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ctgif_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctgif_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t artdir_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void artdor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t artsr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void artmr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t iostr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void artcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void swr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ioctlr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER( key_callback );
+	void key_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( ext_cassette_read );
-	TIMER_DEVICE_CALLBACK_MEMBER( frc_tick );
-	TIMER_DEVICE_CALLBACK_MEMBER( upd7508_1sec_callback );
+	void ext_cassette_read(timer_device &timer, void *ptr, int32_t param);
+	void frc_tick(timer_device &timer, void *ptr, int32_t param);
+	void upd7508_1sec_callback(timer_device &timer, void *ptr, int32_t param);
 
 	// serial
-	DECLARE_WRITE_LINE_MEMBER( sio_rx_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_pin_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_dsr_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_cts_w );
+	void sio_rx_w(int state);
+	void sio_pin_w(int state);
+	void rs232_rx_w(int state);
+	void rs232_dcd_w(int state);
+	void rs232_dsr_w(int state);
+	void rs232_cts_w(int state);
 
 	// centronics
-	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
-	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w ) { m_centronics_perror = state; }
+	void centronics_busy_w(int state) { m_centronics_busy = state; }
+	void centronics_perror_w(int state) { m_centronics_perror = state; }
 
 protected:
 	// driver_device overrides
@@ -173,7 +173,7 @@ private:
 
 	void gapnit_interrupt();
 
-	DECLARE_WRITE_LINE_MEMBER( serial_rx_w );
+	void serial_rx_w(int state);
 	void txd_w(int data);
 
 	void install_rom_capsule(address_space &space, int size, memory_region *mem);
@@ -252,14 +252,14 @@ public:
 	m_ramdisk(nullptr)
 	{ }
 
-	DECLARE_DRIVER_INIT( px4p );
+	void init_px4p();
 
-	DECLARE_PALETTE_INIT( px4p );
+	void palette_init_px4p(palette_device &palette);
 
-	DECLARE_WRITE8_MEMBER( ramdisk_address_w );
-	DECLARE_READ8_MEMBER( ramdisk_data_r );
-	DECLARE_WRITE8_MEMBER( ramdisk_data_w );
-	DECLARE_READ8_MEMBER( ramdisk_control_r );
+	void ramdisk_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ramdisk_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ramdisk_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ramdisk_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// driver_device overrides
@@ -300,7 +300,7 @@ void px4_state::gapnit_interrupt()
 }
 
 // external cassette or barcode reader input
-TIMER_DEVICE_CALLBACK_MEMBER( px4_state::ext_cassette_read )
+void px4_state::ext_cassette_read(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t result;
 	int trigger = 0;
@@ -338,7 +338,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( px4_state::ext_cassette_read )
 }
 
 // free running counter
-TIMER_DEVICE_CALLBACK_MEMBER( px4_state::frc_tick )
+void px4_state::frc_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_frc_value++;
 
@@ -350,7 +350,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( px4_state::frc_tick )
 }
 
 // input capture register low command trigger
-READ8_MEMBER( px4_state::icrlc_r )
+uint8_t px4_state::icrlc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: icrlc_r\n", machine().describe_context());
@@ -362,7 +362,7 @@ READ8_MEMBER( px4_state::icrlc_r )
 }
 
 // control register 1
-WRITE8_MEMBER( px4_state::ctrl1_w )
+void px4_state::ctrl1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	const int rcv_rates[] = { 110, 150, 300, 600, 1200, 2400, 4800, 9600, 75, 1200, 19200, 38400, 200 };
 	const int tra_rates[] = { 110, 150, 300, 600, 1200, 2400, 4800, 9600, 1200, 75, 19200, 38400, 200 };
@@ -386,7 +386,7 @@ WRITE8_MEMBER( px4_state::ctrl1_w )
 }
 
 // input capture register high command trigger
-READ8_MEMBER( px4_state::icrhc_r )
+uint8_t px4_state::icrhc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: icrhc_r\n", machine().describe_context());
@@ -395,7 +395,7 @@ READ8_MEMBER( px4_state::icrhc_r )
 }
 
 // command register
-WRITE8_MEMBER( px4_state::cmdr_w )
+void px4_state::cmdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (0)
 		logerror("%s: cmdr_w (0x%02x)\n", machine().describe_context(), data);
@@ -409,7 +409,7 @@ WRITE8_MEMBER( px4_state::cmdr_w )
 }
 
 // input capture register low barcode trigger
-READ8_MEMBER( px4_state::icrlb_r )
+uint8_t px4_state::icrlb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: icrlb_r\n", machine().describe_context());
@@ -418,7 +418,7 @@ READ8_MEMBER( px4_state::icrlb_r )
 }
 
 // control register 2
-WRITE8_MEMBER( px4_state::ctrl2_w )
+void px4_state::ctrl2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: ctrl2_w (0x%02x)\n", machine().describe_context(), data);
@@ -440,7 +440,7 @@ WRITE8_MEMBER( px4_state::ctrl2_w )
 }
 
 // input capture register high barcode trigger
-READ8_MEMBER( px4_state::icrhb_r )
+uint8_t px4_state::icrhb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: icrhb_r\n", machine().describe_context());
@@ -453,7 +453,7 @@ READ8_MEMBER( px4_state::icrhb_r )
 }
 
 // interrupt status register
-READ8_MEMBER( px4_state::isr_r )
+uint8_t px4_state::isr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: isr_r\n", machine().describe_context());
@@ -462,7 +462,7 @@ READ8_MEMBER( px4_state::isr_r )
 }
 
 // interrupt enable register
-WRITE8_MEMBER( px4_state::ier_w )
+void px4_state::ier_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (0)
 		logerror("%s: ier_w (0x%02x)\n", machine().describe_context(), data);
@@ -472,7 +472,7 @@ WRITE8_MEMBER( px4_state::ier_w )
 }
 
 // status register
-READ8_MEMBER( px4_state::str_r )
+uint8_t px4_state::str_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -507,7 +507,7 @@ void px4_state::install_rom_capsule(address_space &space, int size, memory_regio
 }
 
 // bank register
-WRITE8_MEMBER( px4_state::bankr_w )
+void px4_state::bankr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &space_program = m_z80->space(AS_PROGRAM);
 
@@ -545,7 +545,7 @@ WRITE8_MEMBER( px4_state::bankr_w )
 }
 
 // serial io register
-READ8_MEMBER( px4_state::sior_r )
+uint8_t px4_state::sior_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (0)
 		logerror("%s: sior_r 0x%02x\n", machine().describe_context(), m_sior);
@@ -574,7 +574,7 @@ READ8_MEMBER( px4_state::sior_r )
 }
 
 // serial io register
-WRITE8_MEMBER( px4_state::sior_w )
+void px4_state::sior_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (0)
 		logerror("%s: sior_w (0x%02x)\n", machine().describe_context(), data);
@@ -746,7 +746,7 @@ WRITE8_MEMBER( px4_state::sior_w )
 //**************************************************************************
 
 // vram start address register
-WRITE8_MEMBER( px4_state::vadr_w )
+void px4_state::vadr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: vadr_w (0x%02x)\n", machine().describe_context(), data);
@@ -755,7 +755,7 @@ WRITE8_MEMBER( px4_state::vadr_w )
 }
 
 // y offset register
-WRITE8_MEMBER( px4_state::yoff_w )
+void px4_state::yoff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: yoff_w (0x%02x)\n", machine().describe_context(), data);
@@ -764,14 +764,14 @@ WRITE8_MEMBER( px4_state::yoff_w )
 }
 
 // frame register
-WRITE8_MEMBER( px4_state::fr_w )
+void px4_state::fr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: fr_w (0x%02x)\n", machine().describe_context(), data);
 }
 
 // speed-up register
-WRITE8_MEMBER( px4_state::spur_w )
+void px4_state::spur_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: spur_w (0x%02x)\n", machine().describe_context(), data);
@@ -782,40 +782,40 @@ WRITE8_MEMBER( px4_state::spur_w )
 //  GAPNIO
 //**************************************************************************
 
-WRITE_LINE_MEMBER( px4_state::serial_rx_w )
+void px4_state::serial_rx_w(int state)
 {
 	m_serial_rx = state;
 	device_serial_interface::rx_w(state);
 }
 
-WRITE_LINE_MEMBER( px4_state::sio_rx_w )
+void px4_state::sio_rx_w(int state)
 {
 	if (!BIT(m_swr, 3) && BIT(m_swr, 2))
 		serial_rx_w(state);
 }
 
-WRITE_LINE_MEMBER( px4_state::sio_pin_w )
+void px4_state::sio_pin_w(int state)
 {
 	m_sio_pin = state;
 }
 
-WRITE_LINE_MEMBER( px4_state::rs232_rx_w )
+void px4_state::rs232_rx_w(int state)
 {
 	if (BIT(m_swr, 3))
 		serial_rx_w(state);
 }
 
-WRITE_LINE_MEMBER( px4_state::rs232_dcd_w )
+void px4_state::rs232_dcd_w(int state)
 {
 	m_rs232_dcd = state;
 }
 
-WRITE_LINE_MEMBER( px4_state::rs232_dsr_w )
+void px4_state::rs232_dsr_w(int state)
 {
 	m_artsr |= !state << 7;
 }
 
-WRITE_LINE_MEMBER( px4_state::rs232_cts_w )
+void px4_state::rs232_cts_w(int state)
 {
 	m_rs232_cts = state;
 }
@@ -890,7 +890,7 @@ void px4_state::txd_w(int data)
 }
 
 // cartridge interface
-READ8_MEMBER( px4_state::ctgif_r )
+uint8_t px4_state::ctgif_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: ctgif_r @ 0x%02x\n", machine().describe_context(), offset);
@@ -899,14 +899,14 @@ READ8_MEMBER( px4_state::ctgif_r )
 }
 
 // cartridge interface
-WRITE8_MEMBER( px4_state::ctgif_w )
+void px4_state::ctgif_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: ctgif_w (0x%02x @ 0x%02x)\n", machine().describe_context(), data, offset);
 }
 
 // art data input register
-READ8_MEMBER( px4_state::artdir_r )
+uint8_t px4_state::artdir_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: artdir_r (%02x)\n", machine().describe_context(), m_artdir);
@@ -922,7 +922,7 @@ READ8_MEMBER( px4_state::artdir_r )
 }
 
 // art data output register
-WRITE8_MEMBER( px4_state::artdor_w )
+void px4_state::artdor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: artdor_w (0x%02x)\n", machine().describe_context(), data);
@@ -943,7 +943,7 @@ WRITE8_MEMBER( px4_state::artdor_w )
 }
 
 // art status register
-READ8_MEMBER( px4_state::artsr_r )
+uint8_t px4_state::artsr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (0)
 		logerror("%s: artsr_r (%02x)\n", machine().describe_context(), m_artsr);
@@ -952,7 +952,7 @@ READ8_MEMBER( px4_state::artsr_r )
 }
 
 // art mode register
-WRITE8_MEMBER( px4_state::artmr_w )
+void px4_state::artmr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int data_bit_count = BIT(data, 2) ? 8 : 7;
 	parity_t parity = BIT(data, 4) ? (BIT(data, 5) ? PARITY_EVEN : PARITY_ODD) : PARITY_NONE;
@@ -965,7 +965,7 @@ WRITE8_MEMBER( px4_state::artmr_w )
 }
 
 // io status register
-READ8_MEMBER( px4_state::iostr_r )
+uint8_t px4_state::iostr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -993,7 +993,7 @@ READ8_MEMBER( px4_state::iostr_r )
 }
 
 // art command register
-WRITE8_MEMBER( px4_state::artcr_w )
+void px4_state::artcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: artcr_w (0x%02x)\n", machine().describe_context(), data);
@@ -1010,7 +1010,7 @@ WRITE8_MEMBER( px4_state::artcr_w )
 }
 
 // switch register
-WRITE8_MEMBER( px4_state::swr_w )
+void px4_state::swr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 	{
@@ -1024,7 +1024,7 @@ WRITE8_MEMBER( px4_state::swr_w )
 }
 
 // io control register
-WRITE8_MEMBER( px4_state::ioctlr_w )
+void px4_state::ioctlr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s: ioctlr_w (0x%02x)\n", machine().describe_context(), data);
@@ -1048,7 +1048,7 @@ WRITE8_MEMBER( px4_state::ioctlr_w )
 //  7508 RELATED
 //**************************************************************************
 
-TIMER_DEVICE_CALLBACK_MEMBER( px4_state::upd7508_1sec_callback )
+void px4_state::upd7508_1sec_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	// adjust interrupt status
 	m_interrupt_status |= UPD7508_INT_ONE_SECOND;
@@ -1064,7 +1064,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( px4_state::upd7508_1sec_callback )
 	m_time.set(m_time.time + 1);
 }
 
-INPUT_CHANGED_MEMBER( px4_state::key_callback )
+void px4_state::key_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint32_t oldvalue = oldval * field.mask(), newvalue = newval * field.mask();
 	uint32_t delta = oldvalue ^ newvalue;
@@ -1108,7 +1108,7 @@ INPUT_CHANGED_MEMBER( px4_state::key_callback )
 //  EXTERNAL RAM-DISK
 //**************************************************************************
 
-WRITE8_MEMBER( px4p_state::ramdisk_address_w )
+void px4p_state::ramdisk_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1118,7 +1118,7 @@ WRITE8_MEMBER( px4p_state::ramdisk_address_w )
 	}
 }
 
-READ8_MEMBER( px4p_state::ramdisk_data_r )
+uint8_t px4p_state::ramdisk_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0xff;
 
@@ -1138,7 +1138,7 @@ READ8_MEMBER( px4p_state::ramdisk_data_r )
 	return ret;
 }
 
-WRITE8_MEMBER( px4p_state::ramdisk_data_w )
+void px4p_state::ramdisk_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ramdisk_address < 0x20000)
 		m_ramdisk[m_ramdisk_address] = data;
@@ -1146,7 +1146,7 @@ WRITE8_MEMBER( px4p_state::ramdisk_data_w )
 	m_ramdisk_address = (m_ramdisk_address & 0xffff00) | ((m_ramdisk_address & 0xff) + 1);
 }
 
-READ8_MEMBER( px4p_state::ramdisk_control_r )
+uint8_t px4p_state::ramdisk_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// bit 7 determines the presence of a ram-disk
 	return 0x7f;
@@ -1203,16 +1203,16 @@ uint32_t px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitma
 //  DRIVER INIT
 //**************************************************************************
 
-DRIVER_INIT_MEMBER( px4_state, px4 )
+void px4_state::init_px4()
 {
 	// map os rom and last half of memory
 	membank("bank1")->set_base(memregion("os")->base());
 	membank("bank2")->set_base(m_ram->pointer() + 0x8000);
 }
 
-DRIVER_INIT_MEMBER( px4p_state, px4p )
+void px4p_state::init_px4p()
 {
-	DRIVER_INIT_CALL(px4);
+	init_px4();
 
 	// reserve memory for external ram-disk
 	m_ramdisk = std::make_unique<uint8_t[]>(0x20000);
@@ -1449,13 +1449,13 @@ INPUT_PORTS_END
 //  PALETTE
 //**************************************************************************
 
-PALETTE_INIT_MEMBER( px4_state, px4 )
+void px4_state::palette_init_px4(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-PALETTE_INIT_MEMBER( px4p_state, px4p )
+void px4p_state::palette_init_px4p(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(149, 157, 130));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

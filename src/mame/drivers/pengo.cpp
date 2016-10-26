@@ -74,10 +74,10 @@ class pengo_state : public pacman_state
 public:
 	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag), m_decrypted_opcodes(*this, "decrypted_opcodes") { }
-	DECLARE_WRITE8_MEMBER(pengo_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_DRIVER_INIT(penta);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void pengo_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_penta();
+	void vblank_irq(device_t &device);
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 };
@@ -112,12 +112,12 @@ public:
  *
  *************************************/
 
-WRITE8_MEMBER(pengo_state::pengo_coin_counter_w)
+void pengo_state::pengo_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
-WRITE8_MEMBER(pengo_state::irq_mask_w)
+void pengo_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }
@@ -362,7 +362,7 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(pengo_state::vblank_irq)
+void pengo_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -652,7 +652,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pengo_state,penta)
+void pengo_state::init_penta()
 {
 /*
     the values vary, but the translation mask is always laid out like this:

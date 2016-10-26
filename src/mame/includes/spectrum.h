@@ -118,50 +118,50 @@ public:
 
 	uint8_t *m_ram_0000;
 	uint8_t m_ram_disabled_by_beta;
-	DECLARE_WRITE8_MEMBER(spectrum_port_fe_w);
-	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
-	DECLARE_READ8_MEMBER(spectrum_port_1f_r);
-	DECLARE_READ8_MEMBER(spectrum_port_7f_r);
-	DECLARE_READ8_MEMBER(spectrum_port_df_r);
-	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
+	void spectrum_port_fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_port_fe_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_port_1f_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_port_7f_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_port_df_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_port_ula_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(spectrum_128_port_7ffd_w);
-	DECLARE_READ8_MEMBER(spectrum_128_ula_r);
+	void spectrum_128_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_128_ula_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_3ffd_w);
-	DECLARE_READ8_MEMBER(spectrum_plus3_port_3ffd_r);
-	DECLARE_READ8_MEMBER(spectrum_plus3_port_2ffd_r);
-	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_7ffd_w);
-	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_1ffd_w);
+	void spectrum_plus3_port_3ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_plus3_port_3ffd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_plus3_port_2ffd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spectrum_plus3_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spectrum_plus3_port_1ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(ts2068_port_f4_r);
-	DECLARE_WRITE8_MEMBER(ts2068_port_f4_w);
-	DECLARE_READ8_MEMBER(ts2068_port_ff_r);
-	DECLARE_WRITE8_MEMBER(ts2068_port_ff_w);
-	DECLARE_WRITE8_MEMBER(tc2048_port_ff_w);
+	uint8_t ts2068_port_f4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ts2068_port_f4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ts2068_port_ff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ts2068_port_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tc2048_port_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(spectrum);
-	DECLARE_DRIVER_INIT(plus2);
-	DECLARE_DRIVER_INIT(plus3);
-	DECLARE_MACHINE_RESET(spectrum);
-	DECLARE_VIDEO_START(spectrum);
-	DECLARE_PALETTE_INIT(spectrum);
-	DECLARE_MACHINE_RESET(tc2048);
-	DECLARE_VIDEO_START(spectrum_128);
-	DECLARE_MACHINE_RESET(spectrum_128);
-	DECLARE_MACHINE_RESET(spectrum_plus3);
-	DECLARE_MACHINE_RESET(ts2068);
-	DECLARE_VIDEO_START(ts2068);
+	void init_spectrum();
+	void init_plus2();
+	void init_plus3();
+	void machine_reset_spectrum();
+	void video_start_spectrum();
+	void palette_init_spectrum(palette_device &palette);
+	void machine_reset_tc2048();
+	void video_start_spectrum_128();
+	void machine_reset_spectrum_128();
+	void machine_reset_spectrum_plus3();
+	void machine_reset_ts2068();
+	void video_start_ts2068();
 	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
 	void screen_eof_timex(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(spec_interrupt);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( spectrum_cart );
+	void spec_interrupt(device_t &device);
+	image_init_result device_image_load_spectrum_cart(device_image_interface &image);
 
 	// for timex cart only
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( timex_cart );
+	image_init_result device_image_load_timex_cart(device_image_interface &image);
 	int m_dock_cart_type, m_ram_chunks;
 	memory_region *m_dock_crt;
 

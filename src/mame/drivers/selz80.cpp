@@ -43,10 +43,10 @@ public:
 		m_p_ram(*this, "ram")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(scanlines_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_MACHINE_RESET(dagz80);
+	void scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void machine_reset_dagz80();
 	uint8_t m_digit;
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_p_ram;
@@ -122,7 +122,7 @@ RG EN SA SD     0(AF)  1(BC)  2(DE)  3(HL)
 INPUT_PORTS_END
 
 
-MACHINE_RESET_MEMBER(selz80_state, dagz80)
+void selz80_state::machine_reset_dagz80()
 {
 	uint8_t* rom = memregion("user1")->base();
 	uint16_t size = memregion("user1")->bytes();
@@ -130,17 +130,17 @@ MACHINE_RESET_MEMBER(selz80_state, dagz80)
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( selz80_state::scanlines_w )
+void selz80_state::scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit = data;
 }
 
-WRITE8_MEMBER( selz80_state::digit_w )
+void selz80_state::digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(m_digit, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4));
 }
 
-READ8_MEMBER( selz80_state::kbd_r )
+uint8_t selz80_state::kbd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 

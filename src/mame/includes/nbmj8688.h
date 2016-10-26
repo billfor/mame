@@ -48,41 +48,41 @@ public:
 	emu_timer *m_blitter_timer;
 
 	// common
-	DECLARE_READ8_MEMBER(ff_r);
-	DECLARE_WRITE8_MEMBER(clut_w);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
+	uint8_t ff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void clut_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 
-	DECLARE_WRITE8_MEMBER(mjsikaku_gfxflag2_w);
-	DECLARE_WRITE8_MEMBER(mjsikaku_gfxflag3_w);
-	DECLARE_WRITE8_MEMBER(mjsikaku_romsel_w);
-	DECLARE_WRITE8_MEMBER(secolove_romsel_w);
-	DECLARE_WRITE8_MEMBER(crystalg_romsel_w);
-	DECLARE_WRITE8_MEMBER(seiha_romsel_w);
-	DECLARE_WRITE8_MEMBER(HD61830B_both_instr_w);
-	DECLARE_WRITE8_MEMBER(HD61830B_both_data_w);
-	DECLARE_READ8_MEMBER(dipsw1_r);
-	DECLARE_READ8_MEMBER(dipsw2_r);
-	DECLARE_WRITE8_MEMBER(barline_output_w);
+	void mjsikaku_gfxflag2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjsikaku_gfxflag3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjsikaku_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void secolove_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void crystalg_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void seiha_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void HD61830B_both_instr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void HD61830B_both_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dipsw1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dipsw2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void barline_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
+	ioport_value nb1413m3_busyflag_r(ioport_field &field, void *param);
 
-	DECLARE_DRIVER_INIT(kyuhito);
-	DECLARE_DRIVER_INIT(idhimitu);
-	DECLARE_DRIVER_INIT(kaguya2);
-	DECLARE_DRIVER_INIT(mjcamera);
-	DECLARE_DRIVER_INIT(kanatuen);
-	DECLARE_VIDEO_START(mbmj8688_pure_12bit);
-	DECLARE_PALETTE_INIT(mbmj8688_12bit);
-	DECLARE_VIDEO_START(mbmj8688_pure_16bit_LCD);
-	DECLARE_PALETTE_INIT(mbmj8688_16bit);
-	DECLARE_PALETTE_INIT(mbmj8688_lcd);
-	DECLARE_VIDEO_START(mbmj8688_8bit);
-	DECLARE_PALETTE_INIT(mbmj8688_8bit);
-	DECLARE_VIDEO_START(mbmj8688_hybrid_16bit);
-	DECLARE_VIDEO_START(mbmj8688_hybrid_12bit);
-	DECLARE_VIDEO_START(mbmj8688_pure_16bit);
+	void init_kyuhito();
+	void init_idhimitu();
+	void init_kaguya2();
+	void init_mjcamera();
+	void init_kanatuen();
+	void video_start_mbmj8688_pure_12bit();
+	void palette_init_mbmj8688_12bit(palette_device &palette);
+	void video_start_mbmj8688_pure_16bit_LCD();
+	void palette_init_mbmj8688_16bit(palette_device &palette);
+	void palette_init_mbmj8688_lcd(palette_device &palette);
+	void video_start_mbmj8688_8bit();
+	void palette_init_mbmj8688_8bit(palette_device &palette);
+	void video_start_mbmj8688_hybrid_16bit();
+	void video_start_mbmj8688_hybrid_12bit();
+	void video_start_mbmj8688_pure_16bit();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vramflip();

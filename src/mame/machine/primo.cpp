@@ -32,7 +32,7 @@
 
 *******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(primo_state::primo_vblank_interrupt)
+void primo_state::primo_vblank_interrupt(device_t &device)
 {
 	if (m_nmi)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -75,7 +75,7 @@ void primo_state::primo_update_memory()
 
 *******************************************************************************/
 
-READ8_MEMBER(primo_state::primo_be_1_r)
+uint8_t primo_state::primo_be_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x00;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
@@ -101,7 +101,7 @@ READ8_MEMBER(primo_state::primo_be_1_r)
 	return data;
 }
 
-READ8_MEMBER(primo_state::primo_be_2_r)
+uint8_t primo_state::primo_be_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -131,7 +131,7 @@ READ8_MEMBER(primo_state::primo_be_2_r)
 	return data;
 }
 
-WRITE8_MEMBER(primo_state::primo_ki_1_w)
+void primo_state::primo_ki_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 7 - NMI generator enable/disable
 	m_nmi = (data & 0x80) ? 1 : 0;
@@ -167,7 +167,7 @@ WRITE8_MEMBER(primo_state::primo_ki_1_w)
 	}
 }
 
-WRITE8_MEMBER(primo_state::primo_ki_2_w)
+void primo_state::primo_ki_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 7, 6 - not used
 
@@ -190,7 +190,7 @@ WRITE8_MEMBER(primo_state::primo_ki_2_w)
 //  logerror ("IOW KI-2 data:%02x\n", data);
 }
 
-WRITE8_MEMBER(primo_state::primo_FD_w)
+void primo_state::primo_FD_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!ioport("MEMORY_EXPANSION")->read())
 	{
@@ -210,19 +210,19 @@ void primo_state::primo_common_driver_init (primo_state *state)
 	m_port_FD = 0x00;
 }
 
-DRIVER_INIT_MEMBER(primo_state,primo32)
+void primo_state::init_primo32()
 {
 	primo_common_driver_init(this);
 	m_video_memory_base = 0x6800;
 }
 
-DRIVER_INIT_MEMBER(primo_state,primo48)
+void primo_state::init_primo48()
 {
 	primo_common_driver_init(this);
 	m_video_memory_base = 0xa800;
 }
 
-DRIVER_INIT_MEMBER(primo_state,primo64)
+void primo_state::init_primo64()
 {
 	primo_common_driver_init(this);
 	m_video_memory_base = 0xe800;
@@ -254,7 +254,7 @@ void primo_state::machine_reset()
 	primo_common_machine_init();
 }
 
-MACHINE_RESET_MEMBER(primo_state,primob)
+void primo_state::machine_reset_primob()
 {
 	primo_common_machine_init();
 

@@ -99,86 +99,86 @@ public:
 	template<class _spkr> void set_spkr_callback(_spkr spkr) { m_write_spkr.set_callback(spkr); }
 
 	// not really public
-	DECLARE_READ8_MEMBER( dma_read_byte );
-	DECLARE_WRITE8_MEMBER( dma_write_byte );
-	DECLARE_READ8_MEMBER( dma_read_word );
-	DECLARE_WRITE8_MEMBER( dma_write_word );
-	DECLARE_WRITE_LINE_MEMBER( dma1_eop_w );
-	DECLARE_READ8_MEMBER( dma1_ior0_r ) { return m_read_ior(0); }
-	DECLARE_READ8_MEMBER( dma1_ior1_r ) { return m_read_ior(1); }
-	DECLARE_READ8_MEMBER( dma1_ior2_r ) { return m_read_ior(2); }
-	DECLARE_READ8_MEMBER( dma1_ior3_r ) { return m_read_ior(3); }
-	DECLARE_READ8_MEMBER( dma2_ior1_r ) { uint16_t result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_READ8_MEMBER( dma2_ior2_r ) { uint16_t result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_READ8_MEMBER( dma2_ior3_r ) { uint16_t result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
-	DECLARE_WRITE8_MEMBER( dma1_iow0_w ) { m_write_iow(0, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma1_iow1_w ) { m_write_iow(1, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma1_iow2_w ) { m_write_iow(2, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma1_iow3_w ) { m_write_iow(3, data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma2_iow1_w ) { m_write_iow(5, (m_dma_high_byte << 8) | data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma2_iow2_w ) { m_write_iow(6, (m_dma_high_byte << 8) | data, 0xffff); }
-	DECLARE_WRITE8_MEMBER( dma2_iow3_w ) { m_write_iow(7, (m_dma_high_byte << 8) | data, 0xffff); }
-	DECLARE_WRITE_LINE_MEMBER( dma1_dack0_w ) { set_dma_channel(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma1_dack1_w ) { set_dma_channel(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma1_dack2_w ) { set_dma_channel(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma1_dack3_w ) { set_dma_channel(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma2_dack0_w );
-	DECLARE_WRITE_LINE_MEMBER( dma2_dack1_w ) { set_dma_channel(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma2_dack2_w ) { set_dma_channel(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma2_dack3_w ) { set_dma_channel(7, state); }
-	DECLARE_WRITE_LINE_MEMBER( dma2_hreq_w ) { m_write_hold(state); }
-	DECLARE_WRITE_LINE_MEMBER( intc1_int_w ) { m_write_intr(state); }
-	DECLARE_READ8_MEMBER( intc1_slave_ack_r );
-	DECLARE_WRITE_LINE_MEMBER( ctc_out1_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_out2_w );
-	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
+	uint8_t dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dma_read_word(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_write_word(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma1_eop_w(int state);
+	uint8_t dma1_ior0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_read_ior(0); }
+	uint8_t dma1_ior1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_read_ior(1); }
+	uint8_t dma1_ior2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_read_ior(2); }
+	uint8_t dma1_ior3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_read_ior(3); }
+	uint8_t dma2_ior1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { uint16_t result = m_read_ior(5); m_dma_high_byte = result >> 8; return result; }
+	uint8_t dma2_ior2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { uint16_t result = m_read_ior(6); m_dma_high_byte = result >> 8; return result; }
+	uint8_t dma2_ior3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { uint16_t result = m_read_ior(7); m_dma_high_byte = result >> 8; return result; }
+	void dma1_iow0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_write_iow(0, data, 0xffff); }
+	void dma1_iow1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_write_iow(1, data, 0xffff); }
+	void dma1_iow2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_write_iow(2, data, 0xffff); }
+	void dma1_iow3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_write_iow(3, data, 0xffff); }
+	void dma2_iow1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_write_iow(5, (m_dma_high_byte << 8) | data, 0xffff); }
+	void dma2_iow2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_write_iow(6, (m_dma_high_byte << 8) | data, 0xffff); }
+	void dma2_iow3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_write_iow(7, (m_dma_high_byte << 8) | data, 0xffff); }
+	void dma1_dack0_w(int state) { set_dma_channel(0, state); }
+	void dma1_dack1_w(int state) { set_dma_channel(1, state); }
+	void dma1_dack2_w(int state) { set_dma_channel(2, state); }
+	void dma1_dack3_w(int state) { set_dma_channel(3, state); }
+	void dma2_dack0_w(int state);
+	void dma2_dack1_w(int state) { set_dma_channel(5, state); }
+	void dma2_dack2_w(int state) { set_dma_channel(6, state); }
+	void dma2_dack3_w(int state) { set_dma_channel(7, state); }
+	void dma2_hreq_w(int state) { m_write_hold(state); }
+	void intc1_int_w(int state) { m_write_intr(state); }
+	uint8_t intc1_slave_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctc_out1_w(int state);
+	void ctc_out2_w(int state);
+	void rtc_irq_w(int state);
 
 	// internal io
-	DECLARE_WRITE8_MEMBER( config_address_w );
-	DECLARE_READ8_MEMBER( config_data_r );
-	DECLARE_WRITE8_MEMBER( config_data_w );
-	DECLARE_READ8_MEMBER( portb_r );
-	DECLARE_WRITE8_MEMBER( portb_w );
-	DECLARE_WRITE8_MEMBER( rtc_w );
-	DECLARE_WRITE8_MEMBER( sysctrl_w );
-	DECLARE_READ8_MEMBER( sysctrl_r );
-	DECLARE_READ8_MEMBER( dma_page_r ) { return m_dma_page[offset]; }
-	DECLARE_WRITE8_MEMBER( dma_page_w ) { m_dma_page[offset] = data; }
-	DECLARE_READ8_MEMBER( dma2_r ) { return m_dma2->read(space, offset / 2); }
-	DECLARE_WRITE8_MEMBER( dma2_w ) { m_dma2->write(space, offset / 2, data); }
-	DECLARE_READ8_MEMBER( keyb_data_r );
-	DECLARE_WRITE8_MEMBER( keyb_data_w );
-	DECLARE_READ8_MEMBER( keyb_status_r );
-	DECLARE_WRITE8_MEMBER( keyb_command_w );
-	DECLARE_WRITE8_MEMBER( keyb_command_blocked_w );
+	void config_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t config_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void config_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sysctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sysctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dma_page_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_dma_page[offset]; }
+	void dma_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_dma_page[offset] = data; }
+	uint8_t dma2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_dma2->read(space, offset / 2); }
+	void dma2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_dma2->write(space, offset / 2, data); }
+	uint8_t keyb_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyb_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyb_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyb_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void keyb_command_blocked_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// input lines
-	DECLARE_WRITE_LINE_MEMBER( irq01_w ) { m_intc1->ir1_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq03_w ) { m_intc1->ir3_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq04_w ) { m_intc1->ir4_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq05_w ) { m_intc1->ir5_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq06_w ) { m_intc1->ir6_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq07_w ) { m_intc1->ir7_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq09_w ) { m_intc2->ir1_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq10_w ) { m_intc2->ir2_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq11_w ) { m_intc2->ir3_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq12_w ) { m_intc2->ir4_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq13_w ) { m_intc2->ir5_w(state); } // also FERR#
-	DECLARE_WRITE_LINE_MEMBER( irq14_w ) { m_intc2->ir6_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( irq15_w ) { m_intc2->ir7_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dreq0_w ) { m_dma1->dreq0_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dreq1_w ) { m_dma1->dreq1_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dreq2_w ) { m_dma1->dreq2_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dreq3_w ) { m_dma1->dreq3_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dreq5_w ) { m_dma2->dreq1_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dreq6_w ) { m_dma2->dreq2_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dreq7_w ) { m_dma2->dreq3_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( hlda_w ) { m_dma2->hack_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( iochck_w );
-	DECLARE_WRITE_LINE_MEMBER( gatea20_w );
-	DECLARE_WRITE_LINE_MEMBER( kbrst_w );
+	void irq01_w(int state) { m_intc1->ir1_w(state); }
+	void irq03_w(int state) { m_intc1->ir3_w(state); }
+	void irq04_w(int state) { m_intc1->ir4_w(state); }
+	void irq05_w(int state) { m_intc1->ir5_w(state); }
+	void irq06_w(int state) { m_intc1->ir6_w(state); }
+	void irq07_w(int state) { m_intc1->ir7_w(state); }
+	void irq09_w(int state) { m_intc2->ir1_w(state); }
+	void irq10_w(int state) { m_intc2->ir2_w(state); }
+	void irq11_w(int state) { m_intc2->ir3_w(state); }
+	void irq12_w(int state) { m_intc2->ir4_w(state); }
+	void irq13_w(int state) { m_intc2->ir5_w(state); } // also FERR#
+	void irq14_w(int state) { m_intc2->ir6_w(state); }
+	void irq15_w(int state) { m_intc2->ir7_w(state); }
+	void dreq0_w(int state) { m_dma1->dreq0_w(state); }
+	void dreq1_w(int state) { m_dma1->dreq1_w(state); }
+	void dreq2_w(int state) { m_dma1->dreq2_w(state); }
+	void dreq3_w(int state) { m_dma1->dreq3_w(state); }
+	void dreq5_w(int state) { m_dma2->dreq1_w(state); }
+	void dreq6_w(int state) { m_dma2->dreq2_w(state); }
+	void dreq7_w(int state) { m_dma2->dreq3_w(state); }
+	void hlda_w(int state) { m_dma2->hack_w(state); }
+	void iochck_w(int state);
+	void gatea20_w(int state);
+	void kbrst_w(int state);
 
-	IRQ_CALLBACK_MEMBER(int_ack_r) { return m_intc1->acknowledge(); }
+	int int_ack_r(device_t &device, int irqline) { return m_intc1->acknowledge(); }
 
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);

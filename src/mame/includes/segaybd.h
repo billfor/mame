@@ -47,22 +47,22 @@ public:
 	}
 
 	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER( analog_r );
-	DECLARE_WRITE16_MEMBER( analog_w );
-	DECLARE_READ16_MEMBER( io_chip_r );
-	DECLARE_WRITE16_MEMBER( io_chip_w );
-	DECLARE_WRITE16_MEMBER( sound_data_w );
+	uint16_t analog_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void analog_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t io_chip_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void io_chip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// sound Z80 CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
+	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// linked cabinet specific handlers
-	DECLARE_WRITE_LINE_MEMBER( mb8421_intl );
-	DECLARE_WRITE_LINE_MEMBER( mb8421_intr );
-	DECLARE_READ16_MEMBER( link_r );
-	DECLARE_READ16_MEMBER( link2_r );
-	DECLARE_WRITE16_MEMBER( link2_w );
-//  DECLARE_READ8_MEMBER( link_portc0_r );
+	void mb8421_intl(int state);
+	void mb8421_intr(int state);
+	uint16_t link_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t link2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void link2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+//  uint8_t link_portc0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// game-specific output handlers
 	void gforce2_output_cb1(uint16_t data);
@@ -75,12 +75,12 @@ public:
 	void rchase_output_cb2(uint16_t data);
 
 	// game-specific driver init
-	DECLARE_DRIVER_INIT(generic);
-	DECLARE_DRIVER_INIT(pdrift);
-	DECLARE_DRIVER_INIT(r360);
-	DECLARE_DRIVER_INIT(gforce2);
-	DECLARE_DRIVER_INIT(rchase);
-	DECLARE_DRIVER_INIT(gloc);
+	void init_generic();
+	void init_pdrift();
+	void init_r360();
+	void init_gforce2();
+	void init_rchase();
+	void init_gloc();
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

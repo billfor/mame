@@ -164,7 +164,7 @@ resulting mess can be seen in the F4 viewer display.
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
-WRITE8_MEMBER(spectrum_state::spectrum_128_port_7ffd_w)
+void spectrum_state::spectrum_128_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* D0-D2: RAM page located at 0x0c000-0x0ffff */
 	/* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
@@ -211,7 +211,7 @@ void spectrum_state::spectrum_128_update_memory()
 	}
 }
 
-READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
+uint8_t spectrum_state::spectrum_128_ula_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int vpos = machine().first_screen()->vpos();
 
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START (spectrum_128_mem, AS_PROGRAM, 8, spectrum_state )
 	AM_RANGE( 0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
+void spectrum_state::machine_reset_spectrum_128()
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -249,7 +249,7 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum_128)
 	/* Bank 2 is always in 0x8000 - 0xbfff */
 	membank("bank3")->set_base(messram + (2<<14));
 
-	MACHINE_RESET_CALL_MEMBER(spectrum);
+	machine_reset_spectrum();
 
 	/* set initial ram config */
 	m_port_7ffd_data = 0;

@@ -17,12 +17,12 @@
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(lwings_state::get_bg2_memory_offset)
+tilemap_memory_index lwings_state::get_bg2_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (row * 0x800) | (col * 2);
 }
 
-TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
+void lwings_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fgvideoram[tile_index];
 	int color = m_fgvideoram[tile_index + 0x400];
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
 			TILE_FLIPYX((color & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
+void lwings_state::lwings_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg1videoram[tile_index];
 	int color = m_bg1videoram[tile_index + 0x400];
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
 			TILE_FLIPYX((color & 0x18) >> 3));
 }
 
-TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
+void lwings_state::trojan_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg1videoram[tile_index];
 	int color = m_bg1videoram[tile_index + 0x400];
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
 	tileinfo.group = (color & 0x08) >> 3;
 }
 
-TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
+void lwings_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 	uint8_t *rom = memregion("gfx5")->base();
@@ -84,7 +84,7 @@ void lwings_state::video_start()
 	m_fg_tilemap->set_transparent_pen(3);
 }
 
-VIDEO_START_MEMBER(lwings_state,trojan)
+void lwings_state::video_start_trojan()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lwings_state::trojan_get_bg1_tile_info),this),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
@@ -98,16 +98,16 @@ VIDEO_START_MEMBER(lwings_state,trojan)
 	m_spr_avenger_hw = 0;
 }
 
-VIDEO_START_MEMBER(lwings_state,avengers)
+void lwings_state::video_start_avengers()
 {
-	VIDEO_START_CALL_MEMBER(trojan);
+	video_start_trojan();
 	m_bg2_avenger_hw = 1;
 	m_spr_avenger_hw = 1;
 }
 
-VIDEO_START_MEMBER(lwings_state,avengersb)
+void lwings_state::video_start_avengersb()
 {
-	VIDEO_START_CALL_MEMBER(trojan);
+	video_start_trojan();
 	m_bg2_avenger_hw = 0;
 	m_spr_avenger_hw = 1;
 }
@@ -119,37 +119,37 @@ VIDEO_START_MEMBER(lwings_state,avengersb)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(lwings_state::lwings_fgvideoram_w)
+void lwings_state::lwings_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(lwings_state::lwings_bg1videoram_w)
+void lwings_state::lwings_bg1videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg1videoram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(lwings_state::lwings_bg1_scrollx_w)
+void lwings_state::lwings_bg1_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_x[offset] = data;
 	m_bg1_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
 }
 
-WRITE8_MEMBER(lwings_state::lwings_bg1_scrolly_w)
+void lwings_state::lwings_bg1_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_y[offset] = data;
 	m_bg1_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
 }
 
-WRITE8_MEMBER(lwings_state::trojan_bg2_scrollx_w)
+void lwings_state::trojan_bg2_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg2_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(lwings_state::trojan_bg2_image_w)
+void lwings_state::trojan_bg2_image_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bg2_image != data)
 	{

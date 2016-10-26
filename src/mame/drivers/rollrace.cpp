@@ -31,22 +31,22 @@ void rollrace_state::machine_start()
 	save_item(NAME(m_sound_nmi_mask));
 }
 
-READ8_MEMBER(rollrace_state::fake_d800_r)
+uint8_t rollrace_state::fake_d800_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x51;
 }
 
-WRITE8_MEMBER(rollrace_state::fake_d800_w)
+void rollrace_state::fake_d800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  logerror("d900: %02X\n",data);*/
 }
 
-WRITE8_MEMBER(rollrace_state::nmi_mask_w)
+void rollrace_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }
 
-WRITE8_MEMBER(rollrace_state::sound_nmi_mask_w)
+void rollrace_state::sound_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_mask = data & 1;
 }
@@ -225,13 +225,13 @@ static GFXDECODE_START( rollrace )
 	GFXDECODE_ENTRY( "gfx5", 0x0000, spritelayout,  0,  32 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(rollrace_state::vblank_irq)
+void rollrace_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
+void rollrace_state::sound_timer_irq(device_t &device)
 {
 	if(m_sound_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

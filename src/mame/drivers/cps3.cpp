@@ -820,13 +820,13 @@ void cps3_state::init_crypt(uint32_t key1, uint32_t key2, int altEncryption)
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(cps3_state,redearth)  { init_crypt(0x9e300ab1, 0xa175b82c, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii)     { init_crypt(0xb5fe053e, 0xfc03925a, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii2)    { init_crypt(0x00000000, 0x00000000, 1); } // sfiii2 runs off a 'dead' cart
-DRIVER_INIT_MEMBER(cps3_state,jojo)      { init_crypt(0x02203ee3, 0x01301972, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii3)    { init_crypt(0xa55432b4, 0x0c129981, 0); }
-DRIVER_INIT_MEMBER(cps3_state,jojoba)    { init_crypt(0x23323ee3, 0x03021972, 0); }
-DRIVER_INIT_MEMBER(cps3_state,cps3boot)  { init_crypt((uint32_t)-1,(uint32_t)-1,2); }
+void cps3_state::init_redearth()  { init_crypt(0x9e300ab1, 0xa175b82c, 0); }
+void cps3_state::init_sfiii()     { init_crypt(0xb5fe053e, 0xfc03925a, 0); }
+void cps3_state::init_sfiii2()    { init_crypt(0x00000000, 0x00000000, 1); } // sfiii2 runs off a 'dead' cart
+void cps3_state::init_jojo()      { init_crypt(0x02203ee3, 0x01301972, 0); }
+void cps3_state::init_sfiii3()    { init_crypt(0xa55432b4, 0x0c129981, 0); }
+void cps3_state::init_jojoba()    { init_crypt(0x23323ee3, 0x03021972, 0); }
+void cps3_state::init_cps3boot()  { init_crypt((uint32_t)-1,(uint32_t)-1,2); }
 
 
 
@@ -1328,7 +1328,7 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
-READ32_MEMBER(cps3_state::cps3_ssram_r)
+uint32_t cps3_state::cps3_ssram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset>0x8000/4)
 		return little_endianize_int32(m_ss_ram[offset]);
@@ -1336,7 +1336,7 @@ READ32_MEMBER(cps3_state::cps3_ssram_r)
 		return m_ss_ram[offset];
 }
 
-WRITE32_MEMBER(cps3_state::cps3_ssram_w)
+void cps3_state::cps3_ssram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset>0x8000/4)
 	{
@@ -1349,14 +1349,14 @@ WRITE32_MEMBER(cps3_state::cps3_ssram_w)
 	COMBINE_DATA(&m_ss_ram[offset]);
 }
 
-WRITE32_MEMBER(cps3_state::cps3_0xc0000000_ram_w)
+void cps3_state::cps3_0xc0000000_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_0xc0000000_ram[offset] );
 	// store a decrypted copy
 	m_0xc0000000_ram_decrypted[offset] = m_0xc0000000_ram[offset]^cps3_mask(offset*4+0xc0000000, m_key1, m_key2);
 }
 
-WRITE32_MEMBER(cps3_state::cram_bank_w)
+void cps3_state::cram_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1385,14 +1385,14 @@ WRITE32_MEMBER(cps3_state::cram_bank_w)
 	}
 }
 
-READ32_MEMBER(cps3_state::cram_data_r)
+uint32_t cps3_state::cram_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t fulloffset = (((m_cram_bank&0x7)*0x100000)/4) + offset;
 
 	return little_endianize_int32(m_char_ram[fulloffset]);
 }
 
-WRITE32_MEMBER(cps3_state::cram_data_w)
+void cps3_state::cram_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t fulloffset = (((m_cram_bank&0x7)*0x100000)/4) + offset;
 	mem_mask = little_endianize_int32(mem_mask);
@@ -1403,7 +1403,7 @@ WRITE32_MEMBER(cps3_state::cram_data_w)
 
 /* FLASH ROM ACCESS */
 
-READ32_MEMBER(cps3_state::cps3_gfxflash_r)
+uint32_t cps3_state::cps3_gfxflash_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	if (m_cram_gfxflash_bank&1) offset += 0x200000/4;
@@ -1441,7 +1441,7 @@ READ32_MEMBER(cps3_state::cps3_gfxflash_r)
 	return result;
 }
 
-WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
+void cps3_state::cps3_gfxflash_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int command;
 	if (m_cram_gfxflash_bank&1) offset += 0x200000/4;
@@ -1534,7 +1534,7 @@ uint32_t cps3_state::cps3_flashmain_r(address_space &space, int which, uint32_t 
 
 
 
-READ32_MEMBER(cps3_state::cps3_flash1_r)
+uint32_t cps3_state::cps3_flash1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t retvalue = cps3_flashmain_r(space, 0, offset,mem_mask);
 
@@ -1544,7 +1544,7 @@ READ32_MEMBER(cps3_state::cps3_flash1_r)
 	return retvalue;
 }
 
-READ32_MEMBER(cps3_state::cps3_flash2_r)
+uint32_t cps3_state::cps3_flash2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t retvalue = cps3_flashmain_r(space, 1, offset,mem_mask);
 
@@ -1614,17 +1614,17 @@ void cps3_state::cps3_flashmain_w(int which, uint32_t offset, uint32_t data, uin
 	}
 }
 
-WRITE32_MEMBER(cps3_state::cps3_flash1_w)
+void cps3_state::cps3_flash1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	cps3_flashmain_w(0,offset,data,mem_mask);
 }
 
-WRITE32_MEMBER(cps3_state::cps3_flash2_w)
+void cps3_state::cps3_flash2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	cps3_flashmain_w(1,offset,data,mem_mask);
 }
 
-WRITE32_MEMBER(cps3_state::cram_gfxflash_bank_w)
+void cps3_state::cram_gfxflash_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -1681,23 +1681,23 @@ WRITE32_MEMBER(cps3_state::cram_gfxflash_bank_w)
 }
 
 // this seems to be dma active flags, and maybe vblank... not if it is anything else
-READ32_MEMBER(cps3_state::cps3_vbl_r)
+uint32_t cps3_state::cps3_vbl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x00000000;
 }
 
-READ32_MEMBER(cps3_state::cps3_unk_io_r)
+uint32_t cps3_state::cps3_unk_io_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//  warzard will crash before booting if you return anything here
 	return 0xffffffff;
 }
 
-READ32_MEMBER(cps3_state::cps3_40C0000_r)
+uint32_t cps3_state::cps3_40C0000_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x00000000;
 }
 
-READ32_MEMBER(cps3_state::cps3_40C0004_r)
+uint32_t cps3_state::cps3_40C0004_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x00000000;
 }
@@ -1705,7 +1705,7 @@ READ32_MEMBER(cps3_state::cps3_40C0004_r)
 /* EEPROM access is a little odd, I think it accesses eeprom through some kind of
    additional interface, as these writes aren't normal for the type of eeprom we have */
 
-READ32_MEMBER(cps3_state::cps3_eeprom_r)
+uint32_t cps3_state::cps3_eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int addr = offset*4;
 
@@ -1733,7 +1733,7 @@ READ32_MEMBER(cps3_state::cps3_eeprom_r)
 	}
 }
 
-WRITE32_MEMBER(cps3_state::cps3_eeprom_w)
+void cps3_state::cps3_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int addr = offset*4;
 
@@ -1755,7 +1755,7 @@ WRITE32_MEMBER(cps3_state::cps3_eeprom_w)
 
 }
 
-WRITE32_MEMBER(cps3_state::cps3_ss_bank_base_w)
+void cps3_state::cps3_ss_bank_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// might be scroll registers or something else..
 	// used to display bank with 'insert coin' on during sfiii2 attract intro
@@ -1764,7 +1764,7 @@ WRITE32_MEMBER(cps3_state::cps3_ss_bank_base_w)
 //  printf("cps3_ss_bank_base_w %08x %08x\n", data, mem_mask);
 }
 
-WRITE32_MEMBER(cps3_state::cps3_ss_pal_base_w)
+void cps3_state::cps3_ss_pal_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 		if(DEBUG_PRINTF) printf ("cps3_ss_pal_base_w %08x %08x\n", data, mem_mask);
 
@@ -1784,7 +1784,7 @@ WRITE32_MEMBER(cps3_state::cps3_ss_pal_base_w)
 //<ElSemi> (a word each)
 
 
-WRITE32_MEMBER(cps3_state::cps3_palettedma_w)
+void cps3_state::cps3_palettedma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset==0)
 	{
@@ -2061,7 +2061,7 @@ void cps3_state::cps3_process_character_dma(uint32_t address)
 	}
 }
 
-WRITE32_MEMBER(cps3_state::cps3_characterdma_w)
+void cps3_state::cps3_characterdma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(DEBUG_PRINTF) printf("chardma_w %08x %08x %08x\n", offset, data, mem_mask);
 
@@ -2106,29 +2106,29 @@ WRITE32_MEMBER(cps3_state::cps3_characterdma_w)
 	}
 }
 
-WRITE32_MEMBER(cps3_state::cps3_irq10_ack_w)
+void cps3_state::cps3_irq10_ack_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_maincpu->set_input_line(10, CLEAR_LINE); return;
 }
 
-WRITE32_MEMBER(cps3_state::cps3_irq12_ack_w)
+void cps3_state::cps3_irq12_ack_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_maincpu->set_input_line(12, CLEAR_LINE); return;
 }
 
-WRITE32_MEMBER(cps3_state::cps3_unk_vidregs_w)
+void cps3_state::cps3_unk_vidregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_unk_vidregs[offset]);
 }
 
-READ32_MEMBER(cps3_state::cps3_colourram_r)
+uint32_t cps3_state::cps3_colourram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t* src = (uint16_t*)m_colourram.target();
 
 	return src[offset*2+1] | (src[offset*2+0]<<16);
 }
 
-WRITE32_MEMBER(cps3_state::cps3_colourram_w)
+void cps3_state::cps3_colourram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  COMBINE_DATA(&m_colourram[offset]);
 
@@ -2286,12 +2286,12 @@ static INPUT_PORTS_START( cps3_jojo)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(cps3_state::cps3_vbl_interrupt)
+void cps3_state::cps3_vbl_interrupt(device_t &device)
 {
 	device.execute().set_input_line(12, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(cps3_state::cps3_other_interrupt)
+void cps3_state::cps3_other_interrupt(device_t &device)
 {
 	// this seems to need to be periodic (see the life bar portraits in sfiii2
 	// but also triggered on certain dma events (or warzard locks up in attract)

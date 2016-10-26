@@ -172,7 +172,7 @@
  *
  *************************************/
 
-READ8_MEMBER(mw8080bw_state::mw8080bw_shift_result_rev_r)
+uint8_t mw8080bw_state::mw8080bw_shift_result_rev_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_mb14241->shift_result_r(space, 0);
 
@@ -180,7 +180,7 @@ READ8_MEMBER(mw8080bw_state::mw8080bw_shift_result_rev_r)
 }
 
 
-READ8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_result_r)
+uint8_t mw8080bw_state::mw8080bw_reversable_shift_result_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 
@@ -196,7 +196,7 @@ READ8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_result_r)
 	return ret;
 }
 
-WRITE8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_count_w)
+void mw8080bw_state::mw8080bw_reversable_shift_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mb14241->shift_count_w(space, offset, data);
 
@@ -252,7 +252,7 @@ MACHINE_CONFIG_END
 #define SEAWOLF_ERASE_DIP_PORT_TAG  ("ERASEDIP")
 
 
-WRITE8_MEMBER(mw8080bw_state::seawolf_explosion_lamp_w)
+void mw8080bw_state::seawolf_explosion_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  D0-D3 are column drivers and D4-D7 are row drivers.
     The following table shows values that light up individual lamps.
@@ -304,7 +304,7 @@ WRITE8_MEMBER(mw8080bw_state::seawolf_explosion_lamp_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::seawolf_periscope_lamp_w)
+void mw8080bw_state::seawolf_periscope_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the schematics and the connecting diagrams show the
 	   torpedo light order differently, but this order is
@@ -320,7 +320,7 @@ WRITE8_MEMBER(mw8080bw_state::seawolf_periscope_lamp_w)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::seawolf_erase_input_r)
+ioport_value mw8080bw_state::seawolf_erase_input_r(ioport_field &field, void *param)
 {
 	return ioport(SEAWOLF_ERASE_SW_PORT_TAG)->read() &
 			ioport(SEAWOLF_ERASE_DIP_PORT_TAG)->read();
@@ -425,7 +425,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(mw8080bw_state::gunfight_io_w)
+void mw8080bw_state::gunfight_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)
 		gunfight_audio_w(space, 0, data);
@@ -559,13 +559,13 @@ uint8_t mw8080bw_state::tornbase_get_cabinet_type()
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_left_input_r)
+ioport_value mw8080bw_state::tornbase_hit_left_input_r(ioport_field &field, void *param)
 {
 	return ioport(TORNBASE_L_HIT_PORT_TAG)->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_right_input_r)
+ioport_value mw8080bw_state::tornbase_hit_right_input_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -586,7 +586,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_right_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_pitch_left_input_r)
+ioport_value mw8080bw_state::tornbase_pitch_left_input_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -607,20 +607,20 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_pitch_left_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_pitch_right_input_r)
+ioport_value mw8080bw_state::tornbase_pitch_right_input_r(ioport_field &field, void *param)
 {
 	return ioport(TORNBASE_L_PITCH_PORT_TAG)->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_score_input_r)
+ioport_value mw8080bw_state::tornbase_score_input_r(ioport_field &field, void *param)
 {
 	return ioport(TORNBASE_SCORE_SW_PORT_TAG)->read() &
 			ioport(TORNBASE_SCORE_DIP_PORT_TAG)->read();
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::tornbase_io_w)
+void mw8080bw_state::tornbase_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)
 		tornbase_audio_w(space, 0, data);
@@ -871,14 +871,14 @@ void mw8080bw_state::maze_update_discrete()
 }
 
 
-TIMER_CALLBACK_MEMBER(mw8080bw_state::maze_tone_timing_timer_callback)
+void mw8080bw_state::maze_tone_timing_timer_callback(void *ptr, int32_t param)
 {
 	m_maze_tone_timing_state = !m_maze_tone_timing_state;
 	maze_write_discrete(m_maze_tone_timing_state);
 }
 
 
-MACHINE_START_MEMBER(mw8080bw_state,maze)
+void mw8080bw_state::machine_start_maze()
 {
 	/* create astable timer for IC B1 */
 	machine().scheduler().timer_pulse(MAZE_555_B1_PERIOD, timer_expired_delegate(FUNC(mw8080bw_state::maze_tone_timing_timer_callback),this));
@@ -890,11 +890,11 @@ MACHINE_START_MEMBER(mw8080bw_state,maze)
 	save_item(NAME(m_maze_tone_timing_state));
 	machine().save().register_postload(save_prepost_delegate(FUNC(mw8080bw_state::maze_update_discrete), this));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::maze_coin_counter_w)
+void mw8080bw_state::maze_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the data is not used, just pulse the counter */
 	machine().bookkeeping().coin_counter_w(0, 0);
@@ -902,7 +902,7 @@ WRITE8_MEMBER(mw8080bw_state::maze_coin_counter_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::maze_io_w)
+void mw8080bw_state::maze_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  maze_coin_counter_w(space, 0, data);
 
@@ -971,12 +971,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,boothill)
+void mw8080bw_state::machine_start_boothill()
 {
 	/* setup for save states */
 	save_item(NAME(m_rev_shift_res));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -1066,7 +1066,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(mw8080bw_state::checkmat_io_w)
+void mw8080bw_state::checkmat_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  checkmat_audio_w(space, 0, data);
 
@@ -1173,16 +1173,16 @@ MACHINE_CONFIG_END
 #define DESERTGU_DIP_SW_0_1_SET_2_TAG   ("DIPSW01SET2")
 
 
-MACHINE_START_MEMBER(mw8080bw_state,desertgu)
+void mw8080bw_state::machine_start_desertgu()
 {
 	/* setup for save states */
 	save_item(NAME(m_desertgun_controller_select));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_gun_input_r)
+ioport_value mw8080bw_state::desertgu_gun_input_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -1195,7 +1195,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_gun_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_dip_sw_0_1_r)
+ioport_value mw8080bw_state::desertgu_dip_sw_0_1_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -1313,7 +1313,7 @@ MACHINE_CONFIG_END
 #define DPLAY_CAB_TYPE_COCKTAIL     (1)
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::dplay_pitch_left_input_r)
+ioport_value mw8080bw_state::dplay_pitch_left_input_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -1326,7 +1326,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::dplay_pitch_left_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::dplay_pitch_right_input_r)
+ioport_value mw8080bw_state::dplay_pitch_right_input_r(ioport_field &field, void *param)
 {
 	return ioport(DPLAY_L_PITCH_PORT_TAG)->read();
 }
@@ -1501,12 +1501,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,gmissile)
+void mw8080bw_state::machine_start_gmissile()
 {
 	/* setup for save states */
 	save_item(NAME(m_rev_shift_res));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -1597,12 +1597,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,m4)
+void mw8080bw_state::machine_start_m4()
 {
 	/* setup for save states */
 	save_item(NAME(m_rev_shift_res));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -1695,16 +1695,16 @@ MACHINE_CONFIG_END
 #define CLOWNS_CONTROLLER_P2_TAG        ("CONTP2")
 
 
-MACHINE_START_MEMBER(mw8080bw_state,clowns)
+void mw8080bw_state::machine_start_clowns()
 {
 	/* setup for save states */
 	save_item(NAME(m_clowns_controller_select));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::clowns_controller_r)
+ioport_value mw8080bw_state::clowns_controller_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -2129,13 +2129,13 @@ MACHINE_CONFIG_END
 #define SPCENCTR_STROBE_DUTY_CYCLE  (95.0)  /* % */
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(mw8080bw_state::spcenctr_strobe_timer_callback)
+void mw8080bw_state::spcenctr_strobe_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	output().set_value("STROBE", param && m_spcenctr_strobe_state);
 }
 
 
-MACHINE_START_MEMBER(mw8080bw_state,spcenctr)
+void mw8080bw_state::machine_start_spcenctr()
 {
 	/* setup for save states */
 	save_item(NAME(m_spcenctr_strobe_state));
@@ -2145,11 +2145,11 @@ MACHINE_START_MEMBER(mw8080bw_state,spcenctr)
 	save_item(NAME(m_spcenctr_bright_control));
 	save_item(NAME(m_spcenctr_brightness));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
+void mw8080bw_state::spcenctr_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {                                               /* A7 A6 A5 A4 A3 A2 A1 A0 */
 
 	if ((offset & 0x07) == 0x02)
@@ -2286,12 +2286,12 @@ MACHINE_CONFIG_END
  *************************************/
 
 
-MACHINE_START_MEMBER(mw8080bw_state,phantom2)
+void mw8080bw_state::machine_start_phantom2()
 {
 	/* setup for save states */
 	save_item(NAME(m_phantom2_cloud_counter));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
@@ -2377,7 +2377,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
+uint8_t mw8080bw_state::bowler_shift_result_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* ZV - not too sure why this is needed, I don't see
 	   anything unusual on the schematics that would cause
@@ -2386,7 +2386,7 @@ READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
 	return ~m_mb14241->shift_result_r(space, 0);
 }
 
-WRITE8_MEMBER(mw8080bw_state::bowler_lights_1_w)
+void mw8080bw_state::bowler_lights_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("200_LEFT_LIGHT",  (data >> 0) & 0x01);
 
@@ -2407,7 +2407,7 @@ WRITE8_MEMBER(mw8080bw_state::bowler_lights_1_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_lights_2_w)
+void mw8080bw_state::bowler_lights_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("REGULATION_GAME_LIGHT", ( data >> 0) & 0x01);
 	output().set_value("FLASH_GAME_LIGHT",      (~data >> 0) & 0x01);
@@ -2512,17 +2512,17 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(mw8080bw_state,invaders)
+void mw8080bw_state::machine_start_invaders()
 {
 	/* setup for save states */
 	save_item(NAME(m_flip_screen));
 
-	MACHINE_START_CALL_MEMBER(mw8080bw);
+	machine_start_mw8080bw();
 }
 
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_coin_input_r)
+ioport_value mw8080bw_state::invaders_coin_input_r(ioport_field &field, void *param)
 {
 	uint32_t ret = ioport(INVADERS_COIN_INPUT_PORT_TAG)->read();
 
@@ -2532,7 +2532,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_coin_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw6_sw7_r)
+ioport_value mw8080bw_state::invaders_sw6_sw7_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -2548,7 +2548,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw6_sw7_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw5_r)
+ioport_value mw8080bw_state::invaders_sw5_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -2564,7 +2564,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw5_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in0_control_r)
+ioport_value mw8080bw_state::invaders_in0_control_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -2580,13 +2580,13 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in0_control_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in1_control_r)
+ioport_value mw8080bw_state::invaders_in1_control_r(ioport_field &field, void *param)
 {
 	return ioport(INVADERS_P1_CONTROL_PORT_TAG)->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in2_control_r)
+ioport_value mw8080bw_state::invaders_in2_control_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -2731,7 +2731,7 @@ MACHINE_CONFIG_END
 #define BLUESHRK_COIN_INPUT_PORT_TAG    ("COIN")
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::blueshrk_coin_input_r)
+ioport_value mw8080bw_state::blueshrk_coin_input_r(ioport_field &field, void *param)
 {
 	uint32_t ret = ioport(BLUESHRK_COIN_INPUT_PORT_TAG)->read();
 

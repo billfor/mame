@@ -39,21 +39,21 @@ public:
 	/* video-related */
 	tilemap_t      *m_tilemap[2];
 
-	DECLARE_WRITE16_MEMBER(bigkarnk_sound_command_w);
-	DECLARE_WRITE16_MEMBER(bigkarnk_coin_w);
-	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(gaelco_vram_encrypted_w);
-	DECLARE_WRITE16_MEMBER(gaelco_encrypted_w);
-	DECLARE_WRITE16_MEMBER(thoop_vram_encrypted_w);
-	DECLARE_WRITE16_MEMBER(thoop_encrypted_w);
-	DECLARE_WRITE16_MEMBER(gaelco_vram_w);
+	void bigkarnk_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bigkarnk_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void OKIM6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gaelco_vram_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gaelco_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void thoop_vram_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void thoop_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gaelco_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco_screen0);
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco_screen1);
+	void get_tile_info_gaelco_screen0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_gaelco_screen1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
-	DECLARE_VIDEO_START(bigkarnk);
-	DECLARE_VIDEO_START(maniacsq);
+	void video_start_bigkarnk();
+	void video_start_maniacsq();
 
 	uint32_t screen_update_bigkarnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_maniacsq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

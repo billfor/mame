@@ -21,12 +21,12 @@ public:
 	virtual ~device_generic_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
-	virtual DECLARE_READ16_MEMBER(read16_rom) { return 0xffff; }
-	virtual DECLARE_READ32_MEMBER(read32_rom) { return 0xffffffff; }
+	virtual uint8_t read_rom(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual uint16_t read16_rom(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return 0xffff; }
+	virtual uint32_t read32_rom(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return 0xffffffff; }
 
-	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) {};
+	virtual uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {};
 
 	virtual void rom_alloc(size_t size, int width, endianness_t end, const char *tag);
 	virtual void ram_alloc(uint32_t size);
@@ -82,10 +82,10 @@ enum
 	static_cast<generic_slot_device *>(device)->set_extensions(_ext);
 
 #define MCFG_GENERIC_LOAD(_class, _method)                                \
-	generic_slot_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), #_class "::device_image_load_" #_method, downcast<_class *>(owner)));
+	generic_slot_device::static_set_device_load(*device, device_image_load_delegate(&_class::device_image_load_##_method, #_class "::device_image_load_" #_method, downcast<_class *>(owner)));
 
 #define MCFG_GENERIC_UNLOAD(_class, _method)                            \
-	generic_slot_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), #_class "::device_image_unload_" #_method, downcast<_class *>(owner)));
+	generic_slot_device::static_set_device_unload(*device, device_image_func_delegate(&_class::device_image_unload_##_method, #_class "::device_image_unload_" #_method, downcast<_class *>(owner)));
 
 
 
@@ -135,12 +135,12 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ16_MEMBER(read16_rom);
-	virtual DECLARE_READ32_MEMBER(read32_rom);
+	virtual uint8_t read_rom(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint16_t read16_rom(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual uint32_t read32_rom(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void rom_alloc(size_t size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
 	virtual void ram_alloc(uint32_t size)  { if (m_cart) m_cart->ram_alloc(size); }

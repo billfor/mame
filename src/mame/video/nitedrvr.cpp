@@ -9,14 +9,14 @@
 #include "emu.h"
 #include "includes/nitedrvr.h"
 
-WRITE8_MEMBER(nitedrvr_state::nitedrvr_videoram_w)
+void nitedrvr_state::nitedrvr_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(nitedrvr_state::get_bg_tile_info)
+void nitedrvr_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] & 0x3f;
 

@@ -16,7 +16,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(centiped_state::centiped_get_tile_info)
+void centiped_state::centiped_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 
@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(centiped_state::centiped_get_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(centiped_state::warlords_get_tile_info)
+void centiped_state::warlords_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(centiped_state::warlords_get_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(centiped_state::milliped_get_tile_info)
+void centiped_state::milliped_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(centiped_state::milliped_get_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(centiped_state::bullsdrt_get_tile_info)
+void centiped_state::bullsdrt_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -92,7 +92,7 @@ void centiped_state::init_common()
 }
 
 
-VIDEO_START_MEMBER(centiped_state,centiped)
+void centiped_state::video_start_centiped()
 {
 	init_common();
 	init_penmask();
@@ -101,7 +101,7 @@ VIDEO_START_MEMBER(centiped_state,centiped)
 }
 
 
-VIDEO_START_MEMBER(centiped_state,warlords)
+void centiped_state::video_start_warlords()
 {
 	init_common();
 
@@ -109,7 +109,7 @@ VIDEO_START_MEMBER(centiped_state,warlords)
 }
 
 
-VIDEO_START_MEMBER(centiped_state,milliped)
+void centiped_state::video_start_milliped()
 {
 	init_common();
 	init_penmask();
@@ -118,7 +118,7 @@ VIDEO_START_MEMBER(centiped_state,milliped)
 }
 
 
-VIDEO_START_MEMBER(centiped_state,bullsdrt)
+void centiped_state::video_start_bullsdrt()
 {
 	init_common();
 	init_penmask();
@@ -134,7 +134,7 @@ VIDEO_START_MEMBER(centiped_state,bullsdrt)
  *
  *************************************/
 
-WRITE8_MEMBER(centiped_state::centiped_videoram_w)
+void centiped_state::centiped_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 
@@ -150,7 +150,7 @@ WRITE8_MEMBER(centiped_state::centiped_videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(centiped_state::centiped_flip_screen_w)
+void centiped_state::centiped_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data >> 7;
 }
@@ -163,7 +163,7 @@ WRITE8_MEMBER(centiped_state::centiped_flip_screen_w)
  *
  *************************************/
 
-WRITE8_MEMBER(centiped_state::multiped_gfxbank_w)
+void centiped_state::multiped_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d6: N/C?
 	// d7: gfx rom bank
@@ -176,14 +176,14 @@ WRITE8_MEMBER(centiped_state::multiped_gfxbank_w)
 }
 
 
-WRITE8_MEMBER(centiped_state::bullsdrt_tilesbank_w)
+void centiped_state::bullsdrt_tilesbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bullsdrt_tiles_bankram[offset] = data;
 	m_bg_tilemap->mark_all_dirty();
 }
 
 
-WRITE8_MEMBER(centiped_state::bullsdrt_sprites_bank_w)
+void centiped_state::bullsdrt_sprites_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bullsdrt_sprites_bank = data;
 }
@@ -217,7 +217,7 @@ WRITE8_MEMBER(centiped_state::bullsdrt_sprites_bank_w)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
+void centiped_state::centiped_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 
@@ -282,7 +282,7 @@ WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(centiped_state,warlords)
+void centiped_state::palette_init_warlords(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -400,7 +400,7 @@ void centiped_state::milliped_set_color(offs_t offset, uint8_t data)
 }
 
 
-WRITE8_MEMBER(centiped_state::milliped_paletteram_w)
+void centiped_state::milliped_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 
@@ -408,7 +408,7 @@ WRITE8_MEMBER(centiped_state::milliped_paletteram_w)
 }
 
 
-WRITE8_MEMBER(centiped_state::mazeinv_paletteram_w)
+void centiped_state::mazeinv_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 

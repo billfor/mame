@@ -171,7 +171,7 @@ bool model2_state::copro_fifoin_pop(device_t *device, uint32_t *result,uint32_t 
 	return true;
 }
 
-READ_LINE_MEMBER(model2_state::copro_tgp_fifoin_pop_ok)
+int model2_state::copro_tgp_fifoin_pop_ok()
 {
 	if (m_copro_fifoin_num == 0)
 	{
@@ -182,7 +182,7 @@ READ_LINE_MEMBER(model2_state::copro_tgp_fifoin_pop_ok)
 }
 
 
-READ32_MEMBER(model2_state::copro_tgp_fifoin_pop)
+uint32_t model2_state::copro_tgp_fifoin_pop(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = m_copro_fifoin_data[m_copro_fifoin_rpos++];
 
@@ -301,7 +301,7 @@ void model2_state::copro_fifoout_push(device_t *device, uint32_t data,uint32_t o
 	}
 }
 
-WRITE32_MEMBER(model2_state::copro_tgp_fifoout_push)
+void model2_state::copro_tgp_fifoout_push(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 	{
@@ -320,7 +320,7 @@ WRITE32_MEMBER(model2_state::copro_tgp_fifoout_push)
 }
 
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
-READ32_MEMBER(model2_state::timers_r)
+uint32_t model2_state::timers_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_maincpu->i960_noburst();
 
@@ -337,7 +337,7 @@ READ32_MEMBER(model2_state::timers_r)
 	return m_timervals[offset];
 }
 
-WRITE32_MEMBER(model2_state::timers_w)
+void model2_state::timers_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	attotime period;
 
@@ -350,7 +350,7 @@ WRITE32_MEMBER(model2_state::timers_w)
 	m_timerrun[offset] = 1;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
+void model2_state::model2_timer_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	int tnum = (int)(uintptr_t)ptr;
 	int bit = tnum + 2;
@@ -370,13 +370,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 	m_timerrun[tnum] = 0;
 }
 
-MACHINE_START_MEMBER(model2_state,model2)
+void model2_state::machine_start_model2()
 {
 	m_copro_fifoin_data = make_unique_clear<uint32_t[]>(COPRO_FIFOIN_SIZE);
 	m_copro_fifoout_data = make_unique_clear<uint32_t[]>(COPRO_FIFOOUT_SIZE);
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2_common)
+void model2_state::machine_reset_model2_common()
 {
 	int i;
 
@@ -405,9 +405,9 @@ MACHINE_RESET_MEMBER(model2_state,model2_common)
 		m_timers[i]->reset();
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2o)
+void model2_state::machine_reset_model2o()
 {
-	MACHINE_RESET_CALL_MEMBER(model2_common);
+	machine_reset_model2_common();
 
 	// hold TGP in halt until we have code
 	m_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -415,7 +415,7 @@ MACHINE_RESET_MEMBER(model2_state,model2o)
 	m_dsp_type = DSP_TYPE_TGP;
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2_scsp)
+void model2_state::machine_reset_model2_scsp()
 {
 	membank("bank4")->set_base(memregion("scsp")->base() + 0x200000);
 	membank("bank5")->set_base(memregion("scsp")->base() + 0x600000);
@@ -426,10 +426,10 @@ MACHINE_RESET_MEMBER(model2_state,model2_scsp)
 	m_scsp->set_ram_base(m_soundram);
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2)
+void model2_state::machine_reset_model2()
 {
-	MACHINE_RESET_CALL_MEMBER(model2_common);
-	MACHINE_RESET_CALL_MEMBER(model2_scsp);
+	machine_reset_model2_common();
+	machine_reset_model2_scsp();
 
 	// hold TGP in halt until we have code
 	m_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -437,10 +437,10 @@ MACHINE_RESET_MEMBER(model2_state,model2)
 	m_dsp_type = DSP_TYPE_TGP;
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2b)
+void model2_state::machine_reset_model2b()
 {
-	MACHINE_RESET_CALL_MEMBER(model2_common);
-	MACHINE_RESET_CALL_MEMBER(model2_scsp);
+	machine_reset_model2_common();
+	machine_reset_model2_scsp();
 
 	m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
@@ -452,10 +452,10 @@ MACHINE_RESET_MEMBER(model2_state,model2b)
 	m_dsp_type = DSP_TYPE_SHARC;
 }
 
-MACHINE_RESET_MEMBER(model2_state,model2c)
+void model2_state::machine_reset_model2c()
 {
-	MACHINE_RESET_CALL_MEMBER(model2_common);
-	MACHINE_RESET_CALL_MEMBER(model2_scsp);
+	machine_reset_model2_common();
+	machine_reset_model2_scsp();
 
 	m_tgpx4->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
@@ -467,18 +467,18 @@ static void chcolor(palette_device &palette, pen_t color, uint16_t data)
 	palette.set_pen_color(color, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
-WRITE16_MEMBER(model2_state::model2_palette_w)
+void model2_state::model2_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_palram[offset]);
 	chcolor(*m_palette, offset, m_palram[offset]);
 }
 
-READ16_MEMBER(model2_state::model2_palette_r)
+uint16_t model2_state::model2_palette_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_palram[offset];
 }
 
-WRITE32_MEMBER(model2_state::ctrl0_w)
+void model2_state::ctrl0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -489,13 +489,13 @@ WRITE32_MEMBER(model2_state::ctrl0_w)
 	}
 }
 
-WRITE32_MEMBER(model2_state::analog_2b_w)
+void model2_state::analog_2b_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_analog_channel = (data >> 16) & 0x07;
 }
 
 
-READ32_MEMBER(model2_state::fifoctl_r)
+uint32_t model2_state::fifoctl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -508,17 +508,17 @@ READ32_MEMBER(model2_state::fifoctl_r)
 	return r | 0x04;
 }
 
-READ32_MEMBER(model2_state::videoctl_r)
+uint32_t model2_state::videoctl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return ((m_screen->frame_number() & 1) << 2) | (m_videocontrol & 3);
 }
 
-WRITE32_MEMBER(model2_state::videoctl_w)
+void model2_state::videoctl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_videocontrol);
 }
 
-CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
+ioport_value model2_state::_1c00000_r(ioport_field &field, void *param)
 {
 	uint32_t ret = m_in0->read();
 
@@ -533,7 +533,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
+ioport_value model2_state::_1c0001c_r(ioport_field &field, void *param)
 {
 	uint32_t iptval = 0x00ff;
 	if(m_analog_channel < 4)
@@ -554,7 +554,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
     PORT_DIPSETTING(    0x70, "7" )*/
 
 /* Used specifically by Sega Rally, others might be different */
-CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
+ioport_value model2_state::srallyc_gearbox_r(ioport_field &field, void *param)
 {
 	uint8_t res = m_gears.read_safe(0);
 	int i;
@@ -643,12 +643,12 @@ CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
 */
 
 
-CUSTOM_INPUT_MEMBER(model2_state::rchase2_devices_r)
+ioport_value model2_state::rchase2_devices_r(ioport_field &field, void *param)
 {
 	return 0xffff;
 }
 
-WRITE32_MEMBER(model2_state::rchase2_devices_w)
+void model2_state::rchase2_devices_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	0x00040000 start 1 lamp
@@ -660,7 +660,7 @@ WRITE32_MEMBER(model2_state::rchase2_devices_w)
 }
 
 
-WRITE32_MEMBER(model2_state::srallyc_devices_w)
+void model2_state::srallyc_devices_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	0x00040000 start 1 lamp
@@ -678,13 +678,13 @@ WRITE32_MEMBER(model2_state::srallyc_devices_w)
 /*****************************************************************************/
 /* COPRO */
 
-READ32_MEMBER(model2_state::copro_prg_r)
+uint32_t model2_state::copro_prg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
 
-WRITE32_MEMBER(model2_state::copro_prg_w)
+void model2_state::copro_prg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_coproctl & 0x80000000)
 	{
@@ -707,12 +707,12 @@ WRITE32_MEMBER(model2_state::copro_prg_w)
 	}
 }
 
-READ32_MEMBER(model2_state::copro_ctl1_r)
+uint32_t model2_state::copro_ctl1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_coproctl;
 }
 
-WRITE32_MEMBER(model2_state::copro_ctl1_w)
+void model2_state::copro_ctl1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// did hi bit change?
 	if ((data ^ m_coproctl) == 0x80000000)
@@ -743,7 +743,7 @@ WRITE32_MEMBER(model2_state::copro_ctl1_w)
 	COMBINE_DATA(&m_coproctl);
 }
 
-WRITE32_MEMBER(model2_state::copro_function_port_w)
+void model2_state::copro_function_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t d = data & 0x800fffff;
 	uint32_t a = (offset >> 2) & 0xff;
@@ -756,13 +756,13 @@ WRITE32_MEMBER(model2_state::copro_function_port_w)
 		copro_fifoin_push(machine().device("tgp"), d,offset,mem_mask);
 }
 
-READ32_MEMBER(model2_state::copro_fifo_r)
+uint32_t model2_state::copro_fifo_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//logerror("copro_fifo_r: %08X, %08X\n", offset, mem_mask);
 	return copro_fifoout_pop(space,offset,mem_mask);
 }
 
-WRITE32_MEMBER(model2_state::copro_fifo_w)
+void model2_state::copro_fifo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_coproctl & 0x80000000)
 	{
@@ -790,7 +790,7 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 	}
 }
 
-WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
+void model2_state::copro_sharc_iop_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* FIXME: clean this mess */
 	if ((strcmp(machine().system().name, "schamp" ) == 0) ||
@@ -834,7 +834,7 @@ WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 /* GEO */
 
 
-WRITE32_MEMBER(model2_state::geo_ctl1_w)
+void model2_state::geo_ctl1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// did hi bit change?
 	if ((data ^ m_geoctl) == 0x80000000)
@@ -855,7 +855,7 @@ WRITE32_MEMBER(model2_state::geo_ctl1_w)
 
 
 #ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(model2_state::geo_sharc_ctl1_w)
+void model2_state::geo_sharc_ctl1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// did hi bit change?
 	if ((data ^ m_geoctl) == 0x80000000)
@@ -876,7 +876,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_ctl1_w)
 	m_geoctl = data;
 }
 
-READ32_MEMBER(model2_state::geo_sharc_fifo_r)
+uint32_t model2_state::geo_sharc_fifo_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if ((strcmp(machine().system().name, "manxtt" ) == 0) || (strcmp(machine().system().name, "srallyc" ) == 0))
 	{
@@ -889,7 +889,7 @@ READ32_MEMBER(model2_state::geo_sharc_fifo_r)
 	}
 }
 
-WRITE32_MEMBER(model2_state::geo_sharc_fifo_w)
+void model2_state::geo_sharc_fifo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_geoctl & 0x80000000)
 	{
@@ -903,7 +903,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_fifo_w)
 	}
 }
 
-WRITE32_MEMBER(model2_state::geo_sharc_iop_w)
+void model2_state::geo_sharc_iop_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ((strcmp(machine().system().name, "schamp" ) == 0))
 	{
@@ -933,13 +933,13 @@ void model2_state::push_geo_data(uint32_t data)
 	m_geo_write_start_address += 4;
 }
 
-READ32_MEMBER(model2_state::geo_prg_r)
+uint32_t model2_state::geo_prg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	popmessage("Read from Geometry FIFO at %08x, contact MAMEdev",offset*4);
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(model2_state::geo_prg_w)
+void model2_state::geo_prg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_geoctl & 0x80000000)
 	{
@@ -953,7 +953,7 @@ WRITE32_MEMBER(model2_state::geo_prg_w)
 	}
 }
 
-READ32_MEMBER(model2_state::geo_r)
+uint32_t model2_state::geo_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int address = offset * 4;
 	if (address == 0x2008)
@@ -971,7 +971,7 @@ READ32_MEMBER(model2_state::geo_r)
 	return 0;
 }
 
-WRITE32_MEMBER(model2_state::geo_w)
+void model2_state::geo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int address = offset * 4;
 
@@ -1051,7 +1051,7 @@ WRITE32_MEMBER(model2_state::geo_w)
 /*****************************************************************************/
 
 
-READ32_MEMBER(model2_state::hotd_lightgun_r)
+uint32_t model2_state::hotd_lightgun_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t res = 0xffff;
 
@@ -1080,26 +1080,26 @@ READ32_MEMBER(model2_state::hotd_lightgun_r)
 	return 0x000c0000 | res;
 }
 
-WRITE32_MEMBER(model2_state::hotd_lightgun_w)
+void model2_state::hotd_lightgun_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_lightgun_mux = data;
 }
 
 
 #ifdef UNUSED_FUNCTION
-READ32_MEMBER(model2_state::sonic_unk_r)
+uint32_t model2_state::sonic_unk_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x001a0000;
 }
 #endif
 
-READ32_MEMBER(model2_state::daytona_unk_r)
+uint32_t model2_state::daytona_unk_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x00400000;
 }
 
 #if 0
-READ32_MEMBER(model2_state::desert_unk_r)
+uint32_t model2_state::desert_unk_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	static uint8_t test;
 
@@ -1111,7 +1111,7 @@ READ32_MEMBER(model2_state::desert_unk_r)
 }
 #endif
 
-READ32_MEMBER(model2_state::model2_irq_r)
+uint32_t model2_state::model2_irq_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_maincpu->i960_noburst();
 
@@ -1151,7 +1151,7 @@ void model2_state::model2_check_irqack_state(uint32_t data)
 	}
 }
 
-WRITE32_MEMBER(model2_state::model2_irq_w)
+void model2_state::model2_irq_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_maincpu->i960_noburst();
 
@@ -1168,7 +1168,7 @@ WRITE32_MEMBER(model2_state::model2_irq_w)
 }
 
 /* TODO: rewrite this part. It's a 8251-compatible chip */
-READ32_MEMBER(model2_state::model2_serial_r)
+uint32_t model2_state::model2_serial_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if ((offset == 0) && (mem_mask == 0xffff0000))
 	{
@@ -1179,7 +1179,7 @@ READ32_MEMBER(model2_state::model2_serial_r)
 }
 
 
-WRITE32_MEMBER(model2_state::model2o_serial_w)
+void model2_state::model2o_serial_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(mem_mask == 0xffff0000)
 	{
@@ -1202,7 +1202,7 @@ WRITE32_MEMBER(model2_state::model2o_serial_w)
 	}
 }
 
-WRITE32_MEMBER(model2_state::model2_serial_w)
+void model2_state::model2_serial_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
@@ -1232,7 +1232,7 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 /* Protection handling */
 
 
-READ32_MEMBER(model2_state::model2_5881prot_r)
+uint32_t model2_state::model2_5881prot_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t retval = 0;
 
@@ -1265,7 +1265,7 @@ READ32_MEMBER(model2_state::model2_5881prot_r)
 	return retval;
 }
 
-WRITE32_MEMBER(model2_state::model2_5881prot_w)
+void model2_state::model2_5881prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("model2_5881prot_w %08x: %08x (%08x)\n", offset*4, data, mem_mask);
 
@@ -1298,7 +1298,7 @@ WRITE32_MEMBER(model2_state::model2_5881prot_w)
 /* Daytona "To The MAXX" PIC protection simulation */
 
 
-READ32_MEMBER(model2_state::maxx_r)
+uint32_t model2_state::maxx_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
@@ -1340,7 +1340,7 @@ READ32_MEMBER(model2_state::maxx_r)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(model2_state::copro_w)
+void model2_state::copro_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int address = offset * 4;
 
@@ -1359,12 +1359,12 @@ WRITE32_MEMBER(model2_state::copro_w)
 }
 #endif
 
-WRITE32_MEMBER(model2_state::mode_w)
+void model2_state::mode_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	osd_printf_debug("Mode = %08X\n", data);
 }
 
-WRITE32_MEMBER(model2_state::model2o_tex_w0)
+void model2_state::model2o_tex_w0(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ( (offset & 1) == 0 )
 	{
@@ -1378,7 +1378,7 @@ WRITE32_MEMBER(model2_state::model2o_tex_w0)
 	}
 }
 
-WRITE32_MEMBER(model2_state::model2o_tex_w1)
+void model2_state::model2o_tex_w1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ( (offset & 1) == 0 )
 	{
@@ -1392,7 +1392,7 @@ WRITE32_MEMBER(model2_state::model2o_tex_w1)
 	}
 }
 
-WRITE32_MEMBER(model2_state::model2o_luma_w)
+void model2_state::model2o_luma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ( (offset & 1) == 0 )
 	{
@@ -1406,13 +1406,13 @@ WRITE32_MEMBER(model2_state::model2o_luma_w)
 	}
 }
 
-WRITE32_MEMBER(model2_state::model2_3d_zclip_w)
+void model2_state::model2_3d_zclip_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	model2_3d_set_zclip( machine(), data & 0xFF );
 }
 
 /* Top Skater reads here and discards the result */
-READ8_MEMBER(model2_state::tgpid_r)
+uint8_t model2_state::tgpid_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	unsigned char ID[]={0,'T','A','H',0,'A','K','O',0,'Z','A','K',0,'M','T','K'};
 
@@ -1420,7 +1420,7 @@ READ8_MEMBER(model2_state::tgpid_r)
 }
 
 /* Sky Target, TODO */
-READ32_MEMBER(model2_state::polygon_count_r)
+uint32_t model2_state::polygon_count_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
@@ -1475,7 +1475,7 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x11680000, 0x116fffff) AM_RAM AM_SHARE("share1") // FB mirror
 ADDRESS_MAP_END
 
-READ8_MEMBER(model2_state::virtuacop_lightgun_r)
+uint8_t model2_state::virtuacop_lightgun_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -1485,7 +1485,7 @@ READ8_MEMBER(model2_state::virtuacop_lightgun_r)
 }
 
 /* handles offscreen gun trigger detection here */
-READ8_MEMBER(model2_state::virtuacop_lightgun_offscreen_r)
+uint8_t model2_state::virtuacop_lightgun_offscreen_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t special_res = 0xfffc;
 	uint16_t p1x,p1y,p2x,p2y;
@@ -1506,7 +1506,7 @@ READ8_MEMBER(model2_state::virtuacop_lightgun_offscreen_r)
 }
 
 /* Apparently original Model 2 doesn't have fifo control? */
-READ32_MEMBER(model2_state::model2o_fifoctrl_r)
+uint32_t model2_state::model2o_fifoctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
@@ -1544,7 +1544,7 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 ADDRESS_MAP_END
 
 /* TODO: read by Sonic the Fighters (bit 1), unknown purpose */
-READ32_MEMBER(model2_state::copro_status_r)
+uint32_t model2_state::copro_status_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(m_coprocnt == 0)
 		return -1;
@@ -2172,7 +2172,7 @@ static INPUT_PORTS_START( skytargt )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
+void model2_state::model2_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2195,7 +2195,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
+void model2_state::model2c_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2229,7 +2229,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
 
 /* Model 2 sound board emulation */
 
-WRITE16_MEMBER(model2_state::model2snd_ctrl)
+void model2_state::model2snd_ctrl(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// handle sample banking
 	if (memregion("scsp")->bytes() > 0x800000)
@@ -2259,7 +2259,7 @@ static ADDRESS_MAP_START( model2_snd, AS_PROGRAM, 16, model2_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(model2_state::scsp_irq)
+void model2_state::scsp_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(offset, data);
 }
@@ -2268,7 +2268,7 @@ WRITE8_MEMBER(model2_state::scsp_irq)
 /*****************************************************************************/
 // SHARC memory maps
 
-READ32_MEMBER(model2_state::copro_sharc_input_fifo_r)
+uint32_t model2_state::copro_sharc_input_fifo_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	bool type;
@@ -2280,18 +2280,18 @@ READ32_MEMBER(model2_state::copro_sharc_input_fifo_r)
 	return result;
 }
 
-WRITE32_MEMBER(model2_state::copro_sharc_output_fifo_w)
+void model2_state::copro_sharc_output_fifo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//osd_printf_debug("SHARC FIFOOUT push %08X\n", data);
 	copro_fifoout_push(machine().device("dsp"), data,offset,mem_mask);
 }
 
-READ32_MEMBER(model2_state::copro_sharc_buffer_r)
+uint32_t model2_state::copro_sharc_buffer_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_bufferram[offset & 0x7fff];
 }
 
-WRITE32_MEMBER(model2_state::copro_sharc_buffer_w)
+void model2_state::copro_sharc_buffer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//osd_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, space.device().safe_pc(), data, *(float*)&data);
 	m_bufferram[offset & 0x7fff] = data;
@@ -2312,12 +2312,12 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 /* TGP memory maps */
 
-READ32_MEMBER(model2_state::copro_tgp_buffer_r)
+uint32_t model2_state::copro_tgp_buffer_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_bufferram[offset & 0x7fff];
 }
 
-WRITE32_MEMBER(model2_state::copro_tgp_buffer_w)
+void model2_state::copro_tgp_buffer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_bufferram[offset&0x7fff] = data;
 }
@@ -2452,18 +2452,18 @@ static MACHINE_CONFIG_DERIVED( model2a_0229, model2a )
 //  MCFG_SET_5838_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
 
-READ8_MEMBER(model2_state::driveio_port_r)
+uint8_t model2_state::driveio_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_driveio_comm_data;
 }
 
-WRITE8_MEMBER(model2_state::driveio_port_w)
+void model2_state::driveio_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  TODO: hook up to the main CPU
 //  popmessage("%02x",data);
 }
 
-READ8_MEMBER(model2_state::driveio_port_str_r)
+uint8_t model2_state::driveio_port_str_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char sega_str[4] = { 'S', 'E', 'G', 'A' };
 
@@ -5849,46 +5849,46 @@ ROM_START( desert ) /* Desert Tank, Model 2 */
 	MODEL2_CPU_BOARD
 ROM_END
 
-DRIVER_INIT_MEMBER(model2_state,genprot)
+void model2_state::init_genprot()
 {
 	//std::string key = parameter(":315_5881:key");
 	m_maincpu->space(AS_PROGRAM).install_ram(0x01d80000, 0x01d8ffff);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d90000, 0x01d9ffff, read32_delegate(FUNC(model2_state::model2_5881prot_r), this), write32_delegate(FUNC(model2_state::model2_5881prot_w), this));
 }
 
-DRIVER_INIT_MEMBER(model2_state,pltkids)
+void model2_state::init_pltkids()
 {
-	DRIVER_INIT_CALL(genprot);
+	init_genprot();
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x730/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,zerogun)
+void model2_state::init_zerogun()
 {
-	DRIVER_INIT_CALL(genprot);
+	init_genprot();
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x700/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,daytonam)
+void model2_state::init_daytonam()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x240000, 0x24ffff, read32_delegate(FUNC(model2_state::maxx_r),this));
 }
 
-DRIVER_INIT_MEMBER(model2_state,sgt24h)
+void model2_state::init_sgt24h()
 {
-//  DRIVER_INIT_CALL(genprot);
+//  init_genprot();
 
 	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x56578/4] = 0x08000004;
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,doa)
+void model2_state::init_doa()
 {
 	m_0229crypt->install_doa_protection();
 
@@ -5897,12 +5897,12 @@ DRIVER_INIT_MEMBER(model2_state,doa)
 	ROM[0x808/4] = 0x08000004;
 }
 
-DRIVER_INIT_MEMBER(model2_state,rchase2)
+void model2_state::init_rchase2()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::rchase2_devices_w),this));
 }
 
-DRIVER_INIT_MEMBER(model2_state,srallyc)
+void model2_state::init_srallyc()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01c00008, 0x01c0000b, write32_delegate(FUNC(model2_state::srallyc_devices_w),this));
 }

@@ -116,7 +116,7 @@ void policetr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
+void policetr_state::irq4_gen(device_t &device)
 {
 	device.execute().set_input_line(R3000_IRQ4, ASSERT_LINE);
 	timer_set(m_screen->time_until_pos(0), TIMER_IRQ5_GEN);
@@ -130,7 +130,7 @@ INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::control_w)
+void policetr_state::control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = m_control_data;
 
@@ -171,7 +171,7 @@ WRITE32_MEMBER(policetr_state::control_w)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::policetr_bsmt2000_reg_w)
+void policetr_state::policetr_bsmt2000_reg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_control_data & 0x80000000)
 		machine().device<bsmt2000_device>("bsmt")->write_data(data);
@@ -180,20 +180,20 @@ WRITE32_MEMBER(policetr_state::policetr_bsmt2000_reg_w)
 }
 
 
-WRITE32_MEMBER(policetr_state::policetr_bsmt2000_data_w)
+void policetr_state::policetr_bsmt2000_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	machine().device<bsmt2000_device>("bsmt")->write_reg(data);
 	COMBINE_DATA(&m_bsmt_data_bank);
 }
 
 
-CUSTOM_INPUT_MEMBER(policetr_state::bsmt_status_r)
+ioport_value policetr_state::bsmt_status_r(ioport_field &field, void *param)
 {
 	return machine().device<bsmt2000_device>("bsmt")->read_status();
 }
 
 
-READ32_MEMBER(policetr_state::bsmt2000_data_r)
+uint32_t policetr_state::bsmt2000_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return memregion("bsmt")->base()[m_bsmt_data_bank * 0x10000 + m_bsmt_data_offset] << 8;
 }
@@ -206,7 +206,7 @@ READ32_MEMBER(policetr_state::bsmt2000_data_r)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::speedup_w)
+void policetr_state::speedup_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_speedup_data);
 
@@ -676,14 +676,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(policetr_state,policetr)
+void policetr_state::init_policetr()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc028ac;
 	m_speedup_data = m_rambase + 0xfc8/4;
 }
 
-DRIVER_INIT_MEMBER(policetr_state,plctr13b)
+void policetr_state::init_plctr13b()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00000fc8, 0x00000fcb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc028bc;
@@ -691,14 +691,14 @@ DRIVER_INIT_MEMBER(policetr_state,plctr13b)
 }
 
 
-DRIVER_INIT_MEMBER(policetr_state,sshooter)
+void policetr_state::init_sshooter()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc03470;
 	m_speedup_data = m_rambase + 0x18fd8/4;
 }
 
-DRIVER_INIT_MEMBER(policetr_state,sshoot12)
+void policetr_state::init_sshoot12()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00018fd8, 0x00018fdb, write32_delegate(FUNC(policetr_state::speedup_w),this));
 	m_speedup_pc = 0x1fc033e0;

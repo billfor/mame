@@ -23,16 +23,16 @@ public:
 	{ }
 
 	// in drivers/zodiack.c
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(master_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void master_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// in video/zodiack.c
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(attributes_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void attributes_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -64,11 +64,11 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_DRIVER_INIT(zodiack);
-	DECLARE_DRIVER_INIT(percuss);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	DECLARE_PALETTE_INIT(zodiack);
-	INTERRUPT_GEN_MEMBER(zodiack_sound_nmi_gen);
-	INTERRUPT_GEN_MEMBER(zodiack_main_nmi_gen);
+	void init_zodiack();
+	void init_percuss();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void palette_init_zodiack(palette_device &palette);
+	void zodiack_sound_nmi_gen(device_t &device);
+	void zodiack_main_nmi_gen(device_t &device);
 };

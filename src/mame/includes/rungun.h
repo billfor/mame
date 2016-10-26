@@ -75,24 +75,24 @@ public:
 	bool        m_single_screen_mode;
 	uint8_t       m_video_mux_bank;
 
-	DECLARE_READ16_MEMBER(rng_sysregs_r);
-	DECLARE_WRITE16_MEMBER(rng_sysregs_w);
-	DECLARE_WRITE16_MEMBER(sound_cmd1_w);
-	DECLARE_WRITE16_MEMBER(sound_cmd2_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_READ16_MEMBER(sound_status_msb_r);
-	DECLARE_WRITE8_MEMBER(sound_status_w);
-	DECLARE_WRITE8_MEMBER(sound_ctrl_w);
-	DECLARE_READ16_MEMBER(rng_ttl_ram_r);
-	DECLARE_WRITE16_MEMBER(rng_ttl_ram_w);
-	DECLARE_READ16_MEMBER(rng_psac2_videoram_r);
-	DECLARE_WRITE16_MEMBER(rng_psac2_videoram_w);
-	DECLARE_READ8_MEMBER(rng_53936_rom_r);
-	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
-	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
-	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
-	DECLARE_READ16_MEMBER(palette_read);
-	DECLARE_WRITE16_MEMBER(palette_write);
+	uint16_t rng_sysregs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void rng_sysregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_cmd1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_cmd2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sound_status_msb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t rng_ttl_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void rng_ttl_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t rng_psac2_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void rng_psac2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t rng_53936_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ttl_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_rng_936_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void k054539_nmi_gen(int state);
+	uint16_t palette_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void palette_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 
 	K055673_CB_MEMBER(sprite_callback);
@@ -108,5 +108,5 @@ public:
 	bitmap_ind16 m_rng_dual_demultiplex_right_temp;
 	void   sprite_dma_trigger(void);
 
-	INTERRUPT_GEN_MEMBER(rng_interrupt);
+	void rng_interrupt(device_t &device);
 };

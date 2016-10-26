@@ -125,13 +125,13 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(coolpool_state::from_shiftreg)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(coolpool_state,amerdart)
+void coolpool_state::machine_reset_amerdart()
 {
 	m_nvram_write_enable = 0;
 }
 
 
-MACHINE_RESET_MEMBER(coolpool_state,coolpool)
+void coolpool_state::machine_reset_coolpool()
 {
 	m_nvram_write_enable = 0;
 }
@@ -144,13 +144,13 @@ MACHINE_RESET_MEMBER(coolpool_state,coolpool)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(coolpool_state::nvram_write_timeout)
+void coolpool_state::nvram_write_timeout(timer_device &timer, void *ptr, int32_t param)
 {
 	m_nvram_write_enable = 0;
 }
 
 
-WRITE16_MEMBER(coolpool_state::nvram_thrash_w)
+void coolpool_state::nvram_thrash_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* keep track of the last few writes */
 	memmove(&m_nvram_write_seq[0], &m_nvram_write_seq[1], (NVRAM_UNLOCK_SEQ_LEN - 1) * sizeof(m_nvram_write_seq[0]));
@@ -166,7 +166,7 @@ WRITE16_MEMBER(coolpool_state::nvram_thrash_w)
 }
 
 
-WRITE16_MEMBER(coolpool_state::nvram_data_w)
+void coolpool_state::nvram_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* only the low 8 bits matter */
 	if (ACCESSING_BITS_0_7)
@@ -179,7 +179,7 @@ WRITE16_MEMBER(coolpool_state::nvram_data_w)
 }
 
 
-WRITE16_MEMBER(coolpool_state::nvram_thrash_data_w)
+void coolpool_state::nvram_thrash_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	nvram_data_w(space, offset, data, mem_mask);
 	nvram_thrash_w(space, offset, data, mem_mask);
@@ -193,14 +193,14 @@ WRITE16_MEMBER(coolpool_state::nvram_thrash_data_w)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(coolpool_state::amerdart_audio_int_gen)
+void coolpool_state::amerdart_audio_int_gen(timer_device &timer, void *ptr, int32_t param)
 {
 	m_dsp->set_input_line(0, ASSERT_LINE);
 	m_dsp->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
+void coolpool_state::amerdart_misc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%08x:IOP_system_w %04x\n",space.device().safe_pc(),data);
 
@@ -212,7 +212,7 @@ WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
 	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
+int coolpool_state::amerdart_dsp_bio_line_r()
 {
 	/* Skip idle checking */
 	if (m_old_cmd == m_cmd_pending)
@@ -230,7 +230,7 @@ READ_LINE_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 	return m_cmd_pending ? CLEAR_LINE : ASSERT_LINE;
 }
 
-READ16_MEMBER(coolpool_state::amerdart_iop_r)
+uint16_t coolpool_state::amerdart_iop_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  logerror("%08x:IOP read %04x\n",space.device().safe_pc(),m_iop_answer);
 	m_maincpu->set_input_line(1, CLEAR_LINE);
@@ -238,21 +238,21 @@ READ16_MEMBER(coolpool_state::amerdart_iop_r)
 	return m_iop_answer;
 }
 
-WRITE16_MEMBER(coolpool_state::amerdart_iop_w)
+void coolpool_state::amerdart_iop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  logerror("%08x:IOP write %04x\n", space.device().safe_pc(), data);
 	COMBINE_DATA(&m_iop_cmd);
 	m_cmd_pending = 1;
 }
 
-READ16_MEMBER(coolpool_state::amerdart_dsp_cmd_r)
+uint16_t coolpool_state::amerdart_dsp_cmd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  logerror("%08x:DSP cmd_r %04x\n", space.device().safe_pc(), m_iop_cmd);
 	m_cmd_pending = 0;
 	return m_iop_cmd;
 }
 
-WRITE16_MEMBER(coolpool_state::amerdart_dsp_answer_w)
+void coolpool_state::amerdart_dsp_answer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  logerror("%08x:DSP answer %04x\n", space.device().safe_pc(), data);
 	m_iop_answer = data;
@@ -342,7 +342,7 @@ int coolpool_state::amerdart_trackball_direction(int num, int data)
 }
 
 
-READ16_MEMBER(coolpool_state::amerdart_trackball_r)
+uint16_t coolpool_state::amerdart_trackball_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 /*
     Trackballs seem to be handled as though they're rotated 45 degrees anti-clockwise.
@@ -414,7 +414,7 @@ READ16_MEMBER(coolpool_state::amerdart_trackball_r)
  *
  *************************************/
 
-WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
+void coolpool_state::coolpool_misc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%08x:IOP_system_w %04x\n",space.device().safe_pc(),data);
 
@@ -433,7 +433,7 @@ WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(coolpool_state::deferred_iop_w)
+void coolpool_state::deferred_iop_w(void *ptr, int32_t param)
 {
 	m_iop_cmd = param;
 	m_cmd_pending = 1;
@@ -444,14 +444,14 @@ TIMER_CALLBACK_MEMBER(coolpool_state::deferred_iop_w)
 }
 
 
-WRITE16_MEMBER(coolpool_state::coolpool_iop_w)
+void coolpool_state::coolpool_iop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%08x:IOP write %04x\n", space.device().safe_pc(), data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(coolpool_state::deferred_iop_w),this), data);
 }
 
 
-READ16_MEMBER(coolpool_state::coolpool_iop_r)
+uint16_t coolpool_state::coolpool_iop_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%08x:IOP read %04x\n",space.device().safe_pc(),m_iop_answer);
 	m_maincpu->set_input_line(1, CLEAR_LINE);
@@ -468,7 +468,7 @@ READ16_MEMBER(coolpool_state::coolpool_iop_r)
  *
  *************************************/
 
-READ16_MEMBER(coolpool_state::dsp_cmd_r)
+uint16_t coolpool_state::dsp_cmd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_cmd_pending = 0;
 	logerror("%08x:IOP cmd_r %04x\n", space.device().safe_pc(), m_iop_cmd);
@@ -476,7 +476,7 @@ READ16_MEMBER(coolpool_state::dsp_cmd_r)
 }
 
 
-WRITE16_MEMBER(coolpool_state::dsp_answer_w)
+void coolpool_state::dsp_answer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%08x:IOP answer %04x\n", space.device().safe_pc(), data);
 	m_iop_answer = data;
@@ -484,13 +484,13 @@ WRITE16_MEMBER(coolpool_state::dsp_answer_w)
 }
 
 
-READ16_MEMBER(coolpool_state::dsp_bio_line_r)
+uint16_t coolpool_state::dsp_bio_line_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cmd_pending ? CLEAR_LINE : ASSERT_LINE;
 }
 
 
-READ16_MEMBER(coolpool_state::dsp_hold_line_r)
+uint16_t coolpool_state::dsp_hold_line_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return CLEAR_LINE;  /* ??? */
 }
@@ -503,7 +503,7 @@ READ16_MEMBER(coolpool_state::dsp_hold_line_r)
  *
  *************************************/
 
-READ16_MEMBER(coolpool_state::dsp_rom_r)
+uint16_t coolpool_state::dsp_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t *rom = memregion("user2")->base();
 
@@ -511,7 +511,7 @@ READ16_MEMBER(coolpool_state::dsp_rom_r)
 }
 
 
-WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
+void coolpool_state::dsp_romaddr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -533,7 +533,7 @@ WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
  *
  *************************************/
 
-READ16_MEMBER(coolpool_state::coolpool_input_r)
+uint16_t coolpool_state::coolpool_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_result = (ioport("IN1")->read() & 0x00ff) | (m_lastresult & 0xff00);
 	m_newx[1] = ioport("XAXIS")->read();
@@ -1111,14 +1111,14 @@ void coolpool_state::register_state_save()
 
 
 
-DRIVER_INIT_MEMBER(coolpool_state,amerdart)
+void coolpool_state::init_amerdart()
 {
 	m_lastresult = 0xffff;
 
 	register_state_save();
 }
 
-DRIVER_INIT_MEMBER(coolpool_state,coolpool)
+void coolpool_state::init_coolpool()
 {
 	m_dsp->space(AS_IO).install_read_handler(0x07, 0x07, read16_delegate(FUNC(coolpool_state::coolpool_input_r),this));
 
@@ -1126,7 +1126,7 @@ DRIVER_INIT_MEMBER(coolpool_state,coolpool)
 }
 
 
-DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
+void coolpool_state::init_9ballsht()
 {
 	int a, len;
 	uint16_t *rom;

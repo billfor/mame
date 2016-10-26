@@ -60,7 +60,7 @@ and two large (paddles pretending to be) guns.
 #include "includes/m79amb.h"
 #include "cpu/i8085/i8085.h"
 
-WRITE8_MEMBER(m79amb_state::ramtek_videoram_w)
+void m79amb_state::ramtek_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data & ~*m_mask;
 }
@@ -91,7 +91,7 @@ uint32_t m79amb_state::screen_update_ramtek(screen_device &screen, bitmap_rgb32 
 }
 
 
-READ8_MEMBER(m79amb_state::gray5bit_controller0_r)
+uint8_t m79amb_state::gray5bit_controller0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t port_data = ioport("8004")->read();
 	uint8_t gun_pos = ioport("GUN1")->read();
@@ -99,7 +99,7 @@ READ8_MEMBER(m79amb_state::gray5bit_controller0_r)
 	return (port_data & 0xe0) | m_lut_gun1[gun_pos];
 }
 
-READ8_MEMBER(m79amb_state::gray5bit_controller1_r)
+uint8_t m79amb_state::gray5bit_controller1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t port_data = ioport("8005")->read();
 	uint8_t gun_pos = ioport("GUN2")->read();
@@ -107,7 +107,7 @@ READ8_MEMBER(m79amb_state::gray5bit_controller1_r)
 	return (port_data & 0xe0) | m_lut_gun2[gun_pos];
 }
 
-WRITE8_MEMBER(m79amb_state::m79amb_8002_w)
+void m79amb_state::m79amb_8002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* D1 may also be watchdog reset */
 	/* port goes to 0x7f to turn on explosion lamp */
@@ -180,7 +180,7 @@ static INPUT_PORTS_START( m79amb )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(m79amb_state::m79amb_interrupt)
+void m79amb_state::m79amb_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);  /* RST 08h */
 }
@@ -266,7 +266,7 @@ static const uint8_t lut_pos[0x20] = {
 };
 
 
-DRIVER_INIT_MEMBER(m79amb_state,m79amb)
+void m79amb_state::init_m79amb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i, j;

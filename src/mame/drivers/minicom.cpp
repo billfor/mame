@@ -52,9 +52,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(minicom_io_w);
-	DECLARE_READ8_MEMBER(minicom_io_r);
-	DECLARE_DRIVER_INIT(minicom);
+	void minicom_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t minicom_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_minicom();
 private:
 	uint8_t m_p[4];
 	uint16_t m_display_data;
@@ -90,7 +90,7 @@ void minicom_state::machine_reset()
 		output().set_digit_value(i, 0);
 }
 
-READ8_MEMBER(minicom_state::minicom_io_r)
+uint8_t minicom_state::minicom_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -123,7 +123,7 @@ static void printbits(uint8_t v) {
 #define P1_UNKNOWN_BITS (0xFF & ~(1 << 2))
 #define P2_UNKNOWN_BITS 0xFF
 #define P3_UNKNOWN_BITS (0xFF & ~((1 << 4)|(1 << 5)))
-WRITE8_MEMBER(minicom_state::minicom_io_w)
+void minicom_state::minicom_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -221,7 +221,7 @@ WRITE8_MEMBER(minicom_state::minicom_io_w)
 	}
 }
 
-DRIVER_INIT_MEMBER( minicom_state, minicom )
+void minicom_state::init_minicom()
 {
 }
 

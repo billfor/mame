@@ -29,7 +29,7 @@
 /******* MC6840 PTM on MPID Board *******/
 
 /* 6840 PTM handlers */
-WRITE_LINE_MEMBER( swtpc09_state::ptm_o1_callback )
+void swtpc09_state::ptm_o1_callback(int state)
 {
 	// RH 3 Oct. 2016 FIXME: Does the hardware actually work this way, incrementing a counter any time
 	// the O1 line on the PTM changes? This seems unlikely, as the current implementation will increment
@@ -41,14 +41,14 @@ WRITE_LINE_MEMBER( swtpc09_state::ptm_o1_callback )
 	if (m_pia_counter & 0x80) pia->ca1_w(1);
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::ptm_o3_callback )
+void swtpc09_state::ptm_o3_callback(int state)
 {
 	//ptm6840_device *ptm = machine().device<ptm6840_device>("ptm");
 	/* the output from timer3 is the input clock for timer2 */
 	//m_ptm->set_c2(state);
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::ptm_irq )
+void swtpc09_state::ptm_irq(int state)
 {
 	if (state)
 		swtpc09_irq_handler(PTM_IRQ, ASSERT_LINE);
@@ -59,17 +59,17 @@ WRITE_LINE_MEMBER( swtpc09_state::ptm_irq )
 /******* MC6821 PIA on MPID Board *******/
 /* Read/Write handlers for pia */
 
-READ8_MEMBER( swtpc09_state::pia0_a_r )
+uint8_t swtpc09_state::pia0_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pia_counter;
 }
 
-READ8_MEMBER( swtpc09_state::pia0_ca1_r )
+uint8_t swtpc09_state::pia0_ca1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::pia0_irq_a )
+void swtpc09_state::pia0_irq_a(int state)
 {
 		pia6821_device *pia = machine().device<pia6821_device>("pia");
 
@@ -83,7 +83,7 @@ WRITE_LINE_MEMBER( swtpc09_state::pia0_irq_a )
 
 /******* MC6850 ACIA on MPS2 *******/
 
-WRITE_LINE_MEMBER( swtpc09_state::acia_interrupt )
+void swtpc09_state::acia_interrupt(int state)
 {
 	if (state)
 	{
@@ -102,12 +102,12 @@ WRITE_LINE_MEMBER( swtpc09_state::acia_interrupt )
 /*********************************************************************/
 
 /* DMF2 dma extended address register */
-READ8_MEMBER ( swtpc09_state::dmf2_dma_address_reg_r )
+uint8_t swtpc09_state::dmf2_dma_address_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc_dma_address_reg;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmf2_dma_address_reg_w )
+void swtpc09_state::dmf2_dma_address_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc_dma_address_reg = data;
 
@@ -119,13 +119,13 @@ WRITE8_MEMBER ( swtpc09_state::dmf2_dma_address_reg_w )
 }
 
 /* DMF2 fdc control register */
-READ8_MEMBER ( swtpc09_state::dmf2_control_reg_r )
+uint8_t swtpc09_state::dmf2_control_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//LOG(("swtpc09_dmf2_control_reg_r $%02X\n", m_fdc_status));
 	return m_fdc_status;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmf2_control_reg_w )
+void swtpc09_state::dmf2_control_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("swtpc09_dmf2_control_reg_w $%02X\n", data));
 
@@ -220,7 +220,7 @@ void swtpc09_state::swtpc09_irq_handler(uint8_t peripheral, uint8_t state)
 }
 
 /* handlers for fdc */
-WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
+void swtpc09_state::fdc_intrq_w(int state)
 {
 	LOG(("swtpc09_fdc_intrq_w %02X\n", state));
 	if ( m_system_type == UNIFLEX_DMF3 )  //IRQ from 1791 is connect into VIA ca2
@@ -276,7 +276,7 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::fdc_drq_w )
+void swtpc09_state::fdc_drq_w(int state)
 {
 	if (m_system_type == FLEX_DC4_PIAIDE)  //for dc4 no dma
 	{
@@ -304,29 +304,29 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_drq_w )
 /*********************************************************************/
 
 /* via on dmf3 board */
-READ8_MEMBER( swtpc09_state::dmf3_via_read_porta )
+uint8_t swtpc09_state::dmf3_via_read_porta(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dmf3_via_porta;
 }
 
-READ8_MEMBER( swtpc09_state::dmf3_via_read_portb )
+uint8_t swtpc09_state::dmf3_via_read_portb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( swtpc09_state::dmf3_via_write_porta )
+void swtpc09_state::dmf3_via_write_porta(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dmf3_via_porta &= data;
 }
 
-//WRITE_LINE_MEMBER( swtpc09_state::dmf3_via_write_ca1 )
+//void swtpc09_state::dmf3_via_write_ca1(int state)
 //{
 //  return m_via_ca1_input;
 //    LOG(("swtpc09_dmf3_via_write_ca1 %02X\n", state));
 
 //}
 
-WRITE_LINE_MEMBER( swtpc09_state::dmf3_via_irq )
+void swtpc09_state::dmf3_via_irq(int state)
 {
 	if (state)
 		swtpc09_irq_handler(VIA_IRQ, ASSERT_LINE);
@@ -335,25 +335,25 @@ WRITE_LINE_MEMBER( swtpc09_state::dmf3_via_irq )
 }
 
 /* DMF3 dma extended address register */
-READ8_MEMBER ( swtpc09_state::dmf3_dma_address_reg_r )
+uint8_t swtpc09_state::dmf3_dma_address_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc_dma_address_reg;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmf3_dma_address_reg_w )
+void swtpc09_state::dmf3_dma_address_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc_dma_address_reg = data;
 	LOG(("swtpc09_dmf3_dma_address_reg_w %02X\n", data));
 }
 
 /* DMF3 fdc control register */
-READ8_MEMBER ( swtpc09_state::dmf3_control_reg_r )
+uint8_t swtpc09_state::dmf3_control_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//LOG(("swtpc09_dmf3_control_reg_r $%02X\n", m_fdc_status));
 	return m_fdc_status;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmf3_control_reg_w )
+void swtpc09_state::dmf3_control_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("swtpc09_dmf3_control_reg_w $%02X\n", data));
 
@@ -377,7 +377,7 @@ WRITE8_MEMBER ( swtpc09_state::dmf3_control_reg_w )
 
 // DC4 drive select
 
-WRITE8_MEMBER ( swtpc09_state::dc4_control_reg_w )
+void swtpc09_state::dc4_control_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("swtpc09_dc4_control_reg_w $%02X\n", data));
 
@@ -396,22 +396,22 @@ WRITE8_MEMBER ( swtpc09_state::dc4_control_reg_w )
 /* Read/Write handlers for pia ide */
 /* TODO: update and finish this off */
 
-READ8_MEMBER( swtpc09_state::piaide_a_r )
+uint8_t swtpc09_state::piaide_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_piaide_porta;
 }
 
-READ8_MEMBER( swtpc09_state::piaide_b_r )
+uint8_t swtpc09_state::piaide_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_piaide_portb;
 }
 
-WRITE8_MEMBER( swtpc09_state::piaide_a_w )
+void swtpc09_state::piaide_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_piaide_porta = data;
 }
 
-WRITE8_MEMBER( swtpc09_state::piaide_b_w )
+void swtpc09_state::piaide_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int tempidedata;
 
@@ -453,7 +453,7 @@ WRITE8_MEMBER( swtpc09_state::piaide_b_w )
 /* memory map is created based on system_type flag       */
 /* this is accommodate the different cards installed     */
 
-WRITE8_MEMBER(swtpc09_state::dat_w)
+void swtpc09_state::dat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t a16_to_a19, a12_to_a15;
 	uint8_t *RAM = memregion("maincpu")->base();
@@ -579,7 +579,7 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
 
 /*  MC6844 DMA controller I/O */
 
-READ8_MEMBER( swtpc09_state::m6844_r )
+uint8_t swtpc09_state::m6844_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -667,7 +667,7 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 }
 
 
-WRITE8_MEMBER( swtpc09_state::m6844_w )
+void swtpc09_state::m6844_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -771,7 +771,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 }
 
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09 )
+void swtpc09_state::init_swtpc09()
 {
 	int i;
 	m_pia_counter = 0;  // init ptm/pia counter to 0
@@ -793,7 +793,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09 )
 
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09i )
+void swtpc09_state::init_swtpc09i()
 {
 	int i;
 	m_pia_counter = 0;  // init ptm/pia counter to 0
@@ -815,7 +815,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09i )
 
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09u )
+void swtpc09_state::init_swtpc09u()
 {
 	int i;
 	m_pia_counter = 0;  //init ptm/pia counter to 0
@@ -837,7 +837,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09u )
 
 }
 
-DRIVER_INIT_MEMBER( swtpc09_state, swtpc09d3 )
+void swtpc09_state::init_swtpc09d3()
 {
 	int i;
 	m_pia_counter = 0;  //init ptm/pia counter to 0

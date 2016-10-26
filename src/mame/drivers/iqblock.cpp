@@ -59,14 +59,14 @@ Grndtour:
 #include "sound/ym2413.h"
 
 
-WRITE8_MEMBER(iqblock_state::iqblock_prot_w)
+void iqblock_state::iqblock_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rambase[0xe26] = data;
 	m_rambase[0xe27] = data;
 	m_rambase[0xe1c] = data;
 }
 
-WRITE8_MEMBER(iqblock_state::grndtour_prot_w)
+void iqblock_state::grndtour_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rambase[0xe39] = data;
 	m_rambase[0xe3a] = data;
@@ -75,7 +75,7 @@ WRITE8_MEMBER(iqblock_state::grndtour_prot_w)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(iqblock_state::irq)
+void iqblock_state::irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -89,13 +89,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(iqblock_state::irq)
 }
 
 
-WRITE8_MEMBER(iqblock_state::irqack_w)
+void iqblock_state::irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(iqblock_state::port_C_w)
+void iqblock_state::port_C_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 4 unknown; it is pulsed at the end of every NMI */
 
@@ -497,7 +497,7 @@ ROM_START( grndtour )
 	ROM_LOAD( "grand5.u24",        0x4000, 0x4000, CRC(f896efb2) SHA1(8dc8546e363b4ff80983e3b8e2a19ebb7ff30c7b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(iqblock_state,iqblock)
+void iqblock_state::init_iqblock()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i;
@@ -514,7 +514,7 @@ DRIVER_INIT_MEMBER(iqblock_state,iqblock)
 	m_video_type=1;
 }
 
-DRIVER_INIT_MEMBER(iqblock_state,grndtour)
+void iqblock_state::init_grndtour()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int i;

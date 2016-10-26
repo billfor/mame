@@ -82,10 +82,10 @@ public:
 	hdc92x4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// Accesors from the CPU side
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE_LINE_MEMBER( reset );
-	DECLARE_WRITE_LINE_MEMBER( dmaack );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reset(int state);
+	void dmaack(int state);
 
 	// Callbacks
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<hdc92x4_device &>(device).m_out_intrq.set_callback(object); }

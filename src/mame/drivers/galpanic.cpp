@@ -89,7 +89,7 @@ void galpanic_state::screen_eof(screen_device &screen, bool state)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(galpanic_state::scanline)
+void galpanic_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -104,7 +104,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpanic_state::scanline)
 
 
 
-WRITE16_MEMBER(galpanic_state::m6295_bankswitch_w)
+void galpanic_state::m6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -117,7 +117,7 @@ WRITE16_MEMBER(galpanic_state::m6295_bankswitch_w)
 
 
 
-WRITE16_MEMBER(galpanic_state::coin_w)
+void galpanic_state::coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{

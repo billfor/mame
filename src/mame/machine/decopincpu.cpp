@@ -80,19 +80,19 @@ void decocpu_type1_device::device_timer(emu_timer &timer, device_timer_id id, in
 	}
 }
 
-INPUT_CHANGED_MEMBER( decocpu_type1_device::main_nmi )
+void decocpu_type1_device::main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( decocpu_type1_device::audio_nmi )
+void decocpu_type1_device::audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Not on DECO board?
 }
 
-WRITE_LINE_MEMBER(decocpu_type1_device::cpu_pia_irq)
+void decocpu_type1_device::cpu_pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{
@@ -109,24 +109,24 @@ WRITE_LINE_MEMBER(decocpu_type1_device::cpu_pia_irq)
 	}
 }
 
-WRITE_LINE_MEMBER( decocpu_type1_device::pia21_ca2_w )
+void decocpu_type1_device::pia21_ca2_w(int state)
 {
 // sound ns
 	m_ca2 = state;
 }
 
-WRITE8_MEMBER( decocpu_type1_device::lamp0_w )
+void decocpu_type1_device::lamp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpu->set_input_line(M6808_IRQ_LINE, CLEAR_LINE);
 	m_write_lamp(0,data,0xff);
 }
 
-WRITE8_MEMBER( decocpu_type1_device::lamp1_w )
+void decocpu_type1_device::lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_write_lamp(1,data,0xff);
 }
 
-READ8_MEMBER( decocpu_type1_device::display_strobe_r )
+uint8_t decocpu_type1_device::display_strobe_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x80;
 
@@ -136,62 +136,62 @@ READ8_MEMBER( decocpu_type1_device::display_strobe_r )
 	return ret | (m_read_display(0) & 0x7f);
 }
 
-WRITE8_MEMBER( decocpu_type1_device::display_strobe_w )
+void decocpu_type1_device::display_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_write_display(0,data,0xff);
 }
 
-WRITE8_MEMBER( decocpu_type1_device::display_out1_w )
+void decocpu_type1_device::display_out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_write_display(1,data,0xff);
 }
 
-WRITE8_MEMBER( decocpu_type1_device::display_out2_w )
+void decocpu_type1_device::display_out2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_write_display(2,data,0xff);
 }
 
-WRITE8_MEMBER( decocpu_type1_device::display_out3_w )
+void decocpu_type1_device::display_out3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_write_display(3,data,0xff);
 }
 
-READ8_MEMBER( decocpu_type1_device::display_in3_r )
+uint8_t decocpu_type1_device::display_in3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_read_display(3);
 }
 
-WRITE8_MEMBER( decocpu_type1_device::switch_w )
+void decocpu_type1_device::switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_write_switch(0,data,0xff);
 }
 
-READ8_MEMBER( decocpu_type1_device::switch_r )
+uint8_t decocpu_type1_device::switch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_read_switch(0);
 }
 
-READ8_MEMBER( decocpu_type1_device::dmdstatus_r )
+uint8_t decocpu_type1_device::dmdstatus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_read_dmdstatus(0);
 }
 
-WRITE8_MEMBER( decocpu_type1_device::display_out4_w )
+void decocpu_type1_device::display_out4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_write_display(4,data,0xff);
 }
 
-WRITE8_MEMBER( decocpu_type1_device::sound_w )
+void decocpu_type1_device::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_write_soundlatch(0,data,0xff);
 }
 
-WRITE8_MEMBER( decocpu_type1_device::solenoid1_w )
+void decocpu_type1_device::solenoid1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// todo
 }
 
-WRITE8_MEMBER( decocpu_type1_device::solenoid2_w )
+void decocpu_type1_device::solenoid2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// todo
 }

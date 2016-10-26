@@ -60,7 +60,7 @@
 /* Need to check for a coin on the interrupt, */
 /* This will reset the cpu                    */
 
-INTERRUPT_GEN_MEMBER(blockade_state::blockade_interrupt)
+void blockade_state::blockade_interrupt(device_t &device)
 {
 	device.execute().resume(SUSPEND_ANY_REASON);
 
@@ -77,7 +77,7 @@ INTERRUPT_GEN_MEMBER(blockade_state::blockade_interrupt)
  *
  *************************************/
 
-READ8_MEMBER(blockade_state::blockade_input_port_0_r)
+uint8_t blockade_state::blockade_input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* coin latch is bit 7 */
 	uint8_t temp = (ioport("IN0")->read() & 0x7f);
@@ -85,7 +85,7 @@ READ8_MEMBER(blockade_state::blockade_input_port_0_r)
 	return (m_coin_latch << 7) | temp;
 }
 
-WRITE8_MEMBER(blockade_state::blockade_coin_latch_w)
+void blockade_state::blockade_coin_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x80)
 	{

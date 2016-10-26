@@ -25,14 +25,14 @@ inline void fromanc2_state::fromanc2_get_tile_info( tile_data &tileinfo, int til
 	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l0_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 0); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l1_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 1); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l2_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 2); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l3_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 3); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l0_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 0); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l1_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 1); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l2_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 2); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l3_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 3); }
+void fromanc2_state::fromanc2_get_v0_l0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 0); }
+void fromanc2_state::fromanc2_get_v0_l1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 1); }
+void fromanc2_state::fromanc2_get_v0_l2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 2); }
+void fromanc2_state::fromanc2_get_v0_l3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 3); }
+void fromanc2_state::fromanc2_get_v1_l0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 0); }
+void fromanc2_state::fromanc2_get_v1_l1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 1); }
+void fromanc2_state::fromanc2_get_v1_l2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 2); }
+void fromanc2_state::fromanc2_get_v1_l3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 3); }
 
 
 inline void fromanc2_state::fromancr_get_tile_info( tile_data &tileinfo, int tile_index, int vram, int layer )
@@ -42,12 +42,12 @@ inline void fromanc2_state::fromancr_get_tile_info( tile_data &tileinfo, int til
 	SET_TILE_INFO_MEMBER(layer, tile, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l0_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 0, 0); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l1_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 0, 1); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l2_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 0, 2); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v1_l0_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 1, 0); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v1_l1_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 1, 1); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v1_l2_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 1, 2); }
+void fromanc2_state::fromancr_get_v0_l0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromancr_get_tile_info(tileinfo, tile_index, 0, 0); }
+void fromanc2_state::fromancr_get_v0_l1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromancr_get_tile_info(tileinfo, tile_index, 0, 1); }
+void fromanc2_state::fromancr_get_v0_l2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromancr_get_tile_info(tileinfo, tile_index, 0, 2); }
+void fromanc2_state::fromancr_get_v1_l0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromancr_get_tile_info(tileinfo, tile_index, 1, 0); }
+void fromanc2_state::fromancr_get_v1_l1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromancr_get_tile_info(tileinfo, tile_index, 1, 1); }
+void fromanc2_state::fromancr_get_v1_l2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromancr_get_tile_info(tileinfo, tile_index, 1, 2); }
 
 
 /******************************************************************************
@@ -64,12 +64,12 @@ inline void fromanc2_state::fromanc2_dispvram_w( offs_t offset, uint16_t data, u
 	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_0_w){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 0); }
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_1_w){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 2); }
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_2_w){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 0); }
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_3_w){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 2); }
+void fromanc2_state::fromanc2_videoram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 0); }
+void fromanc2_state::fromanc2_videoram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 2); }
+void fromanc2_state::fromanc2_videoram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 0); }
+void fromanc2_state::fromanc2_videoram_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 2); }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_0_w)
+void fromanc2_state::fromanc2_gfxreg_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -82,7 +82,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_0_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_1_w)
+void fromanc2_state::fromanc2_gfxreg_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -95,7 +95,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_1_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_2_w)
+void fromanc2_state::fromanc2_gfxreg_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -108,7 +108,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_2_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_3_w)
+void fromanc2_state::fromanc2_gfxreg_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -121,7 +121,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_3_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxbank_0_w)
+void fromanc2_state::fromanc2_gfxbank_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_gfxbank[0][0] = (data & 0x000f) >>  0;
 	m_gfxbank[0][1] = (data & 0x00f0) >>  4;
@@ -133,7 +133,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxbank_0_w)
 	m_tilemap[0][3]->mark_all_dirty();
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_gfxbank_1_w)
+void fromanc2_state::fromanc2_gfxbank_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_gfxbank[1][0] = (data & 0x000f) >>  0;
 	m_gfxbank[1][1] = (data & 0x00f0) >>  4;
@@ -154,11 +154,11 @@ inline void fromanc2_state::fromancr_vram_w(offs_t offset, uint16_t data, uint16
 	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
 }
 
-WRITE16_MEMBER(fromanc2_state::fromancr_videoram_0_w){ fromancr_vram_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(fromanc2_state::fromancr_videoram_1_w){ fromancr_vram_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER(fromanc2_state::fromancr_videoram_2_w){ fromancr_vram_w(offset, data, mem_mask, 2); }
+void fromanc2_state::fromancr_videoram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ fromancr_vram_w(offset, data, mem_mask, 1); }
+void fromanc2_state::fromancr_videoram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ fromancr_vram_w(offset, data, mem_mask, 0); }
+void fromanc2_state::fromancr_videoram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ fromancr_vram_w(offset, data, mem_mask, 2); }
 
-WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_0_w)
+void fromanc2_state::fromancr_gfxreg_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -171,7 +171,7 @@ WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_0_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_1_w)
+void fromanc2_state::fromancr_gfxreg_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -205,11 +205,11 @@ inline void fromanc2_state::fromanc4_vram_w( offs_t offset, uint16_t data, uint1
 	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x3fff);
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_0_w){ fromanc4_vram_w(offset, data, mem_mask, 2); }
-WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_1_w){ fromanc4_vram_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_2_w){ fromanc4_vram_w(offset, data, mem_mask, 0); }
+void fromanc2_state::fromanc4_videoram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 2); }
+void fromanc2_state::fromanc4_videoram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 1); }
+void fromanc2_state::fromanc4_videoram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ fromanc4_vram_w(offset, data, mem_mask, 0); }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_0_w)
+void fromanc2_state::fromanc4_gfxreg_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -227,7 +227,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_0_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_1_w)
+void fromanc2_state::fromanc4_gfxreg_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -245,7 +245,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_1_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_2_w)
+void fromanc2_state::fromanc4_gfxreg_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -270,7 +270,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_2_w)
 
 ******************************************************************************/
 
-VIDEO_START_MEMBER(fromanc2_state,fromanc2)
+void fromanc2_state::video_start_fromanc2()
 {
 	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromanc2_get_v0_l0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromanc2_get_v0_l1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -308,7 +308,7 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc2)
 	save_item(NAME(m_gfxbank[1]));
 }
 
-VIDEO_START_MEMBER(fromanc2_state,fromancr)
+void fromanc2_state::video_start_fromancr()
 {
 	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -344,7 +344,7 @@ VIDEO_START_MEMBER(fromanc2_state,fromancr)
 	save_item(NAME(m_gfxbank[1]));
 }
 
-VIDEO_START_MEMBER(fromanc2_state,fromanc4)
+void fromanc2_state::video_start_fromanc4()
 {
 	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);

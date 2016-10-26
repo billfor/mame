@@ -330,7 +330,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 
 
-WRITE16_MEMBER(rbisland_state::jumping_sound_w)
+void rbisland_state::jumping_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -395,12 +395,12 @@ ADDRESS_MAP_END
               Jumping uses two YM2203's
 ***********************************************************/
 
-WRITE8_MEMBER(rbisland_state::bankswitch_w)
+void rbisland_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 3);
 }
 
-READ8_MEMBER(rbisland_state::jumping_latch_r)
+uint8_t rbisland_state::jumping_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_jumping_latch;
 }
@@ -942,7 +942,7 @@ ROM_START( jumpingi )
 		ROM_LOAD( "JP3.IC51",            0x000, 0x104, CRC(c1e6cb8f) SHA1(9908e62bb9b806047b7a344bb62334bd696b9fc8) ) // PAL16L8A-2CN z80 address decoder?
 ROM_END
 
-DRIVER_INIT_MEMBER(rbisland_state,rbisland)
+void rbisland_state::init_rbisland()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -951,7 +951,7 @@ DRIVER_INIT_MEMBER(rbisland_state,rbisland)
 	rbisland_cchip_init(0);
 }
 
-DRIVER_INIT_MEMBER(rbisland_state,rbislande)
+void rbisland_state::init_rbislande()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
@@ -960,7 +960,7 @@ DRIVER_INIT_MEMBER(rbisland_state,rbislande)
 	rbisland_cchip_init(1);
 }
 
-DRIVER_INIT_MEMBER(rbisland_state,jumping)
+void rbisland_state::init_jumping()
 {
 	m_jumping_latch = 0;
 	save_item(NAME(m_jumping_latch));

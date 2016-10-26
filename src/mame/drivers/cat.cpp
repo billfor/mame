@@ -280,39 +280,39 @@ public:
 	emu_timer *m_keyboard_timer;
 	emu_timer *m_6ms_timer;
 
-	DECLARE_MACHINE_START(cat);
-	DECLARE_MACHINE_RESET(cat);
-	DECLARE_VIDEO_START(cat);
-	DECLARE_DRIVER_INIT(cat);
+	void machine_start_cat();
+	void machine_reset_cat();
+	void video_start_cat();
+	void init_cat();
 
 	uint32_t screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
-	DECLARE_WRITE_LINE_MEMBER(cat_duart_txb);
-	DECLARE_WRITE8_MEMBER(cat_duart_output);
-	DECLARE_WRITE_LINE_MEMBER(prn_ack_ff);
+	void cat_duart_irq_handler(int state);
+	void cat_duart_txa(int state);
+	void cat_duart_txb(int state);
+	void cat_duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void prn_ack_ff(int state);
 
-	DECLARE_READ16_MEMBER(cat_floppy_control_r);
-	DECLARE_WRITE16_MEMBER(cat_floppy_control_w);
-	DECLARE_WRITE16_MEMBER(cat_printer_data_w);
-	DECLARE_READ16_MEMBER(cat_floppy_data_r);
-	DECLARE_WRITE16_MEMBER(cat_floppy_data_w);
-	DECLARE_READ16_MEMBER(cat_keyboard_r);
-	DECLARE_WRITE16_MEMBER(cat_keyboard_w);
-	DECLARE_WRITE16_MEMBER(cat_video_control_w);
-	DECLARE_READ16_MEMBER(cat_floppy_status_r);
-	DECLARE_READ16_MEMBER(cat_battery_r);
-	DECLARE_WRITE16_MEMBER(cat_printer_control_w);
-	DECLARE_READ16_MEMBER(cat_modem_r);
-	DECLARE_WRITE16_MEMBER(cat_modem_w);
-	DECLARE_READ16_MEMBER(cat_6ms_counter_r);
-	DECLARE_WRITE16_MEMBER(cat_opr_w);
-	DECLARE_READ16_MEMBER(cat_wdt_r);
-	DECLARE_WRITE16_MEMBER(cat_tcb_w);
-	DECLARE_READ16_MEMBER(cat_2e80_r);
-	DECLARE_READ16_MEMBER(cat_0080_r);
-	DECLARE_READ16_MEMBER(cat_0000_r);
+	uint16_t cat_floppy_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cat_floppy_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cat_printer_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cat_floppy_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cat_floppy_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cat_keyboard_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cat_keyboard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cat_video_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cat_floppy_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t cat_battery_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cat_printer_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cat_modem_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cat_modem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cat_6ms_counter_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cat_opr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cat_wdt_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cat_tcb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cat_2e80_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t cat_0080_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t cat_0000_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 
 	/* gate array 2 has a 16-bit counter inside which counts at 10mhz and
@@ -346,9 +346,9 @@ public:
 	uint8_t m_keyboard_line;
 	uint8_t m_floppy_control;
 
-	//TIMER_CALLBACK_MEMBER(keyboard_callback);
-	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
-	IRQ_CALLBACK_MEMBER(cat_int_ack);
+	//void keyboard_callback(void *ptr, int32_t param);
+	void counter_6ms_callback(void *ptr, int32_t param);
+	int cat_int_ack(device_t &device, int irqline);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -356,7 +356,7 @@ protected:
 
 // TODO: this init doesn't actually work yet! please fix me!
 /*
-DRIVER_INIT_MEMBER( cat_state,cat )
+void cat_state::init_cat()
 {
     uint8_t *svrom = memregion("svrom")->base();
     int i;
@@ -397,7 +397,7 @@ DRIVER_INIT_MEMBER( cat_state,cat )
  650xxx - HSS (HSync Start)
  658xxx - VOC (Video Control)
  */
-WRITE16_MEMBER( cat_state::cat_video_control_w )
+void cat_state::cat_video_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	 * 006500AE ,          ( HSS HSync Start    89 )
@@ -451,7 +451,7 @@ WRITE16_MEMBER( cat_state::cat_video_control_w )
 	 * [2] this bit's function is unknown. it could possibly be an FM vs MFM selector bit, where high = MFM, low = FM ? or MFM vs GCR?
 	 */
 // 0x800000-0x800001 read
-READ16_MEMBER( cat_state::cat_floppy_control_r )
+uint16_t cat_state::cat_floppy_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 #ifdef DEBUG_FLOPPY_CONTROL_R
 	fprintf(stderr,"Read from Floppy Status address %06X\n", 0x800000+(offset<<1));
@@ -459,7 +459,7 @@ READ16_MEMBER( cat_state::cat_floppy_control_r )
 	return (m_floppy_control << 8)|0x80; // LOW 8 BITS ARE OPEN BUS
 }
 // 0x800000-0x800001 write
-WRITE16_MEMBER( cat_state::cat_floppy_control_w )
+void cat_state::cat_floppy_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #ifdef DEBUG_FLOPPY_CONTROL_W
 	fprintf(stderr,"Write to Floppy Control address %06X, data %04X\n", 0x800000+(offset<<1), data);
@@ -469,7 +469,7 @@ WRITE16_MEMBER( cat_state::cat_floppy_control_w )
 
 // 0x800002-0x800003 read = 0x0080, see open bus
 // 0x800002-0x800003 write
-WRITE16_MEMBER( cat_state::cat_keyboard_w )
+void cat_state::cat_keyboard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_keyboard_line = data >> 8;
 }
@@ -477,7 +477,7 @@ WRITE16_MEMBER( cat_state::cat_keyboard_w )
 // 0x800004-0x800005 'pr.data' write
 // /DSTB (centronics pin 1) is implied by the cat source code to be pulsed
 // low (for some unknown period of time) upon any write to this port.
-WRITE16_MEMBER( cat_state::cat_printer_data_w )
+void cat_state::cat_printer_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #ifdef DEBUG_PRINTER_DATA_W
 	fprintf(stderr,"Write to Printer Data address %06X, data %04X\n", 0x800004+(offset<<1), data);
@@ -488,14 +488,14 @@ WRITE16_MEMBER( cat_state::cat_printer_data_w )
 	m_ctx->write_strobe(1);
 }
 // 0x800006-0x800007: Floppy data register (called fd.dwr in the cat source code)
-READ16_MEMBER( cat_state::cat_floppy_data_r )
+uint16_t cat_state::cat_floppy_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 #ifdef DEBUG_FLOPPY_DATA_R
 	fprintf(stderr,"Read from Floppy Data address %06X\n", 0x800006+(offset<<1));
 #endif
 	return 0x0080;
 }
-WRITE16_MEMBER( cat_state::cat_floppy_data_w )
+void cat_state::cat_floppy_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #ifdef DEBUG_FLOPPY_DATA_W
 	fprintf(stderr,"Write to Floppy Data address %06X, data %04X\n", 0x800006+(offset<<1), data);
@@ -514,7 +514,7 @@ WRITE16_MEMBER( cat_state::cat_floppy_data_w )
 	 * \--------- ? this bit may indicate 'data separator overflow'; it is usually low but becomes high if you manually select the floppy drive
 	 ALL of these bits except bit F seem to be reset when the selected drive in floppy control is switched
 	 */
-READ16_MEMBER( cat_state::cat_floppy_status_r )
+uint16_t cat_state::cat_floppy_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 #ifdef DEBUG_FLOPPY_STATUS_R
 	fprintf(stderr,"Read from Floppy Status address %06X\n", 0x800008+(offset<<1));
@@ -523,7 +523,7 @@ READ16_MEMBER( cat_state::cat_floppy_status_r )
 }
 
 // 0x80000a-0x80000b
-READ16_MEMBER( cat_state::cat_keyboard_r )
+uint16_t cat_state::cat_keyboard_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t retVal = 0;
 	// Read country code
@@ -558,7 +558,7 @@ READ16_MEMBER( cat_state::cat_keyboard_r )
 // 0x80000c-0x80000d (unused in cat source code; may have originally been a separate read only port where 800006 would have been write-only)
 
 // 0x80000e-0x80000f 'pr.cont' read
-READ16_MEMBER( cat_state::cat_battery_r )
+uint16_t cat_state::cat_battery_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 	 * FEDCBA98 (76543210 is open bus)
@@ -577,7 +577,7 @@ READ16_MEMBER( cat_state::cat_battery_r )
 	return 0x0080;
 }
 // 0x80000e-0x80000f 'pr.cont' write
-WRITE16_MEMBER( cat_state::cat_printer_control_w )
+void cat_state::cat_printer_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	 * FEDCBA98 (76543210 is ignored)
@@ -599,7 +599,7 @@ WRITE16_MEMBER( cat_state::cat_printer_control_w )
 }
 
 // 0x820000: AMI S35213 300/1200 Single Chip Modem (datasheet found at http://bitsavers.trailing-edge.com/pdf/ami/_dataBooks/1985_AMI_MOS_Products_Catalog.pdf on pdf page 243)
-READ16_MEMBER( cat_state::cat_modem_r )
+uint16_t cat_state::cat_modem_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 #ifdef DEBUG_MODEM_R
 	fprintf(stderr,"Read from s35213 modem address %06X\n", 0x820000+(offset<<1));
@@ -608,7 +608,7 @@ READ16_MEMBER( cat_state::cat_modem_r )
 	return 0x00;
 }
 
-WRITE16_MEMBER( cat_state::cat_modem_w )
+void cat_state::cat_modem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #ifdef DEBUG_MODEM_W
 	fprintf(stderr,"Write to s35213 modem address %06X, data %04X\n", 0x820000+(offset<<1), data);
@@ -616,7 +616,7 @@ WRITE16_MEMBER( cat_state::cat_modem_w )
 }
 
 // 0x830000: 6ms counter (counts KTOBF pulses and does not reset; 16 bits wide)
-READ16_MEMBER( cat_state::cat_6ms_counter_r )
+uint16_t cat_state::cat_6ms_counter_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_6ms_counter;
 }
@@ -626,7 +626,7 @@ READ16_MEMBER( cat_state::cat_6ms_counter_r )
  * if the watchdog expires /NMI (and maybe /RESET) are asserted to the cpu
  * watchdog counter (counts KTOBF pulses and is reset on any ga2opr write with bit 3 set; <9 bits wide)
  */
-WRITE16_MEMBER( cat_state::cat_opr_w )
+void cat_state::cat_opr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	 * 76543210 (FEDCBA98 are ignored)
@@ -667,7 +667,7 @@ WRITE16_MEMBER( cat_state::cat_opr_w )
 	 * |\-------- (always 0?)
 	 * \--------- (always 0?)
 	 */
-READ16_MEMBER( cat_state::cat_wdt_r )
+uint16_t cat_state::cat_wdt_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16 Retval = 0x0100; // set pfail to 1; should this be a dipswitch?
 	return Retval | m_wdt_counter;
@@ -676,7 +676,7 @@ READ16_MEMBER( cat_state::cat_wdt_r )
 // 0x860000: 'tcb' "test control bits" test mode register; what the bits do is
 // unknown. 0x0000 is written here to disable test mode, and that is the extent
 // of the cat touching this register.
-WRITE16_MEMBER( cat_state::cat_tcb_w )
+void cat_state::cat_tcb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #ifdef DEBUG_TEST_W
 	fprintf(stderr, "Test reg write: offset %06X, data %04X\n", 0x860000+(offset<<1), data);
@@ -684,17 +684,17 @@ WRITE16_MEMBER( cat_state::cat_tcb_w )
 }
 
 // open bus etc handlers
-READ16_MEMBER( cat_state::cat_2e80_r )
+uint16_t cat_state::cat_2e80_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x2e80;
 }
 
-READ16_MEMBER( cat_state::cat_0000_r )
+uint16_t cat_state::cat_0000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0000;
 }
 
-READ16_MEMBER( cat_state::cat_0080_r )
+uint16_t cat_state::cat_0080_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0080;
 }
@@ -891,7 +891,7 @@ void cat_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
+void cat_state::counter_6ms_callback(void *ptr, int32_t param)
 {
 	// This is effectively also the KTOBF (guessed: acronym for "Keyboard Timer Out Bit Flip")
 	// line connected in such a way to invert the d-flipflop connected to the duart IP2
@@ -901,13 +901,13 @@ TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 	m_6ms_counter++;
 }
 
-IRQ_CALLBACK_MEMBER(cat_state::cat_int_ack)
+int cat_state::cat_int_ack(device_t &device, int irqline)
 {
 	m_maincpu->set_input_line(M68K_IRQ_1,CLEAR_LINE);
 	return M68K_INT_ACK_AUTOVECTOR;
 }
 
-MACHINE_START_MEMBER(cat_state,cat)
+void cat_state::machine_start_cat()
 {
 	m_duart_ktobf_ff = 0; // reset doesn't touch this
 	m_duart_prn_ack_prev_state = 1; // technically uninitialized
@@ -920,7 +920,7 @@ MACHINE_START_MEMBER(cat_state,cat)
 	machine().device<nvram_device>("nvram")->set_base(m_svram, 0x4000);
 }
 
-MACHINE_RESET_MEMBER(cat_state,cat)
+void cat_state::machine_reset_cat()
 {
 	m_6ms_counter = 0;
 	m_wdt_counter = 0;
@@ -928,7 +928,7 @@ MACHINE_RESET_MEMBER(cat_state,cat)
 	m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL_19_968MHz/2)/65536));
 }
 
-VIDEO_START_MEMBER(cat_state,cat)
+void cat_state::video_start_cat()
 {
 }
 
@@ -967,7 +967,7 @@ uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitma
  * The duart also will, if configured to do so, fire an int when the state
  * changes of the centronics /ACK pin; this is used while printing.
  */
-WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
+void cat_state::cat_duart_irq_handler(int state)
 {
 	int irqvector = m_duart->get_irq_vector();
 
@@ -977,14 +977,14 @@ WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, irqvector);
 }
 
-WRITE_LINE_MEMBER(cat_state::cat_duart_txa) // semit sends stuff here; connects to the serial port on the back
+void cat_state::cat_duart_txa(int state) // semit sends stuff here; connects to the serial port on the back
 {
 #ifdef DEBUG_DUART_TXA
 	fprintf(stderr, "Duart TXA: data %02X\n", state);
 #endif
 }
 
-WRITE_LINE_MEMBER(cat_state::cat_duart_txb) // memit sends stuff here; connects to the modem chip
+void cat_state::cat_duart_txb(int state) // memit sends stuff here; connects to the modem chip
 {
 #ifdef DEBUG_DUART_TXB
 	fprintf(stderr, "Duart TXB: data %02X\n", state);
@@ -1010,7 +1010,7 @@ WRITE_LINE_MEMBER(cat_state::cat_duart_txb) // memit sends stuff here; connects 
  * OP6: TD01 "
  * OP7: TD00 "
  */
-WRITE8_MEMBER(cat_state::cat_duart_output)
+void cat_state::cat_duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #ifdef DEBUG_DUART_OUTPUT_LINES
 	fprintf(stderr,"Duart output io lines changed to: %02X\n", data);
@@ -1018,7 +1018,7 @@ WRITE8_MEMBER(cat_state::cat_duart_output)
 	m_speaker->level_w((data >> 3) & 1);
 }
 
-WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the rising edge of /ACK
+void cat_state::prn_ack_ff(int state) // switch the flipflop state on the rising edge of /ACK
 {
 	if ((m_duart_prn_ack_prev_state == 0) && (state == 1))
 	{

@@ -400,7 +400,7 @@ uint32_t upd65031_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( upd65031_device::read )
+uint8_t upd65031_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t port = offset & 0xff;
 
@@ -466,7 +466,7 @@ READ8_MEMBER( upd65031_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( upd65031_device::write )
+void upd65031_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t port = offset & 0xff;
 
@@ -592,7 +592,7 @@ WRITE8_MEMBER( upd65031_device::write )
 //  flp line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd65031_device::flp_w )
+void upd65031_device::flp_w(int state)
 {
 	if (!(m_sta & STA_FLAPOPEN) && state)
 	{
@@ -612,7 +612,7 @@ WRITE_LINE_MEMBER( upd65031_device::flp_w )
 //  battery low line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd65031_device::btl_w )
+void upd65031_device::btl_w(int state)
 {
 	if (state)
 		m_sta |= STA_BTL;

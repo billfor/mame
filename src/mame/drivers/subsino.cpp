@@ -280,48 +280,48 @@ public:
 
 	ticket_dispenser_device *m_hopper;
 
-	DECLARE_WRITE8_MEMBER(subsino_tiles_offset_w);
-	DECLARE_WRITE8_MEMBER(subsino_videoram_w);
-	DECLARE_WRITE8_MEMBER(subsino_colorram_w);
-	DECLARE_WRITE8_MEMBER(subsino_reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(subsino_reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(subsino_reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(subsino_out_a_w);
-	DECLARE_WRITE8_MEMBER(subsino_out_b_w);
-	DECLARE_READ8_MEMBER(flash_r);
-	DECLARE_WRITE8_MEMBER(flash_w);
-	DECLARE_READ8_MEMBER(hwcheck_r);
-	DECLARE_WRITE8_MEMBER(subsino_out_c_w);
-	DECLARE_WRITE8_MEMBER(colordac_w);
-	DECLARE_WRITE8_MEMBER(reel_scrollattr_w);
-	DECLARE_READ8_MEMBER(reel_scrollattr_r);
-	DECLARE_DRIVER_INIT(stbsub);
-	DECLARE_DRIVER_INIT(stisub);
-	DECLARE_DRIVER_INIT(tesorone);
-	DECLARE_DRIVER_INIT(tesorone230);
-	DECLARE_DRIVER_INIT(smoto20);
-	DECLARE_DRIVER_INIT(sharkpy);
-	DECLARE_DRIVER_INIT(smoto16);
-	DECLARE_DRIVER_INIT(crsbingo);
-	DECLARE_DRIVER_INIT(victor21);
-	DECLARE_DRIVER_INIT(victor5);
-	DECLARE_DRIVER_INIT(tisuba);
-	DECLARE_DRIVER_INIT(sharkpye);
-	DECLARE_DRIVER_INIT(tisub);
-	DECLARE_DRIVER_INIT(mtrainnv);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_stbsub_tile_info);
-	TILE_GET_INFO_MEMBER(get_subsino_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_stbsub_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_subsino_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_stbsub_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_subsino_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_stbsub_reel3_tile_info);
-	DECLARE_VIDEO_START(subsino);
-	DECLARE_PALETTE_INIT(subsino_2proms);
-	DECLARE_PALETTE_INIT(subsino_3proms);
-	DECLARE_VIDEO_START(subsino_reels);
-	DECLARE_VIDEO_START(stbsub);
+	void subsino_tiles_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_out_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_out_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t flash_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void flash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hwcheck_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void subsino_out_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colordac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel_scrollattr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t reel_scrollattr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_stbsub();
+	void init_stisub();
+	void init_tesorone();
+	void init_tesorone230();
+	void init_smoto20();
+	void init_sharkpy();
+	void init_smoto16();
+	void init_crsbingo();
+	void init_victor21();
+	void init_victor5();
+	void init_tisuba();
+	void init_sharkpye();
+	void init_tisub();
+	void init_mtrainnv();
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stbsub_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_subsino_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stbsub_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_subsino_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stbsub_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_subsino_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stbsub_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void video_start_subsino();
+	void palette_init_subsino_2proms(palette_device &palette);
+	void palette_init_subsino_3proms(palette_device &palette);
+	void video_start_subsino_reels();
+	void video_start_stbsub();
 	uint32_t screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_subsino_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stbsub_reels(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -341,26 +341,26 @@ void subsino_state::machine_start()
 ***************************************************************************/
 
 
-WRITE8_MEMBER(subsino_state::subsino_tiles_offset_w)
+void subsino_state::subsino_tiles_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tiles_offset = (data & 1) ? 0x1000: 0;
 	m_tmap->mark_tile_dirty(offset);
 //  popmessage("gfx %02x",data);
 }
 
-WRITE8_MEMBER(subsino_state::subsino_videoram_w)
+void subsino_state::subsino_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(subsino_state::subsino_colorram_w)
+void subsino_state::subsino_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_tile_info)
+void subsino_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
 	uint16_t color = (code >> 8) & 0x0f;
@@ -369,7 +369,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_tile_info)
+void subsino_state::get_stbsub_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
 	code&= 0x3fff;
@@ -377,7 +377,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_tile_info)
 }
 
 
-VIDEO_START_MEMBER(subsino_state,subsino)
+void subsino_state::video_start_subsino()
 {
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
 	m_tmap->set_transparent_pen(0 );
@@ -386,13 +386,13 @@ VIDEO_START_MEMBER(subsino_state,subsino)
 
 
 
-WRITE8_MEMBER(subsino_state::subsino_reel1_ram_w)
+void subsino_state::subsino_reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel1_tile_info)
+void subsino_state::get_subsino_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel1_ram[tile_index];
 	int colour = (m_out_c&0x7) + 8;
@@ -403,7 +403,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel1_tile_info)
+void subsino_state::get_stbsub_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel1_ram[tile_index];
 	int attr = m_reel1_attr[tile_index];
@@ -415,13 +415,13 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel1_tile_info)
 }
 
 
-WRITE8_MEMBER(subsino_state::subsino_reel2_ram_w)
+void subsino_state::subsino_reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel2_ram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel2_tile_info)
+void subsino_state::get_subsino_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel2_ram[tile_index];
 	int colour = (m_out_c&0x7) + 8;
@@ -432,7 +432,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel2_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel2_tile_info)
+void subsino_state::get_stbsub_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel2_ram[tile_index];
 	int attr = m_reel2_attr[tile_index];
@@ -443,13 +443,13 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel2_tile_info)
 			0);
 }
 
-WRITE8_MEMBER(subsino_state::subsino_reel3_ram_w)
+void subsino_state::subsino_reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel3_tile_info)
+void subsino_state::get_subsino_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel3_ram[tile_index];
 	int colour = (m_out_c&0x7) + 8;
@@ -460,7 +460,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel3_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel3_tile_info)
+void subsino_state::get_stbsub_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel3_ram[tile_index];
 	int attr = m_reel3_attr[tile_index];
@@ -472,9 +472,9 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel3_tile_info)
 }
 
 
-VIDEO_START_MEMBER(subsino_state,subsino_reels)
+void subsino_state::video_start_subsino_reels()
 {
-	VIDEO_START_CALL_MEMBER( subsino );
+	video_start_subsino();
 
 	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_subsino_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
@@ -486,7 +486,7 @@ VIDEO_START_MEMBER(subsino_state,subsino_reels)
 
 }
 
-VIDEO_START_MEMBER(subsino_state,stbsub)
+void subsino_state::video_start_stbsub()
 {
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(subsino_state::get_stbsub_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20 );
 	m_tmap->set_transparent_pen(0 );
@@ -576,7 +576,7 @@ uint32_t subsino_state::screen_update_stbsub_reels(screen_device &screen, bitmap
 
 
 
-PALETTE_INIT_MEMBER(subsino_state,subsino_2proms)
+void subsino_state::palette_init_subsino_2proms(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
@@ -603,7 +603,7 @@ PALETTE_INIT_MEMBER(subsino_state,subsino_2proms)
 	}
 }
 
-PALETTE_INIT_MEMBER(subsino_state,subsino_3proms)
+void subsino_state::palette_init_subsino_3proms(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
@@ -635,7 +635,7 @@ PALETTE_INIT_MEMBER(subsino_state,subsino_3proms)
 *                          Lamps & other outputs.                          *
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino_state::subsino_out_a_w)
+void subsino_state::subsino_out_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /***** COIN PULSE: *****
 
@@ -685,7 +685,7 @@ WRITE8_MEMBER(subsino_state::subsino_out_a_w)
 //  popmessage("Out A %02x",data);
 }
 
-WRITE8_MEMBER(subsino_state::subsino_out_b_w)
+void subsino_state::subsino_out_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /***** LAMPS: *****
 
@@ -937,7 +937,7 @@ what it is exactly and what it can possibly do.
 */
 
 
-READ8_MEMBER(subsino_state::flash_r)
+uint8_t subsino_state::flash_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("R %02x\n",m_flash_val);
 
@@ -951,7 +951,7 @@ READ8_MEMBER(subsino_state::flash_r)
 		return 0xd9;
 }
 
-WRITE8_MEMBER(subsino_state::flash_w)
+void subsino_state::flash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(m_flash_packet_start)
 	{
@@ -977,7 +977,7 @@ static ADDRESS_MAP_START( victor5_map, AS_PROGRAM, 8, subsino_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(subsino_state::hwcheck_r)
+uint8_t subsino_state::hwcheck_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Wants this at POST otherwise an "Hardware Error" occurs. */
 	return 0x55;
@@ -1016,7 +1016,7 @@ static ADDRESS_MAP_START( crsbingo_map, AS_PROGRAM, 8, subsino_state )
 
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(subsino_state::subsino_out_c_w)
+void subsino_state::subsino_out_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// not 100% sure on this
 
@@ -1073,7 +1073,7 @@ static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(subsino_state::colordac_w)
+void subsino_state::colordac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( offset )
 	{
@@ -1103,7 +1103,7 @@ WRITE8_MEMBER(subsino_state::colordac_w)
 
 // this stuff is banked..
 // not 100% sure on the bank bits.. other bits are also set
-WRITE8_MEMBER(subsino_state::reel_scrollattr_w)
+void subsino_state::reel_scrollattr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (*m_stbsub_out_c & 0x20)
 	{
@@ -1147,7 +1147,7 @@ WRITE8_MEMBER(subsino_state::reel_scrollattr_w)
 	}
 }
 
-READ8_MEMBER(subsino_state::reel_scrollattr_r)
+uint8_t subsino_state::reel_scrollattr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_reel1_attr[offset];
 }
@@ -3535,7 +3535,7 @@ ROM_START( smoto16 )
 	ROM_LOAD( "prom-n82s129an.u13", 0x200, 0x100, CRC(9cb4a5c0) SHA1(0e0a368329c6d1cb685ed655d699a4894988fdb1) )
 ROM_END
 
-DRIVER_INIT_MEMBER(subsino_state,smoto16)
+void subsino_state::init_smoto16()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
 	rom[0x12d0] = 0x20; // "ERROR 951010"
@@ -3771,42 +3771,42 @@ ROM_END
 *                        Driver Init / Decryption                          *
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(subsino_state,victor5)
+void subsino_state::init_victor5()
 {
 	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0xc000);
 }
 
-DRIVER_INIT_MEMBER(subsino_state,victor21)
+void subsino_state::init_victor21()
 {
 	subsino_decrypt(machine(), victor21_bitswaps, victor21_xors, 0xc000);
 }
 
-DRIVER_INIT_MEMBER(subsino_state,crsbingo)
+void subsino_state::init_crsbingo()
 {
 	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0xc000);
 }
 
-DRIVER_INIT_MEMBER(subsino_state,sharkpy)
+void subsino_state::init_sharkpy()
 {
 	subsino_decrypt(machine(), sharkpy_bitswaps, sharkpy_xors, 0xa000);
 }
 
-DRIVER_INIT_MEMBER(subsino_state,sharkpye)
+void subsino_state::init_sharkpye()
 {
 	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0xa000);
 }
 
-DRIVER_INIT_MEMBER(subsino_state,smoto20)
+void subsino_state::init_smoto20()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
 	rom[0x12e1] = 0x20; // "ERROR 951010"
 }
 
-DRIVER_INIT_MEMBER(subsino_state,tisub)
+void subsino_state::init_tisub()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
 
-	DRIVER_INIT_CALL(victor5);
+	init_victor5();
 
 	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
 	rom[0x64c8] = 0x00;
@@ -3817,11 +3817,11 @@ DRIVER_INIT_MEMBER(subsino_state,tisub)
 	rom[0x64cf] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(subsino_state,tisuba)
+void subsino_state::init_tisuba()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
 
-	DRIVER_INIT_CALL(victor5);
+	init_victor5();
 
 	/* this trips a z180 MMU core bug? It unmaps a region then the program code jumps to that region... */
 	rom[0x6491] = 0x00;
@@ -3832,7 +3832,7 @@ DRIVER_INIT_MEMBER(subsino_state,tisuba)
 	rom[0x6498] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(subsino_state,stbsub)
+void subsino_state::init_stbsub()
 {
 #if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
@@ -3852,7 +3852,7 @@ DRIVER_INIT_MEMBER(subsino_state,stbsub)
 	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
 }
 
-DRIVER_INIT_MEMBER(subsino_state, stisub)
+void subsino_state::init_stisub()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
 	rom[0x0FA0] = 0x28;
@@ -3869,7 +3869,7 @@ DRIVER_INIT_MEMBER(subsino_state, stisub)
 	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
 }
 
-DRIVER_INIT_MEMBER(subsino_state,tesorone)
+void subsino_state::init_tesorone()
 {
 #if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
@@ -3890,7 +3890,7 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone)
 	m_reel3_attr = std::make_unique<uint8_t[]>(0x200);
 }
 
-DRIVER_INIT_MEMBER(subsino_state,tesorone230)
+void subsino_state::init_tesorone230()
 {
 #if 1
 	uint8_t *rom = memregion( "maincpu" )->base();            //check this patch!!!!
@@ -3912,7 +3912,7 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone230)
 }
 
 
-DRIVER_INIT_MEMBER(subsino_state,mtrainnv)
+void subsino_state::init_mtrainnv()
 {
 	m_stbsub_colorram = std::make_unique<uint8_t[]>(256*3);
 

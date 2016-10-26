@@ -231,7 +231,7 @@ void bzone_state::machine_start()
 }
 
 
-MACHINE_START_MEMBER(bzone_state,redbaron)
+void bzone_state::machine_start_redbaron()
 {
 	save_item(NAME(m_analog_data));
 	save_item(NAME(m_rb_input_select));
@@ -245,7 +245,7 @@ MACHINE_START_MEMBER(bzone_state,redbaron)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
+void bzone_state::bzone_interrupt(device_t &device)
 {
 	if (ioport("IN0")->read() & 0x10)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -259,13 +259,13 @@ INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(bzone_state::clock_r)
+ioport_value bzone_state::clock_r(ioport_field &field, void *param)
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
 
 
-WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
+void bzone_state::bzone_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);
 }
@@ -278,12 +278,12 @@ WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
  *
  *************************************/
 
-READ8_MEMBER(bzone_state::redbaron_joy_r)
+uint8_t bzone_state::redbaron_joy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport(m_rb_input_select ? "FAKE1" : "FAKE2")->read();
 }
 
-WRITE8_MEMBER(bzone_state::redbaron_joysound_w)
+void bzone_state::redbaron_joysound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rb_input_select = data & 1;
 	m_redbaronsound->sounds_w(space, offset, data);
@@ -845,13 +845,13 @@ ROM_END
  *
  *************************************/
 
-READ8_MEMBER(bzone_state::analog_data_r)
+uint8_t bzone_state::analog_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_analog_data;
 }
 
 
-WRITE8_MEMBER(bzone_state::analog_select_w)
+void bzone_state::analog_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char *const analog_port[] = { "AN0", "AN1", "AN2" };
 
@@ -860,7 +860,7 @@ WRITE8_MEMBER(bzone_state::analog_select_w)
 }
 
 
-DRIVER_INIT_MEMBER(bzone_state,bradley)
+void bzone_state::init_bradley()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_ram(0x400, 0x7ff);

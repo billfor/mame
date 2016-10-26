@@ -130,60 +130,60 @@ public:
 	/* sound-related variables */
 	uint8_t       m_sound_banks;      /* number of sound banks */
 
-	DECLARE_DRIVER_INIT(c2boot);
-	DECLARE_DRIVER_INIT(bloxeedc);
-	DECLARE_DRIVER_INIT(columns);
-	DECLARE_DRIVER_INIT(columns2);
-	DECLARE_DRIVER_INIT(tfrceac);
-	DECLARE_DRIVER_INIT(tfrceacb);
-	DECLARE_DRIVER_INIT(borench);
-	DECLARE_DRIVER_INIT(twinsqua);
-	DECLARE_DRIVER_INIT(ribbit);
-	DECLARE_DRIVER_INIT(puyo);
-	DECLARE_DRIVER_INIT(tantr);
-	DECLARE_DRIVER_INIT(tantrkor);
-	DECLARE_DRIVER_INIT(potopoto);
-	DECLARE_DRIVER_INIT(stkclmns);
-	DECLARE_DRIVER_INIT(stkclmnj);
-	DECLARE_DRIVER_INIT(ichir);
-	DECLARE_DRIVER_INIT(ichirk);
-	DECLARE_DRIVER_INIT(ichirj);
-	DECLARE_DRIVER_INIT(ichirjbl);
-	DECLARE_DRIVER_INIT(puyopuy2);
-	DECLARE_DRIVER_INIT(zunkyou);
-	DECLARE_DRIVER_INIT(pclub);
-	DECLARE_DRIVER_INIT(pclubjv2);
-	DECLARE_DRIVER_INIT(pclubjv4);
-	DECLARE_DRIVER_INIT(pclubjv5);
+	void init_c2boot();
+	void init_bloxeedc();
+	void init_columns();
+	void init_columns2();
+	void init_tfrceac();
+	void init_tfrceacb();
+	void init_borench();
+	void init_twinsqua();
+	void init_ribbit();
+	void init_puyo();
+	void init_tantr();
+	void init_tantrkor();
+	void init_potopoto();
+	void init_stkclmns();
+	void init_stkclmnj();
+	void init_ichir();
+	void init_ichirk();
+	void init_ichirj();
+	void init_ichirjbl();
+	void init_puyopuy2();
+	void init_zunkyou();
+	void init_pclub();
+	void init_pclubjv2();
+	void init_pclubjv4();
+	void init_pclubjv5();
 	void segac2_common_init(segac2_prot_delegate prot_func);
-	DECLARE_VIDEO_START(segac2_new);
-	DECLARE_MACHINE_START(segac2);
-	DECLARE_MACHINE_RESET(segac2);
+	void video_start_segac2_new();
+	void machine_start_segac2();
+	void machine_reset_segac2();
 
 	uint32_t screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int m_segac2_bg_pal_lookup[4];
 	int m_segac2_sp_pal_lookup[4];
 	void recompute_palette_tables();
 
-	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_c2);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_c2);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_c2);
+	void vdp_sndirqline_callback_c2(int state);
+	void vdp_lv6irqline_callback_c2(int state);
+	void vdp_lv4irqline_callback_c2(int state);
 
-	DECLARE_READ8_MEMBER(io_portc_r);
-	DECLARE_WRITE8_MEMBER(io_portd_w);
-	DECLARE_WRITE8_MEMBER(io_porth_w);
+	uint8_t io_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_portd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_porth_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE16_MEMBER( segac2_upd7759_w );
-	DECLARE_READ16_MEMBER( palette_r );
-	DECLARE_WRITE16_MEMBER( palette_w );
-	DECLARE_WRITE8_MEMBER( control_w );
-	DECLARE_READ8_MEMBER( prot_r );
-	DECLARE_WRITE8_MEMBER( prot_w );
-	DECLARE_WRITE8_MEMBER( counter_timer_w );
-	DECLARE_READ16_MEMBER( printer_r );
-	DECLARE_WRITE16_MEMBER( print_club_camera_w );
-	DECLARE_READ16_MEMBER(ichirjbl_prot_r);
-	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
+	void segac2_upd7759_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t palette_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void counter_timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t printer_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void print_club_camera_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ichirjbl_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void segac2_irq2_interrupt(int state);
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -222,7 +222,7 @@ public:
 
 ******************************************************************************/
 
-MACHINE_START_MEMBER(segac2_state,segac2)
+void segac2_state::machine_start_segac2()
 {
 	save_item(NAME(m_prot_write_buf));
 	save_item(NAME(m_prot_read_buf));
@@ -231,7 +231,7 @@ MACHINE_START_MEMBER(segac2_state,segac2)
 }
 
 
-MACHINE_RESET_MEMBER(segac2_state,segac2)
+void segac2_state::machine_reset_segac2()
 {
 //  megadriv_scanline_timer = machine().device<timer_device>("md_scan_timer");
 //  megadriv_scanline_timer->adjust(attotime::zero);
@@ -281,7 +281,7 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 ******************************************************************************/
 
 /* handle writes to the UPD7759 */
-WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
+void segac2_state::segac2_upd7759_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* make sure we have a UPD chip */
 	if (m_upd7759 == nullptr)
@@ -315,7 +315,7 @@ WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
 ******************************************************************************/
 
 /* handle reads from the paletteram */
-READ16_MEMBER(segac2_state::palette_r)
+uint16_t segac2_state::palette_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= 0x1ff;
 	if (m_segac2_alt_palette_mode)
@@ -325,7 +325,7 @@ READ16_MEMBER(segac2_state::palette_r)
 }
 
 /* handle writes to the paletteram */
-WRITE16_MEMBER(segac2_state::palette_w)
+void segac2_state::palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r, g, b, newword;
 	int tmpr, tmpg, tmpb;
@@ -418,7 +418,7 @@ void segac2_state::recompute_palette_tables()
     Sega 315-5296 I/O chip
 ******************************************************************************/
 
-READ8_MEMBER(segac2_state::io_portc_r)
+uint8_t segac2_state::io_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// D7 : From MB3773P pin 1. (/RESET output)
 	// D6 : From uPD7759 pin 18. (/BUSY output)
@@ -426,7 +426,7 @@ READ8_MEMBER(segac2_state::io_portc_r)
 	return 0xbf | busy;
 }
 
-WRITE8_MEMBER(segac2_state::io_portd_w)
+void segac2_state::io_portd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	 D7 : To pin 3 of JP15. (Watchdog clock control)
@@ -444,7 +444,7 @@ WRITE8_MEMBER(segac2_state::io_portd_w)
 	space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
-WRITE8_MEMBER(segac2_state::io_porth_w)
+void segac2_state::io_porth_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	 D7 : To pin A19 of CN4
@@ -481,7 +481,7 @@ WRITE8_MEMBER(segac2_state::io_porth_w)
 
 ******************************************************************************/
 
-WRITE8_MEMBER(segac2_state::control_w)
+void segac2_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0x0f;
 
@@ -513,7 +513,7 @@ WRITE8_MEMBER(segac2_state::control_w)
 ******************************************************************************/
 
 /* protection chip reads */
-READ8_MEMBER(segac2_state::prot_r)
+uint8_t segac2_state::prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", space.device().safe_pcbase(), m_prot_read_buf);
 	return m_prot_read_buf | 0xf0;
@@ -521,7 +521,7 @@ READ8_MEMBER(segac2_state::prot_r)
 
 
 /* protection chip writes */
-WRITE8_MEMBER(segac2_state::prot_w)
+void segac2_state::prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int new_sp_palbase = (data >> 2) & 3;
 	int new_bg_palbase = data & 3;
@@ -560,7 +560,7 @@ WRITE8_MEMBER(segac2_state::prot_w)
 
 ******************************************************************************/
 
-WRITE8_MEMBER(segac2_state::counter_timer_w)
+void segac2_state::counter_timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*int value = data & 1;*/
 	switch (data & 0x1e)
@@ -604,12 +604,12 @@ WRITE8_MEMBER(segac2_state::counter_timer_w)
 
 ******************************************************************************/
 
-READ16_MEMBER(segac2_state::printer_r)
+uint16_t segac2_state::printer_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cam_data;
 }
 
-WRITE16_MEMBER(segac2_state::print_club_camera_w)
+void segac2_state::print_club_camera_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_cam_data = data;
 }
@@ -1395,7 +1395,7 @@ INPUT_PORTS_END
     Sound interfaces
 ******************************************************************************/
 
-WRITE_LINE_MEMBER(segac2_state::segac2_irq2_interrupt)
+void segac2_state::segac2_irq2_interrupt(int state)
 {
 	//printf("sound irq %d\n", state);
 	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
@@ -1414,9 +1414,9 @@ WRITE_LINE_MEMBER(segac2_state::segac2_irq2_interrupt)
 
 ******************************************************************************/
 
-VIDEO_START_MEMBER(segac2_state,segac2_new)
+void segac2_state::video_start_segac2_new()
 {
-	VIDEO_START_CALL_MEMBER(megadriv);
+	video_start_megadriv();
 }
 
 // C2 doesn't use the internal VDP CRAM, instead it uses the digital output of the chip
@@ -1483,20 +1483,20 @@ uint32_t segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rg
 
 
 // the main interrupt on C2 comes from the vdp line used to drive the z80 interrupt on a regular genesis(!)
-WRITE_LINE_MEMBER(segac2_state::vdp_sndirqline_callback_c2)
+void segac2_state::vdp_sndirqline_callback_c2(int state)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 // the line usually used to drive irq6 is not connected
-WRITE_LINE_MEMBER(segac2_state::vdp_lv6irqline_callback_c2)
+void segac2_state::vdp_lv6irqline_callback_c2(int state)
 {
 	//
 }
 
 // the scanline interrupt seems connected as usual
-WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
+void segac2_state::vdp_lv4irqline_callback_c2(int state)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(4, HOLD_LINE);
@@ -2060,7 +2060,7 @@ it should be, otherwise I don't see how the formula could be computed.
 
 void segac2_state::segac2_common_init(segac2_prot_delegate prot_func)
 {
-	DRIVER_INIT_CALL(megadriv_c2);
+	init_megadriv_c2();
 	m_prot_func = prot_func;
 
 	if (m_upd7759 != nullptr)
@@ -2295,122 +2295,122 @@ int segac2_state::prot_func_pclubjv5(int in)
 
 
 
-DRIVER_INIT_MEMBER(segac2_state,c2boot)
+void segac2_state::init_c2boot()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_dummy),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,bloxeedc)
+void segac2_state::init_bloxeedc()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_dummy),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,columns)
+void segac2_state::init_columns()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_columns),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,columns2)
+void segac2_state::init_columns2()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_columns2),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,tfrceac)
+void segac2_state::init_tfrceac()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_tfrceac),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,tfrceacb)
+void segac2_state::init_tfrceacb()
 {
 	/* disable the palette bank switching from the protection chip */
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_dummy),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x800000, 0x800001);
 }
 
-DRIVER_INIT_MEMBER(segac2_state,borench)
+void segac2_state::init_borench()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_borench),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,twinsqua)
+void segac2_state::init_twinsqua()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_twinsqua),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,ribbit)
+void segac2_state::init_ribbit()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_ribbit),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,puyo)
+void segac2_state::init_puyo()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_puyo),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,tantr)
+void segac2_state::init_tantr()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_tantr),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,tantrkor)
+void segac2_state::init_tantrkor()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_tantrkor),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,potopoto)
+void segac2_state::init_potopoto()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_potopoto),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,stkclmns)
+void segac2_state::init_stkclmns()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_stkclmns),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,stkclmnj)
+void segac2_state::init_stkclmnj()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_stkclmnj),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,ichir)
+void segac2_state::init_ichir()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_ichir),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,ichirk)
+void segac2_state::init_ichirk()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_ichirk),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,ichirj)
+void segac2_state::init_ichirj()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_ichirj),this));
 }
 
-READ16_MEMBER(segac2_state::ichirjbl_prot_r )
+uint16_t segac2_state::ichirjbl_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x00f5;
 }
 
-DRIVER_INIT_MEMBER(segac2_state,ichirjbl)
+void segac2_state::init_ichirjbl()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_dummy),this));
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x840108, 0x840109, read16_delegate(FUNC(segac2_state::ichirjbl_prot_r),this) );
 }
 
-DRIVER_INIT_MEMBER(segac2_state,puyopuy2)
+void segac2_state::init_puyopuy2()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_puyopuy2),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,zunkyou)
+void segac2_state::init_zunkyou()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_zunkyou),this));
 }
 
 
-DRIVER_INIT_MEMBER(segac2_state,pclub)
+void segac2_state::init_pclub()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclub),this));
 
@@ -2419,7 +2419,7 @@ DRIVER_INIT_MEMBER(segac2_state,pclub)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,pclubjv2)
+void segac2_state::init_pclubjv2()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclubjv2),this));
 
@@ -2428,7 +2428,7 @@ DRIVER_INIT_MEMBER(segac2_state,pclubjv2)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,pclubjv4)
+void segac2_state::init_pclubjv4()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclubjv4),this));
 
@@ -2437,7 +2437,7 @@ DRIVER_INIT_MEMBER(segac2_state,pclubjv4)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
-DRIVER_INIT_MEMBER(segac2_state,pclubjv5)
+void segac2_state::init_pclubjv5()
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclubjv5),this));
 

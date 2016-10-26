@@ -31,14 +31,14 @@ public:
 		: pk8000_base_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 
-	DECLARE_WRITE8_MEMBER(pk8000_80_porta_w);
-	DECLARE_READ8_MEMBER(pk8000_80_portb_r);
-	DECLARE_WRITE8_MEMBER(pk8000_80_portc_w);
+	void pk8000_80_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pk8000_80_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pk8000_80_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
-	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);
+	void pk8000_interrupt(device_t &device);
+	int pk8000_irq_callback(device_t &device, int irqline);
 	void pk8000_set_bank(uint8_t data);
 	required_device<speaker_sound_device> m_speaker;
 };
@@ -103,17 +103,17 @@ void photon_state::pk8000_set_bank(uint8_t data)
 				break;
 	}
 }
-WRITE8_MEMBER(photon_state::pk8000_80_porta_w)
+void photon_state::pk8000_80_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pk8000_set_bank(data);
 }
 
-READ8_MEMBER(photon_state::pk8000_80_portb_r)
+uint8_t photon_state::pk8000_80_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(photon_state::pk8000_80_portc_w)
+void photon_state::pk8000_80_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data,7));
 }
@@ -155,12 +155,12 @@ static INPUT_PORTS_START( photon )
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(photon_state::pk8000_interrupt)
+void photon_state::pk8000_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(photon_state::pk8000_irq_callback)
+int photon_state::pk8000_irq_callback(device_t &device, int irqline)
 {
 	return 0xff;
 }

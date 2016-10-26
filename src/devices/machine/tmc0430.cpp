@@ -131,7 +131,7 @@ tmc0430_device::tmc0430_device(const machine_config &mconfig, const char *tag, d
 /*
     Direction. When ASSERTed, GROM is set to be read by CPU.
 */
-WRITE_LINE_MEMBER( tmc0430_device::m_line )
+void tmc0430_device::m_line(int state)
 {
 	m_read_mode = (state==ASSERT_LINE);
 	if (TRACE_LINE) logerror("GROM %d dir %s\n", m_ident>>13, m_read_mode? "READ" : "WRITE");
@@ -140,7 +140,7 @@ WRITE_LINE_MEMBER( tmc0430_device::m_line )
 /*
     Mode. When ASSERTed, the address counter will be accessed (read or write).
 */
-WRITE_LINE_MEMBER( tmc0430_device::mo_line )
+void tmc0430_device::mo_line(int state)
 {
 	m_address_mode = (state==ASSERT_LINE);
 	if (TRACE_LINE) logerror("GROM %d mode %s\n", m_ident>>13, m_address_mode? "ADDR" : "DATA");
@@ -149,7 +149,7 @@ WRITE_LINE_MEMBER( tmc0430_device::mo_line )
 /*
     Select. When ASSERTed, the read/write operation is started.
 */
-WRITE_LINE_MEMBER( tmc0430_device::gsq_line )
+void tmc0430_device::gsq_line(int state)
 {
 	if (state==ASSERT_LINE && !m_selected)      // check for edge
 	{
@@ -169,7 +169,7 @@ WRITE_LINE_MEMBER( tmc0430_device::gsq_line )
     3 -> MO=1, M=1
     Data: gsq line (ASSERT, CLEAR)
 */
-WRITE8_MEMBER( tmc0430_device::set_lines )
+void tmc0430_device::set_lines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_read_mode = ((offset & GROM_M_LINE)!=0);
 	m_address_mode = ((offset & GROM_MO_LINE)!=0);
@@ -199,7 +199,7 @@ WRITE8_MEMBER( tmc0430_device::set_lines )
     For the emulation we may assume that all GROMs at the same clock line
     raise their outputs synchronously.
 */
-WRITE_LINE_MEMBER( tmc0430_device::gclock_in )
+void tmc0430_device::gclock_in(int state)
 {
 	int bank = 0;
 	uint16_t baddr = 0;
@@ -306,7 +306,7 @@ READ8Z_MEMBER( tmc0430_device::readz )
     This operation occurs in parallel to phase 4. The real GROM will pick up
     the value from the data bus some phases later.
 */
-WRITE8_MEMBER( tmc0430_device::write )
+void tmc0430_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_selected) return;
 

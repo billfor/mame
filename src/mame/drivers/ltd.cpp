@@ -54,19 +54,19 @@ public:
 		, m_p_ram(*this, "nvram")
 	{ }
 
-	DECLARE_DRIVER_INIT(atla_ltd);
-	DECLARE_DRIVER_INIT(bhol_ltd);
-	DECLARE_DRIVER_INIT(zephy);
-	DECLARE_DRIVER_INIT(ltd);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_WRITE8_MEMBER(count_reset_w);
-	DECLARE_INPUT_CHANGED_MEMBER(ficha);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
+	void init_atla_ltd();
+	void init_bhol_ltd();
+	void init_zephy();
+	void init_ltd();
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void count_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ficha(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void timer_r(timer_device &timer, void *ptr, int32_t param);
 private:
 	bool m_timer_r;
 	bool m_clear;
@@ -229,14 +229,14 @@ static INPUT_PORTS_START( ltd4 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( ltd_state::ficha )
+void ltd_state::ficha(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 // switches
-READ8_MEMBER( ltd_state::io_r )
+uint8_t ltd_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset==0)
 		return ioport("X0")->read();
@@ -257,12 +257,12 @@ READ8_MEMBER( ltd_state::io_r )
 }
 
 // Lamps only used by Zephy
-WRITE8_MEMBER( ltd_state::io_w )
+void ltd_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset >>= 10; // reduces offsets to 1 per bank
 }
 
-READ8_MEMBER( ltd_state:: port1_r )
+uint8_t ltd_state:: port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (~m_port2 & 0x10)
 	{
@@ -295,7 +295,7 @@ READ8_MEMBER( ltd_state:: port1_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( ltd_state::port1_w )
+void ltd_state::port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_port2 & 0x10)
 	{
@@ -336,12 +336,12 @@ WRITE8_MEMBER( ltd_state::port1_w )
 	}
 }
 
-READ8_MEMBER( ltd_state:: port2_r )
+uint8_t ltd_state:: port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port2;
 }
 
-WRITE8_MEMBER( ltd_state::port2_w )
+void ltd_state::port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (~m_port2 & data & 0x10)
 		m_counter++;
@@ -349,7 +349,7 @@ WRITE8_MEMBER( ltd_state::port2_w )
 	m_port2 = data;
 }
 
-WRITE8_MEMBER( ltd_state::count_reset_w )
+void ltd_state::count_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_counter = 0;
 }
@@ -362,29 +362,29 @@ void ltd_state::machine_reset()
 	m_timer_r = 0;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, ltd )
+void ltd_state::init_ltd()
 {
 	m_game = 0;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, atla_ltd )
+void ltd_state::init_atla_ltd()
 {
 	m_game = 1;
 	output().set_digit_value(0, 0x3f);
 	output().set_digit_value(10, 0x3f);
 }
 
-DRIVER_INIT_MEMBER( ltd_state, bhol_ltd )
+void ltd_state::init_bhol_ltd()
 {
 	m_game = 2;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, zephy )
+void ltd_state::init_zephy()
 {
 	m_game = 3;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
+void ltd_state::timer_r(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer_r ^= 1;
 	m_maincpu->set_input_line(M6802_IRQ_LINE, (m_timer_r) ? CLEAR_LINE : ASSERT_LINE);

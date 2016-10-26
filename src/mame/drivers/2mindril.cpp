@@ -56,18 +56,18 @@ public:
 	uint16_t        m_irq_reg;
 
 	/* devices */
-	DECLARE_READ16_MEMBER(drill_io_r);
-	DECLARE_WRITE16_MEMBER(drill_io_w);
-	DECLARE_WRITE16_MEMBER(sensors_w);
-	DECLARE_READ16_MEMBER(drill_irq_r);
-	DECLARE_WRITE16_MEMBER(drill_irq_w);
-	DECLARE_DRIVER_INIT(drill);
-	DECLARE_MACHINE_START(drill);
-	DECLARE_MACHINE_RESET(drill);
-	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
-	//INTERRUPT_GEN_MEMBER(drill_device_irq);
+	uint16_t drill_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void drill_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sensors_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t drill_irq_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void drill_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void init_drill();
+	void machine_start_drill();
+	void machine_reset_drill();
+	void drill_vblank_irq(device_t &device);
+	//void drill_device_irq(device_t &device);
 	void tile_decode();
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 	#ifdef UNUSED_FUNCTION
 	enum
 	{
@@ -81,7 +81,7 @@ protected:
 };
 
 
-READ16_MEMBER(_2mindril_state::drill_io_r)
+uint16_t _2mindril_state::drill_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  if (offset * 2 == 0x4)
 	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", space.device().safe_pc(), m_iodata[0/2], m_iodata[2/2], m_iodata[4/2], m_iodata[6/2],
@@ -109,7 +109,7 @@ READ16_MEMBER(_2mindril_state::drill_io_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(_2mindril_state::drill_io_w)
+void _2mindril_state::drill_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_iodata[offset]);
 
@@ -158,7 +158,7 @@ void _2mindril_state::device_timer(emu_timer &timer, device_timer_id id, int par
 }
 #endif
 
-WRITE16_MEMBER(_2mindril_state::sensors_w)
+void _2mindril_state::sensors_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*---- xxxx ---- ---- select "lamps" (guess)*/
 	/*---- ---- ---- -x-- lamp*/
@@ -185,12 +185,12 @@ WRITE16_MEMBER(_2mindril_state::sensors_w)
 	}
 }
 
-READ16_MEMBER(_2mindril_state::drill_irq_r)
+uint16_t _2mindril_state::drill_irq_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_irq_reg;
 }
 
-WRITE16_MEMBER(_2mindril_state::drill_irq_w)
+void _2mindril_state::drill_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	(note: could rather be irq mask)
@@ -410,33 +410,33 @@ static GFXDECODE_START( 2mindril )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(_2mindril_state::drill_vblank_irq)
+void _2mindril_state::drill_vblank_irq(device_t &device)
 {
 	device.execute().set_input_line(4, ASSERT_LINE);
 }
 
 #if 0
-INTERRUPT_GEN_MEMBER(_2mindril_state::drill_device_irq)
+void _2mindril_state::drill_device_irq(device_t &device)
 {
 	device.execute().set_input_line(5, ASSERT_LINE);
 }
 #endif
 
 /* WRONG,it does something with 60000c & 700002,likely to be called when the player throws the ball.*/
-WRITE_LINE_MEMBER(_2mindril_state::irqhandler)
+void _2mindril_state::irqhandler(int state)
 {
 //  m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-MACHINE_START_MEMBER(_2mindril_state,drill)
+void _2mindril_state::machine_start_drill()
 {
 	save_item(NAME(m_defender_sensor));
 	save_item(NAME(m_shutter_sensor));
 	save_item(NAME(m_irq_reg));
 }
 
-MACHINE_RESET_MEMBER(_2mindril_state,drill)
+void _2mindril_state::machine_reset_drill()
 {
 	m_defender_sensor = 0;
 	m_shutter_sensor = 0;
@@ -555,7 +555,7 @@ void _2mindril_state::tile_decode()
 	}
 }
 
-DRIVER_INIT_MEMBER(_2mindril_state,drill)
+void _2mindril_state::init_drill()
 {
 	m_f3_game=TMDRILL;
 	tile_decode();

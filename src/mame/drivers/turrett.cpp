@@ -156,25 +156,25 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ_LINE_MEMBER( turrett_state::sbrc2_r )
+int turrett_state::sbrc2_r()
 {
 	return m_screen->vblank();
 }
 
 
-READ_LINE_MEMBER( turrett_state::sbrc3_r )
+int turrett_state::sbrc3_r()
 {
 	return m_dma_idle;
 }
 
 
-READ32_MEMBER( turrett_state::int_r )
+uint32_t turrett_state::int_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return update_inputs() << 24;
 }
 
 
-WRITE32_MEMBER( turrett_state::int_w )
+void turrett_state::int_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// TODO
 	logerror("Output write: %08x\n", data);
@@ -252,7 +252,7 @@ uint32_t turrett_state::update_inputs(void)
 }
 
 
-INPUT_CHANGED_MEMBER( turrett_state::ipt_change )
+void turrett_state::ipt_change(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int p = (uintptr_t)param;
 
@@ -283,7 +283,7 @@ INPUT_CHANGED_MEMBER( turrett_state::ipt_change )
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER( turrett_state::vblank )
+void turrett_state::vblank(device_t &device)
 {
 	if (m_frame)
 		m_inputs_active |= 0x01000000;
@@ -295,7 +295,7 @@ INTERRUPT_GEN_MEMBER( turrett_state::vblank )
 }
 
 
-INTERRUPT_GEN_MEMBER( turrett_state::adc )
+void turrett_state::adc(device_t &device)
 {
 	if (m_adc)
 		m_inputs_active |= 0x00000001;

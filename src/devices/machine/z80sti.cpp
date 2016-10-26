@@ -368,7 +368,7 @@ void z80sti_device::take_interrupt(int level)
 //  read - register read
 //-------------------------------------------------
 
-READ8_MEMBER( z80sti_device::read )
+uint8_t z80sti_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -413,7 +413,7 @@ READ8_MEMBER( z80sti_device::read )
 //  write - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80sti_device::write )
+void z80sti_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x0f)
 	{
@@ -690,21 +690,21 @@ void z80sti_device::gpip_input(int bit, int state)
 	m_gpip = (m_gpip & ~(1 << bit)) | (state << bit);
 }
 
-WRITE_LINE_MEMBER( z80sti_device::i0_w ) { gpip_input(0, state); }
-WRITE_LINE_MEMBER( z80sti_device::i1_w ) { gpip_input(1, state); }
-WRITE_LINE_MEMBER( z80sti_device::i2_w ) { gpip_input(2, state); }
-WRITE_LINE_MEMBER( z80sti_device::i3_w ) { gpip_input(3, state); }
-WRITE_LINE_MEMBER( z80sti_device::i4_w ) { gpip_input(4, state); }
-WRITE_LINE_MEMBER( z80sti_device::i5_w ) { gpip_input(5, state); }
-WRITE_LINE_MEMBER( z80sti_device::i6_w ) { gpip_input(6, state); }
-WRITE_LINE_MEMBER( z80sti_device::i7_w ) { gpip_input(7, state); }
+void z80sti_device::i0_w(int state) { gpip_input(0, state); }
+void z80sti_device::i1_w(int state) { gpip_input(1, state); }
+void z80sti_device::i2_w(int state) { gpip_input(2, state); }
+void z80sti_device::i3_w(int state) { gpip_input(3, state); }
+void z80sti_device::i4_w(int state) { gpip_input(4, state); }
+void z80sti_device::i5_w(int state) { gpip_input(5, state); }
+void z80sti_device::i6_w(int state) { gpip_input(6, state); }
+void z80sti_device::i7_w(int state) { gpip_input(7, state); }
 
 
 //-------------------------------------------------
 //  rc_w - receiver clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80sti_device::rc_w )
+void z80sti_device::rc_w(int state)
 {
 	rx_clock_w(state);
 }
@@ -714,7 +714,7 @@ WRITE_LINE_MEMBER( z80sti_device::rc_w )
 //  tc_w - transmitter clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80sti_device::tc_w )
+void z80sti_device::tc_w(int state)
 {
 	tx_clock_w(state);
 }

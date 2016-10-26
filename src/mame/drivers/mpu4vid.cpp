@@ -255,51 +255,51 @@ public:
 	int8_t m_cur[2];
 
 
-	DECLARE_DRIVER_INIT(crmazea);
-	DECLARE_DRIVER_INIT(v4barqst2);
-	DECLARE_DRIVER_INIT(quidgrid);
-	DECLARE_DRIVER_INIT(v4barqst);
-	DECLARE_DRIVER_INIT(timemchn);
-	DECLARE_DRIVER_INIT(crmaze2a);
-	DECLARE_DRIVER_INIT(v4opt3);
-	DECLARE_DRIVER_INIT(eyesdown);
-	DECLARE_DRIVER_INIT(v4cmazeb);
-	DECLARE_DRIVER_INIT(crmaze2);
-	DECLARE_DRIVER_INIT(crmaze);
-	DECLARE_DRIVER_INIT(prizeinv);
-	DECLARE_DRIVER_INIT(strikeit);
-	DECLARE_DRIVER_INIT(v4wize);
-	DECLARE_DRIVER_INIT(turnover);
-	DECLARE_DRIVER_INIT(adders);
-	DECLARE_DRIVER_INIT(mating);
-	DECLARE_DRIVER_INIT(crmaze3a);
-	DECLARE_DRIVER_INIT(skiltrek);
-	DECLARE_DRIVER_INIT(crmaze3);
-	DECLARE_DRIVER_INIT(cybcas);
-	DECLARE_MACHINE_START(mpu4_vid);
-	DECLARE_MACHINE_RESET(mpu4_vid);
-	DECLARE_VIDEO_START(mpu4_vid);
+	void init_crmazea();
+	void init_v4barqst2();
+	void init_quidgrid();
+	void init_v4barqst();
+	void init_timemchn();
+	void init_crmaze2a();
+	void init_v4opt3();
+	void init_eyesdown();
+	void init_v4cmazeb();
+	void init_crmaze2();
+	void init_crmaze();
+	void init_prizeinv();
+	void init_strikeit();
+	void init_v4wize();
+	void init_turnover();
+	void init_adders();
+	void init_mating();
+	void init_crmaze3a();
+	void init_skiltrek();
+	void init_crmaze3();
+	void init_cybcas();
+	void machine_start_mpu4_vid();
+	void machine_reset_mpu4_vid();
+	void video_start_mpu4_vid();
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
-	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(cpu1_ptm_irq);
-	DECLARE_WRITE_LINE_MEMBER(vid_o1_callback);
-	DECLARE_WRITE_LINE_MEMBER(vid_o2_callback);
-	DECLARE_WRITE_LINE_MEMBER(vid_o3_callback);
-	DECLARE_READ8_MEMBER(pia_ic5_porta_track_r);
+	void m6809_acia_irq(int state);
+	void m68k_acia_irq(int state);
+	void cpu1_ptm_irq(int state);
+	void vid_o1_callback(int state);
+	void vid_o2_callback(int state);
+	void vid_o3_callback(int state);
+	uint8_t pia_ic5_porta_track_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mpu4vid_char_cheat( int address);
-	DECLARE_WRITE_LINE_MEMBER(update_mpu68_interrupts);
-	DECLARE_READ16_MEMBER( mpu4_vid_vidram_r );
-	DECLARE_WRITE16_MEMBER( mpu4_vid_vidram_w );
-	DECLARE_WRITE8_MEMBER( ef9369_w );
-	DECLARE_READ8_MEMBER( ef9369_r );
-	DECLARE_WRITE8_MEMBER( bt471_w );
-	DECLARE_READ8_MEMBER( bt471_r );
-	DECLARE_WRITE8_MEMBER( vidcharacteriser_w );
-	DECLARE_READ8_MEMBER( vidcharacteriser_r );
-	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
-	DECLARE_WRITE8_MEMBER( vram_w );
-	DECLARE_READ8_MEMBER( vram_r );
+	void update_mpu68_interrupts(int state);
+	uint16_t mpu4_vid_vidram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mpu4_vid_vidram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ef9369_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ef9369_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bt471_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bt471_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vidcharacteriser_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vidcharacteriser_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mpu_video_reset(int state);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 /*************************************
@@ -323,7 +323,7 @@ public:
 */
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::update_mpu68_interrupts)
+void mpu4vid_state::update_mpu68_interrupts(int state)
 {
 	m_videocpu->set_input_line(1, m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_videocpu->set_input_line(2, m_m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
@@ -331,13 +331,13 @@ WRITE_LINE_MEMBER(mpu4vid_state::update_mpu68_interrupts)
 
 /* Communications with 6809 board */
 
-WRITE_LINE_MEMBER(mpu4vid_state::m6809_acia_irq)
+void mpu4vid_state::m6809_acia_irq(int state)
 {
 	m_acia_1->write_cts(state);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
-WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_irq)
+void mpu4vid_state::m68k_acia_irq(int state)
 {
 	m_acia_0->write_cts(state);
 	m_m6850_irq_state = state;
@@ -345,14 +345,14 @@ WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_irq)
 }
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::cpu1_ptm_irq)
+void mpu4vid_state::cpu1_ptm_irq(int state)
 {
 	m_m6840_irq_state = state;
 	update_mpu68_interrupts(1);
 }
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::vid_o1_callback)
+void mpu4vid_state::vid_o1_callback(int state)
 {
 	m_ptm->set_c2(state); /* this output is the clock for timer2 */
 
@@ -363,13 +363,13 @@ WRITE_LINE_MEMBER(mpu4vid_state::vid_o1_callback)
 }
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::vid_o2_callback)
+void mpu4vid_state::vid_o2_callback(int state)
 {
 	m_ptm->set_c3(state); /* this output is the clock for timer3 */
 }
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::vid_o3_callback)
+void mpu4vid_state::vid_o3_callback(int state)
 {
 	m_ptm->set_c1(state); /* this output is the clock for timer1 */
 }
@@ -386,12 +386,12 @@ static const gfx_layout mpu4_vid_char_8x8_layout =
 	8*32
 };
 
-WRITE8_MEMBER(mpu4vid_state::vram_w)
+void mpu4vid_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vid_mainram[offset] = data | (m_vid_mainram[offset] & 0xff00);
 }
 
-READ8_MEMBER(mpu4vid_state::vram_r)
+uint8_t mpu4vid_state::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vid_mainram[offset];
 }
@@ -413,13 +413,13 @@ SCN2674_DRAW_CHARACTER_MEMBER(mpu4vid_state::display_pixels)
 }
 
 
-READ16_MEMBER(mpu4vid_state::mpu4_vid_vidram_r )
+uint16_t mpu4vid_state::mpu4_vid_vidram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_vid_vidram[offset];
 }
 
 
-WRITE16_MEMBER(mpu4vid_state::mpu4_vid_vidram_w )
+void mpu4vid_state::mpu4_vid_vidram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vid_vidram[offset]);
 	offset <<= 1;
@@ -427,7 +427,7 @@ WRITE16_MEMBER(mpu4vid_state::mpu4_vid_vidram_w )
 }
 
 
-VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::video_start_mpu4_vid()
 {
 	m_vid_vidram.allocate(0x20000/2);
 
@@ -454,7 +454,7 @@ VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 
 /* Non-multiplexed mode */
 
-WRITE8_MEMBER(mpu4vid_state::ef9369_w )
+void mpu4vid_state::ef9369_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct ef9369_t &pal = m_pal;
 
@@ -494,7 +494,7 @@ WRITE8_MEMBER(mpu4vid_state::ef9369_w )
 }
 
 
-READ8_MEMBER(mpu4vid_state::ef9369_r )
+uint8_t mpu4vid_state::ef9369_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	struct ef9369_t &pal = m_pal;
 	if ((offset & 1) == 0)
@@ -533,7 +533,7 @@ READ8_MEMBER(mpu4vid_state::ef9369_r )
  *  1 0 1    Overlay register
  */
 
-WRITE8_MEMBER(mpu4vid_state::bt471_w )
+void mpu4vid_state::bt471_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct bt471_t &bt471 = m_bt471;
 
@@ -575,7 +575,7 @@ WRITE8_MEMBER(mpu4vid_state::bt471_w )
 	}
 }
 
-READ8_MEMBER(mpu4vid_state::bt471_r )
+uint8_t mpu4vid_state::bt471_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	popmessage("Bt471: Unhandled read access (offset:%x)", offset);
 	return 0;
@@ -588,7 +588,7 @@ READ8_MEMBER(mpu4vid_state::bt471_r )
  *
  *************************************/
 
-READ8_MEMBER(mpu4vid_state::pia_ic5_porta_track_r)
+uint8_t mpu4vid_state::pia_ic5_porta_track_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* The SWP trackball interface connects a standard trackball to the AUX1 port on the MPU4
 	mainboard. As per usual, they've taken the cheap route here, reading and processing the
@@ -1201,14 +1201,14 @@ static INPUT_PORTS_START( adders )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")//PORT_IMPULSE(5)
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
+void mpu4vid_state::mpu_video_reset(int state)
 {
 	m_ptm->reset();
 	m_acia_1->reset();
 }
 
 /* machine start (called only once) */
-MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::machine_start_mpu4_vid()
 {
 	mpu4_config_common();
 
@@ -1220,7 +1220,7 @@ MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
 	m_videocpu->set_reset_callback(write_line_delegate(FUNC(mpu4vid_state::mpu_video_reset),this));
 }
 
-MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::machine_reset_mpu4_vid()
 {
 	m_vfd->reset(); //for debug ports only
 
@@ -1454,7 +1454,7 @@ Characteriser (CHR)
  the 'challenge' part of the startup check is always the same
 */
 
-WRITE8_MEMBER(mpu4vid_state::vidcharacteriser_w )
+void mpu4vid_state::vidcharacteriser_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x;
 	int call=(data&0xff);
@@ -1485,7 +1485,7 @@ WRITE8_MEMBER(mpu4vid_state::vidcharacteriser_w )
 }
 
 
-READ8_MEMBER(mpu4vid_state::vidcharacteriser_r )
+uint8_t mpu4vid_state::vidcharacteriser_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", space.device().safe_pcbase(),offset,m_current_chr_table[m_prot_col].response));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
@@ -1678,93 +1678,93 @@ static mpu4_chr_table prizeinv_data[8] = {
 {0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
 };
 
-DRIVER_INIT_MEMBER(mpu4vid_state,adders)
+void mpu4vid_state::init_adders()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = adders_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze)
+void mpu4vid_state::init_crmaze()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = crmaze_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmazea)
+void mpu4vid_state::init_crmazea()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = crmazea_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze2)
+void mpu4vid_state::init_crmaze2()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = crmaze2_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze2a)
+void mpu4vid_state::init_crmaze2a()
 {
 	m_reels = 0;//currently no hybrid games
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze3)
+void mpu4vid_state::init_crmaze3()
 {
 	m_reels = 0;//currently no hybrid games
 	m_reel_mux = FLUTTERBOX;
 	m_current_chr_table = crmaze3_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,crmaze3a)
+void mpu4vid_state::init_crmaze3a()
 {
 	m_reels = 0;//currently no hybrid games
 	m_reel_mux = FLUTTERBOX;
 	m_current_chr_table = crmaze3a_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,mating)
+void mpu4vid_state::init_mating()
 {
 	m_reels = 0;//currently no hybrid games
 
 	m_current_chr_table = mating_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,skiltrek)
+void mpu4vid_state::init_skiltrek()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = skiltrek_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,timemchn)
+void mpu4vid_state::init_timemchn()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = timemchn_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,strikeit)
+void mpu4vid_state::init_strikeit()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = strikeit_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,turnover)
+void mpu4vid_state::init_turnover()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = turnover_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,eyesdown)
+void mpu4vid_state::init_eyesdown()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = eyesdown_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,quidgrid)
+void mpu4vid_state::init_quidgrid()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = quidgrid_data;
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,prizeinv)
+void mpu4vid_state::init_prizeinv()
 {
 	m_reels = 0;//currently no hybrid games
 	m_current_chr_table = prizeinv_data;
@@ -1785,7 +1785,7 @@ static mpu4_chr_table cybcas_data[8] = {
 {0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
 };
 
-DRIVER_INIT_MEMBER(mpu4vid_state,cybcas)
+void mpu4vid_state::init_cybcas()
 {
 	//no idea what this should be, use blues boys table for now
 	m_bwb_chr_table1 = cybcas_data1;
@@ -1804,27 +1804,27 @@ void mpu4vid_state::mpu4vid_char_cheat( int address)
 	}
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4barqst)
+void mpu4vid_state::init_v4barqst()
 {
 	mpu4vid_char_cheat(0x154);
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4barqst2)
+void mpu4vid_state::init_v4barqst2()
 {
 	mpu4vid_char_cheat(0x15c);
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4wize)
+void mpu4vid_state::init_v4wize()
 {
 	mpu4vid_char_cheat(0x16c);
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4cmazeb)
+void mpu4vid_state::init_v4cmazeb()
 {
 	mpu4vid_char_cheat(0x4c6);
 }
 
-DRIVER_INIT_MEMBER(mpu4vid_state,v4opt3)
+void mpu4vid_state::init_v4opt3()
 {
 	mpu4vid_char_cheat(0x164);
 }

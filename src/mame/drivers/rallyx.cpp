@@ -206,14 +206,14 @@ TODO:
  *
  *************************************/
 
-WRITE8_MEMBER(rallyx_state::rallyx_interrupt_vector_w)
+void rallyx_state::rallyx_interrupt_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line_vector(0, data);
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(rallyx_state::rallyx_bang_w)
+void rallyx_state::rallyx_bang_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0 && m_last_bang != 0)
 		m_samples->start(0, 0);
@@ -221,7 +221,7 @@ WRITE8_MEMBER(rallyx_state::rallyx_bang_w)
 	m_last_bang = data;
 }
 
-WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
+void rallyx_state::rallyx_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = data & 1;
 
@@ -265,7 +265,7 @@ WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
 }
 
 
-WRITE8_MEMBER(rallyx_state::locomotn_latch_w)
+void rallyx_state::locomotn_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = data & 1;
 
@@ -814,25 +814,25 @@ static const char *const rallyx_sample_names[] =
  *
  *************************************/
 
-MACHINE_START_MEMBER(rallyx_state,rallyx)
+void rallyx_state::machine_start_rallyx()
 {
 	save_item(NAME(m_last_bang));
 	save_item(NAME(m_stars_enable));
 }
 
-MACHINE_RESET_MEMBER(rallyx_state,rallyx)
+void rallyx_state::machine_reset_rallyx()
 {
 	m_last_bang = 0;
 	m_stars_enable = 0;
 }
 
-INTERRUPT_GEN_MEMBER(rallyx_state::rallyx_vblank_irq)
+void rallyx_state::rallyx_vblank_irq(device_t &device)
 {
 	if (m_main_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(rallyx_state::jungler_vblank_irq)
+void rallyx_state::jungler_vblank_irq(device_t &device)
 {
 	if (m_main_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

@@ -103,25 +103,25 @@ public:
 	uint8_t m_question_offset_high;
 	uint8_t m_latched_coin;
 	uint8_t m_last_coin;
-	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
-	DECLARE_READ8_MEMBER(question_data_r);
-	DECLARE_READ8_MEMBER(laserdisc_io_r);
-	DECLARE_WRITE8_MEMBER(laserdisc_io_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
-	DECLARE_DRIVER_INIT(addr_xlh);
-	DECLARE_DRIVER_INIT(addr_lhx);
-	DECLARE_DRIVER_INIT(addr_lmh);
-	DECLARE_DRIVER_INIT(addr_lmhe);
-	DECLARE_DRIVER_INIT(addr_xhl);
-	DECLARE_DRIVER_INIT(laserdisc);
-	TILE_GET_INFO_MEMBER(horizontal_tile_info);
-	TILE_GET_INFO_MEMBER(vertical_tile_info);
+	void statriv2_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t question_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t laserdisc_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void laserdisc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value latched_coin_r(ioport_field &field, void *param);
+	void ppi_portc_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_addr_xlh();
+	void init_addr_lhx();
+	void init_addr_lmh();
+	void init_addr_lmhe();
+	void init_addr_xhl();
+	void init_laserdisc();
+	void horizontal_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void vertical_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(statriv2);
-	DECLARE_VIDEO_START(vertical);
+	void palette_init_statriv2(palette_device &palette);
+	void video_start_vertical();
 	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
+	void statriv2_interrupt(device_t &device);
 };
 
 
@@ -134,7 +134,7 @@ public:
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
+void statriv2_state::horizontal_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = videoram[0x400+tile_index];
@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, attr, 0);
 }
 
-TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
+void statriv2_state::vertical_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = videoram[0x400+tile_index];
@@ -160,7 +160,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(statriv2_state, statriv2)
+void statriv2_state::palette_init_statriv2(palette_device &palette)
 {
 	int i;
 
@@ -176,7 +176,7 @@ void statriv2_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info),this) ,TILEMAP_SCAN_ROWS, 8,15, 64,16);
 }
 
-VIDEO_START_MEMBER(statriv2_state,vertical)
+void statriv2_state::video_start_vertical()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 }
@@ -189,7 +189,7 @@ VIDEO_START_MEMBER(statriv2_state,vertical)
  *
  *************************************/
 
-WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
+void statriv2_state::statriv2_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -221,7 +221,7 @@ uint32_t statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_in
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(statriv2_state::statriv2_interrupt)
+void statriv2_state::statriv2_interrupt(device_t &device)
 {
 	uint8_t new_coin = ioport("COIN")->read();
 
@@ -241,7 +241,7 @@ INTERRUPT_GEN_MEMBER(statriv2_state::statriv2_interrupt)
  *
  *************************************/
 
-READ8_MEMBER(statriv2_state::question_data_r)
+uint8_t statriv2_state::question_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const uint8_t *qrom = memregion("questions")->base();
 	uint32_t qromsize = memregion("questions")->bytes();
@@ -266,13 +266,13 @@ READ8_MEMBER(statriv2_state::question_data_r)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(statriv2_state::latched_coin_r)
+ioport_value statriv2_state::latched_coin_r(ioport_field &field, void *param)
 {
 	return m_latched_coin;
 }
 
 
-WRITE8_MEMBER(statriv2_state::ppi_portc_hi_w)
+void statriv2_state::ppi_portc_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data >>= 4;
 	if (data != 0x0f)
@@ -1036,7 +1036,7 @@ ROM_END
  *************************************/
 
 /* question address is stored as L/H/X (low/high/don't care) */
-DRIVER_INIT_MEMBER(statriv2_state,addr_lhx)
+void statriv2_state::init_addr_lhx()
 {
 	m_question_offset_low = 0;
 	m_question_offset_mid = 1;
@@ -1044,7 +1044,7 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_lhx)
 }
 
 /* question address is stored as X/L/H (don't care/low/high) */
-DRIVER_INIT_MEMBER(statriv2_state,addr_xlh)
+void statriv2_state::init_addr_xlh()
 {
 	m_question_offset_low = 1;
 	m_question_offset_mid = 2;
@@ -1052,7 +1052,7 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_xlh)
 }
 
 /* question address is stored as X/H/L (don't care/high/low) */
-DRIVER_INIT_MEMBER(statriv2_state,addr_xhl)
+void statriv2_state::init_addr_xhl()
 {
 	m_question_offset_low = 2;
 	m_question_offset_mid = 1;
@@ -1060,14 +1060,14 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_xhl)
 }
 
 /* question address is stored as L/M/H (low/mid/high) */
-DRIVER_INIT_MEMBER(statriv2_state,addr_lmh)
+void statriv2_state::init_addr_lmh()
 {
 	m_question_offset_low = 0;
 	m_question_offset_mid = 1;
 	m_question_offset_high = 2;
 }
 
-DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
+void statriv2_state::init_addr_lmhe()
 {
 	/***************************************************\
 	*                                                   *
@@ -1138,11 +1138,11 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
 	for (address = 0; address < length; address++)
 		qrom[address] ^= BITSWAP8(address, 4,3,3,2,2,1,1,0);
 
-	DRIVER_INIT_CALL(addr_lmh);
+	init_addr_lmh();
 }
 
 
-READ8_MEMBER(statriv2_state::laserdisc_io_r)
+uint8_t statriv2_state::laserdisc_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0x00;
 	if (offset == 1)
@@ -1151,12 +1151,12 @@ READ8_MEMBER(statriv2_state::laserdisc_io_r)
 	return result;
 }
 
-WRITE8_MEMBER(statriv2_state::laserdisc_io_w)
+void statriv2_state::laserdisc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	osd_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
 }
 
-DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
+void statriv2_state::init_laserdisc()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_readwrite_handler(0x28, 0x2b, read8_delegate(FUNC(statriv2_state::laserdisc_io_r), this), write8_delegate(FUNC(statriv2_state::laserdisc_io_w), this));

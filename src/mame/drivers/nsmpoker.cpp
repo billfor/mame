@@ -79,15 +79,15 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(nsmpoker_videoram_w);
-	DECLARE_WRITE8_MEMBER(nsmpoker_colorram_w);
-	DECLARE_READ8_MEMBER(debug_r);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void nsmpoker_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nsmpoker_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t debug_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(nsmpoker);
+	void palette_init_nsmpoker(palette_device &palette);
 	virtual void machine_reset() override;
 	uint32_t screen_update_nsmpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(nsmpoker_interrupt);
+	void nsmpoker_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -98,21 +98,21 @@ public:
 *************************/
 
 
-WRITE8_MEMBER(nsmpoker_state::nsmpoker_videoram_w)
+void nsmpoker_state::nsmpoker_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(nsmpoker_state::nsmpoker_colorram_w)
+void nsmpoker_state::nsmpoker_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(nsmpoker_state::get_bg_tile_info)
+void nsmpoker_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -142,7 +142,7 @@ uint32_t nsmpoker_state::screen_update_nsmpoker(screen_device &screen, bitmap_in
 }
 
 
-PALETTE_INIT_MEMBER(nsmpoker_state, nsmpoker)
+void nsmpoker_state::palette_init_nsmpoker(palette_device &palette)
 {
 }
 
@@ -151,19 +151,19 @@ PALETTE_INIT_MEMBER(nsmpoker_state, nsmpoker)
 *  Read / Write Handlers  *
 **************************/
 
-INTERRUPT_GEN_MEMBER(nsmpoker_state::nsmpoker_interrupt)
+void nsmpoker_state::nsmpoker_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
 	// need to clear the interrupt; maybe right here?
 	m_maincpu->set_input_line(INT_9995_INT1, CLEAR_LINE);
 }
 
-//WRITE8_MEMBER(nsmpoker_state::debug_w)
+//void nsmpoker_state::debug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 //{
 //  popmessage("written : %02X", data);
 //}
 
-READ8_MEMBER(nsmpoker_state::debug_r)
+uint8_t nsmpoker_state::debug_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand() & 0xff;
 }

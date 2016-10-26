@@ -58,40 +58,40 @@ public:
 	int m_keyboard_cmd;
 	int m_gfxbank;
 
-	DECLARE_WRITE8_MEMBER(rmhaihai_videoram_w);
-	DECLARE_WRITE8_MEMBER(rmhaihai_colorram_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(samples_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(themj_rombank_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
+	void rmhaihai_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rmhaihai_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t samples_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void themj_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(rmhaihai);
+	void init_rmhaihai();
 	virtual void video_start() override;
-	DECLARE_MACHINE_START(themj);
-	DECLARE_MACHINE_RESET(themj);
+	void machine_start_themj();
+	void machine_reset_themj();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
 
 
 
-WRITE8_MEMBER(rmhaihai_state::rmhaihai_videoram_w)
+void rmhaihai_state::rmhaihai_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(rmhaihai_state::rmhaihai_colorram_w)
+void rmhaihai_state::rmhaihai_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(rmhaihai_state::get_bg_tile_info)
+void rmhaihai_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + (m_gfxbank << 12) + ((attr & 0x07) << 8) + ((attr & 0x80) << 4);
@@ -118,7 +118,7 @@ uint32_t rmhaihai_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 
 
-READ8_MEMBER(rmhaihai_state::keyboard_r)
+uint8_t rmhaihai_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1" };
 
@@ -168,25 +168,25 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 	return 0;
 }
 
-WRITE8_MEMBER(rmhaihai_state::keyboard_w)
+void rmhaihai_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 logerror("%04x: keyboard_w %02x\n",space.device().safe_pc(),data);
 	m_keyboard_cmd = data;
 }
 
-READ8_MEMBER(rmhaihai_state::samples_r)
+uint8_t rmhaihai_state::samples_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return memregion("adpcm")->base()[offset];
 }
 
-WRITE8_MEMBER(rmhaihai_state::adpcm_w)
+void rmhaihai_state::adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->data_w(data);         /* bit0..3  */
 	m_msm->reset_w(BIT(data, 5)); /* bit 5    */
 	m_msm->vclk_w(BIT(data, 4)); /* bit4     */
 }
 
-WRITE8_MEMBER(rmhaihai_state::ctrl_w)
+void rmhaihai_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 
@@ -200,20 +200,20 @@ WRITE8_MEMBER(rmhaihai_state::ctrl_w)
 	m_gfxbank = (data & 0x40) >> 6; /* rmhaisei only */
 }
 
-WRITE8_MEMBER(rmhaihai_state::themj_rombank_w)
+void rmhaihai_state::themj_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("banksw %d\n", data & 0x03);
 	membank("bank1")->set_entry(data & 0x03);
 	membank("bank2")->set_entry(data & 0x03);
 }
 
-MACHINE_START_MEMBER(rmhaihai_state,themj)
+void rmhaihai_state::machine_start_themj()
 {
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x12000, 0x4000);
 }
 
-MACHINE_RESET_MEMBER(rmhaihai_state,themj)
+void rmhaihai_state::machine_reset_themj()
 {
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
@@ -674,7 +674,7 @@ ROM_START( themj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
+void rmhaihai_state::init_rmhaihai()
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	int size = memregion("gfx1")->bytes();

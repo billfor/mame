@@ -325,16 +325,16 @@ public:
 	required_ioport m_in2;
 
 	uint8_t m_player_select;
-	DECLARE_WRITE8_MEMBER(wdclr_w);
-	DECLARE_WRITE8_MEMBER(tempest_led_w);
-	DECLARE_WRITE8_MEMBER(tempest_coin_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-	DECLARE_READ8_MEMBER(input_port_1_bit_r);
-	DECLARE_READ8_MEMBER(input_port_2_bit_r);
+	void wdclr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tempest_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tempest_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	ioport_value tempest_knob_r(ioport_field &field, void *param);
+	ioport_value tempest_buttons_r(ioport_field &field, void *param);
+	ioport_value clock_r(ioport_field &field, void *param);
+	uint8_t input_port_1_bit_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t input_port_2_bit_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(rom_ae1f_r);
+	uint8_t rom_ae1f_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 };
@@ -351,7 +351,7 @@ void tempest_state::machine_start()
  *
  *************************************/
 
-WRITE8_MEMBER(tempest_state::wdclr_w)
+void tempest_state::wdclr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_watchdog->watchdog_reset();
@@ -363,31 +363,31 @@ WRITE8_MEMBER(tempest_state::wdclr_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(tempest_state::tempest_knob_r)
+ioport_value tempest_state::tempest_knob_r(ioport_field &field, void *param)
 {
 	return (m_player_select == 0) ? m_knob_p1->read() : m_knob_p2->read();
 }
 
-CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
+ioport_value tempest_state::tempest_buttons_r(ioport_field &field, void *param)
 {
 	return (m_player_select == 0) ? m_buttons_p1->read() : m_buttons_p2->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(tempest_state::clock_r)
+ioport_value tempest_state::clock_r(ioport_field &field, void *param)
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
 
 
-READ8_MEMBER(tempest_state::input_port_1_bit_r)
+uint8_t tempest_state::input_port_1_bit_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_in1->read() & (1 << offset)) ? 0 : 228;
 }
 
 
-READ8_MEMBER(tempest_state::input_port_2_bit_r)
+uint8_t tempest_state::input_port_2_bit_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_in2->read() & (1 << offset)) ? 0 : 228;
 }
@@ -400,7 +400,7 @@ READ8_MEMBER(tempest_state::input_port_2_bit_r)
  *
  *************************************/
 
-WRITE8_MEMBER(tempest_state::tempest_led_w)
+void tempest_state::tempest_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, ~data & 0x02);
 	output().set_led_value(1, ~data & 0x01);
@@ -409,7 +409,7 @@ WRITE8_MEMBER(tempest_state::tempest_led_w)
 }
 
 
-WRITE8_MEMBER(tempest_state::tempest_coin_w)
+void tempest_state::tempest_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (data & 0x01));
 	machine().bookkeeping().coin_counter_w(1, (data & 0x02));
@@ -426,7 +426,7 @@ WRITE8_MEMBER(tempest_state::tempest_coin_w)
  *
  *************************************/
 
-READ8_MEMBER(tempest_state::rom_ae1f_r)
+uint8_t tempest_state::rom_ae1f_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// This is needed to ensure that the routine starting at ae1c passes checks and does not corrupt data;
 	// MCFG_QUANTUM_PERFECT_CPU("maincpu") would be very taxing on this driver.

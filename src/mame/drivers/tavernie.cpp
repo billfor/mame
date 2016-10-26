@@ -81,17 +81,17 @@ public:
 	{
 	}
 
-	DECLARE_READ_LINE_MEMBER(ca1_r);
-	DECLARE_READ8_MEMBER(pa_r);
-	DECLARE_WRITE8_MEMBER(pa_w);
-	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_WRITE8_MEMBER(pa_ivg_w);
-	DECLARE_READ8_MEMBER(pb_ivg_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE8_MEMBER(ds_w);
-	DECLARE_MACHINE_RESET(cpu09);
-	DECLARE_MACHINE_RESET(ivg09);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	int ca1_r();
+	uint8_t pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pa_ivg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pb_ivg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void machine_reset_cpu09();
+	void machine_reset_ivg09();
+	void write_acia_clock(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	const uint8_t *m_p_chargen;
@@ -171,12 +171,12 @@ static INPUT_PORTS_START( ivg09 )
 	PORT_DIPSETTING(    0x60, "IVG09 (mc6845)" )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( tavernie_state, cpu09)
+void tavernie_state::machine_reset_cpu09()
 {
 	m_term_data = 0;
 }
 
-MACHINE_RESET_MEMBER( tavernie_state, ivg09)
+void tavernie_state::machine_reset_ivg09()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_beep->set_state(1);
@@ -189,7 +189,7 @@ static SLOT_INTERFACE_START( ifd09_floppies )
 SLOT_INTERFACE_END
 
 // can support 3 drives
-WRITE8_MEMBER( tavernie_state::ds_w )
+void tavernie_state::ds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 	if ((data & 3) == 1) floppy = m_floppy0->get_device();
@@ -239,7 +239,7 @@ MC6845_UPDATE_ROW( tavernie_state::crtc_update_row )
 }
 
 
-READ8_MEMBER( tavernie_state::pa_r )
+uint8_t tavernie_state::pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("DSW")->read() | m_pa;
 }
@@ -253,43 +253,43 @@ d5: S3
 d6: S4
 d7: cassout
 */
-WRITE8_MEMBER( tavernie_state::pa_w )
+void tavernie_state::pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pa = data & 0x9f;
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
 // centronics
-WRITE8_MEMBER( tavernie_state::pb_w )
+void tavernie_state::pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 // cass in
-READ_LINE_MEMBER( tavernie_state::ca1_r )
+int tavernie_state::ca1_r()
 {
 	return (m_cass->input() > +0.01);
 }
 
-READ8_MEMBER( tavernie_state::pb_ivg_r )
+uint8_t tavernie_state::pb_ivg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( tavernie_state::pa_ivg_w )
+void tavernie_state::pa_ivg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // bits 0-3 are attribute bits
 }
 
-WRITE8_MEMBER( tavernie_state::kbd_put )
+void tavernie_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 	m_pia_ivg->cb1_w(0);
 	m_pia_ivg->cb1_w(1);
 }
 
-WRITE_LINE_MEMBER( tavernie_state::write_acia_clock )
+void tavernie_state::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

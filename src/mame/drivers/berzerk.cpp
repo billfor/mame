@@ -56,24 +56,24 @@ public:
 	int m_p2_counter_74ls161;
 	int m_p2_direction;
 
-	DECLARE_READ8_MEMBER(led_on_r);
-	DECLARE_WRITE8_MEMBER(led_on_w);
-	DECLARE_READ8_MEMBER(led_off_r);
-	DECLARE_WRITE8_MEMBER(led_off_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(nmi_disable_w);
-	DECLARE_READ8_MEMBER(nmi_enable_r);
-	DECLARE_READ8_MEMBER(nmi_disable_r);
-	DECLARE_WRITE8_MEMBER(magicram_w);
-	DECLARE_WRITE8_MEMBER(magicram_control_w);
-	DECLARE_READ8_MEMBER(intercept_v256_r);
-	DECLARE_WRITE8_MEMBER(audio_w);
-	DECLARE_READ8_MEMBER(audio_r);
-	DECLARE_READ8_MEMBER(moonwarp_p1_r);
-	DECLARE_READ8_MEMBER(moonwarp_p2_r);
+	uint8_t led_on_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void led_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t led_off_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void led_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nmi_enable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t nmi_disable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void magicram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void magicram_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t intercept_v256_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t audio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t moonwarp_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t moonwarp_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(moonwarp);
+	void init_moonwarp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void sound_reset() override;
@@ -81,8 +81,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(irq_callback);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
+	void irq_callback(void *ptr, int32_t param);
+	void nmi_callback(void *ptr, int32_t param);
 	void vpos_to_vsync_chain_counter(int vpos, uint8_t *counter, uint8_t *v256);
 	int vsync_chain_counter_to_vpos(uint8_t counter, uint8_t v256);
 	void create_irq_timer();
@@ -121,7 +121,7 @@ static const uint8_t nmi_trigger_v256s [NMIS_PER_FRAME] = { 0x00, 0x00, 0x00, 0x
  *
  *************************************/
 
-READ8_MEMBER(berzerk_state::led_on_r)
+uint8_t berzerk_state::led_on_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	output().set_led_value(0, 1);
 
@@ -129,13 +129,13 @@ READ8_MEMBER(berzerk_state::led_on_r)
 }
 
 
-WRITE8_MEMBER(berzerk_state::led_on_w)
+void berzerk_state::led_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, 1);
 }
 
 
-READ8_MEMBER(berzerk_state::led_off_r)
+uint8_t berzerk_state::led_off_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	output().set_led_value(0, 0);
 
@@ -143,7 +143,7 @@ READ8_MEMBER(berzerk_state::led_off_r)
 }
 
 
-WRITE8_MEMBER(berzerk_state::led_off_w)
+void berzerk_state::led_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, 0);
 }
@@ -204,13 +204,13 @@ int berzerk_state::vsync_chain_counter_to_vpos(uint8_t counter, uint8_t v256)
  *
  *************************************/
 
-WRITE8_MEMBER(berzerk_state::irq_enable_w)
+void berzerk_state::irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_enabled = data & 0x01;
 }
 
 
-TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
+void berzerk_state::irq_callback(void *ptr, int32_t param)
 {
 	int irq_number = param;
 	uint8_t next_counter;
@@ -259,19 +259,19 @@ void berzerk_state::start_irq_timer()
  *
  *************************************/
 
-WRITE8_MEMBER(berzerk_state::nmi_enable_w)
+void berzerk_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enabled = 1;
 }
 
 
-WRITE8_MEMBER(berzerk_state::nmi_disable_w)
+void berzerk_state::nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enabled = 0;
 }
 
 
-READ8_MEMBER(berzerk_state::nmi_enable_r)
+uint8_t berzerk_state::nmi_enable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_nmi_enabled = 1;
 
@@ -279,7 +279,7 @@ READ8_MEMBER(berzerk_state::nmi_enable_r)
 }
 
 
-READ8_MEMBER(berzerk_state::nmi_disable_r)
+uint8_t berzerk_state::nmi_disable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_nmi_enabled = 0;
 
@@ -287,7 +287,7 @@ READ8_MEMBER(berzerk_state::nmi_disable_r)
 }
 
 
-TIMER_CALLBACK_MEMBER(berzerk_state::nmi_callback)
+void berzerk_state::nmi_callback(void *ptr, int32_t param)
 {
 	int nmi_number = param;
 	uint8_t next_counter;
@@ -376,7 +376,7 @@ void berzerk_state::video_start()
 }
 
 
-WRITE8_MEMBER(berzerk_state::magicram_w)
+void berzerk_state::magicram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t alu_output;
 
@@ -413,7 +413,7 @@ WRITE8_MEMBER(berzerk_state::magicram_w)
 }
 
 
-WRITE8_MEMBER(berzerk_state::magicram_control_w)
+void berzerk_state::magicram_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* save the control byte, clear the shift data latch,
 	   and set the intercept flip-flop */
@@ -423,7 +423,7 @@ WRITE8_MEMBER(berzerk_state::magicram_control_w)
 }
 
 
-READ8_MEMBER(berzerk_state::intercept_v256_r)
+uint8_t berzerk_state::intercept_v256_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t counter;
 	uint8_t v256;
@@ -513,7 +513,7 @@ uint32_t berzerk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
  *
  *************************************/
 
-WRITE8_MEMBER(berzerk_state::audio_w)
+void berzerk_state::audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -562,7 +562,7 @@ WRITE8_MEMBER(berzerk_state::audio_w)
 }
 
 
-READ8_MEMBER(berzerk_state::audio_r)
+uint8_t berzerk_state::audio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -920,7 +920,7 @@ static INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0xff, "255" )
 INPUT_PORTS_END
 
-READ8_MEMBER(berzerk_state::moonwarp_p1_r)
+uint8_t berzerk_state::moonwarp_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// This seems to be the same type of dial as the later 'moon war 2' set uses
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
@@ -940,7 +940,7 @@ READ8_MEMBER(berzerk_state::moonwarp_p1_r)
 	return ret;
 }
 
-READ8_MEMBER(berzerk_state::moonwarp_p2_r)
+uint8_t berzerk_state::moonwarp_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// same as above, but for player 2 in cocktail mode
 	signed char dialread = ioport("P2_DIAL")->read();
@@ -1300,7 +1300,7 @@ ROM_START( moonwarp )
 	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom - from the sound rom only set, is it bad? */
 ROM_END
 
-DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
+void berzerk_state::init_moonwarp()
 {
 	address_space &io = m_maincpu->space(AS_IO);
 	io.install_read_handler (0x48, 0x48, read8_delegate(FUNC(berzerk_state::moonwarp_p1_r), this));

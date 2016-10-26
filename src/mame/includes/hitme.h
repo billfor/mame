@@ -33,18 +33,18 @@ public:
 
 	/* misc */
 	attotime m_timeout_time;
-	DECLARE_WRITE8_MEMBER(hitme_vidram_w);
-	DECLARE_READ8_MEMBER(hitme_port_0_r);
-	DECLARE_READ8_MEMBER(hitme_port_1_r);
-	DECLARE_READ8_MEMBER(hitme_port_2_r);
-	DECLARE_READ8_MEMBER(hitme_port_3_r);
-	DECLARE_WRITE8_MEMBER(output_port_0_w);
-	DECLARE_WRITE8_MEMBER(output_port_1_w);
-	TILE_GET_INFO_MEMBER(get_hitme_tile_info);
+	void hitme_vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hitme_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hitme_port_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hitme_port_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hitme_port_3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void output_port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_hitme_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_VIDEO_START(barricad);
+	void video_start_barricad();
 	uint32_t screen_update_hitme(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_barricad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t read_port_and_t0( int port );

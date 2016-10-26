@@ -317,7 +317,7 @@ void ti99_datamux_device::debugger_write(address_space& space, uint16_t addr, ui
 
     mem_mask is always ffff on TMS processors (cannot control bus width)
 */
-READ16_MEMBER( ti99_datamux_device::read )
+uint16_t ti99_datamux_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t value = 0;
 
@@ -369,7 +369,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 /*
     Write access.
 */
-WRITE16_MEMBER( ti99_datamux_device::write )
+void ti99_datamux_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (space.debugger_access())
 	{
@@ -413,7 +413,7 @@ WRITE16_MEMBER( ti99_datamux_device::write )
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-SETOFFSET_MEMBER( ti99_datamux_device::setoffset )
+void ti99_datamux_device::setoffset(address_space &space, offs_t offset)
 {
 	m_addr_buf = offset << 1;
 	m_waitcount = 0;
@@ -460,7 +460,7 @@ SETOFFSET_MEMBER( ti99_datamux_device::setoffset )
     The datamux is connected to the clock line in order to operate
     the wait state counter and to read/write the bytes.
 */
-WRITE_LINE_MEMBER( ti99_datamux_device::clock_in )
+void ti99_datamux_device::clock_in(int state)
 {
 	// return immediately if the datamux is currently inactive
 	if (m_waitcount>0)
@@ -525,13 +525,13 @@ void ti99_datamux_device::ready_join()
 	m_ready((m_sysready==CLEAR_LINE || m_muxready==CLEAR_LINE)? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( ti99_datamux_device::dbin_in )
+void ti99_datamux_device::dbin_in(int state)
 {
 	m_dbin = (line_state)state;
 	if (TRACE_ADDRESS) logerror("data bus in = %d\n", (m_dbin==ASSERT_LINE)? 1:0 );
 }
 
-WRITE_LINE_MEMBER( ti99_datamux_device::ready_line )
+void ti99_datamux_device::ready_line(int state)
 {
 	if (TRACE_READY)
 	{
@@ -543,7 +543,7 @@ WRITE_LINE_MEMBER( ti99_datamux_device::ready_line )
 }
 
 /* Called from VDP via console. */
-WRITE_LINE_MEMBER( ti99_datamux_device::gromclk_in )
+void ti99_datamux_device::gromclk_in(int state)
 {
 	// Don't propagate the clock in idle phase
 	if (m_grom_idle) return;

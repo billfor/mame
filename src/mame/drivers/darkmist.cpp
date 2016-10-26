@@ -34,7 +34,7 @@ void darkmist_state::machine_start()
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-WRITE8_MEMBER(darkmist_state::hw_w)
+void darkmist_state::hw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hw=data;
 	membank("bank1")->set_entry((data&0x80)?1:0);
@@ -220,7 +220,7 @@ static GFXDECODE_START( darkmist )
 	GFXDECODE_ENTRY( "spr_gfx", 0, tilelayout,  0, 16*4 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
+void darkmist_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -412,7 +412,7 @@ void darkmist_state::decrypt_snd()
 		ROM[i] = BITSWAP8(ROM[i], 7, 1, 2, 3, 4, 5, 6, 0);
 }
 
-DRIVER_INIT_MEMBER(darkmist_state,darkmist)
+void darkmist_state::init_darkmist()
 {
 	int i, len;
 	uint8_t *ROM = memregion("maincpu")->base();

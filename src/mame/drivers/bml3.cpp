@@ -79,38 +79,38 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(bml3_6845_r);
-	DECLARE_WRITE8_MEMBER(bml3_6845_w);
-	DECLARE_READ8_MEMBER(bml3_keyboard_r);
-	DECLARE_WRITE8_MEMBER(bml3_keyboard_w);
-	DECLARE_WRITE8_MEMBER(bml3_hres_reg_w);
-	DECLARE_WRITE8_MEMBER(bml3_vres_reg_w);
-	DECLARE_READ8_MEMBER(bml3_vram_r);
-	DECLARE_WRITE8_MEMBER(bml3_vram_w);
-	DECLARE_READ8_MEMBER(bml3_psg_latch_r);
-	DECLARE_WRITE8_MEMBER(bml3_psg_latch_w);
-	DECLARE_READ8_MEMBER(bml3_vram_attr_r);
-	DECLARE_WRITE8_MEMBER(bml3_vram_attr_w);
-	DECLARE_READ8_MEMBER(bml3_beep_r);
-	DECLARE_WRITE8_MEMBER(bml3_beep_w);
-	DECLARE_WRITE8_MEMBER(bml3_piaA_w);
-	DECLARE_READ8_MEMBER(bml3_keyb_nmi_r);
-	DECLARE_WRITE8_MEMBER(bml3_firq_mask_w);
-	DECLARE_READ8_MEMBER(bml3_firq_status_r);
-	DECLARE_WRITE8_MEMBER(relay_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_firq_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3_acia_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3_acia_rts_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3_acia_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	uint8_t bml3_6845_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bml3_6845_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bml3_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bml3_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bml3_hres_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bml3_vres_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bml3_vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bml3_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bml3_psg_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bml3_psg_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bml3_vram_attr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bml3_vram_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bml3_beep_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bml3_beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bml3_piaA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bml3_keyb_nmi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bml3_firq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bml3_firq_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void relay_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bml3bus_nmi_w(int state);
+	void bml3bus_irq_w(int state);
+	void bml3bus_firq_w(int state);
+	void bml3_acia_tx_w(int state);
+	void bml3_acia_rts_w(int state);
+	void bml3_acia_irq_w(int state);
+	void write_acia_clock(int state);
 
-	DECLARE_READ8_MEMBER(bml3_a000_r); DECLARE_WRITE8_MEMBER(bml3_a000_w);
-	DECLARE_READ8_MEMBER(bml3_c000_r); DECLARE_WRITE8_MEMBER(bml3_c000_w);
-	DECLARE_READ8_MEMBER(bml3_e000_r); DECLARE_WRITE8_MEMBER(bml3_e000_w);
-	DECLARE_READ8_MEMBER(bml3_f000_r); DECLARE_WRITE8_MEMBER(bml3_f000_w);
-	DECLARE_READ8_MEMBER(bml3_fff0_r); DECLARE_WRITE8_MEMBER(bml3_fff0_w);
+	uint8_t bml3_a000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); void bml3_a000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bml3_c000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); void bml3_c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bml3_e000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); void bml3_e000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bml3_f000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); void bml3_f000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bml3_fff0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); void bml3_fff0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -118,13 +118,13 @@ public:
 	uint8_t *m_p_chargen;
 	uint8_t m_hres_reg;
 	uint8_t m_crtc_vreg[0x100];
-	// INTERRUPT_GEN_MEMBER(bml3_irq);
-	INTERRUPT_GEN_MEMBER(bml3_timer_firq);
-	TIMER_DEVICE_CALLBACK_MEMBER(bml3_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(bml3_p);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	DECLARE_READ8_MEMBER(bml3_ym2203_r);
-	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
+	// void bml3_irq(device_t &device);
+	void bml3_timer_firq(device_t &device);
+	void bml3_c(timer_device &timer, void *ptr, int32_t param);
+	void bml3_p(timer_device &timer, void *ptr, int32_t param);
+	void keyboard_callback(timer_device &timer, void *ptr, int32_t param);
+	uint8_t bml3_ym2203_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bml3_ym2203_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	uint8_t m_psg_latch;
@@ -178,7 +178,7 @@ public:
 
 
 
-READ8_MEMBER( bml3_state::bml3_6845_r )
+uint8_t bml3_state::bml3_6845_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset)
 		return m_crtc->register_r(space, 0);
@@ -186,7 +186,7 @@ READ8_MEMBER( bml3_state::bml3_6845_r )
 		return m_crtc->status_r(space, 0);
 }
 
-WRITE8_MEMBER( bml3_state::bml3_6845_w )
+void bml3_state::bml3_6845_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0)
 	{
@@ -200,14 +200,14 @@ WRITE8_MEMBER( bml3_state::bml3_6845_w )
 	}
 }
 
-READ8_MEMBER( bml3_state::bml3_keyboard_r )
+uint8_t bml3_state::bml3_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_keyb_scancode;
 	m_keyb_scancode &= 0x7f;
 	return ret;
 }
 
-WRITE8_MEMBER( bml3_state::bml3_keyboard_w )
+void bml3_state::bml3_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyb_katakana_led_on = BIT(data, 0);
 	m_keyb_hiragana_led_on = BIT(data, 1);
@@ -232,7 +232,7 @@ void bml3_state::m6845_change_clock(uint8_t setting)
 	m_crtc->set_clock(m6845_clock);
 }
 
-WRITE8_MEMBER( bml3_state::bml3_hres_reg_w )
+void bml3_state::bml3_hres_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// MODE SEL register (see service manual p.43).
 	/*
@@ -247,7 +247,7 @@ WRITE8_MEMBER( bml3_state::bml3_hres_reg_w )
 	m6845_change_clock((m_hres_reg & 0x80) | (m_vres_reg & 0x08));
 }
 
-WRITE8_MEMBER( bml3_state::bml3_vres_reg_w )
+void bml3_state::bml3_vres_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// The MB-6890 had an interlaced video mode which was used for displaying Japanese (Hiragana and Katakana) text (8x16 character glyph bitmaps).
 	/*
@@ -259,7 +259,7 @@ WRITE8_MEMBER( bml3_state::bml3_vres_reg_w )
 }
 
 
-READ8_MEMBER( bml3_state::bml3_vram_r )
+uint8_t bml3_state::bml3_vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Bit 7 masks reading back to the latch
 	if (!BIT(m_attr_latch, 7))
@@ -270,38 +270,38 @@ READ8_MEMBER( bml3_state::bml3_vram_r )
 	return m_p_videoram[offset];
 }
 
-WRITE8_MEMBER( bml3_state::bml3_vram_w )
+void bml3_state::bml3_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p_videoram[offset] = data;
 	// color ram is 5-bit
 	m_p_videoram[offset+0x4000] = m_attr_latch & 0x1F;
 }
 
-READ8_MEMBER( bml3_state::bml3_psg_latch_r)
+uint8_t bml3_state::bml3_psg_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x7f;
 }
 
-WRITE8_MEMBER( bml3_state::bml3_psg_latch_w)
+void bml3_state::bml3_psg_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_psg_latch = data;
 }
 
-READ8_MEMBER(bml3_state::bml3_ym2203_r)
+uint8_t bml3_state::bml3_ym2203_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t dev_offs = ((m_psg_latch & 3) != 3);
 
 	return m_ym2203->read(space, dev_offs);
 }
 
-WRITE8_MEMBER(bml3_state::bml3_ym2203_w)
+void bml3_state::bml3_ym2203_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t dev_offs = ((m_psg_latch & 3) != 3);
 
 	m_ym2203->write(space, dev_offs, data);
 }
 
-READ8_MEMBER( bml3_state::bml3_vram_attr_r)
+uint8_t bml3_state::bml3_vram_attr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// C-REG-SELECT register
 	// Reads from a VRAM address copy the corresponding 'colour RAM' address to the low-order 5 bits of this register as a side-effect
@@ -309,7 +309,7 @@ READ8_MEMBER( bml3_state::bml3_vram_attr_r)
 	return m_attr_latch;
 }
 
-WRITE8_MEMBER( bml3_state::bml3_vram_attr_w)
+void bml3_state::bml3_vram_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C-REG-SELECT register
 	// Writes to a VRAM address copy the low-order 5 bits of this register to the corresponding 'colour RAM' address as a side-effect
@@ -322,39 +322,39 @@ WRITE8_MEMBER( bml3_state::bml3_vram_attr_w)
 	m_attr_latch = data;
 }
 
-READ8_MEMBER( bml3_state::bml3_beep_r)
+uint8_t bml3_state::bml3_beep_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return -1; // BEEP status read?
 }
 
-WRITE8_MEMBER( bml3_state::bml3_beep_w)
+void bml3_state::bml3_beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER( bml3_state::relay_w )
+void bml3_state::relay_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cass->change_state(
 		BIT(data,7) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-READ8_MEMBER( bml3_state::bml3_a000_r) { return m_extram[offset + 0xa000]; }
-WRITE8_MEMBER( bml3_state::bml3_a000_w) { m_extram[offset + 0xa000] = data; }
-READ8_MEMBER( bml3_state::bml3_c000_r) { return m_extram[offset + 0xc000]; }
-WRITE8_MEMBER( bml3_state::bml3_c000_w) { m_extram[offset + 0xc000] = data; }
-READ8_MEMBER( bml3_state::bml3_e000_r) { return m_extram[offset + 0xe000]; }
-WRITE8_MEMBER( bml3_state::bml3_e000_w) { m_extram[offset + 0xe000] = data; }
-READ8_MEMBER( bml3_state::bml3_f000_r) { return m_extram[offset + 0xf000]; }
-WRITE8_MEMBER( bml3_state::bml3_f000_w) { m_extram[offset + 0xf000] = data; }
-READ8_MEMBER( bml3_state::bml3_fff0_r) { return m_extram[offset + 0xfff0]; }
-WRITE8_MEMBER( bml3_state::bml3_fff0_w) { m_extram[offset + 0xfff0] = data; }
+uint8_t bml3_state::bml3_a000_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_extram[offset + 0xa000]; }
+void bml3_state::bml3_a000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_extram[offset + 0xa000] = data; }
+uint8_t bml3_state::bml3_c000_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_extram[offset + 0xc000]; }
+void bml3_state::bml3_c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_extram[offset + 0xc000] = data; }
+uint8_t bml3_state::bml3_e000_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_extram[offset + 0xe000]; }
+void bml3_state::bml3_e000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_extram[offset + 0xe000] = data; }
+uint8_t bml3_state::bml3_f000_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_extram[offset + 0xf000]; }
+void bml3_state::bml3_f000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_extram[offset + 0xf000] = data; }
+uint8_t bml3_state::bml3_fff0_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_extram[offset + 0xfff0]; }
+void bml3_state::bml3_fff0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_extram[offset + 0xfff0] = data; }
 
-READ8_MEMBER( bml3_state::bml3_keyb_nmi_r)
+uint8_t bml3_state::bml3_keyb_nmi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0; // bit 7 used to signal a BREAK key pressure
 }
 
-WRITE8_MEMBER( bml3_state::bml3_firq_mask_w)
+void bml3_state::bml3_firq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_firq_mask = data & 0x80;
 	if(m_firq_mask)
@@ -364,7 +364,7 @@ WRITE8_MEMBER( bml3_state::bml3_firq_mask_w)
 	}
 }
 
-READ8_MEMBER( bml3_state::bml3_firq_status_r )
+uint8_t bml3_state::bml3_firq_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = m_firq_status << 7;
 	m_firq_status = 0;
@@ -372,17 +372,17 @@ READ8_MEMBER( bml3_state::bml3_firq_status_r )
 	return res;
 }
 
-WRITE_LINE_MEMBER(bml3_state::bml3bus_nmi_w)
+void bml3_state::bml3bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-WRITE_LINE_MEMBER(bml3_state::bml3bus_irq_w)
+void bml3_state::bml3bus_irq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
-WRITE_LINE_MEMBER(bml3_state::bml3bus_firq_w)
+void bml3_state::bml3bus_firq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
 }
@@ -681,7 +681,7 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
+void bml3_state::keyboard_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,trigger = 0;
@@ -729,7 +729,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_p )
+void bml3_state::bml3_p(timer_device &timer, void *ptr, int32_t param)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -744,14 +744,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_p )
 }
 
 #if 0
-INTERRUPT_GEN_MEMBER(bml3_state::bml3_irq)
+void bml3_state::bml3_irq(device_t &device)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 #endif
 
 
-INTERRUPT_GEN_MEMBER(bml3_state::bml3_timer_firq)
+void bml3_state::bml3_timer_firq(device_t &device)
 {
 	if(!m_firq_mask)
 	{
@@ -798,7 +798,7 @@ void bml3_state::machine_reset()
 	m_firq_mask = -1; // disable firq
 }
 
-WRITE8_MEMBER(bml3_state::bml3_piaA_w)
+void bml3_state::bml3_piaA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	/* ROM banking:
@@ -901,30 +901,30 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 	}
 }
 
-WRITE_LINE_MEMBER( bml3_state::bml3_acia_tx_w )
+void bml3_state::bml3_acia_tx_w(int state)
 {
 	//logerror("%02x TAPE\n",state);
 	m_cassbit = state;
 }
 
 
-WRITE_LINE_MEMBER( bml3_state::bml3_acia_rts_w )
+void bml3_state::bml3_acia_rts_w(int state)
 {
 	logerror("%02x TAPE RTS\n",state);
 }
 
-WRITE_LINE_MEMBER( bml3_state::bml3_acia_irq_w )
+void bml3_state::bml3_acia_irq_w(int state)
 {
 	logerror("%02x TAPE IRQ\n",state);
 }
 
-WRITE_LINE_MEMBER( bml3_state::write_acia_clock )
+void bml3_state::write_acia_clock(int state)
 {
 	m_acia6850->write_txc(state);
 	m_acia6850->write_rxc(state);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_c )
+void bml3_state::bml3_c(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[3]++;
 

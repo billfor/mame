@@ -17,7 +17,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(vindictr_state::get_alpha_tile_info)
+void vindictr_state::get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(vindictr_state::get_alpha_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(vindictr_state::get_playfield_tile_info)
+void vindictr_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = (m_playfield_tile_bank * 0x1000) + (data & 0xfff);
@@ -77,7 +77,7 @@ const atari_motion_objects_config vindictr_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(vindictr_state,vindictr)
+void vindictr_state::video_start_vindictr()
 {
 	/* save states */
 	save_item(NAME(m_playfield_tile_bank));
@@ -93,7 +93,7 @@ VIDEO_START_MEMBER(vindictr_state,vindictr)
  *
  *************************************/
 
-WRITE16_MEMBER( vindictr_state::vindictr_paletteram_w )
+void vindictr_state::vindictr_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int ztable[16] =
 		{ 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11 };

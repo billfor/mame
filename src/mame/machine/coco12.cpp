@@ -57,7 +57,7 @@ void coco12_state::configure_sam()
 //  horizontal_sync
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco12_state::horizontal_sync )
+void coco12_state::horizontal_sync(int state)
 {
 	m_pia_0->ca1_w(state);
 	m_sam->hs_w(state);
@@ -69,7 +69,7 @@ WRITE_LINE_MEMBER( coco12_state::horizontal_sync )
 //  field_sync
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco12_state::field_sync )
+void coco12_state::field_sync(int state)
 {
 	m_pia_0->cb1_w(state);
 }
@@ -80,7 +80,7 @@ WRITE_LINE_MEMBER( coco12_state::field_sync )
 //  sam_read
 //-------------------------------------------------
 
-READ8_MEMBER( coco12_state::sam_read )
+uint8_t coco12_state::sam_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_ram->read(offset);
 	m_vdg->as_w(data & 0x80 ? ASSERT_LINE : CLEAR_LINE);

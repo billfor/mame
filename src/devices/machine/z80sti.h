@@ -95,20 +95,20 @@ public:
 	static void set_rx_clock(device_t &device, int clock) { downcast<z80sti_device &>(device).m_rx_clock = clock; }
 	static void set_tx_clock(device_t &device, int clock) { downcast<z80sti_device &>(device).m_tx_clock = clock; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( i0_w );
-	DECLARE_WRITE_LINE_MEMBER( i1_w );
-	DECLARE_WRITE_LINE_MEMBER( i2_w );
-	DECLARE_WRITE_LINE_MEMBER( i3_w );
-	DECLARE_WRITE_LINE_MEMBER( i4_w );
-	DECLARE_WRITE_LINE_MEMBER( i5_w );
-	DECLARE_WRITE_LINE_MEMBER( i6_w );
-	DECLARE_WRITE_LINE_MEMBER( i7_w );
+	void i0_w(int state);
+	void i1_w(int state);
+	void i2_w(int state);
+	void i3_w(int state);
+	void i4_w(int state);
+	void i5_w(int state);
+	void i6_w(int state);
+	void i7_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( tc_w );
-	DECLARE_WRITE_LINE_MEMBER( rc_w );
+	void tc_w(int state);
+	void rc_w(int state);
 
 private:
 	enum

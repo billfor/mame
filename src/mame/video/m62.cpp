@@ -199,7 +199,7 @@ void m62_state::m62_amplify_contrast(palette_t *palette, uint32_t numcolors)
 	palette->set_contrast(255000.0/ymax);
 }
 
-PALETTE_INIT_MEMBER(m62_state, m62)
+void m62_state::palette_init_m62(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -217,7 +217,7 @@ PALETTE_INIT_MEMBER(m62_state, m62)
 }
 
 
-PALETTE_INIT_MEMBER(m62_state,lotlot)
+void m62_state::palette_init_lotlot(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -235,7 +235,7 @@ PALETTE_INIT_MEMBER(m62_state,lotlot)
 }
 
 
-PALETTE_INIT_MEMBER(m62_state,battroad)
+void m62_state::palette_init_battroad(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -258,7 +258,7 @@ PALETTE_INIT_MEMBER(m62_state,battroad)
 }
 
 
-PALETTE_INIT_MEMBER(m62_state,spelunk2)
+void m62_state::palette_init_spelunk2(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -289,7 +289,7 @@ void m62_state::register_savestate(  )
 }
 
 
-WRITE8_MEMBER(m62_state::m62_flipscreen_w)
+void m62_state::m62_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* screen flip is handled both by software and hardware */
 	data ^= ((~ioport("DSW2")->read()) & 1);
@@ -308,33 +308,33 @@ WRITE8_MEMBER(m62_state::m62_flipscreen_w)
 		m_audio->m_audio_SINH->write((data >> 3) & 1);
 }
 
-WRITE8_MEMBER(m62_state::m62_hscroll_low_w)
+void m62_state::m62_hscroll_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m62_background_hscroll = (m_m62_background_hscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(m62_state::m62_hscroll_high_w)
+void m62_state::m62_hscroll_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m62_background_hscroll = (m_m62_background_hscroll & 0xff) | (data << 8);
 }
 
-WRITE8_MEMBER(m62_state::m62_vscroll_low_w)
+void m62_state::m62_vscroll_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m62_background_vscroll = (m_m62_background_vscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(m62_state::m62_vscroll_high_w)
+void m62_state::m62_vscroll_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m62_background_vscroll = (m_m62_background_vscroll & 0xff) | (data << 8);
 }
 
-WRITE8_MEMBER(m62_state::m62_tileram_w)
+void m62_state::m62_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m62_tileram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(m62_state::m62_textram_w)
+void m62_state::m62_textram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m62_textram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
@@ -423,13 +423,13 @@ void m62_state::m62_textlayer( tilemap_get_info_delegate tile_get_info, int rows
 		m_fg_tilemap->set_scroll_cols(cols);
 }
 
-WRITE8_MEMBER(m62_state::kungfum_tileram_w)
+void m62_state::kungfum_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m62_tileram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_kungfum_bg_tile_info)
+void m62_state::get_kungfum_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -450,7 +450,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_kungfum_bg_tile_info)
 		tileinfo.category = 0;
 }
 
-VIDEO_START_MEMBER(m62_state,kungfum)
+void m62_state::video_start_kungfum()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_kungfum_bg_tile_info),this), 32, 0, 8, 8, 64, 32);
 }
@@ -473,7 +473,7 @@ uint32_t m62_state::screen_update_kungfum(screen_device &screen, bitmap_ind16 &b
 }
 
 
-TILE_GET_INFO_MEMBER(m62_state::get_ldrun_bg_tile_info)
+void m62_state::get_ldrun_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -511,7 +511,7 @@ uint32_t m62_state::screen_update_ldrun(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_ldrun2_bg_tile_info)
+void m62_state::get_ldrun2_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -530,7 +530,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_ldrun2_bg_tile_info)
 		tileinfo.group = 0;
 }
 
-VIDEO_START_MEMBER(m62_state,ldrun2)
+void m62_state::video_start_ldrun2()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_ldrun2_bg_tile_info),this), 1, 1, 8, 8, 64, 32);
 	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
@@ -538,7 +538,7 @@ VIDEO_START_MEMBER(m62_state,ldrun2)
 }
 
 
-WRITE8_MEMBER(m62_state::ldrun3_topbottom_mask_w)
+void m62_state::ldrun3_topbottom_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ldrun3_topbottom_mask = data & 1;
 }
@@ -564,7 +564,7 @@ uint32_t m62_state::screen_update_ldrun3(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-TILE_GET_INFO_MEMBER(m62_state::get_battroad_bg_tile_info)
+void m62_state::get_battroad_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -583,7 +583,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_battroad_bg_tile_info)
 		tileinfo.group = 0;
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_battroad_fg_tile_info)
+void m62_state::get_battroad_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -592,7 +592,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_battroad_fg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code | ((color & 0x40) << 3) | ((color & 0x10) << 4), color & 0x0f, 0);
 }
 
-VIDEO_START_MEMBER(m62_state,battroad)
+void m62_state::video_start_battroad()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_battroad_bg_tile_info),this), 1, 1, 8, 8, 64, 32);
 	m62_textlayer(tilemap_get_info_delegate(FUNC(m62_state::get_battroad_fg_tile_info),this), 1, 1, 8, 8, 32, 32);
@@ -619,7 +619,7 @@ uint32_t m62_state::screen_update_battroad(screen_device &screen, bitmap_ind16 &
 
 /* almost identical but scrolling background, more characters, */
 /* no char x flip, and more sprites */
-TILE_GET_INFO_MEMBER(m62_state::get_ldrun4_bg_tile_info)
+void m62_state::get_ldrun4_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -628,7 +628,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_ldrun4_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2) | ((color & 0x20) << 5), color & 0x1f, 0);
 }
 
-VIDEO_START_MEMBER(m62_state,ldrun4)
+void m62_state::video_start_ldrun4()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_ldrun4_bg_tile_info),this), 1, 0, 8, 8, 64, 32);
 }
@@ -643,7 +643,7 @@ uint32_t m62_state::screen_update_ldrun4(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-TILE_GET_INFO_MEMBER(m62_state::get_lotlot_bg_tile_info)
+void m62_state::get_lotlot_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -658,7 +658,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_lotlot_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2), color & 0x1f, flags);
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_lotlot_fg_tile_info)
+void m62_state::get_lotlot_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -667,7 +667,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_lotlot_fg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code | ((color & 0xc0) << 2), color & 0x1f, 0);
 }
 
-VIDEO_START_MEMBER(m62_state,lotlot)
+void m62_state::video_start_lotlot()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_lotlot_bg_tile_info),this), 1, 1, 12, 10, 32, 64);
 	m62_textlayer(tilemap_get_info_delegate(FUNC(m62_state::get_lotlot_fg_tile_info),this), 1, 1, 12, 10, 32, 64);
@@ -688,17 +688,17 @@ uint32_t m62_state::screen_update_lotlot(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-WRITE8_MEMBER(m62_state::kidniki_text_vscroll_low_w)
+void m62_state::kidniki_text_vscroll_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kidniki_text_vscroll = (m_kidniki_text_vscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(m62_state::kidniki_text_vscroll_high_w)
+void m62_state::kidniki_text_vscroll_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kidniki_text_vscroll = (m_kidniki_text_vscroll & 0xff) | (data << 8);
 }
 
-WRITE8_MEMBER(m62_state::kidniki_background_bank_w)
+void m62_state::kidniki_background_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_kidniki_background_bank != (data & 1))
 	{
@@ -707,7 +707,7 @@ WRITE8_MEMBER(m62_state::kidniki_background_bank_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_kidniki_bg_tile_info)
+void m62_state::get_kidniki_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -717,7 +717,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_kidniki_bg_tile_info)
 	tileinfo.group = ((color & 0xe0) == 0xe0) ? 1 : 0;
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_kidniki_fg_tile_info)
+void m62_state::get_kidniki_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -726,7 +726,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_kidniki_fg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code | ( ( color & 0xc0 ) << 2 ), color & 0x1f, 0);
 }
 
-VIDEO_START_MEMBER(m62_state,kidniki)
+void m62_state::video_start_kidniki()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m62_state::get_kidniki_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
@@ -752,7 +752,7 @@ uint32_t m62_state::screen_update_kidniki(screen_device &screen, bitmap_ind16 &b
 }
 
 
-WRITE8_MEMBER(m62_state::spelunkr_palbank_w)
+void m62_state::spelunkr_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_spelunkr_palbank != (data & 0x01))
 	{
@@ -762,7 +762,7 @@ WRITE8_MEMBER(m62_state::spelunkr_palbank_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_spelunkr_bg_tile_info)
+void m62_state::get_spelunkr_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -771,7 +771,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_spelunkr_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0x10) << 4) | ((color & 0x20) << 6) | ((color & 0xc0) << 3), (color & 0x0f) | (m_spelunkr_palbank << 4), 0);
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_spelunkr_fg_tile_info)
+void m62_state::get_spelunkr_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -781,7 +781,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_spelunkr_fg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code | ((color & 0x10) << 4), (color & 0x0f) | (m_spelunkr_palbank << 4), 0);
 }
 
-VIDEO_START_MEMBER(m62_state,spelunkr)
+void m62_state::video_start_spelunkr()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_bg_tile_info),this), 1, 1, 8, 8, 64, 64);
 	m62_textlayer(tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_fg_tile_info),this), 1, 1, 12, 8, 32, 32);
@@ -802,7 +802,7 @@ uint32_t m62_state::screen_update_spelunkr(screen_device &screen, bitmap_ind16 &
 }
 
 
-WRITE8_MEMBER(m62_state::spelunk2_gfxport_w)
+void m62_state::spelunk2_gfxport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m62_hscroll_high_w(space, 0, (data & 2) >> 1);
 	m62_vscroll_high_w(space, 0, (data & 1));
@@ -814,7 +814,7 @@ WRITE8_MEMBER(m62_state::spelunk2_gfxport_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_spelunk2_bg_tile_info)
+void m62_state::get_spelunk2_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -823,7 +823,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_spelunk2_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0xf0) << 4), (color & 0x0f) | (m_spelunkr_palbank << 4), 0 );
 }
 
-VIDEO_START_MEMBER(m62_state,spelunk2)
+void m62_state::video_start_spelunk2()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_spelunk2_bg_tile_info),this), 1, 1, 8, 8, 64, 64);
 	m62_textlayer(tilemap_get_info_delegate(FUNC(m62_state::get_spelunkr_fg_tile_info),this), 1, 1, 12, 8, 32, 32);
@@ -844,7 +844,7 @@ uint32_t m62_state::screen_update_spelunk2(screen_device &screen, bitmap_ind16 &
 }
 
 
-TILE_GET_INFO_MEMBER(m62_state::get_youjyudn_bg_tile_info)
+void m62_state::get_youjyudn_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -857,7 +857,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_youjyudn_bg_tile_info)
 		tileinfo.group = 0;
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_youjyudn_fg_tile_info)
+void m62_state::get_youjyudn_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -866,7 +866,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_youjyudn_fg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code | ((color & 0xc0) << 2), (color & 0x0f), 0);
 }
 
-VIDEO_START_MEMBER(m62_state,youjyudn)
+void m62_state::video_start_youjyudn()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_youjyudn_bg_tile_info),this), 1, 0, 8, 16, 64, 16);
 	m62_textlayer(tilemap_get_info_delegate(FUNC(m62_state::get_youjyudn_fg_tile_info),this), 1, 1, 12, 8, 32, 32);
@@ -889,12 +889,12 @@ uint32_t m62_state::screen_update_youjyudn(screen_device &screen, bitmap_ind16 &
 }
 
 
-WRITE8_MEMBER(m62_state::horizon_scrollram_w)
+void m62_state::horizon_scrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollram[offset] = data;
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_horizon_bg_tile_info)
+void m62_state::get_horizon_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -908,7 +908,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_horizon_bg_tile_info)
 		tileinfo.group = 0;
 }
 
-VIDEO_START_MEMBER(m62_state,horizon)
+void m62_state::video_start_horizon()
 {
 	m62_start(tilemap_get_info_delegate(FUNC(m62_state::get_horizon_bg_tile_info),this), 32, 0, 8, 8, 64, 32);
 	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */

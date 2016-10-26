@@ -169,7 +169,7 @@ void at28c16_device::nvram_write( emu_file &file )
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE8_MEMBER( at28c16_device::write )
+void at28c16_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( m_last_write >= 0 )
 	{
@@ -207,7 +207,7 @@ WRITE8_MEMBER( at28c16_device::write )
 }
 
 
-READ8_MEMBER( at28c16_device::read )
+uint8_t at28c16_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if( m_last_write >= 0 )
 	{
@@ -229,7 +229,7 @@ READ8_MEMBER( at28c16_device::read )
 }
 
 
-WRITE_LINE_MEMBER( at28c16_device::set_a9_12v )
+void at28c16_device::set_a9_12v(int state)
 {
 	state &= 1;
 	if( m_a9_12v != state )
@@ -240,7 +240,7 @@ WRITE_LINE_MEMBER( at28c16_device::set_a9_12v )
 }
 
 
-WRITE_LINE_MEMBER( at28c16_device::set_oe_12v )
+void at28c16_device::set_oe_12v(int state)
 {
 	state &= 1;
 	if( m_oe_12v != state )

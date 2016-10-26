@@ -15,7 +15,7 @@
 #include "includes/crospang.h"
 
 
-WRITE16_MEMBER(crospang_state::bestri_tilebank_w)
+void crospang_state::bestri_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_bestri_tilebank = (data>>10) & 0xf;
 	//printf("bestri %04x\n", data);
@@ -26,7 +26,7 @@ WRITE16_MEMBER(crospang_state::bestri_tilebank_w)
 
 
 // Bestri performs some unusual operations on the scroll values before writing them
-WRITE16_MEMBER(crospang_state::bestri_bg_scrolly_w)
+void crospang_state::bestri_bg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// addi.w #$1f8, D0
 	// eori.w #$154, D0
@@ -34,7 +34,7 @@ WRITE16_MEMBER(crospang_state::bestri_bg_scrolly_w)
 	m_bg_layer->set_scrolly(0, -scroll + 7);
 }
 
-WRITE16_MEMBER(crospang_state::bestri_fg_scrolly_w)
+void crospang_state::bestri_fg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// addi.w #$1f8, D0
 	// eori.w #$aa, D0
@@ -42,7 +42,7 @@ WRITE16_MEMBER(crospang_state::bestri_fg_scrolly_w)
 	m_fg_layer->set_scrolly(0, -scroll + 7);
 }
 
-WRITE16_MEMBER(crospang_state::bestri_fg_scrollx_w)
+void crospang_state::bestri_fg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// addi.w #$400, D1
 	// eori.w #$1e0, D1
@@ -50,7 +50,7 @@ WRITE16_MEMBER(crospang_state::bestri_fg_scrollx_w)
 	m_fg_layer->set_scrollx(0, scroll - 1);
 }
 
-WRITE16_MEMBER(crospang_state::bestri_bg_scrollx_w)
+void crospang_state::bestri_bg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// addi.w #$3fc, D1
 	// eori.w #$3c0, D1
@@ -59,40 +59,40 @@ WRITE16_MEMBER(crospang_state::bestri_bg_scrollx_w)
 }
 
 
-WRITE16_MEMBER(crospang_state::crospang_fg_scrolly_w)
+void crospang_state::crospang_fg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_fg_layer->set_scrolly(0, data + 8);
 }
 
-WRITE16_MEMBER(crospang_state::crospang_bg_scrolly_w)
+void crospang_state::crospang_bg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_bg_layer->set_scrolly(0, data + 8);
 }
 
-WRITE16_MEMBER(crospang_state::crospang_fg_scrollx_w)
+void crospang_state::crospang_fg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_fg_layer->set_scrollx(0, data);
 }
 
-WRITE16_MEMBER(crospang_state::crospang_bg_scrollx_w)
+void crospang_state::crospang_bg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_bg_layer->set_scrollx(0, data + 4);
 }
 
 
-WRITE16_MEMBER(crospang_state::crospang_fg_videoram_w)
+void crospang_state::crospang_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(crospang_state::crospang_bg_videoram_w)
+void crospang_state::crospang_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_layer->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(crospang_state::get_bg_tile_info)
+void crospang_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data  = m_bg_videoram[tile_index];
 	int tile  = data & 0xfff;
@@ -101,7 +101,7 @@ TILE_GET_INFO_MEMBER(crospang_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, tile + m_bestri_tilebank * 0x1000, color + 0x20, 0);
 }
 
-TILE_GET_INFO_MEMBER(crospang_state::get_fg_tile_info)
+void crospang_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data  = m_fg_videoram[tile_index];
 	int tile  = data & 0xfff;

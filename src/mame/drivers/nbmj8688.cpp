@@ -42,7 +42,7 @@ TODO:
 #include "nbmj8688.lh"
 
 
-DRIVER_INIT_MEMBER(nbmj8688_state,mjcamera)
+void nbmj8688_state::init_mjcamera()
 {
 	uint8_t *rom = memregion("voice")->base() + 0x20000;
 	uint8_t *prot = memregion("user1")->base();
@@ -59,7 +59,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,mjcamera)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8688_state,kanatuen)
+void nbmj8688_state::init_kanatuen()
 {
 	/* uses the same protection data as mjcamer, but a different check */
 	uint8_t *rom = memregion("voice")->base() + 0x30000;
@@ -70,7 +70,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,kanatuen)
 	rom[0x0301] = 0xdc;
 }
 
-DRIVER_INIT_MEMBER(nbmj8688_state,kyuhito)
+void nbmj8688_state::init_kyuhito()
 {
 #if 1
 	/* uses the same protection data as ????, but a different check */
@@ -82,7 +82,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,kyuhito)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8688_state,idhimitu)
+void nbmj8688_state::init_idhimitu()
 {
 	uint8_t *rom = memregion("voice")->base() + 0x20000;
 	uint8_t *prot = memregion("user1")->base();
@@ -99,7 +99,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,idhimitu)
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8688_state,kaguya2)
+void nbmj8688_state::init_kaguya2()
 {
 	uint8_t *rom = memregion("voice")->base() + 0x20000;
 	uint8_t *prot = memregion("user1")->base();
@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 
 
 
-READ8_MEMBER(nbmj8688_state::ff_r)
+uint8_t nbmj8688_state::ff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* possibly because of a bug, reads from port 0xd0 must return 0xff
 	   otherwise apparel doesn't clear the background when you insert a coin */
@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( secolove_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(scrolly_w)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(nbmj8688_state::barline_output_w)
+void nbmj8688_state::barline_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0,~data & 0x80);
 	machine().bookkeeping().coin_counter_w(0,data & 0x02);
@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( mmsikaku_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(scrolly_w)
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER( nbmj8688_state::nb1413m3_busyflag_r )
+ioport_value nbmj8688_state::nb1413m3_busyflag_r(ioport_field &field, void *param)
 {
 	return m_nb1413m3->m_busyflag & 0x01;
 }
@@ -2435,12 +2435,12 @@ static INPUT_PORTS_START( nightlov )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(nbmj8688_state::dipsw1_r)
+uint8_t nbmj8688_state::dipsw1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nb1413m3->dipsw1_r(space,offset);
 }
 
-READ8_MEMBER(nbmj8688_state::dipsw2_r)
+uint8_t nbmj8688_state::dipsw2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nb1413m3->dipsw2_r(space,offset);
 }

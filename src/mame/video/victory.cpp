@@ -94,7 +94,7 @@ void victory_state::update_irq()
 }
 
 
-INTERRUPT_GEN_MEMBER(victory_state::vblank_interrupt)
+void victory_state::vblank_interrupt(device_t &device)
 {
 	m_vblank_irq = 1;
 
@@ -109,7 +109,7 @@ INTERRUPT_GEN_MEMBER(victory_state::vblank_interrupt)
  *
  *************************************/
 
-WRITE8_MEMBER(victory_state::paletteram_w)
+void victory_state::paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset & 0x3f] = ((offset & 0x80) << 1) | data;
 }
@@ -135,7 +135,7 @@ void victory_state::set_palette()
  *
  *************************************/
 
-READ8_MEMBER(victory_state::video_control_r)
+uint8_t victory_state::video_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = 0;
 
@@ -201,7 +201,7 @@ READ8_MEMBER(victory_state::video_control_r)
  *
  *************************************/
 
-WRITE8_MEMBER(victory_state::video_control_w)
+void victory_state::video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct micro_t &micro = m_micro;
 	switch (offset)
@@ -1073,7 +1073,7 @@ void victory_state::update_foreground()
 }
 
 
-TIMER_CALLBACK_MEMBER(victory_state::bgcoll_irq_callback)
+void victory_state::bgcoll_irq_callback(void *ptr, int32_t param)
 {
 	m_bgcollx = param & 0xff;
 	m_bgcolly = param >> 8;

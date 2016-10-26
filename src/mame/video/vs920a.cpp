@@ -75,7 +75,7 @@ void vs920a_text_tilemap_device::static_set_gfxdecode_tag(device_t &device, cons
 
 
 
-TILE_GET_INFO_MEMBER(vs920a_text_tilemap_device::get_tile_info)
+void vs920a_text_tilemap_device::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data;
 	int tileno, pal;
@@ -88,14 +88,14 @@ TILE_GET_INFO_MEMBER(vs920a_text_tilemap_device::get_tile_info)
 	SET_TILE_INFO_MEMBER(m_gfx_region, tileno, m_pal_base + pal, 0);
 }
 
-WRITE16_MEMBER(vs920a_text_tilemap_device::vram_w)
+void vs920a_text_tilemap_device::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 	m_tmap->mark_tile_dirty(offset);
 }
 
 
-READ16_MEMBER(vs920a_text_tilemap_device::vram_r)
+uint16_t vs920a_text_tilemap_device::vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_vram[offset];
 }

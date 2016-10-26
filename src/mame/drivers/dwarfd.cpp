@@ -327,25 +327,25 @@ public:
 	required_region_ptr<uint16_t> m_charmap;
 	required_ioport m_dsw2;
 
-	DECLARE_READ8_MEMBER(dwarfd_ram_r);
-	DECLARE_WRITE8_MEMBER(dwarfd_ram_w);
-	DECLARE_WRITE8_MEMBER(output1_w);
-	DECLARE_WRITE8_MEMBER(output2_w);
-	DECLARE_READ8_MEMBER(qc_b8_r);
-	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
-	DECLARE_DRIVER_INIT(qc);
-	DECLARE_DRIVER_INIT(dwarfd);
+	uint8_t dwarfd_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dwarfd_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t qc_b8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dwarfd_sod_callback(int state);
+	void drq_w(int state);
+	void init_qc();
+	void init_dwarfd();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(dwarfd);
+	void palette_init_dwarfd(palette_device &palette);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(pesp_display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(qc_display_pixels);
 };
 
 
-READ8_MEMBER(dwarfd_state::dwarfd_ram_r)
+uint8_t dwarfd_state::dwarfd_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_crt_access == 0)
 	{
@@ -358,12 +358,12 @@ READ8_MEMBER(dwarfd_state::dwarfd_ram_r)
 	}
 }
 
-WRITE8_MEMBER(dwarfd_state::dwarfd_ram_w)
+void dwarfd_state::dwarfd_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dw_ram[offset] = data;
 }
 
-WRITE8_MEMBER(dwarfd_state::output1_w)
+void dwarfd_state::output1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
  bits:
@@ -378,7 +378,7 @@ WRITE8_MEMBER(dwarfd_state::output1_w)
 */
 }
 
-WRITE8_MEMBER(dwarfd_state::output2_w)
+void dwarfd_state::output2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
  bits:
@@ -394,7 +394,7 @@ WRITE8_MEMBER(dwarfd_state::output2_w)
 }
 
 
-READ8_MEMBER(dwarfd_state::qc_b8_r)
+uint8_t dwarfd_state::qc_b8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
@@ -647,12 +647,12 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 	}
 }
 
-WRITE_LINE_MEMBER(dwarfd_state::dwarfd_sod_callback)
+void dwarfd_state::dwarfd_sod_callback(int state)
 {
 	m_crt_access = state;
 }
 
-WRITE_LINE_MEMBER(dwarfd_state::drq_w)
+void dwarfd_state::drq_w(int state)
 {
 	if(state && !m_crt_access)
 		m_maincpu->set_input_line(I8085_RST65_LINE, ASSERT_LINE);
@@ -758,7 +758,7 @@ static GFXDECODE_START( dwarfd )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout3, 0, 16 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(dwarfd_state, dwarfd)
+void dwarfd_state::palette_init_dwarfd(palette_device &palette)
 {
 	uint8_t rgb[3];
 	int i,j;
@@ -1051,7 +1051,7 @@ ROM_START( qc )
 	ROM_LOAD( "colors.bin",0x00, 0x20, BAD_DUMP CRC(3adeee7c) SHA1(f118ee62f84b0384316c12fc22356d43b2cfd876) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dwarfd_state,dwarfd)
+void dwarfd_state::init_dwarfd()
 {
 	/* expand gfx roms */
 	uint8_t *dst = memregion("gfx2")->base();
@@ -1091,9 +1091,9 @@ DRIVER_INIT_MEMBER(dwarfd_state,dwarfd)
 
 }
 
-DRIVER_INIT_MEMBER(dwarfd_state,qc)
+void dwarfd_state::init_qc()
 {
-	DRIVER_INIT_CALL(dwarfd);
+	init_dwarfd();
 
 	// hacks for program to proceed
 	memregion("maincpu")->base()[0x6564] = 0x00;

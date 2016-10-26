@@ -41,19 +41,19 @@ GP1 HDD data contents:
  *
  *************************************/
 
-READ16_MEMBER(qdrmfgp_state::inputs_r)
+uint16_t qdrmfgp_state::inputs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_control & 0x0080 ? m_inputs_port->read() : m_dsw_port->read();
 }
 
-CUSTOM_INPUT_MEMBER(qdrmfgp_state::battery_sensor_r)
+ioport_value qdrmfgp_state::battery_sensor_r(ioport_field &field, void *param)
 {
 	/* bit 0-1  battery power sensor: 3=good, 2=low, other=bad */
 	return 0x0003;
 }
 
 
-WRITE16_MEMBER(qdrmfgp_state::gp_control_w)
+void qdrmfgp_state::gp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 0        enable irq 1 (sound) */
 	/* bit 1        enable irq 2 (not used) */
@@ -96,7 +96,7 @@ WRITE16_MEMBER(qdrmfgp_state::gp_control_w)
 	}
 }
 
-WRITE16_MEMBER(qdrmfgp_state::gp2_control_w)
+void qdrmfgp_state::gp2_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 2        enable irq 3 (sound) */
 	/* bit 3        enable irq 4 (vblank) */
@@ -135,7 +135,7 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_control_w)
 }
 
 
-READ16_MEMBER(qdrmfgp_state::v_rom_r)
+uint16_t qdrmfgp_state::v_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t *mem8 = memregion("gfx1")->base();
 	int bank = m_k056832->word_r(space, 0x34/2, 0xffff);
@@ -149,7 +149,7 @@ READ16_MEMBER(qdrmfgp_state::v_rom_r)
 }
 
 
-READ16_MEMBER(qdrmfgp_state::gp2_vram_r)
+uint16_t qdrmfgp_state::gp2_vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 0x1000 / 2)
 		return m_k056832->ram_word_r(space, offset * 2 + 1, mem_mask);
@@ -157,7 +157,7 @@ READ16_MEMBER(qdrmfgp_state::gp2_vram_r)
 		return m_k056832->ram_word_r(space, (offset - 0x1000 / 2) * 2, mem_mask);
 }
 
-READ16_MEMBER(qdrmfgp_state::gp2_vram_mirror_r)
+uint16_t qdrmfgp_state::gp2_vram_mirror_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 0x1000 / 2)
 		return m_k056832->ram_word_r(space, offset * 2, mem_mask);
@@ -165,7 +165,7 @@ READ16_MEMBER(qdrmfgp_state::gp2_vram_mirror_r)
 		return m_k056832->ram_word_r(space, (offset - 0x1000 / 2) * 2 + 1, mem_mask);
 }
 
-WRITE16_MEMBER(qdrmfgp_state::gp2_vram_w)
+void qdrmfgp_state::gp2_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x1000 / 2)
 		m_k056832->ram_word_w(space, offset * 2 + 1, data, mem_mask);
@@ -173,7 +173,7 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_vram_w)
 		m_k056832->ram_word_w(space, (offset - 0x1000 / 2) * 2, data, mem_mask);
 }
 
-WRITE16_MEMBER(qdrmfgp_state::gp2_vram_mirror_w)
+void qdrmfgp_state::gp2_vram_mirror_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x1000 / 2)
 		m_k056832->ram_word_w(space, offset * 2, data, mem_mask);
@@ -184,7 +184,7 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_vram_mirror_w)
 
 /*************/
 
-READ16_MEMBER(qdrmfgp_state::sndram_r)
+uint16_t qdrmfgp_state::sndram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		return m_sndram[offset];
@@ -192,7 +192,7 @@ READ16_MEMBER(qdrmfgp_state::sndram_r)
 	return 0;
 }
 
-WRITE16_MEMBER(qdrmfgp_state::sndram_w)
+void qdrmfgp_state::sndram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -205,7 +205,7 @@ WRITE16_MEMBER(qdrmfgp_state::sndram_w)
 /*************/
 
 
-READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
+uint16_t qdrmfgp_state::gp2_ide_std_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0x07)
 	{
@@ -232,7 +232,7 @@ READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(qdrmfgp_state::qdrmfgp_interrupt)
+void qdrmfgp_state::qdrmfgp_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -242,7 +242,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(qdrmfgp_state::qdrmfgp_interrupt)
 			m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(qdrmfgp_state::ide_interrupt)
+void qdrmfgp_state::ide_interrupt(int state)
 {
 	if (m_control & 0x0008)
 		if (state != CLEAR_LINE)
@@ -251,20 +251,20 @@ WRITE_LINE_MEMBER(qdrmfgp_state::ide_interrupt)
 
 /*************/
 
-TIMER_CALLBACK_MEMBER(qdrmfgp_state::gp2_timer_callback)
+void qdrmfgp_state::gp2_timer_callback(void *ptr, int32_t param)
 {
 	if (m_control & 0x0004)
 		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(qdrmfgp_state::qdrmfgp2_interrupt)
+void qdrmfgp_state::qdrmfgp2_interrupt(device_t &device)
 {
 	/* trigger V-blank interrupt */
 	if (m_control & 0x0008)
 		device.execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(qdrmfgp_state::gp2_ide_interrupt)
+void qdrmfgp_state::gp2_ide_interrupt(int state)
 {
 #if IDE_HACK
 	if (m_control & 0x0010)
@@ -524,7 +524,7 @@ INPUT_PORTS_END
 
 int m_sound_intck;
 
-WRITE_LINE_MEMBER(qdrmfgp_state::k054539_irq1_gen)
+void qdrmfgp_state::k054539_irq1_gen(int state)
 {
 	if (m_control & 1)
 	{
@@ -542,19 +542,19 @@ WRITE_LINE_MEMBER(qdrmfgp_state::k054539_irq1_gen)
  *
  *************************************/
 
-MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp)
+void qdrmfgp_state::machine_start_qdrmfgp()
 {
 	save_item(NAME(m_control));
 	save_item(NAME(m_pal));
 	save_item(NAME(m_gp2_irq_control));
 }
 
-MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp2)
+void qdrmfgp_state::machine_start_qdrmfgp2()
 {
 	/* sound irq (CCU? 240Hz) */
 	machine().scheduler().timer_pulse(attotime::from_hz(XTAL_18_432MHz/76800), timer_expired_delegate(FUNC(qdrmfgp_state::gp2_timer_callback),this));
 
-	MACHINE_START_CALL_MEMBER( qdrmfgp );
+	machine_start_qdrmfgp();
 }
 
 void qdrmfgp_state::machine_reset()

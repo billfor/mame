@@ -69,69 +69,69 @@ public:
 	void mapper_sound_w(uint8_t data);
 
 	// main CPU read/write handlers
-	DECLARE_WRITE16_MEMBER( rom_5704_bank_w );
-	DECLARE_READ16_MEMBER( rom_5797_bank_math_r );
-	DECLARE_WRITE16_MEMBER( rom_5797_bank_math_w );
-	DECLARE_READ16_MEMBER( unknown_rgn2_r );
-	DECLARE_WRITE16_MEMBER( unknown_rgn2_w );
-	DECLARE_READ16_MEMBER( standard_io_r );
-	DECLARE_WRITE16_MEMBER( standard_io_w );
-	DECLARE_WRITE16_MEMBER( atomicp_sound_w );
+	void rom_5704_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t rom_5797_bank_math_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void rom_5797_bank_math_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t unknown_rgn2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void unknown_rgn2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t standard_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void standard_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void atomicp_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER( bootleg_custom_io_r );
-	DECLARE_WRITE16_MEMBER( bootleg_custom_io_w );
+	uint16_t bootleg_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void bootleg_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// sound CPU read/write handlers
-	DECLARE_WRITE8_MEMBER( upd7759_control_w );
-	DECLARE_READ8_MEMBER( upd7759_status_r );
-	DECLARE_WRITE16_MEMBER( sound_w16 );
+	void upd7759_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t upd7759_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// other callbacks
-	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+	void upd7759_generate_nmi(int state);
+	void i8751_main_cpu_vblank(device_t &device);
 
 	// ROM board-specific driver init
-	DECLARE_DRIVER_INIT(generic_5521);
-	DECLARE_DRIVER_INIT(generic_5358);
-	DECLARE_DRIVER_INIT(generic_5704);
-	DECLARE_DRIVER_INIT(generic_5358_small);
-	DECLARE_DRIVER_INIT(generic_5797);
-	DECLARE_DRIVER_INIT(generic_korean);
-	DECLARE_DRIVER_INIT(generic_bootleg);
-	DECLARE_DRIVER_INIT(lockonph);
+	void init_generic_5521();
+	void init_generic_5358();
+	void init_generic_5704();
+	void init_generic_5358_small();
+	void init_generic_5797();
+	void init_generic_korean();
+	void init_generic_bootleg();
+	void init_lockonph();
 	// game-specific driver init
-	DECLARE_DRIVER_INIT(isgsm);
-	DECLARE_DRIVER_INIT(tturf_5704);
-	DECLARE_DRIVER_INIT(wb3_5704);
-	DECLARE_DRIVER_INIT(hwchamp_5521);
-	DECLARE_DRIVER_INIT(altbeas5_5521);
-	DECLARE_DRIVER_INIT(sdi_5358_small);
-	DECLARE_DRIVER_INIT(altbeasj_5521);
-	DECLARE_DRIVER_INIT(ddux_5704);
-	DECLARE_DRIVER_INIT(snapper);
-	DECLARE_DRIVER_INIT(shinobi4_5521);
-	DECLARE_DRIVER_INIT(goldnaxe_5704);
-	DECLARE_DRIVER_INIT(defense_5358_small);
-	DECLARE_DRIVER_INIT(sjryuko_5358_small);
-	DECLARE_DRIVER_INIT(altbeast_5521);
-	DECLARE_DRIVER_INIT(exctleag_5358);
-	DECLARE_DRIVER_INIT(tetrbx);
-	DECLARE_DRIVER_INIT(aceattac_5358);
-	DECLARE_DRIVER_INIT(passshtj_5358);
-	DECLARE_DRIVER_INIT(cencourt_5358);
-	DECLARE_DRIVER_INIT(shinfz);
-	DECLARE_DRIVER_INIT(dunkshot_5358_small);
-	DECLARE_DRIVER_INIT(timescan_5358_small);
-	DECLARE_DRIVER_INIT(shinobi3_5358);
-	DECLARE_DRIVER_INIT(goldnaxe_5797);
-	DECLARE_DRIVER_INIT(altbeas4_5521);
-	DECLARE_DRIVER_INIT(aliensyn7_5358_small);
+	void init_isgsm();
+	void init_tturf_5704();
+	void init_wb3_5704();
+	void init_hwchamp_5521();
+	void init_altbeas5_5521();
+	void init_sdi_5358_small();
+	void init_altbeasj_5521();
+	void init_ddux_5704();
+	void init_snapper();
+	void init_shinobi4_5521();
+	void init_goldnaxe_5704();
+	void init_defense_5358_small();
+	void init_sjryuko_5358_small();
+	void init_altbeast_5521();
+	void init_exctleag_5358();
+	void init_tetrbx();
+	void init_aceattac_5358();
+	void init_passshtj_5358();
+	void init_cencourt_5358();
+	void init_shinfz();
+	void init_dunkshot_5358_small();
+	void init_timescan_5358_small();
+	void init_shinobi3_5358();
+	void init_goldnaxe_5797();
+	void init_altbeas4_5521();
+	void init_aliensyn7_5358_small();
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER( tileram_w ) { m_segaic16vid->tileram_w(space,offset,data,mem_mask); };
-	DECLARE_WRITE16_MEMBER( textram_w ) { m_segaic16vid->textram_w(space,offset,data,mem_mask); };
+	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { m_segaic16vid->tileram_w(space,offset,data,mem_mask); };
+	void textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { m_segaic16vid->textram_w(space,offset,data,mem_mask); };
 
 	// bootleg stuff
 	void tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram);
@@ -178,14 +178,14 @@ protected:
 	void wb3_i8751_sim();
 
 	// custom I/O handlers
-	DECLARE_READ16_MEMBER( aceattac_custom_io_r );
-	DECLARE_READ16_MEMBER( dunkshot_custom_io_r );
-	DECLARE_READ16_MEMBER( hwchamp_custom_io_r );
-	DECLARE_WRITE16_MEMBER( hwchamp_custom_io_w );
-	DECLARE_READ16_MEMBER( passshtj_custom_io_r );
-	DECLARE_READ16_MEMBER( sdi_custom_io_r );
-	DECLARE_READ16_MEMBER( sjryuko_custom_io_r );
-	DECLARE_WRITE16_MEMBER( sjryuko_custom_io_w );
+	uint16_t aceattac_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dunkshot_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t hwchamp_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void hwchamp_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t passshtj_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t sdi_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t sjryuko_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sjryuko_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	protected:
 	// devices
@@ -267,19 +267,19 @@ public:
 	void init_tetrbx();
 
 	// read/write handlers
-	DECLARE_WRITE16_MEMBER( cart_addr_high_w );
-	DECLARE_WRITE16_MEMBER( cart_addr_low_w );
-	DECLARE_READ16_MEMBER( cart_data_r );
-	DECLARE_WRITE16_MEMBER( data_w );
-	DECLARE_WRITE16_MEMBER( datatype_w );
-	DECLARE_WRITE16_MEMBER( addr_high_w );
-	DECLARE_WRITE16_MEMBER( addr_low_w );
-	DECLARE_WRITE16_MEMBER( cart_security_high_w );
-	DECLARE_WRITE16_MEMBER( cart_security_low_w );
-	DECLARE_READ16_MEMBER( cart_security_low_r );
-	DECLARE_READ16_MEMBER( cart_security_high_r );
-	DECLARE_WRITE16_MEMBER( sound_reset_w );
-	DECLARE_WRITE16_MEMBER( main_bank_change_w );
+	void cart_addr_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cart_addr_low_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cart_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void datatype_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void addr_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void addr_low_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cart_security_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cart_security_low_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cart_security_low_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t cart_security_high_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void main_bank_change_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// security callbacks
 	uint32_t shinfz_security(uint32_t input);

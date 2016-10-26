@@ -27,10 +27,10 @@ public:
 
 	static void set_chargen_tag(device_t &device, const char *tag) { downcast<vt100_video_device &>(device).m_char_rom.set_tag(tag); }
 
-	DECLARE_READ8_MEMBER(lba7_r);
-	DECLARE_WRITE8_MEMBER(dc012_w);
-	DECLARE_WRITE8_MEMBER(dc011_w);
-	DECLARE_WRITE8_MEMBER(brightness_w);
+	uint8_t lba7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dc012_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dc011_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void brightness_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 protected:
@@ -42,7 +42,7 @@ protected:
 	// internal state
 	void recompute_parameters();
 	virtual void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type);
-	TIMER_CALLBACK_MEMBER(lba7_change);
+	void lba7_change(void *ptr, int32_t param);
 
 	devcb_read8        m_read_ram;
 	devcb_write8       m_write_clear_video_interrupt;

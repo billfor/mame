@@ -31,7 +31,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(gyruss_state, gyruss)
+void gyruss_state::palette_init_gyruss(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -91,7 +91,7 @@ PALETTE_INIT_MEMBER(gyruss_state, gyruss)
 
 
 
-WRITE8_MEMBER(gyruss_state::gyruss_spriteram_w)
+void gyruss_state::gyruss_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -99,7 +99,7 @@ WRITE8_MEMBER(gyruss_state::gyruss_spriteram_w)
 }
 
 
-TILE_GET_INFO_MEMBER(gyruss_state::gyruss_get_tile_info)
+void gyruss_state::gyruss_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_colorram[tile_index] & 0x20) << 3) | m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
@@ -120,7 +120,7 @@ void gyruss_state::video_start()
 
 
 
-READ8_MEMBER(gyruss_state::gyruss_scanline_r)
+uint8_t gyruss_state::gyruss_scanline_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* reads 1V - 128V */
 	return m_screen->vpos();

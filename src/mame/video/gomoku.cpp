@@ -20,7 +20,7 @@
 
 ******************************************************************************/
 
-PALETTE_INIT_MEMBER(gomoku_state, gomoku)
+void gomoku_state::palette_init_gomoku(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -56,7 +56,7 @@ PALETTE_INIT_MEMBER(gomoku_state, gomoku)
 
 ******************************************************************************/
 
-TILE_GET_INFO_MEMBER(gomoku_state::get_fg_tile_info)
+void gomoku_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = (m_videoram[tile_index]);
 	int attr = (m_colorram[tile_index]);
@@ -69,29 +69,29 @@ TILE_GET_INFO_MEMBER(gomoku_state::get_fg_tile_info)
 			TILE_FLIPYX(flipyx));
 }
 
-WRITE8_MEMBER(gomoku_state::gomoku_videoram_w)
+void gomoku_state::gomoku_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gomoku_state::gomoku_colorram_w)
+void gomoku_state::gomoku_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gomoku_state::gomoku_bgram_w)
+void gomoku_state::gomoku_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgram[offset] = data;
 }
 
-WRITE8_MEMBER(gomoku_state::gomoku_flipscreen_w)
+void gomoku_state::gomoku_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = (data & 0x02) ? 0 : 1;
 }
 
-WRITE8_MEMBER(gomoku_state::gomoku_bg_dispsw_w)
+void gomoku_state::gomoku_bg_dispsw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_dispsw = (data & 0x02) ? 0 : 1;
 }

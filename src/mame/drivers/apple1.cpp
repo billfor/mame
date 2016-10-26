@@ -112,18 +112,18 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(apple2);
+	void palette_init_apple2(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(pia_keyboard_r);
-	DECLARE_WRITE8_MEMBER(pia_display_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_display_gate_w);
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia_display_gate_w(int state);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( apple1 );
-	TIMER_CALLBACK_MEMBER(ready_start_cb);
-	TIMER_CALLBACK_MEMBER(ready_end_cb);
-	TIMER_CALLBACK_MEMBER(keyboard_strobe_cb);
+	void ready_start_cb(void *ptr, int32_t param);
+	void ready_end_cb(void *ptr, int32_t param);
+	void keyboard_strobe_cb(void *ptr, int32_t param);
 
 private:
 	uint8_t *m_ram_ptr, *m_char_ptr;
@@ -406,7 +406,7 @@ void apple1_state::machine_reset()
 	m_lastports[0] = m_lastports[1] = m_lastports[2] = m_lastports[3] = 0;
 }
 
-READ8_MEMBER(apple1_state::ram_r)
+uint8_t apple1_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < m_ram_size)
 	{
@@ -416,7 +416,7 @@ READ8_MEMBER(apple1_state::ram_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(apple1_state::ram_w)
+void apple1_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < m_ram_size)
 	{
@@ -431,12 +431,12 @@ static ADDRESS_MAP_START( apple1_map, AS_PROGRAM, 8, apple1_state )
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION(A1_CPU_TAG, 0)
 ADDRESS_MAP_END
 
-READ8_MEMBER(apple1_state::pia_keyboard_r)
+uint8_t apple1_state::pia_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_transchar | 0x80;  // bit 7 is wired high, similar-ish to the Apple II
 }
 
-WRITE8_MEMBER(apple1_state::pia_display_w)
+void apple1_state::pia_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0x7f;   // D7 is ignored by the video h/w
 
@@ -483,7 +483,7 @@ WRITE8_MEMBER(apple1_state::pia_display_w)
 
 // CB2 here is connected two places: Port B bit 7 for CPU readback,
 // and to the display hardware
-WRITE_LINE_MEMBER(apple1_state::pia_display_gate_w)
+void apple1_state::pia_display_gate_w(int state)
 {
 	m_pia->portb_w((state << 7) ^ 0x80);
 
@@ -494,19 +494,19 @@ WRITE_LINE_MEMBER(apple1_state::pia_display_gate_w)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(apple1_state::ready_start_cb)
+void apple1_state::ready_start_cb(void *ptr, int32_t param)
 {
 	// we're ready, pulse CB1 for 3500 nanoseconds
 	m_pia->cb1_w(0);
 	m_ready_end_timer->adjust(attotime::from_nsec(3500));
 }
 
-TIMER_CALLBACK_MEMBER(apple1_state::ready_end_cb)
+void apple1_state::ready_end_cb(void *ptr, int32_t param)
 {
 	m_pia->cb1_w(1);
 }
 
-TIMER_CALLBACK_MEMBER(apple1_state::keyboard_strobe_cb)
+void apple1_state::keyboard_strobe_cb(void *ptr, int32_t param)
 {
 	m_pia->ca1_w(0);
 }

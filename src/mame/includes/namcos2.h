@@ -137,28 +137,28 @@ public:
 	// C123 Tilemap Emulation
 	// TODO: merge with namcos1.cpp implementation and convert to device
 public:
-	DECLARE_WRITE16_MEMBER( c123_tilemap_videoram_w );
-	DECLARE_READ16_MEMBER( c123_tilemap_videoram_r );
-	DECLARE_WRITE16_MEMBER( c123_tilemap_control_w );
-	DECLARE_READ16_MEMBER( c123_tilemap_control_r );
-	TILE_GET_INFO_MEMBER( get_tile_info0 );
-	TILE_GET_INFO_MEMBER( get_tile_info1 );
-	TILE_GET_INFO_MEMBER( get_tile_info2 );
-	TILE_GET_INFO_MEMBER( get_tile_info3 );
-	TILE_GET_INFO_MEMBER( get_tile_info4 );
-	TILE_GET_INFO_MEMBER( get_tile_info5 );
+	void c123_tilemap_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t c123_tilemap_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c123_tilemap_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t c123_tilemap_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info5(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void namco_tilemap_init(int gfxbank, void *pMaskROM, void (*cb)( running_machine &machine, uint16_t code, int *gfx, int *mask) );
 
 	// C169 ROZ Layer Emulation
 public:
 	void c169_roz_init(int gfxbank, const char *maskregion);
 	void c169_roz_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
-	DECLARE_READ16_MEMBER( c169_roz_control_r );
-	DECLARE_WRITE16_MEMBER( c169_roz_control_w );
-	DECLARE_READ16_MEMBER( c169_roz_bank_r );
-	DECLARE_WRITE16_MEMBER( c169_roz_bank_w );
-	DECLARE_READ16_MEMBER( c169_roz_videoram_r );
-	DECLARE_WRITE16_MEMBER( c169_roz_videoram_w );
+	uint16_t c169_roz_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c169_roz_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t c169_roz_bank_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c169_roz_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t c169_roz_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c169_roz_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	struct roz_parameters
@@ -172,9 +172,9 @@ protected:
 	void c169_roz_draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params);
 	void c169_roz_draw_scanline(screen_device &screen, bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect);
 	void c169_roz_get_info(tile_data &tileinfo, int tile_index, int which);
-	TILE_GET_INFO_MEMBER( c169_roz_get_info0 );
-	TILE_GET_INFO_MEMBER( c169_roz_get_info1 );
-	TILEMAP_MAPPER_MEMBER( c169_roz_mapper );
+	void c169_roz_get_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void c169_roz_get_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index c169_roz_mapper(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	static const int ROZ_TILEMAP_COUNT = 2;
 	tilemap_t *m_c169_roz_tilemap[ROZ_TILEMAP_COUNT];
@@ -192,12 +192,12 @@ public:
 	int c355_obj_default_code2tile(int code);
 	void c355_obj_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void c355_obj_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
-	DECLARE_READ16_MEMBER( c355_obj_ram_r );
-	DECLARE_WRITE16_MEMBER( c355_obj_ram_w );
-	DECLARE_READ16_MEMBER( c355_obj_position_r );
-	DECLARE_WRITE16_MEMBER( c355_obj_position_w );
-	DECLARE_MACHINE_START(namcos2);
-	DECLARE_MACHINE_RESET(namcos2);
+	uint16_t c355_obj_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c355_obj_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t c355_obj_position_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c355_obj_position_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void machine_start_namcos2();
+	void machine_reset_namcos2();
 protected:
 	// C355 Motion Object internals
 	template<class _BitmapClass>
@@ -218,35 +218,35 @@ public:
 	// general
 	void zdrawgfxzoom(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
 	void zdrawgfxzoom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
-	INTERRUPT_GEN_MEMBER(namcos2_68k_master_vblank);
-	INTERRUPT_GEN_MEMBER(namcos2_68k_slave_vblank);
-	INTERRUPT_GEN_MEMBER(namcos2_68k_gpu_vblank);
-	TIMER_CALLBACK_MEMBER(namcos2_posirq_tick);
+	void namcos2_68k_master_vblank(device_t &device);
+	void namcos2_68k_slave_vblank(device_t &device);
+	void namcos2_68k_gpu_vblank(device_t &device);
+	void namcos2_posirq_tick(void *ptr, int32_t param);
 	void adjust_posirq_timer( int scanline );
 	void init_c148();
 	void reset_all_subcpus(int state);
 	uint16_t readwrite_c148( address_space &space, offs_t offset, uint16_t data, int bWrite );
 	int get_posirq_scanline();
 
-	DECLARE_WRITE8_MEMBER( namcos2_68k_eeprom_w );
-	DECLARE_READ8_MEMBER( namcos2_68k_eeprom_r );
-	DECLARE_WRITE16_MEMBER( namcos2_68k_master_C148_w );
-	DECLARE_READ16_MEMBER( namcos2_68k_master_C148_r );
+	void namcos2_68k_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t namcos2_68k_eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void namcos2_68k_master_C148_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t namcos2_68k_master_C148_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER( namcos2_68k_slave_C148_w );
-	DECLARE_READ16_MEMBER( namcos2_68k_slave_C148_r );
+	void namcos2_68k_slave_C148_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t namcos2_68k_slave_C148_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE8_MEMBER( namcos2_mcu_port_d_w );
-	DECLARE_READ8_MEMBER( namcos2_mcu_port_d_r );
-	DECLARE_WRITE8_MEMBER( namcos2_mcu_analog_ctrl_w );
-	DECLARE_READ8_MEMBER( namcos2_mcu_analog_ctrl_r );
-	DECLARE_WRITE8_MEMBER( namcos2_mcu_analog_port_w );
-	DECLARE_READ8_MEMBER( namcos2_mcu_analog_port_r );
-	DECLARE_WRITE8_MEMBER( namcos2_sound_bankselect_w );
+	void namcos2_mcu_port_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t namcos2_mcu_port_d_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void namcos2_mcu_analog_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t namcos2_mcu_analog_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void namcos2_mcu_analog_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t namcos2_mcu_analog_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void namcos2_sound_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* TODO: this should belong to namcos21_state */
-	DECLARE_WRITE16_MEMBER( namcos21_68k_gpu_C148_w );
-	DECLARE_READ16_MEMBER( namcos21_68k_gpu_C148_r );
+	void namcos21_68k_gpu_C148_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t namcos21_68k_gpu_C148_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_slave;
@@ -270,47 +270,47 @@ public:
 			m_c45_road(*this, "c45_road")
 	{ }
 
-	DECLARE_READ8_MEMBER(c68_p5_r);
-	DECLARE_WRITE8_MEMBER(c68_p3_w);
-	DECLARE_READ16_MEMBER(dpram_word_r);
-	DECLARE_WRITE16_MEMBER(dpram_word_w);
-	DECLARE_READ8_MEMBER(dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(dpram_byte_w);
-	DECLARE_READ8_MEMBER(ack_mcu_vbl_r);
-	DECLARE_DRIVER_INIT(cosmogng);
-	DECLARE_DRIVER_INIT(sgunner2);
-	DECLARE_DRIVER_INIT(kyukaidk);
-	DECLARE_DRIVER_INIT(bubbletr);
-	DECLARE_DRIVER_INIT(suzuk8h2);
-	DECLARE_DRIVER_INIT(burnforc);
-	DECLARE_DRIVER_INIT(gollygho);
-	DECLARE_DRIVER_INIT(rthun2j);
-	DECLARE_DRIVER_INIT(sws);
-	DECLARE_DRIVER_INIT(finehour);
-	DECLARE_DRIVER_INIT(finallap);
-	DECLARE_DRIVER_INIT(dirtfoxj);
-	DECLARE_DRIVER_INIT(marvlanj);
-	DECLARE_DRIVER_INIT(sws92);
-	DECLARE_DRIVER_INIT(dsaber);
-	DECLARE_DRIVER_INIT(assault);
-	DECLARE_DRIVER_INIT(mirninja);
-	DECLARE_DRIVER_INIT(finalap2);
-	DECLARE_DRIVER_INIT(valkyrie);
-	DECLARE_DRIVER_INIT(fourtrax);
-	DECLARE_DRIVER_INIT(finalap3);
-	DECLARE_DRIVER_INIT(luckywld);
-	DECLARE_DRIVER_INIT(assaultj);
-	DECLARE_DRIVER_INIT(dsaberj);
-	DECLARE_DRIVER_INIT(suzuka8h);
-	DECLARE_DRIVER_INIT(phelios);
-	DECLARE_DRIVER_INIT(sws93);
-	DECLARE_DRIVER_INIT(metlhawk);
-	DECLARE_DRIVER_INIT(sws92g);
-	DECLARE_DRIVER_INIT(assaultp_hack);
-	DECLARE_DRIVER_INIT(assaultp);
-	DECLARE_DRIVER_INIT(ordyne);
-	DECLARE_DRIVER_INIT(marvland);
-	DECLARE_DRIVER_INIT(rthun2);
+	uint8_t c68_p5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c68_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t dpram_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dpram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t dpram_byte_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dpram_byte_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ack_mcu_vbl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_cosmogng();
+	void init_sgunner2();
+	void init_kyukaidk();
+	void init_bubbletr();
+	void init_suzuk8h2();
+	void init_burnforc();
+	void init_gollygho();
+	void init_rthun2j();
+	void init_sws();
+	void init_finehour();
+	void init_finallap();
+	void init_dirtfoxj();
+	void init_marvlanj();
+	void init_sws92();
+	void init_dsaber();
+	void init_assault();
+	void init_mirninja();
+	void init_finalap2();
+	void init_valkyrie();
+	void init_fourtrax();
+	void init_finalap3();
+	void init_luckywld();
+	void init_assaultj();
+	void init_dsaberj();
+	void init_suzuka8h();
+	void init_phelios();
+	void init_sws93();
+	void init_metlhawk();
+	void init_sws92g();
+	void init_assaultp_hack();
+	void init_assaultp();
+	void init_ordyne();
+	void init_marvland();
+	void init_rthun2();
 
 	virtual void video_start() override;
 	void video_start_finallap();
@@ -324,17 +324,17 @@ public:
 	uint32_t screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TILE_GET_INFO_MEMBER( roz_tile_info );
+	void roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	DECLARE_READ16_MEMBER( paletteram_word_r );
-	DECLARE_WRITE16_MEMBER( paletteram_word_w );
-	DECLARE_WRITE16_MEMBER( rozram_word_w );
-	DECLARE_READ16_MEMBER( gfx_ctrl_r );
-	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
-	DECLARE_READ16_MEMBER( serial_comms_ram_r );
-	DECLARE_WRITE16_MEMBER( serial_comms_ram_w );
-	DECLARE_READ16_MEMBER( serial_comms_ctrl_r );
-	DECLARE_WRITE16_MEMBER( serial_comms_ctrl_w );
+	uint16_t paletteram_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void paletteram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void rozram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t gfx_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void gfx_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t serial_comms_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void serial_comms_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t serial_comms_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void serial_comms_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void draw_sprite_init();
 	void update_palette();
@@ -360,9 +360,9 @@ public:
 
 	optional_device<namco_c45_road_device> m_c45_road;
 
-	DECLARE_READ16_MEMBER( namcos2_68k_key_r );
-	DECLARE_WRITE16_MEMBER( namcos2_68k_key_w );
-	DECLARE_READ16_MEMBER( namcos2_finallap_prot_r );
+	uint16_t namcos2_68k_key_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void namcos2_68k_key_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t namcos2_finallap_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void GollyGhostUpdateLED_c4( int data );
 	void GollyGhostUpdateLED_c6( int data );
 	void GollyGhostUpdateLED_c8( int data );

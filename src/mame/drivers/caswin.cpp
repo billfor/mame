@@ -86,16 +86,16 @@ public:
 	required_shared_ptr<uint8_t> m_sc0_vram;
 	required_shared_ptr<uint8_t> m_sc0_attr;
 	tilemap_t *m_sc0_tilemap;
-	DECLARE_WRITE8_MEMBER(sc0_vram_w);
-	DECLARE_WRITE8_MEMBER(sc0_attr_w);
-	DECLARE_WRITE8_MEMBER(vvillage_scroll_w);
-	DECLARE_WRITE8_MEMBER(vvillage_vregs_w);
-	DECLARE_READ8_MEMBER(vvillage_rng_r);
-	DECLARE_WRITE8_MEMBER(vvillage_output_w);
-	DECLARE_WRITE8_MEMBER(vvillage_lamps_w);
-	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
+	void sc0_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sc0_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vvillage_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vvillage_vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vvillage_rng_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vvillage_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vvillage_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_sc0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(caswin);
+	void palette_init_caswin(palette_device &palette);
 	uint32_t screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -103,7 +103,7 @@ public:
 
 
 
-TILE_GET_INFO_MEMBER(caswin_state::get_sc0_tile_info)
+void caswin_state::get_sc0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = (m_sc0_vram[tile_index] | ((m_sc0_attr[tile_index] & 0x70)<<4)) & 0x7ff;
 	int colour = m_sc0_attr[tile_index] & 0xf;
@@ -125,27 +125,27 @@ uint32_t caswin_state::screen_update_vvillage(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE8_MEMBER(caswin_state::sc0_vram_w)
+void caswin_state::sc0_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sc0_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(caswin_state::sc0_attr_w)
+void caswin_state::sc0_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sc0_attr[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
 /*These two are tested during the two cherry sub-games.I really don't know what is supposed to do...*/
-WRITE8_MEMBER(caswin_state::vvillage_scroll_w)
+void caswin_state::vvillage_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//...
 }
 
 /*---- --x- window effect? */
 /*---- ---x flip screen */
-WRITE8_MEMBER(caswin_state::vvillage_vregs_w)
+void caswin_state::vvillage_vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }
@@ -156,12 +156,12 @@ WRITE8_MEMBER(caswin_state::vvillage_vregs_w)
 *
 **********************/
 
-READ8_MEMBER(caswin_state::vvillage_rng_r)
+uint8_t caswin_state::vvillage_rng_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(caswin_state::vvillage_output_w)
+void caswin_state::vvillage_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 1);
 	machine().bookkeeping().coin_counter_w(1,data & 1);
@@ -170,7 +170,7 @@ WRITE8_MEMBER(caswin_state::vvillage_output_w)
 	machine().bookkeeping().coin_lockout_w(1,data & 0x20);
 }
 
-WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
+void caswin_state::vvillage_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	---x ---- lamp button 5
@@ -292,7 +292,7 @@ static GFXDECODE_START( vvillage )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(caswin_state, caswin)
+void caswin_state::palette_init_caswin(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;

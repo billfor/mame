@@ -50,11 +50,11 @@ inline void galpani2_state::galpani2_bg8_regs_w(address_space &space, offs_t off
 	COMBINE_DATA(&m_bg8_regs[_n_][offset]);
 }
 
-READ16_MEMBER( galpani2_bg8_regs_0_r ) { return galpani2_bg8_regs_r(space, offset, 0); }
-READ16_MEMBER( galpani2_bg8_regs_1_r ) { return galpani2_bg8_regs_r(space, offset, 1); }
+uint16_t galpani2_bg8_regs_0_r(address_space &space, offs_t offset, uint16_t mem_mask) { return galpani2_bg8_regs_r(space, offset, 0); }
+uint16_t galpani2_bg8_regs_1_r(address_space &space, offs_t offset, uint16_t mem_mask) { return galpani2_bg8_regs_r(space, offset, 1); }
 
-WRITE16_MEMBER( galpani2_bg8_regs_0_w ) { galpani2_bg8_regs_w(space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER( galpani2_bg8_regs_1_w ) { galpani2_bg8_regs_w(space, offset, data, mem_mask, 1); }
+void galpani2_bg8_regs_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) { galpani2_bg8_regs_w(space, offset, data, mem_mask, 0); }
+void galpani2_bg8_regs_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) { galpani2_bg8_regs_w(space, offset, data, mem_mask, 1); }
 #endif
 
 
@@ -67,7 +67,7 @@ WRITE16_MEMBER( galpani2_bg8_regs_1_w ) { galpani2_bg8_regs_w(space, offset, dat
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(galpani2_state, galpani2)
+void galpani2_state::palette_init_galpani2(palette_device &palette)
 {
 	int i;
 	/* first $4200 colors are dynamic */

@@ -23,7 +23,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(rpunch_state::get_bg0_tile_info)
+void rpunch_state::get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(rpunch_state::get_bg0_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(rpunch_state::get_bg1_tile_info)
+void rpunch_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int data = videoram[0x2000 / 2 + tile_index];
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(rpunch_state::get_bg1_tile_info)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(rpunch_state::crtc_interrupt_gen)
+void rpunch_state::crtc_interrupt_gen(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(1, HOLD_LINE);
 	if (param != 0)
@@ -66,7 +66,7 @@ TIMER_CALLBACK_MEMBER(rpunch_state::crtc_interrupt_gen)
 }
 
 
-VIDEO_START_MEMBER(rpunch_state,rpunch)
+void rpunch_state::video_start_rpunch()
 {
 	m_sprite_xoffs = 0;
 
@@ -85,9 +85,9 @@ VIDEO_START_MEMBER(rpunch_state,rpunch)
 }
 
 
-VIDEO_START_MEMBER(rpunch_state,svolley)
+void rpunch_state::video_start_svolley()
 {
-	VIDEO_START_CALL_MEMBER(rpunch);
+	video_start_rpunch();
 	m_background[0]->set_scrolldx(8, 0); // aligns middle net sprite with bg as shown in reference
 	m_sprite_xoffs = -4;
 }
@@ -102,7 +102,7 @@ VIDEO_START_MEMBER(rpunch_state,svolley)
  *
  *************************************/
 
-WRITE16_MEMBER(rpunch_state::rpunch_videoram_w)
+void rpunch_state::rpunch_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *videoram = m_videoram;
 	int tmap = offset >> 12;
@@ -112,7 +112,7 @@ WRITE16_MEMBER(rpunch_state::rpunch_videoram_w)
 }
 
 
-WRITE16_MEMBER(rpunch_state::rpunch_videoreg_w)
+void rpunch_state::rpunch_videoreg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword = m_videoflags;
 	COMBINE_DATA(&m_videoflags);
@@ -128,7 +128,7 @@ WRITE16_MEMBER(rpunch_state::rpunch_videoreg_w)
 }
 
 
-WRITE16_MEMBER(rpunch_state::rpunch_scrollreg_w)
+void rpunch_state::rpunch_scrollreg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
 		switch (offset)
@@ -152,7 +152,7 @@ WRITE16_MEMBER(rpunch_state::rpunch_scrollreg_w)
 }
 
 
-WRITE16_MEMBER(rpunch_state::rpunch_crtc_data_w)
+void rpunch_state::rpunch_crtc_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -172,14 +172,14 @@ WRITE16_MEMBER(rpunch_state::rpunch_crtc_data_w)
 }
 
 
-WRITE16_MEMBER(rpunch_state::rpunch_crtc_register_w)
+void rpunch_state::rpunch_crtc_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_crtc_register = data & 0xff;
 }
 
 
-WRITE16_MEMBER(rpunch_state::rpunch_ins_w)
+void rpunch_state::rpunch_ins_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

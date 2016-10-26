@@ -24,7 +24,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(digdug_state,digdug)
+void digdug_state::palette_init_digdug(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -74,7 +74,7 @@ PALETTE_INIT_MEMBER(digdug_state,digdug)
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-TILEMAP_MAPPER_MEMBER(digdug_state::tilemap_scan)
+tilemap_memory_index digdug_state::tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -89,7 +89,7 @@ TILEMAP_MAPPER_MEMBER(digdug_state::tilemap_scan)
 }
 
 
-TILE_GET_INFO_MEMBER(digdug_state::bg_get_tile_info)
+void digdug_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *rom = memregion("gfx4")->base();
 
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(digdug_state::bg_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(digdug_state::tx_get_tile_info)
+void digdug_state::tx_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_videoram[tile_index];
 	int color;
@@ -140,7 +140,7 @@ TILE_GET_INFO_MEMBER(digdug_state::tx_get_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(digdug_state,digdug)
+void digdug_state::video_start_digdug()
 {
 	m_bg_select = 0;
 	m_tx_color_mode = 0;
@@ -166,13 +166,13 @@ VIDEO_START_MEMBER(digdug_state,digdug)
 
 ***************************************************************************/
 
-WRITE8_MEMBER( digdug_state::digdug_videoram_w )
+void digdug_state::digdug_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER( digdug_state::digdug_PORT_w )
+void digdug_state::digdug_PORT_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

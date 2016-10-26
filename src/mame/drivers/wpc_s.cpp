@@ -26,34 +26,34 @@ public:
 			out(*this, "out")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(firq_src_r);
-	DECLARE_READ8_MEMBER(zc_r);
-	DECLARE_READ8_MEMBER(dcs_data_r);
-	DECLARE_WRITE8_MEMBER(dcs_data_w);
-	DECLARE_READ8_MEMBER(dcs_ctrl_r);
-	DECLARE_WRITE8_MEMBER(dcs_reset_w);
-	DECLARE_READ8_MEMBER(rtc_r);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t firq_src_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t zc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dcs_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dcs_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dcs_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dcs_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void init();
-	DECLARE_DRIVER_INIT(corv);
-	DECLARE_DRIVER_INIT(dh);
-	DECLARE_DRIVER_INIT(i500);
-	DECLARE_DRIVER_INIT(jb);
-	DECLARE_DRIVER_INIT(jm);
-	DECLARE_DRIVER_INIT(nf);
-	DECLARE_DRIVER_INIT(rs);
-	DECLARE_DRIVER_INIT(fs);
-	DECLARE_DRIVER_INIT(ts);
-	DECLARE_DRIVER_INIT(tom);
-	DECLARE_DRIVER_INIT(wd);
-	DECLARE_DRIVER_INIT(wcs);
-	DECLARE_DRIVER_INIT(tfs);
+	void init_corv();
+	void init_dh();
+	void init_i500();
+	void init_jb();
+	void init_jm();
+	void init_nf();
+	void init_rs();
+	void init_fs();
+	void init_ts();
+	void init_tom();
+	void init_wd();
+	void init_wcs();
+	void init_tfs();
 
-	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
+	void scanline_irq(int state);
+	void zc_timer(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	// devices
@@ -136,29 +136,29 @@ static ADDRESS_MAP_START( wpc_s_map, AS_PROGRAM, 8, wpc_s_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x78000)
 ADDRESS_MAP_END
 
-READ8_MEMBER(wpc_s_state::dcs_data_r)
+uint8_t wpc_s_state::dcs_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return dcs->data_r();
 }
 
-WRITE8_MEMBER(wpc_s_state::dcs_data_w)
+void wpc_s_state::dcs_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dcs->data_w(data);
 }
 
-READ8_MEMBER(wpc_s_state::dcs_ctrl_r)
+uint8_t wpc_s_state::dcs_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return dcs->control_r();
 }
 
-WRITE8_MEMBER(wpc_s_state::dcs_reset_w)
+void wpc_s_state::dcs_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dcs->reset_w(0);
 	dcs->reset_w(1);
 }
 
 
-READ8_MEMBER(wpc_s_state::rtc_r)
+uint8_t wpc_s_state::rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	system_time systime;
 	machine().base_datetime(systime);
@@ -180,41 +180,41 @@ READ8_MEMBER(wpc_s_state::rtc_r)
 	}
 }
 
-READ8_MEMBER(wpc_s_state::firq_src_r)
+uint8_t wpc_s_state::firq_src_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return firq_src;
 }
 
-READ8_MEMBER(wpc_s_state::zc_r)
+uint8_t wpc_s_state::zc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = zc;
 	zc &= 0x7f;
 	return res;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(wpc_s_state::zc_timer)
+void wpc_s_state::zc_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	zc |= 0x80;
 }
 
-WRITE8_MEMBER(wpc_s_state::bank_w)
+void wpc_s_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	rombank->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER(wpc_s_state::watchdog_w)
+void wpc_s_state::watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Mhhh?  Maybe it's not 3ff3, maybe it's going down by itself...
 	maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_s_state::scanline_irq)
+void wpc_s_state::scanline_irq(int state)
 {
 	firq_src = 0x00;
 	maincpu->set_input_line(1, state);
 }
 
-WRITE8_MEMBER(wpc_s_state::irq_ack_w)
+void wpc_s_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	maincpu->set_input_line(0, CLEAR_LINE);
 	maincpu->set_input_line(1, CLEAR_LINE);
@@ -260,7 +260,7 @@ void wpc_s_state::init()
 	save_item(NAME(zc));
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, corv)
+void wpc_s_state::init_corv()
 {
 	pic->set_serial("536 123456 12345 123");
 	lamp->set_names(lamps_corv);
@@ -268,7 +268,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, corv)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, dh)
+void wpc_s_state::init_dh()
 {
 	pic->set_serial("530 123456 12345 123");
 	lamp->set_names(lamps_dh);
@@ -276,7 +276,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, dh)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, i500)
+void wpc_s_state::init_i500()
 {
 	pic->set_serial("526 123456 12345 123");
 	lamp->set_names(lamps_i500);
@@ -284,7 +284,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, i500)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, jb)
+void wpc_s_state::init_jb()
 {
 	pic->set_serial("551 123456 12345 123");
 	lamp->set_names(lamps_jb);
@@ -292,7 +292,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, jb)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, jm)
+void wpc_s_state::init_jm()
 {
 	pic->set_serial("542 123456 12345 123");
 	lamp->set_names(lamps_jm);
@@ -300,7 +300,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, jm)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, nf)
+void wpc_s_state::init_nf()
 {
 	pic->set_serial("525 123456 12345 123");
 	lamp->set_names(lamps_nf);
@@ -308,7 +308,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, nf)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, rs)
+void wpc_s_state::init_rs()
 {
 	pic->set_serial("524 123456 12345 123");
 	lamp->set_names(lamps_rs);
@@ -316,7 +316,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, rs)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, fs)
+void wpc_s_state::init_fs()
 {
 	pic->set_serial("529 123456 12345 123");
 	lamp->set_names(lamps_fs);
@@ -324,7 +324,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, fs)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, ts)
+void wpc_s_state::init_ts()
 {
 	pic->set_serial("532 123456 12345 123");
 	lamp->set_names(lamps_ts);
@@ -332,7 +332,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, ts)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, tom)
+void wpc_s_state::init_tom()
 {
 	pic->set_serial("124 123456 12345 123");
 	lamp->set_names(lamps_tom);
@@ -340,7 +340,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, tom)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, wd)
+void wpc_s_state::init_wd()
 {
 	pic->set_serial("544 123456 12345 123");
 	lamp->set_names(lamps_wd);
@@ -348,7 +348,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, wd)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, wcs)
+void wpc_s_state::init_wcs()
 {
 	pic->set_serial("531 123456 12345 123");
 	lamp->set_names(lamps_wcs);
@@ -356,7 +356,7 @@ DRIVER_INIT_MEMBER(wpc_s_state, wcs)
 	init();
 }
 
-DRIVER_INIT_MEMBER(wpc_s_state, tfs)
+void wpc_s_state::init_tfs()
 {
 	pic->set_serial("648 123456 12345 123");
 	lamp->set_names(nullptr);

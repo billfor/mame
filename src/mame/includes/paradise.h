@@ -47,32 +47,32 @@ public:
 	int m_irq_count;
 
 	// common
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(palbank_w);
-	DECLARE_WRITE8_MEMBER(vram_0_w);
-	DECLARE_WRITE8_MEMBER(vram_1_w);
-	DECLARE_WRITE8_MEMBER(vram_2_w);
-	DECLARE_WRITE8_MEMBER(pixmap_w);
-	DECLARE_WRITE8_MEMBER(priority_w);
+	void rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pixmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// paradise specific
-	DECLARE_WRITE8_MEMBER(paradise_okibank_w);
+	void paradise_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// torus specific
-	DECLARE_WRITE8_MEMBER(torus_coin_counter_w);
+	void torus_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// tgtball specific
-	DECLARE_WRITE8_MEMBER(tgtball_flipscreen_w);
+	void tgtball_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(torus);
-	DECLARE_DRIVER_INIT(paradise);
-	DECLARE_DRIVER_INIT(tgtball);
+	void init_torus();
+	void init_paradise();
+	void init_tgtball();
 
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	TILE_GET_INFO_MEMBER(get_tile_info_2);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -82,7 +82,7 @@ public:
 	uint32_t screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(irq);
+	void irq(device_t &device);
 
 	void update_pix_palbank();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -49,29 +49,29 @@ public:
 	int m_adpcm_end[2];
 	int m_adpcm_data[2];
 
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(boardb_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(boardc_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(trigger_nmi);
-	DECLARE_WRITE8_MEMBER(adpcm_start_w);
-	DECLARE_WRITE8_MEMBER(adpcm_end_w);
-	DECLARE_WRITE8_MEMBER(adpcm_vol_w);
-	DECLARE_WRITE8_MEMBER(txvideoram_w);
-	DECLARE_WRITE8_MEMBER(bg2videoram_w);
-	DECLARE_WRITE8_MEMBER(bgxscroll_lo);
-	DECLARE_WRITE8_MEMBER(bgxscroll_hi);
-	DECLARE_WRITE8_MEMBER(bgyscroll_lo);
-	DECLARE_WRITE8_MEMBER(bgyscroll_hi);
-	DECLARE_WRITE8_MEMBER(bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(bg2xscroll_lo);
-	DECLARE_WRITE8_MEMBER(bg2xscroll_hi);
-	DECLARE_WRITE8_MEMBER(bg2yscroll_lo);
-	DECLARE_WRITE8_MEMBER(bg2yscroll_hi);
+	void coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void boardb_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void boardc_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trigger_nmi(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_end_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_vol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void txvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg2videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgxscroll_lo(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgxscroll_hi(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgyscroll_lo(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgyscroll_hi(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg2xscroll_lo(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg2xscroll_hi(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg2yscroll_lo(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg2yscroll_hi(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -81,6 +81,6 @@ public:
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void adpcm_int(msm5205_device *device, int chip);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int_1);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int_2);
+	void adpcm_int_1(int state);
+	void adpcm_int_2(int state);
 };

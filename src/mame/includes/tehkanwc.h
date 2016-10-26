@@ -51,33 +51,33 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
-	DECLARE_READ8_MEMBER(track_0_r);
-	DECLARE_READ8_MEMBER(track_1_r);
-	DECLARE_WRITE8_MEMBER(track_0_reset_w);
-	DECLARE_WRITE8_MEMBER(track_1_reset_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(sound_answer_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(scroll_x_w);
-	DECLARE_WRITE8_MEMBER(scroll_y_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_x_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_y_w);
-	DECLARE_WRITE8_MEMBER(gridiron_led0_w);
-	DECLARE_WRITE8_MEMBER(gridiron_led1_w);
-	DECLARE_READ8_MEMBER(portA_r);
-	DECLARE_READ8_MEMBER(portB_r);
-	DECLARE_WRITE8_MEMBER(portA_w);
-	DECLARE_WRITE8_MEMBER(portB_w);
-	DECLARE_WRITE8_MEMBER(msm_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void sub_cpu_halt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t track_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t track_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void track_0_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void track_1_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_answer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gridiron_led0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gridiron_led1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_int(int state);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	DECLARE_DRIVER_INIT(teedoff);
+	void init_teedoff();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 

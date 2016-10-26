@@ -10,7 +10,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(nova2001_state,nova2001)
+void nova2001_state::palette_init_nova2001(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -50,7 +50,7 @@ PALETTE_INIT_MEMBER(nova2001_state,nova2001)
 	}
 }
 
-PALETTE_DECODER_MEMBER( nova2001_state, BBGGRRII )
+rgb_t nova2001_state::BBGGRRII_decoder(uint32_t raw)
 {
 	uint8_t i = raw & 3;
 	uint8_t r = (raw >> 0) & 0x0c;
@@ -60,7 +60,7 @@ PALETTE_DECODER_MEMBER( nova2001_state, BBGGRRII )
 	return rgb_t(pal4bit(r | i), pal4bit(g | i), pal4bit(b | i));
 }
 
-WRITE8_MEMBER(nova2001_state::ninjakun_paletteram_w)
+void nova2001_state::ninjakun_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -89,7 +89,7 @@ WRITE8_MEMBER(nova2001_state::ninjakun_paletteram_w)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_bg_tile_info)
+void nova2001_state::nova2001_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_videoram[tile_index];
 	int color = m_bg_videoram[tile_index + 0x400] & 0x0f;
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_fg_tile_info)
+void nova2001_state::nova2001_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_fg_videoram[tile_index + 0x400];
 	int code = m_fg_videoram[tile_index];
@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_fg_tile_info)
 	tileinfo.category = (attr & 0x10) >> 4;
 }
 
-TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_bg_tile_info)
+void nova2001_state::ninjakun_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr  = m_bg_videoram[tile_index+0x400];
 	int code = m_bg_videoram[tile_index] + ((attr & 0xc0) << 2);
@@ -117,7 +117,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_fg_tile_info)
+void nova2001_state::ninjakun_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_fg_videoram[tile_index+0x400];
 	int code = m_fg_videoram[tile_index] + ((attr & 0x20) << 3);
@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_fg_tile_info)
 	tileinfo.category = (attr & 0x10) >> 4;
 }
 
-TILE_GET_INFO_MEMBER(nova2001_state::pkunwar_get_bg_tile_info)
+void nova2001_state::pkunwar_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bg_videoram[tile_index + 0x400];
 	int code = m_bg_videoram[tile_index] + ((attr & 0x07) << 8);
@@ -139,7 +139,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::pkunwar_get_bg_tile_info)
 	tileinfo.category = (attr & 0x08) >> 3;
 }
 
-TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_bg_tile_info)
+void nova2001_state::raiders5_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bg_videoram[tile_index+0x400];
 	int code = m_bg_videoram[tile_index] + ((attr & 0x01) << 8);
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_fg_tile_info)
+void nova2001_state::raiders5_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_videoram[tile_index];
 	int color = (m_fg_videoram[tile_index + 0x400] & 0xf0) >> 4;
@@ -164,7 +164,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_fg_tile_info)
  *
  *************************************/
 
-VIDEO_START_MEMBER(nova2001_state,nova2001)
+void nova2001_state::video_start_nova2001()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::nova2001_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::nova2001_get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
@@ -172,13 +172,13 @@ VIDEO_START_MEMBER(nova2001_state,nova2001)
 	m_bg_tilemap->set_scrolldx(0, -7);
 }
 
-VIDEO_START_MEMBER(nova2001_state,pkunwar)
+void nova2001_state::video_start_pkunwar()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::pkunwar_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(nova2001_state,ninjakun)
+void nova2001_state::video_start_ninjakun()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::ninjakun_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::ninjakun_get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
@@ -186,7 +186,7 @@ VIDEO_START_MEMBER(nova2001_state,ninjakun)
 	m_bg_tilemap->set_scrolldx(7, 0);
 }
 
-VIDEO_START_MEMBER(nova2001_state,raiders5)
+void nova2001_state::video_start_raiders5()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::raiders5_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::raiders5_get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
@@ -202,19 +202,19 @@ VIDEO_START_MEMBER(nova2001_state,raiders5)
  *
  *************************************/
 
-WRITE8_MEMBER(nova2001_state::nova2001_fg_videoram_w)
+void nova2001_state::nova2001_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(nova2001_state::nova2001_bg_videoram_w)
+void nova2001_state::nova2001_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(nova2001_state::ninjakun_bg_videoram_w)
+void nova2001_state::ninjakun_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x = m_bg_tilemap->scrollx(0) >> 3;
 	int y = m_bg_tilemap->scrolly(0) >> 3;
@@ -226,7 +226,7 @@ WRITE8_MEMBER(nova2001_state::ninjakun_bg_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-READ8_MEMBER(nova2001_state::ninjakun_bg_videoram_r)
+uint8_t nova2001_state::ninjakun_bg_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int x = m_bg_tilemap->scrollx(0) >> 3;
 	int y = m_bg_tilemap->scrolly(0) >> 3;
@@ -237,23 +237,23 @@ READ8_MEMBER(nova2001_state::ninjakun_bg_videoram_r)
 	return m_bg_videoram[offset];
 }
 
-WRITE8_MEMBER(nova2001_state::nova2001_scroll_x_w)
+void nova2001_state::nova2001_scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(nova2001_state::nova2001_scroll_y_w)
+void nova2001_state::nova2001_scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(nova2001_state::nova2001_flipscreen_w)
+void nova2001_state::nova2001_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// inverted
 	flip_screen_set(~data & 1);
 }
 
-WRITE8_MEMBER(nova2001_state::pkunwar_flipscreen_w)
+void nova2001_state::pkunwar_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }

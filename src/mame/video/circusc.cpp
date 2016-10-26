@@ -32,7 +32,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(circusc_state, circusc)
+void circusc_state::palette_init_circusc(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -98,7 +98,7 @@ PALETTE_INIT_MEMBER(circusc_state, circusc)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(circusc_state::get_tile_info)
+void circusc_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_colorram[tile_index];
 	tileinfo.category = (attr & 0x10) >> 4;
@@ -132,19 +132,19 @@ void circusc_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(circusc_state::circusc_videoram_w)
+void circusc_state::circusc_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(circusc_state::circusc_colorram_w)
+void circusc_state::circusc_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(circusc_state::circusc_flipscreen_w)
+void circusc_state::circusc_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }

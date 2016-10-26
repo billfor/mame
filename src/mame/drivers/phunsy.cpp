@@ -51,15 +51,15 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(phunsy);
-	DECLARE_READ8_MEMBER( phunsy_data_r );
-	DECLARE_WRITE8_MEMBER( phunsy_ctrl_w );
-	DECLARE_WRITE8_MEMBER( phunsy_data_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
-	DECLARE_READ8_MEMBER(cass_r);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	void init_phunsy();
+	uint8_t phunsy_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void phunsy_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void phunsy_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cass_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cass_w(int state);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(phunsy);
-	DECLARE_PALETTE_INIT(phunsy);
+	void palette_init_phunsy(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	const uint8_t *m_p_chargen;
@@ -74,12 +74,12 @@ private:
 };
 
 
-WRITE_LINE_MEMBER( phunsy_state::cass_w )
+void phunsy_state::cass_w(int state)
 {
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( phunsy_state::cass_r )
+uint8_t phunsy_state::cass_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_cass->input() > 0.03) ? 0 : 1;
 }
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( phunsy_io, AS_IO, 8, phunsy_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
+void phunsy_state::phunsy_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG)
 		logerror("%s: phunsy_ctrl_w %02x\n", machine().describe_context(), data);
@@ -117,7 +117,7 @@ WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
 }
 
 
-WRITE8_MEMBER( phunsy_state::phunsy_data_w )
+void phunsy_state::phunsy_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG)
 		logerror("%s: phunsy_data_w %02x\n", machine().describe_context(), data);
@@ -142,7 +142,7 @@ WRITE8_MEMBER( phunsy_state::phunsy_data_w )
 }
 
 
-READ8_MEMBER( phunsy_state::phunsy_data_r )
+uint8_t phunsy_state::phunsy_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -179,7 +179,7 @@ static INPUT_PORTS_START( phunsy )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( phunsy_state::kbd_put )
+void phunsy_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 		m_keyboard_input = data;
@@ -195,7 +195,7 @@ void phunsy_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(phunsy_state, phunsy)
+void phunsy_state::palette_init_phunsy(palette_device &palette)
 {
 	for ( int i = 0; i < 8; i++ )
 	{
@@ -316,7 +316,7 @@ QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
 	return result;
 }
 
-DRIVER_INIT_MEMBER( phunsy_state, phunsy )
+void phunsy_state::init_phunsy()
 {
 	uint8_t *main = memregion("maincpu")->base();
 	uint8_t *roms = memregion("roms")->base();

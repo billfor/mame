@@ -190,22 +190,22 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 	m_allocspaces = false;
 }
 
-READ8_MEMBER(isa8_device::prog_r)
+uint8_t isa8_device::prog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_prgspace->read_byte(offset);
 }
 
-WRITE8_MEMBER(isa8_device::prog_w)
+void isa8_device::prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prgspace->write_byte(offset, data);
 }
 
-READ8_MEMBER(isa8_device::io_r)
+uint8_t isa8_device::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_iospace->read_byte(offset);
 }
 
-WRITE8_MEMBER(isa8_device::io_w)
+void isa8_device::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_iospace->write_byte(offset, data);
 }
@@ -357,17 +357,17 @@ bool isa8_device::is_option_rom_space_available(offs_t start, int size)
 }
 
 // interrupt request from isa card
-WRITE_LINE_MEMBER( isa8_device::irq2_w ) { m_out_irq2_cb(state); }
-WRITE_LINE_MEMBER( isa8_device::irq3_w ) { m_out_irq3_cb(state); }
-WRITE_LINE_MEMBER( isa8_device::irq4_w ) { m_out_irq4_cb(state); }
-WRITE_LINE_MEMBER( isa8_device::irq5_w ) { m_out_irq5_cb(state); }
-WRITE_LINE_MEMBER( isa8_device::irq6_w ) { m_out_irq6_cb(state); }
-WRITE_LINE_MEMBER( isa8_device::irq7_w ) { m_out_irq7_cb(state); }
+void isa8_device::irq2_w(int state) { m_out_irq2_cb(state); }
+void isa8_device::irq3_w(int state) { m_out_irq3_cb(state); }
+void isa8_device::irq4_w(int state) { m_out_irq4_cb(state); }
+void isa8_device::irq5_w(int state) { m_out_irq5_cb(state); }
+void isa8_device::irq6_w(int state) { m_out_irq6_cb(state); }
+void isa8_device::irq7_w(int state) { m_out_irq7_cb(state); }
 
 // dma request from isa card
-WRITE_LINE_MEMBER( isa8_device::drq1_w ) { m_out_drq1_cb(state); }
-WRITE_LINE_MEMBER( isa8_device::drq2_w ) { m_out_drq2_cb(state); }
-WRITE_LINE_MEMBER( isa8_device::drq3_w ) { m_out_drq3_cb(state); }
+void isa8_device::drq1_w(int state) { m_out_drq1_cb(state); }
+void isa8_device::drq2_w(int state) { m_out_drq2_cb(state); }
+void isa8_device::drq3_w(int state) { m_out_drq3_cb(state); }
 
 uint8_t isa8_device::dack_r(int line)
 {
@@ -534,27 +534,27 @@ void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rh
 	}
 }
 
-READ16_MEMBER(isa16_device::prog16_r)
+uint16_t isa16_device::prog16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_prgspace->read_word(offset<<1, mem_mask);
 }
 
-WRITE16_MEMBER(isa16_device::prog16_w)
+void isa16_device::prog16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_prgspace->write_word(offset<<1, data, mem_mask);
 }
 
-READ16_MEMBER(isa16_device::io16_r)
+uint16_t isa16_device::io16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_iospace->read_word(offset<<1, mem_mask);
 }
 
-WRITE16_MEMBER(isa16_device::io16_w)
+void isa16_device::io16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_iospace->write_word(offset<<1, data, mem_mask);
 }
 
-READ16_MEMBER(isa16_device::prog16_swap_r)
+uint16_t isa16_device::prog16_swap_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t rv;
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
@@ -564,14 +564,14 @@ READ16_MEMBER(isa16_device::prog16_swap_r)
 	return (rv<<8) | (rv>>8);
 }
 
-WRITE16_MEMBER(isa16_device::prog16_swap_w)
+void isa16_device::prog16_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
 	data = (data<<8) | (data>>8);
 	m_prgspace->write_word(offset<<1, data, mem_mask);
 }
 
-READ16_MEMBER(isa16_device::io16_swap_r)
+uint16_t isa16_device::io16_swap_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t rv;
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
@@ -581,7 +581,7 @@ READ16_MEMBER(isa16_device::io16_swap_r)
 	return (rv<<8) | (rv>>8);
 }
 
-WRITE16_MEMBER(isa16_device::io16_swap_w)
+void isa16_device::io16_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
 	data = (data<<8) | (data>>8);
@@ -589,17 +589,17 @@ WRITE16_MEMBER(isa16_device::io16_swap_w)
 }
 
 // interrupt request from isa card
-WRITE_LINE_MEMBER( isa16_device::irq10_w ) { m_out_irq10_cb(state); }
-WRITE_LINE_MEMBER( isa16_device::irq11_w ) { m_out_irq11_cb(state); }
-WRITE_LINE_MEMBER( isa16_device::irq12_w ) { m_out_irq12_cb(state); }
-WRITE_LINE_MEMBER( isa16_device::irq14_w ) { m_out_irq14_cb(state); }
-WRITE_LINE_MEMBER( isa16_device::irq15_w ) { m_out_irq15_cb(state); }
+void isa16_device::irq10_w(int state) { m_out_irq10_cb(state); }
+void isa16_device::irq11_w(int state) { m_out_irq11_cb(state); }
+void isa16_device::irq12_w(int state) { m_out_irq12_cb(state); }
+void isa16_device::irq14_w(int state) { m_out_irq14_cb(state); }
+void isa16_device::irq15_w(int state) { m_out_irq15_cb(state); }
 
 // dma request from isa card
-WRITE_LINE_MEMBER( isa16_device::drq0_w ) { m_out_drq0_cb(state); }
-WRITE_LINE_MEMBER( isa16_device::drq5_w ) { m_out_drq5_cb(state); }
-WRITE_LINE_MEMBER( isa16_device::drq6_w ) { m_out_drq6_cb(state); }
-WRITE_LINE_MEMBER( isa16_device::drq7_w ) { m_out_drq7_cb(state); }
+void isa16_device::drq0_w(int state) { m_out_drq0_cb(state); }
+void isa16_device::drq5_w(int state) { m_out_drq5_cb(state); }
+void isa16_device::drq6_w(int state) { m_out_drq6_cb(state); }
+void isa16_device::drq7_w(int state) { m_out_drq7_cb(state); }
 
 uint16_t isa16_device::dack16_r(int line)
 {

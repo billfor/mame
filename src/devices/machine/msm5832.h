@@ -50,18 +50,18 @@ public:
 	// construction/destruction
 	msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void address_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( adj_w );
-	DECLARE_WRITE_LINE_MEMBER( test_w );
-	DECLARE_WRITE_LINE_MEMBER( hold_w );
+	void adj_w(int state);
+	void test_w(int state);
+	void hold_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( read_w );
-	DECLARE_WRITE_LINE_MEMBER( write_w );
-	DECLARE_WRITE_LINE_MEMBER( cs_w );
+	void read_w(int state);
+	void write_w(int state);
+	void cs_w(int state);
 
 protected:
 	// device-level overrides

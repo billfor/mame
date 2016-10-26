@@ -79,29 +79,29 @@ public:
 	required_device<samples_device> m_samples;
 	required_device<screen_device> m_screen;
 
-	DECLARE_WRITE8_MEMBER(color_latch_w);
-	DECLARE_WRITE8_MEMBER(spaceint_videoram_w);
-	DECLARE_READ8_MEMBER(kamikaze_ppi_r);
-	DECLARE_WRITE8_MEMBER(kamikaze_ppi_w);
-	DECLARE_WRITE8_MEMBER(spaceint_sound1_w);
-	DECLARE_WRITE8_MEMBER(spaceint_sound2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(spaceint_coin_inserted);
-	DECLARE_WRITE8_MEMBER(kamikaze_sound1_w);
-	DECLARE_WRITE8_MEMBER(kamikaze_sound2_w);
-	DECLARE_WRITE8_MEMBER(spcking2_sound1_w);
-	DECLARE_WRITE8_MEMBER(spcking2_sound2_w);
-	DECLARE_WRITE8_MEMBER(spcking2_sound3_w);
-	DECLARE_DRIVER_INIT(kamikaze);
-	DECLARE_DRIVER_INIT(spcking2);
-	DECLARE_MACHINE_START(kamikaze);
-	DECLARE_MACHINE_RESET(kamikaze);
-	DECLARE_MACHINE_START(spaceint);
-	DECLARE_MACHINE_RESET(spaceint);
-	DECLARE_VIDEO_START(spaceint);
+	void color_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spaceint_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kamikaze_ppi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kamikaze_ppi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spaceint_sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spaceint_sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spaceint_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void kamikaze_sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kamikaze_sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spcking2_sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spcking2_sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spcking2_sound3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_kamikaze();
+	void init_spcking2();
+	void machine_start_kamikaze();
+	void machine_reset_kamikaze();
+	void machine_start_spaceint();
+	void machine_reset_spaceint();
+	void video_start_spaceint();
 	uint32_t screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
-	TIMER_CALLBACK_MEMBER(kamizake_int_gen);
+	void kamikaze_int_off(void *ptr, int32_t param);
+	void kamizake_int_gen(void *ptr, int32_t param);
 	void plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color );
 
 protected:
@@ -115,7 +115,7 @@ protected:
  *
  *************************************/
 
-VIDEO_START_MEMBER(astinvad_state,spaceint)
+void astinvad_state::video_start_spaceint()
 {
 	m_colorram = std::make_unique<uint8_t[]>(m_videoram.bytes());
 
@@ -124,13 +124,13 @@ VIDEO_START_MEMBER(astinvad_state,spaceint)
 }
 
 
-WRITE8_MEMBER(astinvad_state::color_latch_w)
+void astinvad_state::color_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color_latch = data & 0x0f;
 }
 
 
-WRITE8_MEMBER(astinvad_state::spaceint_videoram_w)
+void astinvad_state::spaceint_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_colorram[offset] = m_color_latch;
@@ -234,13 +234,13 @@ void astinvad_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-TIMER_CALLBACK_MEMBER(astinvad_state::kamikaze_int_off)
+void astinvad_state::kamikaze_int_off(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
+void astinvad_state::kamizake_int_gen(void *ptr, int32_t param)
 {
 	/* interrupts are asserted on every state change of the 128V line */
 	m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -252,7 +252,7 @@ TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
 }
 
 
-MACHINE_START_MEMBER(astinvad_state,kamikaze)
+void astinvad_state::machine_start_kamikaze()
 {
 	m_int_timer = timer_alloc(TIMER_INT_GEN);
 	m_int_timer->adjust(m_screen->time_until_pos(128), 128);
@@ -262,7 +262,7 @@ MACHINE_START_MEMBER(astinvad_state,kamikaze)
 	save_item(NAME(m_sound_state));
 }
 
-MACHINE_RESET_MEMBER(astinvad_state,kamikaze)
+void astinvad_state::machine_reset_kamikaze()
 {
 	m_screen_flip = 0;
 	m_screen_red = 0;
@@ -271,13 +271,13 @@ MACHINE_RESET_MEMBER(astinvad_state,kamikaze)
 }
 
 
-MACHINE_START_MEMBER(astinvad_state,spaceint)
+void astinvad_state::machine_start_spaceint()
 {
 	save_item(NAME(m_screen_flip));
 	save_item(NAME(m_sound_state));
 }
 
-MACHINE_RESET_MEMBER(astinvad_state,spaceint)
+void astinvad_state::machine_reset_spaceint()
 {
 	m_screen_flip = 0;
 	m_sound_state[0] = 0;
@@ -286,7 +286,7 @@ MACHINE_RESET_MEMBER(astinvad_state,spaceint)
 }
 
 
-INPUT_CHANGED_MEMBER(astinvad_state::spaceint_coin_inserted)
+void astinvad_state::spaceint_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -300,7 +300,7 @@ INPUT_CHANGED_MEMBER(astinvad_state::spaceint_coin_inserted)
  *
  *************************************/
 
-READ8_MEMBER(astinvad_state::kamikaze_ppi_r)
+uint8_t astinvad_state::kamikaze_ppi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -313,7 +313,7 @@ READ8_MEMBER(astinvad_state::kamikaze_ppi_r)
 }
 
 
-WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
+void astinvad_state::kamikaze_ppi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
@@ -331,7 +331,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
  *************************************/
 
 // Kamikaze
-WRITE8_MEMBER(astinvad_state::kamikaze_sound1_w)
+void astinvad_state::kamikaze_sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: ufo sound generator
 	// d1: fire sound generator
@@ -354,7 +354,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_sound1_w)
 	machine().sound().system_enable(data & 0x20);
 }
 
-WRITE8_MEMBER(astinvad_state::kamikaze_sound2_w)
+void astinvad_state::kamikaze_sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: red screen -> to video board
 	// d1: invaders advancing sound generator
@@ -373,7 +373,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_sound2_w)
 }
 
 // Space King 2
-WRITE8_MEMBER(astinvad_state::spcking2_sound1_w)
+void astinvad_state::spcking2_sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bits_gone_hi = data & ~m_sound_state[0];
 	m_sound_state[0] = data;
@@ -388,7 +388,7 @@ WRITE8_MEMBER(astinvad_state::spcking2_sound1_w)
 	m_screen_red = data & 0x04; // ?
 }
 
-WRITE8_MEMBER(astinvad_state::spcking2_sound2_w)
+void astinvad_state::spcking2_sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bits_gone_hi = data & ~m_sound_state[1];
 	m_sound_state[1] = data;
@@ -402,13 +402,13 @@ WRITE8_MEMBER(astinvad_state::spcking2_sound2_w)
 	m_screen_flip = (ioport("CABINET")->read() & data & 0x20) ? 0xff : 0x00;
 }
 
-WRITE8_MEMBER(astinvad_state::spcking2_sound3_w)
+void astinvad_state::spcking2_sound3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ?
 }
 
 // Space Intruder
-WRITE8_MEMBER(astinvad_state::spaceint_sound1_w)
+void astinvad_state::spaceint_sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bits_gone_hi = data & ~m_sound_state[0];
 	m_sound_state[0] = data;
@@ -425,7 +425,7 @@ WRITE8_MEMBER(astinvad_state::spaceint_sound1_w)
 	if (bits_gone_hi & 0x80) m_samples->start(5, SND_FLEET4);
 }
 
-WRITE8_MEMBER(astinvad_state::spaceint_sound2_w)
+void astinvad_state::spaceint_sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bits_gone_hi = data & ~m_sound_state[1];
 	m_sound_state[1] = data;
@@ -801,14 +801,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(astinvad_state,kamikaze)
+void astinvad_state::init_kamikaze()
 {
 	/* the flip screen logic adds 32 to the Y after flipping */
 	m_flip_yoffs = 32;
 }
 
 
-DRIVER_INIT_MEMBER(astinvad_state,spcking2)
+void astinvad_state::init_spcking2()
 {
 	/* don't have the schematics, but the blanking must center the screen here */
 	m_flip_yoffs = 0;

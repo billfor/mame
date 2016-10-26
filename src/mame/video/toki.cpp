@@ -28,13 +28,13 @@ remove all the code writing the $a0000 area.)
 
 *************************************************************************/
 
-WRITE16_MEMBER(toki_state::toki_control_w)
+void toki_state::toki_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos() - 1);
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
-TILE_GET_INFO_MEMBER(toki_state::get_text_tile_info)
+void toki_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int tile = videoram[tile_index];
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_text_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(toki_state::get_back_tile_info)
+void toki_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_background1_videoram[tile_index];
 	int color = (tile >> 12) & 0xf;
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_back_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(toki_state::get_fore_tile_info)
+void toki_state::get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_background2_videoram[tile_index];
 	int color = (tile >> 12) & 0xf;
@@ -94,20 +94,20 @@ void toki_state::video_start()
 
 /*************************************/
 
-WRITE16_MEMBER(toki_state::foreground_videoram_w)
+void toki_state::foreground_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
 	m_text_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toki_state::background1_videoram_w)
+void toki_state::background1_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_background1_videoram[offset]);
 	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toki_state::background2_videoram_w)
+void toki_state::background2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_background2_videoram[offset]);
 	m_foreground_layer->mark_tile_dirty(offset);

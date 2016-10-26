@@ -85,7 +85,7 @@ static const unsigned char intv_colors[] =
 	0xB5, 0x1A, 0x58  /* PURPLE */
 };
 
-PALETTE_INIT_MEMBER(intv_state, intv)
+void intv_state::palette_init_intv(palette_device &palette)
 {
 	int k = 0;
 	uint8_t r, g, b;
@@ -438,12 +438,12 @@ void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 /* This is needed because MAME core does not allow PULSE_LINE.
     The time interval is not critical, although it should be below 1000. */
 
-TIMER_CALLBACK_MEMBER(intv_state::intv_interrupt2_complete)
+void intv_state::intv_interrupt2_complete(void *ptr, int32_t param)
 {
 	m_keyboard->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
+void intv_state::intv_interrupt2(device_t &device)
 {
 	m_keyboard->set_input_line(0, ASSERT_LINE);
 	timer_set(m_keyboard->cycles_to_attotime(100), TIMER_INTV_INTERRUPT2_COMPLETE);
@@ -621,14 +621,14 @@ ROM_START(intvkbd) // the intv1 exec rom should be two roms: RO-3-9502-011.U5 an
 	ROM_LOAD( "0370.u74", 0x20, 0x20, CRC(19da5096) SHA1(76af50e4fd29649fc4837120c245321a8fc84cd3))
 ROM_END
 
-DRIVER_INIT_MEMBER(intv_state,intv)
+void intv_state::init_intv()
 {
 	m_stic->set_x_scale(INTV_X_SCALE);
 	m_stic->set_y_scale(INTV_Y_SCALE);
 	m_is_keybd = 0;
 }
 
-DRIVER_INIT_MEMBER(intv_state,intvkbd)
+void intv_state::init_intvkbd()
 {
 	m_stic->set_x_scale(INTVKBD_X_SCALE);
 	m_stic->set_y_scale(INTVKBD_Y_SCALE);

@@ -376,12 +376,12 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 /**********************************************************************************/
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(deco32_state::interrupt_gen)
+void deco32_state::interrupt_gen(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
-READ32_MEMBER(deco32_state::irq_controller_r)
+uint32_t deco32_state::irq_controller_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int vblank;
 
@@ -417,7 +417,7 @@ READ32_MEMBER(deco32_state::irq_controller_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(deco32_state::irq_controller_w)
+void deco32_state::irq_controller_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int scanline;
 
@@ -441,7 +441,7 @@ WRITE32_MEMBER(deco32_state::irq_controller_w)
 	}
 }
 
-WRITE32_MEMBER(deco32_state::sound_w)
+void deco32_state::sound_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -453,7 +453,7 @@ void deco32_state::deco32_sound_cb( address_space &space, uint16_t data, uint16_
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-READ32_MEMBER(deco32_state::_71_r)
+uint32_t deco32_state::_71_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* Bit 0x80 goes high when sprite DMA is complete, and low
 	while it's in progress, we don't bother to emulate it */
@@ -461,13 +461,13 @@ READ32_MEMBER(deco32_state::_71_r)
 }
 
 
-READ32_MEMBER(deco32_state::captaven_soundcpu_r)
+uint32_t deco32_state::captaven_soundcpu_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* Top byte - top bit low == sound cpu busy, bottom word is dips */
 	return 0xffff0000 | ioport("DSW2")->read();
 }
 
-READ32_MEMBER(deco32_state::fghthist_control_r)
+uint32_t deco32_state::fghthist_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset) {
 	case 0: return 0xffff0000 | ioport("IN0")->read();
@@ -478,7 +478,7 @@ READ32_MEMBER(deco32_state::fghthist_control_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(deco32_state::fghthist_eeprom_w)
+void deco32_state::fghthist_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
@@ -497,13 +497,13 @@ WRITE32_MEMBER(deco32_state::fghthist_eeprom_w)
 /**********************************************************************************/
 
 
-READ32_MEMBER(dragngun_state::service_r)
+uint32_t dragngun_state::service_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  logerror("%08x:Read service\n",space.device().safe_pc());
 	return ioport("IN2")->read();
 }
 
-READ32_MEMBER(dragngun_state::lockload_gun_mirror_r)
+uint32_t dragngun_state::lockload_gun_mirror_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //logerror("%08x:Read gun %d\n",space.device().safe_pc(),offset);
 //return ((machine().rand()%0xffff)<<16) | machine().rand()%0xffff;
@@ -512,7 +512,7 @@ READ32_MEMBER(dragngun_state::lockload_gun_mirror_r)
 	return ioport("IN3")->read() | ioport("LIGHT0_X")->read() | (ioport("LIGHT0_X")->read()<<16) | (ioport("LIGHT0_X")->read()<<24); //((machine().rand()%0xff)<<16);
 }
 
-READ32_MEMBER(dragngun_state::lightgun_r)
+uint32_t dragngun_state::lightgun_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* Ports 0-3 are read, but seem unused */
 	switch (m_lightgun_port) {
@@ -526,18 +526,18 @@ READ32_MEMBER(dragngun_state::lightgun_r)
 	return 0;
 }
 
-WRITE32_MEMBER(dragngun_state::lightgun_w)
+void dragngun_state::lightgun_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  logerror("Lightgun port %d\n",m_lightgun_port);
 	m_lightgun_port=offset;
 }
 
-READ32_MEMBER(dragngun_state::eeprom_r)
+uint32_t dragngun_state::eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xfffffffe | m_eeprom->do_read();
 }
 
-WRITE32_MEMBER(dragngun_state::eeprom_w)
+void dragngun_state::eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_eeprom->clk_write((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
@@ -552,7 +552,7 @@ WRITE32_MEMBER(dragngun_state::eeprom_w)
 /**********************************************************************************/
 
 
-WRITE32_MEMBER(deco32_state::tattass_control_w)
+void deco32_state::tattass_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* Eprom in low byte */
 	if (mem_mask==0x000000ff) { /* Byte write to low byte only (different from word writing including low byte) */
@@ -710,7 +710,7 @@ void deco32_state::tattass_sound_cb( address_space &space, uint16_t data, uint16
 	m_decobsmt->bsmt_comms_w(space, 0, soundcommand);
 }
 
-WRITE32_MEMBER(deco32_state::nslasher_eeprom_w)
+void deco32_state::nslasher_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -726,46 +726,46 @@ WRITE32_MEMBER(deco32_state::nslasher_eeprom_w)
 /**********************************************************************************/
 
 
-READ32_MEMBER(deco32_state::spriteram_r)
+uint32_t deco32_state::spriteram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_spriteram16[offset] ^ 0xffff0000;
 }
 
-WRITE32_MEMBER(deco32_state::spriteram_w)
+void deco32_state::spriteram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 	COMBINE_DATA(&m_spriteram16[offset]);
 }
 
-WRITE32_MEMBER(deco32_state::buffer_spriteram_w)
+void deco32_state::buffer_spriteram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	memcpy(m_spriteram16_buffered, m_spriteram16, 0x1000);
 }
 
-READ32_MEMBER(deco32_state::spriteram2_r)
+uint32_t deco32_state::spriteram2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_spriteram16_2[offset] ^ 0xffff0000;
 }
 
-WRITE32_MEMBER(deco32_state::spriteram2_w)
+void deco32_state::spriteram2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 	COMBINE_DATA(&m_spriteram16_2[offset]);
 }
 
-WRITE32_MEMBER(deco32_state::buffer_spriteram2_w)
+void deco32_state::buffer_spriteram2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	memcpy(m_spriteram16_2_buffered, m_spriteram16_2, 0x1000);
 }
 
 
 // tattass tests these as 32-bit ram, even if only 16-bits are hooked up to the tilemap chip - does it mirror parts of the dword?
-WRITE32_MEMBER(deco32_state::pf1_rowscroll_w){ COMBINE_DATA(&m_pf1_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
-WRITE32_MEMBER(deco32_state::pf2_rowscroll_w){ COMBINE_DATA(&m_pf2_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
-WRITE32_MEMBER(deco32_state::pf3_rowscroll_w){ COMBINE_DATA(&m_pf3_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf3_rowscroll[offset]); }
-WRITE32_MEMBER(deco32_state::pf4_rowscroll_w){ COMBINE_DATA(&m_pf4_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf4_rowscroll[offset]); }
+void deco32_state::pf1_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_pf1_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
+void deco32_state::pf2_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_pf2_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
+void deco32_state::pf3_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_pf3_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf3_rowscroll[offset]); }
+void deco32_state::pf4_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_pf4_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf4_rowscroll[offset]); }
 
 
 static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, deco32_state )
@@ -804,7 +804,7 @@ static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, deco32_state )
 ADDRESS_MAP_END
 
 
-READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
+uint32_t deco32_state::fghthist_protection_region_0_146_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t retdata = 0x0000ffff;
 
@@ -824,7 +824,7 @@ READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
 	return retdata;
 }
 
-WRITE32_MEMBER( deco32_state::fghthist_protection_region_0_146_w )
+void deco32_state::fghthist_protection_region_0_146_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -904,7 +904,7 @@ static ADDRESS_MAP_START( fghthsta_memmap, AS_PROGRAM, 32, deco32_state )
 ADDRESS_MAP_END
 
 
-READ16_MEMBER( deco32_state::dg_protection_region_0_146_r )
+uint16_t deco32_state::dg_protection_region_0_146_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -913,7 +913,7 @@ READ16_MEMBER( deco32_state::dg_protection_region_0_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( deco32_state::dg_protection_region_0_146_w )
+void deco32_state::dg_protection_region_0_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -921,7 +921,7 @@ WRITE16_MEMBER( deco32_state::dg_protection_region_0_146_w )
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
-READ32_MEMBER( dragngun_state::unk_video_r)
+uint32_t dragngun_state::unk_video_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand();
 }
@@ -1084,7 +1084,7 @@ static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x200000, 0x207fff) AM_READ16(nslasher_debug_r, 0x0000ffff)
 ADDRESS_MAP_END
 
-READ16_MEMBER( deco32_state::nslasher_protection_region_0_104_r )
+uint16_t deco32_state::nslasher_protection_region_0_104_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -1093,7 +1093,7 @@ READ16_MEMBER( deco32_state::nslasher_protection_region_0_104_r )
 	return data;
 }
 
-WRITE16_MEMBER( deco32_state::nslasher_protection_region_0_104_w )
+void deco32_state::nslasher_protection_region_0_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -1101,7 +1101,7 @@ WRITE16_MEMBER( deco32_state::nslasher_protection_region_0_104_w )
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
-READ16_MEMBER( deco32_state::nslasher_debug_r )
+uint16_t deco32_state::nslasher_debug_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
@@ -1162,7 +1162,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deco32_state )
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(deco32_state::latch_r)
+uint8_t deco32_state::latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 	m_nslasher_sound_irq &= ~0x02;
@@ -1747,7 +1747,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE_LINE_MEMBER(deco32_state::sound_irq_nslasher)
+void deco32_state::sound_irq_nslasher(int state)
 {
 	/* bit 0 of nslasher_sound_irq specifies IRQ from sound chip */
 	if (state)
@@ -1757,7 +1757,7 @@ WRITE_LINE_MEMBER(deco32_state::sound_irq_nslasher)
 	m_audiocpu->set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
+void deco32_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki1->set_rom_bank((data >> 0) & 1);
 	m_oki2->set_rom_bank((data >> 1) & 1);
@@ -1765,12 +1765,12 @@ WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
 
 /**********************************************************************************/
 
-MACHINE_RESET_MEMBER(deco32_state,deco32)
+void deco32_state::machine_reset_deco32()
 {
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");
 }
 
-INTERRUPT_GEN_MEMBER(deco32_state::deco32_vbl_interrupt)
+void deco32_state::deco32_vbl_interrupt(device_t &device)
 {
 	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
@@ -2209,7 +2209,7 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 MACHINE_CONFIG_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(dragngun_state::lockload_vbl_irq)
+void dragngun_state::lockload_vbl_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -3944,7 +3944,7 @@ ROM_START( nslasheru ) /* DE-0395-1 PCB */
 	ROM_LOAD( "vm-02.8j",  0x0400, 0x0117, CRC(53692426) SHA1(b8f8cf6b1f6b637fcd1fcd62474e637f5d4a6901) )
 ROM_END
 
-DRIVER_INIT_MEMBER(deco32_state,captaven)
+void deco32_state::init_captaven()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco56_decrypt_gfx(machine(), "gfx2");
@@ -3996,7 +3996,7 @@ void dragngun_state::dragngun_init_common()
 //  process_dvi_data(this,memregion("dvi")->base(),0xB80000, 0x1000000);
 }
 
-DRIVER_INIT_MEMBER(dragngun_state,dragngun)
+void dragngun_state::init_dragngun()
 {
 	dragngun_init_common();
 
@@ -4004,7 +4004,7 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 	ROM[0x1b32c/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
-DRIVER_INIT_MEMBER(dragngun_state,dragngunj)
+void dragngun_state::init_dragngunj()
 {
 	dragngun_init_common();
 
@@ -4012,13 +4012,13 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngunj)
 	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
-DRIVER_INIT_MEMBER(deco32_state,fghthist)
+void deco32_state::init_fghthist()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 }
 
-DRIVER_INIT_MEMBER(dragngun_state,lockload)
+void dragngun_state::init_lockload()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 //  uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
@@ -4039,7 +4039,7 @@ DRIVER_INIT_MEMBER(dragngun_state,lockload)
 //  ROM[0x3fe40c/4]=0xe1a00000;//  NOP test switch lock
 }
 
-DRIVER_INIT_MEMBER(deco32_state,tattass)
+void deco32_state::init_tattass()
 {
 	uint8_t *RAM = memregion("gfx1")->base();
 	std::vector<uint8_t> tmp(0x80000);
@@ -4066,7 +4066,7 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 	save_item(NAME(m_byteAddr));
 }
 
-DRIVER_INIT_MEMBER(deco32_state,nslasher)
+void deco32_state::init_nslasher()
 {
 	uint8_t *RAM = memregion("gfx1")->base();
 	std::vector<uint8_t> tmp(0x80000);

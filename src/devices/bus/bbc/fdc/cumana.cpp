@@ -131,8 +131,8 @@ void bbc_cumanafdc_device::device_start()
 	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DELEGATE(bbc_cumanafdc_device, ctrl_r), WRITE8_DELEGATE(bbc_cumanafdc_device, ctrl_w));
-	space.install_readwrite_handler(0xfe84, 0xfe9f, READ8_DEVICE_DELEGATE(m_fdc, mb8877_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, mb8877_t, write));
+	space.install_readwrite_handler(0xfe80, 0xfe83, read8_delegate(FUNC(bbc_cumanafdc_device::ctrl_r), this), write8_delegate(FUNC(bbc_cumanafdc_device::ctrl_w), this));
+	space.install_readwrite_handler(0xfe84, 0xfe9f, read8_delegate(FUNC(mb8877_t::read), (mb8877_t *)m_fdc), write8_delegate(FUNC(mb8877_t::write), (mb8877_t *)m_fdc));
 }
 
 //-------------------------------------------------
@@ -151,12 +151,12 @@ void bbc_cumanafdc_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_cumanafdc_device::ctrl_r)
+uint8_t bbc_cumanafdc_device::ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_drive_control;
 }
 
-WRITE8_MEMBER(bbc_cumanafdc_device::ctrl_w)
+void bbc_cumanafdc_device::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -194,19 +194,19 @@ WRITE8_MEMBER(bbc_cumanafdc_device::ctrl_w)
 	m_fdc_ie = BIT(data, 4);
 }
 
-WRITE_LINE_MEMBER(bbc_cumanafdc_device::fdc_intrq_w)
+void bbc_cumanafdc_device::fdc_intrq_w(int state)
 {
 	if (m_fdc_ie)
 		m_slot->intrq_w(state);
 }
 
-WRITE_LINE_MEMBER(bbc_cumanafdc_device::fdc_drq_w)
+void bbc_cumanafdc_device::fdc_drq_w(int state)
 {
 	if (m_fdc_ie)
 		m_slot->drq_w(state);
 }
 
-WRITE_LINE_MEMBER(bbc_cumanafdc_device::motor_w)
+void bbc_cumanafdc_device::motor_w(int state)
 {
 	for (int i = 0; i != 2; i++) {
 		char devname[8];

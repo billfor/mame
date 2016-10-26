@@ -68,14 +68,14 @@ static ADDRESS_MAP_START( c2031_mem, AS_PROGRAM, 8, c2031_device )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER( c2031_device::via0_irq_w )
+void c2031_device::via0_irq_w(int state)
 {
 	m_via0_irq = state;
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( c2031_device::via0_pa_r )
+uint8_t c2031_device::via0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -95,7 +95,7 @@ READ8_MEMBER( c2031_device::via0_pa_r )
 	return m_bus->dio_r();
 }
 
-WRITE8_MEMBER( c2031_device::via0_pa_w )
+void c2031_device::via0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -115,7 +115,7 @@ WRITE8_MEMBER( c2031_device::via0_pa_w )
 	m_bus->dio_w(this, data);
 }
 
-READ8_MEMBER( c2031_device::via0_pb_r )
+uint8_t c2031_device::via0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -152,7 +152,7 @@ READ8_MEMBER( c2031_device::via0_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c2031_device::via0_pb_w )
+void c2031_device::via0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -200,14 +200,14 @@ WRITE8_MEMBER( c2031_device::via0_pb_w )
 }
 
 
-WRITE_LINE_MEMBER( c2031_device::via1_irq_w )
+void c2031_device::via1_irq_w(int state)
 {
 	m_via1_irq = state;
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( c2031_device::via1_pb_r )
+uint8_t c2031_device::via1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -235,7 +235,7 @@ READ8_MEMBER( c2031_device::via1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c2031_device::via1_pb_w )
+void c2031_device::via1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -270,7 +270,7 @@ WRITE8_MEMBER( c2031_device::via1_pb_w )
 //  C64H156_INTERFACE( ga_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c2031_device::byte_w )
+void c2031_device::byte_w(int state)
 {
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
 

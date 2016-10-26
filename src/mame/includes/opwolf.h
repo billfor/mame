@@ -80,43 +80,43 @@ public:
 	required_device<pc090oj_device> m_pc090oj;
 	required_device<msm5205_device> m_msm1;
 	required_device<msm5205_device> m_msm2;
-	DECLARE_READ16_MEMBER(cchip_r);
-	DECLARE_WRITE16_MEMBER(cchip_w);
-	DECLARE_READ16_MEMBER(opwolf_in_r);
-	DECLARE_READ16_MEMBER(opwolf_dsw_r);
-	DECLARE_READ16_MEMBER(opwolf_lightgun_r);
-	DECLARE_READ8_MEMBER(z80_input1_r);
-	DECLARE_READ8_MEMBER(z80_input2_r);
-	DECLARE_WRITE8_MEMBER(opwolf_adpcm_d_w);
-	DECLARE_WRITE8_MEMBER(opwolf_adpcm_e_w);
-	DECLARE_WRITE16_MEMBER(opwolf_cchip_status_w);
-	DECLARE_WRITE16_MEMBER(opwolf_cchip_bank_w);
-	DECLARE_WRITE16_MEMBER(opwolf_cchip_data_w);
-	DECLARE_READ16_MEMBER(opwolf_cchip_status_r);
-	DECLARE_READ16_MEMBER(opwolf_cchip_data_r);
-	DECLARE_WRITE16_MEMBER(opwolf_spritectrl_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(opwolf_adpcm_b_w);
-	DECLARE_WRITE8_MEMBER(opwolf_adpcm_c_w);
-	DECLARE_DRIVER_INIT(opwolf);
-	DECLARE_DRIVER_INIT(opwolfb);
-	DECLARE_DRIVER_INIT(opwolfp);
+	uint16_t cchip_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cchip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t opwolf_in_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t opwolf_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t opwolf_lightgun_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t z80_input1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t z80_input2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void opwolf_adpcm_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void opwolf_adpcm_e_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void opwolf_cchip_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void opwolf_cchip_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void opwolf_cchip_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t opwolf_cchip_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t opwolf_cchip_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void opwolf_spritectrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void opwolf_adpcm_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void opwolf_adpcm_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_opwolf();
+	void init_opwolfb();
+	void init_opwolfp();
 
 
-	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_x_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_y_r);
+	ioport_value opwolf_gun_x_r(ioport_field &field, void *param);
+	ioport_value opwolf_gun_y_r(ioport_field &field, void *param);
 
 
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(opwolf);
+	void machine_reset_opwolf();
 	uint32_t screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(opwolf_timer_callback);
-	TIMER_CALLBACK_MEMBER(cchip_timer);
+	void opwolf_timer_callback(void *ptr, int32_t param);
+	void cchip_timer(void *ptr, int32_t param);
 	void updateDifficulty( int mode );
 	void opwolf_cchip_init(  );
 	void opwolf_msm5205_vck(msm5205_device *device, int chip);
-	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_1);
-	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_2);
+	void opwolf_msm5205_vck_1(int state);
+	void opwolf_msm5205_vck_2(int state);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

@@ -23,11 +23,11 @@ public:
 
 	void device_start() override;
 
-	DECLARE_READ8_MEMBER( bus_r );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_READ8_MEMBER( t0_r );
-	DECLARE_WRITE_LINE_MEMBER( t0_w );
+	uint8_t bus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t t0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void t0_w(int state);
 private:
 	required_ioport_array<17> m_rows;
 	uint8_t m_p1;

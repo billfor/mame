@@ -44,35 +44,35 @@ public:
 	bool    m_video_enable;
 
 	/* common */
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_READ8_MEMBER(scanline_r);
+	void coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t scanline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* all but psurge */
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(video_enable_w);
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* psurge */
-	DECLARE_READ8_MEMBER(psurge_protection_r);
+	uint8_t psurge_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* chkun */
-	DECLARE_CUSTOM_INPUT_MEMBER(chkun_hopper_status_r);
-	DECLARE_WRITE8_MEMBER(chkun_sound_w);
+	ioport_value chkun_hopper_status_r(ioport_field &field, void *param);
+	void chkun_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_chkun_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_chkun_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(timeplt);
-	DECLARE_VIDEO_START(chkun);
-	DECLARE_VIDEO_START(psurge);
+	void palette_init_timeplt(palette_device &palette);
+	void video_start_chkun();
+	void video_start_psurge();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void interrupt(device_t &device);
 };

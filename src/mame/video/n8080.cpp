@@ -10,7 +10,7 @@
 #include "includes/n8080.h"
 
 
-WRITE8_MEMBER(n8080_state::n8080_video_control_w)
+void n8080_state::n8080_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sheriff_color_mode = (data >> 3) & 3;
 	m_sheriff_color_data = (data >> 0) & 7;
@@ -18,7 +18,7 @@ WRITE8_MEMBER(n8080_state::n8080_video_control_w)
 }
 
 
-PALETTE_INIT_MEMBER(n8080_state,n8080)
+void n8080_state::palette_init_n8080(palette_device &palette)
 {
 	int i;
 
@@ -27,11 +27,11 @@ PALETTE_INIT_MEMBER(n8080_state,n8080)
 }
 
 
-PALETTE_INIT_MEMBER(n8080_state,helifire)
+void n8080_state::palette_init_helifire(palette_device &palette)
 {
 	int i;
 
-	PALETTE_INIT_NAME(n8080)(palette);
+	palette_init_n8080(palette);
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -53,7 +53,7 @@ void n8080_state::spacefev_start_red_cannon(  )
 }
 
 
-TIMER_CALLBACK_MEMBER(n8080_state::spacefev_stop_red_cannon)
+void n8080_state::spacefev_stop_red_cannon(void *ptr, int32_t param)
 {
 	m_spacefev_red_cannon = 0;
 	m_cannon_timer->adjust(attotime::never);
@@ -83,7 +83,7 @@ void n8080_state::helifire_next_line(  )
 }
 
 
-VIDEO_START_MEMBER(n8080_state,spacefev)
+void n8080_state::video_start_spacefev()
 {
 	m_cannon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::spacefev_stop_red_cannon),this));
 
@@ -94,7 +94,7 @@ VIDEO_START_MEMBER(n8080_state,spacefev)
 }
 
 
-VIDEO_START_MEMBER(n8080_state,sheriff)
+void n8080_state::video_start_sheriff()
 {
 	flip_screen_set(0);
 
@@ -103,7 +103,7 @@ VIDEO_START_MEMBER(n8080_state,sheriff)
 }
 
 
-VIDEO_START_MEMBER(n8080_state,helifire)
+void n8080_state::video_start_helifire()
 {
 	uint8_t data = 0;
 	int i;

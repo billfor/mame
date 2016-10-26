@@ -31,7 +31,7 @@
 #include "includes/pc4.h"
 
 
-READ8_MEMBER( pc4_state::kb_r )
+uint8_t pc4_state::kb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -46,13 +46,13 @@ READ8_MEMBER( pc4_state::kb_r )
 	return data;
 }
 
-WRITE8_MEMBER( pc4_state::bank_w )
+void pc4_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("set bank %x\n", data);
 	m_rombank->set_entry(data&0x07);
 }
 
-WRITE8_MEMBER( pc4_state::beep_w )
+void pc4_state::beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_beep->set_state(data&0x40);
 }
@@ -161,7 +161,7 @@ static INPUT_PORTS_START( pc4 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(pc4_state, pc4)
+void pc4_state::palette_init_pc4(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

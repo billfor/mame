@@ -614,7 +614,7 @@ void mappy_state::common_latch_w(uint32_t offset)
 	}
 }
 
-WRITE8_MEMBER(mappy_state::superpac_latch_w)
+void mappy_state::superpac_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = offset & 1;
 
@@ -644,7 +644,7 @@ WRITE8_MEMBER(mappy_state::superpac_latch_w)
 	}
 }
 
-WRITE8_MEMBER(mappy_state::phozon_latch_w)
+void mappy_state::phozon_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = offset & 1;
 
@@ -671,7 +671,7 @@ WRITE8_MEMBER(mappy_state::phozon_latch_w)
 	}
 }
 
-WRITE8_MEMBER(mappy_state::mappy_latch_w)
+void mappy_state::mappy_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = offset & 1;
 
@@ -706,7 +706,7 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 	}
 }
 
-MACHINE_RESET_MEMBER(mappy_state,superpac)
+void mappy_state::machine_reset_superpac()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -715,7 +715,7 @@ MACHINE_RESET_MEMBER(mappy_state,superpac)
 		superpac_latch_w(space, i, 0);
 }
 
-MACHINE_RESET_MEMBER(mappy_state,phozon)
+void mappy_state::machine_reset_phozon()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -724,7 +724,7 @@ MACHINE_RESET_MEMBER(mappy_state,phozon)
 		phozon_latch_w(space, i, 0);
 }
 
-MACHINE_RESET_MEMBER(mappy_state,mappy)
+void mappy_state::machine_reset_mappy()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -766,7 +766,7 @@ void mappy_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::superpac_io_run)
+void mappy_state::superpac_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -779,7 +779,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::superpac_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::superpac_main_vblank_irq)
+void mappy_state::superpac_main_vblank_irq(device_t &device)
 {
 	if (m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -791,7 +791,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::superpac_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_SUPERPAC_IO_RUN, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::pacnpal_io_run)
+void mappy_state::pacnpal_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -804,7 +804,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::pacnpal_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::pacnpal_main_vblank_irq)
+void mappy_state::pacnpal_main_vblank_irq(device_t &device)
 {
 	if (m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -816,7 +816,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::pacnpal_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_PACNPAL_IO_RUN, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::grobda_io_run)
+void mappy_state::grobda_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -829,7 +829,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::grobda_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::grobda_main_vblank_irq)
+void mappy_state::grobda_main_vblank_irq(device_t &device)
 {
 	if (m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -841,7 +841,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::grobda_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_GROBDA_IO_RUN, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::phozon_io_run)
+void mappy_state::phozon_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -854,7 +854,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::phozon_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::phozon_main_vblank_irq)
+void mappy_state::phozon_main_vblank_irq(device_t &device)
 {
 	if (m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -866,7 +866,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::phozon_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_PHOZON_IO_RUN, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::mappy_io_run)
+void mappy_state::mappy_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -879,7 +879,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::mappy_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::mappy_main_vblank_irq)
+void mappy_state::mappy_main_vblank_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -891,7 +891,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::mappy_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_MAPPY_IO_RUN, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::digdug2_io_run)
+void mappy_state::digdug2_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -904,7 +904,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::digdug2_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::digdug2_main_vblank_irq)
+void mappy_state::digdug2_main_vblank_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -916,7 +916,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::digdug2_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_DIGDUG2_IO_RUN, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::motos_io_run)
+void mappy_state::motos_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -929,7 +929,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::motos_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::motos_main_vblank_irq)
+void mappy_state::motos_main_vblank_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -941,13 +941,13 @@ INTERRUPT_GEN_MEMBER(mappy_state::motos_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_MOTOS_IO_RUN, 1);
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::sub_vblank_irq)
+void mappy_state::sub_vblank_irq(device_t &device)
 {
 	if(m_sub_irq_mask)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::sub2_vblank_irq)
+void mappy_state::sub2_vblank_irq(device_t &device)
 {
 	if(m_sub2_irq_mask)
 		m_subcpu2->set_input_line(0, ASSERT_LINE);
@@ -1604,26 +1604,26 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-READ8_MEMBER(mappy_state::dipA_l){ return ioport("DSW1")->read(); }     // dips A
-READ8_MEMBER(mappy_state::dipA_h){ return ioport("DSW1")->read() >> 4; }    // dips A
+uint8_t mappy_state::dipA_l(address_space &space, offs_t offset, uint8_t mem_mask){ return ioport("DSW1")->read(); }     // dips A
+uint8_t mappy_state::dipA_h(address_space &space, offs_t offset, uint8_t mem_mask){ return ioport("DSW1")->read() >> 4; }    // dips A
 
-READ8_MEMBER(mappy_state::dipB_mux)// dips B
+uint8_t mappy_state::dipB_mux(address_space &space, offs_t offset, uint8_t mem_mask)// dips B
 {
 	return ioport("DSW2")->read() >> (4 * m_mux);
 }
 
-READ8_MEMBER(mappy_state::dipB_muxi)// dips B
+uint8_t mappy_state::dipB_muxi(address_space &space, offs_t offset, uint8_t mem_mask)// dips B
 {
 	// bits are interleaved in Phozon
 	return BITSWAP8(ioport("DSW2")->read(),6,4,2,0,7,5,3,1) >> (4 * m_mux);
 }
 
-WRITE8_MEMBER(mappy_state::out_mux)
+void mappy_state::out_mux(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux = data & 1;
 }
 
-WRITE8_MEMBER(mappy_state::out_lamps)
+void mappy_state::out_lamps(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 1);
 	output().set_led_value(1, data & 2);
@@ -1631,7 +1631,7 @@ WRITE8_MEMBER(mappy_state::out_lamps)
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
-MACHINE_START_MEMBER(mappy_state,mappy)
+void mappy_state::machine_start_mappy()
 {
 	switch (m_type)
 	{
@@ -2398,17 +2398,17 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(mappy_state,superpac)
+void mappy_state::init_superpac()
 {
 	m_type = GAME_SUPERPAC;
 }
 
-DRIVER_INIT_MEMBER(mappy_state,pacnpal)
+void mappy_state::init_pacnpal()
 {
 	m_type = GAME_PACNPAL;
 }
 
-DRIVER_INIT_MEMBER(mappy_state,grobda)
+void mappy_state::init_grobda()
 {
 	m_type = GAME_GROBDA;
 
@@ -2423,23 +2423,23 @@ DRIVER_INIT_MEMBER(mappy_state,grobda)
 	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::write), (dac_byte_interface *)m_dac));
 }
 
-DRIVER_INIT_MEMBER(mappy_state,phozon)
+void mappy_state::init_phozon()
 {
 	m_type = GAME_PHOZON;
 }
 
-DRIVER_INIT_MEMBER(mappy_state,mappy)
+void mappy_state::init_mappy()
 {
 	m_type = GAME_MAPPY;
 }
 
-DRIVER_INIT_MEMBER(mappy_state,druaga)
+void mappy_state::init_druaga()
 {
 	m_type = GAME_DRUAGA;
 }
 
 
-DRIVER_INIT_MEMBER(mappy_state,digdug2)
+void mappy_state::init_digdug2()
 {
 	m_type = GAME_DIGDUG2;
 
@@ -2447,7 +2447,7 @@ DRIVER_INIT_MEMBER(mappy_state,digdug2)
 	m_maincpu->space(AS_PROGRAM).nop_write(0x8000, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(mappy_state,motos)
+void mappy_state::init_motos()
 {
 	m_type = GAME_MOTOS;
 }

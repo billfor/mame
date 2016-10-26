@@ -49,10 +49,10 @@ public:
 	template<class _Object> static devcb_base &set_out_dack_2_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_dack_2_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dack_3_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_dack_3_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE_LINE_MEMBER(set_hreq);
-	DECLARE_WRITE_LINE_MEMBER(set_eop);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void set_hreq(int state);
+	void set_eop(int state);
 
 	int dmarq(int state, int channel);
 
@@ -63,7 +63,7 @@ protected:
 private:
 	// internal state
 	void soft_reset();
-	TIMER_CALLBACK_MEMBER(dma_transfer_timer);
+	void dma_transfer_timer(void *ptr, int32_t param);
 
 	struct upd71071_reg m_reg;
 	int m_selected_channel;

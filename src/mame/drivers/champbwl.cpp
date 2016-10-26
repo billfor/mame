@@ -176,20 +176,20 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<x1_010_device> m_x1;
 	uint8_t    m_last_trackball_val[2];
-	DECLARE_READ8_MEMBER(trackball_r);
-	DECLARE_WRITE8_MEMBER(champbwl_misc_w);
-	DECLARE_WRITE8_MEMBER(doraemon_outputs_w);
-	DECLARE_MACHINE_START(champbwl);
-	DECLARE_MACHINE_RESET(champbwl);
-	DECLARE_MACHINE_START(doraemon);
-	DECLARE_PALETTE_INIT(champbwl);
+	uint8_t trackball_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void champbwl_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void doraemon_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void machine_start_champbwl();
+	void machine_reset_champbwl();
+	void machine_start_doraemon();
+	void palette_init_champbwl(palette_device &palette);
 	uint32_t screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_champbwl(screen_device &screen, bool state);
 	void screen_eof_doraemon(screen_device &screen, bool state);
 };
 
-PALETTE_INIT_MEMBER(champbwl_state,champbwl)
+void champbwl_state::palette_init_champbwl(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, col;
@@ -202,7 +202,7 @@ PALETTE_INIT_MEMBER(champbwl_state,champbwl)
 }
 
 
-READ8_MEMBER(champbwl_state::trackball_r)
+uint8_t champbwl_state::trackball_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 	uint8_t port4 = ioport("FAKEX")->read();
@@ -216,7 +216,7 @@ READ8_MEMBER(champbwl_state::trackball_r)
 	return ret;
 }
 
-WRITE8_MEMBER(champbwl_state::champbwl_misc_w)
+void champbwl_state::champbwl_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -253,7 +253,7 @@ ADDRESS_MAP_END
 
 
 
-WRITE8_MEMBER(champbwl_state::doraemon_outputs_w)
+void champbwl_state::doraemon_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1); // coin in counter
 	machine().bookkeeping().coin_counter_w(1, data & 2); // gift out counter
@@ -452,7 +452,7 @@ static GFXDECODE_START( champbwl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(champbwl_state,champbwl)
+void champbwl_state::machine_start_champbwl()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -462,7 +462,7 @@ MACHINE_START_MEMBER(champbwl_state,champbwl)
 	save_item(NAME(m_last_trackball_val));
 }
 
-MACHINE_RESET_MEMBER(champbwl_state,champbwl)
+void champbwl_state::machine_reset_champbwl()
 {
 	m_screenflip = 0;
 	m_last_trackball_val[0] = 0;
@@ -548,7 +548,7 @@ void champbwl_state::screen_eof_doraemon(screen_device &screen, bool state)
 		m_seta001->setac_eof();
 }
 
-MACHINE_START_MEMBER(champbwl_state,doraemon)
+void champbwl_state::machine_start_doraemon()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);

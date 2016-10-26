@@ -53,38 +53,38 @@ public:
 	required_shared_ptr<uint8_t> m_bg_videoram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	DECLARE_WRITE8_MEMBER(ettrivia_fg_w);
-	DECLARE_WRITE8_MEMBER(ettrivia_bg_w);
-	DECLARE_WRITE8_MEMBER(ettrivia_control_w);
-	DECLARE_READ8_MEMBER(ettrivia_question_r);
-	DECLARE_WRITE8_MEMBER(b000_w);
-	DECLARE_READ8_MEMBER(b000_r);
-	DECLARE_WRITE8_MEMBER(b800_w);
-	TILE_GET_INFO_MEMBER(get_tile_info_bg);
-	TILE_GET_INFO_MEMBER(get_tile_info_fg);
+	void ettrivia_fg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ettrivia_bg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ettrivia_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ettrivia_question_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void b000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t b000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void b800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ettrivia);
+	void palette_init_ettrivia(palette_device &palette);
 	uint32_t screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ettrivia_interrupt);
+	void ettrivia_interrupt(device_t &device);
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, uint8_t *vidram, int gfx_code);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
-WRITE8_MEMBER(ettrivia_state::ettrivia_fg_w)
+void ettrivia_state::ettrivia_fg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ettrivia_state::ettrivia_bg_w)
+void ettrivia_state::ettrivia_bg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
+void ettrivia_state::ettrivia_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().tilemap().mark_all_dirty();
 
@@ -98,18 +98,18 @@ WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
 	flip_screen_set(data & 1);
 }
 
-READ8_MEMBER(ettrivia_state::ettrivia_question_r)
+uint8_t ettrivia_state::ettrivia_question_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *QUESTIONS = memregion("user1")->base();
 	return QUESTIONS[offset + 0x10000 * m_question_bank];
 }
 
-WRITE8_MEMBER(ettrivia_state::b000_w)
+void ettrivia_state::b000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_b000_val = data;
 }
 
-READ8_MEMBER(ettrivia_state::b000_r)
+uint8_t ettrivia_state::b000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_b800_prev)
 		return m_b000_ret;
@@ -117,7 +117,7 @@ READ8_MEMBER(ettrivia_state::b000_r)
 		return m_b000_val;
 }
 
-WRITE8_MEMBER(ettrivia_state::b800_w)
+void ettrivia_state::b800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(data)
 	{
@@ -213,17 +213,17 @@ void ettrivia_state::get_tile_info(tile_data &tileinfo, int tile_index, uint8_t 
 	SET_TILE_INFO_MEMBER(gfx_code,code,color,0);
 }
 
-TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_bg)
+void ettrivia_state::get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo, tile_index, m_bg_videoram, 0);
 }
 
-TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_fg)
+void ettrivia_state::get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo, tile_index, m_fg_videoram, 1);
 }
 
-PALETTE_INIT_MEMBER(ettrivia_state, ettrivia)
+void ettrivia_state::palette_init_ettrivia(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[2] = { 270, 130 };
@@ -275,7 +275,7 @@ uint32_t ettrivia_state::screen_update_ettrivia(screen_device &screen, bitmap_in
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
+void ettrivia_state::ettrivia_interrupt(device_t &device)
 {
 	if( ioport("COIN")->read() & 0x01 )
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

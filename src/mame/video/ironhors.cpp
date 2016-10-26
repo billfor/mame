@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(ironhors_state, ironhors)
+void ironhors_state::palette_init_ironhors(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2000, 1000, 470, 220 };
@@ -78,19 +78,19 @@ PALETTE_INIT_MEMBER(ironhors_state, ironhors)
 	}
 }
 
-WRITE8_MEMBER(ironhors_state::videoram_w)
+void ironhors_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ironhors_state::colorram_w)
+void ironhors_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ironhors_state::charbank_w)
+void ironhors_state::charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charbank != (data & 0x03))
 	{
@@ -103,7 +103,7 @@ WRITE8_MEMBER(ironhors_state::charbank_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(ironhors_state::palettebank_w)
+void ironhors_state::palettebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palettebank != (data & 0x07))
 	{
@@ -120,7 +120,7 @@ WRITE8_MEMBER(ironhors_state::palettebank_w)
 		popmessage("palettebank_w %02x",data);
 }
 
-WRITE8_MEMBER(ironhors_state::flipscreen_w)
+void ironhors_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (~data & 0x08))
 	{
@@ -131,7 +131,7 @@ WRITE8_MEMBER(ironhors_state::flipscreen_w)
 	/* other bits are used too, but unknown */
 }
 
-TILE_GET_INFO_MEMBER(ironhors_state::get_bg_tile_info)
+void ironhors_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x40) << 2) +
 		((m_colorram[tile_index] & 0x20) << 4) + (m_charbank << 10);
@@ -244,7 +244,7 @@ uint32_t ironhors_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-TILE_GET_INFO_MEMBER(ironhors_state::farwest_get_bg_tile_info)
+void ironhors_state::farwest_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x40) << 2) +
 		((m_colorram[tile_index] & 0x20) << 4) + (m_charbank << 10);
@@ -254,7 +254,7 @@ TILE_GET_INFO_MEMBER(ironhors_state::farwest_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-VIDEO_START_MEMBER(ironhors_state,farwest)
+void ironhors_state::video_start_farwest()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ironhors_state::farwest_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 

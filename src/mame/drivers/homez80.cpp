@@ -34,18 +34,18 @@ public:
 		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER( homez80_keyboard_r );
+	uint8_t homez80_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint8_t* m_p_chargen;
 	bool m_irq;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(homez80_interrupt);
+	void homez80_interrupt(device_t &device);
 };
 
 
-READ8_MEMBER( homez80_state::homez80_keyboard_r )
+uint8_t homez80_state::homez80_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"LINE%d",offset);
@@ -274,7 +274,7 @@ static GFXDECODE_START( homez80 )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(homez80_state::homez80_interrupt)
+void homez80_state::homez80_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, (m_irq) ? HOLD_LINE : CLEAR_LINE);
 	m_irq ^= 1;

@@ -34,8 +34,8 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ_LINE_MEMBER( th_pin_r );
-	DECLARE_INPUT_CHANGED_MEMBER( position_changed );
+	int th_pin_r();
+	void position_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	// device-level overrides

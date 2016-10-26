@@ -84,25 +84,25 @@ public:
 	template<class _lamp_w> void set_lamp_write_callback(_lamp_w lamp_w) { m_write_lamp.set_callback(lamp_w); }
 	template<class _sol_w> void set_solenoid_write_callback(_sol_w sol_w) { m_write_solenoid.set_callback(sol_w); }
 
-	DECLARE_WRITE_LINE_MEMBER(cpu_pia_irq);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w);
-	DECLARE_READ8_MEMBER(display_strobe_r);
-	DECLARE_WRITE8_MEMBER(display_strobe_w);
-	DECLARE_WRITE8_MEMBER(display_out1_w);
-	DECLARE_WRITE8_MEMBER(display_out2_w);
-	DECLARE_WRITE8_MEMBER(display_out3_w);
-	DECLARE_WRITE8_MEMBER(display_out4_w);
-	DECLARE_READ8_MEMBER(display_in3_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_READ8_MEMBER(dmdstatus_r);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(solenoid1_w);
-	DECLARE_WRITE8_MEMBER(solenoid2_w);
-	INPUT_CHANGED_MEMBER(main_nmi);
-	INPUT_CHANGED_MEMBER(audio_nmi);
+	void cpu_pia_irq(int state);
+	void pia21_ca2_w(int state);
+	void lamp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t display_strobe_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void display_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void display_out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void display_out2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void display_out3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void display_out4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t display_in3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dmdstatus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void solenoid1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void solenoid2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	static void static_set_cpuregion(device_t &device, const char *tag);
 

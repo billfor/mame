@@ -202,30 +202,30 @@ public:
 	required_shared_ptr<uint16_t> m_scc68070_dma_ch1_regs;
 	required_shared_ptr<uint16_t> m_scc68070_dma_ch2_regs;
 	required_shared_ptr<uint16_t> m_scc68070_mmu_regs;
-	DECLARE_READ16_MEMBER(test_r);
-	DECLARE_READ16_MEMBER(philips_66470_r);
-	DECLARE_WRITE16_MEMBER(philips_66470_w);
-	DECLARE_READ16_MEMBER(scc68070_ext_irqc_r);
-	DECLARE_WRITE16_MEMBER(scc68070_ext_irqc_w);
-	DECLARE_READ16_MEMBER(scc68070_iic_r);
-	DECLARE_WRITE16_MEMBER(scc68070_iic_w);
-	DECLARE_READ16_MEMBER(scc68070_uart_r);
-	DECLARE_WRITE16_MEMBER(scc68070_uart_w);
-	DECLARE_READ16_MEMBER(scc68070_timer_r);
-	DECLARE_WRITE16_MEMBER(scc68070_timer_w);
-	DECLARE_READ16_MEMBER(scc68070_int_irqc_r);
-	DECLARE_WRITE16_MEMBER(scc68070_int_irqc_w);
-	DECLARE_READ16_MEMBER(scc68070_dma_ch1_r);
-	DECLARE_WRITE16_MEMBER(scc68070_dma_ch1_w);
-	DECLARE_READ16_MEMBER(scc68070_dma_ch2_r);
-	DECLARE_WRITE16_MEMBER(scc68070_dma_ch2_w);
-	DECLARE_READ16_MEMBER(scc68070_mmu_r);
-	DECLARE_WRITE16_MEMBER(scc68070_mmu_w);
-	DECLARE_DRIVER_INIT(magicard);
+	uint16_t test_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t philips_66470_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void philips_66470_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t scc68070_ext_irqc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scc68070_ext_irqc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t scc68070_iic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scc68070_iic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t scc68070_uart_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scc68070_uart_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t scc68070_timer_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scc68070_timer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t scc68070_int_irqc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scc68070_int_irqc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t scc68070_dma_ch1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scc68070_dma_ch1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t scc68070_dma_ch2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scc68070_dma_ch2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t scc68070_mmu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scc68070_mmu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void init_magicard();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(magicard_irq);
+	void magicard_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -498,12 +498,12 @@ uint32_t magicard_state::screen_update_magicard(screen_device &screen, bitmap_rg
 *      R/W Handlers      *
 *************************/
 
-READ16_MEMBER(magicard_state::test_r)
+uint16_t magicard_state::test_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand();
 }
 
-READ16_MEMBER(magicard_state::philips_66470_r)
+uint16_t magicard_state::philips_66470_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -522,7 +522,7 @@ READ16_MEMBER(magicard_state::philips_66470_r)
 	return m_pcab_vregs[offset];
 }
 
-WRITE16_MEMBER(magicard_state::philips_66470_w)
+void magicard_state::philips_66470_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pcab_vregs[offset]);
 
@@ -535,19 +535,19 @@ WRITE16_MEMBER(magicard_state::philips_66470_w)
 
 /* scc68070 specific stuff (to be moved) */
 
-READ16_MEMBER(magicard_state::scc68070_ext_irqc_r)
+uint16_t magicard_state::scc68070_ext_irqc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_scc68070_ext_irqc_regs[offset];
 }
 
-WRITE16_MEMBER(magicard_state::scc68070_ext_irqc_w)
+void magicard_state::scc68070_ext_irqc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
 	m_scc68070_ext_irqc_regs[offset] = data;
 }
 
-READ16_MEMBER(magicard_state::scc68070_iic_r)
+uint16_t magicard_state::scc68070_iic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//printf("%04x\n",offset*2);
 
@@ -559,14 +559,14 @@ READ16_MEMBER(magicard_state::scc68070_iic_r)
 	return m_scc68070_iic_regs[offset];
 }
 
-WRITE16_MEMBER(magicard_state::scc68070_iic_w)
+void magicard_state::scc68070_iic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
 	m_scc68070_iic_regs[offset] = data;
 }
 
-READ16_MEMBER(magicard_state::scc68070_uart_r)
+uint16_t magicard_state::scc68070_uart_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//printf("%02x\n",offset*2);
 
@@ -578,67 +578,67 @@ READ16_MEMBER(magicard_state::scc68070_uart_r)
 	return m_scc68070_uart_regs[offset];
 }
 
-WRITE16_MEMBER(magicard_state::scc68070_uart_w)
+void magicard_state::scc68070_uart_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
 	m_scc68070_uart_regs[offset] = data;
 }
 
-READ16_MEMBER(magicard_state::scc68070_timer_r)
+uint16_t magicard_state::scc68070_timer_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_scc68070_timer_regs[offset];
 }
 
-WRITE16_MEMBER(magicard_state::scc68070_timer_w)
+void magicard_state::scc68070_timer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
 	m_scc68070_timer_regs[offset] = data;
 }
 
-READ16_MEMBER(magicard_state::scc68070_int_irqc_r)
+uint16_t magicard_state::scc68070_int_irqc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_scc68070_int_irqc_regs[offset];
 }
 
-WRITE16_MEMBER(magicard_state::scc68070_int_irqc_w)
+void magicard_state::scc68070_int_irqc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
 	m_scc68070_int_irqc_regs[offset] = data;
 }
 
-READ16_MEMBER(magicard_state::scc68070_dma_ch1_r)
+uint16_t magicard_state::scc68070_dma_ch1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_scc68070_dma_ch1_regs[offset];
 }
 
-WRITE16_MEMBER(magicard_state::scc68070_dma_ch1_w)
+void magicard_state::scc68070_dma_ch1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
 	m_scc68070_dma_ch1_regs[offset] = data;
 }
 
-READ16_MEMBER(magicard_state::scc68070_dma_ch2_r)
+uint16_t magicard_state::scc68070_dma_ch2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_scc68070_dma_ch2_regs[offset];
 }
 
-WRITE16_MEMBER(magicard_state::scc68070_dma_ch2_w)
+void magicard_state::scc68070_dma_ch2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
 	m_scc68070_dma_ch2_regs[offset] = data;
 }
 
-READ16_MEMBER(magicard_state::scc68070_mmu_r)
+uint16_t magicard_state::scc68070_mmu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_scc68070_mmu_regs[offset];
 }
 
-WRITE16_MEMBER(magicard_state::scc68070_mmu_w)
+void magicard_state::scc68070_mmu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -736,7 +736,7 @@ void magicard_state::machine_reset()
 *************************/
 
 /*Probably there's a mask somewhere if it REALLY uses irqs at all...irq vectors dynamically changes after some time.*/
-INTERRUPT_GEN_MEMBER(magicard_state::magicard_irq)
+void magicard_state::magicard_irq(device_t &device)
 {
 	if(machine().input().code_pressed(KEYCODE_Z)) //vblank?
 		device.execute().set_input_line_and_vector(1, HOLD_LINE, 0xe4 / 4);
@@ -890,7 +890,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(magicard_state, magicard)
+void magicard_state::init_magicard()
 {
 	//...
 }

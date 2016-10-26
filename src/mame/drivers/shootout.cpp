@@ -44,23 +44,23 @@
 
 /*******************************************************************************/
 
-WRITE8_MEMBER(shootout_state::bankswitch_w)
+void shootout_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
+void shootout_state::sound_cpu_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write( space, offset, data );
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
-WRITE8_MEMBER(shootout_state::flipscreen_w)
+void shootout_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 }
 
-WRITE8_MEMBER(shootout_state::coincounter_w)
+void shootout_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data);
 }
@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-INPUT_CHANGED_MEMBER(shootout_state::coin_inserted)
+void shootout_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -390,7 +390,7 @@ ROM_START( shootoutb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(shootout_state,shootout)
+void shootout_state::init_shootout()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }

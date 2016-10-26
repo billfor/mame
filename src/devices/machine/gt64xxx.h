@@ -209,36 +209,36 @@ public:
 	void set_irq_num(const int irq_num) {m_irq_num = irq_num;}
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
-	DECLARE_WRITE_LINE_MEMBER(pci_stall);
+	void pci_stall(int state);
 
 	// pci bus
-	DECLARE_READ32_MEMBER(  pci_config_r);
-	DECLARE_WRITE32_MEMBER( pci_config_w);
+	uint32_t pci_config_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pci_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// cpu bus
-	DECLARE_READ32_MEMBER (cpu_if_r);
-	DECLARE_WRITE32_MEMBER(cpu_if_w);
+	uint32_t cpu_if_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cpu_if_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER (master_mem0_r);
-	DECLARE_WRITE32_MEMBER(master_mem0_w);
+	uint32_t master_mem0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void master_mem0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER (master_mem1_r);
-	DECLARE_WRITE32_MEMBER(master_mem1_w);
+	uint32_t master_mem1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void master_mem1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER (master_io_r);
-	DECLARE_WRITE32_MEMBER(master_io_w);
+	uint32_t master_io_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void master_io_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// devices
-	DECLARE_READ32_MEMBER (ras_0_r);
-	DECLARE_WRITE32_MEMBER(ras_0_w);
-	DECLARE_READ32_MEMBER(ras_1_r);
-	DECLARE_WRITE32_MEMBER(ras_1_w);
-	DECLARE_READ32_MEMBER(ras_2_r);
-	DECLARE_WRITE32_MEMBER(ras_2_w);
-	DECLARE_READ32_MEMBER(ras_3_r);
-	DECLARE_WRITE32_MEMBER(ras_3_w);
-	DECLARE_READ32_MEMBER (cs_0_r);
-	DECLARE_WRITE32_MEMBER(cs_0_w);
+	uint32_t ras_0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ras_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ras_1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ras_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ras_2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ras_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ras_3_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ras_3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cs_0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cs_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// Enums
 	enum proc_addr_bank {ADDR_RAS1_0, ADDR_RAS3_2, ADDR_CS2_0, ADDR_CS3_BCS, ADDR_PCI_IO, ADDR_PCI_MEM0, ADDR_PCI_MEM1, ADDR_NUM};
@@ -281,7 +281,7 @@ private:
 
 	/* timer info */
 	galileo_timer   m_timer[4];
-	TIMER_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(void *ptr, int32_t param);
 
 	/* DMA info */
 	int8_t            m_dma_active;
@@ -307,7 +307,7 @@ private:
 	emu_timer* m_dma_timer;
 	galileo_addr_map dma_addr_map[proc_addr_bank::ADDR_NUM];
 	int dma_fetch_next(address_space &space, int which);
-	TIMER_CALLBACK_MEMBER(perform_dma);
+	void perform_dma(void *ptr, int32_t param);
 	address_space* dma_decode_address(uint32_t &addr);
 
 };

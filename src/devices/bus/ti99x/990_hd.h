@@ -19,11 +19,11 @@ public:
 
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<ti990_hdc_device &>(device).m_interrupt_callback.set_callback(object); }
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ti990_hd );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hd );
+	image_init_result device_image_load_ti990_hd(device_image_interface &image);
+	void device_image_unload_ti990_hd(device_image_interface &image);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

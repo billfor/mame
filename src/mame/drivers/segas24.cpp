@@ -378,7 +378,7 @@ void segas24_state::fdc_init()
 	fdc_index_count = 0;
 }
 
-READ16_MEMBER( segas24_state::fdc_r )
+uint16_t segas24_state::fdc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(!track_size)
 		return 0xffff;
@@ -413,7 +413,7 @@ READ16_MEMBER( segas24_state::fdc_r )
 	}
 }
 
-WRITE16_MEMBER( segas24_state::fdc_w )
+void segas24_state::fdc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!track_size)
 		return;
@@ -498,7 +498,7 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 	}
 }
 
-READ16_MEMBER( segas24_state::fdc_status_r )
+uint16_t segas24_state::fdc_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(!track_size)
 		return 0xffff;
@@ -506,7 +506,7 @@ READ16_MEMBER( segas24_state::fdc_status_r )
 	return 0x90 | (fdc_irq ? 2 : 0) | (fdc_drq ? 1 : 0) | (fdc_phys_track ? 0x40 : 0) | (fdc_index_count ? 0x20 : 0);
 }
 
-WRITE16_MEMBER( segas24_state::fdc_ctrl_w )
+void segas24_state::fdc_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		FDC_LOG(("FDC control %02x\n", data & 0xff));
@@ -625,7 +625,7 @@ void segas24_state::hotrod_io_w(uint8_t port, uint8_t data)
 }
 
 
-WRITE16_MEMBER( segas24_state::hotrod3_ctrl_w )
+void segas24_state::hotrod3_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -634,7 +634,7 @@ WRITE16_MEMBER( segas24_state::hotrod3_ctrl_w )
 	}
 }
 
-READ16_MEMBER( segas24_state::hotrod3_ctrl_r )
+uint16_t segas24_state::hotrod3_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -670,13 +670,13 @@ READ16_MEMBER( segas24_state::hotrod3_ctrl_r )
 	return 0;
 }
 
-READ16_MEMBER( segas24_state::iod_r )
+uint16_t segas24_state::iod_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("IO daughterboard read %02x (%x)\n", offset, space.device().safe_pc());
 	return 0xffff;
 }
 
-WRITE16_MEMBER( segas24_state::iod_w )
+void segas24_state::iod_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("IO daughterboard write %02x, %04x & %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
 }
@@ -734,7 +734,7 @@ CPUs to worry about.
 
 */
 
-TIMER_CALLBACK_MEMBER(segas24_state::gground_hack_timer_callback)
+void segas24_state::gground_hack_timer_callback(void *ptr, int32_t param)
 {
 	m_subcpu->set_clock_scale(1.0f);
 }
@@ -785,12 +785,12 @@ void segas24_state::reset_bank()
 	}
 }
 
-READ16_MEMBER( segas24_state::curbank_r )
+uint16_t segas24_state::curbank_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return curbank;
 }
 
-WRITE16_MEMBER( segas24_state::curbank_w )
+void segas24_state::curbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7) {
 		curbank = data & 0xff;
@@ -798,19 +798,19 @@ WRITE16_MEMBER( segas24_state::curbank_w )
 	}
 }
 
-READ8_MEMBER( segas24_state::frc_mode_r )
+uint8_t segas24_state::frc_mode_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return frc_mode & 1;
 }
 
-WRITE8_MEMBER( segas24_state::frc_mode_w )
+void segas24_state::frc_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* reset frc if a write happens here */
 	frc_cnt_timer->reset();
 	frc_mode = data & 1;
 }
 
-READ8_MEMBER( segas24_state::frc_r )
+uint8_t segas24_state::frc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int32_t result = (frc_cnt_timer->time_elapsed() * (frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0)).as_double();
 
@@ -819,7 +819,7 @@ READ8_MEMBER( segas24_state::frc_r )
 	return result;
 }
 
-WRITE8_MEMBER( segas24_state::frc_w )
+void segas24_state::frc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Undocumented behaviour, Bonanza Bros. seems to use this for irq ack'ing ... */
 	m_maincpu->set_input_line(IRQ_FRC+1, CLEAR_LINE);
@@ -838,12 +838,12 @@ const uint8_t segas24_state::quizmeku_mlt[8] = { 0, 3, 2, 4, 6, 1, 7, 5 };
 const uint8_t   segas24_state::dcclub_mlt[8] = { 4, 7, 3, 0, 2, 6, 5, 1 };
 
 
-READ16_MEMBER( segas24_state::mlatch_r )
+uint16_t segas24_state::mlatch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return mlatch;
 }
 
-WRITE16_MEMBER( segas24_state::mlatch_w )
+void segas24_state::mlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7) {
 		int i;
@@ -926,7 +926,7 @@ void segas24_state::irq_timer_start(int old_tmode)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_cb)
+void segas24_state::irq_timer_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	irq_timer_sync();
 
@@ -949,7 +949,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_cb)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_clear_cb)
+void segas24_state::irq_timer_clear_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	irq_sprite = irq_vblank = 0;
 	m_maincpu->set_input_line(IRQ_VBLANK+1, CLEAR_LINE);
@@ -958,7 +958,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_clear_cb)
 	m_subcpu->set_input_line(IRQ_SPRITE+1, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_frc_cb)
+void segas24_state::irq_frc_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	if(irq_allow0 & (1 << IRQ_FRC) && frc_mode == 1)
 		m_maincpu->set_input_line(IRQ_FRC+1, ASSERT_LINE);
@@ -984,7 +984,7 @@ void segas24_state::irq_init()
 	irq_vsynctime = attotime::zero;
 }
 
-WRITE16_MEMBER(segas24_state::irq_w)
+void segas24_state::irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset) {
 	case 0: {
@@ -1033,7 +1033,7 @@ WRITE16_MEMBER(segas24_state::irq_w)
 // 410 cycles/ligne
 // 410*0x200/26 = 8073
 
-READ16_MEMBER(segas24_state::irq_r)
+uint16_t segas24_state::irq_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset) {
 	case 2:
@@ -1049,7 +1049,7 @@ READ16_MEMBER(segas24_state::irq_r)
 	return irq_tval & 0xfff;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_vbl)
+void segas24_state::irq_vbl(timer_device &timer, void *ptr, int32_t param)
 {
 	int irq, mask;
 	int scanline = param;
@@ -1083,7 +1083,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_vbl)
 	irq_vsynctime = machine().time();
 }
 
-WRITE_LINE_MEMBER(segas24_state::irq_ym)
+void segas24_state::irq_ym(int state)
 {
 	irq_yms = state;
 	m_maincpu->set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
@@ -1091,7 +1091,7 @@ WRITE_LINE_MEMBER(segas24_state::irq_ym)
 }
 
 
-READ16_MEMBER ( segas24_state::sys16_io_r )
+uint16_t segas24_state::sys16_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//  logerror("IO read %02x (%s:%x)\n", offset, space.device().tag(), space.device().safe_pc());
 	if(offset < 8)
@@ -1118,7 +1118,7 @@ READ16_MEMBER ( segas24_state::sys16_io_r )
 		return iod_r(space, offset & 0x1f, mem_mask);
 }
 
-WRITE16_MEMBER( segas24_state::sys16_io_w )
+void segas24_state::sys16_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7) {
 		if(offset < 8) {
@@ -1147,12 +1147,12 @@ WRITE16_MEMBER( segas24_state::sys16_io_w )
 
 // 315-5242
 
-READ16_MEMBER( segas24_state::sys16_paletteram_r )
+uint16_t segas24_state::sys16_paletteram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_generic_paletteram_16[offset];
 }
 
-WRITE16_MEMBER( segas24_state::sys16_paletteram_w )
+void segas24_state::sys16_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r, g, b;
 	COMBINE_DATA (m_generic_paletteram_16 + offset);
@@ -2406,7 +2406,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segas24_state,qgh)
+void segas24_state::init_qgh()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2414,7 +2414,7 @@ DRIVER_INIT_MEMBER(segas24_state,qgh)
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,dcclub)
+void segas24_state::init_dcclub()
 {
 	io_r = &segas24_state::dcclub_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2422,7 +2422,7 @@ DRIVER_INIT_MEMBER(segas24_state,dcclub)
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,qrouka)
+void segas24_state::init_qrouka()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2430,7 +2430,7 @@ DRIVER_INIT_MEMBER(segas24_state,qrouka)
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,quizmeku)
+void segas24_state::init_quizmeku()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2438,7 +2438,7 @@ DRIVER_INIT_MEMBER(segas24_state,quizmeku)
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,mahmajn)
+void segas24_state::init_mahmajn()
 {
 	io_r = &segas24_state::mahmajn_io_r;
 	io_w = &segas24_state::mahmajn_io_w;
@@ -2447,7 +2447,7 @@ DRIVER_INIT_MEMBER(segas24_state,mahmajn)
 	cur_input_line = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,mahmajn2)
+void segas24_state::init_mahmajn2()
 {
 	io_r = &segas24_state::mahmajn_io_r;
 	io_w = &segas24_state::mahmajn_io_w;
@@ -2456,7 +2456,7 @@ DRIVER_INIT_MEMBER(segas24_state,mahmajn2)
 	cur_input_line = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,hotrod)
+void segas24_state::init_hotrod()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2473,7 +2473,7 @@ DRIVER_INIT_MEMBER(segas24_state,hotrod)
 	track_size = 0x2f00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,bnzabros)
+void segas24_state::init_bnzabros()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2491,7 +2491,7 @@ DRIVER_INIT_MEMBER(segas24_state,bnzabros)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,sspirits)
+void segas24_state::init_sspirits()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2499,7 +2499,7 @@ DRIVER_INIT_MEMBER(segas24_state,sspirits)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,sspiritj)
+void segas24_state::init_sspiritj()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2507,7 +2507,7 @@ DRIVER_INIT_MEMBER(segas24_state,sspiritj)
 	track_size = 0x2f00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,dcclubfd)
+void segas24_state::init_dcclubfd()
 {
 	io_r = &segas24_state::dcclub_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2516,7 +2516,7 @@ DRIVER_INIT_MEMBER(segas24_state,dcclubfd)
 }
 
 
-DRIVER_INIT_MEMBER(segas24_state,sgmast)
+void segas24_state::init_sgmast()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2524,7 +2524,7 @@ DRIVER_INIT_MEMBER(segas24_state,sgmast)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,qsww)
+void segas24_state::init_qsww()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2532,7 +2532,7 @@ DRIVER_INIT_MEMBER(segas24_state,qsww)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,gground)
+void segas24_state::init_gground()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2542,7 +2542,7 @@ DRIVER_INIT_MEMBER(segas24_state,gground)
 	m_gground_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas24_state::gground_hack_timer_callback), this));
 }
 
-DRIVER_INIT_MEMBER(segas24_state,crkdown)
+void segas24_state::init_crkdown()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;
@@ -2550,7 +2550,7 @@ DRIVER_INIT_MEMBER(segas24_state,crkdown)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,roughrac)
+void segas24_state::init_roughrac()
 {
 	io_r = &segas24_state::hotrod_io_r;
 	io_w = &segas24_state::hotrod_io_w;

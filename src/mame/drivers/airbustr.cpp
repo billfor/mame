@@ -226,7 +226,7 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 #include "includes/airbustr.h"
 
 /* Read/Write Handlers */
-READ8_MEMBER(airbustr_state::devram_r)
+uint8_t airbustr_state::devram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// There's an MCU here, possibly
 	switch (offset)
@@ -259,17 +259,17 @@ READ8_MEMBER(airbustr_state::devram_r)
 	}
 }
 
-WRITE8_MEMBER(airbustr_state::master_nmi_trigger_w)
+void airbustr_state::master_nmi_trigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_slave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(airbustr_state::master_bankswitch_w)
+void airbustr_state::master_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("masterbank")->set_entry(data & 0x07);
 }
 
-WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
+void airbustr_state::slave_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("slavebank")->set_entry(data & 0x07);
 
@@ -279,44 +279,44 @@ WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 	m_pandora->set_clear_bitmap(data & 0x20);
 }
 
-WRITE8_MEMBER(airbustr_state::sound_bankswitch_w)
+void airbustr_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("audiobank")->set_entry(data & 0x07);
 }
 
-READ8_MEMBER(airbustr_state::soundcommand_status_r)
+uint8_t airbustr_state::soundcommand_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// bits: 2 <-> ?    1 <-> soundlatch full   0 <-> soundlatch2 empty
 	return 4 + m_soundlatch_status * 2 + (1 - m_soundlatch2_status);
 }
 
-READ8_MEMBER(airbustr_state::soundcommand_r)
+uint8_t airbustr_state::soundcommand_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundlatch_status = 0;    // soundlatch has been read
 	return m_soundlatch->read(space, 0);
 }
 
-READ8_MEMBER(airbustr_state::soundcommand2_r)
+uint8_t airbustr_state::soundcommand2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundlatch2_status = 0;   // soundlatch2 has been read
 	return m_soundlatch2->read(space, 0);
 }
 
-WRITE8_MEMBER(airbustr_state::soundcommand_w)
+void airbustr_state::soundcommand_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_soundlatch_status = 1;    // soundlatch has been written
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // cause a nmi to sub cpu
 }
 
-WRITE8_MEMBER(airbustr_state::soundcommand2_w)
+void airbustr_state::soundcommand2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch2->write(space, 0, data);
 	m_soundlatch2_status = 1;   // soundlatch2 has been written
 }
 
 
-WRITE8_MEMBER(airbustr_state::coin_counter_w)
+void airbustr_state::coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -519,7 +519,7 @@ GFXDECODE_END
 /* Interrupt Generators */
 
 /* Main Z80 uses IM2 */
-TIMER_DEVICE_CALLBACK_MEMBER(airbustr_state::airbustr_scanline)
+void airbustr_state::airbustr_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -532,7 +532,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(airbustr_state::airbustr_scanline)
 }
 
 /* Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it */
-INTERRUPT_GEN_MEMBER(airbustr_state::slave_interrupt)
+void airbustr_state::slave_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
 }
@@ -729,7 +729,7 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(airbustr_state,airbustr)
+void airbustr_state::init_airbustr()
 {
 	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(airbustr_state::devram_r),this)); // protection device lives here
 }

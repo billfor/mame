@@ -17,13 +17,13 @@
  for writes to Video Ram
 *******************************************************************************/
 
-WRITE16_MEMBER(wwfsstar_state::fg0_videoram_w)
+void wwfsstar_state::fg0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg0_videoram[offset]);
 	m_fg0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(wwfsstar_state::bg0_videoram_w)
+void wwfsstar_state::bg0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg0_videoram[offset]);
 	m_bg0_tilemap->mark_tile_dirty(offset/2);
@@ -33,7 +33,7 @@ WRITE16_MEMBER(wwfsstar_state::bg0_videoram_w)
  Tilemap Related Functions
 *******************************************************************************/
 
-TILE_GET_INFO_MEMBER(wwfsstar_state::get_fg0_tile_info)
+void wwfsstar_state::get_fg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/*- FG0 RAM Format -**
 
@@ -63,12 +63,12 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_fg0_tile_info)
 			0);
 }
 
-TILEMAP_MAPPER_MEMBER(wwfsstar_state::bg0_scan)
+tilemap_memory_index wwfsstar_state::bg0_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-TILE_GET_INFO_MEMBER(wwfsstar_state::get_bg0_tile_info)
+void wwfsstar_state::get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/*- BG0 RAM Format -**
 

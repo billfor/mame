@@ -23,7 +23,7 @@ void ssozumo_state::machine_start()
 	save_item(NAME(m_sound_nmi_mask));
 }
 
-WRITE8_MEMBER(ssozumo_state::sh_command_w)
+void ssozumo_state::sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
@@ -49,7 +49,7 @@ static ADDRESS_MAP_START( ssozumo_map, AS_PROGRAM, 8, ssozumo_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(ssozumo_state::sound_nmi_mask_w)
+void ssozumo_state::sound_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_mask = data & 1;
 }
@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( ssozumo_sound_map, AS_PROGRAM, 8, ssozumo_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(ssozumo_state::coin_inserted)
+void ssozumo_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -188,7 +188,7 @@ static GFXDECODE_START( ssozumo )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*8, 2 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
+void ssozumo_state::sound_timer_irq(device_t &device)
 {
 	if(m_sound_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

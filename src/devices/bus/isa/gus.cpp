@@ -60,7 +60,7 @@ void gf1_device::update_irq()
 }
 
 /* only the Adlib timers are implemented in hardware */
-READ8_MEMBER( gf1_device::adlib_r )
+uint8_t gf1_device::adlib_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = 0xff;
 	switch(offset)
@@ -75,7 +75,7 @@ READ8_MEMBER( gf1_device::adlib_r )
 	return retVal;
 }
 
-WRITE8_MEMBER( gf1_device::adlib_w )
+void gf1_device::adlib_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -461,7 +461,7 @@ void gf1_device::device_stop()
 //   device I/O handlers
 // ------------------------------------------------
 
-READ8_MEMBER(gf1_device::global_reg_select_r)
+uint8_t gf1_device::global_reg_select_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset == 0)
 		return m_current_voice;
@@ -469,7 +469,7 @@ READ8_MEMBER(gf1_device::global_reg_select_r)
 		return m_current_reg | 0xc0;
 }
 
-WRITE8_MEMBER(gf1_device::global_reg_select_w)
+void gf1_device::global_reg_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0)
 		m_current_voice = data & 0x1f;
@@ -477,7 +477,7 @@ WRITE8_MEMBER(gf1_device::global_reg_select_w)
 		m_current_reg = data;
 }
 
-READ8_MEMBER(gf1_device::global_reg_data_r)
+uint8_t gf1_device::global_reg_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t ret;
 
@@ -596,7 +596,7 @@ READ8_MEMBER(gf1_device::global_reg_data_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(gf1_device::global_reg_data_w)
+void gf1_device::global_reg_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(m_current_reg)
 	{
@@ -859,7 +859,7 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 
 /* port 0x3X7 - DRAM I/O
  * read and write bytes directly to wavetable DRAM */
-READ8_MEMBER(gf1_device::dram_r)
+uint8_t gf1_device::dram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset == 1)
 	{
@@ -869,7 +869,7 @@ READ8_MEMBER(gf1_device::dram_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(gf1_device::dram_w)
+void gf1_device::dram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 1)
 	{
@@ -879,7 +879,7 @@ WRITE8_MEMBER(gf1_device::dram_w)
 
 /* port 2XA - read selected adlib command?
  * the GUS driver installation writes 0x55 to port 0x388, then expects to reads the same from 0x2XA */
-READ8_MEMBER(gf1_device::adlib_cmd_r)
+uint8_t gf1_device::adlib_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset == 0)
 	{
@@ -905,7 +905,7 @@ READ8_MEMBER(gf1_device::adlib_cmd_r)
  * bits 5-3 = DMA select register 2 (values same as reg 1)
  * bit 6 = combine both on same DMA channel
  */
-WRITE8_MEMBER(gf1_device::adlib_cmd_w)
+void gf1_device::adlib_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 1)
 	{
@@ -1055,18 +1055,18 @@ WRITE8_MEMBER(gf1_device::adlib_cmd_w)
  * bit 4 - Combine GF1 IRQs with MIDI IRQs
  * bit 5 - Enable MIDI TxD to RxD loopback
  * bit 6 - Control Reg Select - set next I/O write to 0x2XB to be DMA (0) or IRQ (1) channel latches */
-READ8_MEMBER(gf1_device::mix_ctrl_r)
+uint8_t gf1_device::mix_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;  // read only
 }
 
-WRITE8_MEMBER(gf1_device::mix_ctrl_w)
+void gf1_device::mix_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0)
 		m_mix_ctrl = data;
 }
 
-READ8_MEMBER(gf1_device::sb_r)
+uint8_t gf1_device::sb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val;
 
@@ -1089,7 +1089,7 @@ READ8_MEMBER(gf1_device::sb_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(gf1_device::sb_w)
+void gf1_device::sb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1110,7 +1110,7 @@ WRITE8_MEMBER(gf1_device::sb_w)
 	}
 }
 
-WRITE8_MEMBER(gf1_device::sb2x6_w)
+void gf1_device::sb2x6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset==0)
 	{
@@ -1123,7 +1123,7 @@ WRITE8_MEMBER(gf1_device::sb2x6_w)
 	}
 }
 
-READ8_MEMBER(gf1_device::stat_r)
+uint8_t gf1_device::stat_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = m_statread & 0xf9;
 	if(m_mix_ctrl & 0x08)
@@ -1131,7 +1131,7 @@ READ8_MEMBER(gf1_device::stat_r)
 	return val;
 }
 
-WRITE8_MEMBER(gf1_device::stat_w)
+void gf1_device::stat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reg_ctrl = data;
 }
@@ -1297,7 +1297,7 @@ void isa16_gus_device::device_stop()
 {
 }
 
-READ8_MEMBER(isa16_gus_device::board_r)
+uint8_t isa16_gus_device::board_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1334,7 +1334,7 @@ READ8_MEMBER(isa16_gus_device::board_r)
 	}
 }
 
-WRITE8_MEMBER(isa16_gus_device::board_w)
+void isa16_gus_device::board_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1366,7 +1366,7 @@ WRITE8_MEMBER(isa16_gus_device::board_w)
 	}
 }
 
-READ8_MEMBER(isa16_gus_device::synth_r)
+uint8_t isa16_gus_device::synth_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1389,7 +1389,7 @@ READ8_MEMBER(isa16_gus_device::synth_r)
 	}
 }
 
-WRITE8_MEMBER(isa16_gus_device::synth_w)
+void isa16_gus_device::synth_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1416,17 +1416,17 @@ WRITE8_MEMBER(isa16_gus_device::synth_w)
 	}
 }
 
-READ8_MEMBER(isa16_gus_device::adlib_r)
+uint8_t isa16_gus_device::adlib_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_gf1->adlib_r(space,offset);
 }
 
-WRITE8_MEMBER(isa16_gus_device::adlib_w)
+void isa16_gus_device::adlib_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gf1->adlib_w(space,offset,data);
 }
 
-READ8_MEMBER(isa16_gus_device::joy_r)
+uint8_t isa16_gus_device::joy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset == 1)
 	{
@@ -1449,12 +1449,12 @@ READ8_MEMBER(isa16_gus_device::joy_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(isa16_gus_device::joy_w)
+void isa16_gus_device::joy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_joy_time = machine().time();
 }
 
-WRITE_LINE_MEMBER(isa16_gus_device::wavetable_irq)
+void isa16_gus_device::wavetable_irq(int state)
 {
 	if(state)
 		set_irq(IRQ_WAVETABLE);
@@ -1462,7 +1462,7 @@ WRITE_LINE_MEMBER(isa16_gus_device::wavetable_irq)
 		reset_irq(IRQ_WAVETABLE);
 }
 
-WRITE_LINE_MEMBER(isa16_gus_device::volumeramp_irq)
+void isa16_gus_device::volumeramp_irq(int state)
 {
 	if(state)
 		set_irq(IRQ_VOLUME_RAMP);
@@ -1470,7 +1470,7 @@ WRITE_LINE_MEMBER(isa16_gus_device::volumeramp_irq)
 		reset_irq(IRQ_VOLUME_RAMP);
 }
 
-WRITE_LINE_MEMBER(isa16_gus_device::timer1_irq)
+void isa16_gus_device::timer1_irq(int state)
 {
 	if(state)
 		set_irq(IRQ_TIMER1);
@@ -1478,7 +1478,7 @@ WRITE_LINE_MEMBER(isa16_gus_device::timer1_irq)
 		reset_irq(IRQ_TIMER1);
 }
 
-WRITE_LINE_MEMBER(isa16_gus_device::timer2_irq)
+void isa16_gus_device::timer2_irq(int state)
 {
 	if(state)
 		set_irq(IRQ_TIMER2);
@@ -1486,7 +1486,7 @@ WRITE_LINE_MEMBER(isa16_gus_device::timer2_irq)
 		reset_irq(IRQ_TIMER2);
 }
 
-WRITE_LINE_MEMBER(isa16_gus_device::dma_irq)
+void isa16_gus_device::dma_irq(int state)
 {
 	if(state)
 		set_irq(IRQ_DRAM_TC_DMA);
@@ -1494,7 +1494,7 @@ WRITE_LINE_MEMBER(isa16_gus_device::dma_irq)
 		reset_irq(IRQ_DRAM_TC_DMA);
 }
 
-WRITE_LINE_MEMBER(isa16_gus_device::sb_irq)
+void isa16_gus_device::sb_irq(int state)
 {
 	if(state)
 		set_midi_irq(IRQ_SB);
@@ -1502,7 +1502,7 @@ WRITE_LINE_MEMBER(isa16_gus_device::sb_irq)
 		reset_midi_irq(IRQ_SB);
 }
 
-WRITE_LINE_MEMBER(isa16_gus_device::drq1_w)
+void isa16_gus_device::drq1_w(int state)
 {
 	m_isa->set_dma_channel(m_gf1->dma_channel1(), this, true);
 	switch(m_gf1->dma_channel1())
@@ -1527,7 +1527,7 @@ WRITE_LINE_MEMBER(isa16_gus_device::drq1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(isa16_gus_device::drq2_w)
+void isa16_gus_device::drq2_w(int state)
 {
 	m_isa->set_dma_channel(m_gf1->dma_channel2(), this, true);
 	switch(m_gf1->dma_channel2())
@@ -1676,7 +1676,7 @@ void isa16_gus_device::reset_midi_irq(uint8_t source)
 	logerror("GUS: Reset MIDI IRQ %02x\n",source);
 }
 
-WRITE_LINE_MEMBER( isa16_gus_device::midi_txirq )
+void isa16_gus_device::midi_txirq(int state)
 {
 	if (state)
 		set_midi_irq(IRQ_MIDI_TRANSMIT);
@@ -1684,7 +1684,7 @@ WRITE_LINE_MEMBER( isa16_gus_device::midi_txirq )
 		reset_midi_irq(IRQ_MIDI_TRANSMIT | IRQ_MIDI_RECEIVE);
 }
 
-WRITE_LINE_MEMBER( isa16_gus_device::midi_rxirq )
+void isa16_gus_device::midi_rxirq(int state)
 {
 	if (state)
 		set_midi_irq(IRQ_MIDI_RECEIVE);
@@ -1692,13 +1692,13 @@ WRITE_LINE_MEMBER( isa16_gus_device::midi_rxirq )
 		reset_midi_irq(IRQ_MIDI_TRANSMIT | IRQ_MIDI_RECEIVE);
 }
 
-WRITE_LINE_MEMBER( isa16_gus_device::write_acia_clock )
+void isa16_gus_device::write_acia_clock(int state)
 {
 	m_gf1->write_txc(state);
 	m_gf1->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( isa16_gus_device::nmi_w)
+void isa16_gus_device::nmi_w(int state)
 {
 	m_irq_status |= IRQ_SB;
 	m_isa->nmi();

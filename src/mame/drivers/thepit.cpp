@@ -179,17 +179,17 @@ void thepit_state::machine_start()
 	save_item(NAME(m_nmi_mask));
 }
 
-READ8_MEMBER(thepit_state::intrepid_colorram_mirror_r)
+uint8_t thepit_state::intrepid_colorram_mirror_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_colorram[offset];
 }
 
-WRITE8_MEMBER(thepit_state::sound_enable_w)
+void thepit_state::sound_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().sound().system_enable(data);
 }
 
-WRITE8_MEMBER(thepit_state::nmi_mask_w)
+void thepit_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }
@@ -700,7 +700,7 @@ static GFXDECODE_START( suprmous )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(thepit_state::vblank_irq)
+void thepit_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -1227,7 +1227,7 @@ ROM_END
 */
 
 
-READ8_MEMBER(thepit_state::rtriv_question_r)
+uint8_t thepit_state::rtriv_question_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Set-up the remap table for every 16 bytes
 	if((offset & 0xc00) == 0x800)
@@ -1254,7 +1254,7 @@ READ8_MEMBER(thepit_state::rtriv_question_r)
 	return 0; // the value read from the configuration reads is discarded
 }
 
-DRIVER_INIT_MEMBER(thepit_state,rtriv)
+void thepit_state::init_rtriv()
 {
 	// Set-up the weirdest questions read ever done
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(thepit_state::rtriv_question_r),this));

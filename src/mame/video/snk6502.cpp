@@ -24,7 +24,7 @@
   Zarzon has a different PROM layout from the others.
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(snk6502_state,snk6502)
+void snk6502_state::palette_init_snk6502(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -76,26 +76,26 @@ PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 	}
 }
 
-WRITE8_MEMBER(snk6502_state::videoram_w)
+void snk6502_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk6502_state::videoram2_w)
+void snk6502_state::videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk6502_state::colorram_w)
+void snk6502_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk6502_state::charram_w)
+void snk6502_state::charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charram[offset] != data)
 	{
@@ -105,7 +105,7 @@ WRITE8_MEMBER(snk6502_state::charram_w)
 }
 
 
-WRITE8_MEMBER(snk6502_state::flipscreen_w)
+void snk6502_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-2 select background color */
 
@@ -136,18 +136,18 @@ WRITE8_MEMBER(snk6502_state::flipscreen_w)
 	}
 }
 
-WRITE8_MEMBER(snk6502_state::scrollx_w)
+void snk6502_state::scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(snk6502_state::scrolly_w)
+void snk6502_state::scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
 
-TILE_GET_INFO_MEMBER(snk6502_state::get_bg_tile_info)
+void snk6502_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 256 * m_charbank;
 	int color = (m_colorram[tile_index] & 0x38) >> 3;
@@ -155,7 +155,7 @@ TILE_GET_INFO_MEMBER(snk6502_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(snk6502_state::get_fg_tile_info)
+void snk6502_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index];
 	int color = m_colorram[tile_index] & 0x07;
@@ -163,7 +163,7 @@ TILE_GET_INFO_MEMBER(snk6502_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START_MEMBER(snk6502_state,snk6502)
+void snk6502_state::video_start_snk6502()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk6502_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk6502_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -179,9 +179,9 @@ void snk6502_state::postload()
 	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
-VIDEO_START_MEMBER(snk6502_state,pballoon)
+void snk6502_state::video_start_pballoon()
 {
-	VIDEO_START_CALL_MEMBER( snk6502 );
+	video_start_snk6502();
 
 	m_bg_tilemap->set_scrolldy(-16, -16);
 	m_fg_tilemap->set_scrolldy(-16, -16);
@@ -197,7 +197,7 @@ uint32_t snk6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /* Satan of Saturn */
 
-PALETTE_INIT_MEMBER(snk6502_state,satansat)
+void snk6502_state::palette_init_satansat(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -249,7 +249,7 @@ PALETTE_INIT_MEMBER(snk6502_state,satansat)
 	}
 }
 
-WRITE8_MEMBER(snk6502_state::satansat_b002_w)
+void snk6502_state::satansat_b002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 flips screen */
 
@@ -265,7 +265,7 @@ WRITE8_MEMBER(snk6502_state::satansat_b002_w)
 	/* other bits unused */
 }
 
-WRITE8_MEMBER(snk6502_state::satansat_backcolor_w)
+void snk6502_state::satansat_backcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-1 select background color. Other bits unused. */
 
@@ -278,7 +278,7 @@ WRITE8_MEMBER(snk6502_state::satansat_backcolor_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_bg_tile_info)
+void snk6502_state::satansat_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = (m_colorram[tile_index] & 0x0c) >> 2;
@@ -286,7 +286,7 @@ TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_fg_tile_info)
+void snk6502_state::satansat_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index];
 	int color = m_colorram[tile_index] & 0x03;
@@ -294,7 +294,7 @@ TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-VIDEO_START_MEMBER(snk6502_state,satansat)
+void snk6502_state::video_start_satansat()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk6502_state::satansat_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk6502_state::satansat_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);

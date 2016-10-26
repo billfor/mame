@@ -136,69 +136,69 @@ public:
 	void write_memory(address_space &space, offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
 	inline void update_iec();
 
-	DECLARE_READ8_MEMBER( z80_r );
-	DECLARE_WRITE8_MEMBER( z80_w );
-	DECLARE_READ8_MEMBER( z80_io_r );
-	DECLARE_WRITE8_MEMBER( z80_io_w );
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
+	uint8_t z80_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void z80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t z80_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void z80_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vic_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vic_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( mmu_z80en_w );
-	DECLARE_WRITE_LINE_MEMBER( mmu_fsdir_w );
-	DECLARE_READ_LINE_MEMBER( mmu_game_r );
-	DECLARE_READ_LINE_MEMBER( mmu_exrom_r );
-	DECLARE_READ_LINE_MEMBER( mmu_sense40_r );
+	void mmu_z80en_w(int state);
+	void mmu_fsdir_w(int state);
+	int mmu_game_r();
+	int mmu_exrom_r();
+	int mmu_sense40_r();
 
-	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
-	DECLARE_WRITE8_MEMBER( vic_k_w );
+	void vic_irq_w(int state);
+	void vic_k_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( sid_potx_r );
-	DECLARE_READ8_MEMBER( sid_poty_r );
+	uint8_t sid_potx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sid_poty_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( cia1_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( cia1_cnt_w );
-	DECLARE_WRITE_LINE_MEMBER( cia1_sp_w );
-	DECLARE_READ8_MEMBER( cia1_pa_r );
-	DECLARE_WRITE8_MEMBER( cia1_pa_w );
-	DECLARE_READ8_MEMBER( cia1_pb_r );
-	DECLARE_WRITE8_MEMBER( cia1_pb_w );
+	void cia1_irq_w(int state);
+	void cia1_cnt_w(int state);
+	void cia1_sp_w(int state);
+	uint8_t cia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( cia2_irq_w );
-	DECLARE_READ8_MEMBER( cia2_pa_r );
-	DECLARE_WRITE8_MEMBER( cia2_pa_w );
+	void cia2_irq_w(int state);
+	uint8_t cia2_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia2_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
+	uint8_t cpu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cpu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( iec_srq_w );
-	DECLARE_WRITE_LINE_MEMBER( iec_data_w );
+	void iec_srq_w(int state);
+	void iec_data_w(int state);
 
-	DECLARE_READ8_MEMBER( exp_dma_cd_r );
-	DECLARE_WRITE8_MEMBER( exp_dma_cd_w );
-	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( exp_nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
-	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
+	uint8_t exp_dma_cd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void exp_dma_cd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exp_irq_w(int state);
+	void exp_nmi_w(int state);
+	void exp_dma_w(int state);
+	void exp_reset_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( write_restore );
-	DECLARE_INPUT_CHANGED_MEMBER( caps_lock );
+	void write_restore(int state);
+	void caps_lock(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
 
-	DECLARE_READ8_MEMBER( cia2_pb_r );
-	DECLARE_WRITE8_MEMBER( cia2_pb_w );
+	uint8_t cia2_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia2_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_user_pa2 ) { m_user_pa2 = state; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb0 ) { if (state) m_user_pb |= 1; else m_user_pb &= ~1; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb1 ) { if (state) m_user_pb |= 2; else m_user_pb &= ~2; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb2 ) { if (state) m_user_pb |= 4; else m_user_pb &= ~4; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb3 ) { if (state) m_user_pb |= 8; else m_user_pb &= ~8; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb4 ) { if (state) m_user_pb |= 16; else m_user_pb &= ~16; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb5 ) { if (state) m_user_pb |= 32; else m_user_pb &= ~32; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb6 ) { if (state) m_user_pb |= 64; else m_user_pb &= ~64; }
-	DECLARE_WRITE_LINE_MEMBER( write_user_pb7 ) { if (state) m_user_pb |= 128; else m_user_pb &= ~128; }
+	void write_user_pa2(int state) { m_user_pa2 = state; }
+	void write_user_pb0(int state) { if (state) m_user_pb |= 1; else m_user_pb &= ~1; }
+	void write_user_pb1(int state) { if (state) m_user_pb |= 2; else m_user_pb &= ~2; }
+	void write_user_pb2(int state) { if (state) m_user_pb |= 4; else m_user_pb &= ~4; }
+	void write_user_pb3(int state) { if (state) m_user_pb |= 8; else m_user_pb &= ~8; }
+	void write_user_pb4(int state) { if (state) m_user_pb |= 16; else m_user_pb &= ~16; }
+	void write_user_pb5(int state) { if (state) m_user_pb |= 32; else m_user_pb &= ~32; }
+	void write_user_pb6(int state) { if (state) m_user_pb |= 64; else m_user_pb &= ~64; }
+	void write_user_pb7(int state) { if (state) m_user_pb |= 128; else m_user_pb &= ~128; }
 
 	// memory state
 	int m_z80en;
@@ -550,7 +550,7 @@ void c128_state::write_memory(address_space &space, offs_t offset, offs_t vma, u
 //  z80_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::z80_r )
+uint8_t c128_state::z80_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -563,7 +563,7 @@ READ8_MEMBER( c128_state::z80_r )
 //  z80_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c128_state::z80_w )
+void c128_state::z80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -576,7 +576,7 @@ WRITE8_MEMBER( c128_state::z80_w )
 //  z80_io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::z80_io_r )
+uint8_t c128_state::z80_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
@@ -589,7 +589,7 @@ READ8_MEMBER( c128_state::z80_io_r )
 //  z80_io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c128_state::z80_io_w )
+void c128_state::z80_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ba = 1, aec = 1, z80io = 0;
 	offs_t vma = 0;
@@ -602,7 +602,7 @@ WRITE8_MEMBER( c128_state::z80_io_w )
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::read )
+uint8_t c128_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -615,7 +615,7 @@ READ8_MEMBER( c128_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c128_state::write )
+void c128_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -628,7 +628,7 @@ WRITE8_MEMBER( c128_state::write )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::vic_videoram_r )
+uint8_t c128_state::vic_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = 0, aec = 0, z80io = 1;
 
@@ -640,7 +640,7 @@ READ8_MEMBER( c128_state::vic_videoram_r )
 //  vic_colorram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::vic_colorram_r )
+uint8_t c128_state::vic_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_color_ram[(m_clrbank << 10) | offset];
 }
@@ -714,14 +714,14 @@ ADDRESS_MAP_END
 //  INPUT_PORTS( c128 )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c128_state::write_restore )
+void c128_state::write_restore(int state)
 {
 	m_restore = state;
 
 	check_interrupts();
 }
 
-INPUT_CHANGED_MEMBER( c128_state::caps_lock )
+void c128_state::caps_lock(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_caps_lock = newval;
 }
@@ -1040,7 +1040,7 @@ INPUT_PORTS_END
 //  MOS8722_INTERFACE( mmu_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c128_state::mmu_z80en_w )
+void c128_state::mmu_z80en_w(int state)
 {
 	if (state)
 	{
@@ -1063,22 +1063,22 @@ WRITE_LINE_MEMBER( c128_state::mmu_z80en_w )
 	m_z80en = state;
 }
 
-WRITE_LINE_MEMBER( c128_state::mmu_fsdir_w )
+void c128_state::mmu_fsdir_w(int state)
 {
 	update_iec();
 }
 
-READ_LINE_MEMBER( c128_state::mmu_game_r )
+int c128_state::mmu_game_r()
 {
 	return m_game;
 }
 
-READ_LINE_MEMBER( c128_state::mmu_exrom_r )
+int c128_state::mmu_exrom_r()
 {
 	return m_exrom;
 }
 
-READ_LINE_MEMBER( c128_state::mmu_sense40_r )
+int c128_state::mmu_sense40_r()
 {
 	return BIT(m_40_80->read(), 0);
 }
@@ -1097,14 +1097,14 @@ GFXDECODE_END
 //  MOS8564_INTERFACE( vic_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c128_state::vic_irq_w )
+void c128_state::vic_irq_w(int state)
 {
 	m_vic_irq = state;
 
 	check_interrupts();
 }
 
-WRITE8_MEMBER( c128_state::vic_k_w )
+void c128_state::vic_k_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vic_k = data;
 }
@@ -1114,7 +1114,7 @@ WRITE8_MEMBER( c128_state::vic_k_w )
 //  MOS6581_INTERFACE( sid_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::sid_potx_r )
+uint8_t c128_state::sid_potx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -1141,7 +1141,7 @@ READ8_MEMBER( c128_state::sid_potx_r )
 	return data;
 }
 
-READ8_MEMBER( c128_state::sid_poty_r )
+uint8_t c128_state::sid_poty_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -1173,14 +1173,14 @@ READ8_MEMBER( c128_state::sid_poty_r )
 //  MOS6526_INTERFACE( cia1_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c128_state::cia1_irq_w )
+void c128_state::cia1_irq_w(int state)
 {
 	m_cia1_irq = state;
 
 	check_interrupts();
 }
 
-READ8_MEMBER( c128_state::cia1_pa_r )
+uint8_t c128_state::cia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -1228,7 +1228,7 @@ READ8_MEMBER( c128_state::cia1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c128_state::cia1_pa_w )
+void c128_state::cia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1248,7 +1248,7 @@ WRITE8_MEMBER( c128_state::cia1_pa_w )
 	m_joy2->joy_w(data & 0x1f);
 }
 
-READ8_MEMBER( c128_state::cia1_pb_r )
+uint8_t c128_state::cia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -1292,7 +1292,7 @@ READ8_MEMBER( c128_state::cia1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c128_state::cia1_pb_w )
+void c128_state::cia1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1314,7 +1314,7 @@ WRITE8_MEMBER( c128_state::cia1_pb_w )
 	m_vic->lp_w(BIT(data, 4));
 }
 
-WRITE_LINE_MEMBER( c128_state::cia1_cnt_w )
+void c128_state::cia1_cnt_w(int state)
 {
 	m_cnt1 = state;
 	m_user->write_4(state);
@@ -1322,7 +1322,7 @@ WRITE_LINE_MEMBER( c128_state::cia1_cnt_w )
 	update_iec();
 }
 
-WRITE_LINE_MEMBER( c128_state::cia1_sp_w )
+void c128_state::cia1_sp_w(int state)
 {
 	m_sp1 = state;
 	m_user->write_5(state);
@@ -1335,14 +1335,14 @@ WRITE_LINE_MEMBER( c128_state::cia1_sp_w )
 //  MOS6526_INTERFACE( cia2_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c128_state::cia2_irq_w )
+void c128_state::cia2_irq_w(int state)
 {
 	m_cia2_irq = state;
 
 	check_interrupts();
 }
 
-READ8_MEMBER( c128_state::cia2_pa_r )
+uint8_t c128_state::cia2_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -1371,7 +1371,7 @@ READ8_MEMBER( c128_state::cia2_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c128_state::cia2_pa_w )
+void c128_state::cia2_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1403,12 +1403,12 @@ WRITE8_MEMBER( c128_state::cia2_pa_w )
 	update_iec();
 }
 
-READ8_MEMBER( c128_state::cia2_pb_r )
+uint8_t c128_state::cia2_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_user_pb;
 }
 
-WRITE8_MEMBER( c128_state::cia2_pb_w )
+void c128_state::cia2_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_user->write_c((data>>0)&1);
 	m_user->write_d((data>>1)&1);
@@ -1424,7 +1424,7 @@ WRITE8_MEMBER( c128_state::cia2_pb_w )
 //  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::cpu_r)
+uint8_t c128_state::cpu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -1451,7 +1451,7 @@ READ8_MEMBER( c128_state::cpu_r)
 	return data;
 }
 
-WRITE8_MEMBER( c128_state::cpu_w )
+void c128_state::cpu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1513,12 +1513,12 @@ inline void c128_state::update_iec()
 	m_iec->srq_w(srq_out);
 }
 
-WRITE_LINE_MEMBER( c128_state::iec_srq_w )
+void c128_state::iec_srq_w(int state)
 {
 	update_iec();
 }
 
-WRITE_LINE_MEMBER( c128_state::iec_data_w )
+void c128_state::iec_data_w(int state)
 {
 	update_iec();
 }
@@ -1528,7 +1528,7 @@ WRITE_LINE_MEMBER( c128_state::iec_data_w )
 //  C64_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::exp_dma_cd_r )
+uint8_t c128_state::exp_dma_cd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = 0, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -1536,7 +1536,7 @@ READ8_MEMBER( c128_state::exp_dma_cd_r )
 	return read_memory(space, offset, vma, ba, aec, z80io);
 }
 
-WRITE8_MEMBER( c128_state::exp_dma_cd_w )
+void c128_state::exp_dma_cd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ba = 0, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -1544,28 +1544,28 @@ WRITE8_MEMBER( c128_state::exp_dma_cd_w )
 	return write_memory(space, offset, data, vma, ba, aec, z80io);
 }
 
-WRITE_LINE_MEMBER( c128_state::exp_irq_w )
+void c128_state::exp_irq_w(int state)
 {
 	m_exp_irq = state;
 
 	check_interrupts();
 }
 
-WRITE_LINE_MEMBER( c128_state::exp_nmi_w )
+void c128_state::exp_nmi_w(int state)
 {
 	m_exp_nmi = state;
 
 	check_interrupts();
 }
 
-WRITE_LINE_MEMBER( c128_state::exp_dma_w )
+void c128_state::exp_dma_w(int state)
 {
 	m_exp_dma = state;
 
 	check_interrupts();
 }
 
-WRITE_LINE_MEMBER( c128_state::exp_reset_w )
+void c128_state::exp_reset_w(int state)
 {
 	if (!state)
 	{

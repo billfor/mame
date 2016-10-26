@@ -65,22 +65,22 @@ public:
 	uint8_t m_gunx[2];
 	void get_crosshair_xy(int player, int &x, int &y);
 
-	DECLARE_WRITE16_MEMBER(rapidfir_transparent_w);
-	DECLARE_READ16_MEMBER(rapidfir_transparent_r);
-	DECLARE_WRITE16_MEMBER(tickee_control_w);
-	DECLARE_READ16_MEMBER(ffff_r);
-	DECLARE_READ16_MEMBER(rapidfir_gun1_r);
-	DECLARE_READ16_MEMBER(rapidfir_gun2_r);
-	DECLARE_READ16_MEMBER(ff7f_r);
-	DECLARE_WRITE16_MEMBER(ff7f_w);
-	DECLARE_WRITE16_MEMBER(rapidfir_control_w);
-	DECLARE_WRITE16_MEMBER(sound_bank_w);
-	DECLARE_MACHINE_RESET(tickee);
-	DECLARE_VIDEO_START(tickee);
-	DECLARE_MACHINE_RESET(rapidfir);
-	TIMER_CALLBACK_MEMBER(trigger_gun_interrupt);
-	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
-	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
+	void rapidfir_transparent_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t rapidfir_transparent_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tickee_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ffff_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t rapidfir_gun1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t rapidfir_gun2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t ff7f_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ff7f_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void rapidfir_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void machine_reset_tickee();
+	void video_start_tickee();
+	void machine_reset_rapidfir();
+	void trigger_gun_interrupt(void *ptr, int32_t param);
+	void clear_gun_interrupt(void *ptr, int32_t param);
+	void setup_gun_interrupts(void *ptr, int32_t param);
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(rapidfir_to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(rapidfir_from_shiftreg);
@@ -138,7 +138,7 @@ void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-TIMER_CALLBACK_MEMBER(tickee_state::trigger_gun_interrupt)
+void tickee_state::trigger_gun_interrupt(void *ptr, int32_t param)
 {
 	int which = param & 1;
 	int beamx = (m_screen->hpos()/2)-58;
@@ -151,14 +151,14 @@ TIMER_CALLBACK_MEMBER(tickee_state::trigger_gun_interrupt)
 }
 
 
-TIMER_CALLBACK_MEMBER(tickee_state::clear_gun_interrupt)
+void tickee_state::clear_gun_interrupt(void *ptr, int32_t param)
 {
 	/* clear the IRQ on the next scanline? */
 	m_maincpu->set_input_line(param, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
+void tickee_state::setup_gun_interrupts(void *ptr, int32_t param)
 {
 	int beamx, beamy;
 
@@ -189,7 +189,7 @@ TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
  *
  *************************************/
 
-VIDEO_START_MEMBER(tickee_state,tickee)
+void tickee_state::video_start_tickee()
 {
 	/* start a timer going on the first scanline of every frame */
 	m_setup_gun_timer = timer_alloc(TIMER_SETUP_GUN_INTERRUPTS);
@@ -265,13 +265,13 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::rapidfir_scanline_update)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(tickee_state,tickee)
+void tickee_state::machine_reset_tickee()
 {
 	m_beamxadd = 50;
 	m_beamyadd = 0;
 }
 
-MACHINE_RESET_MEMBER(tickee_state,rapidfir)
+void tickee_state::machine_reset_rapidfir()
 {
 	m_beamxadd = 0;
 	m_beamyadd = -5;
@@ -284,7 +284,7 @@ MACHINE_RESET_MEMBER(tickee_state,rapidfir)
  *
  *************************************/
 
-WRITE16_MEMBER(tickee_state::rapidfir_transparent_w)
+void tickee_state::rapidfir_transparent_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!(data & 0xff00)) mem_mask &= 0x00ff;
 	if (!(data & 0x00ff)) mem_mask &= 0xff00;
@@ -292,7 +292,7 @@ WRITE16_MEMBER(tickee_state::rapidfir_transparent_w)
 }
 
 
-READ16_MEMBER(tickee_state::rapidfir_transparent_r)
+uint16_t tickee_state::rapidfir_transparent_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_vram[offset];
 }
@@ -319,7 +319,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_from_shiftreg)
  *
  *************************************/
 
-WRITE16_MEMBER(tickee_state::tickee_control_w)
+void tickee_state::tickee_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t olddata = m_control[offset];
 
@@ -350,36 +350,36 @@ WRITE16_MEMBER(tickee_state::tickee_control_w)
  *
  *************************************/
 
-READ16_MEMBER(tickee_state::ffff_r)
+uint16_t tickee_state::ffff_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
 
-READ16_MEMBER(tickee_state::rapidfir_gun1_r)
+uint16_t tickee_state::rapidfir_gun1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_gunx[0];
 }
 
 
-READ16_MEMBER(tickee_state::rapidfir_gun2_r)
+uint16_t tickee_state::rapidfir_gun2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_gunx[1];
 }
 
 
-READ16_MEMBER(tickee_state::ff7f_r)
+uint16_t tickee_state::ff7f_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* Ticket dispenser status? */
 	return 0xff7f;
 }
 
-WRITE16_MEMBER(tickee_state::ff7f_w)
+void tickee_state::ff7f_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Ticket dispenser output? */
 }
 
-WRITE16_MEMBER(tickee_state::rapidfir_control_w)
+void tickee_state::rapidfir_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* other bits like control on tickee? */
 	if (ACCESSING_BITS_0_7)
@@ -394,7 +394,7 @@ WRITE16_MEMBER(tickee_state::rapidfir_control_w)
  *
  *************************************/
 
-WRITE16_MEMBER(tickee_state::sound_bank_w)
+void tickee_state::sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (data & 0xff)
 	{

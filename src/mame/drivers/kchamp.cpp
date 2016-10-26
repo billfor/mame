@@ -75,30 +75,30 @@ IO ports and memory map changes. Dip switches differ too.
 * VS Version        *
 ********************/
 
-WRITE8_MEMBER(kchamp_state::control_w)
+void kchamp_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data & 1;
 }
 
-WRITE8_MEMBER(kchamp_state::sound_reset_w)
+void kchamp_state::sound_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 1))
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
-WRITE8_MEMBER(kchamp_state::sound_control_w)
+void kchamp_state::sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(!(data & 1));
 	m_sound_nmi_enable = ((data >> 1) & 1);
 }
 
-WRITE8_MEMBER(kchamp_state::sound_command_w)
+void kchamp_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(kchamp_state::sound_msm_w)
+void kchamp_state::sound_msm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_data = data;
 	m_msm_play_lo_nibble = 1;
@@ -146,13 +146,13 @@ ADDRESS_MAP_END
 /********************
 * 1 Player Version  *
 ********************/
-READ8_MEMBER(kchamp_state::sound_reset_r)
+uint8_t kchamp_state::sound_reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
-WRITE8_MEMBER(kchamp_state::kc_sound_control_w)
+void kchamp_state::kc_sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 		m_sound_nmi_enable = ((data >> 7) & 1);
@@ -343,13 +343,13 @@ GFXDECODE_END
 
 
 
-INTERRUPT_GEN_MEMBER(kchamp_state::kc_interrupt)
+void kchamp_state::kc_interrupt(device_t &device)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE_LINE_MEMBER(kchamp_state::msmint)
+void kchamp_state::msmint(int state)
 {
 	if (m_msm_play_lo_nibble)
 		m_msm->data_w(m_msm_data & 0x0f);
@@ -369,22 +369,22 @@ WRITE_LINE_MEMBER(kchamp_state::msmint)
 * 1 Player Version  *
 ********************/
 
-INTERRUPT_GEN_MEMBER(kchamp_state::sound_int)
+void kchamp_state::sound_int(device_t &device)
 {
 	if (m_sound_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-MACHINE_START_MEMBER(kchamp_state,kchamp)
+void kchamp_state::machine_start_kchamp()
 {
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_sound_nmi_enable));
 }
 
-MACHINE_START_MEMBER(kchamp_state,kchampvs)
+void kchamp_state::machine_start_kchampvs()
 {
-	MACHINE_START_CALL_MEMBER(kchamp);
+	machine_start_kchamp();
 
 	save_item(NAME(m_msm_data));
 	save_item(NAME(m_msm_play_lo_nibble));
@@ -718,7 +718,7 @@ void kchamp_state::decrypt_code()
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
+void kchamp_state::init_kchampvs()
 {
 	decrypt_code();
 
@@ -750,7 +750,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
+void kchamp_state::init_kchampvs2()
 {
 	decrypt_code();
 	m_counter = 0;

@@ -322,13 +322,13 @@ TODO:
 
 
 
-WRITE8_MEMBER(welltris_state::sound_bankswitch_w)
+void welltris_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("soundbank")->set_entry(data & 0x03);
 }
 
 
-WRITE16_MEMBER(welltris_state::sound_command_w)
+void welltris_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -338,12 +338,12 @@ WRITE16_MEMBER(welltris_state::sound_command_w)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(welltris_state::pending_sound_r)
+ioport_value welltris_state::pending_sound_r(ioport_field &field, void *param)
 {
 	return m_pending_command ? 1 : 0;
 }
 
-WRITE8_MEMBER(welltris_state::pending_command_clear_w)
+void welltris_state::pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pending_command = 0;
 }
@@ -670,7 +670,7 @@ static GFXDECODE_START( welltris )
 GFXDECODE_END
 
 
-DRIVER_INIT_MEMBER(welltris_state,welltris)
+void welltris_state::init_welltris()
 {
 #if WELLTRIS_4P_HACK
 	/* A Hack which shows 4 player mode in code which is disabled */

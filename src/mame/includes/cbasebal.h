@@ -36,20 +36,20 @@ public:
 
 	/* misc */
 	uint8_t      m_rambank;
-	DECLARE_WRITE8_MEMBER(cbasebal_bankswitch_w);
-	DECLARE_READ8_MEMBER(bankedram_r);
-	DECLARE_WRITE8_MEMBER(bankedram_w);
-	DECLARE_WRITE8_MEMBER(cbasebal_coinctrl_w);
-	DECLARE_WRITE8_MEMBER(cbasebal_textram_w);
-	DECLARE_READ8_MEMBER(cbasebal_textram_r);
-	DECLARE_WRITE8_MEMBER(cbasebal_scrollram_w);
-	DECLARE_READ8_MEMBER(cbasebal_scrollram_r);
-	DECLARE_WRITE8_MEMBER(cbasebal_gfxctrl_w);
-	DECLARE_WRITE8_MEMBER(cbasebal_scrollx_w);
-	DECLARE_WRITE8_MEMBER(cbasebal_scrolly_w);
-	DECLARE_DRIVER_INIT(cbasebal);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void cbasebal_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bankedram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bankedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cbasebal_coinctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cbasebal_textram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cbasebal_textram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cbasebal_scrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cbasebal_scrollram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cbasebal_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cbasebal_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cbasebal_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_cbasebal();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

@@ -31,22 +31,22 @@ public:
 
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_WRITE16_MEMBER(skullxbo_halt_until_hblank_0_w);
-	DECLARE_WRITE16_MEMBER(skullxbo_mobwr_w);
-	DECLARE_DRIVER_INIT(skullxbo);
-	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	WRITE16_MEMBER(playfield_latch_w);
-	WRITE16_MEMBER(playfield_latched_w);
-	DECLARE_MACHINE_START(skullxbo);
-	DECLARE_MACHINE_RESET(skullxbo);
-	DECLARE_VIDEO_START(skullxbo);
+	void skullxbo_halt_until_hblank_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void skullxbo_mobwr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void init_skullxbo();
+	void get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void playfield_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	void playfield_latched_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	void machine_start_skullxbo();
+	void machine_reset_skullxbo();
+	void video_start_skullxbo();
 	uint32_t screen_update_skullxbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
+	void scanline_timer(timer_device &timer, void *ptr, int32_t param);
 	void skullxbo_scanline_update(int scanline);
-	DECLARE_WRITE16_MEMBER( skullxbo_xscroll_w );
-	DECLARE_WRITE16_MEMBER( skullxbo_yscroll_w );
-	DECLARE_WRITE16_MEMBER( skullxbo_mobmsb_w );
+	void skullxbo_xscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void skullxbo_yscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void skullxbo_mobmsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	static const atari_motion_objects_config s_mob_config;
 };

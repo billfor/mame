@@ -12,43 +12,43 @@
 #include "includes/commando.h"
 
 
-WRITE8_MEMBER(commando_state::commando_videoram_w)
+void commando_state::commando_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(commando_state::commando_colorram_w)
+void commando_state::commando_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(commando_state::commando_videoram2_w)
+void commando_state::commando_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(commando_state::commando_colorram2_w)
+void commando_state::commando_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(commando_state::commando_scrollx_w)
+void commando_state::commando_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_x[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
 }
 
-WRITE8_MEMBER(commando_state::commando_scrolly_w)
+void commando_state::commando_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_y[offset] = data;
 	m_bg_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
 }
 
-WRITE8_MEMBER(commando_state::commando_c804_w)
+void commando_state::commando_c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bits 0 and 1 are coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -61,7 +61,7 @@ WRITE8_MEMBER(commando_state::commando_c804_w)
 	flip_screen_set(data & 0x80);
 }
 
-TILE_GET_INFO_MEMBER(commando_state::get_bg_tile_info)
+void commando_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0xc0) << 2);
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(commando_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(commando_state::get_fg_tile_info)
+void commando_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram2[tile_index];
 	int code = m_videoram2[tile_index] + ((attr & 0xc0) << 2);

@@ -55,7 +55,7 @@ Verify Color PROM resistor values (Last 8 colors)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_motor_not_ready)
+ioport_value stactics_state::get_motor_not_ready(ioport_field &field, void *param)
 {
 	/* if the motor is self-centering, but not centered yet */
 	return ((*m_motor_on & 0x01) == 0) &&
@@ -63,13 +63,13 @@ CUSTOM_INPUT_MEMBER(stactics_state::get_motor_not_ready)
 }
 
 
-READ8_MEMBER(stactics_state::vert_pos_r)
+uint8_t stactics_state::vert_pos_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x70 - m_vert_pos;
 }
 
 
-READ8_MEMBER(stactics_state::horiz_pos_r)
+uint8_t stactics_state::horiz_pos_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_horiz_pos + 0x88;
 }
@@ -123,7 +123,7 @@ void stactics_state::move_motor()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_rng)
+ioport_value stactics_state::get_rng(ioport_field &field, void *param)
 {
 	/* this is a 555 timer, but cannot read one of the resistor values */
 	return machine().rand() & 0x07;
@@ -137,7 +137,7 @@ CUSTOM_INPUT_MEMBER(stactics_state::get_rng)
  *
  *************************************/
 
-WRITE8_MEMBER(stactics_state::coinlockout_w)
+void stactics_state::coinlockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(offset, ~data & 0x01);
 }
@@ -150,7 +150,7 @@ WRITE8_MEMBER(stactics_state::coinlockout_w)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(stactics_state::interrupt)
+void stactics_state::interrupt(device_t &device)
 {
 	move_motor();
 

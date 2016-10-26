@@ -8,7 +8,7 @@
 
 /* tilemaps */
 
-TILE_GET_INFO_MEMBER(pirates_state::get_tx_tile_info)
+void pirates_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tx_tileram[tile_index*2];
 	int colr = m_tx_tileram[tile_index*2+1];
@@ -16,7 +16,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_tx_tile_info)
 	SET_TILE_INFO_MEMBER(0,code,colr,0);
 }
 
-TILE_GET_INFO_MEMBER(pirates_state::get_fg_tile_info)
+void pirates_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_tileram[tile_index*2];
 	int colr = m_fg_tileram[tile_index*2+1]+0x80;
@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0,code,colr,0);
 }
 
-TILE_GET_INFO_MEMBER(pirates_state::get_bg_tile_info)
+void pirates_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_tileram[tile_index*2];
 	int colr = m_bg_tileram[tile_index*2+1]+ 0x100;
@@ -49,19 +49,19 @@ void pirates_state::video_start()
 
 
 
-WRITE16_MEMBER(pirates_state::tx_tileram_w)
+void pirates_state::tx_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_tx_tileram+offset);
 	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(pirates_state::fg_tileram_w)
+void pirates_state::fg_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_fg_tileram+offset);
 	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(pirates_state::bg_tileram_w)
+void pirates_state::bg_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_bg_tileram+offset);
 	m_bg_tilemap->mark_tile_dirty(offset/2);

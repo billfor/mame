@@ -31,7 +31,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(trackfld_state,trackfld)
+void trackfld_state::palette_init_trackfld(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -89,19 +89,19 @@ PALETTE_INIT_MEMBER(trackfld_state,trackfld)
 	}
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_videoram_w)
+void trackfld_state::trackfld_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_colorram_w)
+void trackfld_state::trackfld_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_flipscreen_w)
+void trackfld_state::trackfld_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != data)
 	{
@@ -110,7 +110,7 @@ WRITE8_MEMBER(trackfld_state::trackfld_flipscreen_w)
 	}
 }
 
-WRITE8_MEMBER(trackfld_state::atlantol_gfxbank_w)
+void trackfld_state::atlantol_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 1)
 	{
@@ -157,7 +157,7 @@ WRITE8_MEMBER(trackfld_state::atlantol_gfxbank_w)
 	}
 }
 
-TILE_GET_INFO_MEMBER(trackfld_state::get_bg_tile_info)
+void trackfld_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + 4 * (attr & 0xc0);
@@ -170,7 +170,7 @@ TILE_GET_INFO_MEMBER(trackfld_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-VIDEO_START_MEMBER(trackfld_state,trackfld)
+void trackfld_state::video_start_trackfld()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(trackfld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_scroll_rows(32);
@@ -178,9 +178,9 @@ VIDEO_START_MEMBER(trackfld_state,trackfld)
 }
 
 
-VIDEO_START_MEMBER(trackfld_state,atlantol)
+void trackfld_state::video_start_atlantol()
 {
-	VIDEO_START_CALL_MEMBER( trackfld );
+	video_start_trackfld();
 	m_sprites_gfx_banked = 1;
 }
 

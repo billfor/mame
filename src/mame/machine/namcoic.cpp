@@ -45,12 +45,12 @@ inline void namcos2_shared_state::namcoic_get_tile_info(tile_data &tileinfo,int 
 	SET_TILE_INFO_MEMBER(mTilemapInfo.gfxbank,tile,0,0);
 } /* get_tile_info */
 
-TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info0 ) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x0000]); }
-TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info1 ) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x1000]); }
-TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info2 ) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x2000]); }
-TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info3 ) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x3000]); }
-TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info4 ) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x4008]); }
-TILE_GET_INFO_MEMBER( namcos2_shared_state::get_tile_info5 ) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x4408]); }
+void namcos2_shared_state::get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x0000]); }
+void namcos2_shared_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x1000]); }
+void namcos2_shared_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x2000]); }
+void namcos2_shared_state::get_tile_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x3000]); }
+void namcos2_shared_state::get_tile_info4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x4008]); }
+void namcos2_shared_state::get_tile_info5(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { namcoic_get_tile_info(tileinfo,tile_index,&mTilemapInfo.videoram[0x4408]); }
 
 void namcos2_shared_state::namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 	void (*cb)( running_machine &machine, uint16_t code, int *gfx, int *mask) )
@@ -120,14 +120,14 @@ SetTilemapVideoram( int offset, uint16_t newword )
 	}
 } /* SetTilemapVideoram */
 
-WRITE16_MEMBER( namcos2_shared_state::c123_tilemap_videoram_w )
+void namcos2_shared_state::c123_tilemap_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t newword = mTilemapInfo.videoram[offset];
 	COMBINE_DATA( &newword );
 	SetTilemapVideoram( offset, newword );
 }
 
-READ16_MEMBER( namcos2_shared_state::c123_tilemap_videoram_r )
+uint16_t namcos2_shared_state::c123_tilemap_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return mTilemapInfo.videoram[offset];
 }
@@ -183,14 +183,14 @@ SetTilemapControl( int offset, uint16_t newword )
 	}
 } /* SetTilemapControl */
 
-WRITE16_MEMBER( namcos2_shared_state::c123_tilemap_control_w )
+void namcos2_shared_state::c123_tilemap_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t newword = mTilemapInfo.control[offset];
 	COMBINE_DATA( &newword );
 	SetTilemapControl( offset, newword );
 }
 
-READ16_MEMBER( namcos2_shared_state::c123_tilemap_control_r )
+uint16_t namcos2_shared_state::c123_tilemap_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return mTilemapInfo.control[offset];
 }
@@ -555,11 +555,11 @@ void namcos2_state::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &
 
 /**************************************************************************************/
 
-WRITE16_MEMBER( namcos2_shared_state::c355_obj_position_w )
+void namcos2_shared_state::c355_obj_position_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_c355_obj_position[offset]);
 }
-READ16_MEMBER( namcos2_shared_state::c355_obj_position_r )
+uint16_t namcos2_shared_state::c355_obj_position_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_c355_obj_position[offset];
 }
@@ -865,12 +865,12 @@ void namcos2_shared_state::c355_obj_draw(screen_device &screen, bitmap_rgb32 &bi
 		c355_obj_draw_list(screen, bitmap, cliprect, pri, &m_c355_obj_ram[0x14000/2], &m_c355_obj_ram[0x10000/2]);
 }
 
-WRITE16_MEMBER( namcos2_shared_state::c355_obj_ram_w )
+void namcos2_shared_state::c355_obj_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_c355_obj_ram[offset]);
 }
 
-READ16_MEMBER( namcos2_shared_state::c355_obj_ram_r )
+uint16_t namcos2_shared_state::c355_obj_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_c355_obj_ram[offset];
 }
@@ -956,17 +956,17 @@ void namcos2_shared_state::c169_roz_get_info(tile_data &tileinfo, int tile_index
 	tileinfo.mask_data = m_c169_roz_mask + 32*tile;
 }
 
-TILE_GET_INFO_MEMBER( namcos2_shared_state::c169_roz_get_info0 )
+void namcos2_shared_state::c169_roz_get_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	c169_roz_get_info(tileinfo, tile_index, 0);
 }
 
-TILE_GET_INFO_MEMBER( namcos2_shared_state::c169_roz_get_info1 )
+void namcos2_shared_state::c169_roz_get_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	c169_roz_get_info(tileinfo, tile_index, 1);
 }
 
-TILEMAP_MAPPER_MEMBER( namcos2_shared_state::c169_roz_mapper )
+tilemap_memory_index namcos2_shared_state::c169_roz_mapper(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	if (col >= 128)
 	{
@@ -1154,22 +1154,22 @@ void namcos2_shared_state::c169_roz_draw(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
-READ16_MEMBER( namcos2_shared_state::c169_roz_control_r )
+uint16_t namcos2_shared_state::c169_roz_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_c169_roz_control[offset];
 }
 
-WRITE16_MEMBER( namcos2_shared_state::c169_roz_control_w )
+void namcos2_shared_state::c169_roz_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_c169_roz_control[offset]);
 }
 
-READ16_MEMBER( namcos2_shared_state::c169_roz_bank_r )
+uint16_t namcos2_shared_state::c169_roz_bank_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_c169_roz_bank[offset];
 }
 
-WRITE16_MEMBER( namcos2_shared_state::c169_roz_bank_w )
+void namcos2_shared_state::c169_roz_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old_data = m_c169_roz_bank[offset];
 	COMBINE_DATA(&m_c169_roz_bank[offset]);
@@ -1178,12 +1178,12 @@ WRITE16_MEMBER( namcos2_shared_state::c169_roz_bank_w )
 			elem->mark_all_dirty();
 }
 
-READ16_MEMBER( namcos2_shared_state::c169_roz_videoram_r )
+uint16_t namcos2_shared_state::c169_roz_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_c169_roz_videoram[offset];
 }
 
-WRITE16_MEMBER( namcos2_shared_state::c169_roz_videoram_w )
+void namcos2_shared_state::c169_roz_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_c169_roz_videoram[offset]);
 	for (auto & elem : m_c169_roz_tilemap)

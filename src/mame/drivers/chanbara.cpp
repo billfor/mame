@@ -87,25 +87,25 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(chanbara_videoram_w);
-	DECLARE_WRITE8_MEMBER(chanbara_colorram_w);
-	DECLARE_WRITE8_MEMBER(chanbara_videoram2_w);
-	DECLARE_WRITE8_MEMBER(chanbara_colorram2_w);
-	DECLARE_WRITE8_MEMBER(chanbara_ay_out_0_w);
-	DECLARE_WRITE8_MEMBER(chanbara_ay_out_1_w);
-	DECLARE_DRIVER_INIT(chanbara);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	void chanbara_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chanbara_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chanbara_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chanbara_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chanbara_ay_out_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chanbara_ay_out_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_chanbara();
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(chanbara);
+	void palette_init_chanbara(palette_device &palette);
 	uint32_t screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 
-PALETTE_INIT_MEMBER(chanbara_state, chanbara)
+void chanbara_state::palette_init_chanbara(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, red, green, blue;
@@ -120,32 +120,32 @@ PALETTE_INIT_MEMBER(chanbara_state, chanbara)
 	}
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_videoram_w)
+void chanbara_state::chanbara_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_colorram_w)
+void chanbara_state::chanbara_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_videoram2_w)
+void chanbara_state::chanbara_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_colorram2_w)
+void chanbara_state::chanbara_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram2[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(chanbara_state::get_bg_tile_info)
+void chanbara_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 1) << 8);
 	int color = (m_colorram[tile_index] >> 1) & 0x1f;
@@ -154,7 +154,7 @@ TILE_GET_INFO_MEMBER(chanbara_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(chanbara_state::get_bg2_tile_info)
+void chanbara_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index];
 	int color = (m_colorram2[tile_index] >> 1) & 0x1f;
@@ -351,14 +351,14 @@ GFXDECODE_END
 /***************************************************************************/
 
 
-WRITE8_MEMBER(chanbara_state::chanbara_ay_out_0_w)
+void chanbara_state::chanbara_ay_out_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("chanbara_ay_out_0_w %02x\n",data);
 
 	m_scroll = data;
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_ay_out_1_w)
+void chanbara_state::chanbara_ay_out_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("chanbara_ay_out_1_w %02x\n",data);
 
@@ -453,7 +453,7 @@ ROM_START( chanbara )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(chanbara_state,chanbara)
+void chanbara_state::init_chanbara()
 {
 	uint8_t   *src = memregion("gfx4")->base();
 	uint8_t   *dst = memregion("gfx3")->base() + 0x4000;

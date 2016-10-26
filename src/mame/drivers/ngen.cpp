@@ -99,50 +99,50 @@ public:
 		m_hd_buffer(*this,"hd_buffer_ram")
 	{}
 
-	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out1_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2_w);
-	DECLARE_WRITE_LINE_MEMBER(cpu_timer_w);
-	DECLARE_WRITE_LINE_MEMBER(timer_clk_out);
-	DECLARE_WRITE16_MEMBER(cpu_peripheral_cb);
-	DECLARE_WRITE16_MEMBER(peripheral_w);
-	DECLARE_READ16_MEMBER(peripheral_r);
-	DECLARE_WRITE16_MEMBER(xbus_w);
-	DECLARE_READ16_MEMBER(xbus_r);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
-	DECLARE_WRITE_LINE_MEMBER(dma_eop_changed);
-	DECLARE_WRITE_LINE_MEMBER(dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	DECLARE_READ8_MEMBER(dma_read_word);
-	DECLARE_WRITE8_MEMBER(dma_write_word);
+	void pit_out0_w(int state);
+	void pit_out1_w(int state);
+	void pit_out2_w(int state);
+	void cpu_timer_w(int state);
+	void timer_clk_out(int state);
+	void cpu_peripheral_cb(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void peripheral_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t peripheral_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void xbus_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t xbus_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dma_hrq_changed(int state);
+	void dma_eop_changed(int state);
+	void dack0_w(int state);
+	void dack1_w(int state);
+	void dack2_w(int state);
+	void dack3_w(int state);
+	uint8_t dma_read_word(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_write_word(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	// TODO: sort out what devices use which channels
-	DECLARE_READ8_MEMBER( dma_0_dack_r ) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
-	DECLARE_READ8_MEMBER( dma_1_dack_r ) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
-	DECLARE_READ8_MEMBER( dma_2_dack_r ) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
-	DECLARE_READ8_MEMBER( dma_3_dack_r );
-	DECLARE_WRITE8_MEMBER( dma_0_dack_w ){ popmessage("IOW0: data %02x",data); }
-	DECLARE_WRITE8_MEMBER( dma_1_dack_w ){  }
-	DECLARE_WRITE8_MEMBER( dma_2_dack_w ){  }
-	DECLARE_WRITE8_MEMBER( dma_3_dack_w ){ popmessage("IOW3: data %02x",data); }
+	uint8_t dma_0_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	uint8_t dma_1_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	uint8_t dma_2_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
+	uint8_t dma_3_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_0_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff){ popmessage("IOW0: data %02x",data); }
+	void dma_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff){  }
+	void dma_2_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff){  }
+	void dma_3_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff){ popmessage("IOW3: data %02x",data); }
 
-	DECLARE_WRITE16_MEMBER(hfd_w);
-	DECLARE_READ16_MEMBER(hfd_r);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE8_MEMBER(fdc_control_w);
-	DECLARE_READ8_MEMBER(irq_cb);
-	DECLARE_WRITE8_MEMBER(hdc_control_w);
-	DECLARE_WRITE8_MEMBER(disk_addr_ext);
-	DECLARE_READ8_MEMBER(hd_buffer_r);
-	DECLARE_WRITE8_MEMBER(hd_buffer_w);
+	void hfd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t hfd_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irq_cb(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hdc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void disk_addr_ext(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hd_buffer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hd_buffer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ16_MEMBER(b38_keyboard_r);
-	DECLARE_WRITE16_MEMBER(b38_keyboard_w);
-	DECLARE_READ16_MEMBER(b38_crtc_r);
-	DECLARE_WRITE16_MEMBER(b38_crtc_w);
+	uint16_t b38_keyboard_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void b38_keyboard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t b38_crtc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void b38_crtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -192,34 +192,34 @@ public:
 private:
 };
 
-WRITE_LINE_MEMBER(ngen_state::pit_out0_w)
+void ngen_state::pit_out0_w(int state)
 {
 	m_pic->ir3_w(state);  // Timer interrupt
 	popmessage("PIT Timer 0 state %i\n",state);
 }
 
-WRITE_LINE_MEMBER(ngen_state::pit_out1_w)
+void ngen_state::pit_out1_w(int state)
 {
 	popmessage("PIT Timer 1 state %i\n",state);
 	m_iouart->rxcb_w(state);
 	m_iouart->txcb_w(state);  // channels in the correct order?
 }
 
-WRITE_LINE_MEMBER(ngen_state::pit_out2_w)
+void ngen_state::pit_out2_w(int state)
 {
 	m_iouart->rxca_w(state);
 	m_iouart->txca_w(state);
 	popmessage("PIT Timer 2 state %i\n",state);
 }
 
-WRITE_LINE_MEMBER(ngen_state::cpu_timer_w)
+void ngen_state::cpu_timer_w(int state)
 {
 	if(state != 0)
 		popmessage("80186 Timer 0 state %i\n",state);
 	m_pic->ir5_w(state);
 }
 
-WRITE_LINE_MEMBER(ngen_state::timer_clk_out)
+void ngen_state::timer_clk_out(int state)
 {
 	m_viduart->write_rxc(state);  // Keyboard UART Rx/Tx clocks
 	m_viduart->write_txc(state);
@@ -231,7 +231,7 @@ WRITE_LINE_MEMBER(ngen_state::timer_clk_out)
 	}
 }
 
-WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
+void ngen_state::cpu_peripheral_cb(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t addr;
 
@@ -263,7 +263,7 @@ WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
 
 // 80186 peripheral space
 // Largely guesswork at this stage
-WRITE16_MEMBER(ngen_state::peripheral_w)
+void ngen_state::peripheral_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -339,7 +339,7 @@ WRITE16_MEMBER(ngen_state::peripheral_w)
 	}
 }
 
-READ16_MEMBER(ngen_state::peripheral_r)
+uint16_t ngen_state::peripheral_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0xffff;
 	switch(offset)
@@ -420,7 +420,7 @@ READ16_MEMBER(ngen_state::peripheral_r)
 // expansion module.  The base I/O address for the currently selected module is set by writing to
 // this register (bits 0-7 are ignored)
 // TODO: make expansion modules slot devices
-WRITE16_MEMBER(ngen_state::xbus_w)
+void ngen_state::xbus_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t addr = (data & 0x00ff) << 8;
 	cpu_device* cpu;
@@ -449,7 +449,7 @@ WRITE16_MEMBER(ngen_state::xbus_w)
 // Known module IDs:
 //  0x1070 - Floppy/Hard disk module
 //  0x3141 - QIC Tape module
-READ16_MEMBER(ngen_state::xbus_r)
+uint16_t ngen_state::xbus_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0xffff;
 
@@ -471,7 +471,7 @@ READ16_MEMBER(ngen_state::xbus_r)
 
 
 // Floppy/Hard disk module
-WRITE16_MEMBER(ngen_state::hfd_w)
+void ngen_state::hfd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -530,7 +530,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 	}
 }
 
-READ16_MEMBER(ngen_state::hfd_r)
+uint16_t ngen_state::hfd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0xffff;
 
@@ -581,12 +581,12 @@ READ16_MEMBER(ngen_state::hfd_r)
 	return ret;
 }
 
-WRITE_LINE_MEMBER(ngen_state::fdc_irq_w)
+void ngen_state::fdc_irq_w(int state)
 {
 	m_pic->ir7_w(state);
 }
 
-WRITE_LINE_MEMBER(ngen_state::fdc_drq_w)
+void ngen_state::fdc_drq_w(int state)
 {
 	m_dmac->dreq3_w(state);
 }
@@ -597,7 +597,7 @@ WRITE_LINE_MEMBER(ngen_state::fdc_drq_w)
 // Bit 5 - side select
 // Bit 6 - 1 = 2Mhz for seek, 0 = 1MHz for read/write
 // Bit 7 - FDC reset
-WRITE8_MEMBER(ngen_state::fdc_control_w)
+void ngen_state::fdc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->set_floppy(m_fd0->get_device());
 	m_fd0->get_device()->mon_w(~data & 0x04);
@@ -613,7 +613,7 @@ WRITE8_MEMBER(ngen_state::fdc_control_w)
 // bits 3-5 - select head / expansion module head
 // bit 6 - write enable, must be set to write to a hard disk
 // bit 7 - HDC reset
-WRITE8_MEMBER(ngen_state::hdc_control_w)
+void ngen_state::hdc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hdc_control = data;
 	if(m_hdc_control & 0x04)
@@ -627,22 +627,22 @@ WRITE8_MEMBER(ngen_state::hdc_control_w)
 
 // page of system RAM to access
 // bit 7 = disables read/write signals to the WD1010
-WRITE8_MEMBER(ngen_state::disk_addr_ext)
+void ngen_state::disk_addr_ext(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_disk_page = data & 0x7f;
 }
 
-READ8_MEMBER(ngen_state::hd_buffer_r)
+uint8_t ngen_state::hd_buffer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_hd_buffer[offset];
 }
 
-WRITE8_MEMBER(ngen_state::hd_buffer_w)
+void ngen_state::hd_buffer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hd_buffer[offset] = data;
 }
 
-WRITE_LINE_MEMBER( ngen_state::dma_hrq_changed )
+void ngen_state::dma_hrq_changed(int state)
 {
 	if(m_maincpu)
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
@@ -650,7 +650,7 @@ WRITE_LINE_MEMBER( ngen_state::dma_hrq_changed )
 		m_i386cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( ngen_state::dma_eop_changed )
+void ngen_state::dma_eop_changed(int state)
 {
 	if(m_dma_channel == 0)
 	{
@@ -677,12 +677,12 @@ void ngen_state::set_dma_channel(int channel, int state)
 		m_dma_channel = -1;
 }
 
-WRITE_LINE_MEMBER( ngen_state::dack0_w ) { set_dma_channel(0, state); }
-WRITE_LINE_MEMBER( ngen_state::dack1_w ) { set_dma_channel(1, state); }
-WRITE_LINE_MEMBER( ngen_state::dack2_w ) { set_dma_channel(2, state); }
-WRITE_LINE_MEMBER( ngen_state::dack3_w ) { set_dma_channel(3, state); }
+void ngen_state::dack0_w(int state) { set_dma_channel(0, state); }
+void ngen_state::dack1_w(int state) { set_dma_channel(1, state); }
+void ngen_state::dack2_w(int state) { set_dma_channel(2, state); }
+void ngen_state::dack3_w(int state) { set_dma_channel(3, state); }
 
-READ8_MEMBER(ngen_state::dma_3_dack_r)
+uint8_t ngen_state::dma_3_dack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t ret = 0xffff;
 
@@ -700,7 +700,7 @@ READ8_MEMBER(ngen_state::dma_3_dack_r)
 	return ret;
 }
 
-READ8_MEMBER(ngen_state::dma_read_word)
+uint8_t ngen_state::dma_read_word(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	cpu_device* cpu;
 	uint16_t result;
@@ -722,7 +722,7 @@ READ8_MEMBER(ngen_state::dma_read_word)
 }
 
 
-WRITE8_MEMBER(ngen_state::dma_write_word)
+void ngen_state::dma_write_word(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	cpu_device* cpu;
 
@@ -758,12 +758,12 @@ MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 	}
 }
 
-READ8_MEMBER( ngen_state::irq_cb )
+uint8_t ngen_state::irq_cb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pic->acknowledge();
 }
 
-READ16_MEMBER( ngen_state::b38_keyboard_r )
+uint16_t ngen_state::b38_keyboard_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t ret = 0;
 	switch(offset)
@@ -781,7 +781,7 @@ READ16_MEMBER( ngen_state::b38_keyboard_r )
 	return ret;
 }
 
-WRITE16_MEMBER( ngen_state::b38_keyboard_w )
+void ngen_state::b38_keyboard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -796,7 +796,7 @@ WRITE16_MEMBER( ngen_state::b38_keyboard_w )
 	}
 }
 
-READ16_MEMBER( ngen_state::b38_crtc_r )
+uint16_t ngen_state::b38_crtc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t ret = 0;
 	switch(offset)
@@ -813,7 +813,7 @@ READ16_MEMBER( ngen_state::b38_crtc_r )
 	return ret;
 }
 
-WRITE16_MEMBER( ngen_state::b38_crtc_w )
+void ngen_state::b38_crtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{

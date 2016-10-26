@@ -133,14 +133,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
  *************************************/
 
 /* Players inputs are muxed at 0xa000 */
-CUSTOM_INPUT_MEMBER(exerion_state::exerion_controls_r)
+ioport_value exerion_state::exerion_controls_r(ioport_field &field, void *param)
 {
 	static const char *const inname[2] = { "P1", "P2" };
 	return ioport(inname[m_cocktail_flip])->read() & 0x3f;
 }
 
 
-INPUT_CHANGED_MEMBER(exerion_state::coin_inserted)
+void exerion_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
@@ -156,14 +156,14 @@ INPUT_CHANGED_MEMBER(exerion_state::coin_inserted)
 
 /* This is the first of many Exerion "features". No clue if it's */
 /* protection or some sort of timer. */
-READ8_MEMBER(exerion_state::exerion_porta_r)
+uint8_t exerion_state::exerion_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_porta ^= 0x40;
 	return m_porta;
 }
 
 
-WRITE8_MEMBER(exerion_state::exerion_portb_w)
+void exerion_state::exerion_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* pull the expected value from the ROM */
 	m_porta = memregion("maincpu")->base()[0x5f76];
@@ -173,7 +173,7 @@ WRITE8_MEMBER(exerion_state::exerion_portb_w)
 }
 
 
-READ8_MEMBER(exerion_state::exerion_protection_r)
+uint8_t exerion_state::exerion_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.device().safe_pc() == 0x4143)
 		return memregion("maincpu")->base()[0x33c0 + (m_main_ram[0xd] << 2) + offset];
@@ -507,7 +507,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(exerion_state,exerion)
+void exerion_state::init_exerion()
 {
 	uint32_t oldaddr, newaddr, length;
 	uint8_t *src, *dst;
@@ -554,7 +554,7 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 }
 
 
-DRIVER_INIT_MEMBER(exerion_state,exerionb)
+void exerion_state::init_exerionb()
 {
 	uint8_t *ram = memregion("maincpu")->base();
 	int addr;
@@ -564,7 +564,7 @@ DRIVER_INIT_MEMBER(exerion_state,exerionb)
 		ram[addr] = (ram[addr] & 0xf9) | ((ram[addr] & 2) << 1) | ((ram[addr] & 4) >> 1);
 
 	/* also convert the gfx as in Exerion */
-	DRIVER_INIT_CALL(exerion);
+	init_exerion();
 }
 
 

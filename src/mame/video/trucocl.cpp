@@ -38,7 +38,7 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 #include "includes/trucocl.h"
 
 
-PALETTE_INIT_MEMBER(trucocl_state, trucocl)
+void trucocl_state::palette_init_trucocl(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -47,19 +47,19 @@ PALETTE_INIT_MEMBER(trucocl_state, trucocl)
 		palette.set_pen_color(i,pal4bit(color_prom[i] >> 0),pal4bit(color_prom[i+32] >> 0),pal4bit(color_prom[i+32] >> 4));
 }
 
-WRITE8_MEMBER(trucocl_state::trucocl_videoram_w)
+void trucocl_state::trucocl_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(trucocl_state::trucocl_colorram_w)
+void trucocl_state::trucocl_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(trucocl_state::get_bg_tile_info)
+void trucocl_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int gfxsel = m_colorram[tile_index] & 1;
 	int bank = ( ( m_colorram[tile_index] >> 2 ) & 0x07 );

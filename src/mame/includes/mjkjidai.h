@@ -35,17 +35,17 @@ public:
 	bool m_display_enable;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_select_w);
-	DECLARE_WRITE8_MEMBER(mjkjidai_videoram_w);
-	DECLARE_WRITE8_MEMBER(mjkjidai_ctrl_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	ioport_value keyboard_r(ioport_field &field, void *param);
+	void keyboard_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjkjidai_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjkjidai_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_int(int state);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mjkjidai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };

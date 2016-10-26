@@ -809,7 +809,7 @@ void am9517a_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( am9517a_device::read )
+uint8_t am9517a_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -873,7 +873,7 @@ READ8_MEMBER( am9517a_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( am9517a_device::write )
+void am9517a_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!BIT(offset, 3))
 	{
@@ -1008,7 +1008,7 @@ WRITE8_MEMBER( am9517a_device::write )
 //  hack_w - hold acknowledge
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::hack_w )
+void am9517a_device::hack_w(int state)
 {
 	if (LOG) logerror("AM9517A '%s' Hold Acknowledge: %u\n", tag(), state);
 
@@ -1021,7 +1021,7 @@ WRITE_LINE_MEMBER( am9517a_device::hack_w )
 //  ready_w - ready
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::ready_w )
+void am9517a_device::ready_w(int state)
 {
 	if (LOG) logerror("AM9517A '%s' Ready: %u\n", tag(), state);
 
@@ -1033,7 +1033,7 @@ WRITE_LINE_MEMBER( am9517a_device::ready_w )
 //  eop_w - end of process
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::eop_w )
+void am9517a_device::eop_w(int state)
 {
 	if (LOG) logerror("AM9517A '%s' End of Process: %u\n", tag(), state);
 }
@@ -1043,7 +1043,7 @@ WRITE_LINE_MEMBER( am9517a_device::eop_w )
 //  dreq0_w - DMA request for channel 0
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::dreq0_w )
+void am9517a_device::dreq0_w(int state)
 {
 	dma_request(0, state);
 }
@@ -1053,7 +1053,7 @@ WRITE_LINE_MEMBER( am9517a_device::dreq0_w )
 //  dreq0_w - DMA request for channel 1
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::dreq1_w )
+void am9517a_device::dreq1_w(int state)
 {
 	dma_request(1, state);
 }
@@ -1063,7 +1063,7 @@ WRITE_LINE_MEMBER( am9517a_device::dreq1_w )
 //  dreq1_w - DMA request for channel 2
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::dreq2_w )
+void am9517a_device::dreq2_w(int state)
 {
 	dma_request(2, state);
 }
@@ -1073,7 +1073,7 @@ WRITE_LINE_MEMBER( am9517a_device::dreq2_w )
 //  dreq3_w - DMA request for channel 3
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( am9517a_device::dreq3_w )
+void am9517a_device::dreq3_w(int state)
 {
 	dma_request(3, state);
 }
@@ -1103,7 +1103,7 @@ void upd71071_v53_device::device_reset()
 }
 
 
-READ8_MEMBER(upd71071_v53_device::read)
+uint8_t upd71071_v53_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 	int channel = m_selected_channel;
@@ -1187,7 +1187,7 @@ READ8_MEMBER(upd71071_v53_device::read)
 	return ret;
 }
 
-WRITE8_MEMBER(upd71071_v53_device::write)
+void upd71071_v53_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int channel = m_selected_channel;
 

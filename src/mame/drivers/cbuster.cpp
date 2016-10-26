@@ -39,7 +39,7 @@
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
-WRITE16_MEMBER(cbuster_state::twocrude_control_w)
+void cbuster_state::twocrude_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -92,7 +92,7 @@ WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 	logerror("Warning %04x- %02x written to control %02x\n", space.device().safe_pc(), data, offset);
 }
 
-READ16_MEMBER(cbuster_state::twocrude_control_r)
+uint16_t cbuster_state::twocrude_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
@@ -573,7 +573,7 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(cbuster_state,twocrude)
+void cbuster_state::init_twocrude()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	uint8_t *PTR;

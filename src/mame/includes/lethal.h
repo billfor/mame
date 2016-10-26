@@ -41,18 +41,18 @@ public:
 	required_device<k05324x_device> m_k053244;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(control2_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_w);
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(le_bankswitch_w);
-	DECLARE_READ8_MEMBER(guns_r);
-	DECLARE_READ8_MEMBER(gunsaux_r);
-	DECLARE_WRITE8_MEMBER(lethalen_palette_control);
+	void control2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void le_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t guns_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gunsaux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lethalen_palette_control(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(lethalen_interrupt);
+	void lethalen_interrupt(device_t &device);
 	K05324X_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);
 };

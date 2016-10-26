@@ -47,18 +47,18 @@ Memo:
 #include "sound/volt_reg.h"
 
 
-WRITE8_MEMBER(niyanpai_state::soundbank_w)
+void niyanpai_state::soundbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("soundbank")->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(niyanpai_state::soundlatch_clear_w)
+void niyanpai_state::soundlatch_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x01)) m_soundlatch->clear_w(space, 0, 0);
 }
 
 
-DRIVER_INIT_MEMBER(niyanpai_state,niyanpai)
+void niyanpai_state::init_niyanpai()
 {
 	uint8_t *SNDROM = memregion("audiocpu")->base();
 
@@ -74,7 +74,7 @@ DRIVER_INIT_MEMBER(niyanpai_state,niyanpai)
 }
 
 
-READ16_MEMBER(niyanpai_state::dipsw_r)
+uint16_t niyanpai_state::dipsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t dipsw_a = ioport("DSWA")->read();
 	uint8_t dipsw_b = ioport("DSWB")->read();
@@ -85,14 +85,14 @@ READ16_MEMBER(niyanpai_state::dipsw_r)
 	return ((dipsw_a << 8) | dipsw_b);
 }
 
-MACHINE_START_MEMBER(niyanpai_state, musobana)
+void niyanpai_state::machine_start_musobana()
 {
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_musobana_inputport));
 	save_item(NAME(m_musobana_outcoin_flag));
 }
 
-READ16_MEMBER(niyanpai_state::musobana_inputport_0_r)
+uint16_t niyanpai_state::musobana_inputport_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int portdata;
 
@@ -110,7 +110,7 @@ READ16_MEMBER(niyanpai_state::musobana_inputport_0_r)
 	return (portdata);
 }
 
-WRITE16_MEMBER(niyanpai_state::tmp68301_parallel_port_w)
+void niyanpai_state::tmp68301_parallel_port_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// tmp68301_parallel_interface[0x05]
 	//  bit 0   coin counter
@@ -123,7 +123,7 @@ WRITE16_MEMBER(niyanpai_state::tmp68301_parallel_port_w)
 	machine().bookkeeping().coin_lockout_w(0,data & 0x08);
 }
 
-CUSTOM_INPUT_MEMBER(niyanpai_state::musobana_outcoin_flag_r)
+ioport_value niyanpai_state::musobana_outcoin_flag_r(ioport_field &field, void *param)
 {
 	if (m_motor_on) m_musobana_outcoin_flag ^= 1;
 	else m_musobana_outcoin_flag = 1;
@@ -131,7 +131,7 @@ CUSTOM_INPUT_MEMBER(niyanpai_state::musobana_outcoin_flag_r)
 	return m_musobana_outcoin_flag & 0x01;
 }
 
-WRITE16_MEMBER(niyanpai_state::musobana_inputport_w)
+void niyanpai_state::musobana_inputport_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_musobana_inputport = data;
 }
@@ -705,7 +705,7 @@ static INPUT_PORTS_START( zokumahj )    // I don't have manual for this game.
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(niyanpai_state::interrupt)
+void niyanpai_state::interrupt(device_t &device)
 {
 	m_tmp68301->external_interrupt_0();
 }

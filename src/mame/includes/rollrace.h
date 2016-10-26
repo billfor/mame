@@ -33,29 +33,29 @@ public:
 	uint8_t m_nmi_mask;
 	uint8_t m_sound_nmi_mask;
 
-	DECLARE_READ8_MEMBER(fake_d800_r);
-	DECLARE_WRITE8_MEMBER(fake_d800_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(charbank_w);
-	DECLARE_WRITE8_MEMBER(bkgpen_w);
-	DECLARE_WRITE8_MEMBER(spritebank_w);
-	DECLARE_WRITE8_MEMBER(backgroundpage_w);
-	DECLARE_WRITE8_MEMBER(backgroundcolor_w);
-	DECLARE_WRITE8_MEMBER(flipy_w);
-	DECLARE_WRITE8_MEMBER(flipx_w);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(cram_w);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	uint8_t fake_d800_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fake_d800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bkgpen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spritebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void backgroundpage_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void backgroundcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void tilemap_refresh_flip();
 
-	DECLARE_PALETTE_INIT(rollrace);
+	void palette_init_rollrace(palette_device &palette);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	void vblank_irq(device_t &device);
+	void sound_timer_irq(device_t &device);
 };

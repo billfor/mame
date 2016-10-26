@@ -431,7 +431,7 @@ int c2040_fdc_t::get_next_bit(attotime &tm, const attotime &limit)
 	return bit && cur_live.rw_sel;
 }
 
-READ8_MEMBER( c2040_fdc_t::read )
+uint8_t c2040_fdc_t::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t e = checkpoint_live.e;
 	offs_t i = checkpoint_live.i;
@@ -443,7 +443,7 @@ READ8_MEMBER( c2040_fdc_t::read )
 	return data;
 }
 
-WRITE8_MEMBER( c2040_fdc_t::write )
+void c2040_fdc_t::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_pi != data)
 	{
@@ -455,19 +455,19 @@ WRITE8_MEMBER( c2040_fdc_t::write )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::ds0_w )
+void c2040_fdc_t::ds0_w(int state)
 {
 	m_ds0 = state;
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::ds1_w )
+void c2040_fdc_t::ds1_w(int state)
 {
 	m_ds1 = state;
 
 	ds_w(m_ds1 << 1 | m_ds0);
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::drv_sel_w )
+void c2040_fdc_t::drv_sel_w(int state)
 {
 	if (m_drv_sel != state)
 	{
@@ -479,7 +479,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::drv_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::mode_sel_w )
+void c2040_fdc_t::mode_sel_w(int state)
 {
 	if (m_mode_sel != state)
 	{
@@ -491,7 +491,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::mode_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::rw_sel_w )
+void c2040_fdc_t::rw_sel_w(int state)
 {
 	if (m_rw_sel != state)
 	{
@@ -508,7 +508,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::rw_sel_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::mtr0_w )
+void c2040_fdc_t::mtr0_w(int state)
 {
 	if (m_mtr0 != state)
 	{
@@ -530,7 +530,7 @@ WRITE_LINE_MEMBER( c2040_fdc_t::mtr0_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c2040_fdc_t::mtr1_w )
+void c2040_fdc_t::mtr1_w(int state)
 {
 	if (m_mtr1 != state)
 	{

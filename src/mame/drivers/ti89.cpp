@@ -48,7 +48,7 @@ uint8_t ti68k_state::keypad_r()
 }
 
 
-WRITE16_MEMBER ( ti68k_state::ti68k_io_w )
+void ti68k_state::ti68k_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset & 0x0f)
 	{
@@ -91,7 +91,7 @@ WRITE16_MEMBER ( ti68k_state::ti68k_io_w )
 }
 
 
-READ16_MEMBER ( ti68k_state::ti68k_io_r )
+uint16_t ti68k_state::ti68k_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -113,7 +113,7 @@ READ16_MEMBER ( ti68k_state::ti68k_io_r )
 }
 
 
-WRITE16_MEMBER ( ti68k_state::ti68k_io2_w )
+void ti68k_state::ti68k_io2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset & 0x7f)
 	{
@@ -129,7 +129,7 @@ WRITE16_MEMBER ( ti68k_state::ti68k_io2_w )
 }
 
 
-READ16_MEMBER ( ti68k_state::ti68k_io2_r )
+uint16_t ti68k_state::ti68k_io2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -142,14 +142,14 @@ READ16_MEMBER ( ti68k_state::ti68k_io2_r )
 }
 
 
-WRITE16_MEMBER ( ti68k_state::flash_w )
+void ti68k_state::flash_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// verification if it is flash memory
 	if (m_flash_mem)
 		m_flash->write(offset, data);
 }
 
-READ16_MEMBER ( ti68k_state::flash_r )
+uint16_t ti68k_state::flash_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_flash_mem)
 	{
@@ -162,7 +162,7 @@ READ16_MEMBER ( ti68k_state::flash_r )
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(ti68k_state::ti68k_timer_callback)
+void ti68k_state::ti68k_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer++;
 
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START(ti89t_mem, AS_PROGRAM, 16, ti68k_state)
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(ti68k_state::ti68k_on_key)
+void ti68k_state::ti68k_on_key(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_on_key = newval;
 
@@ -507,7 +507,7 @@ uint32_t ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(ti68k_state, ti68k)
+void ti68k_state::palette_init_ti68k(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

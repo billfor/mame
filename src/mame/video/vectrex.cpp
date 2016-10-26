@@ -39,7 +39,7 @@ enum {
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_state::lightpen_trigger)
+void vectrex_state::lightpen_trigger(void *ptr, int32_t param)
 {
 	if (m_lightpen_port & 1)
 	{
@@ -73,12 +73,12 @@ TIMER_CALLBACK_MEMBER(vectrex_state::lightpen_trigger)
 
 *********************************************************************/
 
-READ8_MEMBER(vectrex_state::vectrex_via_r)
+uint8_t vectrex_state::vectrex_via_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_via6522_0->read(space, offset);
 }
 
-WRITE8_MEMBER(vectrex_state::vectrex_via_w)
+void vectrex_state::vectrex_via_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	attotime period;
 
@@ -112,7 +112,7 @@ WRITE8_MEMBER(vectrex_state::vectrex_via_w)
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_refresh)
+void vectrex_state::vectrex_refresh(void *ptr, int32_t param)
 {
 	/* Refresh only marks the range of vectors which will be drawn
 	 * during the next screen_update. */
@@ -182,7 +182,7 @@ void vectrex_state::vectrex_add_point_stereo(int x, int y, rgb_t color, int inte
 }
 
 
-TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_zero_integrators)
+void vectrex_state::vectrex_zero_integrators(void *ptr, int32_t param)
 {
 	m_x_int = m_x_center + (m_analog[A_ZR] * INT_PER_CLOCK);
 	m_y_int = m_y_center + (m_analog[A_ZR] * INT_PER_CLOCK);
@@ -200,7 +200,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_zero_integrators)
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_state::update_signal)
+void vectrex_state::update_signal(void *ptr, int32_t param)
 {
 	int length;
 
@@ -269,7 +269,7 @@ void vectrex_state::vectrex_multiplexer(int mux)
 }
 
 
-WRITE8_MEMBER(vectrex_state::v_via_pb_w)
+void vectrex_state::v_via_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x80))
 	{
@@ -352,7 +352,7 @@ WRITE8_MEMBER(vectrex_state::v_via_pb_w)
 }
 
 
-WRITE8_MEMBER(vectrex_state::v_via_pa_w)
+void vectrex_state::v_via_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* DAC output always goes to Y integrator */
 	m_via_out[PORTA] = data;
@@ -363,14 +363,14 @@ WRITE8_MEMBER(vectrex_state::v_via_pa_w)
 }
 
 
-WRITE_LINE_MEMBER(vectrex_state::v_via_ca2_w)
+void vectrex_state::v_via_ca2_w(int state)
 {
 	if (state == 0)
 		timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_VECTREX_ZERO_INTEGRATORS);
 }
 
 
-WRITE_LINE_MEMBER(vectrex_state::v_via_cb2_w)
+void vectrex_state::v_via_cb2_w(int state)
 {
 	int dx, dy;
 
@@ -405,7 +405,7 @@ WRITE_LINE_MEMBER(vectrex_state::v_via_cb2_w)
 
 *****************************************************************/
 
-WRITE8_MEMBER(vectrex_state::raaspec_led_w)
+void vectrex_state::raaspec_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Spectrum I+ LED: %i%i%i%i%i%i%i%i\n",
 				(data>>7)&0x1, (data>>6)&0x1, (data>>5)&0x1, (data>>4)&0x1,
@@ -413,7 +413,7 @@ WRITE8_MEMBER(vectrex_state::raaspec_led_w)
 }
 
 
-VIDEO_START_MEMBER(vectrex_state,raaspec)
+void vectrex_state::video_start_raaspec()
 {
 	const rectangle &visarea = m_screen->visible_area();
 

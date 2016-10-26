@@ -136,20 +136,20 @@ public:
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint8_t> m_soundram;
 
-	DECLARE_READ16_MEMBER(_68k_soundram_r);
-	DECLARE_WRITE16_MEMBER(_68k_soundram_w);
-	DECLARE_READ8_MEMBER(_6502_soundmem_r);
-	DECLARE_WRITE8_MEMBER(_6502_soundmem_w);
+	uint16_t _68k_soundram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void _68k_soundram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t _6502_soundmem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void _6502_soundmem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void dma_w(address_space &space, int offset, uint16_t data, uint16_t mem_mask, int ch);
-	DECLARE_WRITE16_MEMBER(dma_channel0_w);
-	DECLARE_WRITE16_MEMBER(dma_channel1_w);
+	void dma_channel0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dma_channel1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_READ16_MEMBER(video_r);
-	DECLARE_WRITE16_MEMBER(video_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	uint16_t sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t video_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	acan_dma_regs_t m_acan_dma_regs;
 	acan_sprdma_regs_t m_acan_sprdma_regs;
 
@@ -206,22 +206,22 @@ public:
 	tilemap_t *m_tilemap_sizes[4][4];
 	bitmap_ind16 m_sprite_final_bitmap;
 	void write_swapped_byte(int offset, uint8_t byte);
-	TILE_GET_INFO_MEMBER(get_supracan_tilemap0_tile_info);
-	TILE_GET_INFO_MEMBER(get_supracan_tilemap1_tile_info);
-	TILE_GET_INFO_MEMBER(get_supracan_tilemap2_tile_info);
-	TILE_GET_INFO_MEMBER(get_supracan_roz_tile_info);
+	void get_supracan_tilemap0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_supracan_tilemap1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_supracan_tilemap2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_supracan_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(supracan);
+	void palette_init_supracan(palette_device &palette);
 	uint32_t screen_update_supracan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(supracan_irq);
-	INTERRUPT_GEN_MEMBER(supracan_sound_irq);
-	TIMER_CALLBACK_MEMBER(supracan_hbl_callback);
-	TIMER_CALLBACK_MEMBER(supracan_line_on_callback);
-	TIMER_CALLBACK_MEMBER(supracan_line_off_callback);
-	TIMER_CALLBACK_MEMBER(supracan_video_callback);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(supracan_cart);
+	void supracan_irq(device_t &device);
+	void supracan_sound_irq(device_t &device);
+	void supracan_hbl_callback(void *ptr, int32_t param);
+	void supracan_line_on_callback(void *ptr, int32_t param);
+	void supracan_line_off_callback(void *ptr, int32_t param);
+	void supracan_video_callback(void *ptr, int32_t param);
+	image_init_result device_image_load_supracan_cart(device_image_interface &image);
 	inline void verboselog(const char *tag, int n_level, const char *s_fmt, ...) ATTR_PRINTF(4,5);
 	int supracan_tilemap_get_region(int layer);
 	void supracan_tilemap_get_info_common(int layer, tile_data &tileinfo, int count);
@@ -405,22 +405,22 @@ void supracan_state::supracan_tilemap_get_info_roz(int layer, tile_data &tileinf
 
 
 
-TILE_GET_INFO_MEMBER(supracan_state::get_supracan_tilemap0_tile_info)
+void supracan_state::get_supracan_tilemap0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	supracan_tilemap_get_info_common(0, tileinfo, tile_index);
 }
 
-TILE_GET_INFO_MEMBER(supracan_state::get_supracan_tilemap1_tile_info)
+void supracan_state::get_supracan_tilemap1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	supracan_tilemap_get_info_common(1, tileinfo, tile_index);
 }
 
-TILE_GET_INFO_MEMBER(supracan_state::get_supracan_tilemap2_tile_info)
+void supracan_state::get_supracan_tilemap2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	supracan_tilemap_get_info_common(2, tileinfo, tile_index);
 }
 
-TILE_GET_INFO_MEMBER(supracan_state::get_supracan_roz_tile_info)
+void supracan_state::get_supracan_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	supracan_tilemap_get_info_roz(3, tileinfo, tile_index);
 }
@@ -1070,19 +1070,19 @@ void supracan_state::dma_w(address_space &space, int offset, uint16_t data, uint
 	}
 }
 
-WRITE16_MEMBER( supracan_state::dma_channel0_w )
+void supracan_state::dma_channel0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	dma_w(space, offset, data, mem_mask, 0);
 }
 
-WRITE16_MEMBER( supracan_state::dma_channel1_w )
+void supracan_state::dma_channel1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	dma_w(space, offset, data, mem_mask, 1);
 }
 
 
 #if 0
-WRITE16_MEMBER( supracan_state::supracan_pram_w )
+void supracan_state::supracan_pram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_pram[offset] &= ~mem_mask;
 	m_pram[offset] |= data & mem_mask;
@@ -1097,7 +1097,7 @@ void supracan_state::write_swapped_byte( int offset, uint8_t byte )
 	m_vram_addr_swapped[swapped_offset] = byte;
 }
 
-WRITE16_MEMBER( supracan_state::vram_w )
+void supracan_state::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 
@@ -1131,7 +1131,7 @@ static ADDRESS_MAP_START( supracan_mem, AS_PROGRAM, 16, supracan_state )
 	AM_RANGE( 0xfc0000, 0xfcffff ) AM_MIRROR(0x30000) AM_RAM /* System work ram */
 ADDRESS_MAP_END
 
-READ8_MEMBER( supracan_state::_6502_soundmem_r )
+uint8_t supracan_state::_6502_soundmem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint8_t data = m_soundram[offset];
@@ -1190,7 +1190,7 @@ READ8_MEMBER( supracan_state::_6502_soundmem_r )
 	return data;
 }
 
-WRITE8_MEMBER( supracan_state::_6502_soundmem_w )
+void supracan_state::_6502_soundmem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1344,7 +1344,7 @@ static INPUT_PORTS_START( supracan )
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Button A")
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(supracan_state, supracan)
+void supracan_state::palette_init_supracan(palette_device &palette)
 {
 	// Used for debugging purposes for now
 	//#if 0
@@ -1360,7 +1360,7 @@ PALETTE_INIT_MEMBER(supracan_state, supracan)
 	//#endif
 }
 
-WRITE16_MEMBER( supracan_state::_68k_soundram_w )
+void supracan_state::_68k_soundram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_soundram[offset*2 + 1] = data & 0xff;
@@ -1383,7 +1383,7 @@ WRITE16_MEMBER( supracan_state::_68k_soundram_w )
 	}
 }
 
-READ16_MEMBER( supracan_state::_68k_soundram_r )
+uint16_t supracan_state::_68k_soundram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint16_t val = m_soundram[offset*2 + 0] << 8;
@@ -1409,7 +1409,7 @@ READ16_MEMBER( supracan_state::_68k_soundram_r )
 	return val;
 }
 
-READ16_MEMBER( supracan_state::sound_r )
+uint16_t supracan_state::sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -1423,7 +1423,7 @@ READ16_MEMBER( supracan_state::sound_r )
 	return data;
 }
 
-WRITE16_MEMBER( supracan_state::sound_w )
+void supracan_state::sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch ( offset )
 	{
@@ -1457,7 +1457,7 @@ WRITE16_MEMBER( supracan_state::sound_w )
 }
 
 
-READ16_MEMBER( supracan_state::video_r )
+uint16_t supracan_state::video_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint16_t data = m_video_regs[offset];
@@ -1493,28 +1493,28 @@ READ16_MEMBER( supracan_state::video_r )
 	return data;
 }
 
-TIMER_CALLBACK_MEMBER(supracan_state::supracan_hbl_callback)
+void supracan_state::supracan_hbl_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(3, HOLD_LINE);
 
 	m_hbl_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(supracan_state::supracan_line_on_callback)
+void supracan_state::supracan_line_on_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(5, HOLD_LINE);
 
 	m_line_on_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(supracan_state::supracan_line_off_callback)
+void supracan_state::supracan_line_off_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 
 	m_line_on_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(supracan_state::supracan_video_callback)
+void supracan_state::supracan_video_callback(void *ptr, int32_t param)
 {
 	int vpos = machine().first_screen()->vpos();
 
@@ -1553,7 +1553,7 @@ TIMER_CALLBACK_MEMBER(supracan_state::supracan_video_callback)
 	m_video_timer->adjust( machine().first_screen()->time_until_pos( ( vpos + 1 ) % 256, 0 ) );
 }
 
-WRITE16_MEMBER( supracan_state::video_w )
+void supracan_state::video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	acan_sprdma_regs_t *acan_sprdma_regs = &m_acan_sprdma_regs;
@@ -1741,7 +1741,7 @@ WRITE16_MEMBER( supracan_state::video_w )
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( supracan_state, supracan_cart )
+image_init_result supracan_state::device_image_load_supracan_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1860,7 +1860,7 @@ static GFXDECODE_START( supracan )
 	GFXDECODE_RAM( "vram",  0, supracan_gfx1bpp_alt,   0, 0x80 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(supracan_state::supracan_irq)
+void supracan_state::supracan_irq(device_t &device)
 {
 #if 0
 
@@ -1871,7 +1871,7 @@ INTERRUPT_GEN_MEMBER(supracan_state::supracan_irq)
 #endif
 }
 
-INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
+void supracan_state::supracan_sound_irq(device_t &device)
 {
 	m_sound_irq_source_reg |= 0x80;
 

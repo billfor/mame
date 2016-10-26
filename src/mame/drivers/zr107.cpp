@@ -238,25 +238,25 @@ public:
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_intck;
 
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
-	DECLARE_READ8_MEMBER(sysreg_r);
-	DECLARE_WRITE8_MEMBER(sysreg_w);
-	DECLARE_READ32_MEMBER(ccu_r);
-	DECLARE_WRITE32_MEMBER(ccu_w);
-	DECLARE_WRITE32_MEMBER(jetwave_palette_w);
-	DECLARE_READ32_MEMBER(dsp_dataram_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
-	DECLARE_WRITE16_MEMBER(sound_ctrl_w);
+	void paletteram32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t sysreg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sysreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t ccu_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ccu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void jetwave_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t dsp_dataram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dsp_dataram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sound_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DRIVER_INIT(common);
-	DECLARE_DRIVER_INIT(zr107);
-	DECLARE_DRIVER_INIT(jetwave);
-	DECLARE_VIDEO_START(zr107);
-	DECLARE_VIDEO_START(jetwave);
+	void init_common();
+	void init_zr107();
+	void init_jetwave();
+	void video_start_zr107();
+	void video_start_jetwave();
 	uint32_t screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(zr107_vblank);
-	WRITE_LINE_MEMBER(k054539_irq_gen);
+	void zr107_vblank(device_t &device);
+	void k054539_irq_gen(int state);
 	ADC083X_INPUT_CB(adc0838_callback);
 	K056832_CB_MEMBER(tile_callback);
 
@@ -269,7 +269,7 @@ protected:
 
 
 
-VIDEO_START_MEMBER(zr107_state,jetwave)
+void zr107_state::video_start_jetwave()
 {
 }
 
@@ -294,7 +294,7 @@ uint32_t zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 
 
 /*****************************************************************************/
 
-WRITE32_MEMBER(zr107_state::paletteram32_w)
+void zr107_state::paletteram32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -309,7 +309,7 @@ K056832_CB_MEMBER(zr107_state::tile_callback)
 	*color += layer * 0x40;
 }
 
-VIDEO_START_MEMBER(zr107_state,zr107)
+void zr107_state::video_start_zr107()
 {
 	m_k056832->set_layer_offs(0, -29, -27);
 	m_k056832->set_layer_offs(1, -29, -27);
@@ -338,7 +338,7 @@ uint32_t zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &b
 
 /******************************************************************/
 
-READ8_MEMBER(zr107_state::sysreg_r)
+uint8_t zr107_state::sysreg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -365,7 +365,7 @@ READ8_MEMBER(zr107_state::sysreg_r)
 	return r;
 }
 
-WRITE8_MEMBER(zr107_state::sysreg_w)
+void zr107_state::sysreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -428,7 +428,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 	}
 }
 
-READ32_MEMBER(zr107_state::ccu_r)
+uint32_t zr107_state::ccu_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	switch (offset)
@@ -453,7 +453,7 @@ READ32_MEMBER(zr107_state::ccu_r)
 	return r;
 }
 
-WRITE32_MEMBER(zr107_state::ccu_w)
+void zr107_state::ccu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
@@ -488,7 +488,7 @@ static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
 ADDRESS_MAP_END
 
 
-WRITE32_MEMBER(zr107_state::jetwave_palette_w)
+void zr107_state::jetwave_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -519,7 +519,7 @@ ADDRESS_MAP_END
 
 /**********************************************************************/
 
-WRITE16_MEMBER(zr107_state::sound_ctrl_w)
+void zr107_state::sound_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -543,12 +543,12 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 
-READ32_MEMBER(zr107_state::dsp_dataram_r)
+uint32_t zr107_state::dsp_dataram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_sharc_dataram[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(zr107_state::dsp_dataram_w)
+void zr107_state::dsp_dataram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_sharc_dataram[offset] = data;
 }
@@ -725,7 +725,7 @@ ADC083X_INPUT_CB(zr107_state::adc0838_callback)
 
 
 
-WRITE_LINE_MEMBER(zr107_state::k054539_irq_gen)
+void zr107_state::k054539_irq_gen(int state)
 {
 	if (m_sound_ctrl & 1)
 	{
@@ -745,7 +745,7 @@ WRITE_LINE_MEMBER(zr107_state::k054539_irq_gen)
     DMA0
 
 */
-INTERRUPT_GEN_MEMBER(zr107_state::zr107_vblank)
+void zr107_state::zr107_vblank(device_t &device)
 {
 	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
@@ -906,7 +906,7 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(zr107_state,common)
+void zr107_state::init_common()
 {
 	m_sharc_dataram = std::make_unique<uint32_t[]>(0x100000/4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
@@ -915,12 +915,12 @@ DRIVER_INIT_MEMBER(zr107_state,common)
 	m_dsp->enable_recompiler();
 }
 
-DRIVER_INIT_MEMBER(zr107_state,zr107)
+void zr107_state::init_zr107()
 {
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(zr107_state,jetwave)
+void zr107_state::init_jetwave()
 {
 	init_common();
 }

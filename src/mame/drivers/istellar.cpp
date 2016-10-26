@@ -48,19 +48,19 @@ public:
 	uint8_t m_ldp_latch1;
 	uint8_t m_ldp_latch2;
 	uint8_t m_z80_2_nmi_enable;
-	DECLARE_READ8_MEMBER(z80_0_latch1_read);
-	DECLARE_WRITE8_MEMBER(z80_0_latch2_write);
-	DECLARE_READ8_MEMBER(z80_2_ldp_read);
-	DECLARE_READ8_MEMBER(z80_2_latch2_read);
-	DECLARE_READ8_MEMBER(z80_2_nmienable);
-	DECLARE_READ8_MEMBER(z80_2_unknown_read);
-	DECLARE_WRITE8_MEMBER(z80_2_latch1_write);
-	DECLARE_WRITE8_MEMBER(z80_2_ldp_write);
-	DECLARE_DRIVER_INIT(istellar);
+	uint8_t z80_0_latch1_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void z80_0_latch2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t z80_2_ldp_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t z80_2_latch2_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t z80_2_nmienable(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t z80_2_unknown_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void z80_2_latch1_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void z80_2_ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void init_istellar();
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(istellar);
+	void palette_init_istellar(palette_device &palette);
 	uint32_t screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_callback_istellar);
+	void vblank_callback_istellar(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -107,13 +107,13 @@ void istellar_state::machine_start()
 
 /* MEMORY HANDLERS */
 /* Z80 0 R/W */
-READ8_MEMBER(istellar_state::z80_0_latch1_read)
+uint8_t istellar_state::z80_0_latch1_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*logerror("CPU0 : reading LDP status latch (%x)\n", m_ldp_latch1);*/
 	return m_ldp_latch1;
 }
 
-WRITE8_MEMBER(istellar_state::z80_0_latch2_write)
+void istellar_state::z80_0_latch2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*logerror("CPU0 : writing cpu_latch2 (%x).  Potentially followed by an IRQ.\n", data);*/
 	m_ldp_latch2 = data;
@@ -132,39 +132,39 @@ WRITE8_MEMBER(istellar_state::z80_0_latch2_write)
 
 
 /* Z80 2 R/W */
-READ8_MEMBER(istellar_state::z80_2_ldp_read)
+uint8_t istellar_state::z80_2_ldp_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t readResult = m_laserdisc->status_r();
 	logerror("CPU2 : reading LDP : %x\n", readResult);
 	return readResult;
 }
 
-READ8_MEMBER(istellar_state::z80_2_latch2_read)
+uint8_t istellar_state::z80_2_latch2_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("CPU2 : reading latch2 (%x)\n", m_ldp_latch2);
 	return m_ldp_latch2;
 }
 
-READ8_MEMBER(istellar_state::z80_2_nmienable)
+uint8_t istellar_state::z80_2_nmienable(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("CPU2 : ENABLING NMI\n");
 	m_z80_2_nmi_enable = 1;
 	return 0x00;
 }
 
-READ8_MEMBER(istellar_state::z80_2_unknown_read)
+uint8_t istellar_state::z80_2_unknown_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("CPU2 : c000!\n");
 	return 0x00;
 }
 
-WRITE8_MEMBER(istellar_state::z80_2_latch1_write)
+void istellar_state::z80_2_latch1_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("CPU2 : writing latch1 (%x)\n", data);
 	m_ldp_latch1 = data;
 }
 
-WRITE8_MEMBER(istellar_state::z80_2_ldp_write)
+void istellar_state::z80_2_ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("CPU2 : writing LDP : 0x%x\n", data);
 	m_laserdisc->data_w(data);
@@ -275,7 +275,7 @@ static INPUT_PORTS_START( istellar )
 	/* SERVICE might be hanging out back here */
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(istellar_state, istellar)
+void istellar_state::palette_init_istellar(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -327,7 +327,7 @@ static GFXDECODE_START( istellar )
 	GFXDECODE_ENTRY( "gfx1", 0, istellar_gfx_layout, 0x0, 0x20 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(istellar_state::vblank_callback_istellar)
+void istellar_state::vblank_callback_istellar(device_t &device)
 {
 	/* Interrupt presumably comes from VBlank */
 	device.execute().set_input_line(0, HOLD_LINE);
@@ -412,7 +412,7 @@ ROM_START( istellar )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(istellar_state,istellar)
+void istellar_state::init_istellar()
 {
 	m_z80_2_nmi_enable = 0;
 

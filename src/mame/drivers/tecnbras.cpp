@@ -31,12 +31,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(set_x_position_w);
-	DECLARE_WRITE8_MEMBER(print_column_w);
+	void set_x_position_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void print_column_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-//  DECLARE_WRITE8_MEMBER(tecnbras_io_w);
-//  DECLARE_READ8_MEMBER(tecnbras_io_r);
-	DECLARE_DRIVER_INIT(tecnbras);
+//  void tecnbras_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+//  uint8_t tecnbras_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void init_tecnbras();
 private:
 	int m_xcoord;
 	char m_digit[14][7];
@@ -57,7 +57,7 @@ static ADDRESS_MAP_START(i80c31_io, AS_IO, 8, tecnbras_state)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_NOP /*buzzer ?*/
 ADDRESS_MAP_END
 
-DRIVER_INIT_MEMBER( tecnbras_state, tecnbras )
+void tecnbras_state::init_tecnbras()
 {
 	m_xcoord = 0;
 	for (auto & elem : m_digit){
@@ -67,12 +67,12 @@ DRIVER_INIT_MEMBER( tecnbras_state, tecnbras )
 	}
 }
 
-WRITE8_MEMBER(tecnbras_state::set_x_position_w)
+void tecnbras_state::set_x_position_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xcoord = offset;
 }
 
-WRITE8_MEMBER(tecnbras_state::print_column_w)
+void tecnbras_state::print_column_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x = m_xcoord + offset;
 	for (int i=0; i<7; i++){

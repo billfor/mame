@@ -45,12 +45,12 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( si_w );
+	void si_w(int state);
 
 	// not really public
-	DECLARE_READ8_MEMBER( kb_p1_r );
-	DECLARE_WRITE8_MEMBER( kb_p1_w );
-	DECLARE_WRITE8_MEMBER( kb_p2_w );
+	uint8_t kb_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kb_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kb_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

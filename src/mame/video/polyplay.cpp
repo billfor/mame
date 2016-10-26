@@ -15,7 +15,7 @@
 #include "includes/polyplay.h"
 
 
-PALETTE_INIT_MEMBER(polyplay_state, polyplay)
+void polyplay_state::palette_init_polyplay(palette_device &palette)
 {
 	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00));
 	palette.set_pen_color(1,rgb_t(0xff,0xff,0xff));
@@ -31,7 +31,7 @@ PALETTE_INIT_MEMBER(polyplay_state, polyplay)
 }
 
 
-WRITE8_MEMBER(polyplay_state::polyplay_characterram_w)
+void polyplay_state::polyplay_characterram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_characterram[offset] != data)
 	{

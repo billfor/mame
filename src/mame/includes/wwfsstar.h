@@ -35,20 +35,20 @@ public:
 	tilemap_t *m_fg0_tilemap;
 	tilemap_t *m_bg0_tilemap;
 
-	DECLARE_WRITE16_MEMBER(scroll_w);
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(irqack_w);
-	DECLARE_WRITE16_MEMBER(fg0_videoram_w);
-	DECLARE_WRITE16_MEMBER(bg0_videoram_w);
+	void scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void irqack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void fg0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bg0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
+	ioport_value vblank_r(ioport_field &field, void *param);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 
-	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
-	TILEMAP_MAPPER_MEMBER(bg0_scan);
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	void get_fg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index bg0_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 

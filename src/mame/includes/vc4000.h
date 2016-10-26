@@ -102,13 +102,13 @@ public:
 #endif
 	{ }
 
-	DECLARE_WRITE8_MEMBER(vc4000_sound_ctl);
-	DECLARE_READ8_MEMBER(vc4000_key_r);
-	DECLARE_READ8_MEMBER(vc4000_video_r);
-	DECLARE_WRITE8_MEMBER(vc4000_video_w);
-	DECLARE_READ8_MEMBER(vc4000_vsync_r);
-	DECLARE_READ8_MEMBER(elektor_cass_r);
-	DECLARE_WRITE8_MEMBER(elektor_cass_w);
+	void vc4000_sound_ctl(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vc4000_key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vc4000_video_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vc4000_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vc4000_vsync_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t elektor_cass_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void elektor_cass_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	vc4000_video_t m_video;
 	uint8_t m_sprite_collision[0x20];
 	uint8_t m_background_collision[0x20];
@@ -121,9 +121,9 @@ public:
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(vc4000);
+	void palette_init_vc4000(palette_device &palette);
 	uint32_t screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vc4000_video_line);
+	void vc4000_video_line(device_t &device);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(vc4000);
 
 protected:

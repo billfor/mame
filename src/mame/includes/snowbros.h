@@ -36,35 +36,35 @@ public:
 	int m_sb3_music;
 	uint8_t m_semicom_prot_offset;
 
-	DECLARE_WRITE16_MEMBER(snowbros_flipscreen_w);
-	DECLARE_WRITE16_MEMBER(snowbros_irq4_ack_w);
-	DECLARE_WRITE16_MEMBER(snowbros_irq3_ack_w);
-	DECLARE_WRITE16_MEMBER(snowbros_irq2_ack_w);
-	DECLARE_READ16_MEMBER(snowbros_68000_sound_r);
-	DECLARE_WRITE16_MEMBER(snowbros_68000_sound_w);
-	DECLARE_WRITE16_MEMBER(semicom_soundcmd_w);
-	DECLARE_READ8_MEMBER(prot_io_r);
-	DECLARE_WRITE8_MEMBER(prot_io_w);
-	DECLARE_WRITE16_MEMBER(twinadv_68000_sound_w);
-	DECLARE_READ16_MEMBER(sb3_sound_r);
-	DECLARE_READ16_MEMBER(_4in1_02_read);
-	DECLARE_READ16_MEMBER(_3in1_read);
-	DECLARE_READ16_MEMBER(cookbib3_read);
-	DECLARE_WRITE8_MEMBER(twinadv_oki_bank_w);
-	DECLARE_WRITE16_MEMBER(sb3_sound_w);
-	DECLARE_READ16_MEMBER(toto_read);
+	void snowbros_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void snowbros_irq4_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void snowbros_irq3_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void snowbros_irq2_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t snowbros_68000_sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void snowbros_68000_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void semicom_soundcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t prot_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void prot_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void twinadv_68000_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sb3_sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t _4in1_02_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t _3in1_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t cookbib3_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void twinadv_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sb3_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t toto_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DRIVER_INIT(pzlbreak);
-	DECLARE_DRIVER_INIT(snowbro3);
-	DECLARE_DRIVER_INIT(cookbib3);
-	DECLARE_DRIVER_INIT(4in1boot);
-	DECLARE_DRIVER_INIT(3in1semi);
-	DECLARE_DRIVER_INIT(cookbib2);
-	DECLARE_DRIVER_INIT(toto);
-	DECLARE_DRIVER_INIT(hyperpac);
-	DECLARE_DRIVER_INIT(yutnori);
-	DECLARE_MACHINE_RESET(semiprot);
-	DECLARE_MACHINE_RESET(finalttr);
+	void init_pzlbreak();
+	void init_snowbro3();
+	void init_cookbib3();
+	void init_4in1boot();
+	void init_3in1semi();
+	void init_cookbib2();
+	void init_toto();
+	void init_hyperpac();
+	void init_yutnori();
+	void machine_reset_semiprot();
+	void machine_reset_finalttr();
 
 	uint32_t screen_update_snowbros(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_honeydol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -73,8 +73,8 @@ public:
 	uint32_t screen_update_wintbob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_snowbros(screen_device &screen, bool state);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(snowbros_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(snowbros3_irq);
+	void snowbros_irq(timer_device &timer, void *ptr, int32_t param);
+	void snowbros3_irq(timer_device &timer, void *ptr, int32_t param);
 
 	void sb3_play_music(int data);
 	void sb3_play_sound(int data);

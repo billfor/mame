@@ -55,16 +55,16 @@
  *
  ***************************************************************************/
 
-WRITE8_MEMBER(decocass_state::mirrorvideoram_w) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_fgvideoram_w(space, offset, data, mem_mask); }
-WRITE8_MEMBER(decocass_state::mirrorcolorram_w) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_colorram_w(space, offset, data, mem_mask); }
+void decocass_state::mirrorvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_fgvideoram_w(space, offset, data, mem_mask); }
+void decocass_state::mirrorcolorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_colorram_w(space, offset, data, mem_mask); }
 
-READ8_MEMBER(decocass_state::mirrorvideoram_r)
+uint8_t decocass_state::mirrorvideoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return m_fgvideoram[offset];
 }
 
-READ8_MEMBER(decocass_state::mirrorcolorram_r)
+uint8_t decocass_state::mirrorcolorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return m_colorram[offset];
@@ -722,7 +722,7 @@ static GFXDECODE_START( decocass )
 	GFXDECODE_ENTRY( nullptr, 0xd800, objlayout,       48, 4 )  /* object */
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(decocass_state, decocass)
+void decocass_state::palette_init_decocass(palette_device &palette)
 {
 	int i;
 
@@ -1716,7 +1716,7 @@ ROM_START( cflyball )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(decocass_state,decocass)
+void decocass_state::init_decocass()
 {
 	/* Call the state save setup code in machine/decocass.c */
 	decocass_machine_state_save_init();
@@ -1724,10 +1724,10 @@ DRIVER_INIT_MEMBER(decocass_state,decocass)
 	decocass_video_state_save_init();
 }
 
-DRIVER_INIT_MEMBER(decocass_state,decocrom)
+void decocass_state::init_decocrom()
 {
 	/* standard init */
-	DRIVER_INIT_CALL(decocass);
+	init_decocass();
 
 	/* convert charram to a banked ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x6000, 0xafff, "bank1");
@@ -1740,7 +1740,7 @@ DRIVER_INIT_MEMBER(decocass_state,decocrom)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe900, 0xe900, write8_delegate(FUNC(decocass_state::decocass_e900_w),this));
 }
 
-READ8_MEMBER(decocass_state::cdsteljn_input_r )
+uint8_t decocass_state::cdsteljn_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 	static const char *const portnames[2][4] = {
@@ -1755,7 +1755,7 @@ READ8_MEMBER(decocass_state::cdsteljn_input_r )
 	return res;
 }
 
-WRITE8_MEMBER(decocass_state::cdsteljn_mux_w )
+void decocass_state::cdsteljn_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = (data & 0xc) >> 2;
 	/* bit 0 and 1 are p1/p2 lamps */
@@ -1764,10 +1764,10 @@ WRITE8_MEMBER(decocass_state::cdsteljn_mux_w )
 		printf("%02x\n",data);
 }
 
-DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
+void decocass_state::init_cdsteljn()
 {
 	/* standard init */
-	DRIVER_INIT_CALL(decocass);
+	init_decocass();
 
 	/* install custom mahjong panel */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe413, 0xe413, write8_delegate(FUNC(decocass_state::cdsteljn_mux_w), this));

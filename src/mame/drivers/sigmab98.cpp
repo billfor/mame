@@ -165,91 +165,91 @@ public:
 	uint8_t m_timer0_vector;
 	uint8_t m_timer1_vector;
 
-	DECLARE_WRITE8_MEMBER(gegege_regs_w);
-	DECLARE_READ8_MEMBER(gegege_regs_r);
-	DECLARE_WRITE8_MEMBER(gegege_regs2_w);
-	DECLARE_READ8_MEMBER(gegege_regs2_r);
+	void gegege_regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gegege_regs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gegege_regs2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gegege_regs2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(dodghero_regs_w);
-	DECLARE_READ8_MEMBER(dodghero_regs_r);
-	DECLARE_WRITE8_MEMBER(dodghero_regs2_w);
-	DECLARE_READ8_MEMBER(dodghero_regs2_r);
+	void dodghero_regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dodghero_regs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dodghero_regs2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dodghero_regs2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(dashhero_regs2_w);
-	DECLARE_READ8_MEMBER(dashhero_regs2_r);
+	void dashhero_regs2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dashhero_regs2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(vregs_w);
-	DECLARE_READ8_MEMBER(vregs_r);
-	DECLARE_READ8_MEMBER(d013_r);
-	DECLARE_READ8_MEMBER(d021_r);
+	void vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vregs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t d013_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t d021_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(c4_w);
-	DECLARE_WRITE8_MEMBER(c6_w);
-	DECLARE_WRITE8_MEMBER(c8_w);
+	void c4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void c6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void c8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(animalc_rombank_w);
-	DECLARE_READ8_MEMBER(animalc_rombank_r);
-	DECLARE_WRITE8_MEMBER(animalc_rambank_w);
-	DECLARE_READ8_MEMBER(animalc_rambank_r);
+	void animalc_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t animalc_rombank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void animalc_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t animalc_rambank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(unk_34_r);
-	DECLARE_WRITE8_MEMBER(vblank_w);
-	DECLARE_READ8_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(sammymdl_coin_w);
-	DECLARE_WRITE8_MEMBER(sammymdl_leds_w);
-	DECLARE_WRITE8_MEMBER(sammymdl_hopper_w);
-	DECLARE_READ8_MEMBER(sammymdl_coin_hopper_r);
+	uint8_t unk_34_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vblank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vblank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sammymdl_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sammymdl_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sammymdl_hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sammymdl_coin_hopper_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(haekaka_rombank_w);
-	DECLARE_READ8_MEMBER(haekaka_rombank_r);
-	DECLARE_WRITE8_MEMBER(haekaka_rambank_w);
-	DECLARE_READ8_MEMBER(haekaka_rambank_r);
-	DECLARE_READ8_MEMBER(haekaka_vblank_r);
-	DECLARE_READ8_MEMBER(haekaka_b000_r);
-	DECLARE_WRITE8_MEMBER(haekaka_b000_w);
-	DECLARE_WRITE8_MEMBER(haekaka_leds_w);
-	DECLARE_WRITE8_MEMBER(haekaka_coin_w);
+	void haekaka_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t haekaka_rombank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void haekaka_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t haekaka_rambank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t haekaka_vblank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t haekaka_b000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void haekaka_b000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void haekaka_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void haekaka_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(itazuram_rombank_w);
-	DECLARE_READ8_MEMBER(itazuram_rombank_r);
-	DECLARE_WRITE8_MEMBER(itazuram_rambank_w);
-	DECLARE_READ8_MEMBER(itazuram_rambank_r);
-	DECLARE_WRITE8_MEMBER(itazuram_nvram_palette_w);
-	DECLARE_WRITE8_MEMBER(itazuram_palette_w);
-	DECLARE_READ8_MEMBER(itazuram_palette_r);
+	void itazuram_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t itazuram_rombank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void itazuram_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t itazuram_rambank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void itazuram_nvram_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void itazuram_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t itazuram_palette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(tdoboon_rombank_w);
-	DECLARE_READ8_MEMBER(tdoboon_rombank_r);
-	DECLARE_WRITE8_MEMBER(tdoboon_rambank_w);
-	DECLARE_READ8_MEMBER(tdoboon_rambank_r);
-	DECLARE_READ8_MEMBER(tdoboon_c000_r);
-	DECLARE_WRITE8_MEMBER(tdoboon_c000_w);
+	void tdoboon_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tdoboon_rombank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tdoboon_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tdoboon_rambank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t tdoboon_c000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tdoboon_c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void show_outputs();
 	void show_3_outputs();
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(sammymdl_eeprom_r);
-	DECLARE_WRITE8_MEMBER(sammymdl_eeprom_w);
+	void eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sammymdl_eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sammymdl_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT(dodghero);
-	DECLARE_DRIVER_INIT(b3rinsya);
-	DECLARE_DRIVER_INIT(tbeastw2);
-	DECLARE_DRIVER_INIT(dashhero);
-	DECLARE_DRIVER_INIT(gegege);
-	DECLARE_DRIVER_INIT(pepsiman);
-	DECLARE_DRIVER_INIT(itazuram);
-	DECLARE_DRIVER_INIT(animalc);
-	DECLARE_DRIVER_INIT(ucytokyu);
-	DECLARE_DRIVER_INIT(haekaka);
+	void init_dodghero();
+	void init_b3rinsya();
+	void init_tbeastw2();
+	void init_dashhero();
+	void init_gegege();
+	void init_pepsiman();
+	void init_itazuram();
+	void init_animalc();
+	void init_ucytokyu();
+	void init_haekaka();
 
-	DECLARE_MACHINE_RESET(sigmab98);
-	DECLARE_MACHINE_RESET(sammymdl);
+	void machine_reset_sigmab98();
+	void machine_reset_sammymdl();
 
 	virtual void video_start() override;
 	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sammymdl(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_irq);
+	void sigmab98_vblank_interrupt(device_t &device);
+	void sammymdl_irq(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
 };
 
@@ -542,7 +542,7 @@ uint32_t sigmab98_state::screen_update_sigmab98(screen_device &screen, bitmap_in
 
 ***************************************************************************/
 
-WRITE8_MEMBER(sigmab98_state::vregs_w)
+void sigmab98_state::vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vregs[offset] = data;
 
@@ -563,7 +563,7 @@ WRITE8_MEMBER(sigmab98_state::vregs_w)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::vregs_r)
+uint8_t sigmab98_state::vregs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -573,14 +573,14 @@ READ8_MEMBER(sigmab98_state::vregs_r)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::d013_r)
+uint8_t sigmab98_state::d013_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// bit 5 must go 0->1 (vblank?)
 	// bit 2 must set (sprite buffered? triggered by pulsing bit 3 of port C6?)
 	return (m_screen->vblank() ? 0x20 : 0) | 0x04;
 //  return machine().rand();
 }
-READ8_MEMBER(sigmab98_state::d021_r)
+uint8_t sigmab98_state::d021_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// bit 5 must be 0?
 	return 0;
@@ -599,7 +599,7 @@ READ8_MEMBER(sigmab98_state::d021_r)
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::dodghero_regs_w)
+void sigmab98_state::dodghero_regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -629,7 +629,7 @@ WRITE8_MEMBER(sigmab98_state::dodghero_regs_w)
 			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::dodghero_regs_r)
+uint8_t sigmab98_state::dodghero_regs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg;
@@ -647,7 +647,7 @@ READ8_MEMBER(sigmab98_state::dodghero_regs_r)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::dodghero_regs2_w)
+void sigmab98_state::dodghero_regs2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -676,7 +676,7 @@ WRITE8_MEMBER(sigmab98_state::dodghero_regs2_w)
 			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::dodghero_regs2_r)
+uint8_t sigmab98_state::dodghero_regs2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -733,7 +733,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::gegege_regs_w)
+void sigmab98_state::gegege_regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -755,7 +755,7 @@ WRITE8_MEMBER(sigmab98_state::gegege_regs_w)
 			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::gegege_regs_r)
+uint8_t sigmab98_state::gegege_regs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg;
@@ -772,7 +772,7 @@ READ8_MEMBER(sigmab98_state::gegege_regs_r)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::gegege_regs2_w)
+void sigmab98_state::gegege_regs2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -801,7 +801,7 @@ WRITE8_MEMBER(sigmab98_state::gegege_regs2_w)
 			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::gegege_regs2_r)
+uint8_t sigmab98_state::gegege_regs2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -828,7 +828,7 @@ void sigmab98_state::show_outputs()
 }
 
 // Port c0
-WRITE8_MEMBER(sigmab98_state::eeprom_w)
+void sigmab98_state::eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// latch the bit
 	m_eeprom->di_write((data & 0x40) >> 6);
@@ -846,7 +846,7 @@ WRITE8_MEMBER(sigmab98_state::eeprom_w)
 
 // Port c4
 // 10 led?
-WRITE8_MEMBER(sigmab98_state::c4_w)
+void sigmab98_state::c4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, (data & 0x10));
 
@@ -860,7 +860,7 @@ WRITE8_MEMBER(sigmab98_state::c4_w)
 // 08 buffer sprites?
 // 10 led?
 // 20 led? (starts blinking after coin in)
-WRITE8_MEMBER(sigmab98_state::c6_w)
+void sigmab98_state::c6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x02);
 
@@ -879,7 +879,7 @@ WRITE8_MEMBER(sigmab98_state::c6_w)
 // Port c8
 // 01 hopper enable?
 // 02 hopper motor on (active low)?
-WRITE8_MEMBER(sigmab98_state::c8_w)
+void sigmab98_state::c8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (!(data & 0x02) && (data & 0x01)) ? 0x00 : 0x80);
 
@@ -931,7 +931,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::dashhero_regs2_w)
+void sigmab98_state::dashhero_regs2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -968,7 +968,7 @@ WRITE8_MEMBER(sigmab98_state::dashhero_regs2_w)
 			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::dashhero_regs2_r)
+uint8_t sigmab98_state::dashhero_regs2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -1010,7 +1010,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::animalc_rombank_w)
+void sigmab98_state::animalc_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1037,7 +1037,7 @@ WRITE8_MEMBER(sigmab98_state::animalc_rombank_w)
 			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::animalc_rombank_r)
+uint8_t sigmab98_state::animalc_rombank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg;
@@ -1054,7 +1054,7 @@ READ8_MEMBER(sigmab98_state::animalc_rombank_r)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::animalc_rambank_w)
+void sigmab98_state::animalc_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1087,7 +1087,7 @@ WRITE8_MEMBER(sigmab98_state::animalc_rambank_w)
 			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::animalc_rambank_r)
+uint8_t sigmab98_state::animalc_rambank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -1104,12 +1104,12 @@ READ8_MEMBER(sigmab98_state::animalc_rambank_r)
 }
 
 
-READ8_MEMBER(sigmab98_state::sammymdl_eeprom_r)
+uint8_t sigmab98_state::sammymdl_eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_eeprom->do_read() ? 0x80 : 0;
 }
 
-WRITE8_MEMBER(sigmab98_state::sammymdl_eeprom_w)
+void sigmab98_state::sammymdl_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// latch the bit
 	m_eeprom->di_write((data & 0x40) >> 6);
@@ -1124,20 +1124,20 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_eeprom_w)
 		logerror("%s: unknown eeeprom bits written %02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(sigmab98_state::unk_34_r)
+uint8_t sigmab98_state::unk_34_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// mask 0x01?
 	return 0x01;
 }
 
-READ8_MEMBER(sigmab98_state::vblank_r)
+uint8_t sigmab98_state::vblank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// mask 0x04 must be set before writing sprite list
 	// mask 0x10 must be set or irq/00 hangs?
 	return  m_vblank | 0x14;
 }
 
-WRITE8_MEMBER(sigmab98_state::vblank_w)
+void sigmab98_state::vblank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vblank = (m_vblank & ~0x03) | (data & 0x03);
 }
@@ -1158,7 +1158,7 @@ void sigmab98_state::show_3_outputs()
 #endif
 }
 // Port 31
-WRITE8_MEMBER(sigmab98_state::sammymdl_coin_w)
+void sigmab98_state::sammymdl_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0,   data  & 0x01 );  // coin1 in
 	machine().bookkeeping().coin_counter_w(1,   data  & 0x02 );  // coin2 in
@@ -1173,7 +1173,7 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_coin_w)
 }
 
 // Port 32
-WRITE8_MEMBER(sigmab98_state::sammymdl_leds_w)
+void sigmab98_state::sammymdl_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0,    data & 0x01);   // button
 
@@ -1184,7 +1184,7 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_leds_w)
 // Port b0
 // 02 hopper enable?
 // 01 hopper motor on (active low)?
-WRITE8_MEMBER(sigmab98_state::sammymdl_hopper_w)
+void sigmab98_state::sammymdl_hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (!(data & 0x01) && (data & 0x02)) ? 0x00 : 0x80);
 
@@ -1192,7 +1192,7 @@ WRITE8_MEMBER(sigmab98_state::sammymdl_hopper_w)
 	show_3_outputs();
 }
 
-READ8_MEMBER(sigmab98_state::sammymdl_coin_hopper_r)
+uint8_t sigmab98_state::sammymdl_coin_hopper_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = ioport("COIN")->read();
 
@@ -1244,7 +1244,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::haekaka_rombank_w)
+void sigmab98_state::haekaka_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1288,7 +1288,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_rombank_w)
 			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::haekaka_rombank_r)
+uint8_t sigmab98_state::haekaka_rombank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg;
@@ -1305,7 +1305,7 @@ READ8_MEMBER(sigmab98_state::haekaka_rombank_r)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::haekaka_rambank_w)
+void sigmab98_state::haekaka_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1331,7 +1331,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_rambank_w)
 			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::haekaka_rambank_r)
+uint8_t sigmab98_state::haekaka_rambank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -1347,12 +1347,12 @@ READ8_MEMBER(sigmab98_state::haekaka_rambank_r)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::haekaka_vblank_r)
+uint8_t sigmab98_state::haekaka_vblank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_screen->vblank() ? 0 : 0x1c;
 }
 
-READ8_MEMBER(sigmab98_state::haekaka_b000_r)
+uint8_t sigmab98_state::haekaka_b000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_rombank)
 	{
@@ -1398,7 +1398,7 @@ READ8_MEMBER(sigmab98_state::haekaka_b000_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
+void sigmab98_state::haekaka_b000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_rombank)
 	{
@@ -1432,7 +1432,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 	logerror("%s: unknown write to %02x = %02x with rombank = %02x\n", machine().describe_context(), offset+0xb000, data, m_rombank);
 }
 
-WRITE8_MEMBER(sigmab98_state::haekaka_leds_w)
+void sigmab98_state::haekaka_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// All used
 	output().set_led_value(0,    data & 0x01);
@@ -1448,7 +1448,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_leds_w)
 	show_3_outputs();
 }
 
-WRITE8_MEMBER(sigmab98_state::haekaka_coin_w)
+void sigmab98_state::haekaka_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0,   data & 0x01 );   // medal out
 //                                 data & 0x02 ?
@@ -1488,7 +1488,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
+void sigmab98_state::itazuram_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1599,7 +1599,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::itazuram_rombank_r)
+uint8_t sigmab98_state::itazuram_rombank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg;
@@ -1620,7 +1620,7 @@ READ8_MEMBER(sigmab98_state::itazuram_rombank_r)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::itazuram_rambank_w)
+void sigmab98_state::itazuram_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1647,7 +1647,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rambank_w)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::itazuram_rambank_r)
+uint8_t sigmab98_state::itazuram_rambank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -1663,7 +1663,7 @@ READ8_MEMBER(sigmab98_state::itazuram_rambank_r)
 	}
 }
 
-WRITE8_MEMBER(sigmab98_state::itazuram_nvram_palette_w)
+void sigmab98_state::itazuram_nvram_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_rambank == 0x64)
 	{
@@ -1679,7 +1679,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_nvram_palette_w)
 	}
 }
 
-WRITE8_MEMBER(sigmab98_state::itazuram_palette_w)
+void sigmab98_state::itazuram_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_rombank == 0x6c)
 	{
@@ -1692,7 +1692,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_palette_w)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::itazuram_palette_r)
+uint8_t sigmab98_state::itazuram_palette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_paletteram[offset];
 }
@@ -1744,7 +1744,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 // rombank
-WRITE8_MEMBER(sigmab98_state::tdoboon_rombank_w)
+void sigmab98_state::tdoboon_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1789,7 +1789,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_rombank_w)
 			logerror("%s: unknown reg written: %02x = %02x\n", machine().describe_context(), m_reg, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::tdoboon_rombank_r)
+uint8_t sigmab98_state::tdoboon_rombank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg;
@@ -1806,7 +1806,7 @@ READ8_MEMBER(sigmab98_state::tdoboon_rombank_r)
 }
 
 // rambank
-WRITE8_MEMBER(sigmab98_state::tdoboon_rambank_w)
+void sigmab98_state::tdoboon_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1832,7 +1832,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_rambank_w)
 			logerror("%s: unknown reg2 written: %02x = %02x\n", machine().describe_context(), m_reg2, data);
 	}
 }
-READ8_MEMBER(sigmab98_state::tdoboon_rambank_r)
+uint8_t sigmab98_state::tdoboon_rambank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return m_reg2;
@@ -1848,7 +1848,7 @@ READ8_MEMBER(sigmab98_state::tdoboon_rambank_r)
 	}
 }
 
-READ8_MEMBER(sigmab98_state::tdoboon_c000_r)
+uint8_t sigmab98_state::tdoboon_c000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_rombank)
 	{
@@ -1898,7 +1898,7 @@ READ8_MEMBER(sigmab98_state::tdoboon_c000_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(sigmab98_state::tdoboon_c000_w)
+void sigmab98_state::tdoboon_c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_rombank)
 	{
@@ -2131,7 +2131,7 @@ INPUT_PORTS_END
                              Sigma B-98 Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(sigmab98_state,sigmab98)
+void sigmab98_state::machine_reset_sigmab98()
 {
 	m_rombank = 0;
 	membank("rombank")->set_entry(0);
@@ -2140,7 +2140,7 @@ MACHINE_RESET_MEMBER(sigmab98_state,sigmab98)
 	membank("rambank")->set_entry(0);
 }
 
-INTERRUPT_GEN_MEMBER(sigmab98_state::sigmab98_vblank_interrupt)
+void sigmab98_state::sigmab98_vblank_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a);
 }
@@ -2207,12 +2207,12 @@ MACHINE_CONFIG_END
                              Sammy Medal Games
 ***************************************************************************/
 
-MACHINE_RESET_MEMBER(sigmab98_state,sammymdl)
+void sigmab98_state::machine_reset_sammymdl()
 {
 	m_maincpu->set_state_int(Z80_PC, 0x400);  // code starts at 400 ??? (000 = cart header)
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
+void sigmab98_state::sammymdl_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2329,7 +2329,7 @@ ROM_START( dodghero )
 	ROM_LOAD( "b9802-6.ic26", 0x80000, 0x80000, CRC(d83d8537) SHA1(9a5afdc68417db828a09188d653552452930b136) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,dodghero)
+void sigmab98_state::init_dodghero()
 {
 	// ROM banks
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2406,7 +2406,7 @@ ROM_START( gegege )
 	ROM_LOAD( "b9804-5.ic16", 0x00000, 0x80000, CRC(ddd7984c) SHA1(3558c495776671ffd3cd5c665b87827b3959b360) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,gegege)
+void sigmab98_state::init_gegege()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2454,7 +2454,7 @@ ROM_START( b3rinsya )
 	ROM_LOAD( "b9805-5.ic16", 0x00000, 0x80000, CRC(f686f886) SHA1(ab68d12c5cb3a9fbc8a178739f39a2ff3104a0a1) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,b3rinsya)
+void sigmab98_state::init_b3rinsya()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2493,7 +2493,7 @@ ROM_START( pepsiman )
 	ROM_LOAD( "b9806-5.ic16", 0x00000, 0x80000, CRC(6d405dfb) SHA1(e65ffe1279680097894754e379d7ad638657eb49) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,pepsiman)
+void sigmab98_state::init_pepsiman()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2543,7 +2543,7 @@ ROM_START( tbeastw2 )
 	ROM_LOAD( "b9808-6.ic26.bin", 0x80000, 0x80000, CRC(9ed759c9) SHA1(963db80b8a107ce9292bbc776ba91bc76ad82d5b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,tbeastw2)
+void sigmab98_state::init_tbeastw2()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2584,7 +2584,7 @@ ROM_START( ucytokyu )
 	ROM_LOAD( "b9809-6.ic26", 0x80000, 0x80000, CRC(4e2d5fdf) SHA1(af1357b0f6a407890ecad26a18d2b4e223802693) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,ucytokyu)
+void sigmab98_state::init_ucytokyu()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2633,7 +2633,7 @@ ROM_START( dashhero )
 	ROM_LOAD( "b098112-0100.ic16", 0x00000, 0x80000, CRC(26e5d6f5) SHA1(6fe6a26e51097886db58a6619b12a73cd21e7130) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,dashhero)
+void sigmab98_state::init_dashhero()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2735,7 +2735,7 @@ ROM_START( animalc )
 	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, CRC(4ae14ff9) SHA1(1273d15ea642452fecacff572655cd3ab47a5884) )   // 1xxxxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,animalc)
+void sigmab98_state::init_animalc()
 {
 	// RAM banks
 	uint8_t *bankedram = auto_alloc_array(machine(), uint8_t, 0x1000 * 5);
@@ -2775,7 +2775,7 @@ ROM_START( itazuram )
 	ROM_LOAD( "vx2001l01.u016", 0x00000, 0x200000, CRC(9ee95222) SHA1(7154d43ef312a48a882207ca37e1c61e8b215a9b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,itazuram)
+void sigmab98_state::init_itazuram()
 {
 	// ROM banks
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2894,7 +2894,7 @@ ROM_START( haekaka )
 	ROM_LOAD( "em4207l01.u016.bin", 0x00000, 0x200000, CRC(3876961c) SHA1(3d842c1f63ea5aa7e799967928b86c5fabb4e65e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sigmab98_state,haekaka)
+void sigmab98_state::init_haekaka()
 {
 	// RAM banks
 	m_paletteram.resize(0x200);

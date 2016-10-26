@@ -102,17 +102,17 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_CHANGED_MEMBER( mpf1_state::trigger_nmi )
+void mpf1_state::trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( mpf1_state::trigger_irq )
+void mpf1_state::trigger_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( mpf1_state::trigger_res )
+void mpf1_state::trigger_res(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -235,7 +235,7 @@ INPUT_PORTS_END
 
 /* Intel 8255A Interface */
 
-TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
+void mpf1_state::led_refresh(void *ptr, int32_t param)
 {
 	if (BIT(m_lednum, 5)) output().set_digit_value(0, param);
 	if (BIT(m_lednum, 4)) output().set_digit_value(1, param);
@@ -245,7 +245,7 @@ TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
 	if (BIT(m_lednum, 0)) output().set_digit_value(5, param);
 }
 
-READ8_MEMBER( mpf1_state::ppi_pa_r )
+uint8_t mpf1_state::ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x7f;
 
@@ -266,7 +266,7 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( mpf1_state::ppi_pb_w )
+void mpf1_state::ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* swap bits around for the mame 7-segment emulation */
 	uint8_t led_data = BITSWAP8(data, 6, 1, 2, 0, 7, 5, 4, 3);
@@ -275,7 +275,7 @@ WRITE8_MEMBER( mpf1_state::ppi_pb_w )
 	m_led_refresh_timer->adjust(attotime::from_usec(70), led_data);
 }
 
-WRITE8_MEMBER( mpf1_state::ppi_pc_w )
+void mpf1_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-5, led select and keyboard latch */
 	m_lednum = data & 0x3f;
@@ -307,7 +307,7 @@ static const z80_daisy_config mpf1_daisy_chain[] =
 
 /* Machine Initialization */
 
-TIMER_DEVICE_CALLBACK_MEMBER(mpf1_state::check_halt_callback)
+void mpf1_state::check_halt_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
@@ -458,7 +458,7 @@ ROM_END
 
 /* System Drivers */
 
-DIRECT_UPDATE_MEMBER(mpf1_state::mpf1_direct_update_handler)
+offs_t mpf1_state::mpf1_direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (!m_break)
 	{
@@ -473,7 +473,7 @@ DIRECT_UPDATE_MEMBER(mpf1_state::mpf1_direct_update_handler)
 	return address;
 }
 
-DRIVER_INIT_MEMBER(mpf1_state,mpf1)
+void mpf1_state::init_mpf1()
 {
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(mpf1_state::mpf1_direct_update_handler), this));
 }

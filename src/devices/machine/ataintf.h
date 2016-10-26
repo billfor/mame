@@ -85,13 +85,13 @@ public:
 	template<class _Object> static devcb_base &set_dmarq_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dmarq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_dasp_handler(device_t &device, _Object object) { return downcast<ata_interface_device &>(device).m_dasp_handler.set_callback(object); }
 	uint16_t read_dma();
-	virtual DECLARE_READ16_MEMBER(read_cs0);
-	virtual DECLARE_READ16_MEMBER(read_cs1);
+	virtual uint16_t read_cs0(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual uint16_t read_cs1(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	void write_dma(uint16_t data);
-	virtual DECLARE_WRITE16_MEMBER(write_cs0);
-	virtual DECLARE_WRITE16_MEMBER(write_cs1);
-	DECLARE_WRITE_LINE_MEMBER(write_dmack);
+	virtual void write_cs0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual void write_cs1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_dmack(int state);
 
 protected:
 	// device-level overrides
@@ -103,15 +103,15 @@ protected:
 	virtual void set_dasp(int state);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(irq0_write_line);
-	DECLARE_WRITE_LINE_MEMBER(dmarq0_write_line);
-	DECLARE_WRITE_LINE_MEMBER(dasp0_write_line);
-	DECLARE_WRITE_LINE_MEMBER(pdiag0_write_line);
+	void irq0_write_line(int state);
+	void dmarq0_write_line(int state);
+	void dasp0_write_line(int state);
+	void pdiag0_write_line(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(irq1_write_line);
-	DECLARE_WRITE_LINE_MEMBER(dmarq1_write_line);
-	DECLARE_WRITE_LINE_MEMBER(dasp1_write_line);
-	DECLARE_WRITE_LINE_MEMBER(pdiag1_write_line);
+	void irq1_write_line(int state);
+	void dmarq1_write_line(int state);
+	void dasp1_write_line(int state);
+	void pdiag1_write_line(int state);
 
 	ata_slot_device *m_slot[2];
 	int m_irq[2];

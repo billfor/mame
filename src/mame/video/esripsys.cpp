@@ -11,13 +11,13 @@
 #include "includes/esripsys.h"
 
 
-INTERRUPT_GEN_MEMBER(esripsys_state::esripsys_vblank_irq)
+void esripsys_state::esripsys_vblank_irq(device_t &device)
 {
 	m_gamecpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 	m_frame_vbl = 0;
 }
 
-TIMER_CALLBACK_MEMBER(esripsys_state::hblank_start_callback)
+void esripsys_state::hblank_start_callback(void *ptr, int32_t param)
 {
 	int v = m_screen->vpos();
 
@@ -43,7 +43,7 @@ TIMER_CALLBACK_MEMBER(esripsys_state::hblank_start_callback)
 	m_hblank = 0;
 }
 
-TIMER_CALLBACK_MEMBER(esripsys_state::hblank_end_callback)
+void esripsys_state::hblank_end_callback(void *ptr, int32_t param)
 {
 	int v = m_screen->vpos();
 
@@ -182,7 +182,7 @@ uint32_t esripsys_state::screen_update_esripsys(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-WRITE8_MEMBER(esripsys_state::esripsys_bg_intensity_w)
+void esripsys_state::esripsys_bg_intensity_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_intensity = data & 0xf;
 }

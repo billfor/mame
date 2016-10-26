@@ -191,18 +191,18 @@ mzr8105_state(const machine_config &mconfig, device_type type, const char *tag) 
 {
 }
 
-DECLARE_READ16_MEMBER (vme_a24_r);
-DECLARE_WRITE16_MEMBER (vme_a24_w);
-DECLARE_READ16_MEMBER (vme_a16_r);
-DECLARE_WRITE16_MEMBER (vme_a16_w);
+uint16_t vme_a24_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+void vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+uint16_t vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+void vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 virtual void machine_start () override;
-DECLARE_WRITE_LINE_MEMBER (write_updterm_clock);
+void write_updterm_clock(int state);
 
 #if CARDSLOT
 // User EPROM/SRAM slot(s)
 int mzr8105_load_cart(device_image_interface &image, generic_slot_device *slot);
-DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return mzr8105_load_cart(image, m_cart); }
-DECLARE_READ16_MEMBER (read16_rom);
+image_init_result device_image_load_exp1_load(device_image_interface &image) { return mzr8105_load_cart(image, m_cart); }
+uint16_t read16_rom(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 #endif
 
 protected:
@@ -259,21 +259,21 @@ void mzr8105_state::machine_start ()
 }
 
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (mzr8105_state::vme_a24_r){
+uint16_t mzr8105_state::vme_a24_r(address_space &space, offs_t offset, uint16_t mem_mask){
 		LOG (logerror ("vme_a24_r\n"));
 		return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (mzr8105_state::vme_a24_w){
+void mzr8105_state::vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 		LOG (logerror ("vme_a24_w\n"));
 }
 
-READ16_MEMBER (mzr8105_state::vme_a16_r){
+uint16_t mzr8105_state::vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask){
 		LOG (logerror ("vme_16_r\n"));
 		return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (mzr8105_state::vme_a16_w){
+void mzr8105_state::vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 		LOG (logerror ("vme_a16_w\n"));
 }
 
@@ -313,7 +313,7 @@ int mzr8105_state::mzr8105_load_cart(device_image_interface &image, generic_slot
 }
 #endif
 
-WRITE_LINE_MEMBER (mzr8105_state::write_updterm_clock){
+void mzr8105_state::write_updterm_clock(int state){
 		m_updterm->txca_w (state);
 		m_updterm->rxca_w (state);
 }

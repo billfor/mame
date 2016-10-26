@@ -51,12 +51,12 @@ public:
 
 	uint32_t screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER( com5016_fr_w );
+	void com5016_fr_w(int state);
 
-	DECLARE_READ8_MEMBER( system_test_r ); // noted as "for use with auto test equip" in flowchart on pg. 30, ref[1], jumps to 0x8000 if bit 0 is unset
-	DECLARE_READ8_MEMBER( status_reg_2_r );
-	DECLARE_WRITE8_MEMBER( status_reg_3_w );
-	DECLARE_READ8_MEMBER( keyboard_status_latch_r );
+	uint8_t system_test_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); // noted as "for use with auto test equip" in flowchart on pg. 30, ref[1], jumps to 0x8000 if bit 0 is unset
+	uint8_t status_reg_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void status_reg_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_status_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -74,7 +74,7 @@ void hazl1500_state::machine_reset()
 	m_keyboard_status_latch = 0;
 }
 
-WRITE_LINE_MEMBER( hazl1500_state::com5016_fr_w )
+void hazl1500_state::com5016_fr_w(int state)
 {
 	m_uart->rx_process();
 	m_uart->tx_process();
@@ -85,17 +85,17 @@ uint32_t hazl1500_state::screen_update_hazl1500(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-READ8_MEMBER( hazl1500_state::keyboard_status_latch_r )
+uint8_t hazl1500_state::keyboard_status_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_keyboard_status_latch ^ 0xff;
 }
 
-READ8_MEMBER( hazl1500_state::system_test_r )
+uint8_t hazl1500_state::system_test_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER( hazl1500_state::status_reg_2_r )
+uint8_t hazl1500_state::status_reg_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t misc_dips = m_misc_dips->read();
 	uint8_t status = 0;
@@ -108,7 +108,7 @@ READ8_MEMBER( hazl1500_state::status_reg_2_r )
 	return status ^ 0xff;
 }
 
-WRITE8_MEMBER( hazl1500_state::status_reg_3_w )
+void hazl1500_state::status_reg_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("sr3: %02x\n", data);
 	m_status_reg_3 = data;

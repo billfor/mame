@@ -12,7 +12,7 @@
 
 #include "includes/combatsc.h"
 
-PALETTE_INIT_MEMBER(combatsc_state,combatsc)
+void combatsc_state::palette_init_combatsc(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int pal;
@@ -60,7 +60,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 }
 
 
-PALETTE_INIT_MEMBER(combatsc_state,combatscb)
+void combatsc_state::palette_init_combatscb(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int pal;
@@ -93,7 +93,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
+void combatsc_state::get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);
 	uint8_t attributes = m_page[0][tile_index];
@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 	tileinfo.category = (attributes & 0x40) >> 6;
 }
 
-TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
+void combatsc_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t ctrl_6 = m_k007121_2->ctrlram_r(generic_space(), 6);
 	uint8_t attributes = m_page[1][tile_index];
@@ -159,7 +159,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
 	tileinfo.category = (attributes & 0x40) >> 6;
 }
 
-TILE_GET_INFO_MEMBER(combatsc_state::get_text_info)
+void combatsc_state::get_text_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attributes = m_page[0][tile_index + 0x800];
 	int number = m_page[0][tile_index + 0xc00];
@@ -172,7 +172,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info)
 }
 
 
-TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0_bootleg)
+void combatsc_state::get_tile_info0_bootleg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attributes = m_page[0][tile_index];
 	int bank = 4 * ((m_vreg & 0x0f) - 1);
@@ -203,7 +203,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0_bootleg)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1_bootleg)
+void combatsc_state::get_tile_info1_bootleg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attributes = m_page[1][tile_index];
 	int bank = 4*((m_vreg >> 4) - 1);
@@ -234,7 +234,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1_bootleg)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
+void combatsc_state::get_text_info_bootleg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 //  uint8_t attributes = m_page[0][tile_index + 0x800];
 	int number = m_page[0][tile_index + 0xc00];
@@ -252,7 +252,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info_bootleg)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(combatsc_state,combatsc)
+void combatsc_state::video_start_combatsc()
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -271,7 +271,7 @@ VIDEO_START_MEMBER(combatsc_state,combatsc)
 	save_pointer(NAME(m_spriteram[1].get()), 0x800);
 }
 
-VIDEO_START_MEMBER(combatsc_state,combatscb)
+void combatsc_state::video_start_combatscb()
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info0_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(combatsc_state::get_tile_info1_bootleg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -297,12 +297,12 @@ VIDEO_START_MEMBER(combatsc_state,combatscb)
 
 ***************************************************************************/
 
-READ8_MEMBER(combatsc_state::combatsc_video_r)
+uint8_t combatsc_state::combatsc_video_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_video_w)
+void combatsc_state::combatsc_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 
@@ -319,7 +319,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_video_w)
 	}
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_pf_control_w)
+void combatsc_state::combatsc_pf_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	k007121_device *k007121 = m_video_circuit ? m_k007121_2 : m_k007121_1;
 	k007121->ctrl_w(space, offset, data);
@@ -336,12 +336,12 @@ WRITE8_MEMBER(combatsc_state::combatsc_pf_control_w)
 	}
 }
 
-READ8_MEMBER(combatsc_state::combatsc_scrollram_r)
+uint8_t combatsc_state::combatsc_scrollram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_scrollram[offset];
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_scrollram_w)
+void combatsc_state::combatsc_scrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollram[offset] = data;
 }

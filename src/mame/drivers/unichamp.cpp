@@ -59,18 +59,18 @@ public:
 	required_device<generic_slot_device> m_cart;
 
 	uint8_t m_ram[256];
-	DECLARE_DRIVER_INIT(unichamp);
+	void init_unichamp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(unichamp);
+	void palette_init_unichamp(palette_device &palette);
 
-	DECLARE_READ8_MEMBER(bext_r);
+	uint8_t bext_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ16_MEMBER(unichamp_gicram_r);
-	DECLARE_WRITE16_MEMBER(unichamp_gicram_w);
+	uint16_t unichamp_gicram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void unichamp_gicram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(unichamp_trapl_r);
-	DECLARE_WRITE16_MEMBER(unichamp_trapl_w);
+	uint16_t unichamp_trapl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void unichamp_trapl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -79,7 +79,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-PALETTE_INIT_MEMBER(unichamp_state, unichamp)
+void unichamp_state::palette_init_unichamp(palette_device &palette)
 {
 	/*
 	palette.set_pen_color(GIC_BLACK, rgb_t(0x00, 0x00, 0x00));
@@ -124,7 +124,7 @@ void unichamp_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-READ8_MEMBER(unichamp_state::bext_r)
+uint8_t unichamp_state::bext_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//The BEXT instruction pushes a user-defined nibble out on the four EBCA pins (EBCA0 to EBCA3)
 	//and reads the ECBI input pin for HIGH or LOW signal to know whether or not to branch
@@ -145,7 +145,7 @@ READ8_MEMBER(unichamp_state::bext_r)
 }
 
 
-DRIVER_INIT_MEMBER(unichamp_state,unichamp)
+void unichamp_state::init_unichamp()
 {
 	m_gic->set_shared_memory(m_ram);
 }
@@ -199,23 +199,23 @@ uint32_t unichamp_state::screen_update_unichamp(screen_device &screen, bitmap_in
 	return m_gic->screen_update(screen, bitmap, cliprect);
 }
 
-READ16_MEMBER( unichamp_state::unichamp_gicram_r )
+uint16_t unichamp_state::unichamp_gicram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (int)m_ram[offset];
 }
 
-WRITE16_MEMBER( unichamp_state::unichamp_gicram_w )
+void unichamp_state::unichamp_gicram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ram[offset] = data&0xff;
 }
 
-READ16_MEMBER( unichamp_state::unichamp_trapl_r )
+uint16_t unichamp_state::unichamp_trapl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("trapl_r(%x)\n",offset);
 	return (int)0;
 }
 
-WRITE16_MEMBER( unichamp_state::unichamp_trapl_w )
+void unichamp_state::unichamp_trapl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("trapl_w(%x) = %x\n",offset,data);
 }

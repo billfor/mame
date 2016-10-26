@@ -185,15 +185,15 @@ public:
 	void machine_start() override;
 	void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER( x07_io_r );
-	DECLARE_WRITE8_MEMBER( x07_io_w );
+	uint8_t x07_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void x07_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER( kb_keys );
-	DECLARE_INPUT_CHANGED_MEMBER( kb_func_keys );
-	DECLARE_INPUT_CHANGED_MEMBER( kb_break );
-	DECLARE_INPUT_CHANGED_MEMBER( kb_update_udk );
+	void kb_keys(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void kb_func_keys(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void kb_break(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void kb_update_udk(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	DECLARE_DRIVER_INIT(x07);
+	void init_x07();
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	void t6834_cmd(uint8_t cmd);
@@ -213,7 +213,7 @@ public:
 	inline void draw_point(uint8_t x, uint8_t y, uint8_t color);
 	inline void draw_udk();
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( x07_card );
+	image_init_result device_image_load_x07_card(device_image_interface &image);
 
 	/* general */
 	uint8_t m_sleep;
@@ -275,11 +275,11 @@ public:
 	uint8_t m_prn_char_code;
 	uint8_t m_prn_buffer[0x100];
 	uint8_t m_prn_size;
-	DECLARE_PALETTE_INIT(x07);
-	TIMER_CALLBACK_MEMBER(cassette_tick);
-	TIMER_CALLBACK_MEMBER(cassette_poll);
-	TIMER_CALLBACK_MEMBER(rsta_clear);
-	TIMER_CALLBACK_MEMBER(rstb_clear);
-	TIMER_CALLBACK_MEMBER(beep_stop);
-	TIMER_DEVICE_CALLBACK_MEMBER(blink_timer);
+	void palette_init_x07(palette_device &palette);
+	void cassette_tick(void *ptr, int32_t param);
+	void cassette_poll(void *ptr, int32_t param);
+	void rsta_clear(void *ptr, int32_t param);
+	void rstb_clear(void *ptr, int32_t param);
+	void beep_stop(void *ptr, int32_t param);
+	void blink_timer(timer_device &timer, void *ptr, int32_t param);
 };

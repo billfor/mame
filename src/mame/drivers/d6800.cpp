@@ -67,14 +67,14 @@ public:
 		m_io_y3(*this, "Y3"),
 		m_io_shift(*this, "SHIFT") { }
 
-	DECLARE_READ8_MEMBER( d6800_cassette_r );
-	DECLARE_WRITE8_MEMBER( d6800_cassette_w );
-	DECLARE_READ8_MEMBER( d6800_keyboard_r );
-	DECLARE_WRITE8_MEMBER( d6800_keyboard_w );
-	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
+	uint8_t d6800_cassette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void d6800_cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t d6800_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void d6800_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void d6800_screen_w(int state);
 	uint32_t screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(d6800_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
+	void d6800_c(timer_device &timer, void *ptr, int32_t param);
+	void d6800_p(timer_device &timer, void *ptr, int32_t param);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -209,7 +209,7 @@ uint32_t d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &b
 
 /* NE556 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_c)
+void d6800_state::d6800_c(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[3]++;
 
@@ -227,7 +227,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_c)
 
 /* PIA6821 Interface */
 
-TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_p)
+void d6800_state::d6800_p(timer_device &timer, void *ptr, int32_t param)
 {
 	m_rtc++;
 	if (m_rtc > 159)
@@ -255,12 +255,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_p)
 }
 
 
-WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
+void d6800_state::d6800_screen_w(int state)
 {
 	m_cb2 = state;
 }
 
-READ8_MEMBER( d6800_state::d6800_cassette_r )
+uint8_t d6800_state::d6800_cassette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	Cassette circuit consists of a 741 op-amp, a 74121 oneshot, and a 74LS74.
@@ -272,7 +272,7 @@ READ8_MEMBER( d6800_state::d6800_cassette_r )
 	return m_cass_data[2] | m_portb;
 }
 
-WRITE8_MEMBER( d6800_state::d6800_cassette_w )
+void d6800_state::d6800_cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    A NE556 runs at either 1200 or 2400 Hz, depending on the state of bit 0.
@@ -287,7 +287,7 @@ WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 	m_portb = data & 0x7f;
 }
 
-READ8_MEMBER( d6800_state::d6800_keyboard_r )
+uint8_t d6800_state::d6800_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	This system reads the key matrix one way, then swaps the input and output
@@ -300,7 +300,7 @@ READ8_MEMBER( d6800_state::d6800_keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( d6800_state::d6800_keyboard_w )
+void d6800_state::d6800_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

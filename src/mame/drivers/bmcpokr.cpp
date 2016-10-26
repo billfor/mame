@@ -58,37 +58,37 @@ public:
 
 	// Protection
 	uint16_t m_prot_val;
-	DECLARE_READ16_MEMBER(prot_r);
-	DECLARE_WRITE16_MEMBER(prot_w);
-	DECLARE_READ16_MEMBER(unk_r);
+	uint16_t prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	// I/O
 	uint16_t m_mux;
-	DECLARE_WRITE16_MEMBER(mux_w);
-	DECLARE_READ16_MEMBER(dsw_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
-	DECLARE_READ16_MEMBER(mjmaglmp_dsw_r);
-	DECLARE_READ16_MEMBER(mjmaglmp_key_r);
+	void mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dsw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	ioport_value hopper_r(ioport_field &field, void *param);
+	uint16_t mjmaglmp_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t mjmaglmp_key_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	// Interrrupts
 	uint16_t m_irq_enable;
-	DECLARE_WRITE16_MEMBER(irq_enable_w);
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void irq_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	// Video
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
-	TILE_GET_INFO_MEMBER(get_t1_tile_info);
-	TILE_GET_INFO_MEMBER(get_t2_tile_info);
-	DECLARE_WRITE16_MEMBER(videoram_1_w);
-	DECLARE_WRITE16_MEMBER(videoram_2_w);
+	void get_t1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_t2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void videoram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void videoram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	std::unique_ptr<bitmap_ind16> m_pixbitmap;
 	void pixbitmap_redraw();
 	uint16_t m_pixpal;
-	DECLARE_WRITE16_MEMBER(pixram_w);
-	DECLARE_WRITE16_MEMBER(pixpal_w);
+	void pixram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pixpal_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	virtual void video_start() override;
 	void draw_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
@@ -110,25 +110,25 @@ public:
 
 // Tilemaps
 
-WRITE16_MEMBER(bmcpokr_state::videoram_1_w)
+void bmcpokr_state::videoram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram_1[offset]);
 	m_tilemap_1->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bmcpokr_state::videoram_2_w)
+void bmcpokr_state::videoram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram_2[offset]);
 	m_tilemap_2->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(bmcpokr_state::get_t1_tile_info)
+void bmcpokr_state::get_t1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = m_videoram_1[tile_index];
 	SET_TILE_INFO_MEMBER(0, data, 0, (data & 0x8000) ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(bmcpokr_state::get_t2_tile_info)
+void bmcpokr_state::get_t2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = m_videoram_2[tile_index];
 	SET_TILE_INFO_MEMBER(0, data, 0, (data & 0x8000) ? TILE_FLIPX : 0);
@@ -155,7 +155,7 @@ void bmcpokr_state::video_start()
 
 // 1024 x 512 bitmap. 4 bits per pixel (every byte encodes 2 pixels) + palette register
 
-WRITE16_MEMBER(bmcpokr_state::pixram_w)
+void bmcpokr_state::pixram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pixram[offset]);
 
@@ -195,7 +195,7 @@ void bmcpokr_state::pixbitmap_redraw()
 	}
 }
 
-WRITE16_MEMBER(bmcpokr_state::pixpal_w)
+void bmcpokr_state::pixpal_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_pixpal;
 	if (old != COMBINE_DATA(&m_pixpal))
@@ -296,13 +296,13 @@ uint32_t bmcpokr_state::screen_update_bmcpokr(screen_device &screen, bitmap_ind1
                                 Protection
 ***************************************************************************/
 
-READ16_MEMBER(bmcpokr_state::unk_r)
+uint16_t bmcpokr_state::unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return space.machine().rand();
 }
 
 // Hack!
-READ16_MEMBER(bmcpokr_state::prot_r)
+uint16_t bmcpokr_state::prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_prot_val >> 8)
 	{
@@ -311,7 +311,7 @@ READ16_MEMBER(bmcpokr_state::prot_r)
 	}
 	return 0x00 << 8;
 }
-WRITE16_MEMBER(bmcpokr_state::prot_w)
+void bmcpokr_state::prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_prot_val);
 //  logerror("%s: prot val = %04x\n", machine().describe_context(), m_prot_val);
@@ -321,7 +321,7 @@ WRITE16_MEMBER(bmcpokr_state::prot_w)
                                 Memory Maps
 ***************************************************************************/
 
-WRITE16_MEMBER(bmcpokr_state::mux_w)
+void bmcpokr_state::mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mux);
 	if (ACCESSING_BITS_0_7)
@@ -335,7 +335,7 @@ WRITE16_MEMBER(bmcpokr_state::mux_w)
 
 //  popmessage("mux %04x", m_mux);
 }
-READ16_MEMBER(bmcpokr_state::dsw_r)
+uint16_t bmcpokr_state::dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch ((m_mux >> 5) & 3)
 	{
@@ -347,18 +347,18 @@ READ16_MEMBER(bmcpokr_state::dsw_r)
 	return 0xff << 8;
 }
 
-CUSTOM_INPUT_MEMBER(bmcpokr_state::hopper_r)
+ioport_value bmcpokr_state::hopper_r(ioport_field &field, void *param)
 {
 	// motor off should clear the sense bit (I guess ticket.c should actually do this).
 	// Otherwise a hopper bit stuck low will prevent several keys from being registered.
 	return (m_mux & 0x0001) ? m_hopper->line_r() : 1;
 }
 
-WRITE16_MEMBER(bmcpokr_state::irq_enable_w)
+void bmcpokr_state::irq_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_irq_enable);
 }
-WRITE16_MEMBER(bmcpokr_state::irq_ack_w)
+void bmcpokr_state::irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( bmcpokr_mem, AS_PROGRAM, 16, bmcpokr_state )
 ADDRESS_MAP_END
 
 
-READ16_MEMBER(bmcpokr_state::mjmaglmp_dsw_r)
+uint16_t bmcpokr_state::mjmaglmp_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch ((m_mux >> 4) & 7)
 	{
@@ -430,7 +430,7 @@ READ16_MEMBER(bmcpokr_state::mjmaglmp_dsw_r)
 	return 0xff << 8;
 }
 
-READ16_MEMBER(bmcpokr_state::mjmaglmp_key_r)
+uint16_t bmcpokr_state::mjmaglmp_key_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t key = 0x3f;
 	switch ((m_mux >> 4) & 7)
@@ -779,7 +779,7 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(bmcpokr_state::interrupt)
+void bmcpokr_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

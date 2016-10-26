@@ -61,18 +61,18 @@ public:
 		, m_cass(*this, "cassette")
 	{ }
 
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_READ8_MEMBER(portfc_r);
-	DECLARE_READ8_MEMBER(portfd_r);
-	DECLARE_READ8_MEMBER(portfe_r);
-	DECLARE_READ8_MEMBER(sense_r);
-	DECLARE_WRITE_LINE_MEMBER(flag_w);
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_WRITE8_MEMBER(portf8_w);
-	DECLARE_WRITE8_MEMBER(portf9_w);
-	DECLARE_WRITE8_MEMBER(portfa_w);
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portfc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portfd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portfe_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sense_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void flag_w(int state);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portf8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portf9_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portfa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(instruct);
-	INTERRUPT_GEN_MEMBER(t2l_int);
+	void t2l_int(device_t &device);
 private:
 	virtual void machine_reset() override;
 	uint16_t m_lar;
@@ -88,13 +88,13 @@ private:
 };
 
 // flag led
-WRITE_LINE_MEMBER( instruct_state::flag_w )
+void instruct_state::flag_w(int state)
 {
 	output().set_value("led8", !state);
 }
 
 // user port
-WRITE8_MEMBER( instruct_state::port_w )
+void instruct_state::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	char ledname[8];
 	for (int i = 0; i < 8; i++)
@@ -105,7 +105,7 @@ WRITE8_MEMBER( instruct_state::port_w )
 }
 
 // cassette port
-WRITE8_MEMBER( instruct_state::portf8_w )
+void instruct_state::portf8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(data, 4))
 		m_cass->output(BIT(data, 3) ? -1.0 : +1.0);
@@ -116,7 +116,7 @@ WRITE8_MEMBER( instruct_state::portf8_w )
 }
 
 // segment output
-WRITE8_MEMBER( instruct_state::portf9_w )
+void instruct_state::portf9_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_valid_digit)
 		output().set_digit_value(m_digit, data);
@@ -124,32 +124,32 @@ WRITE8_MEMBER( instruct_state::portf9_w )
 }
 
 // digit & keyrow-scan select
-WRITE8_MEMBER( instruct_state::portfa_w )
+void instruct_state::portfa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit = data;
 	m_valid_digit = true;
 }
 
 // user switches
-READ8_MEMBER( instruct_state::port_r )
+uint8_t instruct_state::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("USW")->read();
 }
 
 // last address register A0-7 copied to 17E9 at boot
-READ8_MEMBER( instruct_state::portfc_r )
+uint8_t instruct_state::portfc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_lar;
 }
 
 // last address register A8-14 copied to 17E8 at boot
-READ8_MEMBER( instruct_state::portfd_r )
+uint8_t instruct_state::portfd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_lar >> 8) & 0x7f;
 }
 
 // read keyboard
-READ8_MEMBER( instruct_state::portfe_r )
+uint8_t instruct_state::portfe_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	for (uint8_t i = 0; i < 6; i++)
 	{
@@ -166,7 +166,7 @@ READ8_MEMBER( instruct_state::portfe_r )
 
 
 // Read cassette and SENS key
-READ8_MEMBER( instruct_state::sense_r )
+uint8_t instruct_state::sense_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cassin)
 		return (m_cass->input() > 0.03) ? 1 : 0;
@@ -174,7 +174,7 @@ READ8_MEMBER( instruct_state::sense_r )
 		return BIT(ioport("HW")->read(), 0);
 }
 
-INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
+void instruct_state::t2l_int(device_t &device)
 {
 	uint8_t hwkeys = ioport("HW")->read();
 

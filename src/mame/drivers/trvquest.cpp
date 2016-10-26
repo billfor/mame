@@ -43,17 +43,17 @@ Notes:
 #include "includes/gameplan.h"
 #include "machine/nvram.h"
 
-READ8_MEMBER(gameplan_state::trvquest_question_r)
+uint8_t gameplan_state::trvquest_question_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return memregion("questions")->base()[*m_trvquest_question * 0x2000 + offset];
 }
 
-WRITE_LINE_MEMBER(gameplan_state::trvquest_coin_w)
+void gameplan_state::trvquest_coin_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, ~state & 1);
 }
 
-WRITE_LINE_MEMBER(gameplan_state::trvquest_misc_w)
+void gameplan_state::trvquest_misc_w(int state)
 {
 	// data & 1 -> led on/off ?
 }
@@ -148,7 +148,7 @@ static INPUT_PORTS_START( trvquest )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(gameplan_state,trvquest)
+void gameplan_state::machine_start_trvquest()
 {
 	/* register for save states */
 	save_item(NAME(m_video_x));
@@ -160,7 +160,7 @@ MACHINE_START_MEMBER(gameplan_state,trvquest)
 	m_via_0->write_pb5(1);
 }
 
-MACHINE_RESET_MEMBER(gameplan_state,trvquest)
+void gameplan_state::machine_reset_trvquest()
 {
 	m_video_x = 0;
 	m_video_y = 0;
@@ -168,7 +168,7 @@ MACHINE_RESET_MEMBER(gameplan_state,trvquest)
 	m_video_data = 0;
 }
 
-INTERRUPT_GEN_MEMBER(gameplan_state::trvquest_interrupt)
+void gameplan_state::trvquest_interrupt(device_t &device)
 {
 	m_via_2->write_ca1(1);
 	m_via_2->write_ca1(0);

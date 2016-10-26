@@ -152,19 +152,19 @@ public:
 	/* misc */
 	uint8_t    m_input_pressed;
 	uint16_t   m_coin_input;
-	DECLARE_WRITE16_MEMBER(ddealer_flipscreen_w);
-	DECLARE_WRITE16_MEMBER(back_vram_w);
-	DECLARE_WRITE16_MEMBER(ddealer_vregs_w);
-	DECLARE_WRITE16_MEMBER(ddealer_mcu_shared_w);
-	DECLARE_READ16_MEMBER(ddealer_mcu_r);
-	DECLARE_DRIVER_INIT(ddealer);
-	TILE_GET_INFO_MEMBER(get_back_tile_info);
+	void ddealer_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void back_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddealer_vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddealer_mcu_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ddealer_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void init_ddealer();
+	void get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_ddealer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ddealer_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(ddealer_mcu_sim);
+	void ddealer_interrupt(device_t &device);
+	void ddealer_mcu_sim(timer_device &timer, void *ptr, int32_t param);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -173,12 +173,12 @@ public:
 
 
 
-WRITE16_MEMBER(ddealer_state::ddealer_flipscreen_w)
+void ddealer_state::ddealer_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_flipscreen = data & 0x01;
 }
 
-TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
+void ddealer_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_back_vram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -317,7 +317,7 @@ uint32_t ddealer_state::screen_update_ddealer(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_mcu_sim)
+void ddealer_state::ddealer_mcu_sim(timer_device &timer, void *ptr, int32_t param)
 {
 	/*coin/credit simulation*/
 	/*$fe002 is used,might be for multiple coins for one credit settings.*/
@@ -382,14 +382,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_mcu_sim)
 
 
 
-WRITE16_MEMBER(ddealer_state::back_vram_w)
+void ddealer_state::back_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_vram[offset]);
 	m_back_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER(ddealer_state::ddealer_vregs_w)
+void ddealer_state::ddealer_vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vregs[offset]);
 }
@@ -415,7 +415,7 @@ Protection handling,identical to Hacha Mecha Fighter / Thunder Dragon with diffe
 		m_mcu_shared_ram[_protinput_+1] = (_input_ & 0x0000ffff);\
 	}
 
-WRITE16_MEMBER(ddealer_state::ddealer_mcu_shared_w)
+void ddealer_state::ddealer_mcu_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mcu_shared_ram[offset]);
 
@@ -614,7 +614,7 @@ void ddealer_state::machine_reset()
 	m_coin_input = 0;
 }
 
-INTERRUPT_GEN_MEMBER(ddealer_state::ddealer_interrupt)
+void ddealer_state::ddealer_interrupt(device_t &device)
 {
 	device.execute().set_input_line(4, HOLD_LINE);
 }
@@ -651,7 +651,7 @@ MACHINE_CONFIG_END
 
 
 
-READ16_MEMBER(ddealer_state::ddealer_mcu_r)
+uint16_t ddealer_state::ddealer_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const int resp[] =
 	{
@@ -672,7 +672,7 @@ READ16_MEMBER(ddealer_state::ddealer_mcu_r)
 	return res;
 }
 
-DRIVER_INIT_MEMBER(ddealer_state,ddealer)
+void ddealer_state::init_ddealer()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe01c, 0xfe01d, read16_delegate(FUNC(ddealer_state::ddealer_mcu_r), this));
 }

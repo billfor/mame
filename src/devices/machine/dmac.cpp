@@ -172,7 +172,7 @@ void dmac_device::start_dma()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ16_MEMBER( dmac_device::register_read )
+uint16_t dmac_device::register_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -258,7 +258,7 @@ READ16_MEMBER( dmac_device::register_read )
 	return data;
 }
 
-WRITE16_MEMBER( dmac_device::register_write )
+void dmac_device::register_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -360,7 +360,7 @@ WRITE16_MEMBER( dmac_device::register_write )
 }
 
 // this signal tells us to expose our autoconfig values
-WRITE_LINE_MEMBER( dmac_device::configin_w )
+void dmac_device::configin_w(int state)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
@@ -416,7 +416,7 @@ WRITE_LINE_MEMBER( dmac_device::configin_w )
 }
 
 // this sets the ram size depending on the line voltage
-WRITE_LINE_MEMBER( dmac_device::ramsz_w )
+void dmac_device::ramsz_w(int state)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ramsz_w (%d)\n", shortname(), basetag(), state);
@@ -431,7 +431,7 @@ WRITE_LINE_MEMBER( dmac_device::ramsz_w )
 }
 
 // reset the device
-WRITE_LINE_MEMBER( dmac_device::rst_w )
+void dmac_device::rst_w(int state)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): rst_w (%d)\n", shortname(), basetag(), state);
@@ -443,7 +443,7 @@ WRITE_LINE_MEMBER( dmac_device::rst_w )
 }
 
 // external interrupt
-WRITE_LINE_MEMBER( dmac_device::intx_w )
+void dmac_device::intx_w(int state)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): intx_w (%d)\n", shortname(), basetag(), state);
@@ -457,7 +457,7 @@ WRITE_LINE_MEMBER( dmac_device::intx_w )
 }
 
 // data request
-WRITE_LINE_MEMBER( dmac_device::xdreq_w )
+void dmac_device::xdreq_w(int state)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): xdreq_w (%d)\n", shortname(), basetag(), state);

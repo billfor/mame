@@ -34,12 +34,12 @@ public:
 	required_device<s3c2410_device> m_s3c2410;
 	required_shared_ptr<uint32_t> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
-	DECLARE_DRIVER_INIT(hp49gp);
+	void init_hp49gp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
-	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
-	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);
+	void port_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	uint32_t s3c2410_gpio_port_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void s3c2410_gpio_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	void lcd_spi_reset( );
 	void lcd_spi_init( );
@@ -169,7 +169,7 @@ int hp49gp_state::lcd_spi_line_r( int line)
 
 // I/O PORT
 
-READ32_MEMBER(hp49gp_state::s3c2410_gpio_port_r)
+uint32_t hp49gp_state::s3c2410_gpio_port_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_port[offset];
 	switch (offset)
@@ -219,7 +219,7 @@ READ32_MEMBER(hp49gp_state::s3c2410_gpio_port_r)
 	return data;
 }
 
-WRITE32_MEMBER(hp49gp_state::s3c2410_gpio_port_w)
+void hp49gp_state::s3c2410_gpio_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_port[offset] = data;
 	switch (offset)
@@ -236,7 +236,7 @@ WRITE32_MEMBER(hp49gp_state::s3c2410_gpio_port_w)
 
 // ...
 
-INPUT_CHANGED_MEMBER(hp49gp_state::port_changed)
+void hp49gp_state::port_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_s3c2410->s3c2410_request_eint( (uintptr_t)param + 8);
 }
@@ -268,7 +268,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(hp49gp_state,hp49gp)
+void hp49gp_state::init_hp49gp()
 {
 	uint8_t *rom = (uint8_t *)memregion( "maincpu")->base();
 	memcpy( m_steppingstone, rom, 1024);

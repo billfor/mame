@@ -49,7 +49,7 @@ void bigstrkb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 /* Tilemaps */
 
-TILEMAP_MAPPER_MEMBER(bigstrkb_state::bg_scan)
+tilemap_memory_index bigstrkb_state::bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offset;
 
@@ -60,7 +60,7 @@ TILEMAP_MAPPER_MEMBER(bigstrkb_state::bg_scan)
 	return offset;
 }
 
-TILE_GET_INFO_MEMBER(bigstrkb_state::get_tile_info)
+void bigstrkb_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,col;
 
@@ -70,13 +70,13 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,col>>12,0);
 }
 
-WRITE16_MEMBER(bigstrkb_state::videoram_w)
+void bigstrkb_state::videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(bigstrkb_state::get_tile2_info)
+void bigstrkb_state::get_tile2_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,col;
 
@@ -86,14 +86,14 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_tile2_info)
 	SET_TILE_INFO_MEMBER(1,tileno,col>>12,0);
 }
 
-WRITE16_MEMBER(bigstrkb_state::videoram2_w)
+void bigstrkb_state::videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_tilemap2->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(bigstrkb_state::get_tile3_info)
+void bigstrkb_state::get_tile3_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,col;
 
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(bigstrkb_state::get_tile3_info)
 	SET_TILE_INFO_MEMBER(1,tileno+0x2000,(col>>12)+(0x100/16),0);
 }
 
-WRITE16_MEMBER(bigstrkb_state::videoram3_w)
+void bigstrkb_state::videoram3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_videoram3[offset] = data;
 	m_tilemap3->mark_tile_dirty(offset);

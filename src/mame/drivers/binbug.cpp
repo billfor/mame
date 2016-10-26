@@ -71,9 +71,9 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(binbug_ctrl_w);
-	DECLARE_READ8_MEMBER(binbug_serial_r);
-	DECLARE_WRITE_LINE_MEMBER(binbug_serial_w);
+	void binbug_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t binbug_serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void binbug_serial_w(int state);
 	const uint8_t *m_p_chargen;
 	uint8_t m_framecnt;
 	virtual void video_start() override;
@@ -86,16 +86,16 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
 };
 
-WRITE8_MEMBER( binbug_state::binbug_ctrl_w )
+void binbug_state::binbug_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER( binbug_state::binbug_serial_r )
+uint8_t binbug_state::binbug_serial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rs232->rxd_r() & (m_cass->input() < 0.03);
 }
 
-WRITE_LINE_MEMBER( binbug_state::binbug_serial_w )
+void binbug_state::binbug_serial_w(int state)
 {
 	m_cass->output(state ? -1.0 : +1.0);
 }
@@ -415,14 +415,14 @@ public:
 	m_pio(*this, "z80pio")
 	{ }
 
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_READ8_MEMBER(port08_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	TIMER_DEVICE_CALLBACK_MEMBER(time_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(uart_tick);
+	uint8_t porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port08_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void time_tick(timer_device &timer, void *ptr, int32_t param);
+	void uart_tick(timer_device &timer, void *ptr, int32_t param);
 	uint8_t m_pio_b;
 	uint8_t m_term_data;
 	uint8_t m_protection[0x100];
@@ -470,7 +470,7 @@ static const z80_daisy_config dg680_daisy_chain[] =
 static INPUT_PORTS_START( dg680 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( dg680_state::kbd_put )
+void dg680_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 	/* strobe in keyboard data */
@@ -478,38 +478,38 @@ WRITE8_MEMBER( dg680_state::kbd_put )
 	m_pio->strobe_a(1);
 }
 
-READ8_MEMBER( dg680_state::porta_r )
+uint8_t dg680_state::porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_term_data;
 	m_term_data = 0;
 	return data;
 }
 
-READ8_MEMBER( dg680_state::portb_r )
+uint8_t dg680_state::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pio_b | (m_cass->input() > 0.03);
 }
 
 // bit 1 = cassout; bit 2 = motor on
-WRITE8_MEMBER( dg680_state::portb_w )
+void dg680_state::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pio_b = data & 0xfe;
 	m_cass->output(BIT(data, 1) ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( dg680_state::port08_r )
+uint8_t dg680_state::port08_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t breg = m_maincpu->state_int(Z80_B);
 	return m_protection[breg];
 }
 
-WRITE8_MEMBER( dg680_state::port08_w )
+void dg680_state::port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t breg = m_maincpu->state_int(Z80_B);
 	m_protection[breg] = data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::time_tick)
+void dg680_state::time_tick(timer_device &timer, void *ptr, int32_t param)
 {
 // ch0 is for the clock
 	m_ctc->trg0(1);
@@ -519,7 +519,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::time_tick)
 	m_ctc->trg2(0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
+void dg680_state::uart_tick(timer_device &timer, void *ptr, int32_t param)
 {
 // ch3 is for cassette
 	m_ctc->trg3(1);

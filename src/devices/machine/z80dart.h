@@ -270,13 +270,13 @@ public:
 
 	void receive_data(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( write_rx );
-	DECLARE_WRITE_LINE_MEMBER( cts_w );
-	DECLARE_WRITE_LINE_MEMBER( dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( ri_w );
-	DECLARE_WRITE_LINE_MEMBER( rxc_w );
-	DECLARE_WRITE_LINE_MEMBER( txc_w );
-	DECLARE_WRITE_LINE_MEMBER( sync_w );
+	void write_rx(int state);
+	void cts_w(int state);
+	void dcd_w(int state);
+	void ri_w(int state);
+	void rxc_w(int state);
+	void txc_w(int state);
+	void sync_w(int state);
 
 	int m_rxc;
 	int m_txc;
@@ -495,39 +495,39 @@ public:
 		dev.m_txcb = txb;
 	}
 
-	DECLARE_READ8_MEMBER( cd_ba_r );
-	DECLARE_WRITE8_MEMBER( cd_ba_w );
-	DECLARE_READ8_MEMBER( ba_cd_r );
-	DECLARE_WRITE8_MEMBER( ba_cd_w );
+	uint8_t cd_ba_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cd_ba_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ba_cd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ba_cd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( da_r ) { return m_chanA->data_read(); }
-	DECLARE_WRITE8_MEMBER( da_w ) { m_chanA->data_write(data); }
-	DECLARE_READ8_MEMBER( db_r ) { return m_chanB->data_read(); }
-	DECLARE_WRITE8_MEMBER( db_w ) { m_chanB->data_write(data); }
+	uint8_t da_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_chanA->data_read(); }
+	void da_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_chanA->data_write(data); }
+	uint8_t db_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_chanB->data_read(); }
+	void db_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_chanB->data_write(data); }
 
-	DECLARE_READ8_MEMBER( ca_r ) { return m_chanA->control_read(); }
-	DECLARE_WRITE8_MEMBER( ca_w ) { m_chanA->control_write(data); }
-	DECLARE_READ8_MEMBER( cb_r ) { return m_chanB->control_read(); }
-	DECLARE_WRITE8_MEMBER( cb_w ) { m_chanB->control_write(data); }
+	uint8_t ca_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_chanA->control_read(); }
+	void ca_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_chanA->control_write(data); }
+	uint8_t cb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_chanB->control_read(); }
+	void cb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_chanB->control_write(data); }
 
 	// interrupt acknowledge
 	int m1_r();
 
-	DECLARE_WRITE_LINE_MEMBER( rxa_w ) { m_chanA->write_rx(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxb_w ) { m_chanB->write_rx(state); }
-	DECLARE_WRITE_LINE_MEMBER( ctsa_w ) { m_chanA->cts_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ctsb_w ) { m_chanB->cts_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dcda_w ) { m_chanA->dcd_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dcdb_w ) { m_chanB->dcd_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ria_w ) { m_chanA->ri_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rib_w ) { m_chanB->ri_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { m_chanA->rxc_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { m_chanB->rxc_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( txca_w ) { m_chanA->txc_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( txcb_w ) { m_chanB->txc_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxtxcb_w ) { m_chanB->rxc_w(state); m_chanB->txc_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( synca_w ) { m_chanA->sync_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { m_chanB->sync_w(state); }
+	void rxa_w(int state) { m_chanA->write_rx(state); }
+	void rxb_w(int state) { m_chanB->write_rx(state); }
+	void ctsa_w(int state) { m_chanA->cts_w(state); }
+	void ctsb_w(int state) { m_chanB->cts_w(state); }
+	void dcda_w(int state) { m_chanA->dcd_w(state); }
+	void dcdb_w(int state) { m_chanB->dcd_w(state); }
+	void ria_w(int state) { m_chanA->ri_w(state); }
+	void rib_w(int state) { m_chanB->ri_w(state); }
+	void rxca_w(int state) { m_chanA->rxc_w(state); }
+	void rxcb_w(int state) { m_chanB->rxc_w(state); }
+	void txca_w(int state) { m_chanA->txc_w(state); }
+	void txcb_w(int state) { m_chanB->txc_w(state); }
+	void rxtxcb_w(int state) { m_chanB->rxc_w(state); m_chanB->txc_w(state); }
+	void synca_w(int state) { m_chanA->sync_w(state); }
+	void syncb_w(int state) { m_chanB->sync_w(state); }
 
 protected:
 	// device-level overrides
@@ -655,7 +655,7 @@ public:
 	// construction/destruction
 	i8274_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( inta_r ) { return m1_r(); };
+	uint8_t inta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m1_r(); };
 };
 
 

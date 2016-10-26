@@ -29,27 +29,27 @@ public:
 	uint8_t m_yscroll;
 	uint8_t m_flipscreen;
 
-	DECLARE_WRITE8_MEMBER(bank_sel_w);
-	DECLARE_WRITE8_MEMBER(status_m_w);
-	DECLARE_WRITE8_MEMBER(status_s_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(bgram_w);
-	DECLARE_READ8_MEMBER(bgram_r);
-	DECLARE_WRITE8_MEMBER(scroll_x_w);
-	DECLARE_WRITE8_MEMBER(scroll_y_w);
+	void bank_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void status_m_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void status_s_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bgram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(status_r);
+	ioport_value status_r(ioport_field &field, void *param);
 
-	INTERRUPT_GEN_MEMBER(interrupt_m);
-	INTERRUPT_GEN_MEMBER(interrupt_s);
+	void interrupt_m(device_t &device);
+	void interrupt_s(device_t &device);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	DECLARE_PALETTE_DECODER(BBGGRRII);
+	static rgb_t BBGGRRII_decoder(uint32_t raw);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);

@@ -241,11 +241,11 @@ public:
 		m_palette2(*this, "palette2") { }
 
 	required_shared_ptr<uint16_t> m_vram;
-	DECLARE_DRIVER_INIT(colorama);
-	DECLARE_DRIVER_INIT(cmrltv75);
+	void init_colorama();
+	void init_cmrltv75();
 	virtual void video_start() override;
 	uint32_t screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -293,13 +293,13 @@ uint32_t coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_in
 *  Read / Write Handlers  *
 **************************/
 
-//WRITE8_MEMBER(coinmvga_state::debug_w)
+//void coinmvga_state::debug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 //{
 //  popmessage("written : %02X", data);
 //}
 
 /*
-READ16_MEMBER(coinmvga_state::test_r)
+uint16_t coinmvga_state::test_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
     return machine().rand();
 }*/
@@ -604,7 +604,7 @@ GFXDECODE_END
 *    Sound Interface     *
 *************************/
 
-INTERRUPT_GEN_MEMBER(coinmvga_state::vblank_irq)
+void coinmvga_state::vblank_irq(device_t &device)
 {
 	//printf("1\n");
 	device.execute().set_input_line(2, HOLD_LINE);
@@ -867,11 +867,11 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(coinmvga_state,colorama)
+void coinmvga_state::init_colorama()
 {
 }
 
-DRIVER_INIT_MEMBER(coinmvga_state,cmrltv75)
+void coinmvga_state::init_cmrltv75()
 {
 }
 

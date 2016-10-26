@@ -61,17 +61,17 @@ public:
 	template<class _Object> static devcb_base &set_rts_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_rts_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_dtr_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_dtr_handler.set_callback(object); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(write_xtal1); // txc
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
-	DECLARE_WRITE_LINE_MEMBER(write_rxc);
-	DECLARE_WRITE_LINE_MEMBER(write_cts);
-	DECLARE_WRITE_LINE_MEMBER(write_dsr);
-	DECLARE_WRITE_LINE_MEMBER(write_dcd);
+	void write_xtal1(int state); // txc
+	void write_rxd(int state);
+	void write_rxc(int state);
+	void write_cts(int state);
+	void write_dsr(int state);
+	void write_dcd(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(internal_clock);
+	void internal_clock(int state);
 
 	void set_xtal(uint32_t clock);
 
@@ -146,8 +146,8 @@ private:
 
 	int stoplength();
 
-	DECLARE_WRITE_LINE_MEMBER(receiver_clock);
-	DECLARE_WRITE_LINE_MEMBER(transmitter_clock);
+	void receiver_clock(int state);
+	void transmitter_clock(int state);
 
 	static const int internal_divider[16];
 	static const int transmitter_controls[4][3];

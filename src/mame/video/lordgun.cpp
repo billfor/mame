@@ -48,7 +48,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 // xxxxBBBBGGGGRRRR, but repeat ecah color for each priority code (since we stuff it in the high bits of the pen)
-WRITE16_MEMBER(lordgun_state::lordgun_paletteram_w)
+void lordgun_state::lordgun_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	for (int pri = 0; pri < 8; pri++)
@@ -71,10 +71,10 @@ inline void lordgun_state::get_tile_info(tile_data &tileinfo, tilemap_memory_ind
 	SET_TILE_INFO_MEMBER(_N_, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((_N_ + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
-TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 1); }
-TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 2); }
-TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 3); }
+void lordgun_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 0); }
+void lordgun_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 1); }
+void lordgun_state::get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 2); }
+void lordgun_state::get_tile_info_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 3); }
 
 inline void lordgun_state::lordgun_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_)
 {
@@ -82,10 +82,10 @@ inline void lordgun_state::lordgun_vram_w(offs_t offset, uint16_t data, uint16_t
 	m_tilemap[_N_]->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(lordgun_state::lordgun_vram_0_w){ lordgun_vram_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER(lordgun_state::lordgun_vram_1_w){ lordgun_vram_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(lordgun_state::lordgun_vram_2_w){ lordgun_vram_w(offset, data, mem_mask, 2); }
-WRITE16_MEMBER(lordgun_state::lordgun_vram_3_w){ lordgun_vram_w(offset, data, mem_mask, 3); }
+void lordgun_state::lordgun_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ lordgun_vram_w(offset, data, mem_mask, 0); }
+void lordgun_state::lordgun_vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ lordgun_vram_w(offset, data, mem_mask, 1); }
+void lordgun_state::lordgun_vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ lordgun_vram_w(offset, data, mem_mask, 2); }
+void lordgun_state::lordgun_vram_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ lordgun_vram_w(offset, data, mem_mask, 3); }
 
 /***************************************************************************
 

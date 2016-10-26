@@ -36,30 +36,30 @@ public:
 	uint8_t m_flipx;
 	uint8_t m_flipy;
 
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(coin_lock_w);
-	DECLARE_WRITE8_MEMBER(flipx_w);
-	DECLARE_WRITE8_MEMBER(flipy_w);
-	DECLARE_WRITE8_MEMBER(fgdisable_w);
-	DECLARE_WRITE8_MEMBER(fgscrolly_w);
-	DECLARE_WRITE8_MEMBER(bgscrolly_w);
-	DECLARE_WRITE8_MEMBER(bgram_w);
-	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_READ8_MEMBER(sound_data_r);
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin_lock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgdisable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgscrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgscrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(control_r);
+	ioport_value control_r(ioport_field &field, void *param);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	INTERRUPT_GEN_MEMBER(main_nmi_gen);
-	TIMER_CALLBACK_MEMBER(delayed_sound_w);
+	void main_nmi_gen(device_t &device);
+	void delayed_sound_w(void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(suprridr);
+	void palette_init_suprridr(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int is_screen_flipped();

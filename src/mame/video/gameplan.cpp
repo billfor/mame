@@ -141,38 +141,38 @@ uint32_t gameplan_state::screen_update_leprechn(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-WRITE8_MEMBER(gameplan_state::video_data_w)
+void gameplan_state::video_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_data = data;
 }
 
 
-WRITE8_MEMBER(gameplan_state::gameplan_video_command_w)
+void gameplan_state::gameplan_video_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_command = data & 0x07;
 }
 
 
-WRITE8_MEMBER(gameplan_state::leprechn_video_command_w)
+void gameplan_state::leprechn_video_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_command = (data >> 3) & 0x07;
 }
 
 
-READ8_MEMBER(gameplan_state::leprechn_videoram_r)
+uint8_t gameplan_state::leprechn_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[m_video_y * (HBSTART - HBEND) + m_video_x];
 }
 
 
-TIMER_CALLBACK_MEMBER(gameplan_state::clear_screen_done_callback)
+void gameplan_state::clear_screen_done_callback(void *ptr, int32_t param)
 {
 	/* indicate that the we are done clearing the screen */
 	m_via_0->write_ca1(0);
 }
 
 
-WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
+void gameplan_state::video_command_trigger_w(int state)
 {
 	if (state == 0)
 	{
@@ -232,13 +232,13 @@ WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
 }
 
 
-TIMER_CALLBACK_MEMBER(gameplan_state::via_irq_delayed)
+void gameplan_state::via_irq_delayed(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, param);
 }
 
 
-WRITE_LINE_MEMBER(gameplan_state::via_irq)
+void gameplan_state::via_irq(int state)
 {
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
 	   cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
@@ -247,7 +247,7 @@ WRITE_LINE_MEMBER(gameplan_state::via_irq)
 }
 
 
-TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
+void gameplan_state::via_0_ca1_timer_callback(void *ptr, int32_t param)
 {
 	/* !VBLANK is connected to CA1 */
 	m_via_0->write_ca1(param);
@@ -265,7 +265,7 @@ TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
  *
  *************************************/
 
-VIDEO_START_MEMBER(gameplan_state,common)
+void gameplan_state::video_start_common()
 {
 	m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	m_videoram = std::make_unique<uint8_t[]>(m_videoram_size);
@@ -277,21 +277,21 @@ VIDEO_START_MEMBER(gameplan_state,common)
 }
 
 
-VIDEO_START_MEMBER(gameplan_state,gameplan)
+void gameplan_state::video_start_gameplan()
 {
-	VIDEO_START_CALL_MEMBER(common);
+	video_start_common();
 }
 
 
-VIDEO_START_MEMBER(gameplan_state,leprechn)
+void gameplan_state::video_start_leprechn()
 {
-	VIDEO_START_CALL_MEMBER(common);
+	video_start_common();
 }
 
 
-VIDEO_START_MEMBER(gameplan_state,trvquest)
+void gameplan_state::video_start_trvquest()
 {
-	VIDEO_START_CALL_MEMBER(common);
+	video_start_common();
 }
 
 
@@ -302,7 +302,7 @@ VIDEO_START_MEMBER(gameplan_state,trvquest)
  *
  *************************************/
 
-VIDEO_RESET_MEMBER(gameplan_state,gameplan)
+void gameplan_state::video_reset_gameplan()
 {
 	m_via_0_ca1_timer->adjust(m_screen->time_until_pos(VBSTART));
 }

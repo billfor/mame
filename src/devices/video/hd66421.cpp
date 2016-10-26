@@ -145,25 +145,25 @@ void hd66421_device::device_start()
 	save_item(NAME(m_y));
 }
 
-READ8_MEMBER( hd66421_device::reg_idx_r )
+uint8_t hd66421_device::reg_idx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	_logerror( 2, ("reg_idx_r\n"));
 	return m_cmd;
 }
 
-WRITE8_MEMBER( hd66421_device::reg_idx_w )
+void hd66421_device::reg_idx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	_logerror( 2, ("reg_idx_w (%02X)\n", data));
 	m_cmd = data;
 }
 
-READ8_MEMBER( hd66421_device::reg_dat_r )
+uint8_t hd66421_device::reg_dat_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	_logerror( 2, ("reg_dat_r\n"));
 	return m_reg[m_cmd];
 }
 
-WRITE8_MEMBER( hd66421_device::reg_dat_w )
+void hd66421_device::reg_dat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	_logerror( 2, ("reg_dat_w (%02X)\n", data));
 	m_reg[m_cmd] = data;
@@ -258,7 +258,7 @@ uint32_t hd66421_device::update_screen(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(hd66421_device, hd66421)
+void hd66421_device::palette_init_hd66421(palette_device &palette)
 {
 	// init palette
 	for (int i = 0; i < 4; i++)

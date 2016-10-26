@@ -6,7 +6,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tatsumi_state::tatsumi_sprite_control_w)
+void tatsumi_state::tatsumi_sprite_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sprite_control_ram[offset]);
 
@@ -17,24 +17,24 @@ WRITE16_MEMBER(tatsumi_state::tatsumi_sprite_control_w)
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tatsumi_state::apache3_road_z_w)
+void tatsumi_state::apache3_road_z_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_apache3_road_z = data & 0xff;
 }
 
-WRITE8_MEMBER(tatsumi_state::apache3_road_x_w)
+void tatsumi_state::apache3_road_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Note: Double buffered. Yes, this is correct :)
 	m_apache3_road_x_ram[data] = offset;
 }
 
-READ16_MEMBER(tatsumi_state::roundup5_vram_r)
+uint16_t tatsumi_state::roundup5_vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset+=((m_control_word&0x0c00)>>10) * 0xc000;
 	return m_roundup5_vram[offset];
 }
 
-WRITE16_MEMBER(tatsumi_state::roundup5_vram_w)
+void tatsumi_state::roundup5_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset+=((m_control_word&0x0c00)>>10) * 0xc000;
 
@@ -48,24 +48,24 @@ WRITE16_MEMBER(tatsumi_state::roundup5_vram_w)
 	m_gfxdecode->gfx(1)->mark_dirty(offset/0x10);
 }
 
-WRITE16_MEMBER(tatsumi_state::roundup5_text_w)
+void tatsumi_state::roundup5_text_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
 	m_tx_layer->mark_tile_dirty(offset);
 }
 
-READ16_MEMBER(tatsumi_state::cyclwarr_videoram0_r)
+uint16_t tatsumi_state::cyclwarr_videoram0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		return m_cyclwarr_videoram0[offset];
 }
 
-READ16_MEMBER(tatsumi_state::cyclwarr_videoram1_r)
+uint16_t tatsumi_state::cyclwarr_videoram1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		return m_cyclwarr_videoram1[offset];
 }
 
-WRITE16_MEMBER(tatsumi_state::cyclwarr_videoram0_w)
+void tatsumi_state::cyclwarr_videoram0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cyclwarr_videoram0[offset]);
 	if (offset>=0x400)
@@ -75,7 +75,7 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_videoram0_w)
 	}
 }
 
-WRITE16_MEMBER(tatsumi_state::cyclwarr_videoram1_w)
+void tatsumi_state::cyclwarr_videoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cyclwarr_videoram1[offset]);
 	if (offset>=0x400)
@@ -85,7 +85,7 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_videoram1_w)
 	}
 }
 
-WRITE16_MEMBER(tatsumi_state::roundup5_crt_w)
+void tatsumi_state::roundup5_crt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset==0 && ACCESSING_BITS_0_7)
 		m_roundupt_crt_selected_reg=data&0x3f;
@@ -98,7 +98,7 @@ WRITE16_MEMBER(tatsumi_state::roundup5_crt_w)
 
 /********************************************************************/
 
-TILE_GET_INFO_MEMBER(tatsumi_state::get_text_tile_info)
+void tatsumi_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int tile = videoram[tile_index];
@@ -108,14 +108,14 @@ TILE_GET_INFO_MEMBER(tatsumi_state::get_text_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tatsumi_state::get_tile_info_bigfight_0)
+void tatsumi_state::get_tile_info_bigfight_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_cyclwarr_videoram0[(tile_index+0x400)%0x8000];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
 	SET_TILE_INFO_MEMBER(1,(tile&0x3ff)+(bank<<10),(tile>>12)&0xf,0);
 }
 
-TILE_GET_INFO_MEMBER(tatsumi_state::get_tile_info_bigfight_1)
+void tatsumi_state::get_tile_info_bigfight_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_cyclwarr_videoram1[(tile_index+0x400)%0x8000];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
@@ -124,7 +124,7 @@ TILE_GET_INFO_MEMBER(tatsumi_state::get_tile_info_bigfight_1)
 
 /********************************************************************/
 
-VIDEO_START_MEMBER(tatsumi_state,apache3)
+void tatsumi_state::video_start_apache3()
 {
 	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
@@ -134,7 +134,7 @@ VIDEO_START_MEMBER(tatsumi_state,apache3)
 	m_tx_layer->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(tatsumi_state,roundup5)
+void tatsumi_state::video_start_roundup5()
 {
 	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
@@ -145,7 +145,7 @@ VIDEO_START_MEMBER(tatsumi_state,roundup5)
 	m_gfxdecode->gfx(1)->set_source((uint8_t *)m_roundup5_vram.get());
 }
 
-VIDEO_START_MEMBER(tatsumi_state,cyclwarr)
+void tatsumi_state::video_start_cyclwarr()
 {
 	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_tile_info_bigfight_0),this),TILEMAP_SCAN_ROWS,8,8,64,512);
 	//m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_tile_info_bigfight_0),this),TILEMAP_SCAN_ROWS,8,8,64,512);
@@ -156,7 +156,7 @@ VIDEO_START_MEMBER(tatsumi_state,cyclwarr)
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(8192);
 }
 
-VIDEO_START_MEMBER(tatsumi_state,bigfight)
+void tatsumi_state::video_start_bigfight()
 {
 	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_tile_info_bigfight_0),this),TILEMAP_SCAN_ROWS,8,8,128,256);
 	m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tatsumi_state::get_tile_info_bigfight_0),this),TILEMAP_SCAN_ROWS,8,8,128,256);

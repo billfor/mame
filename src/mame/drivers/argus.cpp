@@ -137,7 +137,7 @@ void argus_state::machine_start()
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(argus_state::scanline)
+void argus_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -148,7 +148,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(argus_state::scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(argus_state::butasan_scanline)
+void argus_state::butasan_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -166,7 +166,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(argus_state::butasan_scanline)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(argus_state::bankselect_w)
+void argus_state::bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("mainbank")->set_entry(data & 7);   /* Select 8 banks of 16k */
 }

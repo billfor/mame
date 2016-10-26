@@ -89,32 +89,32 @@ public:
 	required_memory_bank m_rambank;
 
 	virtual void machine_reset() override;
-	DECLARE_DRIVER_INIT(digel804);
-	DECLARE_WRITE8_MEMBER( op00 );
-	DECLARE_READ8_MEMBER( ip40 );
-	DECLARE_WRITE8_MEMBER( op40 );
-	DECLARE_WRITE8_MEMBER( op41 );
-	DECLARE_WRITE8_MEMBER( op42 );
-	DECLARE_READ8_MEMBER( ip43 );
-	DECLARE_WRITE8_MEMBER( op43 );
-	DECLARE_WRITE8_MEMBER( op43_1_4 );
-	DECLARE_WRITE8_MEMBER( op44 );
-	DECLARE_WRITE8_MEMBER( op45 );
-	DECLARE_READ8_MEMBER( ip46 );
-	DECLARE_WRITE8_MEMBER( op46 );
-	DECLARE_WRITE8_MEMBER( op47 );
-	DECLARE_READ8_MEMBER( acia_rxd_r );
-	DECLARE_WRITE8_MEMBER( acia_txd_w );
-	DECLARE_READ8_MEMBER( acia_status_r );
-	DECLARE_WRITE8_MEMBER( acia_reset_w );
-	DECLARE_READ8_MEMBER( acia_command_r );
-	DECLARE_WRITE8_MEMBER( acia_command_w );
-	DECLARE_READ8_MEMBER( acia_control_r );
-	DECLARE_WRITE8_MEMBER( acia_control_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( ep804_acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( da_w );
-	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
+	void init_digel804();
+	void op00(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ip40(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void op40(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void op41(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void op42(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ip43(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void op43(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void op43_1_4(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void op44(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void op45(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ip46(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void op46(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void op47(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t acia_rxd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void acia_txd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t acia_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void acia_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t acia_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void acia_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t acia_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void acia_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acia_irq_w(int state);
+	void ep804_acia_irq_w(int state);
+	void da_w(int state);
+	void mode_change(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	// current speaker state for port 45
 	uint8_t m_speaker_state;
 	// ram stuff for banking
@@ -136,7 +136,7 @@ public:
 enum { MODE_OFF, MODE_KEY, MODE_REM, MODE_SIM };
 
 
-DRIVER_INIT_MEMBER(digel804_state,digel804)
+void digel804_state::init_digel804()
 {
 	m_speaker_state = 0;
 	//port43_rtn = 0xEE;//0xB6;
@@ -160,19 +160,19 @@ void digel804_state::machine_reset()
 	m_vfd->reset();
 }
 
-READ8_MEMBER( digel804_state::ip40 ) // eprom data bus read
+uint8_t digel804_state::ip40(address_space &space, offs_t offset, uint8_t mem_mask) // eprom data bus read
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	return 0xFF;
 }
 
-WRITE8_MEMBER( digel804_state::op40 ) // eprom data bus write
+void digel804_state::op40(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // eprom data bus write
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 40, eprom databus had %02X written to it!\n", data);
 }
 
-WRITE8_MEMBER( digel804_state::op41 ) // eprom address low write AND SIM write, d6 also controls memory map somehow
+void digel804_state::op41(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // eprom address low write AND SIM write, d6 also controls memory map somehow
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 41, eprom address low/sim/memorybank had %02X written to it!\n", data);
@@ -180,13 +180,13 @@ WRITE8_MEMBER( digel804_state::op41 ) // eprom address low write AND SIM write, 
 	m_op41 = data;
 }
 
-WRITE8_MEMBER( digel804_state::op42 ) // eprom address hi and control write
+void digel804_state::op42(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // eprom address hi and control write
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 42, eprom address hi/control had %02X written to it!\n", data);
 }
 
-READ8_MEMBER( digel804_state::ip43 )
+uint8_t digel804_state::ip43(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Register 0x43: status/mode register read
 	 bits 76543210
@@ -229,13 +229,13 @@ READ8_MEMBER( digel804_state::ip43 )
 
 }
 
-WRITE8_MEMBER( digel804_state::op00 )
+void digel804_state::op00(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_bank = data;
 	m_rambank->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
 }
 
-WRITE8_MEMBER( digel804_state::op43 )
+void digel804_state::op43(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* writes to 0x43 control the ram banking on firmware which supports it
 	 * bits:76543210
@@ -256,12 +256,12 @@ WRITE8_MEMBER( digel804_state::op43 )
 	m_rambank->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
 }
 
-WRITE8_MEMBER( digel804_state::op43_1_4 )
+void digel804_state::op43_1_4(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_overload_state = 0; // writes to port 43 clear overload state
 }
 
-WRITE8_MEMBER( digel804_state::op44 ) // state write
+void digel804_state::op44(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // state write
 {
 	/* writes to 0x44 control the 10937 vfd chip, z80 power/busrq, eprom driving and some eprom power ctl lines
 	 * bits:76543210
@@ -286,7 +286,7 @@ WRITE8_MEMBER( digel804_state::op44 ) // state write
 	m_vfd->sclk(data&1);
 }
 
-WRITE8_MEMBER( digel804_state::op45 ) // speaker write
+void digel804_state::op45(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // speaker write
 {
 	// all writes to here invert the speaker state, verified from schematics
 #ifdef PORT45_W_VERBOSE
@@ -296,7 +296,7 @@ WRITE8_MEMBER( digel804_state::op45 ) // speaker write
 	m_speaker->level_w(m_speaker_state);
 }
 
-READ8_MEMBER( digel804_state::ip46 ) // keypad read
+uint8_t digel804_state::ip46(address_space &space, offs_t offset, uint8_t mem_mask) // keypad read
 {
 	/* reads E* for a keypad number 0-F
 	 * reads F0 for enter
@@ -316,7 +316,7 @@ READ8_MEMBER( digel804_state::ip46 ) // keypad read
 	return BITSWAP8(kbd,7,6,5,4,1,0,3,2);   // verified from schematics
 }
 
-WRITE8_MEMBER( digel804_state::op46 )
+void digel804_state::op46(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* writes to 0x46 control the LEDS on the front panel
 	 * bits:76543210
@@ -340,13 +340,13 @@ WRITE8_MEMBER( digel804_state::op46 )
 		output().set_indexed_value("func_led", i, (!(data & 0x10) && ((~data & 0x0f) == i)) ? 1 : 0);
 }
 
-WRITE8_MEMBER( digel804_state::op47 ) // eprom timing/power and control write
+void digel804_state::op47(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // eprom timing/power and control write
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 47, eprom timing/power and control had %02X written to it!\n", data);
 }
 
-INPUT_CHANGED_MEMBER( digel804_state::mode_change )
+void digel804_state::mode_change(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!newval && !m_keyen_state)
 	{
@@ -377,44 +377,44 @@ INPUT_CHANGED_MEMBER( digel804_state::mode_change )
 }
 
 /* ACIA Trampolines */
-READ8_MEMBER( digel804_state::acia_rxd_r )
+uint8_t digel804_state::acia_rxd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_acia->read(space, 0);
 }
 
-WRITE8_MEMBER( digel804_state::acia_txd_w )
+void digel804_state::acia_txd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_acia->write(space, 0, data);
 }
 
-READ8_MEMBER( digel804_state::acia_status_r )
+uint8_t digel804_state::acia_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_acia->read(space, 1);
 }
 
-WRITE8_MEMBER( digel804_state::acia_reset_w )
+void digel804_state::acia_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_acia->write(space, 1, data);
 }
 
-READ8_MEMBER( digel804_state::acia_command_r )
+uint8_t digel804_state::acia_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_acia->read(space, 2);
 }
 
-WRITE8_MEMBER( digel804_state::acia_command_w )
+void digel804_state::acia_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data |= 0x08;   // HACK for ep804 remote mode
 
 	m_acia->write(space, 2, data);
 }
 
-READ8_MEMBER( digel804_state::acia_control_r )
+uint8_t digel804_state::acia_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_acia->read(space, 3);
 }
 
-WRITE8_MEMBER( digel804_state::acia_control_w )
+void digel804_state::acia_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_acia->write(space, 3, data);
 }
@@ -566,19 +566,19 @@ DEVICE_INPUT_DEFAULTS_END
  Machine Drivers
 ******************************************************************************/
 
-WRITE_LINE_MEMBER( digel804_state::da_w )
+void digel804_state::da_w(int state)
 {
 	m_key_intq = state ? 0 : 1;
 	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( digel804_state::acia_irq_w )
+void digel804_state::acia_irq_w(int state)
 {
 	m_acia_intq = state ? 0 : 1;
 	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( digel804_state::ep804_acia_irq_w )
+void digel804_state::ep804_acia_irq_w(int state)
 {
 }
 

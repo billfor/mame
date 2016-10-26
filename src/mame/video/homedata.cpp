@@ -312,7 +312,7 @@ finish:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(homedata_state,mrokumei)
+void homedata_state::palette_init_mrokumei(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -335,7 +335,7 @@ PALETTE_INIT_MEMBER(homedata_state,mrokumei)
 	}
 }
 
-PALETTE_INIT_MEMBER(homedata_state,reikaids)
+void homedata_state::palette_init_reikaids(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -358,7 +358,7 @@ PALETTE_INIT_MEMBER(homedata_state,reikaids)
 	}
 }
 
-PALETTE_INIT_MEMBER(homedata_state,pteacher)
+void homedata_state::palette_init_pteacher(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -381,7 +381,7 @@ PALETTE_INIT_MEMBER(homedata_state,pteacher)
 	}
 }
 
-PALETTE_INIT_MEMBER(homedata_state,mirderby)
+void homedata_state::palette_init_mirderby(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -422,22 +422,22 @@ inline void homedata_state::mrokumei_info1( tile_data &tileinfo, int tile_index,
 	SET_TILE_INFO_MEMBER(1, code, color, m_flipscreen );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mrokumei_get_info0_0)
+void homedata_state::mrokumei_get_info0_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mrokumei_info0(tileinfo, tile_index, 0,  m_blitter_bank & 0x03 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mrokumei_get_info1_0)
+void homedata_state::mrokumei_get_info1_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mrokumei_info0(tileinfo, tile_index, 1,  m_blitter_bank & 0x03 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mrokumei_get_info0_1)
+void homedata_state::mrokumei_get_info0_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mrokumei_info1(tileinfo, tile_index, 0, (m_blitter_bank & 0x38) >> 3 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mrokumei_get_info1_1)
+void homedata_state::mrokumei_get_info1_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mrokumei_info1(tileinfo, tile_index, 1, (m_blitter_bank & 0x38) >> 3 );
 }
@@ -464,42 +464,42 @@ inline void homedata_state::reikaids_info( tile_data &tileinfo, int tile_index, 
 	 *      xxxx.x---   layer#0
 	 *      ----.-xxx   layer#2
 	 */
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info0_0)
+void homedata_state::reikaids_get_info0_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 0, 0,  (m_gfx_bank[1] >> 3));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info1_0)
+void homedata_state::reikaids_get_info1_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 1, 0,  (m_gfx_bank[1] >> 3));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info0_1)
+void homedata_state::reikaids_get_info0_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 0, 1, ((m_gfx_bank[0] & 0x78) >> 3));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info1_1)
+void homedata_state::reikaids_get_info1_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 1, 1, ((m_gfx_bank[0] & 0x78) >> 3));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info0_2)
+void homedata_state::reikaids_get_info0_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 0, 2,  (m_gfx_bank[1] & 0x7));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info1_2)
+void homedata_state::reikaids_get_info1_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 1, 2,  (m_gfx_bank[1] & 0x7));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info0_3)
+void homedata_state::reikaids_get_info0_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 0, 3,  (m_gfx_bank[0] & 0x7));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info1_3)
+void homedata_state::reikaids_get_info1_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 1, 3,  (m_gfx_bank[0] & 0x7));
 }
@@ -515,22 +515,22 @@ inline void homedata_state::pteacher_info( tile_data &tileinfo, int tile_index, 
 	SET_TILE_INFO_MEMBER(layer, code, color, m_flipscreen);
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::pteacher_get_info0_0)
+void homedata_state::pteacher_get_info0_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	pteacher_info(tileinfo, tile_index, 0, 0, m_gfx_bank[0] & 0x0f);
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::pteacher_get_info1_0)
+void homedata_state::pteacher_get_info1_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	pteacher_info(tileinfo, tile_index, 1, 0, m_gfx_bank[0] & 0x0f);
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::pteacher_get_info0_1)
+void homedata_state::pteacher_get_info0_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	pteacher_info(tileinfo, tile_index, 0, 1, m_gfx_bank[0] >> 4);
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::pteacher_get_info1_1)
+void homedata_state::pteacher_get_info1_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	pteacher_info(tileinfo, tile_index, 1, 1, m_gfx_bank[0] >> 4);
 }
@@ -546,23 +546,23 @@ inline void homedata_state::lemnangl_info( tile_data &tileinfo, int tile_index, 
 	SET_TILE_INFO_MEMBER(2 * layer + gfxset, code, color, m_flipscreen);
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::lemnangl_get_info0_0)
+void homedata_state::lemnangl_get_info0_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	lemnangl_info(tileinfo, tile_index, 0, 0,  m_blitter_bank & 1, m_gfx_bank[0] & 0x0f );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::lemnangl_get_info1_0)
+void homedata_state::lemnangl_get_info1_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	lemnangl_info(tileinfo, tile_index, 1, 0,  m_blitter_bank & 1, m_gfx_bank[0] & 0x0f );
 }
 
 
-TILE_GET_INFO_MEMBER(homedata_state::lemnangl_get_info0_1)
+void homedata_state::lemnangl_get_info0_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	lemnangl_info(tileinfo, tile_index, 0, 1, (m_blitter_bank & 2) >> 1, m_gfx_bank[0] >> 4 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::lemnangl_get_info1_1)
+void homedata_state::lemnangl_get_info1_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	lemnangl_info(tileinfo, tile_index, 1, 1, (m_blitter_bank & 2) >> 1, m_gfx_bank[0] >> 4 );
 }
@@ -587,22 +587,22 @@ inline void homedata_state::mirderby_info1( tile_data &tileinfo, int tile_index,
 	SET_TILE_INFO_MEMBER(1, code, color, m_flipscreen );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info0_0)
+void homedata_state::mirderby_get_info0_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mirderby_info0(tileinfo, tile_index, 0, 0);// m_blitter_bank & 0x03 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info1_0)
+void homedata_state::mirderby_get_info1_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mirderby_info0(tileinfo, tile_index, 1, 0);// m_blitter_bank & 0x03 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info0_1)
+void homedata_state::mirderby_get_info0_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mirderby_info1(tileinfo, tile_index, 0, 0);//(m_blitter_bank & 0x38) >> 3 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info1_1)
+void homedata_state::mirderby_get_info1_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mirderby_info1(tileinfo, tile_index, 1, 0);//(m_blitter_bank & 0x38) >> 3 );
 }
@@ -615,7 +615,7 @@ TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info1_1)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(homedata_state,mrokumei)
+void homedata_state::video_start_mrokumei()
 {
 	m_bg_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homedata_state::mrokumei_get_info0_0),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32 );
 	m_bg_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homedata_state::mrokumei_get_info0_1),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32 );
@@ -626,7 +626,7 @@ VIDEO_START_MEMBER(homedata_state,mrokumei)
 	m_bg_tilemap[1][1]->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(homedata_state,reikaids)
+void homedata_state::video_start_reikaids()
 {
 	m_bg_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homedata_state::reikaids_get_info0_0),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_bg_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homedata_state::reikaids_get_info0_1),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
@@ -647,7 +647,7 @@ VIDEO_START_MEMBER(homedata_state,reikaids)
 	m_bg_tilemap[1][3]->set_transparent_pen(0xff);
 }
 
-VIDEO_START_MEMBER(homedata_state,pteacher)
+void homedata_state::video_start_pteacher()
 {
 	m_bg_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homedata_state::pteacher_get_info0_0),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homedata_state::pteacher_get_info0_1),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
@@ -658,7 +658,7 @@ VIDEO_START_MEMBER(homedata_state,pteacher)
 	m_bg_tilemap[1][1]->set_transparent_pen(0xff);
 }
 
-VIDEO_START_MEMBER(homedata_state,lemnangl)
+void homedata_state::video_start_lemnangl()
 {
 	m_bg_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homedata_state::lemnangl_get_info0_0),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homedata_state::lemnangl_get_info0_1),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
@@ -669,7 +669,7 @@ VIDEO_START_MEMBER(homedata_state,lemnangl)
 	m_bg_tilemap[1][1]->set_transparent_pen(0x0f);
 }
 
-VIDEO_START_MEMBER(homedata_state,mirderby)
+void homedata_state::video_start_mirderby()
 {
 	m_bg_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homedata_state::mirderby_get_info0_0),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32 );
 	m_bg_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homedata_state::mirderby_get_info0_1),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32 );
@@ -686,20 +686,20 @@ VIDEO_START_MEMBER(homedata_state,mirderby)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(homedata_state::mrokumei_videoram_w)
+void homedata_state::mrokumei_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12]->mark_tile_dirty((offset & 0xffe) >> 1);
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_videoram_w)
+void homedata_state::reikaids_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap[(offset & 0x2000) >> 13][offset & 3]->mark_tile_dirty((offset & 0xffc) >> 2);
 }
 
 
-WRITE8_MEMBER(homedata_state::reikaids_gfx_bank_w)
+void homedata_state::reikaids_gfx_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //logerror( "%04x: [setbank %02x]\n",space.device().safe_pc(),data);
 
@@ -712,7 +712,7 @@ WRITE8_MEMBER(homedata_state::reikaids_gfx_bank_w)
 	m_reikaids_which ^= 1;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_gfx_bank_w)
+void homedata_state::pteacher_gfx_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("%04x: gfxbank:=%02x\n", space.device().safe_pc(), data);
 	if (m_gfx_bank[0] != data)
@@ -722,7 +722,7 @@ WRITE8_MEMBER(homedata_state::pteacher_gfx_bank_w)
 	}
 }
 
-WRITE8_MEMBER(homedata_state::homedata_blitter_param_w)
+void homedata_state::homedata_blitter_param_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //logerror("%04x: blitter_param_w %02x\n", space.device().safe_pc(), data);
 	m_blitter_param[m_blitter_param_count] = data;
@@ -730,7 +730,7 @@ WRITE8_MEMBER(homedata_state::homedata_blitter_param_w)
 	m_blitter_param_count &= 3;
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_blitter_bank_w)
+void homedata_state::mrokumei_blitter_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* --xxx--- layer 1 gfx bank
 	   -----x-- blitter ROM bank
@@ -743,7 +743,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_blitter_bank_w)
 	m_blitter_bank = data;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_blitter_bank_w)
+void homedata_state::reikaids_blitter_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* xxx----- priority control
 	   ----x--- target page? what's this for?
@@ -752,7 +752,7 @@ WRITE8_MEMBER(homedata_state::reikaids_blitter_bank_w)
 	m_blitter_bank = data;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_blitter_bank_w)
+void homedata_state::pteacher_blitter_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* xxx----- blitter ROM bank
 	   -----x-- pixel clock (normal/slow)
@@ -766,7 +766,7 @@ WRITE8_MEMBER(homedata_state::pteacher_blitter_bank_w)
 	m_blitter_bank = data;
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_blitter_start_w)
+void homedata_state::mrokumei_blitter_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x80)
 		mrokumei_handleblit(space, ((m_blitter_bank & 0x04) >> 2) * 0x10000);
@@ -775,12 +775,12 @@ WRITE8_MEMBER(homedata_state::mrokumei_blitter_start_w)
 	   optional service mode ROM (not available in current dump) */
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_blitter_start_w)
+void homedata_state::reikaids_blitter_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	reikaids_handleblit(space, (m_blitter_bank & 3) * 0x10000);
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_blitter_start_w)
+void homedata_state::pteacher_blitter_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pteacher_handleblit(space, (m_blitter_bank >> 5) * 0x10000 & (memregion("user1")->bytes() - 1));
 }

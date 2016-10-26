@@ -29,31 +29,31 @@ public:
 	optional_memory_bank m_ram1;
 	optional_memory_bank m_ram2;
 
-	DECLARE_WRITE8_MEMBER(astdelux_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(llander_led_w);
-	DECLARE_READ8_MEMBER(asteroid_IN0_r);
-	DECLARE_READ8_MEMBER(asterock_IN0_r);
-	DECLARE_READ8_MEMBER(asteroid_IN1_r);
-	DECLARE_READ8_MEMBER(asteroid_DSW1_r);
-	DECLARE_WRITE8_MEMBER(asteroid_bank_switch_w);
-	DECLARE_WRITE8_MEMBER(astdelux_bank_switch_w);
-	DECLARE_WRITE8_MEMBER(astdelux_led_w);
-	DECLARE_WRITE8_MEMBER(asteroid_explode_w);
-	DECLARE_WRITE8_MEMBER(asteroid_thump_w);
-	DECLARE_WRITE8_MEMBER(asteroid_sounds_w);
-	DECLARE_WRITE8_MEMBER(astdelux_sounds_w);
-	DECLARE_WRITE8_MEMBER(asteroid_noise_reset_w);
-	DECLARE_WRITE8_MEMBER(llander_snd_reset_w);
-	DECLARE_WRITE8_MEMBER(llander_sounds_w);
+	void astdelux_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void llander_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t asteroid_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t asterock_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t asteroid_IN1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t asteroid_DSW1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void asteroid_bank_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void astdelux_bank_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void astdelux_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void asteroid_explode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void asteroid_thump_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void asteroid_sounds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void astdelux_sounds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void asteroid_noise_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void llander_snd_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void llander_sounds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	ioport_value clock_r(ioport_field &field, void *param);
 
-	INTERRUPT_GEN_MEMBER(asteroid_interrupt);
-	INTERRUPT_GEN_MEMBER(asterock_interrupt);
-	INTERRUPT_GEN_MEMBER(llander_interrupt);
+	void asteroid_interrupt(device_t &device);
+	void asterock_interrupt(device_t &device);
+	void llander_interrupt(device_t &device);
 
-	DECLARE_DRIVER_INIT(asterock);
-	DECLARE_DRIVER_INIT(asteroidb);
+	void init_asterock();
+	void init_asteroidb();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

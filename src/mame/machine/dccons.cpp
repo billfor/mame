@@ -28,7 +28,7 @@
 
 #define ATAPI_CYCLES_PER_SECTOR (5000)  // TBD for Dreamcast
 
-WRITE_LINE_MEMBER(dc_cons_state::ata_interrupt)
+void dc_cons_state::ata_interrupt(int state)
 {
 	if (state)
 		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_GDROM;
@@ -38,7 +38,7 @@ WRITE_LINE_MEMBER(dc_cons_state::ata_interrupt)
 	dc_update_interrupt_status();
 }
 
-TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
+void dc_cons_state::atapi_xfer_end(void *ptr, int32_t param)
 {
 	uint8_t sector_buffer[ 4096 ];
 
@@ -113,7 +113,7 @@ c000776 - DMA triggered to c008000
 
 */
 
-READ32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_r )
+uint32_t dc_cons_state::dc_mess_g1_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
@@ -141,7 +141,7 @@ READ32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_r )
 	return g1bus_regs[offset];
 }
 
-WRITE32_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
+void dc_cons_state::dc_mess_g1_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	g1bus_regs[offset] = data; // 5f7400+reg*4=dat
 //  osd_printf_verbose("%s",string_format("G1CTRL: [%08x=%x] write %I64x to %x, mask %I64x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask).c_str());

@@ -6,26 +6,26 @@
 #include "includes/kickgoal.h"
 
 
-WRITE16_MEMBER(kickgoal_state::kickgoal_fgram_w)
+void kickgoal_state::kickgoal_fgram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgram[offset]);
 	m_fgtm->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(kickgoal_state::kickgoal_bgram_w)
+void kickgoal_state::kickgoal_bgram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bgram[offset]);
 	m_bgtm->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(kickgoal_state::kickgoal_bg2ram_w)
+void kickgoal_state::kickgoal_bg2ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2ram[offset]);
 	m_bg2tm->mark_tile_dirty(offset / 2);
 }
 
 /* FG */
-TILE_GET_INFO_MEMBER(kickgoal_state::get_kickgoal_fg_tile_info)
+void kickgoal_state::get_kickgoal_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_fgram[tile_index * 2] & 0x0fff;
 	int color = m_fgram[tile_index * 2 + 1] & 0x000f;
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(kickgoal_state::get_kickgoal_fg_tile_info)
 }
 
 /* BG */
-TILE_GET_INFO_MEMBER(kickgoal_state::get_kickgoal_bg_tile_info)
+void kickgoal_state::get_kickgoal_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_bgram[tile_index * 2] & m_bg_mask;
 	int color = m_bgram[tile_index * 2 + 1] & 0x000f;
@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(kickgoal_state::get_kickgoal_bg_tile_info)
 }
 
 /* BG 2 */
-TILE_GET_INFO_MEMBER(kickgoal_state::get_kickgoal_bg2_tile_info)
+void kickgoal_state::get_kickgoal_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_bg2ram[tile_index * 2] & m_bg2_mask;
 	int color = m_bg2ram[tile_index * 2 + 1] & 0x000f;
@@ -56,27 +56,27 @@ TILE_GET_INFO_MEMBER(kickgoal_state::get_kickgoal_bg2_tile_info)
 }
 
 
-TILEMAP_MAPPER_MEMBER(kickgoal_state::tilemap_scan_kicksfg)
+tilemap_memory_index kickgoal_state::tilemap_scan_kicksfg(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return col * 32 + (row & 0x1f) + ((row & 0x20) >> 5) * 0x800;
 }
 
-TILEMAP_MAPPER_MEMBER(kickgoal_state::tilemap_scan_kicksbg)
+tilemap_memory_index kickgoal_state::tilemap_scan_kicksbg(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return col * 16 + (row & 0xf) + ((row & 0x70) >> 4) * 0x400;
 }
 
 
-TILEMAP_MAPPER_MEMBER(kickgoal_state::tilemap_scan_kicksbg2)// 16x16 tiles
+tilemap_memory_index kickgoal_state::tilemap_scan_kicksbg2(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)// 16x16 tiles
 {
 	/* logical (col,row) -> memory offset */
 	return col * 8 + (row & 0x7) + ((row & 0x3c) >> 3) * 0x200;
 }
 
 
-TILEMAP_MAPPER_MEMBER(kickgoal_state::tilemap_scan_actionhwbg2)// 32x32 tiles
+tilemap_memory_index kickgoal_state::tilemap_scan_actionhwbg2(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)// 32x32 tiles
 {
 	/* logical (col,row) -> memory offset */
 	return col * 16 + (row & 0xf) + ((row & 0x70) >> 4) * 0x400;
@@ -117,7 +117,7 @@ void kickgoal_state::kickgoal_draw_sprites(bitmap_ind16 &bitmap,const rectangle 
 }
 
 
-VIDEO_START_MEMBER(kickgoal_state,kickgoal)
+void kickgoal_state::video_start_kickgoal()
 {
 	m_sprbase = 0x0000;
 
@@ -137,7 +137,7 @@ VIDEO_START_MEMBER(kickgoal_state,kickgoal)
 	m_bgtm->set_transparent_pen(15);
 }
 
-VIDEO_START_MEMBER(kickgoal_state,actionhw)
+void kickgoal_state::video_start_actionhw()
 {
 	m_sprbase = 0x4000;
 	m_fg_base = 0x7000 * 2;

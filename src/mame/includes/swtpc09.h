@@ -62,48 +62,48 @@ public:
 	optional_device<device_t> m_harddisk;
 	optional_device<ide_controller_device> m_ide;
 
-	DECLARE_READ8_MEMBER(pia0_a_r);
-	DECLARE_READ8_MEMBER(pia0_ca1_r);
-	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
+	uint8_t pia0_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia0_ca1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia0_irq_a(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( ptm_o1_callback );
-	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
-	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
+	void ptm_o1_callback(int state);
+	void ptm_o3_callback(int state);
+	void ptm_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
+	void acia_interrupt(int state);
+	void write_acia_clock(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
-	DECLARE_READ8_MEMBER( dmf3_via_read_porta );
-	DECLARE_READ8_MEMBER( dmf3_via_read_portb );
-	DECLARE_WRITE8_MEMBER( dmf3_via_write_porta );
-	DECLARE_WRITE_LINE_MEMBER( dmf3_via_irq );
+	uint8_t dmf3_via_read_porta(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dmf3_via_read_portb(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmf3_via_write_porta(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dmf3_via_irq(int state);
 
-	DECLARE_READ8_MEMBER(piaide_a_r);
-	DECLARE_READ8_MEMBER(piaide_b_r);
-	DECLARE_WRITE8_MEMBER(piaide_a_w);
-	DECLARE_WRITE8_MEMBER(piaide_b_w);
+	uint8_t piaide_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t piaide_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void piaide_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void piaide_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER ( dmf2_dma_address_reg_r );
-	DECLARE_WRITE8_MEMBER ( dmf2_dma_address_reg_w );
-	DECLARE_READ8_MEMBER ( dmf2_control_reg_r );
-	DECLARE_WRITE8_MEMBER ( dmf2_control_reg_w );
+	uint8_t dmf2_dma_address_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmf2_dma_address_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dmf2_control_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmf2_control_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER ( dmf3_dma_address_reg_r );
-	DECLARE_WRITE8_MEMBER ( dmf3_dma_address_reg_w );
-	DECLARE_READ8_MEMBER ( dmf3_control_reg_r );
-	DECLARE_WRITE8_MEMBER ( dmf3_control_reg_w );
+	uint8_t dmf3_dma_address_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmf3_dma_address_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dmf3_control_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmf3_control_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER ( dc4_control_reg_w );
+	void dc4_control_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(dat_w);
+	void dat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DRIVER_INIT( swtpc09 );
-	DECLARE_DRIVER_INIT( swtpc09i );
-	DECLARE_DRIVER_INIT( swtpc09u );
-	DECLARE_DRIVER_INIT( swtpc09d3 );
+	void init_swtpc09();
+	void init_swtpc09i();
+	void init_swtpc09u();
+	void init_swtpc09d3();
 
 	void swtpc09_fdc_dma_transfer();
 	void swtpc09_irq_handler(uint8_t peripheral, uint8_t state);
@@ -139,8 +139,8 @@ public:
 	uint8_t m_m6844_priority;
 	uint8_t m_m6844_interrupt;
 	uint8_t m_m6844_chain;
-	DECLARE_READ8_MEMBER ( m6844_r );
-	DECLARE_WRITE8_MEMBER ( m6844_w );
+	uint8_t m6844_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m6844_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 };
 

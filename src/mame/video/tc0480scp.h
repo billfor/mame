@@ -37,16 +37,16 @@ public:
 	then tweak them once you have the 4 bg layer positions correct. Col_base
 	may be needed when tilemaps use a palette area from sprites. */
 
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
-	DECLARE_READ16_MEMBER( ctrl_word_r );
-	DECLARE_WRITE16_MEMBER( ctrl_word_w );
+	uint16_t word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ctrl_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ctrl_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	/* Functions for use with 68020 (Super-Z system) */
-	DECLARE_READ32_MEMBER( long_r );
-	DECLARE_WRITE32_MEMBER( long_w );
-	DECLARE_READ32_MEMBER( ctrl_long_r );
-	DECLARE_WRITE32_MEMBER( ctrl_long_w );
+	uint32_t long_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ctrl_long_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ctrl_long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void tilemap_update();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority);
@@ -57,7 +57,7 @@ public:
 	int get_bg_priority();
 
 	/* Undrfire needs to read this for a sprite/tile priority hack */
-	DECLARE_READ8_MEMBER( pri_reg_r );
+	uint8_t pri_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void postload();
 
@@ -98,11 +98,11 @@ private:
 	void common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum );
 	void common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum );
 
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	void get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void dirty_tilemaps();
 	void set_layer_ptrs();

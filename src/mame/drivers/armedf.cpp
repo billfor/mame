@@ -316,7 +316,7 @@ Notes:
     ---- ---- ---- ---x coin counter 0
 */
 
-WRITE16_MEMBER(armedf_state::terraf_io_w)
+void armedf_state::terraf_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
 		m_nb1414m4->exec((m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram.get(),m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
@@ -330,7 +330,7 @@ WRITE16_MEMBER(armedf_state::terraf_io_w)
 	flip_screen_set(m_vreg & 0x1000);
 }
 
-WRITE16_MEMBER(armedf_state::terrafjb_io_w)
+void armedf_state::terrafjb_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
 		m_extra->set_input_line(0, HOLD_LINE);
@@ -343,7 +343,7 @@ WRITE16_MEMBER(armedf_state::terrafjb_io_w)
 	flip_screen_set(m_vreg & 0x1000);
 }
 
-WRITE16_MEMBER(armedf_state::bootleg_io_w)
+void armedf_state::bootleg_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
 	{
@@ -358,24 +358,24 @@ WRITE16_MEMBER(armedf_state::bootleg_io_w)
 	flip_screen_set(m_vreg & 0x1000);
 }
 
-WRITE16_MEMBER(armedf_state::sound_command_w)
+void armedf_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch->write(space, 0, ((data & 0x7f) << 1) | 1);
 }
 
-READ8_MEMBER(armedf_state::soundlatch_clear_r)
+uint8_t armedf_state::soundlatch_clear_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundlatch->clear_w(space, 0, 0);
 	return 0;
 }
 
-WRITE16_MEMBER(armedf_state::irq_lv1_ack_w)
+void armedf_state::irq_lv1_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(armedf_state::irq_lv2_ack_w)
+void armedf_state::irq_lv2_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
@@ -463,7 +463,7 @@ static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(armedf_state::legionjb_fg_scroll_w)
+void armedf_state::legionjb_fg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset >= 0xb && offset < 0xf)
 		m_legion_cmd[offset-0xb] = data & 0xff;
@@ -519,13 +519,13 @@ static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x06d00e, 0x06d00f) AM_WRITE(irq_lv1_ack_w)
 ADDRESS_MAP_END
 
-READ16_MEMBER(bigfghtr_state::latch_r)
+uint16_t bigfghtr_state::latch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_read_latch = 1;
 	return 0;
 }
 
-WRITE16_MEMBER(bigfghtr_state::sharedram_w)
+void bigfghtr_state::sharedram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sharedram[offset]);
 
@@ -538,7 +538,7 @@ WRITE16_MEMBER(bigfghtr_state::sharedram_w)
 	}
 }
 
-READ16_MEMBER(bigfghtr_state::sharedram_r)
+uint16_t bigfghtr_state::sharedram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(m_mcu_input_snippet)
 	{
@@ -703,28 +703,28 @@ static ADDRESS_MAP_START( cclimbr2_soundmap, AS_PROGRAM, 8, armedf_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-READ8_MEMBER(armedf_state::blitter_txram_r)
+uint8_t armedf_state::blitter_txram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_text_videoram[offset];
 }
 
-WRITE8_MEMBER(armedf_state::blitter_txram_w)
+void armedf_state::blitter_txram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_text_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(armedf_state::fg_scrollx_w)
+void armedf_state::fg_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_scrollx = (data & 0xff) | (m_fg_scrollx & 0x300);
 }
 
-WRITE8_MEMBER(armedf_state::fg_scrolly_w)
+void armedf_state::fg_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_scrolly = (data & 0xff) | (m_fg_scrolly & 0x300);
 }
 
-WRITE8_MEMBER(armedf_state::fg_scroll_msb_w)
+void armedf_state::fg_scroll_msb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_scrolly = (((data & 0x03) >> 0) << 8) | (m_fg_scrolly & 0xff);
 	m_fg_scrollx = (((data & 0x0c) >> 2) << 8) | (m_fg_scrollx & 0xff);
@@ -1141,7 +1141,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(armedf_state,armedf)
+void armedf_state::machine_start_armedf()
 {
 	save_item(NAME(m_old_mcu_mode));
 	save_item(NAME(m_scroll_msb));
@@ -1153,7 +1153,7 @@ MACHINE_START_MEMBER(armedf_state,armedf)
 	save_item(NAME(m_bg_scrolly));
 }
 
-MACHINE_RESET_MEMBER(armedf_state,armedf)
+void armedf_state::machine_reset_armedf()
 {
 	m_old_mcu_mode = 0;
 	m_scroll_msb = 0;
@@ -1520,15 +1520,15 @@ static MACHINE_CONFIG_START( legionjb, armedf_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(bigfghtr_state,bigfghtr)
+void bigfghtr_state::machine_start_bigfghtr()
 {
-	MACHINE_START_CALL_MEMBER(armedf);
+	machine_start_armedf();
 	save_item(NAME(m_read_latch));
 }
 
-MACHINE_RESET_MEMBER(bigfghtr_state,bigfghtr)
+void bigfghtr_state::machine_reset_bigfghtr()
 {
-	MACHINE_RESET_CALL_MEMBER(armedf);
+	machine_reset_armedf();
 	m_read_latch = 0;
 }
 
@@ -2106,7 +2106,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(armedf_state,terraf)
+void armedf_state::init_terraf()
 {
 	m_scroll_type = 0;
 
@@ -2116,27 +2116,27 @@ DRIVER_INIT_MEMBER(armedf_state,terraf)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0c0001, write16_delegate(FUNC(armedf_state::terraf_fg_scroll_msb_arm_w),this));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,terrafu)
+void armedf_state::init_terrafu()
 {
 	m_scroll_type = 0;
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,terrafjb)
+void armedf_state::init_terrafjb()
 {
 	m_scroll_type = 0;
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terrafjb_io_w),this));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,armedf)
+void armedf_state::init_armedf()
 {
 	m_scroll_type = 1;
 }
 
 
-DRIVER_INIT_MEMBER(armedf_state,kozure)
+void armedf_state::init_kozure()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2150,7 +2150,7 @@ DRIVER_INIT_MEMBER(armedf_state,kozure)
 
 }
 
-DRIVER_INIT_MEMBER(armedf_state,legion)
+void armedf_state::init_legion()
 {
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
@@ -2166,7 +2166,7 @@ DRIVER_INIT_MEMBER(armedf_state,legion)
 	m_scroll_type = 2;
 }
 
-DRIVER_INIT_MEMBER(armedf_state,legionjb)
+void armedf_state::init_legionjb()
 {
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
@@ -2183,14 +2183,14 @@ DRIVER_INIT_MEMBER(armedf_state,legionjb)
 	save_item(NAME(m_legion_cmd));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,cclimbr2)
+void armedf_state::init_cclimbr2()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 
 	m_scroll_type = 3;
 }
 
-DRIVER_INIT_MEMBER(bigfghtr_state,bigfghtr)
+void bigfghtr_state::init_bigfghtr()
 {
 	m_scroll_type = 1;
 }

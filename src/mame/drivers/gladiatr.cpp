@@ -194,27 +194,27 @@ TODO:
 
 
 /*Rom bankswitching*/
-WRITE8_MEMBER(gladiatr_state::gladiatr_bankswitch_w)
+void gladiatr_state::gladiatr_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x01);
 }
 
 
-READ8_MEMBER(gladiatr_state::gladiator_dsw1_r )
+uint8_t gladiatr_state::gladiator_dsw1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int orig = ioport("DSW1")->read()^0xff;
 
 	return BITSWAP8(orig, 0,1,2,3,4,5,6,7);
 }
 
-READ8_MEMBER(gladiatr_state::gladiator_dsw2_r )
+uint8_t gladiatr_state::gladiator_dsw2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int orig = ioport("DSW2")->read()^0xff;
 
 	return BITSWAP8(orig, 2,3,4,5,6,7,1,0);
 }
 
-READ8_MEMBER(gladiatr_state::gladiator_controls_r )
+uint8_t gladiatr_state::gladiator_controls_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int coins = 0;
 
@@ -232,7 +232,7 @@ READ8_MEMBER(gladiatr_state::gladiator_controls_r )
 	return 0;
 }
 
-READ8_MEMBER(gladiatr_state::gladiator_button3_r )
+uint8_t gladiatr_state::gladiator_button3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -243,7 +243,7 @@ READ8_MEMBER(gladiatr_state::gladiator_button3_r )
 	return 0;
 }
 
-MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
+void gladiatr_state::machine_reset_gladiator()
 {
 	/* 6809 bank memory set */
 	{
@@ -253,21 +253,21 @@ MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
 }
 
 /* YM2203 port B handler (output) */
-WRITE8_MEMBER(gladiatr_state::gladiator_int_control_w)
+void gladiatr_state::gladiator_int_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7   : SSRST = sound reset ? */
 	/* bit 6-1 : N.C.                  */
 	/* bit 0   : ??                    */
 }
 /* YM2203 IRQ */
-WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
+void gladiatr_state::gladiator_ym_irq(int state)
 {
 	/* NMI IRQ is not used by gladiator sound program */
 	m_subcpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*Sound Functions*/
-WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
+void gladiatr_state::gladiator_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit6 = bank offset */
 	membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
@@ -277,19 +277,19 @@ WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
 	m_msm->vclk_w (BIT(data, 4)); /* bit4     */
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_w)
+void gladiatr_state::gladiator_cpu_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space,0,data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-READ8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_r)
+uint8_t gladiatr_state::gladiator_cpu_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read(space,0);
 }
 
-WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
+void gladiatr_state::gladiatr_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }
@@ -297,7 +297,7 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
 
 #if 1
 /* !!!!! patch to IRQ timing for 2nd CPU !!!!! */
-WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
+void gladiatr_state::gladiatr_irq_patch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(0, HOLD_LINE);
 }
@@ -309,7 +309,7 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
 
 
 
-WRITE8_MEMBER(gladiatr_state::ppking_qx0_w)
+void gladiatr_state::ppking_qx0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!offset)
 	{
@@ -318,7 +318,7 @@ WRITE8_MEMBER(gladiatr_state::ppking_qx0_w)
 	}
 }
 
-WRITE8_MEMBER(gladiatr_state::ppking_qx1_w)
+void gladiatr_state::ppking_qx1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!offset)
 	{
@@ -327,15 +327,15 @@ WRITE8_MEMBER(gladiatr_state::ppking_qx1_w)
 	}
 }
 
-WRITE8_MEMBER(gladiatr_state::ppking_qx2_w){ }
+void gladiatr_state::ppking_qx2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ }
 
-WRITE8_MEMBER(gladiatr_state::ppking_qx3_w){ }
+void gladiatr_state::ppking_qx3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ }
 
-READ8_MEMBER(gladiatr_state::ppking_qx2_r){ return machine().rand(); }
+uint8_t gladiatr_state::ppking_qx2_r(address_space &space, offs_t offset, uint8_t mem_mask){ return machine().rand(); }
 
-READ8_MEMBER(gladiatr_state::ppking_qx3_r){ return machine().rand()&0xf; }
+uint8_t gladiatr_state::ppking_qx3_r(address_space &space, offs_t offset, uint8_t mem_mask){ return machine().rand()&0xf; }
 
-READ8_MEMBER(gladiatr_state::ppking_qx0_r)
+uint8_t gladiatr_state::ppking_qx0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!offset)
 			return m_data1;
@@ -343,7 +343,7 @@ READ8_MEMBER(gladiatr_state::ppking_qx0_r)
 		return m_flag2;
 }
 
-READ8_MEMBER(gladiatr_state::ppking_qx1_r)
+uint8_t gladiatr_state::ppking_qx1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!offset)
 		return m_data2;
@@ -351,7 +351,7 @@ READ8_MEMBER(gladiatr_state::ppking_qx1_r)
 		return m_flag1;
 }
 
-MACHINE_RESET_MEMBER(gladiatr_state,ppking)
+void gladiatr_state::machine_reset_ppking()
 {
 	m_data1 = m_data2 = 0;
 	m_flag1 = m_flag2 = 1;
@@ -608,7 +608,7 @@ GFXDECODE_END
 
 
 
-READ8_MEMBER(gladiatr_state::ppking_f1_r)
+uint8_t gladiatr_state::ppking_f1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
@@ -961,7 +961,7 @@ void gladiatr_state::swap_block(uint8_t *src1,uint8_t *src2,int len)
 	}
 }
 
-DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
+void gladiatr_state::init_gladiatr()
 {
 	uint8_t *rom;
 	int i,j;
@@ -1004,7 +1004,7 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 }
 
 
-READ8_MEMBER(gladiatr_state::ppking_f6a3_r)
+uint8_t gladiatr_state::ppking_f6a3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(space.device().safe_pcbase()==0x8e)
 		m_nvram[0x6a3]=1;
@@ -1012,7 +1012,7 @@ READ8_MEMBER(gladiatr_state::ppking_f6a3_r)
 	return m_nvram[0x6a3];
 }
 
-DRIVER_INIT_MEMBER(gladiatr_state,ppking)
+void gladiatr_state::init_ppking()
 {
 	uint8_t *rom;
 	int i,j;

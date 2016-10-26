@@ -654,7 +654,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(cps_state::cps2_interrupt)
+void cps_state::cps2_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	/* 2 is vblank, 4 is some sort of scanline interrupt, 6 is both at the same time. */
 	if (param == 0)
@@ -712,7 +712,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::cps2_interrupt)
  *
  *************************************/
 
-WRITE16_MEMBER( cps_state::cps2_eeprom_port_w )
+void cps_state::cps2_eeprom_port_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -789,7 +789,7 @@ WRITE16_MEMBER( cps_state::cps2_eeprom_port_w )
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(cps_state::cps2_update_digital_volume)
+void cps_state::cps2_update_digital_volume(void *ptr, int32_t param)
 {
 	int vol_button_state;
 
@@ -805,7 +805,7 @@ TIMER_CALLBACK_MEMBER(cps_state::cps2_update_digital_volume)
 	machine().device<qsound_device>("qsound")->set_output_gain(1, m_cps2digitalvolumelevel / 39.0);
 }
 
-READ16_MEMBER(cps_state::cps2_qsound_volume_r)
+uint16_t cps_state::cps2_qsound_volume_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const uint16_t cps2_vol_states[40] =
 	{
@@ -839,12 +839,12 @@ READ16_MEMBER(cps_state::cps2_qsound_volume_r)
  *
  *************************************/
 
-READ16_MEMBER(cps_state::kludge_r)
+uint16_t cps_state::kludge_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-READ16_MEMBER(cps_state::joy_or_paddle_r)
+uint16_t cps_state::joy_or_paddle_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_readpaddle != 0)
 	{
@@ -856,7 +856,7 @@ READ16_MEMBER(cps_state::joy_or_paddle_r)
 	}
 }
 
-READ16_MEMBER(cps_state::joy_or_paddle_ecofghtr_r)
+uint16_t cps_state::joy_or_paddle_ecofghtr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_readpaddle == 0 || (m_io_in1->read() & 0x10) == 0x10) // ignore bit if spinner not enabled
 	{
@@ -1293,7 +1293,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(cps_state,cps2)
+void cps_state::machine_start_cps2()
 {
 	if (m_audiocpu != nullptr) // gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
 		membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, memregion("audiocpu")->base() + 0x10000, 0x4000);
@@ -9703,17 +9703,17 @@ void cps_state::init_digital_volume()
 
 
 
-DRIVER_INIT_MEMBER(cps_state,cps2)
+void cps_state::init_cps2()
 {
 	/* Decrypt the game - see machine/cps2crypt.cpp */
-	DRIVER_INIT_CALL(cps2crypt);
-	DRIVER_INIT_CALL(cps2nc);
+	init_cps2crypt();
+	init_cps2nc();
 }
 
-DRIVER_INIT_MEMBER(cps_state, cps2nc)
+void cps_state::init_cps2nc()
 {
 	/* Initialize some video elements */
-	DRIVER_INIT_CALL(cps2_video);
+	init_cps2_video();
 
 	m_cps2networkpresent = 0;
 
@@ -9723,9 +9723,9 @@ DRIVER_INIT_MEMBER(cps_state, cps2nc)
 }
 
 
-DRIVER_INIT_MEMBER(cps_state,ssf2tb)
+void cps_state::init_ssf2tb()
 {
-	DRIVER_INIT_CALL(cps2);
+	init_cps2();
 
 	m_cps2networkpresent = 0;
 
@@ -9735,9 +9735,9 @@ DRIVER_INIT_MEMBER(cps_state,ssf2tb)
 
 }
 
-DRIVER_INIT_MEMBER(cps_state,pzloop2)
+void cps_state::init_pzloop2()
 {
-	DRIVER_INIT_CALL(cps2);
+	init_cps2();
 
 	m_readpaddle = 0;
 	m_cps2_dial_type = 1;
@@ -9747,21 +9747,21 @@ DRIVER_INIT_MEMBER(cps_state,pzloop2)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16_delegate(FUNC(cps_state::joy_or_paddle_r), this));
 }
 
-DRIVER_INIT_MEMBER(cps_state,singbrd)
+void cps_state::init_singbrd()
 {
-	DRIVER_INIT_CALL(cps2);
+	init_cps2();
 
 	/* the single board games don't have a digital volume switch */
 	m_cps2disabledigitalvolume = 1;
 	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);
 }
 
-READ16_MEMBER( cps_state::gigaman2_dummyqsound_r )
+uint16_t cps_state::gigaman2_dummyqsound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_gigaman2_dummyqsound_ram[offset];
 }
 
-WRITE16_MEMBER( cps_state::gigaman2_dummyqsound_w )
+void cps_state::gigaman2_dummyqsound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_gigaman2_dummyqsound_ram[offset] = data;
 }
@@ -9781,13 +9781,13 @@ void cps_state::gigaman2_gfx_reorder()
 	}
 }
 
-DRIVER_INIT_MEMBER(cps_state,gigaman2)
+void cps_state::init_gigaman2()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	gigaman2_gfx_reorder();
 
-	DRIVER_INIT_CALL(cps2nc);
+	init_cps2nc();
 
 	m_gigaman2_dummyqsound_ram = std::make_unique<uint16_t[]>(0x20000 / 2);
 	save_pointer(NAME(m_gigaman2_dummyqsound_ram.get()), 0x20000 / 2);
@@ -9800,9 +9800,9 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
 	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);
 }
 
-DRIVER_INIT_MEMBER(cps_state,ecofghtr)
+void cps_state::init_ecofghtr()
 {
-	DRIVER_INIT_CALL(cps2);
+	init_cps2();
 
 	m_readpaddle = 0;
 	m_cps2_dial_type = 2;

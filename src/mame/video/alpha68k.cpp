@@ -22,7 +22,7 @@ void alpha68k_state::alpha68k_V_video_bank_w( int bank )
 
 /******************************************************************************/
 
-TILE_GET_INFO_MEMBER(alpha68k_state::get_tile_info)
+void alpha68k_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[2 * tile_index] & 0xff;
 	int color = m_videoram[2 * tile_index + 1] & 0x0f;
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(alpha68k_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_videoram_w)
+void alpha68k_state::alpha68k_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* 8 bit RAM, upper & lower byte writes end up in the same place due to m68k byte smearing */
 	m_videoram[offset] = data & 0xff;
@@ -40,7 +40,7 @@ WRITE16_MEMBER(alpha68k_state::alpha68k_videoram_w)
 	m_fix_tilemap->mark_tile_dirty(offset / 2);
 }
 
-VIDEO_START_MEMBER(alpha68k_state,alpha68k)
+void alpha68k_state::video_start_alpha68k()
 {
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(alpha68k_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	m_fix_tilemap->set_transparent_pen(0);
@@ -140,7 +140,7 @@ uint32_t alpha68k_state::screen_update_alpha68k_II(screen_device &screen, bitmap
 
 */
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_II_video_bank_w)
+void alpha68k_state::alpha68k_II_video_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -179,7 +179,7 @@ WRITE16_MEMBER(alpha68k_state::alpha68k_II_video_bank_w)
 
 /******************************************************************************/
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_V_video_control_w)
+void alpha68k_state::alpha68k_V_video_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -348,7 +348,7 @@ uint32_t alpha68k_state::screen_update_alpha68k_I(screen_device &screen, bitmap_
 //ZT
 /******************************************************************************/
 
-PALETTE_INIT_MEMBER(alpha68k_state,kyros)
+void alpha68k_state::palette_init_kyros(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -373,7 +373,7 @@ PALETTE_INIT_MEMBER(alpha68k_state,kyros)
 	}
 }
 
-PALETTE_INIT_MEMBER(alpha68k_state,paddlem)
+void alpha68k_state::palette_init_paddlem(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

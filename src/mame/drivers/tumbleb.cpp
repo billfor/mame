@@ -316,7 +316,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tumbleb_state::tumblepb_oki_w)
+void tumbleb_state::tumblepb_oki_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask == 0xffff)
 	{
@@ -331,14 +331,14 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_oki_w)
 	/* STUFF IN OTHER BYTE TOO..*/
 }
 
-READ16_MEMBER(tumbleb_state::tumblepb_prot_r)
+uint16_t tumbleb_state::tumblepb_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ~0;
 }
 
 /******************************************************************************/
 
-READ16_MEMBER(tumbleb_state::tumblepopb_controls_r)
+uint16_t tumbleb_state::tumblepopb_controls_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
@@ -442,7 +442,7 @@ static void tumbleb2_playmusic( device_t *device )
 }
 
 
-INTERRUPT_GEN_MEMBER(tumbleb_state::tumbleb2_interrupt)
+void tumbleb_state::tumbleb2_interrupt(device_t &device)
 {
 	device.execute().set_input_line(6, HOLD_LINE);
 	tumbleb2_playmusic(m_oki);
@@ -606,7 +606,7 @@ void tumbleb_state::process_tumbleb2_music_command( okim6295_device *oki, int da
 }
 
 
-WRITE16_MEMBER(tumbleb_state::tumbleb2_soundmcu_w)
+void tumbleb_state::tumbleb2_soundmcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int sound = tumbleb_sound_lookup[data & 0xff];
 
@@ -673,7 +673,7 @@ static ADDRESS_MAP_START( fncywld_main_map, AS_PROGRAM, 16, tumbleb_state )
 ADDRESS_MAP_END
 
 
-READ16_MEMBER(tumbleb_state::semibase_unknown_r)
+uint16_t tumbleb_state::semibase_unknown_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand();
 }
@@ -698,7 +698,7 @@ ADDRESS_MAP_END
 
 
 
-WRITE16_MEMBER(tumbleb_state::jumpkids_sound_w)
+void tumbleb_state::jumpkids_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -734,7 +734,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tumbleb_state::semicom_soundcmd_w)
+void tumbleb_state::semicom_soundcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -746,7 +746,7 @@ WRITE16_MEMBER(tumbleb_state::semicom_soundcmd_w)
 	}
 }
 
-WRITE8_MEMBER(tumbleb_state::oki_sound_bank_w)
+void tumbleb_state::oki_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *oki = memregion("oki")->base();
 	memcpy(&oki[0x30000], &oki[(data * 0x10000) + 0x40000], 0x10000);
@@ -792,7 +792,7 @@ static ADDRESS_MAP_START( jumpkids_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x342400, 0x34247f) AM_WRITENOP
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(tumbleb_state::jumpkids_oki_bank_w)
+void tumbleb_state::jumpkids_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t* sound1 = memregion("oki")->base();
 	uint8_t* sound2 = memregion("oki2")->base();
@@ -810,7 +810,7 @@ static ADDRESS_MAP_START( jumpkids_sound_map, AS_PROGRAM, 8, tumbleb_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(tumbleb_state::prot_io_r)
+uint8_t tumbleb_state::prot_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// never read?
 	return 0x00;
@@ -818,7 +818,7 @@ READ8_MEMBER(tumbleb_state::prot_io_r)
 
 
 // probably not endian safe
-WRITE8_MEMBER(tumbleb_state::prot_io_w)
+void tumbleb_state::prot_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -2021,7 +2021,7 @@ GFXDECODE_END
 /******************************************************************************/
 
 
-MACHINE_START_MEMBER(tumbleb_state,tumbleb)
+void tumbleb_state::machine_start_tumbleb()
 {
 	save_item(NAME(m_music_command));
 	save_item(NAME(m_music_bank));
@@ -2031,7 +2031,7 @@ MACHINE_START_MEMBER(tumbleb_state,tumbleb)
 	save_item(NAME(m_tilebank));
 }
 
-MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
+void tumbleb_state::machine_reset_tumbleb()
 {
 	m_music_command = 0;
 	m_music_bank = 0;
@@ -2203,7 +2203,7 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
+void tumbleb_state::machine_reset_htchctch()
 {
 	if (memregion("user1") != nullptr)
 	{
@@ -2215,7 +2215,7 @@ MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 			m_mainram[0x000 / 2 + i] = PROTDATA[i];
 	}
 
-	MACHINE_RESET_CALL_MEMBER(tumbleb);
+	machine_reset_tumbleb();
 }
 
 static MACHINE_CONFIG_START( htchctch, tumbleb_state )
@@ -3457,7 +3457,7 @@ void tumbleb_state::tumblepb_gfx_rearrange(int rgn)
 	}
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,tumblepb)
+void tumbleb_state::init_tumblepb()
 {
 	tumblepb_gfx_rearrange(1);
 
@@ -3466,13 +3466,13 @@ DRIVER_INIT_MEMBER(tumbleb_state,tumblepb)
 	#endif
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,tumblepba)
+void tumbleb_state::init_tumblepba()
 {
 	// rearrange the bg data instead of the sprite data on this one!
 	tumblepb_gfx_rearrange(2);
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,tumbleb2)
+void tumbleb_state::init_tumbleb2()
 {
 	tumblepb_gfx_rearrange(1);
 
@@ -3483,7 +3483,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,tumbleb2)
 
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,jumpkids)
+void tumbleb_state::init_jumpkids()
 {
 	tumblepb_gfx_rearrange(1);
 
@@ -3492,7 +3492,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,jumpkids)
 	#endif
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,fncywld)
+void tumbleb_state::init_fncywld()
 {
 	tumblepb_gfx_rearrange(1);
 
@@ -3506,7 +3506,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,fncywld)
 }
 
 
-READ16_MEMBER(tumbleb_state::bcstory_1a0_read)
+uint16_t tumbleb_state::bcstory_1a0_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//osd_printf_debug("bcstory_io %06x\n",space.device().safe_pc());
 
@@ -3514,14 +3514,14 @@ READ16_MEMBER(tumbleb_state::bcstory_1a0_read)
 	else return ioport("SYSTEM")->read();
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,bcstory)
+void tumbleb_state::init_bcstory()
 {
 	tumblepb_gfx_rearrange(1);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180008, 0x180009, read16_delegate(FUNC(tumbleb_state::bcstory_1a0_read),this)); // io should be here??
 }
 
 
-DRIVER_INIT_MEMBER(tumbleb_state,htchctch)
+void tumbleb_state::init_htchctch()
 {
 	uint16_t *PROTDATA = (uint16_t*)memregion("user1")->base();
 	int i, len = memregion("user1")->bytes();
@@ -3568,15 +3568,15 @@ void tumbleb_state::suprtrio_decrypt_gfx()
 	}
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,suprtrio)
+void tumbleb_state::init_suprtrio()
 {
 	suprtrio_decrypt_code();
 	suprtrio_decrypt_gfx();
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,chokchok)
+void tumbleb_state::init_chokchok()
 {
-	DRIVER_INIT_CALL(htchctch);
+	init_htchctch();
 
 	/* different palette format, closer to tumblep -- is this controlled by a register? the palette was right with the hatch catch trojan */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x140000, 0x140fff, write16_delegate(FUNC(palette_device::write), m_palette.target()));
@@ -3585,15 +3585,15 @@ DRIVER_INIT_MEMBER(tumbleb_state,chokchok)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),this));
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,carket)
+void tumbleb_state::init_carket()
 {
-	DRIVER_INIT_CALL(htchctch);
+	init_htchctch();
 
 	/* slightly different banking */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),this));
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,wlstar)
+void tumbleb_state::init_wlstar()
 {
 	tumblepb_gfx_rearrange(1);
 
@@ -3603,13 +3603,13 @@ DRIVER_INIT_MEMBER(tumbleb_state,wlstar)
 	m_protbase = 0x0000;
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,wondl96)
+void tumbleb_state::init_wondl96()
 {
-	DRIVER_INIT_CALL(wlstar);
+	init_wlstar();
 	m_protbase = 0x0200;
 }
 
-DRIVER_INIT_MEMBER(tumbleb_state,dquizgo)
+void tumbleb_state::init_dquizgo()
 {
 	tumblepb_gfx_rearrange(1);
 }

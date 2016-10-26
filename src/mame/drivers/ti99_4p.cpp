@@ -150,39 +150,39 @@ public:
 		m_amsram(*this, AMSRAM_TAG)
 		{ }
 
-	DECLARE_WRITE_LINE_MEMBER( ready_line );
-	DECLARE_WRITE_LINE_MEMBER( extint );
-	DECLARE_WRITE_LINE_MEMBER( notconnected );
-	DECLARE_READ8_MEMBER( interrupt_level );
+	void ready_line(int state);
+	void extint(int state);
+	void notconnected(int state);
+	uint8_t interrupt_level(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_SETOFFSET_MEMBER( setoffset );
-	DECLARE_READ16_MEMBER( memread );
-	DECLARE_WRITE16_MEMBER( memwrite );
-	DECLARE_WRITE_LINE_MEMBER( dbin_in );
+	void setoffset(address_space &space, offs_t offset);
+	uint16_t memread(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void memwrite(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dbin_in(int state);
 
-	DECLARE_READ16_MEMBER( samsmem_read );
-	DECLARE_WRITE16_MEMBER( samsmem_write );
+	uint16_t samsmem_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void samsmem_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE8_MEMBER(external_operation);
-	DECLARE_WRITE_LINE_MEMBER( clock_out );
-	DECLARE_WRITE_LINE_MEMBER( dbin_line );
+	void external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clock_out(int state);
+	void dbin_line(int state);
 
 	// CRU (Communication Register Unit) handling
-	DECLARE_READ8_MEMBER( cruread );
-	DECLARE_WRITE8_MEMBER( cruwrite );
-	DECLARE_READ8_MEMBER( read_by_9901 );
-	DECLARE_WRITE_LINE_MEMBER(keyC0);
-	DECLARE_WRITE_LINE_MEMBER(keyC1);
-	DECLARE_WRITE_LINE_MEMBER(keyC2);
-	DECLARE_WRITE_LINE_MEMBER(cs_motor);
-	DECLARE_WRITE_LINE_MEMBER(audio_gate);
-	DECLARE_WRITE_LINE_MEMBER(cassette_output);
-	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(alphaW);
+	uint8_t cruread(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_by_9901(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyC0(int state);
+	void keyC1(int state);
+	void keyC2(int state);
+	void cs_motor(int state);
+	void audio_gate(int state);
+	void cassette_output(int state);
+	void tms9901_interrupt(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void alphaW(int state);
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(ti99_4p);
+	void machine_reset_ti99_4p();
 
-	DECLARE_WRITE_LINE_MEMBER(video_interrupt_in);
+	void video_interrupt_in(int state);
 
 private:
 	void    datamux_clock_in(int clock);
@@ -197,8 +197,8 @@ private:
 	required_device<ram_device> m_amsram;
 
 	int decode_address(int address);
-	DECLARE_READ16_MEMBER( debugger_read );
-	DECLARE_WRITE16_MEMBER( debugger_write );
+	uint16_t debugger_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void debugger_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void ready_join();
 	void    set_keyboard_column(int number, int data);
 
@@ -417,7 +417,7 @@ int ti99_4p_state::decode_address(int address)
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-SETOFFSET_MEMBER( ti99_4p_state::setoffset )
+void ti99_4p_state::setoffset(address_space &space, offs_t offset)
 {
 	m_addr_buf = offset << 1;
 	m_waitcount = 0;
@@ -445,7 +445,7 @@ SETOFFSET_MEMBER( ti99_4p_state::setoffset )
 	ready_join();
 }
 
-READ16_MEMBER( ti99_4p_state::memread )
+uint16_t ti99_4p_state::memread(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int address = 0;
 	uint8_t hbyte = 0;
@@ -511,7 +511,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 }
 
 
-WRITE16_MEMBER( ti99_4p_state::memwrite )
+void ti99_4p_state::memwrite(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int address = 0;
 
@@ -576,7 +576,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 /*
     Used when the debugger is reading values from PEB cards.
 */
-READ16_MEMBER( ti99_4p_state::debugger_read )
+uint16_t ti99_4p_state::debugger_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t lval = 0;
 	uint8_t hval = 0;
@@ -591,7 +591,7 @@ READ16_MEMBER( ti99_4p_state::debugger_read )
 /*
     Used when the debugger is writing values to PEB cards.
 */
-WRITE16_MEMBER( ti99_4p_state::debugger_write )
+void ti99_4p_state::debugger_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int addrb = offset << 1;
 	m_peribox->memen_in(ASSERT_LINE);
@@ -603,7 +603,7 @@ WRITE16_MEMBER( ti99_4p_state::debugger_write )
 /*
    Data bus in (DBIN) line from the CPU.
 */
-WRITE_LINE_MEMBER( ti99_4p_state::dbin_line )
+void ti99_4p_state::dbin_line(int state)
 {
 	m_dbin = (line_state)state;
 }
@@ -612,7 +612,7 @@ WRITE_LINE_MEMBER( ti99_4p_state::dbin_line )
     The datamux is connected to the clock line in order to operate
     the wait state counter and to read/write the bytes.
 */
-WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
+void ti99_4p_state::datamux_clock_in(int state)
 {
 	// return immediately if the datamux is currently inactive
 	if (m_waitcount>0)
@@ -686,7 +686,7 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 /*
     CRU write
 */
-WRITE8_MEMBER( ti99_4p_state::cruwrite )
+void ti99_4p_state::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int addroff = offset<<1;
 
@@ -710,7 +710,7 @@ WRITE8_MEMBER( ti99_4p_state::cruwrite )
 	m_peribox->cruwrite(space, addroff, data);
 }
 
-READ8_MEMBER( ti99_4p_state::cruread )
+uint8_t ti99_4p_state::cruread(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 	m_peribox->crureadz(space, offset<<4, &value);
@@ -722,7 +722,7 @@ READ8_MEMBER( ti99_4p_state::cruread )
 ****************************************************************************/
 static const char *const column[] = { "COL0", "COL1", "COL2", "COL3", "COL4", "COL5" };
 
-READ8_MEMBER( ti99_4p_state::read_by_9901 )
+uint8_t ti99_4p_state::read_by_9901(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int answer=0;
 
@@ -791,17 +791,17 @@ void ti99_4p_state::set_keyboard_column(int number, int data)
 	}
 }
 
-WRITE_LINE_MEMBER( ti99_4p_state::keyC0 )
+void ti99_4p_state::keyC0(int state)
 {
 	set_keyboard_column(0, state);
 }
 
-WRITE_LINE_MEMBER( ti99_4p_state::keyC1 )
+void ti99_4p_state::keyC1(int state)
 {
 	set_keyboard_column(1, state);
 }
 
-WRITE_LINE_MEMBER( ti99_4p_state::keyC2 )
+void ti99_4p_state::keyC2(int state)
 {
 	set_keyboard_column(2, state);
 }
@@ -809,7 +809,7 @@ WRITE_LINE_MEMBER( ti99_4p_state::keyC2 )
 /*
     WRITE alpha lock line (P5)
 */
-WRITE_LINE_MEMBER( ti99_4p_state::alphaW )
+void ti99_4p_state::alphaW(int state)
 {
 	m_check_alphalock = (state==0);
 }
@@ -817,7 +817,7 @@ WRITE_LINE_MEMBER( ti99_4p_state::alphaW )
 /*
     command CS1 (only) tape unit motor (P6)
 */
-WRITE_LINE_MEMBER( ti99_4p_state::cs_motor )
+void ti99_4p_state::cs_motor(int state)
 {
 	m_cassette->change_state((state!=0)? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
@@ -831,14 +831,14 @@ WRITE_LINE_MEMBER( ti99_4p_state::cs_motor )
     We do not really need to emulate this as the tape recorder generates sound
     on its own.
 */
-WRITE_LINE_MEMBER( ti99_4p_state::audio_gate )
+void ti99_4p_state::audio_gate(int state)
 {
 }
 
 /*
     tape output (P9)
 */
-WRITE_LINE_MEMBER( ti99_4p_state::cassette_output )
+void ti99_4p_state::cassette_output(int state)
 {
 	m_cassette->output((state!=0)? +1 : -1);
 }
@@ -866,7 +866,7 @@ void ti99_4p_state::ready_join()
 /*
     Incoming READY line from other cards in the Peripheral Expansion Box.
 */
-WRITE_LINE_MEMBER( ti99_4p_state::ready_line )
+void ti99_4p_state::ready_line(int state)
 {
 	if (TRACE_READY)
 	{
@@ -885,13 +885,13 @@ void ti99_4p_state::set_9901_int( int line, line_state state)
 	else m_9901_int &= ~(1<<line);
 }
 
-WRITE_LINE_MEMBER( ti99_4p_state::extint )
+void ti99_4p_state::extint(int state)
 {
 	if (TRACE_INT) logerror("EXTINT level = %02x\n", state);
 	set_9901_int(1, (line_state)state);
 }
 
-WRITE_LINE_MEMBER( ti99_4p_state::notconnected )
+void ti99_4p_state::notconnected(int state)
 {
 	if (TRACE_INT) logerror("Setting a not connected line ... ignored\n");
 }
@@ -899,13 +899,13 @@ WRITE_LINE_MEMBER( ti99_4p_state::notconnected )
 /*
     Clock line from the CPU. Used to control wait state generation.
 */
-WRITE_LINE_MEMBER( ti99_4p_state::clock_out )
+void ti99_4p_state::clock_out(int state)
 {
 	datamux_clock_in(state);
 	m_peribox->clock_in(state);
 }
 
-WRITE8_MEMBER( ti99_4p_state::tms9901_interrupt )
+void ti99_4p_state::tms9901_interrupt(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// offset contains the interrupt level (0-15)
 	// However, the TI board just ignores that level and hardwires it to 1
@@ -913,14 +913,14 @@ WRITE8_MEMBER( ti99_4p_state::tms9901_interrupt )
 	m_cpu->set_input_line(INT_9900_INTREQ, data);
 }
 
-READ8_MEMBER( ti99_4p_state::interrupt_level )
+uint8_t ti99_4p_state::interrupt_level(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// On the TI-99 systems these IC lines are not used; the input lines
 	// at the CPU are hardwired to level 1.
 	return 1;
 }
 
-WRITE8_MEMBER( ti99_4p_state::external_operation )
+void ti99_4p_state::external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP) logerror("External operation %s not implemented on the SGCPU board\n", extop[offset]);
@@ -968,7 +968,7 @@ void ti99_4p_state::machine_start()
 /*
     set the state of int2 (called by the v9938)
 */
-WRITE_LINE_MEMBER(ti99_4p_state::video_interrupt_in)
+void ti99_4p_state::video_interrupt_in(int state)
 {
 	set_9901_int(2, (line_state)state);
 }
@@ -976,7 +976,7 @@ WRITE_LINE_MEMBER(ti99_4p_state::video_interrupt_in)
 /*
     Reset the machine.
 */
-MACHINE_RESET_MEMBER(ti99_4p_state,ti99_4p)
+void ti99_4p_state::machine_reset_ti99_4p()
 {
 	set_9901_int(12, CLEAR_LINE);
 

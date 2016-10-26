@@ -472,86 +472,86 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(read_video_ram_r);
-	DECLARE_WRITE_LINE_MEMBER(clear_video_interrupt);
+	uint8_t read_video_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void clear_video_interrupt(int state);
 
-	DECLARE_READ8_MEMBER(diagnostic_r);
-	DECLARE_WRITE8_MEMBER(diagnostic_w);
+	uint8_t diagnostic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void diagnostic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(comm_control_r);
-	DECLARE_WRITE8_MEMBER(comm_control_w);
+	uint8_t comm_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void comm_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(share_z80_r);
-	DECLARE_WRITE8_MEMBER(share_z80_w);
+	uint8_t share_z80_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void share_z80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// 'RD51' MFM CONTROLLER (WD1010) *************************************
-	DECLARE_READ8_MEMBER(hd_status_60_r); // TRI STATE DATA PORT (R/W)
-	DECLARE_WRITE8_MEMBER(hd_status_60_w);
+	uint8_t hd_status_60_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); // TRI STATE DATA PORT (R/W)
+	void hd_status_60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(hd_status_68_r); // EXTRA REGISTER 0x68 (R/W 8088)
-	DECLARE_WRITE8_MEMBER(hd_status_68_w);
+	uint8_t hd_status_68_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); // EXTRA REGISTER 0x68 (R/W 8088)
+	void hd_status_68_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(hd_status_69_r); // EXTRA REGISTER 0x69 (R/- 8088)
+	uint8_t hd_status_69_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); // EXTRA REGISTER 0x69 (R/- 8088)
 
-	DECLARE_WRITE_LINE_MEMBER(bundle_irq);
-	DECLARE_WRITE_LINE_MEMBER(hdc_bdrq);  // BUFFER DATA REQUEST (FROM WD)
-	DECLARE_WRITE_LINE_MEMBER(hdc_bcr);   // BUFFER COUNTER RESET (FROM WD)
+	void bundle_irq(int state);
+	void hdc_bdrq(int state);  // BUFFER DATA REQUEST (FROM WD)
+	void hdc_bcr(int state);   // BUFFER COUNTER RESET (FROM WD)
 
-	DECLARE_WRITE_LINE_MEMBER(hdc_step);
-	DECLARE_WRITE_LINE_MEMBER(hdc_direction);
+	void hdc_step(int state);
+	void hdc_direction(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(hdc_read_sector);
-	DECLARE_WRITE_LINE_MEMBER(hdc_write_sector);
+	void hdc_read_sector(int state);
+	void hdc_write_sector(int state);
 
-	DECLARE_READ_LINE_MEMBER(hdc_drive_ready);
-	DECLARE_READ_LINE_MEMBER(hdc_write_fault);
+	int hdc_drive_ready();
+	int hdc_write_fault();
 
-	DECLARE_READ8_MEMBER(i8088_latch_r);
-	DECLARE_WRITE8_MEMBER(i8088_latch_w);
-	DECLARE_READ8_MEMBER(z80_latch_r);
-	DECLARE_WRITE8_MEMBER(z80_latch_w);
+	uint8_t i8088_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8088_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t z80_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void z80_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(z80_diskdiag_read_w);
-	DECLARE_WRITE8_MEMBER(z80_diskdiag_write_w);
+	void z80_diskdiag_read_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void z80_diskdiag_write_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(z80_generalstat_r);
+	uint8_t z80_generalstat_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(z80_diskstatus_r);
-	DECLARE_WRITE8_MEMBER(z80_diskcontrol_w);
+	uint8_t z80_diskstatus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void z80_diskcontrol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(system_parameter_r);
+	uint8_t system_parameter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
-	DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
+	void kbd_tx(int state);
+	void kbd_rxready_w(int state);
+	void kbd_txready_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(irq_hi_w);
+	void irq_hi_w(int state);
 
-	DECLARE_READ8_MEMBER(rtc_reset);
-	DECLARE_READ8_MEMBER(rtc_enable);
-	DECLARE_READ8_MEMBER(rtc_r);
+	uint8_t rtc_reset(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rtc_enable(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(mpsc_irq);
-	DECLARE_WRITE8_MEMBER(comm_bitrate_w);
-	DECLARE_WRITE8_MEMBER(printer_bitrate_w);
-	DECLARE_WRITE_LINE_MEMBER( com8116_a_fr_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_a_ft_w );
+	void mpsc_irq(int state);
+	void comm_bitrate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void printer_bitrate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void com8116_a_fr_w(int state);
+	void com8116_a_ft_w(int state);
 
-	DECLARE_WRITE8_MEMBER(GDC_EXTRA_REGISTER_w);
+	void GDC_EXTRA_REGISTER_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	void vblank_irq(device_t &device);
+	int irq_callback(device_t &device, int irqline);
 
-	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
-	TIMER_DEVICE_CALLBACK_MEMBER(motor_tick);
+	void write_keyboard_clock(int state);
+	void motor_tick(timer_device &timer, void *ptr, int32_t param);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE_LINE_MEMBER(GDC_vblank_irq);
+	uint16_t vram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void GDC_vblank_irq(int state);
 
 protected:
 	virtual void machine_start() override;
@@ -1278,14 +1278,14 @@ void rainbow_state::update_mpsc_irq()
 	m_mpsc->m1_r(); // interrupt acknowledge
 }
 
-WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
+void rainbow_state::mpsc_irq(int state)
 {
 	m_mpsc_irq = state;
 	update_mpsc_irq();
 }
 
 // PORT 0x0e : Printer bit rates
-WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
+void rainbow_state::printer_bitrate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("\nPRINTER bitrate = %02x HEX\n",data & 7);
 
@@ -1294,7 +1294,7 @@ WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
 }
 
 // PORT 0x06 : Communication bit rates (see page 21 of PC 100 SPEC)
-WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
+void rainbow_state::comm_bitrate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dbrg->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
 	printf("\nRECEIVE bitrate = %02x HEX\n",data & 0x0f);
@@ -1303,12 +1303,12 @@ WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 	printf("\nTRANSMIT bitrate = %02x HEX\n",(data & 0xf0) >> 4);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_a_fr_w)
+void rainbow_state::com8116_a_fr_w(int state)
 {
 	m_mpsc->rxca_w(state);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_a_ft_w)
+void rainbow_state::com8116_a_ft_w(int state)
 {
 	m_mpsc->txca_w(state);
 }
@@ -1319,7 +1319,7 @@ WRITE_LINE_MEMBER(rainbow_state::com8116_a_ft_w)
 
 // Shared memory is contended by refresh, concurrent
 //    8088 accesses and arbitration logic (DMA).
-READ8_MEMBER(rainbow_state::share_z80_r)
+uint8_t rainbow_state::share_z80_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_zflip)
 	{
@@ -1345,7 +1345,7 @@ READ8_MEMBER(rainbow_state::share_z80_r)
 	}
 }
 
-WRITE8_MEMBER(rainbow_state::share_z80_w)
+void rainbow_state::share_z80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_zflip)
 	{
@@ -1382,7 +1382,7 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 //
 // TODO: obtain hardware / check address decoders.
 // RTC accesses here were derived from Vincent Esser's published source.
-READ8_MEMBER(rainbow_state::rtc_r)
+uint8_t rainbow_state::rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if((m_inp11->read() == 0x01)) // if enabled...
 	{
@@ -1516,7 +1516,7 @@ static uint32_t get_and_print_lbasector(device_t *device, hard_disk_info *info, 
 }
 
 // READ SECTOR (on BCS 1 -> 0 transition)
-WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
+void rainbow_state::hdc_read_sector(int state)
 {
 	static int last_state;
 	int read_status = 1;
@@ -1583,7 +1583,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 // ...IF WRITE_GATE (WG) TRANSITS FROM 1 -> 0
 
 // NO PROVISIONS for  sector sizes != 512 or MULTIPLE DRIVES (> 0) !!!
-WRITE_LINE_MEMBER(rainbow_state::hdc_write_sector)
+void rainbow_state::hdc_write_sector(int state)
 {
 	int success = 0;
 	static int wg_last;
@@ -1683,7 +1683,7 @@ int rainbow_state::do_write_sector()
 }
 
 
-READ8_MEMBER(rainbow_state::hd_status_60_r)
+uint8_t rainbow_state::hd_status_60_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_hdc_buffer[m_hdc_buf_offset];
 	//logerror("HARD DISK DISK BUFFER: READ offset %04x | data = %02x\n", m_hdc_buf_offset, data); // ! DO NOT CHANGE ORDER !
@@ -1697,7 +1697,7 @@ READ8_MEMBER(rainbow_state::hd_status_60_r)
 	return data;
 }
 
-WRITE8_MEMBER(rainbow_state::hd_status_60_w)
+void rainbow_state::hd_status_60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("HARD DISK BUFFER: WRITE offset %04x | data = %02x\n", m_hdc_buf_offset, data);
 
@@ -1719,7 +1719,7 @@ WRITE8_MEMBER(rainbow_state::hd_status_60_w)
 // - 3 hard-wired controller module identification bits.
 // - signals from the WD1010 chip,
 // - disk drive(latched status signals)
-READ8_MEMBER(rainbow_state::hd_status_68_r)
+uint8_t rainbow_state::hd_status_68_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// (*) Bits 5-7 : HARD WIRED IDENTIFICATION BITS, bits 5+7 = 1 and bit 6 = 0  (= 101 f?r RD51 module)
 	int data = 0xe0; // 111 gives DRIVE NOT READY (when W is pressed on boot screen)
@@ -1765,7 +1765,7 @@ READ8_MEMBER(rainbow_state::hd_status_68_r)
 
 // 68 (WRITE): Secondary Command Registers (68H) - -  "write-only register for commands"
 // - see TABLE 4.8 (4-24)
-WRITE8_MEMBER(rainbow_state::hd_status_68_w)
+void rainbow_state::hd_status_68_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Bit 4-7 : --- not used / reserved
 
@@ -1825,7 +1825,7 @@ inhibited.
 7 Track 0 - The disk drive sets this bit high (1) when the R/W heads are
 positioned over cylinder 0 (the data track furthest away from the spindle).
 */
-READ8_MEMBER(rainbow_state::hd_status_69_r)
+uint8_t rainbow_state::hd_status_69_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int HS = m_hdc->read(space, 0x06) & (1 + 2 + 4); // SDH bits 0-2 = HEAD #
 //  logerror("(x69 READ) %i = HEAD SELECT WD1010\n", HS);
@@ -1855,7 +1855,7 @@ READ8_MEMBER(rainbow_state::hd_status_69_r)
 }
 
 // TREAT SIGNALS FROM / TO CONTROLLER
-WRITE_LINE_MEMBER(rainbow_state::hdc_step)
+void rainbow_state::hdc_step(int state)
 {
 	m_hdc_step_latch = true;
 
@@ -1863,23 +1863,23 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_step)
 	MOTOR_DISABLE_counter = 20;
 }
 
-WRITE_LINE_MEMBER(rainbow_state::hdc_direction)
+void rainbow_state::hdc_direction(int state)
 {
 	m_hdc_direction = state; // (0 = OUT)
 }
 
-READ_LINE_MEMBER(rainbow_state::hdc_drive_ready)
+int rainbow_state::hdc_drive_ready()
 {
 	return m_hdc_drive_ready;
 }
 
-READ_LINE_MEMBER(rainbow_state::hdc_write_fault)
+int rainbow_state::hdc_write_fault()
 {
 	return m_hdc_write_fault;
 }
 
 // Buffer counter reset when BCR goes from 0 -> 1
-WRITE_LINE_MEMBER(rainbow_state::hdc_bcr)
+void rainbow_state::hdc_bcr(int state)
 {
 	static int bcr_state;
 	if ((bcr_state == 0) && (state == 1))
@@ -1899,7 +1899,7 @@ void rainbow_state::hdc_buffer_counter_reset()
 
 // On a WRITE / FORMAT command, signal goes high when the WD1010
 // chip is READY TO ACCESS the information in the sector buffer.
-WRITE_LINE_MEMBER(rainbow_state::hdc_bdrq)
+void rainbow_state::hdc_bdrq(int state)
 {
 	static int old_state;
 //  logerror("BDRQ - BUFFER DATA REQUEST OBTAINED: %u\n", state);
@@ -1932,14 +1932,14 @@ void rainbow_state::update_bundle_irq()
 	}
 }
 
-WRITE_LINE_MEMBER(rainbow_state::bundle_irq)
+void rainbow_state::bundle_irq(int state)
 {
 	m_bdl_irq = state;
 	update_bundle_irq();
 }
 
 
-READ8_MEMBER(rainbow_state::system_parameter_r)
+uint8_t rainbow_state::system_parameter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*  Info about option boards is in bits 0 - 3:
 	SYSTEM PARAMETER INFORMATION: see AA-P308A-TV page 92 section 14.0
@@ -1975,7 +1975,7 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 // 2 COMM DSR  (reflects status of DSR at COMM)
 // 3 COMM CTS  (reflects status of CTS at COMM)
 // 4 COMM RLSD (receive line signal detect at COMM)
-READ8_MEMBER(rainbow_state::comm_control_r)
+uint8_t rainbow_state::comm_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	bool is_mhfu_enabled = false;
 	if (m_POWER_GOOD)
@@ -1995,7 +1995,7 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 // 1 COMM SRTS H     (controls secondary request to send line of COMM)
 // 2 COMM DTR L      (controls terminal ready line of COMM)
 // 3 COMM RTS        (controls request to send line of COMM)
-WRITE8_MEMBER(rainbow_state::comm_control_w)
+void rainbow_state::comm_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("%02x to COMM.CONTROL REGISTER ", data);
 
@@ -2014,7 +2014,7 @@ WRITE8_MEMBER(rainbow_state::comm_control_w)
 
 // 8088 writes to port 0x00 (interrupts Z80)
 // See page 133 (4-34)
-WRITE8_MEMBER(rainbow_state::i8088_latch_w)
+void rainbow_state::i8088_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//    printf("%02x to Z80 mailbox\n", data);
 
@@ -2029,7 +2029,7 @@ WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 
 // Z80 reads port 0x00
 // See page 134 (4-35)
-READ8_MEMBER(rainbow_state::z80_latch_r)
+uint8_t rainbow_state::z80_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//    printf("Read %02x from Z80 mailbox\n", m_z80_mailbox);
 	m_z80->set_input_line(0, CLEAR_LINE);
@@ -2040,7 +2040,7 @@ READ8_MEMBER(rainbow_state::z80_latch_r)
 
 // Z80 writes to port 0x00 (interrupts 8088)
 // See page 134 (4-35)
-WRITE8_MEMBER(rainbow_state::z80_latch_w)
+void rainbow_state::z80_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//    printf("%02x to 8088 mailbox\n", data);
 	raise_8088_irq(IRQ_8088_MAILBOX);
@@ -2050,7 +2050,7 @@ WRITE8_MEMBER(rainbow_state::z80_latch_w)
 }
 
 // 8088 reads port 0x00. See page 133 (4-34)
-READ8_MEMBER(rainbow_state::i8088_latch_r)
+uint8_t rainbow_state::i8088_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//    printf("Read %02x from 8088 mailbox\n", m_8088_mailbox);
 	lower_8088_irq(IRQ_8088_MAILBOX);
@@ -2060,13 +2060,13 @@ READ8_MEMBER(rainbow_state::i8088_latch_r)
 }
 
 // (Z80) : WRITE to 0x20
-WRITE8_MEMBER(rainbow_state::z80_diskdiag_read_w)
+void rainbow_state::z80_diskdiag_read_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_zflip = true; //  "a write to 20H will _SET_ ZFLIP"
 }
 
 // (Z80) : PORT 21H * WRITE *
-WRITE8_MEMBER(rainbow_state::z80_diskdiag_write_w)
+void rainbow_state::z80_diskdiag_write_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*   Z80 LEDs:
 	4   5   6  <- bit #
@@ -2081,7 +2081,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskdiag_write_w)
 }
 
 // (Z80) : PORT 20H / 21H  _READ_
-READ8_MEMBER(rainbow_state::z80_generalstat_r)
+uint8_t rainbow_state::z80_generalstat_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	General / diag.status register Z80 / see page 157 (table 4-18).
@@ -2150,7 +2150,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 
 // (Z80) : PORT 40H _READ_
 // 40H diskette status Register **** READ ONLY *** ( 4-60 of TM100.pdf )
-READ8_MEMBER(rainbow_state::z80_diskstatus_r)
+uint8_t rainbow_state::z80_diskstatus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int track = 0;
 	int data = m_z80_diskcontrol & (255 - 0x80 - 0x40 - 0x20 - 4);
@@ -2199,7 +2199,7 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 
 // ALL SIGNALS ARE HIGH ACTIVE (H), EXCEPT:
 // BIT 5 : SIDE 0 L : For single sided drives, this bit is always set to 0 for side O.
-WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
+void rainbow_state::z80_diskcontrol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int selected_drive = INVALID_DRIVE;
 	static const char *names[] = { FD1793_TAG ":0", FD1793_TAG ":1", FD1793_TAG ":2", FD1793_TAG ":3" };
@@ -2309,7 +2309,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 }
 // --------- END OF Z80 --------------------
 
-READ8_MEMBER(rainbow_state::read_video_ram_r)
+uint8_t rainbow_state::read_video_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p_ram[offset];
 }
@@ -2322,7 +2322,7 @@ READ8_MEMBER(rainbow_state::read_video_ram_r)
 // **************************************************
 
 // CPU acknowledge of VBL IRQ resets counter
-IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
+int rainbow_state::irq_callback(device_t &device, int irqline)
 {
 	int intnum = -1;
 	for (int i = IRQ_8088_VBL; i >= 0; i--)
@@ -2342,7 +2342,7 @@ IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
 // NEC7220 Vsync IRQ ***************************************** GDC-NEW
 
 // VERIFY: SCROLL_MAP & COLOR_MAP are updated at the next VSYNC (not immediately)... Are there more registers?
-WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
+void rainbow_state::GDC_vblank_irq(int state)
 {
 	uint8_t red, green, blue, mono;
 	int xi;
@@ -2427,7 +2427,7 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 		raise_8088_irq(IRQ_GRF_INTR_L);
 }
 
-INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
+void rainbow_state::vblank_irq(device_t &device)
 {
 	raise_8088_irq(IRQ_8088_VBL);
 	m_crtc->notify_vblank(true);
@@ -2445,14 +2445,14 @@ INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(rainbow_state::clear_video_interrupt)
+void rainbow_state::clear_video_interrupt(int state)
 {
 	lower_8088_irq(IRQ_8088_VBL);
 	m_crtc->notify_vblank(false);
 }
 
 // Reflects bits from 'diagnostic_w' (1:1), except test jumpers
-READ8_MEMBER(rainbow_state::diagnostic_r) // 8088 (port 0A READ). Fig.4-29 + table 4-15
+uint8_t rainbow_state::diagnostic_r(address_space &space, offs_t offset, uint8_t mem_mask) // 8088 (port 0A READ). Fig.4-29 + table 4-15
 {
 	return ((m_diagnostic & (0xf1)) |
 			m_inp1->read() |
@@ -2461,7 +2461,7 @@ READ8_MEMBER(rainbow_state::diagnostic_r) // 8088 (port 0A READ). Fig.4-29 + tab
 			);
 }
 
-WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 + table 4-15
+void rainbow_state::diagnostic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // 8088 (port 0A WRITTEN). Fig.4-28 + table 4-15
 {
 	//    printf("%02x to diag port (PC=%x)\n", data, space.device().safe_pc());
 
@@ -2563,7 +2563,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	// Install 8088 read / write handler once loopback test is over
 	if ( !(data & 32) && (m_diagnostic & 32) )
 	{
-			io.install_readwrite_handler(0x40, 0x43, READ8_DEVICE_DELEGATE(m_mpsc, upd7201_device,cd_ba_r), WRITE8_DEVICE_DELEGATE(m_mpsc, upd7201_device, cd_ba_w) );
+			io.install_readwrite_handler(0x40, 0x43, read8_delegate(FUNC(upd7201_device::cd_ba_r), (upd7201_device *)m_mpsc), write8_delegate(FUNC(upd7201_device::cd_ba_w), (upd7201_device *)m_mpsc) );
 			printf("\n **** COMM HANDLER INSTALLED **** ");
 	}
 
@@ -2587,30 +2587,30 @@ void rainbow_state::update_kbd_irq()
 		lower_8088_irq(IRQ_8088_KBD);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::kbd_tx)
+void rainbow_state::kbd_tx(int state)
 {
 	m_lk201->rx_w(state);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::kbd_rxready_w)
+void rainbow_state::kbd_rxready_w(int state)
 {
 	m_kbd_rx_ready = (state == 1) ? true : false;
 	update_kbd_irq();
 }
 
-WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
+void rainbow_state::kbd_txready_w(int state)
 {
 	m_kbd_tx_ready = (state == 1) ? true : false;
 	update_kbd_irq();
 }
 
-WRITE_LINE_MEMBER(rainbow_state::write_keyboard_clock)
+void rainbow_state::write_keyboard_clock(int state)
 {
 	m_kbd8251->write_txc(state);
 	m_kbd8251->write_rxc(state);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::motor_tick)
+void rainbow_state::motor_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_POWER_GOOD)
 		m_crtc->MHFU(MHFU_COUNT); // // Increment IF ENABLED and POWER_GOOD, return count
@@ -2632,7 +2632,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::motor_tick)
 }
 
 // on 100-B, DTR from the keyboard 8051 controls bit 7 of IRQ vectors
-WRITE_LINE_MEMBER(rainbow_state::irq_hi_w)
+void rainbow_state::irq_hi_w(int state)
 {
 #ifdef      ASSUME_MODEL_A_HARDWARE
 	m_irq_high = 0;
@@ -2648,7 +2648,7 @@ WRITE_LINE_MEMBER(rainbow_state::irq_hi_w)
 // NOTE: "More than one plane at a time can be enabled for a write operation; however,
 //        only one plane can be enabled for a read operation at anyone time."
 
-READ16_MEMBER(rainbow_state::vram_r)
+uint16_t rainbow_state::vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if((!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) || space.debugger_access())  // (NOT VECTOR MODE)
 	{
@@ -2679,7 +2679,7 @@ READ16_MEMBER(rainbow_state::vram_r)
 // SELECT_VECTOR_PATTERN_REGISTER  -> IS_VECTOR_MODE !
 
 // Rainbow has separate registers for fore and background.
-WRITE16_MEMBER(rainbow_state::vram_w)
+void rainbow_state::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//uint8_t *video_ram8 = (uint8_t *)(&m_video_ram[0]);
 
@@ -2789,7 +2789,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 }
 
 
-WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
+void rainbow_state::GDC_EXTRA_REGISTER_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static int last_message, last_mode, last_readback, last_scroll_index;
 
