@@ -83,6 +83,15 @@ struct game_driver
 	char                        name[MAX_DRIVER_NAME_CHARS + 1]; // short name of the game
 };
 
+class game_driver_registrar
+{
+public:
+	game_driver_registrar(game_driver const &driver);
+	game_driver_registrar(game_driver_registrar const &) = delete;
+	game_driver_registrar(game_driver_registrar &&) = delete;
+	game_driver_registrar &operator=(game_driver_registrar const &) = delete;
+	game_driver_registrar &operator=(game_driver_registrar &&) = delete;
+};
 
 //**************************************************************************
 //  MACROS
@@ -97,10 +106,15 @@ struct game_driver
 // wrappers for declaring and defining game drivers
 #define GAME_NAME(name)         driver_##name
 #define GAME_EXTERN(name)       extern game_driver const GAME_NAME(name)
+#ifdef _MSC_VER
+#define GAME_REGISTRAR(name)    extern __declspec(dllexport) game_driver_registrar const driver_registrar_##name{ GAME_NAME(name) };
+#else
+#define GAME_REGISTRAR(name)    extern game_driver_registrar const driver_registrar_##name{ GAME_NAME(name) };
+#endif
 
 // standard GAME() macro
 #define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS) \
-extern game_driver const GAME_NAME(NAME)                                \
+static game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
 	__FILE__,                                                           \
 	#PARENT,                                                            \
@@ -115,11 +129,12 @@ extern game_driver const GAME_NAME(NAME)                                \
 	nullptr,                                                            \
 	(MONITOR) | (FLAGS) | MACHINE_TYPE_ARCADE,                          \
 	#NAME                                                               \
-};
+};                                                                      \
+GAME_REGISTRAR(NAME)
 
 // standard macro with additional layout
 #define GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,LAYOUT) \
-extern game_driver const GAME_NAME(NAME)                                \
+static game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
 	__FILE__,                                                           \
 	#PARENT,                                                            \
@@ -134,12 +149,14 @@ extern game_driver const GAME_NAME(NAME)                                \
 	&LAYOUT,                                                            \
 	(MONITOR) | (FLAGS) | MACHINE_TYPE_ARCADE,                          \
 	#NAME                                                               \
-};
+};                                                                      \
+GAME_REGISTRAR(NAME)
+
 
 
 // standard console definition macro
 #define CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS) \
-extern game_driver const GAME_NAME(NAME)                                \
+static game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
 	__FILE__,                                                           \
 	#PARENT,                                                            \
@@ -154,11 +171,12 @@ extern game_driver const GAME_NAME(NAME)                                \
 	nullptr,                                                            \
 	ROT0 | (FLAGS) | MACHINE_TYPE_CONSOLE,                              \
 	#NAME                                                               \
-};
+};                                                                      \
+GAME_REGISTRAR(NAME)
 
 // standard computer definition macro
 #define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS) \
-extern game_driver const GAME_NAME(NAME)                                \
+static game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
 	__FILE__,                                                           \
 	#PARENT,                                                            \
@@ -173,11 +191,12 @@ extern game_driver const GAME_NAME(NAME)                                \
 	nullptr,                                                            \
 	ROT0 | (FLAGS) | MACHINE_TYPE_COMPUTER,                             \
 	#NAME                                                               \
-};
+};                                                                      \
+GAME_REGISTRAR(NAME)
 
 // standard system definition macro
 #define SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS) \
-extern game_driver const GAME_NAME(NAME)                                \
+static game_driver const GAME_NAME(NAME)                                \
 {                                                                       \
 	__FILE__,                                                           \
 	#PARENT,                                                            \
@@ -192,7 +211,8 @@ extern game_driver const GAME_NAME(NAME)                                \
 	nullptr,                                                            \
 	ROT0 | (FLAGS) | MACHINE_TYPE_OTHER,                                \
 	#NAME                                                               \
-};
+};                                                                      \
+GAME_REGISTRAR(NAME)
 
 
 #endif // MAME_EMU_GAMEDRV_H

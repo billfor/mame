@@ -26,6 +26,17 @@ end
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
 
+	if _OPTIONS["targetos"]=="macosx" then
+		linkoptions {
+			"-Wl,-all_load",
+		}
+	else
+		configuration { "not vs*" }
+			linkoptions {
+				"-Wl,--whole-archive,-z,muldefs",
+			}
+	end
+
 	configuration { "android*" }
 		targetprefix "lib"
 		targetname "main"
@@ -40,6 +51,7 @@ end
 			"GLESv2",
 			"SDL2",
 		}
+
 	configuration { "pnacl" }
 		kind "ConsoleApp"
 		targetextension ".pexe"
@@ -370,45 +382,7 @@ if (STANDALONE~=true) then
 	files {
 		mainfile,
 		GEN_DIR .. "version.cpp",
-		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",
 	}
-
-	if (_OPTIONS["SOURCES"] == nil) then
-
-		if os.isfile(MAME_DIR .. "src/".._target .."/" .. _subtarget ..".flt") then
-			dependency {
-			{
-				GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
-			}
-			custombuildtask {
-				{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".flt" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  }, {"@echo Building driver list...",    PYTHON .. " $(1) $(2) $(<) > $(@)" }},
-			}
-		else
-			if os.isfile(MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst") then
-				custombuildtask {
-					{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},
-				}
-			else
-				dependency {
-				{
-					GEN_DIR  .. _target .. "/" .. _target .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
-				}
-				custombuildtask {
-					{ MAME_DIR .. "src/".._target .."/" .. _target ..".lst" ,  GEN_DIR  .. _target .. "/" .. _target .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py" }, {"@echo Building driver list...",    PYTHON .. " $(1) $(<) > $(@)" }},
-				}
-			end
-		end
-	end
-
-	if (_OPTIONS["SOURCES"] ~= nil) then
-			dependency {
-			{
-				GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",  MAME_DIR .. "src/".._target .."/" .. _target ..".lst", true },
-			}
-			custombuildtask {
-				{ GEN_DIR .. _target .."/" .. _subtarget ..".flt" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.cpp",    {  MAME_DIR .. "scripts/build/makelist.py", MAME_DIR .. "src/".._target .."/" .. _target ..".lst"  }, {"@echo Building driver list...",    PYTHON .. " $(1) $(2) $(<) > $(@)" }},
-			}
-	end
 
 	configuration { "mingw*" }
 		custombuildtask {

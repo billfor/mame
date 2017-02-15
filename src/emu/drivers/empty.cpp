@@ -69,4 +69,21 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-GAME( 2007, ___empty, 0, ___empty, 0, driver_device, 0, ROT0, "MAME", "No Driver Loaded", MACHINE_NO_SOUND )
+extern game_driver const GAME_NAME(___empty)
+{
+	__FILE__,
+	0,
+	"No Driver Loaded",
+	"2007",
+	"MAME",
+	MACHINE_CONFIG_NAME(___empty),
+	INPUT_PORTS_NAME(0),
+	&driver_device::driver_init_wrapper<driver_device, &driver_device::init_0>,
+	ROM_NAME(___empty),
+	0,
+	nullptr,
+	ROT0 | MACHINE_NO_SOUND | MACHINE_TYPE_OTHER,
+	"___empty"
+};
+
+GAME_REGISTRAR(___empty);

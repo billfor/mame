@@ -86,8 +86,6 @@ READ8_MEMBER(zaccaria_state::dsw_r)
 }
 
 
-GAME_EXTERN(monymony);
-
 READ8_MEMBER(zaccaria_state::prot1_r)
 {
 	switch (offset)
@@ -99,7 +97,7 @@ READ8_MEMBER(zaccaria_state::prot1_r)
 			return 0x40;    /* Jack Rabbit */
 
 		case 6:
-			if (&machine().system() == &GAME_NAME(monymony))
+			if (!core_stricmp(machine().system().name, "monymony"))
 				return 0x70;    /* Money Money */
 			return 0xa0;    /* Jack Rabbit */
 

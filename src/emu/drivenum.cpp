@@ -20,14 +20,9 @@
 //  DRIVER LIST
 //**************************************************************************
 
-//-------------------------------------------------
-//  driver_list - constructor
-//-------------------------------------------------
-
-driver_list::driver_list()
-{
-}
-
+bool                            driver_list::s_has_sorted = false;
+std::mutex                      driver_list::s_sort_mutex;
+driver_list::game_driver_vector driver_list::s_drivers_sorted;
 
 //-------------------------------------------------
 //  find - find a driver by name
@@ -40,11 +35,10 @@ int driver_list::find(const char *name)
 		return -1;
 
 	// binary search to find it
-	game_driver const *const *const begin = s_drivers_sorted;
-	game_driver const *const *const end = begin + s_driver_count;
+	game_driver_vector const &drivers(drivers_sorted());
 	auto const cmp = [] (game_driver const *driver, char const *name) { return core_stricmp(driver->name, name) < 0; };
-	game_driver const *const *const result = std::lower_bound(begin, end, name, cmp);
-	return ((result == end) || core_stricmp((*result)->name, name)) ? -1 : std::distance(begin, result);
+	auto const result = std::lower_bound(drivers.begin(), drivers.end(), name, cmp);
+	return ((result == drivers.end()) || core_stricmp((*result)->name, name)) ? -1 : std::distance(drivers.begin(), result);
 }
 
 
@@ -105,6 +99,37 @@ int driver_list::penalty_compare(const char *source, const char *target)
 }
 
 
+driver_list::game_driver_vector const &driver_list::drivers_sorted()
+{
+	// Wild DCLP appeared!
+	if (!s_has_sorted)
+	{
+		std::atomic_thread_fence(std::memory_order_acquire);
+		std::lock_guard<std::mutex> lock(s_sort_mutex);
+		if (!s_has_sorted)
+		{
+			assert(s_drivers_sorted.empty());
+			s_drivers_sorted = std::move(drivers_unsorted());
+			auto const cmp = [] (game_driver const *x, game_driver const *y) { return core_stricmp(x->name, y->name) < 0; };
+			std::sort(s_drivers_sorted.begin(), s_drivers_sorted.end(), cmp);
+			s_has_sorted = true;
+		}
+		std::atomic_thread_fence(std::memory_order_release);
+	}
+	return s_drivers_sorted;
+}
+
+
+driver_list::game_driver_vector &driver_list::drivers_unsorted()
+{
+	// This is necessary because we can't depend on static initialisation order across compilation units.
+	// It's very much not thread-safe, but we can get away with it because it's called by static driver
+	// registrars before main(), and hence before the program can go multi-threaded.
+	static std::unique_ptr<game_driver_vector> drivers(new game_driver_vector);
+	return *drivers;
+}
+
+
 
 //**************************************************************************
 //  DRIVER ENUMERATOR
@@ -118,7 +143,7 @@ driver_enumerator::driver_enumerator(emu_options &options)
 	: m_current(-1)
 	, m_filtered_count(0)
 	, m_options(options)
-	, m_included(s_driver_count)
+	, m_included(m_drivers.size())
 	, m_config(CONFIG_CACHE_COUNT)
 {
 	include_all();
@@ -156,12 +181,12 @@ driver_enumerator::~driver_enumerator()
 
 std::shared_ptr<machine_config> const &driver_enumerator::config(std::size_t index, emu_options &options) const
 {
-	assert(index < s_driver_count);
+	assert(index < m_drivers.size());
 
 	// if we don't have it cached, add it
 	std::shared_ptr<machine_config> &config = m_config[index];
 	if (!config)
-		config = std::make_shared<machine_config>(*s_drivers_sorted[index], options);
+		config = std::make_shared<machine_config>(*m_drivers[index], options);
 
 	return config;
 }
@@ -178,8 +203,8 @@ std::size_t driver_enumerator::filter(const char *filterstring)
 	exclude_all();
 
 	// match name against each driver in the list
-	for (std::size_t index = 0; index < s_driver_count; index++)
-		if (matches(filterstring, s_drivers_sorted[index]->name))
+	for (std::size_t index = 0; index < m_drivers.size(); index++)
+		if (matches(filterstring, m_drivers[index]->name))
 			include(index);
 
 	return m_filtered_count;
@@ -197,8 +222,8 @@ std::size_t driver_enumerator::filter(const game_driver &driver)
 	exclude_all();
 
 	// match name against each driver in the list
-	for (std::size_t index = 0; index < s_driver_count; index++)
-		if (s_drivers_sorted[index] == &driver)
+	for (std::size_t index = 0; index < m_drivers.size(); index++)
+		if (m_drivers[index] == &driver)
 			include(index);
 
 	return m_filtered_count;
@@ -230,10 +255,10 @@ bool driver_enumerator::next()
 
 	// always advance one
 	// if we have a filter, scan forward to the next match
-	for (m_current++; (m_current < s_driver_count) && !m_included[m_current]; m_current++) { }
+	for (m_current++; (m_current < m_drivers.size()) && !m_included[m_current]; m_current++) { }
 
 	// return true if we end up in range
-	return (m_current >= 0) && (m_current < s_driver_count);
+	return (m_current >= 0) && (m_current < m_drivers.size());
 }
 
 
@@ -248,10 +273,10 @@ bool driver_enumerator::next_excluded()
 
 	// always advance one
 	// if we have a filter, scan forward to the next match
-	for (m_current++; (m_current < s_driver_count) && m_included[m_current]; m_current++) { }
+	for (m_current++; (m_current < m_drivers.size()) && m_included[m_current]; m_current++) { }
 
 	// return true if we end up in range
-	return (m_current >= 0) && (m_current < s_driver_count);
+	return (m_current >= 0) && (m_current < m_drivers.size());
 }
 
 
@@ -273,13 +298,13 @@ void driver_enumerator::find_approximate_matches(const char *string, std::size_t
 		// allocate a temporary list
 		std::vector<int> templist(m_filtered_count);
 		int arrayindex = 0;
-		for (int index = 0; index < s_driver_count; index++)
+		for (int index = 0; index < m_drivers.size(); index++)
 			if (m_included[index])
 				templist[arrayindex++] = index;
 		assert(arrayindex == m_filtered_count);
 
 		// shuffle
-		for (int shufnum = 0; shufnum < (4 * s_driver_count); shufnum++)
+		for (int shufnum = 0; shufnum < (4 * m_drivers.size()); shufnum++)
 		{
 			int item1 = rand() % m_filtered_count;
 			int item2 = rand() % m_filtered_count;
@@ -305,14 +330,14 @@ void driver_enumerator::find_approximate_matches(const char *string, std::size_t
 		}
 
 		// scan the entire drivers array
-		for (int index = 0; index < s_driver_count; index++)
+		for (int index = 0; index < m_drivers.size(); index++)
 		{
 			// skip things that can't run
-			if (m_included[index] &&  !(s_drivers_sorted[index]->flags & MACHINE_NO_STANDALONE))
+			if (m_included[index] &&  !(m_drivers[index]->flags & MACHINE_NO_STANDALONE))
 			{
 				// pick the best match between driver name and description
-				int curpenalty = penalty_compare(string, s_drivers_sorted[index]->description);
-				int tmp = penalty_compare(string, s_drivers_sorted[index]->name);
+				int curpenalty = penalty_compare(string, m_drivers[index]->description);
+				int tmp = penalty_compare(string, m_drivers[index]->name);
 				curpenalty = (std::min)(curpenalty, tmp);
 
 				// insert into the sorted table of matches
@@ -346,7 +371,7 @@ void driver_enumerator::find_approximate_matches(const char *string, std::size_t
 void driver_enumerator::release_current() const
 {
 	// skip if no current entry
-	if ((m_current >= 0) && (m_current < s_driver_count))
+	if ((m_current >= 0) && (m_current < m_drivers.size()))
 	{
 		// skip if we haven't cached a config
 		auto const cached = m_config.find(m_current);
@@ -357,4 +382,10 @@ void driver_enumerator::release_current() const
 				swlistdev.release();
 		}
 	}
+}
+
+
+game_driver_registrar::game_driver_registrar(game_driver const &driver)
+{
+	driver_list::drivers_unsorted().push_back(&driver);
 }

@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <cassert>
 #include <memory>
+#include <mutex>
+#include <vector>
 
 
 //**************************************************************************
@@ -34,18 +36,23 @@ GAME_EXTERN(___empty);
 // driver_list is a purely static class that wraps the global driver list
 class driver_list
 {
-	DISABLE_COPYING(driver_list);
-
 protected:
+	friend class game_driver_registrar;
+	typedef std::vector<game_driver const *> game_driver_vector;
+
 	// construction/destruction
-	driver_list();
+	driver_list() : m_drivers(drivers_sorted()) { }
+	driver_list(driver_list const &) = delete;
+	driver_list(driver_list &&) = delete;
+	driver_list &operator=(driver_list const &) = delete;
+	driver_list &operator=(driver_list &&) = delete;
 
 public:
 	// getters
-	static std::size_t total() { return s_driver_count; }
+	static std::size_t total() { return drivers_sorted().size(); }
 
 	// any item by index
-	static const game_driver &driver(std::size_t index) { assert(index < total()); return *s_drivers_sorted[index]; }
+	static const game_driver &driver(std::size_t index) { assert(index < total()); return *drivers_sorted()[index]; }
 	static int clone(std::size_t index) { return find(driver(index).parent); }
 	static int non_bios_clone(std::size_t index) { int const result = find(driver(index).parent); return ((result >= 0) && !(driver(result).flags & MACHINE_IS_BIOS_ROOT)) ? result : -1; }
 	static int compatible_with(std::size_t index) { return find(driver(index).compatible_with); }
@@ -64,8 +71,15 @@ public:
 	static int penalty_compare(const char *source, const char *target);
 
 protected:
-	static std::size_t const            s_driver_count;
-	static game_driver const * const    s_drivers_sorted[];
+	game_driver_vector const &m_drivers;
+
+private:
+	static game_driver_vector const &drivers_sorted();
+	static game_driver_vector &drivers_unsorted();
+
+	static bool                 s_has_sorted;
+	static std::mutex           s_sort_mutex;
+	static game_driver_vector   s_drivers_sorted;
 };
 
 
@@ -74,14 +88,18 @@ protected:
 // driver_enumerator enables efficient iteration through the driver list
 class driver_enumerator : public driver_list
 {
-	DISABLE_COPYING(driver_enumerator);
-
 public:
 	// construction/destruction
 	driver_enumerator(emu_options &options);
 	driver_enumerator(emu_options &options, const char *filter);
 	driver_enumerator(emu_options &options, const game_driver &filter);
 	~driver_enumerator();
+
+	// disable copying
+	driver_enumerator(driver_enumerator const &) = delete;
+	driver_enumerator(driver_enumerator &&) = delete;
+	driver_enumerator &operator=(driver_enumerator const &) = delete;
+	driver_enumerator &operator=(driver_enumerator &&) = delete;
 
 	// getters
 	std::size_t count() const { return m_filtered_count; }
@@ -119,7 +137,7 @@ public:
 	bool next_excluded();
 
 	// general helpers
-	void set_current(std::size_t index) { assert(index < s_driver_count); m_current = index; }
+	void set_current(std::size_t index) { assert(index < m_drivers.size()); m_current = index; }
 	void find_approximate_matches(const char *string, std::size_t count, int *results);
 
 private:
