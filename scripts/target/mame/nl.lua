@@ -153,7 +153,5 @@ files{
 end
 
 function linkProjects_mame_nl(_target, _subtarget)
-	links {
-		"mame_netlist",
-	}
+	add_lib("mame_netlist")
 end

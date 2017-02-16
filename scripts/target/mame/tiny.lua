@@ -153,7 +153,5 @@ files{
 end
 
 function linkProjects_mame_tiny(_target, _subtarget)
-	links {
-		"mame_tiny",
-	}
+	add_lib("mame_tiny")
 end

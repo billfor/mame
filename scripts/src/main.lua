@@ -26,17 +26,6 @@ end
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
 
-	if _OPTIONS["targetos"]=="macosx" then
-		linkoptions {
-			"-Wl,-all_load",
-		}
-	else
-		configuration { "not vs*" }
-			linkoptions {
-				"-Wl,--whole-archive,-z,muldefs",
-			}
-	end
-
 	configuration { "android*" }
 		targetprefix "lib"
 		targetname "main"
@@ -234,9 +223,45 @@ end
 		end
 	end
 
+if _OPTIONS["targetos"]=="macosx" then
+	linkoptions {
+		"-Wl,-all_load",
+	}
+else
+	configuration { "not vs*" }
+		linkoptions {
+			"-Wl,--whole-archive,--allow-multiple-definition",
+		}
+	configuration { }
+end
+	
 if (STANDALONE~=true) then
 	findfunction("linkProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
 end
+
+configuration { "not vs*" }
+	for i,v in ipairs(DRIVER_LIBS) do
+		linkoptions {
+			"-l" .. v
+		}
+	end
+
+configuration { "vs*" }
+	for i,v in ipairs(DRIVER_LIBS) do
+		links {
+			v
+		}
+	end
+	
+	
+if _OPTIONS["targetos"]~="macosx" then
+	configuration { "not vs*" }
+		linkoptions {
+			"-Wl,--no-whole-archive",
+		}
+	configuration { }
+end
+
 	links {
 		"osd_" .. _OPTIONS["osd"],
 	}

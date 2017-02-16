@@ -63,9 +63,7 @@ MACHINES["LDPR8210"] = true
 -- comprise the virtual drivers
 --------------------------------------------------
 function linkProjects_mame_virtual(_target, _subtarget)
-	links {
-		"virtual",
-	}
+	add_lib("virtual")
 end
 
 function createVirtualProjects(_target, _subtarget, _name)

@@ -1,6 +1,7 @@
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 STANDALONE = false
+DRIVER_LIBS  = {}
 
 -- Big project specific
 premake.make.makefile_ignore = true
@@ -29,6 +30,10 @@ newoption {
 		{ "1",   "Enabled"      },
 	}
 }
+
+function add_lib(str)	
+	table.insert(DRIVER_LIBS, str);
+end
 
 function backtick(cmd)
 	result = string.gsub(string.gsub(os.outputof(cmd), "\r?\n$", ""), " $", "")

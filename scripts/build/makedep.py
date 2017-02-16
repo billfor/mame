@@ -251,7 +251,5 @@ if sys.argv[3]=='target':
     sys.stdout.write('end\n')
     sys.stdout.write('\n')
     sys.stdout.write('function linkProjects_mame_%s(_target, _subtarget)\n' % sys.argv[4])
-    sys.stdout.write('    links {\n')
-    sys.stdout.write('        "mame_%s",\n' % sys.argv[4])
-    sys.stdout.write('    }\n')
+    sys.stdout.write('    add_lib("mame_%s")\n' % sys.argv[4])
     sys.stdout.write('end\n')

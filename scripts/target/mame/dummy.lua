@@ -40,7 +40,5 @@ files{
 end
 
 function linkProjects_mame_dummy(_target, _subtarget)
-	links {
-		"mame_dummy",
-	}
+	add_lib("mame_dummy")
 end
