@@ -252,7 +252,7 @@ configuration { "vs*" }
 			v
 		}
 	end
-	
+configuration { }
 	
 if _OPTIONS["targetos"]~="macosx" then
 	configuration { "not vs*" }
