@@ -714,7 +714,7 @@ void z8_device::device_start()
 
 	/* find address spaces */
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
 
 	/* allocate timers */

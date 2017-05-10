@@ -223,7 +223,7 @@ void tms32082_mp_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	m_icountptr = &m_icount;
 }
@@ -521,7 +521,7 @@ void tms32082_pp_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	m_icountptr = &m_icount;
 }

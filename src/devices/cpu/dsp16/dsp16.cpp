@@ -161,7 +161,7 @@ void dsp16_device::device_start()
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-1>();
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -351,18 +351,18 @@ offs_t dsp16_device::disassemble(std::ostream &stream, offs_t pc, const data_buf
 
 inline uint32_t dsp16_device::data_read(const uint16_t& addr)
 {
-	return m_data->read_word(addr << 1);
+	return m_data->read_word(addr);
 }
 
 inline void dsp16_device::data_write(const uint16_t& addr, const uint16_t& data)
 {
-	m_data->write_word(addr << 1, data & 0xffff);
+	m_data->write_word(addr, data & 0xffff);
 }
 
 inline uint32_t dsp16_device::opcode_read(const uint8_t pcOffset)
 {
 	const uint16_t readPC = m_pc + pcOffset;
-	return m_direct->read_dword(readPC << 1);
+	return m_direct->read_dword(readPC);
 }
 
 

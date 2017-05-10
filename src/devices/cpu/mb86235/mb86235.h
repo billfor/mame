@@ -74,7 +74,7 @@ protected:
 	virtual uint32_t opcode_alignment() const override { return 1; }
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options) override;
 
-	direct_read_data *m_direct;
+	direct_read_data<-3> *m_direct;
 
 private:
 

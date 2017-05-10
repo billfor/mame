@@ -119,7 +119,7 @@ private:
 	uint16_t *m_sound_data;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<-3> *m_direct;
 	int m_icount;
 
 	int do_sndjmp(int jmp);
@@ -229,7 +229,7 @@ private:
 	uint8_t m_clkcnt;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<-3> *m_direct;
 	int m_icount;
 
 	// For the debugger
@@ -347,7 +347,7 @@ private:
 	uint32_t  m_o_stack[32768];   /* Stack DRAM: 32kx20 */
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<-3> *m_direct;
 	int m_icount;
 
 	// For the debugger

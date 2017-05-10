@@ -106,7 +106,7 @@ void ccpu_cpu_device::device_start()
 	assert(!m_vector_callback.isnull());
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

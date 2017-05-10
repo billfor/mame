@@ -88,7 +88,7 @@ offs_t saturn_device::disassemble(std::ostream &stream, offs_t pc, const data_bu
 void saturn_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	m_out_func.resolve_safe();
 	m_in_func.resolve_safe(0);

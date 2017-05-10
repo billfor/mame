@@ -262,7 +262,7 @@ m6805_base_device::m6805_base_device(
 void m6805_base_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -302,9 +302,6 @@ void m6805_base_device::device_reset()
 	m_pending_interrupts = 0;
 
 	m_nmi_state = 0;
-
-	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
 
 	/* IRQ disabled */
 	SEI;

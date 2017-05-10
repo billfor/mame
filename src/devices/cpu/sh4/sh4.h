@@ -301,7 +301,7 @@ protected:
 	int8_t    m_irq_line_state[17];
 	address_space *m_internal;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_io;
 
 	// sh4 internal

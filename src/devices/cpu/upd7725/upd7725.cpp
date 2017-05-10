@@ -67,7 +67,7 @@ void necdsp_device::device_start()
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-2>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC, "GENPC", regs.pc).noshow();
@@ -358,7 +358,7 @@ void necdsp_device::execute_run()
 
 		if (m_irq_firing == 0) // normal opcode
 		{
-			opcode = m_direct->read_dword(regs.pc<<2)>>8;
+			opcode = m_direct->read_dword(regs.pc) >> 8;
 			regs.pc++;
 		}
 		else if (m_irq_firing == 1) // if we're in an interrupt cycle, execute a op 'nop' first...
