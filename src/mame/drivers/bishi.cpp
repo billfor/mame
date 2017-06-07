@@ -56,12 +56,13 @@ Notes:
       675KAA07 to 10 - 27C240 EPROMs
 
       Konami Custom ICs -
-                          056143 (QFP160)
-                          056832 (QFP144)
-                          055555 (QFP240)
+                          058143 (QFP160) tilemap
+                          056832 (QFP144) tilemap
+                          055555 (QFP240) mixer
                           056879 (QFP144)
                           056232 (ceramic SIL14)
-                          056820 (ceramic SIL13)
+                          056766                 rgbi dac
+                          056820 (ceramic SIL13) analog level conditioner
 
 
 Daughterboard
@@ -86,11 +87,88 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bishi.h"
 
 #include "cpu/m68000/m68000.h"
+#include "screen.h"
 #include "sound/ymz280b.h"
 #include "speaker.h"
+#include "video/k054156_k054157_k056832.h"
+#include "video/k054338.h"
+#include "video/k055555.h"
+#include "video/konami_helper.h"
+
+#define CPU_CLOCK       (XTAL_24MHz / 2)        /* 68000 clock */
+#define SOUND_CLOCK     XTAL_16_9344MHz     /* YMZ280 clock */
+
+class bishi_state : public driver_device
+{
+public:
+	bishi_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_tilemap(*this, "tilemap"),
+		m_blender(*this, "blender"),
+		m_mixer(*this, "mixer"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen") { }
+
+	/* memory pointers */
+	uint8_t *    m_ram;
+
+	/* misc */
+	uint16_t     m_cur_control;
+	uint16_t     m_cur_control2;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	required_device<k058143_056832_device> m_tilemap;
+	required_device<k054338_device> m_blender;
+	required_device<k055555_device> m_mixer;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	DECLARE_READ16_MEMBER(control_r);
+	DECLARE_WRITE16_MEMBER(control_w);
+	DECLARE_WRITE16_MEMBER(control2_w);
+	DECLARE_READ16_MEMBER(bishi_mirror_r);
+	DECLARE_READ16_MEMBER(bishi_K056832_rom_r);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
+
+	void fr_setup(flow_render::manager *manager);
+};
+
+
+void bishi_state::fr_setup(flow_render::manager *manager)
+{
+	auto rb = m_blender->flow_render_get_renderer();
+	auto rm = m_mixer  ->flow_render_get_renderer();
+
+	manager->connect(m_tilemap->flow_render_get_renderer("a")->out(), rm->inp("a color"));
+	manager->connect(m_tilemap->flow_render_get_renderer("b")->out(), rm->inp("b color"));
+	manager->connect(m_tilemap->flow_render_get_renderer("c")->out(), rm->inp("c color"));
+	manager->connect(m_tilemap->flow_render_get_renderer("d")->out(), rm->inp("d color"));
+
+	manager->set_constant(rm->inp("o color"), 0);
+	manager->set_constant(rm->inp("o attr"), 0);
+	manager->set_constant(rm->inp("s1 color"), 0);
+	manager->set_constant(rm->inp("s2 color"), 0);
+	manager->set_constant(rm->inp("s3 color"), 0);
+	manager->set_constant(rm->inp("s1 attr"), 0);
+	manager->set_constant(rm->inp("s2 attr"), 0);
+	manager->set_constant(rm->inp("s3 attr"), 0);
+
+	manager->connect(rm->out("0 color"), rb->inp("0 color"));
+	manager->connect(rm->out("1 color"), rb->inp("1 color"));
+
+	manager->connect(rm->out("0 attr"), rb->inp("0 attr"));
+	manager->connect(rm->out("1 attr"), rb->inp("1 attr"));
+
+	manager->connect(rb->out(), m_screen->flow_render_get_renderer()->inp());
+}
 
 
 READ16_MEMBER(bishi_state::control_r)
@@ -102,12 +180,14 @@ WRITE16_MEMBER(bishi_state::control_w)
 {
 	// bit 8 = interrupt gate
 	COMBINE_DATA(&m_cur_control);
+	logerror("ctrl1 %04x\n", m_cur_control);
 }
 
 WRITE16_MEMBER(bishi_state::control2_w)
 {
 	// bit 12 = part of the banking calculation for the K056832 ROM readback
 	COMBINE_DATA(&m_cur_control2);
+	logerror("ctrl2 %04x\n", m_cur_control2);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(bishi_state::bishi_scanline)
@@ -132,6 +212,7 @@ READ16_MEMBER(bishi_state::bishi_mirror_r)
 
 READ16_MEMBER(bishi_state::bishi_K056832_rom_r)
 {
+#if 0
 	uint16_t ouroffs;
 
 	ouroffs = (offset >> 1) * 8;
@@ -142,6 +223,8 @@ READ16_MEMBER(bishi_state::bishi_K056832_rom_r)
 		ouroffs += 4;
 
 	return m_k056832->bishi_rom_word_r(space, ouroffs, mem_mask);
+#endif
+	return 0;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bishi_state )
@@ -153,15 +236,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bishi_state )
 	AM_RANGE(0x800008, 0x800009) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x810000, 0x810003) AM_WRITE(control2_w)       // bank switch for K056832 character ROM test
 	AM_RANGE(0x820000, 0x820001) AM_WRITENOP            // lamps (see lamp test in service menu)
-	AM_RANGE(0x830000, 0x83003f) AM_DEVWRITE("k056832", k056832_device, word_w)
-	AM_RANGE(0x840000, 0x840007) AM_DEVWRITE("k056832", k056832_device, b_word_w)    // VSCCS
-	AM_RANGE(0x850000, 0x85001f) AM_DEVWRITE("k054338", k054338_device, word_w)  // CLTC
-	AM_RANGE(0x870000, 0x8700ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)  // PCU2
+	AM_RANGE(0x830000, 0x83003f) AM_DEVICE("tilemap", k058143_056832_device, vacset)
+	AM_RANGE(0x840000, 0x840007) AM_DEVICE("tilemap", k058143_056832_device, vsccs)
+	AM_RANGE(0x850000, 0x85001f) AM_DEVICE("blender", k054338_device, map)
+	AM_RANGE(0x870000, 0x8700ff) AM_DEVICE8("mixer", k055555_device, map, 0x00ff)
 	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)
-	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  // Graphic planes
+	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE("tilemap", k058143_056832_device, vram16_r, vram16_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xb04000, 0xb047ff) AM_READ(bishi_mirror_r)    // bug in the ram/rom test?
-	AM_RANGE(0xc00000, 0xc01fff) AM_READ(bishi_K056832_rom_r)
+	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREAD("tilemap", k058143_056832_device, rom16_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bishi )
@@ -388,22 +471,21 @@ static MACHINE_CONFIG_START( bishi )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1200))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(29, 29+288-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bishi_state, screen_update_bishi)
+	MCFG_SCREEN_FLOW_RENDER_RGB()
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(bishi_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	MCFG_FLOW_RENDER_MANAGER_ADD("fr_manager")
+	MCFG_FLOW_RENDER_MANAGER_SETUP(":", bishi_state, fr_setup)
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
-	// FP 201404: any reason why this is not connected to the k055555 below?
+	MCFG_K058143_056832_ADD("tilemap", XTAL_24MHz/4, 4, 1, 24)
+	MCFG_K058143_056832_DISABLE_VRC2()
 
-	MCFG_K055555_ADD("k055555")
+	MCFG_DEVICE_ADD("blender", K054338, 0)
+	MCFG_K054338_PALETTE("palette")
+
+	MCFG_K055555_ADD("mixer")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -422,14 +504,11 @@ ROM_START( bishi )
 	ROM_LOAD16_WORD_SWAP( "575jaa05.12e", 0x000000, 0x80000, CRC(7d354567) SHA1(7fc11585693c91c0ef7a8e00df4f2f01b356210f) )
 	ROM_LOAD16_WORD_SWAP( "575jaa06.15e", 0x080000, 0x80000, CRC(9b2f7fbb) SHA1(26c828085c44a9c4d4e713e8fcc0bc8fc973d107) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "575jaa07.14n", 0x000000, 0x080000, CRC(37bbf387) SHA1(dcf7b151b865d251f3122611b6339dd84eb1f990) )
-	ROM_LOAD16_BYTE( "575jaa08.17n", 0x000001, 0x080000, CRC(47ecd559) SHA1(7baac23557d40cccc21b93f181606563924244b0) )
-	ROM_LOAD16_BYTE( "575jaa09.19n", 0x100000, 0x080000, CRC(c1db6e68) SHA1(e951661e3b39a83db21aed484764e032adcf3c2a) )
-	ROM_LOAD16_BYTE( "575jaa10.22n", 0x100001, 0x080000, BAD_DUMP CRC(c8b145d6) SHA1(15cb3e4bebb999f1791fafa7a2ce3875a56991ff) )  // both halves identical (bad)
-
-	// dummy region (game has no sprites, but we want to use the GX mixer)
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD( "575jaa07.14n", 0x000000, 0x080000, CRC(37bbf387) SHA1(dcf7b151b865d251f3122611b6339dd84eb1f990) )
+	ROM_LOAD32_WORD( "575jaa08.17n", 0x000002, 0x080000, CRC(47ecd559) SHA1(7baac23557d40cccc21b93f181606563924244b0) )
+	ROM_LOAD32_WORD( "575jaa09.19n", 0x100000, 0x080000, CRC(c1db6e68) SHA1(e951661e3b39a83db21aed484764e032adcf3c2a) )
+	ROM_LOAD32_WORD( "575jaa10.22n", 0x100002, 0x080000, BAD_DUMP CRC(c8b145d6) SHA1(15cb3e4bebb999f1791fafa7a2ce3875a56991ff) )  // both halves identical (bad)
 
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "575jaa01.2f", 0x000000, 0x080000, CRC(e1e9f7b2) SHA1(4da93e384a6018d829cbb02cfde98fc3662c5267) )
@@ -443,14 +522,11 @@ ROM_START( sbishi )
 	ROM_LOAD16_WORD_SWAP( "675jaa05.12e", 0x000000, 0x80000, CRC(28a09c01) SHA1(627f6c9b9e88434ff3198c778ae5c57d9cda82c5) )
 	ROM_LOAD16_WORD_SWAP( "675jaa06.15e", 0x080000, 0x80000, CRC(e4998b33) SHA1(3012f7661542b38b1a113c5c10e2729c6a37e709) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "675jaa07.14n", 0x000000, 0x080000, CRC(6fe7c658) SHA1(a786a417053a5fc62f967bdd564e8d3bdc89f958) )
-	ROM_LOAD16_BYTE( "675jaa08.17n", 0x000001, 0x080000, CRC(c230afc9) SHA1(f23c64ed08e77960beb0f8db2605622a3887e5f8) )
-	ROM_LOAD16_BYTE( "675jaa09.19n", 0x100000, 0x080000, CRC(63fe85a5) SHA1(e5ef1f3fc634264260d5fc3a669646abf1601b23) )
-	ROM_LOAD16_BYTE( "675jaa10.22n", 0x100001, 0x080000, CRC(703ac462) SHA1(6dd05b2a78517a46b9ae8322c6b94bddbe91e848) )
-
-	// dummy region (game has no sprites, but we want to use the GX mixer)
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD( "675jaa07.14n", 0x000000, 0x080000, CRC(6fe7c658) SHA1(a786a417053a5fc62f967bdd564e8d3bdc89f958) )
+	ROM_LOAD32_WORD( "675jaa08.17n", 0x000002, 0x080000, CRC(c230afc9) SHA1(f23c64ed08e77960beb0f8db2605622a3887e5f8) )
+	ROM_LOAD32_WORD( "675jaa09.19n", 0x100000, 0x080000, CRC(63fe85a5) SHA1(e5ef1f3fc634264260d5fc3a669646abf1601b23) )
+	ROM_LOAD32_WORD( "675jaa10.22n", 0x100002, 0x080000, CRC(703ac462) SHA1(6dd05b2a78517a46b9ae8322c6b94bddbe91e848) )
 
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "675jaa01.2f", 0x000000, 0x080000, CRC(67910b15) SHA1(6566e2344ebe9d61c584a1ab9ecbc8e7dd0a9a5b) )
@@ -464,14 +540,11 @@ ROM_START( sbishik )
 	ROM_LOAD16_WORD_SWAP( "kab05.12e", 0x000000, 0x80000, CRC(749063ca) SHA1(ef551132410248ef0b858fb8bcf6f8dd1115ad71) )
 	ROM_LOAD16_WORD_SWAP( "kab06.15e", 0x080000, 0x80000, CRC(089e0f37) SHA1(9cd64ebfab716bbaf0ba420ad8168a33601699a9) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "675kaa07.14n", 0x000000, 0x080000, CRC(1177c1f8) SHA1(42c6f3c3a6bd0adb7d927386fd99f1497e5df30c) )
-	ROM_LOAD16_BYTE( "675kaa08.17n", 0x000001, 0x080000, CRC(7117e9cd) SHA1(5a9b4b7427edcc10725d5936869927874fef6463) )
-	ROM_LOAD16_BYTE( "675kaa09.19n", 0x100000, 0x080000, CRC(8d49c765) SHA1(7921f8f3671fbbc3d5ea529234268a1e23ea622c) )
-	ROM_LOAD16_BYTE( "675kaa10.22n", 0x100001, 0x080000, CRC(c16acf32) SHA1(df3eeb5ab3bab8e707eaa79ffc500e1dc2332a82) )
-
-	// dummy region (game has no sprites, but we want to use the GX mixer)
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD( "675kaa07.14n", 0x000000, 0x080000, CRC(1177c1f8) SHA1(42c6f3c3a6bd0adb7d927386fd99f1497e5df30c) )
+	ROM_LOAD32_WORD( "675kaa08.17n", 0x000002, 0x080000, CRC(7117e9cd) SHA1(5a9b4b7427edcc10725d5936869927874fef6463) )
+	ROM_LOAD32_WORD( "675kaa09.19n", 0x100000, 0x080000, CRC(8d49c765) SHA1(7921f8f3671fbbc3d5ea529234268a1e23ea622c) )
+	ROM_LOAD32_WORD( "675kaa10.22n", 0x100002, 0x080000, CRC(c16acf32) SHA1(df3eeb5ab3bab8e707eaa79ffc500e1dc2332a82) )
 
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "675kaa01.2f", 0x000000, 0x080000, CRC(73ac6ae6) SHA1(37e4722647a13275c5f51d2bfa50df3e12ea1ebf) )
@@ -486,14 +559,11 @@ ROM_START( sbishika )
 	ROM_LOAD16_WORD_SWAP( "675kaa05.12e", 0x000000, 0x80000, CRC(23600e1d) SHA1(b3224c84e41e3077425a60232bb91775107f37a8) )
 	ROM_LOAD16_WORD_SWAP( "675kaa06.15e", 0x080000, 0x80000, CRC(bd1091f5) SHA1(29872abc49fe8209d0f414ca40a34fc494ff9b96) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "675kaa07.14n", 0x000000, 0x080000, CRC(1177c1f8) SHA1(42c6f3c3a6bd0adb7d927386fd99f1497e5df30c) )
-	ROM_LOAD16_BYTE( "675kaa08.17n", 0x000001, 0x080000, CRC(7117e9cd) SHA1(5a9b4b7427edcc10725d5936869927874fef6463) )
-	ROM_LOAD16_BYTE( "675kaa09.19n", 0x100000, 0x080000, CRC(8d49c765) SHA1(7921f8f3671fbbc3d5ea529234268a1e23ea622c) )
-	ROM_LOAD16_BYTE( "675kaa10.22n", 0x100001, 0x080000, CRC(c16acf32) SHA1(df3eeb5ab3bab8e707eaa79ffc500e1dc2332a82) )
-
-	// dummy region (game has no sprites, but we want to use the GX mixer)
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD( "675kaa07.14n", 0x000000, 0x080000, CRC(1177c1f8) SHA1(42c6f3c3a6bd0adb7d927386fd99f1497e5df30c) )
+	ROM_LOAD32_WORD( "675kaa08.17n", 0x000002, 0x080000, CRC(7117e9cd) SHA1(5a9b4b7427edcc10725d5936869927874fef6463) )
+	ROM_LOAD32_WORD( "675kaa09.19n", 0x100000, 0x080000, CRC(8d49c765) SHA1(7921f8f3671fbbc3d5ea529234268a1e23ea622c) )
+	ROM_LOAD32_WORD( "675kaa10.22n", 0x100002, 0x080000, CRC(c16acf32) SHA1(df3eeb5ab3bab8e707eaa79ffc500e1dc2332a82) )
 
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "675kaa01.2f", 0x000000, 0x080000, CRC(73ac6ae6) SHA1(37e4722647a13275c5f51d2bfa50df3e12ea1ebf) )

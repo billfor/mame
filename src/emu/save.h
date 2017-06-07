@@ -126,6 +126,13 @@ public:
 		save_memory(device, module, tag, index, valname, &value[0], sizeof(value[0]), N);
 	}
 
+	template<typename _ItemType, std::size_t N>
+	void save_item(device_t *device, const char *module, const char *tag, int index, std::array<_ItemType, N> &value, const char *valname)
+	{
+		if (!type_checker<_ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
+		save_memory(device, module, tag, index, valname, &value[0], sizeof(value[0]), N);
+	}
+
 	// templatized wrapper for 2-dimensional arrays
 	template<typename _ItemType, std::size_t M, std::size_t N>
 	void save_item(device_t *device, const char *module, const char *tag, int index, _ItemType (&value)[M][N], const char *valname)

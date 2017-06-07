@@ -546,6 +546,7 @@ void screen_device::svg_renderer::rebuild_cache()
 
 screen_device::screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SCREEN, tag, owner, clock),
+		flow_render::interface(mconfig, *this),
 		m_type(SCREEN_TYPE_RASTER),
 		m_oldstyle_vblank_supplied(false),
 		m_refresh(0),
@@ -559,6 +560,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_palette_tag(nullptr),
 		m_video_attributes(0),
 		m_svg_region(nullptr),
+		m_flow_render_mode(FLOW_RENDER_DISABLED),
 		m_container(nullptr),
 		m_width(100),
 		m_height(100),
@@ -613,6 +615,12 @@ void screen_device::static_set_type(device_t &device, screen_type_enum type)
 void screen_device::static_set_svg_region(device_t &device, const char *region)
 {
 	downcast<screen_device &>(device).m_svg_region = region;
+}
+
+
+void screen_device::set_flow_render_mode(int flow_render_mode)
+{
+	m_flow_render_mode = flow_render_mode;
 }
 
 
@@ -770,7 +778,7 @@ void screen_device::device_validity_check(validity_checker &valid) const
 			osd_printf_error("Invalid display area\n");
 
 		// sanity check screen formats
-		if (m_screen_update_ind16.isnull() && m_screen_update_rgb32.isnull())
+		if (m_screen_update_ind16.isnull() && m_screen_update_rgb32.isnull() && m_flow_render_mode == FLOW_RENDER_DISABLED)
 			osd_printf_error("Missing SCREEN_UPDATE function\n");
 	}
 
@@ -782,7 +790,7 @@ void screen_device::device_validity_check(validity_checker &valid) const
 	if (m_refresh == 0)
 		osd_printf_error("Invalid (zero) refresh rate\n");
 
-	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
+	texture_format texformat = !m_screen_update_ind16.isnull() || m_flow_render_mode == FLOW_RENDER_U16 ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 	if (m_palette_tag != nullptr)
 	{
 		if (texformat == TEXFORMAT_RGB32)
@@ -1183,7 +1191,16 @@ bool screen_device::update_partial(int scanline)
 	g_profiler.start(PROFILER_VIDEO);
 
 	u32 flags;
-	if (m_type != SCREEN_TYPE_SVG)
+	if (m_flow_render_mode != FLOW_RENDER_DISABLED)
+	{
+		switch (m_flow_render_mode)
+		{
+			case FLOW_RENDER_U16: flow_render_do_render(m_bitmap[m_curbitmap].width(), m_bitmap[m_curbitmap].height(), clip); break;
+			case FLOW_RENDER_RGB: flow_render_do_render(m_bitmap[m_curbitmap].width(), m_bitmap[m_curbitmap].height(), clip); break;
+		}
+		flags = 0;
+	}
+	else if (m_type != SCREEN_TYPE_SVG)
 	{
 		screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
 		switch (curbitmap.format())
@@ -1270,12 +1287,23 @@ void screen_device::update_now()
 			{
 				g_profiler.start(PROFILER_VIDEO);
 
-				screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
-				switch (curbitmap.format())
+				if (m_flow_render_mode != FLOW_RENDER_DISABLED)
 				{
-					default:
-					case BITMAP_FORMAT_IND16: m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
-					case BITMAP_FORMAT_RGB32: m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+					switch (m_flow_render_mode)
+					{
+						case FLOW_RENDER_U16: flow_render_do_render(m_bitmap[m_curbitmap].width(), m_bitmap[m_curbitmap].height(), clip); break;
+						case FLOW_RENDER_RGB: flow_render_do_render(m_bitmap[m_curbitmap].width(), m_bitmap[m_curbitmap].height(), clip); break;
+					}
+				}
+				else
+				{
+					screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
+					switch (curbitmap.format())
+					{
+						default:
+						case BITMAP_FORMAT_IND16: m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+						case BITMAP_FORMAT_RGB32: m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+					}
 				}
 
 				m_partial_updates_this_frame++;
@@ -1310,12 +1338,24 @@ void screen_device::update_now()
 		LOG_PARTIAL_UPDATES(("doing scanline partial draw: Y %d X %d-%d\n", clip.max_y, clip.min_x, clip.max_x));
 
 		u32 flags;
-		screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
-		switch (curbitmap.format())
+		if (m_flow_render_mode != FLOW_RENDER_DISABLED)
 		{
-			default:
-			case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
-			case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+			switch (m_flow_render_mode)
+			{
+				case FLOW_RENDER_U16: flow_render_do_render(m_bitmap[m_curbitmap].width(), m_bitmap[m_curbitmap].height(), clip); break;
+				case FLOW_RENDER_RGB: flow_render_do_render(m_bitmap[m_curbitmap].width(), m_bitmap[m_curbitmap].height(), clip); break;
+			}
+			flags = 0;
+		}
+		else
+		{
+			screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
+			switch (curbitmap.format())
+			{
+				default:
+				case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+				case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+			}
 		}
 
 		m_partial_updates_this_frame++;
@@ -1758,4 +1798,52 @@ void screen_device::load_effect_overlay(const char *filename)
 		m_container->set_overlay(&m_screen_overlay_bitmap);
 	else
 		osd_printf_warning("Unable to load effect PNG file '%s'\n", fullname.c_str());
+}
+
+
+//-------------------------------------------------
+//  flow_render_register_renderers - endpoint for raster screens
+//-------------------------------------------------
+
+void screen_device::flow_render_register_renderers()
+{
+	if(m_type != SCREEN_TYPE_RASTER || m_flow_render_mode == FLOW_RENDER_DISABLED) {
+		m_renderer = nullptr;
+		m_renderer_input_rgb = nullptr;
+		m_renderer_input_u16 = nullptr;
+		return;
+	}
+
+	if (m_flow_render_mode == FLOW_RENDER_RGB)
+	{
+		m_renderer = flow_render_create_renderer([this](const rectangle &cliprect){ render_rgb(cliprect); });
+		m_renderer_input_rgb = m_renderer->create_input_sb_rgb();
+		m_renderer_input_u16 = nullptr;
+	}
+	else
+	{
+		m_renderer = flow_render_create_renderer([this](const rectangle &cliprect){ render_u16(cliprect); });
+		m_renderer_input_u16 = m_renderer->create_input_sb_u16();
+		m_renderer_input_rgb = nullptr;
+	}
+
+	m_renderer->set_target();
+}
+
+void screen_device::render_u16(const rectangle &cliprect)
+{
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
+		const u16 *fi = &m_renderer_input_u16->bitmap().pix16(y, cliprect.min_x);
+		u16 *fo = &m_bitmap[m_curbitmap].as_ind16().pix16(y, cliprect.min_x);
+		memcpy(fo, fi, (cliprect.max_x - cliprect.min_x + 1)*2);
+	}
+}
+
+void screen_device::render_rgb(const rectangle &cliprect)
+{
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
+		const u32 *fi = &m_renderer_input_rgb->bitmap().pix32(y, cliprect.min_x);
+		u32 *fo = &m_bitmap[m_curbitmap].as_rgb32().pix32(y, cliprect.min_x);
+		memcpy(fo, fi, (cliprect.max_x - cliprect.min_x + 1)*4);
+	}
 }

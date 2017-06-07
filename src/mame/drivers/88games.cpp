@@ -7,18 +7,138 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/88games.h"
 
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
-
 #include "screen.h"
+#include "sound/upd7759.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
+#include "video/k051316.h"
+#include "video/k051960.h"
+#include "video/k052109.h"
+#include "video/konami_helper.h"
 
+class _88games_state : public driver_device
+{
+public:
+	_88games_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k052109(*this, "k052109"),
+		m_k051960(*this, "k051960"),
+		m_k051316(*this, "k051316"),
+		m_upd7759_1(*this, "upd1"),
+		m_upd7759_2(*this, "upd2"),
+		m_bank0000(*this, "bank0000"),
+		m_bank1000(*this, "bank1000"),
+		m_ram(*this, "ram") { }
+
+	/* video-related */
+	int          m_k88games_priority;
+	int          m_videobank;
+	int          m_zoomreadroms;
+	int          m_speech_chip;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k052109_device> m_k052109;
+	required_device<k051960_device> m_k051960;
+	required_device<k051316_device> m_k051316;
+	required_device<upd7759_device> m_upd7759_1;
+	required_device<upd7759_device> m_upd7759_2;
+
+	/* memory banks */
+	required_memory_bank m_bank0000;
+	required_memory_bank m_bank1000;
+
+	/* memory pointers */
+	required_shared_ptr<uint8_t> m_ram;
+
+	DECLARE_READ8_MEMBER(bankedram_r);
+	DECLARE_WRITE8_MEMBER(bankedram_w);
+	DECLARE_WRITE8_MEMBER(k88games_5f84_w);
+	DECLARE_WRITE8_MEMBER(k88games_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(speech_control_w);
+	DECLARE_WRITE8_MEMBER(speech_msg_w);
+	DECLARE_READ8_MEMBER(k052109_051960_r);
+	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	uint32_t screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(k88games_interrupt);
+	//	K051316_CB_MEMBER(zoom_callback);
+	K052109_CB_MEMBER(tile_callback);
+	K051960_CB_MEMBER(sprite_callback);
+	DECLARE_WRITE8_MEMBER(banking_callback);
+};
+
+/***************************************************************************
+
+  Callbacks for the K052109
+
+***************************************************************************/
+
+K052109_CB_MEMBER(_88games_state::tile_callback)
+{
+	static const int layer_colorbase[] = { 1024 / 16, 0 / 16, 256 / 16 };
+
+	*code |= ((*color & 0x0f) << 8) | (bank << 12);
+	*color = layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+}
+
+
+/***************************************************************************
+
+  Callbacks for the K051960
+
+***************************************************************************/
+
+K051960_CB_MEMBER(_88games_state::sprite_callback)
+{
+	enum { sprite_colorbase = 512 / 16 };
+
+	*priority = (*color & 0x20) >> 5;   /* ??? */
+	*color = sprite_colorbase + (*color & 0x0f);
+}
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+uint32_t _88games_state::screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_k052109->tilemap_update();
+
+	if (m_k88games_priority)
+	{
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);   // tile 0
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 1, 1);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0); // tile 2
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0); // tile 1
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
+		//		m_k051316->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	}
+	else
+	{
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);   // tile 2
+		//		m_k051316->zoom_draw(screen, bitmap, cliprect, 0, 0);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0); // tile 1
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 1, 1);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0); // tile 0
+	}
+
+	return 0;
+}
 
 /*************************************
  *
@@ -41,7 +161,7 @@ READ8_MEMBER(_88games_state::bankedram_r)
 		if (m_zoomreadroms)
 			return m_k051316->rom_r(space, offset);
 		else
-			return m_k051316->read(space, offset);
+			return m_k051316->vram_r(space, offset);
 	}
 }
 
@@ -50,7 +170,7 @@ WRITE8_MEMBER(_88games_state::bankedram_w)
 	if (m_videobank)
 		m_ram[offset] = data;
 	else
-		m_k051316->write(space, offset, data);
+		m_k051316->vram_w(space, offset, data);
 }
 
 WRITE8_MEMBER(_88games_state::k88games_5f84_w)
@@ -137,7 +257,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _88games_state )
 	AM_RANGE(0x5f96, 0x5f96) AM_READ_PORT("IN2")
 	AM_RANGE(0x5f97, 0x5f97) AM_READ_PORT("DSW1")
 	AM_RANGE(0x5f9b, 0x5f9b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x5fc0, 0x5fcf) AM_DEVWRITE("k051316", k051316_device, ctrl_w)
+	AM_RANGE(0x5fc0, 0x5fcf) AM_DEVICE("k051316", k051316_device, map)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -339,9 +459,7 @@ static MACHINE_CONFIG_START( 88games )
 	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(_88games_state, sprite_callback)
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_CB(_88games_state, zoom_callback)
+	MCFG_K051316_ADD("roz", 4, false, [](u32 address, u32 &code, u16 &color) { code = address & 0x07ffff; color = ((address & 0x800000) >> 16) | ((address & 0x380000) >> 15); })
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

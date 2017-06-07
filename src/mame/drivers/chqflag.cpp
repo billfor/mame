@@ -15,33 +15,119 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/chqflag.h"
-#include "includes/konamipt.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h"
+#include "cpu/z80/z80.h"
+#include "includes/konamipt.h"
+#include "machine/bankdev.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "sound/k007232.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
+#include "video/k051316.h"
+#include "video/k051733.h"
+#include "video/k051960.h"
+#include "video/konami_helper.h"
 
 #include "chqflag.lh"
 
-
-/* these trampolines are less confusing than nested address_map_bank_devices */
-READ8_MEMBER(chqflag_state::k051316_1_ramrom_r)
+class chqflag_state : public driver_device
 {
-	if (m_k051316_readroms)
-		return m_k051316_1->rom_r(space, offset);
-	else
-		return m_k051316_1->read(space, offset);
+public:
+	chqflag_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_bank1000(*this, "bank1000"),
+		m_k007232_1(*this, "k007232_1"),
+		m_k007232_2(*this, "k007232_2"),
+		m_k051960(*this, "k051960"),
+		m_roz_1(*this, "k051316_1"),
+		m_roz_2(*this, "k051316_2"),
+		m_palette(*this, "palette"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_rombank(*this, "rombank") { }
+
+	/* misc */
+	int        m_roz_readroms;
+	int        m_last_vreg;
+	int        m_analog_ctrl;
+	int        m_accel;
+	int        m_wheel;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<address_map_bank_device> m_bank1000;
+	required_device<k007232_device> m_k007232_1;
+	required_device<k007232_device> m_k007232_2;
+	required_device<k051960_device> m_k051960;
+	required_device<k051316_device> m_roz_1;
+	required_device<k051316_device> m_roz_2;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch2;
+
+	/* memory pointers */
+	required_memory_bank m_rombank;
+
+	DECLARE_READ8_MEMBER(roz_1_ramrom_r);
+	DECLARE_READ8_MEMBER(roz_2_ramrom_r);
+	DECLARE_WRITE8_MEMBER(chqflag_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(chqflag_vreg_w);
+	DECLARE_WRITE8_MEMBER(select_analog_ctrl_w);
+	DECLARE_READ8_MEMBER(analog_read_r);
+	DECLARE_WRITE8_MEMBER(chqflag_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(k007232_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(k007232_extvolume_w);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	uint32_t screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE8_MEMBER(volume_callback0);
+	DECLARE_WRITE8_MEMBER(volume_callback1);
+	K051960_CB_MEMBER(sprite_callback);
+};
+
+/***************************************************************************
+
+  Callbacks for the K051960
+
+***************************************************************************/
+
+K051960_CB_MEMBER(chqflag_state::sprite_callback)
+{
+	enum { sprite_colorbase = 0 };
+
+	*priority = (*color & 0x10) ? 0 : GFX_PMASK_1;
+	*color = sprite_colorbase + (*color & 0x0f);
 }
 
-READ8_MEMBER(chqflag_state::k051316_2_ramrom_r)
+uint32_t chqflag_state::screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_k051316_readroms)
-		return m_k051316_2->rom_r(space, offset);
+	screen.priority().fill(0, cliprect);
+
+	//	m_roz_2->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	//	m_roz_2->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
+	//	m_roz_1->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+/* these trampolines are less confusing than nested address_map_bank_devices */
+READ8_MEMBER(chqflag_state::roz_1_ramrom_r)
+{
+	if (m_roz_readroms)
+		return m_roz_1->rom_r(space, offset);
 	else
-		return m_k051316_2->read(space, offset);
+		return m_roz_1->vram_r(space, offset);
+}
+
+READ8_MEMBER(chqflag_state::roz_2_ramrom_r)
+{
+	if (m_roz_readroms)
+		return m_roz_2->rom_r(space, offset);
+	else
+		return m_roz_2->vram_r(space, offset);
 }
 
 WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
@@ -64,7 +150,7 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 
 	/* bit 4 = enable rom reading through K051316 #1 & #2 */
-	m_k051316_readroms = (data & 0x10);
+	m_roz_readroms = (data & 0x10);
 
 	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Sunset Riders, */
 	/* however I don't have enough evidence to determine the exact behaviour. */
@@ -127,7 +213,7 @@ static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x1000, 0x1fff) AM_DEVICE("bank1000", address_map_bank_device, amap8)
 	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE("k051960", k051960_device, k051937_r, k051937_w)            /* Sprite control registers */
 	AM_RANGE(0x2400, 0x27ff) AM_DEVREADWRITE("k051960", k051960_device, k051960_r, k051960_w)            /* Sprite RAM */
-	AM_RANGE(0x2800, 0x2fff) AM_READ(k051316_2_ramrom_r) AM_DEVWRITE("k051316_2", k051316_device, write) /* 051316 zoom/rotation (chip 2) */
+	AM_RANGE(0x2800, 0x2fff) AM_READ(roz_2_ramrom_r) AM_DEVWRITE("k051316_2", k051316_device, vram_w) /* 051316 zoom/rotation (chip 2) */
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)                    /* sound code # */
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(chqflag_sh_irqtrigger_w)                  /* cause interrupt on audio CPU */
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(chqflag_bankswitch_w)                     /* bankswitch control */
@@ -138,8 +224,8 @@ static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x3203, 0x3203) AM_READ_PORT("DSW2")                               /* DIPSW #2 */
 	AM_RANGE(0x3300, 0x3300) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* watchdog timer */
 	AM_RANGE(0x3400, 0x341f) AM_DEVREADWRITE("k051733", k051733_device, read, write)                    /* 051733 (protection) */
-	AM_RANGE(0x3500, 0x350f) AM_DEVWRITE("k051316_1", k051316_device, ctrl_w)                            /* 051316 control registers (chip 1) */
-	AM_RANGE(0x3600, 0x360f) AM_DEVWRITE("k051316_2", k051316_device, ctrl_w)                            /* 051316 control registers (chip 2) */
+	AM_RANGE(0x3500, 0x350f) AM_DEVICE("roz_1", k051316_device, map)                            /* 051316 control registers (chip 1) */
+	AM_RANGE(0x3600, 0x360f) AM_DEVICE("roz_2", k051316_device, map)                            /* 051316 control registers (chip 2) */
 	AM_RANGE(0x3700, 0x3700) AM_WRITE(select_analog_ctrl_w)                     /* select accelerator/wheel */
 	AM_RANGE(0x3701, 0x3701) AM_READ_PORT("IN2")                                /* Brake + Shift + ? */
 	AM_RANGE(0x3702, 0x3702) AM_READWRITE(analog_read_r, select_analog_ctrl_w)  /* accelerator/wheel */
@@ -149,7 +235,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank1000_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_READ(k051316_1_ramrom_r) AM_DEVWRITE("k051316_1", k051316_device, write)
+	AM_RANGE(0x1000, 0x17ff) AM_READ(roz_1_ramrom_r) AM_DEVWRITE("roz_1", k051316_device, vram_w)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
@@ -272,7 +358,7 @@ void chqflag_state::machine_start()
 {
 	m_rombank->configure_entries(0, 0x50000 / 0x4000, memregion("maincpu")->base(), 0x4000);
 
-	save_item(NAME(m_k051316_readroms));
+	save_item(NAME(m_roz_readroms));
 	save_item(NAME(m_last_vreg));
 	save_item(NAME(m_analog_ctrl));
 	save_item(NAME(m_accel));
@@ -281,7 +367,7 @@ void chqflag_state::machine_start()
 
 void chqflag_state::machine_reset()
 {
-	m_k051316_readroms = 0;
+	m_roz_readroms = 0;
 	m_last_vreg = 0;
 	m_analog_ctrl = 0;
 	m_accel = 0;
@@ -327,17 +413,8 @@ static MACHINE_CONFIG_START( chqflag )
 	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 	MCFG_K051960_NMI_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(7, 0)
-	MCFG_K051316_CB(chqflag_state, zoom_callback_1)
-
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(8)
-	MCFG_K051316_LAYER_MASK(0xc0)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(chqflag_state, zoom_callback_2)
+	MCFG_K051316_ADD("roz_1", 4, false, [](u32 address, u32 &code, u16 &color) { code = address & 0x03ffff; color = (address & 0x3c0000) >> 14; })
+	MCFG_K051316_ADD("roz_2", 8, false, [](u32 address, u32 &code, u16 &color) { code = address & 0x0fffff; color = (address & 0x100000) >> 12; })
 
 	MCFG_K051733_ADD("k051733")
 

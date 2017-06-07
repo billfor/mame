@@ -5,51 +5,21 @@
 
 #pragma once
 
+#include "difr.h"
+#include "vlatency.h"
 
-typedef device_delegate<void (int *code, int *color, int *flags)> k051316_cb_delegate;
-#define K051316_CB_MEMBER(_name)   void _name(int *code, int *color, int *flags)
-
-
-#define MCFG_K051316_CB(_class, _method) \
-	k051316_device::set_k051316_callback(*device, k051316_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
-
-#define MCFG_K051316_OFFSETS(_xoffs, _yoffs) \
-	k051316_device::set_offsets(*device, _xoffs, _yoffs);
-
-#define MCFG_K051316_BPP(_bpp) \
-	k051316_device::set_bpp(*device, _bpp);
-
-#define MCFG_K051316_LAYER_MASK(_mask) \
-	k051316_device::set_layermask(*device, _mask);
+#define MCFG_K051316_ADD(_tag, _tile_bpp, _ram_based, _mapper)	\
+	MCFG_DEVICE_ADD(_tag, K051316, 0) \
+	downcast<k051316_device *>(device)->set_info(_tile_bpp, _ram_based, _mapper);
 
 #define MCFG_K051316_WRAP(_wrap) \
-	k051316_device::set_wrap(*device, _wrap);
+	downcast<k051316_device *>(device)->set_wrap(_wrap);
 
 
-class k051316_device : public device_t, public device_gfx_interface
+class k051316_device : public device_t, public flow_render::interface, public video_latency::interface
 {
 public:
 	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	static const gfx_layout charlayout4;
-	static const gfx_layout charlayout7;
-	static const gfx_layout charlayout8;
-	DECLARE_GFXDECODE_MEMBER(gfxinfo);
-	DECLARE_GFXDECODE_MEMBER(gfxinfo7);
-	DECLARE_GFXDECODE_MEMBER(gfxinfo8);
-	DECLARE_GFXDECODE_MEMBER(gfxinfo4_ram);
-
-	// static configuration
-	static void set_k051316_callback(device_t &device, k051316_cb_delegate callback) { downcast<k051316_device &>(device).m_k051316_cb = callback; }
-	static void set_wrap(device_t &device, int wrap) { downcast<k051316_device &>(device).m_wrap = wrap; }
-	static void set_bpp(device_t &device, int bpp);
-	static void set_layermask(device_t &device, int mask) { downcast<k051316_device &>(device).m_layermask = mask; }
-	static void set_offsets(device_t &device, int x_offset, int y_offset)
-	{
-		k051316_device &dev = downcast<k051316_device &>(device);
-		dev.m_dx = x_offset;
-		dev.m_dy = y_offset;
-	}
 
 	/*
 	The callback is passed:
@@ -63,36 +33,60 @@ public:
 	  structure (e.g. TILE_FLIPX)
 	*/
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( rom_r );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
-	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,uint32_t priority);
-	void wraparound_enable(int status);
+	DECLARE_ADDRESS_MAP(map, 8);
 
-	void mark_gfx_dirty(offs_t byteoffset) { gfx(0)->mark_dirty(byteoffset * m_pixels_per_byte / (16 * 16)); }
-	void mark_tmap_dirty() { m_tmap->mark_all_dirty(); }
+	DECLARE_READ8_MEMBER (vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER (rom_r);
+
+	void set_wrap(bool status);
+	void set_info(int tile_bpp, bool ram_based, std::function<void (u32 address, u32 &code, u16 &color)> mapper);
+
+	void ksnotifier_w(int clk, int hv, int hfp, int hs, int hbp, int vv, int vfp, int vs, int vbp);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void flow_render_register_renderers() override;
+
 private:
-	// internal state
-	std::vector<uint8_t> m_ram;
-	uint8_t m_ctrlram[16];
-	tilemap_t *m_tmap;
+	optional_region_ptr<u8> m_rom;
+	optional_shared_ptr<u16> m_ram;
 
-	optional_region_ptr<uint8_t> m_zoom_rom;
+	std::function<void (u32 address, u32 &code, u16 &color)> m_mapper;
 
-	int m_dx, m_dy;
-	int m_wrap;
-	int m_pixels_per_byte;
-	int m_layermask;
-	k051316_cb_delegate m_k051316_cb;
+	int m_tile_bpp;
+	bool m_wrap, m_ram_based;
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	std::array<u16, 32*32> m_tile_ram;
+
+	flow_render::renderer *m_renderer;
+	flow_render::output_sb_u16 *m_renderer_output;
+
+	int m_x_offset, m_y_offset;
+
+	s16 m_start_x, m_start_y, m_incxx, m_incxy, m_incyx, m_incyy, m_rom_base;
+	u8 m_mode;
+
+	DECLARE_WRITE8_MEMBER(start_x_h_w);
+	DECLARE_WRITE8_MEMBER(start_x_l_w);
+	DECLARE_WRITE8_MEMBER(start_y_h_w);
+	DECLARE_WRITE8_MEMBER(start_y_l_w);
+	DECLARE_WRITE8_MEMBER(incxx_h_w);
+	DECLARE_WRITE8_MEMBER(incxx_l_w);
+	DECLARE_WRITE8_MEMBER(incxy_h_w);
+	DECLARE_WRITE8_MEMBER(incxy_l_w);
+	DECLARE_WRITE8_MEMBER(incyx_h_w);
+	DECLARE_WRITE8_MEMBER(incyx_l_w);
+	DECLARE_WRITE8_MEMBER(incyy_h_w);
+	DECLARE_WRITE8_MEMBER(incyy_l_w);
+	DECLARE_WRITE8_MEMBER(rom_base_h_w);
+	DECLARE_WRITE8_MEMBER(rom_base_l_w);
+	DECLARE_WRITE8_MEMBER(mode_w);
+
+	void render(const rectangle &cliprect);
 };
 
 DECLARE_DEVICE_TYPE(K051316, k051316_device)

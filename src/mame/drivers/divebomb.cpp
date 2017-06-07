@@ -91,9 +91,258 @@ To verify against original HW:
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/divebomb.h"
+
+#include "cpu/z80/z80.h"
 #include "screen.h"
+#include "sound/sn76496.h"
 #include "speaker.h"
+#include "video/k051316.h"
+#include "video/resnet.h"
+
+#define XTAL1 XTAL_24MHz
+
+class divebomb_state : public driver_device
+{
+public:
+	divebomb_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag),
+	m_spritecpu(*this, "spritecpu"),
+	m_fgcpu(*this, "fgcpu"),
+	m_rozcpucpu(*this, "rozcpu"),
+	m_bank1(*this, "bank1"),
+	m_fgram(*this, "fgram"),
+	m_spriteram(*this, "spriteram"),
+	m_gfxdecode(*this, "gfxdecode"),
+	m_palette(*this, "palette"),
+	m_roz_1(*this, "roz_1"),
+	m_roz_2(*this, "roz_2")
+	{ }
+
+	required_device<cpu_device> m_spritecpu;
+	required_device<cpu_device> m_fgcpu;
+	required_device<cpu_device> m_rozcpucpu;
+	required_memory_bank m_bank1;
+	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<k051316_device> m_roz_1;
+	required_device<k051316_device> m_roz_2;
+
+	tilemap_t *m_fg_tilemap;
+	uint8_t to_spritecpu;
+	uint8_t to_rozcpu;
+	uint8_t from_sprite;
+	uint8_t from_roz;
+	bool has_fromsprite;
+	bool has_fromroz;
+
+	uint8_t roz_pal;
+	bool roz1_enable;
+	bool roz2_enable;
+	bool roz1_wrap;
+	bool roz2_wrap;
+
+	DECLARE_MACHINE_RESET(divebomb);
+	DECLARE_MACHINE_START(divebomb);
+	DECLARE_VIDEO_START(divebomb);
+	DECLARE_PALETTE_INIT(divebomb);
+
+	void update_irqs();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void decode_proms(const uint8_t* rgn, int size, int index, bool inv);
+	uint32_t screen_update_divebomb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+	DECLARE_READ8_MEMBER(fgcpu_roz_comm_r);
+	DECLARE_WRITE8_MEMBER(fgcpu_roz_comm_w);
+	DECLARE_READ8_MEMBER(fgcpu_spr_comm_r);
+	DECLARE_WRITE8_MEMBER(fgcpu_spr_comm_w);
+	DECLARE_READ8_MEMBER(fgcpu_comm_flags_r);
+	DECLARE_WRITE8_MEMBER(fgram_w);
+
+	DECLARE_WRITE8_MEMBER(spritecpu_port00_w);
+	DECLARE_READ8_MEMBER(spritecpu_comm_r);
+	DECLARE_WRITE8_MEMBER(spritecpu_comm_w);
+
+	DECLARE_WRITE8_MEMBER(rozcpu_bank_w);
+	DECLARE_WRITE8_MEMBER(rozcpu_wrap1_enable_w);
+	DECLARE_WRITE8_MEMBER(rozcpu_enable1_w);
+	DECLARE_WRITE8_MEMBER(rozcpu_enable2_w);
+	DECLARE_WRITE8_MEMBER(rozcpu_wrap2_enable_w);
+	DECLARE_READ8_MEMBER(rozcpu_comm_r);
+	DECLARE_WRITE8_MEMBER(rozcpu_comm_w);
+	DECLARE_WRITE8_MEMBER(rozcpu_pal_w);
+};
+
+
+/*************************************
+ *
+ *  Tilemap callbacks
+ *
+ *************************************/
+
+TILE_GET_INFO_MEMBER(divebomb_state::get_fg_tile_info)
+{
+	uint32_t code = m_fgram[tile_index + 0x000];
+	uint32_t attr = m_fgram[tile_index + 0x400];
+	uint32_t colour = attr >> 4;
+
+	code |= (attr & 0x3) << 8;
+
+	SET_TILE_INFO_MEMBER(0, code, colour, 0);
+}
+
+WRITE8_MEMBER(divebomb_state::fgram_w)
+{
+	m_fgram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+
+WRITE8_MEMBER(divebomb_state::rozcpu_wrap1_enable_w)
+{
+	roz1_wrap = !(data & 1);
+
+}
+
+
+WRITE8_MEMBER(divebomb_state::rozcpu_enable1_w)
+{
+	roz1_enable = !(data & 1);
+}
+
+
+WRITE8_MEMBER(divebomb_state::rozcpu_enable2_w)
+{
+	roz2_enable = !(data & 1);
+}
+
+
+WRITE8_MEMBER(divebomb_state::rozcpu_wrap2_enable_w)
+{
+	roz2_wrap = !(data & 1);
+}
+
+
+WRITE8_MEMBER(divebomb_state::rozcpu_pal_w)
+{
+	//.... ..xx  K051316 1 palette select
+	//..xx ....  K051316 2 palette select
+
+	roz_pal = data;
+
+	if (data & 0xcc)
+		logerror("rozcpu_port50_w %02x\n", data);
+}
+
+
+
+/*************************************
+ *
+ *  Video hardware init
+ *
+ *************************************/
+
+void divebomb_state::decode_proms(const uint8_t * rgn, int size, int index, bool inv)
+{
+	static const int resistances[4] = { 2000, 1000, 470, 220 };
+
+	double rweights[4], gweights[4], bweights[4];
+
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0, 255, -1.0,
+								4, resistances, rweights, 0, 0,
+								4, resistances, gweights, 0, 0,
+								4, resistances, bweights, 0, 0);
+
+	/* create a lookup table for the palette */
+	for (uint32_t i = 0; i < size; ++i)
+	{
+		uint32_t rdata = rgn[i + size*2] & 0x0f;
+		uint32_t r = combine_4_weights(rweights, BIT(rdata, 0), BIT(rdata, 1), BIT(rdata, 2), BIT(rdata, 3));
+
+		uint32_t gdata = rgn[i + size] & 0x0f;
+		uint32_t g = combine_4_weights(gweights, BIT(gdata, 0), BIT(gdata, 1), BIT(gdata, 2), BIT(gdata, 3));
+
+		uint32_t bdata = rgn[i] & 0x0f;
+		uint32_t b = combine_4_weights(bweights, BIT(bdata, 0), BIT(bdata, 1), BIT(bdata, 2), BIT(bdata, 3));
+
+		if (!inv)
+			m_palette->set_pen_color(index + i, rgb_t(r, g, b));
+		else
+			m_palette->set_pen_color(index + (i ^ 0xff), rgb_t(r, g, b));
+	}
+}
+
+
+PALETTE_INIT_MEMBER(divebomb_state, divebomb)
+{
+	decode_proms(memregion("spr_proms")->base(), 0x100, 0x400 + 0x400 + 0x400, false);
+	decode_proms(memregion("fg_proms")->base(), 0x400, 0x400 + 0x400, false);
+	decode_proms(memregion("k051316_1_pr")->base(), 0x400, 0, true);
+	decode_proms(memregion("k051316_2_pr")->base(), 0x400, 0x400, true);
+}
+
+
+VIDEO_START_MEMBER(divebomb_state,divebomb)
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(divebomb_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_scrolly(0, 16);
+}
+
+
+
+/*************************************
+ *
+ *  Main update
+ *
+ *************************************/
+
+void divebomb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const uint8_t *spriteram = m_spriteram;
+
+	for (uint32_t i = 0; i < m_spriteram.bytes(); i += 4)
+	{
+		uint32_t sy = spriteram[i + 3];
+		uint32_t sx = spriteram[i + 0];
+		uint32_t code = spriteram[i + 2];
+		uint32_t attr = spriteram[i + 1];
+
+		code += (attr & 0x0f) << 8;
+
+		uint32_t colour = attr >> 4;
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, colour, 0, 0, sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, colour, 0, 0, sx, sy-256, 0);
+	}
+}
+
+
+uint32_t divebomb_state::screen_update_divebomb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_roz_1->set_wrap(roz1_wrap);
+	m_roz_2->set_wrap(roz2_wrap);
+
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+#if 0
+	if (roz2_enable)
+		m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 0);
+
+	if (roz1_enable)
+		m_k051316_1->zoom_draw(screen, bitmap, cliprect, 0, 0);
+#endif
+
+	draw_sprites(bitmap, cliprect);
+
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
 
 
 
@@ -229,8 +478,8 @@ WRITE8_MEMBER(divebomb_state::spritecpu_port00_w)
 static ADDRESS_MAP_START( divebomb_rozcpu_map, AS_PROGRAM, 8, divebomb_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_DEVREADWRITE("k051316_1", k051316_device, read, write)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_DEVREADWRITE("k051316_2", k051316_device, read, write)
+	AM_RANGE(0xc000, 0xc7ff) AM_DEVREADWRITE("roz_1", k051316_device, vram_r, vram_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_DEVREADWRITE("roz_2", k051316_device, vram_r, vram_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -242,8 +491,8 @@ static ADDRESS_MAP_START( divebomb_rozcpu_iomap, AS_IO, 8, divebomb_state )
 	AM_RANGE(0x12, 0x12) AM_WRITE(rozcpu_enable1_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(rozcpu_enable2_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE(rozcpu_wrap1_enable_w)
-	AM_RANGE(0x20, 0x2f) AM_DEVWRITE("k051316_1", k051316_device, ctrl_w)
-	AM_RANGE(0x30, 0x3f) AM_DEVWRITE("k051316_2", k051316_device, ctrl_w)
+	AM_RANGE(0x20, 0x2f) AM_DEVICE("roz_1", k051316_device, map)
+	AM_RANGE(0x30, 0x3f) AM_DEVICE("roz_2", k051316_device, map)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(rozcpu_comm_r, rozcpu_comm_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(rozcpu_pal_w)
 ADDRESS_MAP_END
@@ -464,19 +713,8 @@ static MACHINE_CONFIG_START( divebomb )
 
 	MCFG_QUANTUM_PERFECT_CPU("fgcpu")
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(8)
-	MCFG_K051316_WRAP(0)
-	MCFG_K051316_OFFSETS(-88, -16)
-	MCFG_K051316_CB(divebomb_state, zoom_callback_1)
-
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(8)
-	MCFG_K051316_WRAP(0)
-	MCFG_K051316_OFFSETS(-88, -16)
-	MCFG_K051316_CB(divebomb_state, zoom_callback_2)
+	MCFG_K051316_ADD("roz_1", 8, false, [](u32 address, u32 &code, u16 &color) { code = address & 0x03ffff; color = 0; })
+	MCFG_K051316_ADD("roz_2", 8, false, [](u32 address, u32 &code, u16 &color) { code = address & 0x03ffff; color = 0; })
 
 	MCFG_MACHINE_START_OVERRIDE(divebomb_state, divebomb)
 	MCFG_MACHINE_RESET_OVERRIDE(divebomb_state, divebomb)

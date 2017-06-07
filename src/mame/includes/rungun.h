@@ -24,13 +24,13 @@ public:
 		m_k054539_1(*this, "k054539_1"),
 		m_k054539_2(*this, "k054539_2"),
 		m_k053936(*this, "k053936"),
-		m_k055673(*this, "k055673"),
-		m_k053252(*this, "k053252"),
+		m_sprites(*this, "sprites"),
+		m_video_timings(*this, "video_timings"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_palette2(*this, "palette2"),
 		m_screen(*this, "screen"),
-		m_k054321(*this, "k054321"),
+		m_soundctrl(*this, "soundctrl"),
 		m_sysreg(*this, "sysreg")
 	{ }
 
@@ -40,13 +40,13 @@ public:
 	required_device<k054539_device> m_k054539_1;
 	required_device<k054539_device> m_k054539_2;
 	required_device<k053936_device> m_k053936;
-	required_device<k055673_device> m_k055673;
-	required_device<k053252_device> m_k053252;
+	required_device<k053246_055673_device> m_sprites;
+	required_device<k053252_device> m_video_timings;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<palette_device> m_palette2;
 	required_device<screen_device> m_screen;
-	required_device<k054321_device> m_k054321;
+	required_device<k054321_device> m_soundctrl;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_sysreg;
@@ -94,18 +94,10 @@ public:
 	DECLARE_WRITE16_MEMBER(palette_write);
 
 
-	K055673_CB_MEMBER(sprite_callback);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	uint32_t screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	bitmap_ind16 m_rng_dual_demultiplex_left_temp;
 	bitmap_ind16 m_rng_dual_demultiplex_right_temp;
-	void   sprite_dma_trigger(void);
 
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
 };

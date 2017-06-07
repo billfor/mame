@@ -77,32 +77,11 @@ Notes:
 
 ****************************************************************************
 
-Change Log
-----------
-
-(ATXXXX03)
-
-Hooked up missing memory handler, emulated object DMA, revised IRQ,
-rewrote the K053250(LVC) effect generator, ported tilemaps to use the
-K056832 emulation(the K054157 is a complete subset of the K056832),
-corrected a few K054539 PCM chip misbehaviors, etc.
-
-
 The following bugs appear to be fixed:
 
 General:
 
 - game doesn't slow down like the arcade
-    IRQ 5 is the "OBJDMA end interrupt" and shouldn't be triggered
-    if DMA didn't complete within the frame.
-
-    * game speed may not be 100% correct but close to that on the
-    Gamest video especially in stage 6. Xexex is 384x256 which suggests
-    an 8Mhz horizontal dotclock and DMA delay can range up to 32.0us(clear)
-    + 256.0us(transfer). Increase XE_DMADELAY if emulation runs faster
-    than the original or use cheat to overclock CPU 0 if you prefer faster
-    gameplay.
-
 - sprite lag, dithering, flicking (DMA)
 - line effects go out of sync (K053250 also does DMA)
 - inconsistent reverb (maths bug)
@@ -132,123 +111,269 @@ Unresolved Issues:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/xexex.h"
 #include "includes/konamipt.h"
-
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/k053252.h"
+#include "machine/k054321.h"
 #include "sound/flt_vol.h"
 #include "sound/k054539.h"
 #include "sound/ym2151.h"
+#include "video/k053246_k053247_k055673.h"
+#include "video/k053250.h"
+#include "video/k053251.h"
+#include "video/k054156_k054157_k056832.h"
+#include "video/k054338.h"
 #include "speaker.h"
 
-
-#define XE_DEBUG      0
-#define XE_SKIPIDLE   1
-#define XE_DMADELAY   attotime::from_usec(256)
-
-#if 0 // (for reference; do not remove)
-
-/* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
-/* of RAM, but they put 0x8000 there. The CPU can access them all. Address lines */
-/* A1, A5 and A6 don't go to the 053247. */
-READ16_MEMBER(xexex_state::k053247_scattered_word_r)
+class xexex_state : public driver_device, public flow_render::interface
 {
-	if (offset & 0x0031)
-		return m_spriteram[offset];
-	else
-	{
-		offset = ((offset & 0x000e) >> 1) | ((offset & 0x3fc0) >> 3);
-		return k053247_word_r(m_k053246, offset, mem_mask);
+public:
+	xexex_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		flow_render::interface(mconfig, *this),
+		m_workram(*this, "workram"),
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k054539(*this, "k054539"),
+		m_filter1l(*this, "filter1l"),
+		m_filter1r(*this, "filter1r"),
+		m_filter2l(*this, "filter2l"),
+		m_filter2r(*this, "filter2r"),
+		m_tilemap(*this, "tilemap"),
+		m_sprites(*this, "sprites"),
+		m_lvc(*this, "lvc"),
+		m_mixer(*this, "mixer"),
+		m_video_timings(*this, "video_timings"),
+		m_blender(*this, "blender"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_soundctrl(*this, "soundctrl") { }
+
+	/* memory pointers */
+	required_shared_ptr<u16> m_workram;
+	required_shared_ptr<u16> m_spriteram;
+
+	/* video-related */
+	bool m_chenmix;
+	flow_render::renderer *m_renderer_prefilter[2], *m_renderer_postfilter;
+	flow_render::input_sb_u16 *m_renderer_input_prefilter[2];
+	flow_render::input_sb_u16 *m_renderer_input_postfilter[5];
+	flow_render::output_sb_u16 *m_renderer_output_prefilter[2];
+	flow_render::output_sb_u16 *m_renderer_output_postfilter[4];
+
+	/* misc */
+	u16 m_cur_control2;
+	u16 m_cur_interrupt;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k054539_device> m_k054539;
+	required_device<filter_volume_device> m_filter1l;
+	required_device<filter_volume_device> m_filter1r;
+	required_device<filter_volume_device> m_filter2l;
+	required_device<filter_volume_device> m_filter2r;
+	required_device<k054156_054157_device> m_tilemap;
+	required_device<k053246_053247_device> m_sprites;
+	required_device<k053250_device> m_lvc;
+	required_device<k053251_device> m_mixer;
+	required_device<k053252_device> m_video_timings;
+	required_device<k054338_device> m_blender;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_device<k054321_device> m_soundctrl;
+
+	DECLARE_WRITE_LINE_MEMBER(objdma_w);
+	DECLARE_WRITE_LINE_MEMBER(whatever_w);
+
+	DECLARE_READ16_MEMBER(control2_r);
+	DECLARE_WRITE16_MEMBER(control2_w);
+	DECLARE_WRITE16_MEMBER(sound_irq_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_DRIVER_INIT(xexex);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	K054539_CB_MEMBER(ym_set_mixing);
+
+	void flow_render_register_renderers() override;
+	void update_irq();
+	void sprites_wiring(u32 output, u16 &color, u16 &attr);
+	offs_t sprites_remap(offs_t offset);
+	void fr_setup(flow_render::manager *manager);
+	void render_prefilter(bool render_front, const rectangle &cliprect);
+	void render_postfilter(const rectangle &cliprect);
+};
+
+void xexex_state::fr_setup(flow_render::manager *manager)
+{
+	auto rb  = m_blender->flow_render_get_renderer();
+	auto rm1 = m_mixer  ->flow_render_get_renderer();
+	auto rm2 = m_mixer  ->flow_render_get_renderer("secondary");
+	auto rs  = m_sprites->flow_render_get_renderer();
+	auto rl  = m_lvc    ->flow_render_get_renderer();
+
+	manager->connect(rs->out("color"), rm1->inp("0 color"));
+	manager->connect(rs->out("color"), rm2->inp("0 color"));
+	manager->connect(rs->out("attr"),  rm1->inp("0 attr"));
+	manager->connect(rs->out("attr"),  rm2->inp("0 attr"));
+	manager->connect(rl->out("color"), rm1->inp("1 color"));
+	manager->connect(rl->out("color"), rm2->inp("1 color"));
+	manager->connect(rl->out("attr"),  rm1->inp("1 attr"));
+	manager->connect(rl->out("attr"),  rm2->inp("1 attr"));
+
+	manager->connect(m_tilemap->flow_render_get_renderer("b")->out(), m_renderer_input_prefilter[0]);
+	manager->connect(m_tilemap->flow_render_get_renderer("b")->out(), m_renderer_input_prefilter[1]);
+	manager->connect(m_renderer_output_prefilter[0], rm1->inp("2 color"));
+	manager->connect(m_renderer_output_prefilter[1], rm2->inp("2 color"));
+
+	manager->set_constant(rm1->inp("2 attr"), 0);
+	manager->set_constant(rm2->inp("2 attr"), 0);
+	manager->connect(m_tilemap->flow_render_get_renderer("c")->out(), rm1->inp("3 color"));
+	manager->connect(m_tilemap->flow_render_get_renderer("c")->out(), rm2->inp("3 color"));
+	manager->connect(m_tilemap->flow_render_get_renderer("d")->out(), rm1->inp("4 color"));
+	manager->connect(m_tilemap->flow_render_get_renderer("d")->out(), rm2->inp("4 color"));
+
+	manager->connect(rm1->out("color"), m_renderer_input_postfilter[0]);
+	manager->connect(rm1->out("attr"),  m_renderer_input_postfilter[1]);
+	manager->connect(rm2->out("color"), m_renderer_input_postfilter[2]);
+	manager->connect(rm2->out("attr"),  m_renderer_input_postfilter[3]);
+	manager->connect(m_tilemap->flow_render_get_renderer("a")->out(), m_renderer_input_postfilter[4]);
+
+	manager->connect(m_renderer_output_postfilter[0], rb->inp("0 color"));
+	manager->connect(m_renderer_output_postfilter[1], rb->inp("0 attr"));
+	manager->connect(m_renderer_output_postfilter[2], rb->inp("1 color"));
+	manager->connect(m_renderer_output_postfilter[3], rb->inp("1 attr"));
+
+	manager->connect(rb->out(), m_screen->flow_render_get_renderer()->inp());
+}
+
+void xexex_state::flow_render_register_renderers()
+{
+	for(int i=0; i<2; i++) {
+		bool render_front = i == 0;
+		m_renderer_prefilter[i] = flow_render_create_renderer([this, render_front](const rectangle &cliprect){ render_prefilter(render_front, cliprect); }, i ? "back" : "front");
+		m_renderer_input_prefilter[i] = m_renderer_prefilter[i]->create_input_sb_u16();
+		m_renderer_output_prefilter[i] = m_renderer_prefilter[i]->create_output_sb_u16();
+	}
+
+	static const char *const io_names[] = { "fc", "fa", "bc", "ba", "tc" };
+	m_renderer_postfilter = flow_render_create_renderer([this](const rectangle &cliprect){ render_postfilter(cliprect); }, "post");
+	for(int i=0; i<5; i++) {
+		m_renderer_input_postfilter[i] = m_renderer_postfilter->create_input_sb_u16(io_names[i]);
+		if(i != 4)
+			m_renderer_output_postfilter[i] = m_renderer_postfilter->create_output_sb_u16(io_names[i]);
 	}
 }
 
-WRITE16_MEMBER(xexex_state::k053247_scattered_word_w)
+void xexex_state::render_prefilter(bool render_front, const rectangle &cliprect)
 {
-	if (offset & 0x0031)
-		COMBINE_DATA(m_spriteram + offset);
-	else
-	{
-		offset = ((offset & 0x000e) >> 1) | ((offset & 0x3fc0) >> 3);
-		k053247_word_w(m_k053246, offset, data, mem_mask);
-	}
-}
-
-#endif
-
-
-void xexex_state::xexex_objdma( int limiter )
-{
-	int counter, num_inactive;
-	uint16_t *src, *dst;
-
-	counter = m_frame;
-	m_frame = m_screen->frame_number();
-	if (limiter && counter == m_frame)
-		return; // make sure we only do DMA transfer once per frame
-
-	m_k053246->k053247_get_ram( &dst);
-	counter = m_k053246->k053247_get_dy();
-	src = m_spriteram;
-	num_inactive = counter = 256;
-
-	do
-	{
-		if (*src & 0x8000)
-		{
-			dst[0] = src[0x0];  dst[1] = src[0x2];
-			dst[2] = src[0x4];  dst[3] = src[0x6];
-			dst[4] = src[0x8];  dst[5] = src[0xa];
-			dst[6] = src[0xc];  dst[7] = src[0xe];
-			dst += 8;
-			num_inactive--;
+	bitmap_ind16 &inp = m_renderer_input_prefilter [render_front ? 0 : 1]->bitmap();
+	bitmap_ind16 &out = m_renderer_output_prefilter[render_front ? 0 : 1]->bitmap();
+	if(render_front != m_chenmix) {
+		for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
+			const u16 *ci = &inp.pix16(y, cliprect.min_x);
+			u16 *co = &out.pix16(y, cliprect.min_x);
+			for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
+				u16 col = *ci++;
+				*co++ = col & 0x100 ? col & 0x1f0 : col;
+			}
 		}
-		src += 0x40;
+	} else {
+		for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
+			const u16 *ci = &inp.pix16(y, cliprect.min_x);
+			u16 *co = &out.pix16(y, cliprect.min_x);
+			memcpy(co, ci, (cliprect.max_x - cliprect.min_x + 1)*2);
+		}
 	}
-	while (--counter);
-
-	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
 }
 
-READ16_MEMBER(xexex_state::spriteram_mirror_r)
+void xexex_state::render_postfilter(const rectangle &cliprect)
 {
-	return m_spriteram[offset];
-}
+	bitmap_ind16 &fci = m_renderer_input_postfilter[0]->bitmap();
+	bitmap_ind16 &fai = m_renderer_input_postfilter[1]->bitmap();
+	bitmap_ind16 &bci = m_renderer_input_postfilter[2]->bitmap();
+	bitmap_ind16 &bai = m_renderer_input_postfilter[3]->bitmap();
+	bitmap_ind16 &tci = m_renderer_input_postfilter[4]->bitmap();
 
-WRITE16_MEMBER(xexex_state::spriteram_mirror_w)
-{
-	COMBINE_DATA(m_spriteram + offset);
-}
+	bitmap_ind16 &fco = m_renderer_output_postfilter[0]->bitmap();
+	bitmap_ind16 &fao = m_renderer_output_postfilter[1]->bitmap();
+	bitmap_ind16 &bco = m_renderer_output_postfilter[2]->bitmap();
+	bitmap_ind16 &bao = m_renderer_output_postfilter[3]->bitmap();
 
-READ16_MEMBER(xexex_state::xexex_waitskip_r)
-{
-	if (space.device().safe_pc() == 0x1158)
-	{
-		space.device().execute().spin_until_trigger(m_resume_trigger);
-		m_suspension_active = 1;
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
+		const u16 *fcip = &fci.pix16(y, cliprect.min_x);
+		const u16 *faip = &fai.pix16(y, cliprect.min_x);
+		const u16 *bcip = &bci.pix16(y, cliprect.min_x);
+		const u16 *baip = &bai.pix16(y, cliprect.min_x);
+		const u16 *tcip = &tci.pix16(y, cliprect.min_x);
+
+		u16 *fcop = &fco.pix16(y, cliprect.min_x);
+		u16 *faop = &fao.pix16(y, cliprect.min_x);
+		u16 *bcop = &bco.pix16(y, cliprect.min_x);
+		u16 *baop = &bao.pix16(y, cliprect.min_x);
+
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
+			u16 tcol = *tcip++;
+			if(tcol & 0xf) {
+				*faop++ = *baop++ = 0x8000;
+				*fcop++ = *bcop++ = tcol | 0x700;
+				fcip++;
+				faip++;
+				bcip++;
+				baip++;
+			} else {
+				u16 fc = *fcop++ = *fcip++;
+				u16 bc = *bcop++ = *bcip++;
+				*faop++ = *faip++ | ((fc & 0x700) == 0x100 ? 0x10 : 0);
+				*baop++ = *baip++ | ((bc & 0x700) == 0x100 ? 0x10 : 0);
+			}
+		}
 	}
+}
 
-	return m_workram[0x14/2];
+WRITE_LINE_MEMBER(xexex_state::objdma_w)
+{
+	// Unclear, possibly correct
+	whatever_w(state);
+
+	if(state)
+		m_cur_interrupt |=  0x0020;
+	else
+		m_cur_interrupt &= ~0x0020;
+	update_irq();
+}
+
+WRITE_LINE_MEMBER(xexex_state::whatever_w)
+{
+	if(state)
+		m_cur_interrupt |=  0x0040;
+	else
+		m_cur_interrupt &= ~0x0040;
+	update_irq();
+}
+
+void xexex_state::sprites_wiring(u32 output, u16 &color, u16 &attr)
+{
+	color = output & 0x1ff;
+	attr  = ((output & 0xc000) >> 6) | ((output & 0x3e00) >> 8);
+}
+
+offs_t xexex_state::sprites_remap(offs_t offset)
+{
+	return ((offset & 0x00e) << 1) | ((offset & 0xff0) << 3);
 }
 
 
-void xexex_state::parse_control2(  )
+void xexex_state::update_irq()
 {
-	/* bit 0  is data */
-	/* bit 1  is cs (active low) */
-	/* bit 2  is clock (active high) */
-	/* bit 5  is enable irq 6 */
-	/* bit 6  is enable irq 5 */
-	/* bit 11 is watchdog */
-	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
+	u16 active = m_cur_control2 & m_cur_interrupt;
 
-	/* bit 8 = enable sprite ROM reading */
-	m_k053246->k053246_set_objcha_line( (m_cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
-
-	/* bit 9 = disable alpha channel on K054157 plane 0 (under investigation) */
-	m_cur_alpha = !(m_cur_control2 & 0x200);
+	m_maincpu->set_input_line(6, active & 0x0020 ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(5, active & 0x0040 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ16_MEMBER(xexex_state::control2_r)
@@ -259,7 +384,21 @@ READ16_MEMBER(xexex_state::control2_r)
 WRITE16_MEMBER(xexex_state::control2_w)
 {
 	COMBINE_DATA(&m_cur_control2);
-	parse_control2();
+
+	/* bit 0  is data */
+	/* bit 1  is cs (active low) */
+	/* bit 2  is clock (active high) */
+	/* bit 5  is enable irq 6 (?) */
+	/* bit 6  is enable irq 5 (objdma) */
+	/* bit 8 = enable sprite ROM reading */
+	/* bit 9 = mix/tilemap b alpha invert */
+	/* bit 11 is watchdog */
+
+	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
+	m_sprites->set_objcha(m_cur_control2 & 0x0100);
+	m_chenmix = m_cur_control2 & 0x200;
+
+	update_irq();
 }
 
 WRITE16_MEMBER(xexex_state::sound_irq_w)
@@ -280,101 +419,31 @@ K054539_CB_MEMBER(xexex_state::ym_set_mixing)
 	m_filter2r->flt_volume_set_volume((71.0 * right) / 55.0);
 }
 
-TIMER_CALLBACK_MEMBER(xexex_state::dmaend_callback)
-{
-	if (m_cur_control2 & 0x0040)
-	{
-		// foul-proof (CPU0 could be deactivated while we wait)
-		if (m_suspension_active)
-		{
-			m_suspension_active = 0;
-			machine().scheduler().trigger(m_resume_trigger);
-		}
-
-		// IRQ 5 is the "object DMA end interrupt" and shouldn't be triggered
-		// if object data isn't ready for DMA within the frame.
-		m_maincpu->set_input_line(5, HOLD_LINE);
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(xexex_state::xexex_interrupt)
-{
-	int scanline = param;
-
-	if (m_suspension_active)
-	{
-		m_suspension_active = 0;
-		machine().scheduler().trigger(m_resume_trigger);
-	}
-
-	if(scanline == 0)
-	{
-		// IRQ 6 is for test mode only
-			if (m_cur_control2 & 0x0020)
-				m_maincpu->set_input_line(6, HOLD_LINE);
-	}
-
-	/* TODO: vblank is at 256! (enable CCU then have fun in fixing offsetted layers) */
-	if(scanline == 128)
-	{
-		if (m_k053246->k053246_is_irq_enabled())
-		{
-			// OBJDMA starts at the beginning of V-blank
-			xexex_objdma(0);
-
-			// schedule DMA end interrupt
-			m_dmadelay_timer->adjust(XE_DMADELAY);
-		}
-
-		// IRQ 4 is the V-blank interrupt. It controls color, sound and
-		// vital game logics that shouldn't be interfered by frame-drop.
-		if (m_cur_control2 & 0x0800)
-			m_maincpu->set_input_line(4, HOLD_LINE);
-	}
-}
-
-
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xexex_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("workram")         // work RAM
-
-#if XE_SKIPIDLE
-	AM_RANGE(0x080014, 0x080015) AM_READ(xexex_waitskip_r)              // helps sound CPU by giving back control as early as possible
-#endif
-
-	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("spriteram")           // K053247 sprite RAM
-	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(spriteram_mirror_r, spriteram_mirror_w)   // K053247 sprite RAM mirror read
-	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_device, word_w)              // VACSET (K054157)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)              // OBJSET1
-	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)               // Passthrough to sprite roms
-	AM_RANGE(0x0c6000, 0x0c7fff) AM_DEVREADWRITE("k053250", k053250_device, ram_r, ram_w)    // K053250 "road" RAM
-	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE("k053250", k053250_device, reg_r, reg_w)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_device, word_w)              // CLTC
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_device, lsb_w)               // priority encoder
-//  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                // CCU
+	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_MIRROR(0x8000) AM_SHARE("spriteram")
+	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVICE("tilemap", k054156_054157_device, vacset)
+	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVICE("sprites", k053246_053247_device, objset1)
+	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD("sprites", k053246_053247_device, rom16_r)
+	AM_RANGE(0x0c6000, 0x0c7fff) AM_RAM AM_SHARE("lvcram")
+	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVICE8("lvc", k053250_device, map, 0x00ff)
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVICE("blender", k054338_device, map)
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVICE8("mixer", k053251_device, map, 0x00ff)
+	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVICE8("video_timings", k053252_device, map, 0x00ff)
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x0d6000, 0x0d601f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
-	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE("k056832", k056832_device, b_word_w)                // VSCCS regs
+	AM_RANGE(0x0d6000, 0x0d601f) AM_DEVICE8("soundctrl", k054321_device, main_map, 0x00ff)
+	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVICE("tilemap", k054156_054157_device, vsccs)
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x180000, 0x181fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)       // Passthrough to tile roms
-	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD("k053250", k053250_device, rom_r)
+	AM_RANGE(0x180000, 0x181fff) AM_MIRROR(0x2000) AM_DEVREADWRITE("tilemap", k054156_054157_device, vram16_r, vram16_w)
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD("tilemap", k054156_054157_device, rom16_r)
+	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD("lvc", k053250_device, rom_r)
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-
-#if XE_DEBUG
-	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD("k056832", k056832_device, word_r)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVREAD("k053246", k053247_device, k053246_reg_word_r)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVREAD("k054338", k054338_device, word_r)
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVREAD("k053251", k053251_device, lsb_r)
-	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVREAD("k056832", k056832_device, b_word_r)
-#endif
-
 ADDRESS_MAP_END
 
 
@@ -384,7 +453,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xexex_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf000, 0xf003) AM_DEVICE("k054321", k054321_device, sound_map)
+	AM_RANGE(0xf000, 0xf003) AM_DEVICE("soundctrl", k054321_device, sound_map)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -420,49 +489,23 @@ static INPUT_PORTS_START( xexex )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
 INPUT_PORTS_END
 
-
-
-void xexex_state::xexex_postload()
-{
-	parse_control2();
-}
-
 void xexex_state::machine_start()
 {
 	membank("z80bank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 	membank("z80bank")->set_entry(0);
 
-	save_item(NAME(m_cur_alpha));
-	save_item(NAME(m_sprite_colorbase));
-	save_item(NAME(m_layer_colorbase));
-	save_item(NAME(m_layerpri));
-
-	save_item(NAME(m_suspension_active));
-	save_item(NAME(m_frame));
-
+	save_item(NAME(m_chenmix));
 	save_item(NAME(m_cur_control2));
-	machine().save().register_postload(save_prepost_delegate(FUNC(xexex_state::xexex_postload), this));
-
-	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xexex_state::dmaend_callback),this));
+	save_item(NAME(m_cur_interrupt));
 }
 
 void xexex_state::machine_reset()
 {
-	int i;
-
-	for (i = 0; i < 4; i++)
-	{
-		m_layerpri[i] = 0;
-		m_layer_colorbase[i] = 0;
-	}
-
-	m_sprite_colorbase = 0;
-
 	m_cur_control2 = 0;
-	m_suspension_active = 0;
-	m_resume_trigger = 1000;
-	m_frame = -1;
+	m_cur_interrupt = 0;
+	m_chenmix = false;
 	m_k054539->init_flags(k054539_device::REVERSE_STEREO);
+	update_irq();
 }
 
 static MACHINE_CONFIG_START( xexex )
@@ -470,7 +513,6 @@ static MACHINE_CONFIG_START( xexex )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // 16MHz
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xexex_state, xexex_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/4) // Z80E 8Mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -480,42 +522,40 @@ static MACHINE_CONFIG_START( xexex )
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
+	MCFG_FLOW_RENDER_MANAGER_ADD("fr_manager")
+	MCFG_FLOW_RENDER_MANAGER_SETUP(":", xexex_state, fr_setup)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-//  MCFG_SCREEN_REFRESH_RATE(XTAL_32MHz/4/512/288)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255) // 8Mhz horizontal dotclock
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 0, 0+256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xexex_state, screen_update_xexex)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4, 512, 56, 56+384, 289, 15, 15+256)
+	MCFG_SCREEN_FLOW_RENDER_RGB()
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(xexex_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	MCFG_K054156_054157_ADD("tilemap", XTAL_32MHz/4, 2, 4, 24)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(xexex_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48, 32)
-	MCFG_K053246_PALETTE("palette")
+	MCFG_K053246_053247_ADD("sprites", XTAL_32MHz/4, "spriteram")
+	MCFG_K053246_053247_WIRING_CB(xexex_state, sprites_wiring)
+	MCFG_K053246_053247_DMA_REMAP_CB(xexex_state, sprites_remap)
+	MCFG_K053246_053247_DMAIRQ_CB(WRITELINE(xexex_state, objdma_w))
 
-	MCFG_K053250_ADD("k053250", "palette", "screen", -5, -16)
+	MCFG_K053250_ADD("lvc", XTAL_32MHz/4, ":lvcram")
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("mixer", 0)
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
+	MCFG_DEVICE_ADD("video_timings", K053252, XTAL_32MHz/4)
+	MCFG_K053252_INT1_CB(INPUTLINE("maincpu", 4))
+	MCFG_K053252_VBLANK_CB(DEVWRITELINE(":sprites", k053246_053247_device, vblank_w))
+	MCFG_K053252_KSNOTIFIER_CB(DEVKSNOTIFIER(":tilemap", k054156_054157_device, ksnotifier_w))
+	MCFG_KSNOTIFIER_CHAIN(DEVKSNOTIFIER(":sprites", k053246_053247_device, ksnotifier_w))
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	MCFG_K054338_ADD("blender", "palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	MCFG_K054321_ADD("soundctrl", ":lspeaker", ":rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "filter1l", 0.50)
@@ -551,17 +591,17 @@ ROM_START( xexex ) /* Europe, Version AA */
 	ROM_REGION( 0x020000, "audiocpu", 0 )
 	ROM_LOAD( "067eaa05.4e", 0x000000, 0x020000, CRC(0e33d6ec) SHA1(4dd68cb78c779e2d035e43fec35a7672ed1c259b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
-	ROM_LOAD32_WORD( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
+	ROM_LOAD32_WORD_SWAP( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD64_WORD( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
-	ROM_LOAD64_WORD( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
-	ROM_LOAD64_WORD( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
-	ROM_LOAD64_WORD( "067b09.22n",  0x000006, 0x100000, CRC(88f072ef) SHA1(7ecc04dbcc29b715117e970cc96e11137a21b83a) )
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
+	ROM_LOAD64_WORD_SWAP( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
+	ROM_LOAD64_WORD_SWAP( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
+	ROM_LOAD64_WORD_SWAP( "067b09.22n",  0x000006, 0x100000, CRC(88f072ef) SHA1(7ecc04dbcc29b715117e970cc96e11137a21b83a) )
 
-	ROM_REGION( 0x080000, "k053250", 0 )
+	ROM_REGION( 0x080000, "lvc", 0 )
 	ROM_LOAD( "067b08.22f",  0x000000, 0x080000, CRC(ca816b7b) SHA1(769ce3700e41200c34adec98598c0fe371fe1e6d) )
 
 	ROM_REGION( 0x300000, "k054539", 0 )
@@ -584,17 +624,17 @@ ROM_START( orius ) /* USA, Version AA */
 	ROM_REGION( 0x020000, "audiocpu", 0 )
 	ROM_LOAD( "067uaa05.4e", 0x000000, 0x020000, CRC(0e33d6ec) SHA1(4dd68cb78c779e2d035e43fec35a7672ed1c259b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
-	ROM_LOAD32_WORD( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
+	ROM_LOAD32_WORD_SWAP( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD64_WORD( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
-	ROM_LOAD64_WORD( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
-	ROM_LOAD64_WORD( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
-	ROM_LOAD64_WORD( "067b09.22n",  0x000006, 0x100000, CRC(88f072ef) SHA1(7ecc04dbcc29b715117e970cc96e11137a21b83a) )
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
+	ROM_LOAD64_WORD_SWAP( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
+	ROM_LOAD64_WORD_SWAP( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
+	ROM_LOAD64_WORD_SWAP( "067b09.22n",  0x000006, 0x100000, CRC(88f072ef) SHA1(7ecc04dbcc29b715117e970cc96e11137a21b83a) )
 
-	ROM_REGION( 0x080000, "k053250", 0 )
+	ROM_REGION( 0x080000, "lvc", 0 )
 	ROM_LOAD( "067b08.22f",  0x000000, 0x080000, CRC(ca816b7b) SHA1(769ce3700e41200c34adec98598c0fe371fe1e6d) )
 
 	ROM_REGION( 0x300000, "k054539", 0 )
@@ -615,17 +655,17 @@ ROM_START( xexexa ) /* Asia, Version AA */
 	ROM_REGION( 0x020000, "audiocpu", 0 )
 	ROM_LOAD( "067eaa05.4e", 0x000000, 0x020000, CRC(0e33d6ec) SHA1(4dd68cb78c779e2d035e43fec35a7672ed1c259b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
-	ROM_LOAD32_WORD( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
+	ROM_LOAD32_WORD_SWAP( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD64_WORD( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
-	ROM_LOAD64_WORD( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
-	ROM_LOAD64_WORD( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
-	ROM_LOAD64_WORD( "067b09.22n",  0x000006, 0x100000, CRC(88f072ef) SHA1(7ecc04dbcc29b715117e970cc96e11137a21b83a) )
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
+	ROM_LOAD64_WORD_SWAP( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
+	ROM_LOAD64_WORD_SWAP( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
+	ROM_LOAD64_WORD_SWAP( "067b09.22n",  0x000006, 0x100000, CRC(88f072ef) SHA1(7ecc04dbcc29b715117e970cc96e11137a21b83a) )
 
-	ROM_REGION( 0x080000, "k053250", 0 )
+	ROM_REGION( 0x080000, "lvc", 0 )
 	ROM_LOAD( "067b08.22f",  0x000000, 0x080000, CRC(ca816b7b) SHA1(769ce3700e41200c34adec98598c0fe371fe1e6d) )
 
 	ROM_REGION( 0x300000, "k054539", 0 )
@@ -646,17 +686,17 @@ ROM_START( xexexj ) /* Japan, Version AA */
 	ROM_REGION( 0x020000, "audiocpu", 0 )
 	ROM_LOAD( "067jaa05.4e", 0x000000, 0x020000, CRC(2f4dd0a8) SHA1(bfa76c9c968f1beba648a2911510e3d666a8fe3a) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
-	ROM_LOAD32_WORD( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_WORD_SWAP( "067b14.1n",   0x000000, 0x100000, CRC(02a44bfa) SHA1(ad95df4dbf8842820ef20f54407870afb6d0e4a3) )
+	ROM_LOAD32_WORD_SWAP( "067b13.2n",   0x000002, 0x100000, CRC(633c8eb5) SHA1(a11f78003a1dffe2d8814d368155059719263082) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )
-	ROM_LOAD64_WORD( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
-	ROM_LOAD64_WORD( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
-	ROM_LOAD64_WORD( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
-	ROM_LOAD64_WORD( "067b09.22n",  0x000006, 0x100000, CRC(88f072ef) SHA1(7ecc04dbcc29b715117e970cc96e11137a21b83a) )
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD64_WORD_SWAP( "067b12.17n",  0x000000, 0x100000, CRC(08d611b0) SHA1(9cac60131e0411f173acd8ef3f206e5e58a7e5d2) )
+	ROM_LOAD64_WORD_SWAP( "067b11.19n",  0x000002, 0x100000, CRC(a26f7507) SHA1(6bf717cb9fcad59a2eafda967f14120b9ebbc8c5) )
+	ROM_LOAD64_WORD_SWAP( "067b10.20n",  0x000004, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
+	ROM_LOAD64_WORD_SWAP( "067b09.22n",  0x000006, 0x100000, CRC(88f072ef) SHA1(7ecc04dbcc29b715117e970cc96e11137a21b83a) )
 
-	ROM_REGION( 0x080000, "k053250", 0 )
+	ROM_REGION( 0x080000, "lvc", 0 )
 	ROM_LOAD( "067b08.22f",  0x000000, 0x080000, CRC(ca816b7b) SHA1(769ce3700e41200c34adec98598c0fe371fe1e6d) )
 
 	ROM_REGION( 0x300000, "k054539", 0 )
@@ -670,15 +710,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(xexex_state,xexex)
 {
-	m_strip_0x1a = 0;
-
-	if (!strcmp(machine().system().name, "xexex"))
-	{
-		// Invulnerability
-//      *(uint16_t *)(memregion("maincpu")->base() + 0x648d4) = 0x4a79;
-//      *(uint16_t *)(memregion("maincpu")->base() + 0x00008) = 0x5500;
-		m_strip_0x1a = 1;
-	}
 }
 
 GAME( 1991, xexex,  0,     xexex, xexex, xexex_state, xexex, ROT0, "Konami", "Xexex (ver EAA)", MACHINE_SUPPORTS_SAVE )

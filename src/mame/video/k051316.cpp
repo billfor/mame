@@ -39,111 +39,38 @@ control registers
 #include "emu.h"
 #include "k051316.h"
 
-
-#define VERBOSE 0
-#include "logmacro.h"
-
-
 DEFINE_DEVICE_TYPE(K051316, k051316_device, "k051316", "K051316 PSAC")
 
-
-const gfx_layout k051316_device::charlayout4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-		8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
-};
-
-const gfx_layout k051316_device::charlayout7 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	7,
-	{ 1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128,
-		8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
-	256*8
-};
-
-const gfx_layout k051316_device::charlayout8 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128,
-		8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
-	256*8
-};
-
-
-GFXDECODE_MEMBER( k051316_device::gfxinfo )
-	GFXDECODE_DEVICE(DEVICE_SELF, 0, charlayout4, 0, 1)
-GFXDECODE_END
-
-GFXDECODE_MEMBER( k051316_device::gfxinfo7 )
-	GFXDECODE_DEVICE(DEVICE_SELF, 0, charlayout7, 0, 1)
-GFXDECODE_END
-
-GFXDECODE_MEMBER( k051316_device::gfxinfo8 )
-	GFXDECODE_DEVICE(DEVICE_SELF, 0, charlayout8, 0, 1)
-GFXDECODE_END
-
-GFXDECODE_MEMBER( k051316_device::gfxinfo4_ram )
-	GFXDECODE_DEVICE_RAM(DEVICE_SELF, 0, charlayout4, 0, 1)
-GFXDECODE_END
+DEVICE_ADDRESS_MAP_START(map, 8, k051316_device)
+	AM_RANGE(0x0, 0x0) AM_WRITE(start_x_h_w)
+	AM_RANGE(0x1, 0x1) AM_WRITE(start_x_l_w)
+	AM_RANGE(0x2, 0x2) AM_WRITE(incxx_h_w)
+	AM_RANGE(0x3, 0x3) AM_WRITE(incxx_l_w)
+	AM_RANGE(0x4, 0x4) AM_WRITE(incyx_h_w)
+	AM_RANGE(0x5, 0x5) AM_WRITE(incyx_l_w)
+	AM_RANGE(0x6, 0x6) AM_WRITE(start_y_h_w)
+	AM_RANGE(0x7, 0x7) AM_WRITE(start_y_l_w)
+	AM_RANGE(0x8, 0x8) AM_WRITE(incxy_h_w)
+	AM_RANGE(0x9, 0x9) AM_WRITE(incxy_l_w)
+	AM_RANGE(0xa, 0xa) AM_WRITE(incyy_h_w)
+	AM_RANGE(0xb, 0xb) AM_WRITE(incyy_l_w)
+	AM_RANGE(0xc, 0xc) AM_WRITE(rom_base_h_w)
+	AM_RANGE(0xd, 0xd) AM_WRITE(rom_base_l_w)
+	AM_RANGE(0xe, 0xe) AM_WRITE(mode_w)
+ADDRESS_MAP_END
 
 
 k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K051316, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, gfxinfo),
-		m_zoom_rom(*this, DEVICE_SELF),
-		m_dx(0),
-		m_dy(0),
-		m_wrap(0),
-		m_pixels_per_byte(2), // 4bpp layout is default
-		m_layermask(0)
+	  flow_render::interface(mconfig, *this),
+	  video_latency::interface(mconfig, *this, 0),
+	  m_rom(*this, DEVICE_SELF),
+	  m_ram(*this, DEVICE_SELF)
 {
+	m_wrap = true;
+	m_x_offset = 0;
+	m_y_offset = 0;
 }
-
-void k051316_device::set_bpp(device_t &device, int bpp)
-{
-	k051316_device &dev = downcast<k051316_device &>(device);
-
-	switch(bpp)
-	{
-		case 4:
-			device_gfx_interface::static_set_info(dev, gfxinfo);
-			dev.m_pixels_per_byte = 2;
-			break;
-		case 7:
-			device_gfx_interface::static_set_info(dev, gfxinfo7);
-			dev.m_pixels_per_byte = 1;
-			break;
-		case 8:
-			device_gfx_interface::static_set_info(dev, gfxinfo8);
-			dev.m_pixels_per_byte = 1;
-			break;
-		case -4:
-			device_gfx_interface::static_set_info(dev, gfxinfo4_ram);
-			dev.m_pixels_per_byte = 2;
-			break;
-		default:
-			fatalerror("Unsupported bpp\n");
-	}
-}
-
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -151,31 +78,23 @@ void k051316_device::set_bpp(device_t &device, int bpp)
 
 void k051316_device::device_start()
 {
-	if (!palette().device().started())
-		throw device_missing_dependencies();
-
-	decode_gfx();
-	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
-
-	m_tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k051316_device::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_ram.resize(0x800);
-	memset(&m_ram[0], 0, 0x800);
-
-	if (m_layermask)
-	{
-		m_tmap->map_pens_to_layer(0, 0, 0, TILEMAP_PIXEL_LAYER1);
-		m_tmap->map_pens_to_layer(0, m_layermask, m_layermask, TILEMAP_PIXEL_LAYER0);
+	if(m_ram_based) {
+		if(!m_ram)
+			fatalerror("k051316 %s: shared ram not found\n", tag());
+	} else {
+		if(!m_rom)
+			fatalerror("k051316 %s: rom region not found\n", tag());
 	}
-	else
-		m_tmap->set_transparent_pen(0);
 
-	// bind callbacks
-	m_k051316_cb.bind_relative_to(*owner());
-
-	save_item(NAME(m_ram));
-	save_item(NAME(m_ctrlram));
-	save_item(NAME(m_wrap));
-
+	save_item(NAME(m_tile_ram));
+	save_item(NAME(m_start_x));
+	save_item(NAME(m_start_y));
+	save_item(NAME(m_incxx));
+	save_item(NAME(m_incxy));
+	save_item(NAME(m_incyx));
+	save_item(NAME(m_incyy));
+	save_item(NAME(m_rom_base));
+	save_item(NAME(m_mode));
 }
 
 //-------------------------------------------------
@@ -184,119 +103,231 @@ void k051316_device::device_start()
 
 void k051316_device::device_reset()
 {
-	memset(m_ctrlram, 0, 0x10);
+	std::fill(m_tile_ram.begin(), m_tile_ram.end(), 0);
+	m_start_x = 0;
+	m_start_y = 0;
+	m_incxx = 0;
+	m_incxy = 0;
+	m_incyx = 0;
+	m_incyy = 0;
+	m_rom_base = 0;
+	m_mode = 0;
 }
 
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-READ8_MEMBER( k051316_device::read )
+void k051316_device::set_info(int tile_bpp, bool ram_based, std::function<void (u32 address, u32 &code, u16 &color)> mapper)
 {
-	return m_ram[offset];
+	m_tile_bpp = tile_bpp;
+	m_ram_based = ram_based;
+	m_mapper = mapper;
 }
 
-WRITE8_MEMBER( k051316_device::write )
+WRITE8_MEMBER(k051316_device::start_x_h_w)
 {
-	m_ram[offset] = data;
-	m_tmap->mark_tile_dirty(offset & 0x3ff);
+	m_start_x = (m_start_x & 0xff) | (data << 8);
+	logerror("start_x %04x (%06x)\n", m_start_x, space.device().safe_pc());
+}
+
+WRITE8_MEMBER(k051316_device::start_x_l_w)
+{
+	m_start_x = (m_start_x & 0xff00) | data;
+	logerror("start_x %04x (%06x)\n", m_start_x, space.device().safe_pc());
+}
+
+WRITE8_MEMBER(k051316_device::start_y_h_w)
+{
+	m_start_y = (m_start_y & 0xff) | (data << 8);
+	logerror("start_y %04x (%06x)\n", m_start_y, space.device().safe_pc());
+}
+
+WRITE8_MEMBER(k051316_device::start_y_l_w)
+{
+	m_start_y = (m_start_y & 0xff00) | data;
+	logerror("start_y %04x (%06x)\n", m_start_y, space.device().safe_pc());
+}
+
+WRITE8_MEMBER(k051316_device::incxx_h_w)
+{
+	m_incxx = (m_incxx & 0xff) | (data << 8);
+	logerror("incxx %04x (%06x)\n", m_incxx, space.device().safe_pc());
+}
+
+WRITE8_MEMBER(k051316_device::incxx_l_w)
+{
+	m_incxx = (m_incxx & 0xff00) | data;
+	logerror("incxx %04x (%06x)\n", m_incxx, space.device().safe_pc());
+}
+
+WRITE8_MEMBER(k051316_device::incxy_h_w)
+{
+	m_incxy = (m_incxy & 0xff) | (data << 8);
+	logerror("incxy %04x (%06x)\n", m_incxy, space.device().safe_pc());
+}
+
+WRITE8_MEMBER(k051316_device::incxy_l_w)
+{
+	m_incxy = (m_incxy & 0xff00) | data;
+	logerror("incxy %04x (%06x)\n", m_incxy, space.device().safe_pc());
+}
+
+WRITE8_MEMBER(k051316_device::incyx_h_w)
+{
+	m_incyx = (m_incyx & 0xff) | (data << 8);
+	logerror("incyx %04x (%06x)\n", m_incyx, space.device().safe_pc());
+}
+
+WRITE8_MEMBER(k051316_device::incyx_l_w)
+{
+	m_incyx = (m_incyx & 0xff00) | data;
+	logerror("incyx %04x (%06x)\n", m_incyx, space.device().safe_pc());
+}
+
+WRITE8_MEMBER(k051316_device::incyy_h_w)
+{
+	m_incyy = (m_incyy & 0xff) | (data << 8);
+	logerror("incyy %04x (%06x)\n", m_incyy, space.device().safe_pc());
+}
+
+WRITE8_MEMBER(k051316_device::incyy_l_w)
+{
+	m_incyy = (m_incyy & 0xff00) | data;
+	logerror("incyy %04x (%06x)\n", m_incyy, space.device().safe_pc());
+}
+
+WRITE8_MEMBER(k051316_device::rom_base_h_w)
+{
+	m_rom_base = (m_rom_base & 0xff) | (data << 8);
+}
+
+WRITE8_MEMBER(k051316_device::rom_base_l_w)
+{
+	m_rom_base = (m_rom_base & 0xff00) | data;
+}
+
+WRITE8_MEMBER(k051316_device::mode_w)
+{
+	if(m_mode != data)
+		logerror("mode %02x\n", data);
+	m_mode = data;
+}
+
+READ8_MEMBER (k051316_device::vram_r)
+{
+	if(offset & 0x400)
+		return m_tile_ram[offset & 0x3ff] >> 8;
+	else
+		return m_tile_ram[offset];
+}
+ 
+WRITE8_MEMBER(k051316_device::vram_w)
+{
+	if(offset & 0x400)
+		m_tile_ram[offset & 0x3ff] = (m_tile_ram[offset & 0x3ff] & 0xff) | data << 8;
+	else
+		m_tile_ram[offset] = (m_tile_ram[offset] & 0xff00) | data;
+} 
+
+void k051316_device::flow_render_register_renderers()
+{
+	m_renderer = flow_render_create_renderer([this](const rectangle &cliprect) { render(cliprect); });
+	m_renderer_output = m_renderer->create_output_sb_u16();
 }
 
 
 READ8_MEMBER( k051316_device::rom_r )
 {
-	assert (m_zoom_rom.found());
+	assert(!m_ram_based);
 
-	if ((m_ctrlram[0x0e] & 0x01) == 0)
-	{
-		int addr = offset + (m_ctrlram[0x0c] << 11) + (m_ctrlram[0x0d] << 19);
-		addr /= m_pixels_per_byte;
-		addr &= m_zoom_rom.mask();
-
-		//  popmessage("%s: offset %04x addr %04x", space.machine().describe_context(), offset, addr);
-
-		return m_zoom_rom[addr];
-	}
-	else
-	{
-		//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n", space.machine().describe_context(), offset);
+	if(!(m_mode & 1)) {
+		u32 adr = (m_rom_base << 11) | offset;
+		if(m_tile_bpp == 4)
+			return m_rom[adr >> 1];
+		else
+			return m_rom[adr];
+	} else
 		return 0;
-	}
-}
-
-WRITE8_MEMBER( k051316_device::ctrl_w )
-{
-	m_ctrlram[offset] = data;
-	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", space.machine().describe_context(), data, offset);
 }
 
 // some games (ajax, rollerg, ultraman, etc.) have external logic that can enable or disable wraparound dynamically
-void k051316_device::wraparound_enable( int status )
+void k051316_device::set_wrap(bool wrap)
 {
-	m_wrap = status;
+	m_wrap = wrap;
 }
 
-/***************************************************************************
-
-  Callbacks for the TileMap code
-
-***************************************************************************/
-
-TILE_GET_INFO_MEMBER(k051316_device::get_tile_info)
+void k051316_device::ksnotifier_w(int clk, int hv, int hfp, int hs, int hbp, int vv, int vfp, int vs, int vbp)
 {
-	int code = m_ram[tile_index];
-	int color = m_ram[tile_index + 0x400];
-	int flags = 0;
-
-	m_k051316_cb(&code, &color, &flags);
-
-	SET_TILE_INFO_MEMBER(0,
-							code,
-							color,
-							flags);
+	m_y_offset = 0;
+	m_x_offset = -16 + hbp - video_latency_get();
 }
 
-
-void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority )
+void k051316_device::render(const rectangle &cliprect)
 {
-	uint32_t startx, starty;
-	int incxx, incxy, incyx, incyy;
+	u32 cx = cliprect.min_x + m_x_offset;
+	u32 cy = cliprect.min_y + m_y_offset;
 
-	startx = 256 * ((int16_t)(256 * m_ctrlram[0x00] + m_ctrlram[0x01]));
-	incxx  =        (int16_t)(256 * m_ctrlram[0x02] + m_ctrlram[0x03]);
-	incyx  =        (int16_t)(256 * m_ctrlram[0x04] + m_ctrlram[0x05]);
-	starty = 256 * ((int16_t)(256 * m_ctrlram[0x06] + m_ctrlram[0x07]));
-	incxy  =        (int16_t)(256 * m_ctrlram[0x08] + m_ctrlram[0x09]);
-	incyy  =        (int16_t)(256 * m_ctrlram[0x0a] + m_ctrlram[0x0b]);
+	s16 start_x, start_y;
+	s16 incxx, incyx, incxy, incyy;
 
-	startx -= (16 + m_dy) * incyx;
-	starty -= (16 + m_dy) * incyy;
+	start_x = m_start_x;
+	start_y = m_start_y;
+	incxx = m_incxx;
+	incyx = m_incyx;
+	incxy = m_incxy;
+	incyy = m_incyy;
 
-	startx -= (89 + m_dx) * incxx;
-	starty -= (89 + m_dx) * incxy;
+	u32 base_x = (start_x << 8) + incxx * cx + incyx * cy;
+	u32 base_y = (start_y << 8) + incxy * cx + incyy * cy;
 
-	m_tmap->draw_roz(screen, bitmap, cliprect, startx << 5, starty << 5,
-			incxx << 5, incxy << 5, incyx << 5, incyy << 5,
-			m_wrap,
-			flags, priority);
+	bitmap_ind16 &bcolor = m_renderer_output->bitmap();
 
-#if 0
-	popmessage("%02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x",
-			m_ctrlram[0x00],
-			m_ctrlram[0x01],
-			m_ctrlram[0x02],
-			m_ctrlram[0x03],
-			m_ctrlram[0x04],
-			m_ctrlram[0x05],
-			m_ctrlram[0x06],
-			m_ctrlram[0x07],
-			m_ctrlram[0x08],
-			m_ctrlram[0x09],
-			m_ctrlram[0x0a],
-			m_ctrlram[0x0b],
-			m_ctrlram[0x0c], /* bank for ROM testing */
-			m_ctrlram[0x0d],
-			m_ctrlram[0x0e], /* 0 = test ROMs */
-			m_ctrlram[0x0f]);
-#endif
+	std::function<u32 (u32 adr)> rom_lookup = [](u32 adr) { return 0; };
+
+	if(m_ram_based) {
+		const u16 *chars = m_ram;
+		u32 cmask = m_ram.mask();
+		if(m_tile_bpp == 4)
+			rom_lookup = [chars, cmask](u32 adr) { u16 pix = chars[(adr >> 2) & cmask]; return (pix >> ((~adr & 3) << 2)) & 0xf; };
+
+	} else {
+		const u8 *chars = m_rom;
+		u32 cmask = m_rom.mask();
+		switch(m_tile_bpp) {
+		case 4: rom_lookup = [chars, cmask](u32 adr) { u8 pix = chars[(adr >> 1) & cmask]; return adr & 1 ? pix & 0xf : pix >> 4; }; break;
+		case 7: rom_lookup = [chars, cmask](u32 adr) { return chars[adr & cmask] & 0x7f; }; break;
+		case 8: rom_lookup = [chars, cmask](u32 adr) { return chars[adr & cmask]; }; break;
+		}
+	}
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
+		u32 pos_x = base_x;
+		u32 pos_y = base_y;
+		u16 *pc = &bcolor.pix16(y, cliprect.min_x);
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
+			bool outside = !m_wrap && ((pos_x & 0xf00000) || (pos_y & 0xf00000));
+
+			if(!outside) {
+				u32 tile_index = ((pos_y & 0x0f8000) >> 10) | ((pos_x & 0x0f8000) >> 15);
+				u32 pix_coord = ((pos_y & 0x007800) >> 7) | ((pos_x & 0x007800) >> 11);
+				u32 adr = (m_tile_ram[tile_index] << 8) | pix_coord;
+
+				// Probably conditional of the bits in m_mode, see chqflag that is know to use flipy on roz 2
+				if(adr & 0x400000)
+					adr ^= 0x00000f;
+				if(adr & 0x800000)
+					adr ^= 0x0000f0;
+
+				u32 code;
+				u16 color;
+				m_mapper(adr, code, color);
+				*pc++ = color | rom_lookup(code);
+
+			} else
+				*pc++ = 0;
+
+			pos_x += incxx;
+			pos_y += incxy;
+		}
+		base_x += incyx;
+		base_y += incyy;
+	}
+	
 }

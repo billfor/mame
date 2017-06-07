@@ -12,15 +12,113 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ultraman.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
+#include "video/k051316.h"
+#include "video/k051960.h"
+#include "video/konami_helper.h"
 
+class ultraman_state : public driver_device
+{
+public:
+	ultraman_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_roz_1(*this, "roz_1"),
+		m_roz_2(*this, "roz_2"),
+		m_roz_3(*this, "roz_3"),
+		m_k051960(*this, "k051960"),
+		m_soundlatch(*this, "soundlatch") { }
+
+	int        m_bank0;
+	int        m_bank1;
+	int        m_bank2;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k051316_device> m_roz_1;
+	required_device<k051316_device> m_roz_2;
+	required_device<k051316_device> m_roz_3;
+	required_device<k051960_device> m_k051960;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	DECLARE_WRITE16_MEMBER(sound_cmd_w);
+	DECLARE_WRITE16_MEMBER(sound_irq_trigger_w);
+	DECLARE_WRITE16_MEMBER(ultraman_gfxctrl_w);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	uint32_t screen_update_ultraman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	K051960_CB_MEMBER(sprite_callback);
+};
+
+K051960_CB_MEMBER(ultraman_state::sprite_callback)
+{
+	enum { sprite_colorbase = 3072 / 16 };
+
+	*priority = (*color & 0x80) ? 0 : GFX_PMASK_1;
+	*color = sprite_colorbase + ((*color & 0x7e) >> 1);
+	*shadow = 0;
+}
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		/*  bit 0: enable wraparound for scr #1
+		    bit 1: msb of code for scr #1
+		    bit 2: enable wraparound for scr #2
+		    bit 3: msb of code for scr #2
+		    bit 4: enable wraparound for scr #3
+		    bit 5: msb of code for scr #3
+		    bit 6: coin counter 1
+		    bit 7: coin counter 2 */
+
+		m_roz_1->set_wrap(data & 0x01);
+		m_bank0 = (data & 0x02) >> 1;
+
+		m_roz_2->set_wrap(data & 0x04);
+		m_bank1 = (data & 0x08) >> 3;
+
+		m_roz_3->set_wrap(data & 0x10);
+		m_bank2 = (data & 0x20) >> 5;
+
+		machine().bookkeeping().coin_counter_w(0, data & 0x40);
+		machine().bookkeeping().coin_counter_w(1, data & 0x80);
+	}
+}
+
+
+
+/***************************************************************************
+
+    Display Refresh
+
+***************************************************************************/
+
+uint32_t ultraman_state::screen_update_ultraman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen.priority().fill(0, cliprect);
+
+	//	m_roz_3->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	//	m_roz_2->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	//	m_roz_1->zoom_draw(screen, bitmap, cliprect, 0, 1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
+	return 0;
+}
 
 WRITE16_MEMBER(ultraman_state::sound_cmd_w)
 {
@@ -48,12 +146,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x1c0020, 0x1c0021) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x1c0028, 0x1c0029) AM_WRITE(sound_irq_trigger_w)
 	AM_RANGE(0x1c0030, 0x1c0031) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x204000, 0x204fff) AM_DEVREADWRITE8("k051316_1", k051316_device, read, write, 0x00ff) /* K051316 #0 RAM */
-	AM_RANGE(0x205000, 0x205fff) AM_DEVREADWRITE8("k051316_2", k051316_device, read, write, 0x00ff) /* K051316 #1 RAM */
-	AM_RANGE(0x206000, 0x206fff) AM_DEVREADWRITE8("k051316_3", k051316_device, read, write, 0x00ff) /* K051316 #2 RAM */
-	AM_RANGE(0x207f80, 0x207f9f) AM_DEVWRITE8("k051316_1", k051316_device, ctrl_w, 0x00ff)   /* K051316 #0 registers */
-	AM_RANGE(0x207fa0, 0x207fbf) AM_DEVWRITE8("k051316_2", k051316_device, ctrl_w, 0x00ff)   /* K051316 #1 registers */
-	AM_RANGE(0x207fc0, 0x207fdf) AM_DEVWRITE8("k051316_3", k051316_device, ctrl_w, 0x00ff)   /* K051316 #2 registers */
+	AM_RANGE(0x204000, 0x204fff) AM_DEVREADWRITE8("roz_1", k051316_device, vram_r, vram_w, 0x00ff) /* K051316 #0 RAM */
+	AM_RANGE(0x205000, 0x205fff) AM_DEVREADWRITE8("roz_2", k051316_device, vram_r, vram_w, 0x00ff) /* K051316 #1 RAM */
+	AM_RANGE(0x206000, 0x206fff) AM_DEVREADWRITE8("roz_3", k051316_device, vram_r, vram_w, 0x00ff) /* K051316 #2 RAM */
+	AM_RANGE(0x207f80, 0x207f9f) AM_DEVICE8("roz_1", k051316_device, map, 0x00ff)   /* K051316 #0 registers */
+	AM_RANGE(0x207fa0, 0x207fbf) AM_DEVICE8("roz_2", k051316_device, map, 0x00ff)   /* K051316 #1 registers */
+	AM_RANGE(0x207fc0, 0x207fdf) AM_DEVICE8("roz_3", k051316_device, map, 0x00ff)   /* K051316 #2 registers */
 	AM_RANGE(0x304000, 0x30400f) AM_DEVREADWRITE8("k051960", k051960_device, k051937_r, k051937_w, 0x00ff)       /* Sprite control */
 	AM_RANGE(0x304800, 0x304fff) AM_DEVREADWRITE8("k051960", k051960_device, k051960_r, k051960_w, 0x00ff)       /* Sprite RAM */
 ADDRESS_MAP_END
@@ -209,20 +307,9 @@ static MACHINE_CONFIG_START( ultraman )
 	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(ultraman_state, sprite_callback)
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(8, 0)
-	MCFG_K051316_CB(ultraman_state, zoom_callback_1)
-
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(8, 0)
-	MCFG_K051316_CB(ultraman_state, zoom_callback_2)
-
-	MCFG_DEVICE_ADD("k051316_3", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(8, 0)
-	MCFG_K051316_CB(ultraman_state, zoom_callback_3)
+	MCFG_K051316_ADD("roz_1", 4, false, [owner](u32 address, u32 &code, u16 &color) { code = (static_cast<ultraman_state *>(owner)->m_bank0 << 23) | (address & 0x07ffff); color = (address & 0xf80000) >> 15; })
+	MCFG_K051316_ADD("roz_2", 4, false, [owner](u32 address, u32 &code, u16 &color) { code = (static_cast<ultraman_state *>(owner)->m_bank1 << 23) | (address & 0x07ffff); color = (address & 0xf80000) >> 15; })
+	MCFG_K051316_ADD("roz_3", 4, false, [owner](u32 address, u32 &code, u16 &color) { code = (static_cast<ultraman_state *>(owner)->m_bank2 << 23) | (address & 0x07ffff); color = (address & 0xf80000) >> 15; })
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

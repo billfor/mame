@@ -59,12 +59,12 @@ public:
 	giclassic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_k056832(*this, "k056832"),
+		m_tilemap(*this, "tilemap"),
 		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<k056832_device> m_k056832;
+	required_device<k058143_056832_device> m_tilemap;
 	required_device<palette_device> m_palette;
 
 	DECLARE_PALETTE_INIT(giclassic);
@@ -75,7 +75,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_giclassic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	K056832_CB_MEMBER(tile_callback);
+	//	K056832_CB_MEMBER(tile_callback);
 
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(vrom_r);
@@ -88,10 +88,12 @@ private:
 // Client portion
 // --------------------------------------------------------------------------------------------------------------
 
+#if 0
 K056832_CB_MEMBER(giclassic_state::tile_callback)
 {
 	*color = (*color & 0xf);
 }
+#endif
 
 void giclassic_state::video_start()
 {
@@ -102,10 +104,10 @@ uint32_t giclassic_state::screen_update_giclassic(screen_device &screen, bitmap_
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
-//  m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 8);
+	//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
+	//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+	//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
+	//  m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 8);
 
 	return 0;
 }
@@ -133,24 +135,27 @@ WRITE16_MEMBER(giclassic_state::control_w)
 
 READ16_MEMBER(giclassic_state::vrom_r)
 {
+#if 0
 	if (m_control & 8)
 	{
 		return m_k056832->piratesh_rom_r(space, offset + 0x1000);
 	}
 
 	return m_k056832->piratesh_rom_r(space, offset);
+#endif
+	return 0;
 }
 
 static ADDRESS_MAP_START( satellite_main, AS_PROGRAM, 16, giclassic_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0x900000, 0x90003f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
+//	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
+//	AM_RANGE(0x900000, 0x90003f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
 	AM_RANGE(0xb00000, 0xb01fff) AM_READ(vrom_r)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(control_w)
 	AM_RANGE(0xd00000, 0xd0003f) AM_RAM // these must read/write or 26S (LCD controller) fails
-	AM_RANGE(0xe00000, 0xe0001f) AM_DEVWRITE8("k056832", k056832_device, b_w, 0xff00)
+//	AM_RANGE(0xe00000, 0xe0001f) AM_DEVWRITE8("k056832", k056832_device, b_w, 0xff00)
 	AM_RANGE(0xf00000, 0xf00001) AM_NOP AM_WRITENOP // watchdog reset
 ADDRESS_MAP_END
 
@@ -175,23 +180,23 @@ public:
 	giclassicsvr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_k056832(*this, "k056832"),
-		m_k055673(*this, "k055673"),
+		m_tilemap(*this, "tilemap"),
+		m_sprites(*this, "sprites"),
 		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<k056832_device> m_k056832;
-	required_device<k055673_device> m_k055673;
+	required_device<k058143_056832_device> m_tilemap;
+	required_device<k053246_055673_device> m_sprites;
 	required_device<palette_device> m_palette;
 
 	INTERRUPT_GEN_MEMBER(giclassicsvr_interrupt);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	uint32_t screen_update_giclassicsvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	K056832_CB_MEMBER(tile_callback);
-	K055673_CB_MEMBER(sprite_callback);
+	uint32_t screen_update_giclassicsvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);//
+	//	K056832_CB_MEMBER(tile_callback);
+	//	K055673_CB_MEMBER(sprite_callback);
 
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(control_r);
@@ -218,7 +223,7 @@ INTERRUPT_GEN_MEMBER(giclassicsvr_state::giclassicsvr_interrupt)
 		m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
 	}
 }
-
+#if 0
 K056832_CB_MEMBER(giclassicsvr_state::tile_callback)
 {
 }
@@ -245,17 +250,17 @@ K055673_CB_MEMBER(giclassicsvr_state::sprite_callback)
 	// 1100 1100
 	// 1010 1010
 }
-
+#endif
 
 uint32_t giclassicsvr_state::screen_update_giclassicsvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 8);
+	//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 3, 0, 1);
+	//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+	//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4);
+	//	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 8);
 
 	return 0;
 }
@@ -266,12 +271,12 @@ static ADDRESS_MAP_START( server_main, AS_PROGRAM, 16, giclassicsvr_state )
 	AM_RANGE(0x090000, 0x093fff) AM_RAM
 	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x183fff) AM_RAM
-	AM_RANGE(0x280000, 0x281fff) AM_RAM AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w) // SPRITES
-	AM_RANGE(0x300060, 0x30006f) AM_DEVREAD("k055673", k055673_device, k055673_ps_rom_word_r) // SPRITES
-	AM_RANGE(0x308000, 0x30803f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
-	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252a", k053252_device, read, write, 0x00ff) // CRTC 1
-	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252b", k053252_device, read, write, 0xff00) // CRTC 2
+//	AM_RANGE(0x280000, 0x281fff) AM_RAM AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
+//	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w) // SPRITES
+//	AM_RANGE(0x300060, 0x30006f) AM_DEVREAD("k055673", k055673_device, k055673_ps_rom_word_r) // SPRITES
+//	AM_RANGE(0x308000, 0x30803f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
+//	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252a", k053252_device, read, write, 0x00ff) // CRTC 1
+//	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252b", k053252_device, read, write, 0xff00) // CRTC 2
 	AM_RANGE(0x380000, 0x380001) AM_WRITENOP    // watchdog reset
 	AM_RANGE(0x398000, 0x398001) AM_READWRITE(control_r, control_w)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
@@ -308,10 +313,10 @@ static MACHINE_CONFIG_START( giclassic )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(giclassic_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+//	MCFG_DEVICE_ADD("k056832", K056832, 0)
+//	MCFG_K056832_CB(giclassic_state, tile_callback)
+//	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 1, 0, "none")
+//	MCFG_K056832_PALETTE("palette")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( giclassvr )
@@ -334,21 +339,21 @@ static MACHINE_CONFIG_START( giclassvr )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(giclassicsvr_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 0, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+//	MCFG_DEVICE_ADD("k056832", K056832, 0)
+//	MCFG_K056832_CB(giclassicsvr_state, tile_callback)
+//	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4PIRATESH, 0, 0, "none")
+//	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(giclassicsvr_state, sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_PS, -60, 24)
-	MCFG_K055673_PALETTE("palette")
+//	MCFG_DEVICE_ADD("k055673", K055673, 0)
+//	MCFG_K055673_CB(giclassicsvr_state, sprite_callback)
+//	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_PS, -60, 24)
+//	MCFG_K055673_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053252a", K053252, XTAL_32MHz/4)
-	MCFG_K053252_OFFSETS(40, 16) // TODO
+//	MCFG_DEVICE_ADD("k053252a", K053252, XTAL_32MHz/4)
+//	MCFG_K053252_OFFSETS(40, 16) // TODO
 
-	MCFG_DEVICE_ADD("k053252b", K053252, XTAL_32MHz/4)
-	MCFG_K053252_OFFSETS(40, 16) // TODO
+//	MCFG_DEVICE_ADD("k053252b", K053252, XTAL_32MHz/4)
+//	MCFG_K053252_OFFSETS(40, 16) // TODO
 MACHINE_CONFIG_END
 
 ROM_START( giclasex )

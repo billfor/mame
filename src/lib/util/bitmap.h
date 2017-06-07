@@ -119,19 +119,21 @@ public:
 class bitmap_t
 {
 protected:
-	// construction/destruction -- subclasses only to ensure type correctness
+	// construction -- subclasses only to ensure type correctness
 	bitmap_t(const bitmap_t &) = delete;
 	bitmap_t(bitmap_t &&that);
 	bitmap_t(bitmap_format format, uint8_t bpp, int width = 0, int height = 0, int xslop = 0, int yslop = 0);
 	bitmap_t(bitmap_format format, uint8_t bpp, void *base, int width, int height, int rowpixels);
 	bitmap_t(bitmap_format format, uint8_t bpp, bitmap_t &source, const rectangle &subrect);
-	virtual ~bitmap_t();
 
 	// prevent implicit copying
 	bitmap_t &operator=(const bitmap_t &) = delete;
 	bitmap_t &operator=(bitmap_t &&that);
 
 public:
+	// destruction
+	virtual ~bitmap_t();
+
 	// allocation/deallocation
 	void reset();
 

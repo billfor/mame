@@ -14,6 +14,8 @@
 
 #include <utility>
 
+#include "difr.h"
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -161,11 +163,17 @@ typedef device_delegate<u32 (screen_device &, bitmap_rgb32 &, const rectangle &)
 
 // ======================> screen_device
 
-class screen_device : public device_t
+class screen_device : public device_t, public flow_render::interface
 {
 	friend class render_manager;
 
 public:
+	enum {
+		FLOW_RENDER_DISABLED,
+		FLOW_RENDER_U16,
+		FLOW_RENDER_RGB
+	};
+
 	// construction/destruction
 	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	~screen_device();
@@ -201,6 +209,7 @@ public:
 	static void static_set_video_attributes(device_t &device, u32 flags);
 	static void static_set_color(device_t &device, rgb_t color);
 	static void static_set_svg_region(device_t &device, const char *region);
+	void set_flow_render_mode(int flow_render_mode);
 
 	// information getters
 	render_container &container() const { assert(m_container != nullptr); return *m_container; }
@@ -249,6 +258,9 @@ public:
 	static constexpr int DEFAULT_FRAME_RATE = 60;
 	static const attotime DEFAULT_FRAME_PERIOD;
 
+protected:
+	void flow_render_register_renderers() override;
+
 private:
 	class svg_renderer;
 
@@ -276,6 +288,8 @@ private:
 	void vblank_end();
 	void finalize_burnin();
 	void load_effect_overlay(const char *filename);
+	void render_u16(const rectangle &cliprect);
+	void render_rgb(const rectangle &cliprect);
 
 	// inline configuration data
 	screen_type_enum    m_type;                     // type of screen
@@ -291,10 +305,15 @@ private:
 	const char *        m_palette_tag;              // configured tag for palette device
 	u32                 m_video_attributes;         // flags describing the video system
 	const char *        m_svg_region;               // the region in which the svg data is in
+	int                 m_flow_render_mode;         // flow rendering mode (not used / output as ind16 / output as rgb32)
 
 	// internal state
 	render_container *  m_container;                // pointer to our container
 	std::unique_ptr<svg_renderer> m_svg; // the svg renderer
+	flow_render::renderer *m_renderer;
+	flow_render::input_sb_rgb *m_renderer_input_rgb;
+	flow_render::input_sb_u16 *m_renderer_input_u16;
+
 	// dimensions
 	int                 m_width;                    // current width (HTOTAL)
 	int                 m_height;                   // current height (VTOTAL)
@@ -496,7 +515,10 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 	screen_device::static_set_video_attributes(*device, _flags);
 #define MCFG_SCREEN_COLOR(_color) \
 	screen_device::static_set_color(*device, _color);
-
+#define MCFG_SCREEN_FLOW_RENDER_U16() \
+	downcast<screen_device *>(device)->set_flow_render_mode(screen_device::FLOW_RENDER_U16);
+#define MCFG_SCREEN_FLOW_RENDER_RGB() \
+	downcast<screen_device *>(device)->set_flow_render_mode(screen_device::FLOW_RENDER_RGB);
 
 //**************************************************************************
 //  INLINE HELPERS

@@ -5,10 +5,6 @@
 #include "emu.h"
 #include "k053936.h"
 
-#define VERBOSE 0
-#include "logmacro.h"
-
-
 // Localized K053936/ROZ+
 #define K053936_MAX_CHIPS 2
 
@@ -74,9 +70,191 @@ additional control from extra RAM:
 (line*4)+2 amount to add to the X counter after each horizontal pixel
 (line*4)+3 amount to add to the Y counter after each horizontal pixel
 
+		  }}}*/
+/*
+  racinfrc writes:
+0c = 7f7f
+0e = 0072
+00 = 0000
+02 = 0000
+04 = 0000
+06 = 0008
+08 = 0008
+0a = 0000
+10 = 003f
+12 = 01c1
+14 = 0010
+16 = 010f
+18 = 0010
+1a = 0000
+1c = 0000
+
+(c08476, global update)
+00 = c02840.l >> 13
+02 = c02844.l >> 13
+e20001.l = c02876.l ????
+
+if(c02910.l)
+    for(int i=0; i<0x80, i++)
+        memcpy((c02901.l)+400*i, c03000+20*i, 20);
+else if(c02930.l)
+    for(int i=0; i<0x20, i++)
+      for(int j=0; j<4, j++)
+        memcpy((c02901.l)+400*j+20*i, c03000+20*i, 20);
+
+if(c02960.l)
+    src = c02960.l->m8l
+	dst = roz_tilemap + c02960.l->m4l // ec0000
+	for(int i=0; i<c02960.l->m2w+1; i++) {
+	    p = dst + 400*i
+		for(int j=0; j<c02960.l->m0w+1; j++) {
+		   p.l++ = 0
+		   p.l++ = src.l++
+		}
+	}
+
+src1 = c02824.l   // c01000
+dst1 = lram2 + 78 // e80078
+src2 = c0282c.l   // c02000
+dst2 = lram4 + 4  // f80004
+memcpy(dst1, src1, 0xff*8)
+memcpy(dst2, src2, 0xff*4)
+
+203c36:
+  c02840 = 10000000
+  c02844 = 03100000
+
+pc c0d66a includes update routine
+-> c0c240
+
 */
 
+DEVICE_ADDRESS_MAP_START(map, 16, k053936_device)
+	AM_RANGE(0x00, 0x03) AM_WRITE(counter_start_w)
+	AM_RANGE(0x04, 0x07) AM_WRITE(vadd_w)
+	AM_RANGE(0x08, 0x0b) AM_WRITE(hadd_w)
+	AM_RANGE(0x0c, 0x0d) AM_WRITE(mode1_w)
+	AM_RANGE(0x0e, 0x0f) AM_WRITE(mode2_w)
+	AM_RANGE(0x10, 0x11) AM_WRITE(x_min_w)
+	AM_RANGE(0x12, 0x13) AM_WRITE(x_max_w)
+	AM_RANGE(0x14, 0x15) AM_WRITE(y_min_w)
+	AM_RANGE(0x16, 0x17) AM_WRITE(y_max_w)
+ADDRESS_MAP_END
 
+void k053936_device::set_rozram_tag(const char *rozram_tag)
+{
+	m_rozram_tag = rozram_tag;
+}
+
+WRITE16_MEMBER(k053936_device::counter_start_w)
+{
+	COMBINE_DATA(m_counter_start+offset);
+	if(0)
+		logerror("%c counter start %04x\n", 'x'+offset, m_counter_start[offset]);
+}
+
+WRITE16_MEMBER(k053936_device::vadd_w)
+{
+	COMBINE_DATA(m_vadd+offset);
+	logerror("%c vadd %04x\n", 'x'+offset, m_vadd[offset]);
+}
+
+WRITE16_MEMBER(k053936_device::hadd_w)
+{
+	COMBINE_DATA(m_hadd+offset);
+	logerror("%c hadd %04x\n", 'x'+offset, m_hadd[offset]);
+}
+
+WRITE16_MEMBER(k053936_device::mode1_w)
+{
+	COMBINE_DATA(&m_mode1);
+	logerror("mode1 lx*%s hstep*%s 1=%02x ly*%s vstep*%s 2=%02x\n",
+			 m_mode1 & 0x8000 ? "256" : "1",
+			 m_mode1 & 0x4000 ? "256" : "1",
+			 (m_mode1 & 0x3f00) >> 8,
+			 m_mode1 & 0x0080 ? "256" : "1",
+			 m_mode1 & 0x0040 ? "256" : "1",
+			 m_mode1 & 0x003f);
+}
+
+WRITE16_MEMBER(k053936_device::mode2_w)
+{
+	COMBINE_DATA(&m_mode2);
+	logerror("mode2 h=%02x ?=%c ram=%s ?=%c%c%c%c%c%c\n",
+			 m_mode2 >> 8,
+			 m_mode2 & 0x80 ? '1' : '0',
+			 m_mode2 & 0x40 ? "on" : "off",
+			 m_mode2 & 0x20 ? '1' : '0',
+			 m_mode2 & 0x10 ? '1' : '0',
+			 m_mode2 & 0x08 ? '1' : '0',
+			 m_mode2 & 0x04 ? '1' : '0',
+			 m_mode2 & 0x02 ? '1' : '0',
+			 m_mode2 & 0x01 ? '1' : '0');
+}
+
+WRITE16_MEMBER(k053936_device::x_min_w)
+{
+	COMBINE_DATA(m_min + 0);
+	logerror("x min %04x\n", m_min[0]);
+}
+
+WRITE16_MEMBER(k053936_device::x_max_w)
+{
+	COMBINE_DATA(m_max + 0);
+	logerror("x max %04x\n", m_max[0]);
+}
+
+WRITE16_MEMBER(k053936_device::y_min_w)
+{
+	COMBINE_DATA(m_min + 1);
+	logerror("y min %04x\n", m_min[1]);
+}
+
+WRITE16_MEMBER(k053936_device::y_max_w)
+{
+	COMBINE_DATA(m_max + 1);
+	logerror("y max %04x\n", m_max[1]);
+}
+
+void k053936_device::bitmap_update(bitmap_ind16 *bitmap_x, bitmap_ind16 *bitmap_y, const rectangle &cliprect)
+{
+	if(m_mode2 & 0x0040) {
+		uint32_t x_base = m_counter_start[0] << 8;
+		uint32_t y_base = m_counter_start[1] << 8;
+		for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
+			uint16_t *xd = &bitmap_x->pix16(y, cliprect.min_x);
+			uint16_t *yd = &bitmap_y->pix16(y, cliprect.min_x);
+
+			uint32_t x_cur, y_cur;
+			uint32_t x_delta, y_delta;
+
+			switch(m_rozram->bytewidth()) {
+			default: abort();
+			case 4: {
+				const uint32_t *base = (const uint32_t *)m_rozram->ptr();
+				base += y << 1;
+				x_cur = x_base + (base[0] >> 16);
+				y_cur = y_base + (base[0] & 0xffff);
+				x_delta = base[1] >> 16;
+				y_delta = base[1] & 0xffff;
+				break;
+			}
+			}
+			
+			x_cur += cliprect.min_y * x_delta;
+			y_cur += cliprect.min_y * y_delta;
+			for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
+				*xd++ = (x_cur >> 8) & 0x1fff;
+				*yd++ = (y_cur >> 8) & 0x1fff;
+				x_cur += x_delta;
+				y_cur += y_delta;
+			}
+		}
+	} else {
+		bitmap_x->fill(0, cliprect);
+		bitmap_y->fill(0, cliprect);
+	}
+}
 
 
 static void K053936_zoom_draw(int chip,uint16_t *ctrl,uint16_t *linectrl, screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,uint32_t priority, int glfgreat_hack)
@@ -227,7 +405,7 @@ void K053936_set_offset(int chip, int xoffs, int yoffs)
 /*                                                                         */
 /***************************************************************************/
 
-DEFINE_DEVICE_TYPE(K053936, k053936_device, "k053936", "K053936 Video Controller")
+DEFINE_DEVICE_TYPE(K053936, k053936_device, "k053936", "K053936 ROZ coordinates generator")
 
 k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K053936, tag, owner, clock),
@@ -245,6 +423,13 @@ k053936_device::k053936_device(const machine_config &mconfig, const char *tag, d
 
 void k053936_device::device_start()
 {
+	// Can't use a required_* because the pointer type varies
+	m_rozram = owner()->memshare(m_rozram_tag);
+	if(!m_rozram)
+		fatalerror("ROZram shared memory '%s' does not exist\n", m_rozram_tag);
+	if(m_rozram->bytewidth() > 4)
+		fatalerror("ROZram shared memory '%s' byte width is %d, which is too large\n", m_rozram_tag, m_rozram->bytewidth());
+
 	m_ctrl = make_unique_clear<uint16_t[]>(0x20);
 	m_linectrl = make_unique_clear<uint16_t[]>(0x4000);
 
@@ -258,6 +443,14 @@ void k053936_device::device_start()
 
 void k053936_device::device_reset()
 {
+	memset(m_counter_start, 0, sizeof(m_counter_start));
+	memset(m_vadd, 0, sizeof(m_vadd));
+	memset(m_hadd, 0, sizeof(m_hadd));
+	m_mode1 = 0x0000;
+	m_mode2 = 0x0000;
+	memset(m_min, 0, sizeof(m_min));
+	memset(m_max, 0, sizeof(m_max));
+
 	memset(m_ctrl.get(), 0, 0x20);
 }
 

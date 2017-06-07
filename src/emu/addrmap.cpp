@@ -489,7 +489,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &owner, endi
 				entry_bits = m_databits;
 
 			if (submap.m_databits != entry_bits)
-				throw emu_fatalerror("AM_DEVICE wants a %d bits large address map and got a %d bits large one instead.\n", entry_bits, submap.m_databits);
+				throw emu_fatalerror("AM_DEVICE wants a %d bits large address map and got a %d bits large one instead (mapping device '%s' into device '%s').\n", entry_bits, submap.m_databits, tag.c_str(), m_device->basetag());
 
 			int entry_bytes = entry_bits / 8;
 			int databytes = m_databits / 8;

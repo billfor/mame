@@ -35,7 +35,7 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
 		m_k053245(*this, "k053245"),
-		m_k053251(*this, "k053251"),
+		m_mixer(*this, "mixer"),
 		m_k053936(*this, "k053936"),
 		m_k054000(*this, "k054000"),
 		m_upd7759(*this, "upd"),
@@ -83,7 +83,7 @@ public:
 	required_device<k052109_device> m_k052109;
 	optional_device<k051960_device> m_k051960;
 	optional_device<k05324x_device> m_k053245;
-	optional_device<k053251_device> m_k053251;
+	optional_device<k053251_device> m_mixer;
 	optional_device<k053936_device> m_k053936;
 	optional_device<k054000_device> m_k054000;
 	optional_device<upd7759_device> m_upd7759;
@@ -120,7 +120,6 @@ public:
 	DECLARE_WRITE16_MEMBER(prmrsocr_eeprom_w);
 	DECLARE_WRITE8_MEMBER(cuebrick_nvbank_w);
 	DECLARE_WRITE16_MEMBER(ssriders_soundkludge_w);
-	DECLARE_WRITE16_MEMBER(k053251_glfgreat_w);
 	DECLARE_WRITE16_MEMBER(tmnt2_1c0800_w);
 	DECLARE_READ8_MEMBER(k054539_ctrl_r);
 	DECLARE_WRITE8_MEMBER(k054539_ctrl_w);

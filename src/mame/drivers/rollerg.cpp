@@ -13,16 +13,86 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/rollerg.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
+#include "cpu/z80/z80.h"
+#include "machine/k053252.h"
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
 #include "sound/k053260.h"
+#include "video/k051316.h"
+#include "video/k053244_k053245.h"
+#include "video/konami_helper.h"
 
 #include "speaker.h"
 
+class rollerg_state : public driver_device
+{
+public:
+	enum
+	{
+		TIMER_NMI
+	};
+
+	rollerg_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k053244(*this, "k053244"),
+		m_roz(*this, "roz"),
+		m_video_timings(*this, "video_timings")
+		{ }
+
+	/* misc */
+	int        m_readzoomroms;
+	emu_timer *m_nmi_timer;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k05324x_device> m_k053244;
+	required_device<k051316_device> m_roz;
+	required_device<k053252_device> m_video_timings;
+	DECLARE_WRITE8_MEMBER(rollerg_0010_w);
+	DECLARE_READ8_MEMBER(rollerg_k051316_r);
+	DECLARE_WRITE8_MEMBER(soundirq_w);
+	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
+	DECLARE_READ8_MEMBER(pip_r);
+	DECLARE_WRITE_LINE_MEMBER(rollerg_irq_ack_w);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	uint32_t screen_update_rollerg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	K05324X_CB_MEMBER(sprite_callback);
+	DECLARE_WRITE8_MEMBER(banking_callback);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+};
+
+
+K05324X_CB_MEMBER(rollerg_state::sprite_callback)
+{
+	enum { sprite_colorbase = 256 / 16 };
+#if 0
+	if (machine().input().code_pressed(KEYCODE_Q) && (*color & 0x80)) *color = machine().rand();
+	if (machine().input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = machine().rand();
+	if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x20)) *color = machine().rand();
+	if (machine().input().code_pressed(KEYCODE_R) && (*color & 0x10)) *color = machine().rand();
+#endif
+	*priority = (*color & 0x10) ? 0 : 0x02;
+	*color = sprite_colorbase + (*color & 0x0f);
+}
+
+uint32_t rollerg_state::screen_update_rollerg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int bg_colorbase = 16;
+
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(16 * bg_colorbase, cliprect);
+	//	m_roz->zoom_draw(screen, bitmap, cliprect, 0, 1);
+	m_k053244->sprites_draw(bitmap, cliprect, screen.priority());
+	return 0;
+}
 
 WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 {
@@ -36,7 +106,7 @@ WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 	m_readzoomroms = data & 0x04;
 
 	/* bit 5 enables 051316 wraparound */
-	m_k051316->wraparound_enable(data & 0x20);
+	m_roz->set_wrap(data & 0x20);
 
 	/* other bits unknown */
 }
@@ -44,9 +114,9 @@ WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 READ8_MEMBER(rollerg_state::rollerg_k051316_r)
 {
 	if (m_readzoomroms)
-		return m_k051316->rom_r(space, offset);
+		return m_roz->rom_r(space, offset);
 	else
-		return m_k051316->read(space, offset);
+		return m_roz->vram_r(space, offset);
 }
 
 WRITE8_MEMBER(rollerg_state::soundirq_w)
@@ -88,10 +158,10 @@ static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0x0053, 0x0053) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0061, 0x0061) AM_READ(pip_r)             /* ????? */
-	AM_RANGE(0x0100, 0x010f) AM_DEVREADWRITE("k053252", k053252_device, read, write)      /* 053252? */
-	AM_RANGE(0x0200, 0x020f) AM_DEVWRITE("k051316", k051316_device, ctrl_w)
+	AM_RANGE(0x0100, 0x010f) AM_DEVICE("video_timings", k053252_device, map)
+	AM_RANGE(0x0200, 0x020f) AM_DEVICE("k051316", k051316_device, map)
 	AM_RANGE(0x0300, 0x030f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
-	AM_RANGE(0x0800, 0x0fff) AM_READ(rollerg_k051316_r) AM_DEVWRITE("k051316", k051316_device, write)
+	AM_RANGE(0x0800, 0x0fff) AM_READ(rollerg_k051316_r) AM_DEVWRITE("k051316", k051316_device, vram_w)
 	AM_RANGE(0x1000, 0x17ff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x2000, 0x3aff) AM_RAM
@@ -273,14 +343,11 @@ static MACHINE_CONFIG_START( rollerg )
 	MCFG_K05324X_OFFSETS(-3, -1)
 	MCFG_K05324X_CB(rollerg_state, sprite_callback)
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(22, 1)
-	MCFG_K051316_CB(rollerg_state, zoom_callback)
+	MCFG_K051316_ADD("roz", 4, false, [](u32 address, u32 &code, u16 &color) { code = address & 0x0fffff; color = (address & 0x300000) >> 16; })
 
-	MCFG_DEVICE_ADD("k053252", K053252, 3000000*2)
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(rollerg_state,rollerg_irq_ack_w))
-	MCFG_K053252_OFFSETS(14*8, 2*8)
+	MCFG_DEVICE_ADD("video_timings", K053252, 3000000*2)
+//	MCFG_K053252_INT1_ACK_CB(WRITELINE(rollerg_state,rollerg_irq_ack_w))
+//	MCFG_K053252_OFFSETS(14*8, 2*8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -15,14 +15,212 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/tail2nos.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/2608intf.h"
-#include "video/vsystem_gga.h"
+#include "machine/gen_latch.h"
 #include "screen.h"
+#include "sound/2608intf.h"
 #include "speaker.h"
+#include "video/k051316.h"
+#include "video/vsystem_gga.h"
+
+class tail2nos_state : public driver_device
+{
+public:
+	tail2nos_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_txvideoram(*this, "txvideoram"),
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_roz(*this, "roz"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
+
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_txvideoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+
+	/* video-related */
+	tilemap_t   *m_tx_tilemap;
+	int         m_txbank;
+	int         m_txpalette;
+	bool        m_video_enable;
+	bool        m_flip_screen;
+	uint8_t     m_pending_command;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k051316_device> m_roz;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	DECLARE_CUSTOM_INPUT_MEMBER(analog_in_r);
+	DECLARE_WRITE16_MEMBER(tail2nos_txvideoram_w);
+	DECLARE_WRITE8_MEMBER(tail2nos_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_READ8_MEMBER(sound_semaphore_r);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tail2nos_postload();
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+};
+
+#define TOTAL_CHARS 0x400
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(tail2nos_state::get_tile_info)
+{
+	uint16_t code = m_txvideoram[tile_index];
+	SET_TILE_INFO_MEMBER(0,
+			(code & 0x1fff) + (m_txbank << 13),
+			((code & 0xe000) >> 13) + m_txpalette * 16,
+			0);
+}
+
+
+/***************************************************************************
+
+    Start the video hardware emulation.
+
+***************************************************************************/
+
+void tail2nos_state::tail2nos_postload()
+{
+	m_tx_tilemap->mark_all_dirty();
+}
+
+void tail2nos_state::video_start()
+{
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tail2nos_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_tx_tilemap->set_transparent_pen(15);
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(tail2nos_state::tail2nos_postload), this));
+}
+
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+WRITE16_MEMBER(tail2nos_state::tail2nos_txvideoram_w)
+{
+	COMBINE_DATA(&m_txvideoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(tail2nos_state::tail2nos_gfxbank_w)
+{
+	// -------- --pe-b-b
+	// p = palette bank
+	// b = tile bank
+	// e = video enable
+
+	// bits 0 and 2 select char bank
+	int bank = 0;
+	if (data & 0x04) bank |= 2;
+	if (data & 0x01) bank |= 1;
+
+	if (m_txbank != bank)
+	{
+		m_txbank = bank;
+		m_tx_tilemap->mark_all_dirty();
+	}
+
+	// bit 5 seems to select palette bank (used on startup)
+	if (data & 0x20)
+		bank = 7;
+	else
+		bank = 3;
+
+	if (m_txpalette != bank)
+	{
+		m_txpalette = bank;
+		m_tx_tilemap->mark_all_dirty();
+	}
+
+	// bit 4 seems to be video enable
+	m_video_enable = BIT(data, 4);
+
+	// bit 7 is flip screen
+	m_flip_screen = BIT(data, 7);
+	m_tx_tilemap->set_flip(m_flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_tx_tilemap->set_scrolly(m_flip_screen ? -8 : 0);
+}
+
+
+/***************************************************************************
+
+    Display Refresh
+
+***************************************************************************/
+
+void tail2nos_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	uint16_t *spriteram = m_spriteram;
+	int offs;
+
+
+	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
+	{
+		int sx, sy, flipx, flipy, code, color;
+
+		sx = spriteram[offs + 1];
+		if (sx >= 0x8000)
+			sx -= 0x10000;
+		sy = 0x10000 - spriteram[offs + 0];
+		if (sy >= 0x8000)
+			sy -= 0x10000;
+		code = spriteram[offs + 2] & 0x07ff;
+		color = (spriteram[offs + 2] & 0xe000) >> 13;
+		flipx = spriteram[offs + 2] & 0x1000;
+		flipy = spriteram[offs + 2] & 0x0800;
+		if (m_flip_screen)
+		{
+			flipx = !flipx;
+			flipy = !flipy;
+			sx = 302 - sx;
+			sy = 216 - sy;
+		}
+
+		m_gfxdecode->gfx(1)->transpen(bitmap,/* placement relative to zoom layer verified on the real thing */
+				cliprect,
+				code,
+				40 + color,
+				flipx,flipy,
+				sx+3,sy+1,15);
+	}
+}
+
+uint32_t tail2nos_state::screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_video_enable)
+	{
+		//		m_k051316->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		draw_sprites(bitmap, cliprect);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	}
+	else
+		bitmap.fill(0, cliprect);
+
+	return 0;
+}
 
 
 READ8_MEMBER(tail2nos_state::sound_semaphore_r)
@@ -39,9 +237,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("user1", 0)    /* extra ROM */
 	AM_RANGE(0x2c0000, 0x2dffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(tail2nos_zoomdata_w) AM_SHARE("k051316")
-	AM_RANGE(0x500000, 0x500fff) AM_DEVREADWRITE8("k051316", k051316_device, read, write, 0x00ff)
-	AM_RANGE(0x510000, 0x51001f) AM_DEVWRITE8("k051316", k051316_device, ctrl_w, 0x00ff)
+	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("zoom")
+	AM_RANGE(0x500000, 0x500fff) AM_DEVREADWRITE8("k051316", k051316_device, vram_r, vram_w, 0x00ff)
+	AM_RANGE(0x510000, 0x51001f) AM_DEVICE8("k051316", k051316_device, map, 0x00ff)
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                             /* work RAM */
 	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
@@ -259,12 +457,8 @@ static MACHINE_CONFIG_START( tail2nos )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(-4)
-	MCFG_K051316_OFFSETS(-89, -14)
+	MCFG_K051316_ADD("roz", 4, true, [](u32 address, u32 &code, u16 &color) { code = address & 0x03ffff; color = (address & 0x380000) >> 15; })
 	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(tail2nos_state, zoom_callback)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 0)
 

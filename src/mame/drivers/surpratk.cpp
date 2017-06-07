@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8, surpratk_state )
 	AM_RANGE(0x5f8f, 0x5f8f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x5f90, 0x5f90) AM_READ_PORT("DSW2")
 	AM_RANGE(0x5fa0, 0x5faf) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
-	AM_RANGE(0x5fb0, 0x5fbf) AM_DEVWRITE("k053251", k053251_device, write)
+	AM_RANGE(0x5fb0, 0x5fbf) AM_DEVICE("k053251", k053251_device, map)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(surpratk_5fc0_w)
 	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE("ymsnd", ym2151_device, write)
 	AM_RANGE(0x5fc4, 0x5fc4) AM_WRITE(surpratk_videobank_w)
@@ -205,7 +205,7 @@ static MACHINE_CONFIG_START( surpratk )
 	MCFG_K05324X_OFFSETS(0, 0)
 	MCFG_K05324X_CB(surpratk_state, sprite_callback)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("k053251", 1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

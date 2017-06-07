@@ -1,74 +1,91 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Olivier Galibert
 #ifndef MAME_VIDEO_K054338_H
 #define MAME_VIDEO_K054338_H
 
 #pragma once
 
-#include "k055555.h"
+// 054338 "CLTC" is a final blender/modifier
+//
+// Mixes two images, each composed of:
+// - one bitmap_ind16 with a 13-bit color code
+// - one bitmap_ind16 with:
+//   - bits 0-1: shadow code
+//   - bits 2-3: brightness code
+//   - bits 4-5: mixing code
+//   - bit 15:   pixel present when 1
+//
+// The bitmaps are in a 4-entry array indexed with the BITMAP_* enum
+//
+// Sometimes bits under bit 10 are skipped when routing the lines on
+// the pcb to reduce the palette size while keeping the palette
+// banking bits of the mixer.  For instance Mystic Warriors skips bits
+// 8-9 of the 055555 output.  Use MCFG_K054338_SKIPPED_BITS(count) to
+// say so.
 
-#define K338_REG_BGC_R      0
-#define K338_REG_BGC_GB     1
-#define K338_REG_SHAD1R     2
-#define K338_REG_BRI3       11
-#define K338_REG_PBLEND     13
-#define K338_REG_CONTROL    15
+#include "difr.h"
+#include "vlatency.h"
 
-#define K338_CTL_KILL       0x01    /* 0 = no video output, 1 = enable */
-#define K338_CTL_MIXPRI     0x02
-#define K338_CTL_SHDPRI     0x04
-#define K338_CTL_BRTPRI     0x08
-#define K338_CTL_WAILSL     0x10
-#define K338_CTL_CLIPSL     0x20
+#define MCFG_K054338_ADD(_tag, _palette_tag) \
+	MCFG_DEVICE_ADD(_tag, K054338, 0)		 \
+	downcast<k054338_device *>(device)->set_palette_tag(_palette_tag);
+
+#define MCFG_K054338_PALETTE(_palette_tag) \
+	downcast<k054338_device *>(device)->set_palette_tag(_palette_tag);
+
+#define MCFG_K054338_SKIPPED_BITS(_count) \
+	downcast<k054338_device *>(device)->set_skipped_bits(_count);
 
 
-class k054338_device : public device_t,
-						public device_video_interface
+class k054338_device : public device_t, public flow_render::interface, public video_latency::interface
 {
 public:
 	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	~k054338_device();
 
-	// static configuration
-	static void set_mixer_tag(device_t &device, const char  *tag) { downcast<k054338_device &>(device).m_k055555_tag = tag; }
-	static void set_alpha_invert(device_t &device, int alpha_inv) { downcast<k054338_device &>(device).m_alpha_inv = alpha_inv; }
+	void set_palette_tag(const char *tag) { m_palette_tag = tag; }
+	void set_skipped_bits(int count) { m_skipped_bits = count; }
 
-	DECLARE_WRITE16_MEMBER( word_w ); // "CLCT" registers
-	DECLARE_WRITE32_MEMBER( long_w );
+	DECLARE_WRITE16_MEMBER(backr_w);
+	DECLARE_WRITE16_MEMBER(backgb_w);
+	DECLARE_WRITE16_MEMBER(shadow_w);
+	DECLARE_WRITE16_MEMBER(shadow2_w); // Need to fix that in the memory system
+	DECLARE_WRITE16_MEMBER(bri1_w);
+	DECLARE_WRITE16_MEMBER(bri23_w);
+	DECLARE_WRITE16_MEMBER(mix1_w);
+	DECLARE_WRITE16_MEMBER(mix23_w);
+	DECLARE_WRITE16_MEMBER(system_w);
 
-	DECLARE_READ16_MEMBER( word_r );        // CLTC
-
-	int register_r(int reg);
-	void update_all_shadows(int rushingheroes_hack, palette_device &palette);          // called at the beginning of SCREEN_UPDATE()
-	void fill_solid_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect);             // solid backcolor fill
-	void fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pen_t *pal_ptr, int mode);  // solid or gradient fill using k055555
-	int  set_alpha_level(int pblend);                         // blend style 0-2
-	void invert_alpha(int invert);                                // 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
-	void export_config(int **shdRGB);
+	DECLARE_ADDRESS_MAP(map, 16);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
-	// internal state
-	uint16_t      m_regs[32];
-	int         m_shd_rgb[9];
-	int         m_alpha_inv;
-	const char  *m_k055555_tag;
+	virtual void flow_render_register_renderers() override;
 
-	k055555_device *m_k055555;  /* used to fill BG color */
+private:
+	const char *m_palette_tag;
+	palette_device *m_palette;
+
+	flow_render::renderer *m_renderer;
+	std::array<flow_render::input_sb_u16 *, 2> m_renderer_input_color, m_renderer_input_attr;
+	flow_render::output_sb_rgb *m_renderer_output;
+
+	int m_skipped_bits;
+
+	uint8_t m_through_shadow_table[0x300];
+	uint8_t m_clip_shadow_table[0x300];
+	int32_t m_shadow[3][3];
+	uint32_t m_back;
+	uint8_t m_brightness[3], m_mix_level[3];
+	uint8_t m_system;
+	bool m_mix_add[3];
+
+	void render(const rectangle &cliprect);
 };
 
 DECLARE_DEVICE_TYPE(K054338, k054338_device)
-
-
-#define MCFG_K054338_MIXER(_tag) \
-	k054338_device::set_mixer_tag(*device, _tag);
-
-#define MCFG_K054338_ALPHAINV(_alphainv) \
-	k054338_device::set_alpha_invert(*device, _alphainv);
-
-#define MCFG_K054338_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #endif // MAME_VIDEO_K054338_H

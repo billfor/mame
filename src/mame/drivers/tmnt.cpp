@@ -542,7 +542,7 @@ static ADDRESS_MAP_START( punkshot_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P1/P2")
 	AM_RANGE(0x0a0020, 0x0a0021) AM_WRITE(punkshot_0a0020_w)
 	AM_RANGE(0x0a0040, 0x0a0043) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
-	AM_RANGE(0x0a0060, 0x0a007f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
+	AM_RANGE(0x0a0060, 0x0a007f) AM_DEVICE8("mixer", k053251_device, map, 0x00ff)
 	AM_RANGE(0x0a0080, 0x0a0081) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, punkshot_k052109_word_noA12_w)
 	AM_RANGE(0x110000, 0x110007) AM_DEVREADWRITE8("k051960", k051960_device, k051937_r, k051937_w, 0xffff)
@@ -565,7 +565,7 @@ static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0028, 0x0a0029) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x0c0000, 0x0c001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
-	AM_RANGE(0x0e0000, 0x0e001f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
+	AM_RANGE(0x0e0000, 0x0e001f) AM_DEVICE8("mixer", k053251_device, map, 0x00ff)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 ADDRESS_MAP_END
 
@@ -592,29 +592,8 @@ static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x700400, 0x700401) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
 	AM_RANGE(0x780600, 0x780603) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
 	AM_RANGE(0x780604, 0x780605) AM_WRITE(ssriders_soundkludge_w)
-	AM_RANGE(0x780700, 0x78071f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
+	AM_RANGE(0x780700, 0x78071f) AM_DEVICE8("mixer", k053251_device, map, 0x00ff)
 ADDRESS_MAP_END
-
-WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
-{
-	int i;
-
-	if (ACCESSING_BITS_8_15)
-	{
-		m_k053251->write(space, offset, (data >> 8) & 0xff);
-
-		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251
-		and got marked as dirty in the write above... how was the original hardware working?!? */
-		for (i = 0; i < 3; i++)
-		{
-			if (m_k053251->get_tmap_dirty(2 + i))
-			{
-				m_k052109->tilemap_mark_dirty(i);
-				m_k053251->set_tmap_dirty(2 + i, 0);
-			}
-		}
-	}
-}
 
 static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -625,8 +604,7 @@ static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)              /* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k05324x_device, k053244_lsb_r, k053244_lsb_w)    /* duplicate! */
 	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
-	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE("k053251", k053251_device, msb_w)
-	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
+	AM_RANGE(0x11c000, 0x11c01f) AM_DEVICE8("mixer", k053251_device, map, 0xff00)
 	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/P2")
 	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P3/P4")
 	AM_RANGE(0x120004, 0x120005) AM_READ_PORT("COINS/DSW3")
@@ -648,8 +626,7 @@ static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)              /* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k05324x_device, k053244_lsb_r, k053244_lsb_w)    /* duplicate! */
 	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
-	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE("k053251", k053251_device, msb_w)
-	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
+	AM_RANGE(0x11c000, 0x11c01f) AM_DEVICE8("mixer", k053251_device, map, 0xff00)
 	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/COINS")
 	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P2/EEPROM")
 	AM_RANGE(0x12100c, 0x12100d) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
@@ -919,7 +896,7 @@ static ADDRESS_MAP_START( tmnt2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x5c0600, 0x5c0603) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
 	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
-	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
+	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVICE8("mixer", k053251_device, map, 0x00ff)
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
 ADDRESS_MAP_END
 
@@ -943,7 +920,7 @@ static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x5c0600, 0x5c0603) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
 	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
-	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
+	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVICE8("mixer", k053251_device, map, 0x00ff)
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
 ADDRESS_MAP_END
 
@@ -951,7 +928,7 @@ static ADDRESS_MAP_START( sunsetbl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM /* main RAM */
 	AM_RANGE(0x14c000, 0x14cfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x14e700, 0x14e71f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
+	AM_RANGE(0x14e700, 0x14e71f) AM_DEVICE8("mixer", k053251_device, map, 0x00ff)
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x184000, 0x18ffff) AM_RAM
 	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE(ssriders_1c0300_w)
@@ -977,7 +954,7 @@ static ADDRESS_MAP_START( thndrx2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM /* main RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x300000, 0x30001f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
+	AM_RANGE(0x300000, 0x30001f) AM_DEVICE8("mixer", k053251_device, map, 0x00ff)
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
 	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE("k054000", k054000_device, lsb_r, lsb_w)
 	AM_RANGE(0x500100, 0x500101) AM_WRITE(thndrx2_eeprom_w)
@@ -2116,7 +2093,7 @@ static MACHINE_CONFIG_START( punkshot )
 	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(tmnt_state, punkshot_sprite_callback)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("k053251", 1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2171,7 +2148,7 @@ static MACHINE_CONFIG_START( lgtnfght )
 	MCFG_K05324X_OFFSETS(0, 0)
 	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("k053251", 1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2231,7 +2208,7 @@ static MACHINE_CONFIG_START( blswhstl )
 	MCFG_K05324X_OFFSETS(0, 0)
 	MCFG_K05324X_CB(tmnt_state, blswhstl_sprite_callback)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("k053251", 1)
 	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
@@ -2312,7 +2289,7 @@ static MACHINE_CONFIG_START( glfgreat )
 	MCFG_K053936_WRAP(1)
 	MCFG_K053936_OFFSETS(85, 0)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("k053251", 1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2379,7 +2356,7 @@ static MACHINE_CONFIG_START( prmrsocr )
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_OFFSETS(85, 1)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("k053251", 1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2443,7 +2420,7 @@ static MACHINE_CONFIG_START( tmnt2 )
 	MCFG_K05324X_OFFSETS(0, 0)
 	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("k053251", 1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2502,7 +2479,7 @@ static MACHINE_CONFIG_START( ssriders )
 	MCFG_K05324X_OFFSETS(0, 0)
 	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("k053251", 1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2553,7 +2530,7 @@ static MACHINE_CONFIG_START( sunsetbl )
 	MCFG_K05324X_OFFSETS(0, 0)
 	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("k053251", 1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2602,7 +2579,7 @@ static MACHINE_CONFIG_START( thndrx2 )
 	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(tmnt_state, thndrx2_sprite_callback)
 
-	MCFG_K053251_ADD("k053251")
+	MCFG_K053251_ADD("k053251", 1)
 
 	MCFG_K054000_ADD("k054000")
 

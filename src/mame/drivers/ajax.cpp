@@ -13,15 +13,339 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/ajax.h"
-#include "includes/konamipt.h"
 
-#include "cpu/z80/z80.h"
-#include "cpu/m6809/m6809.h"
 #include "cpu/m6809/konami.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/z80/z80.h"
+#include "includes/konamipt.h"
+#include "machine/gen_latch.h"
+#include "machine/watchdog.h"
+#include "sound/k007232.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
+#include "video/k051316.h"
+#include "video/k051960.h"
+#include "video/k052109.h"
+#include "video/konami_helper.h"
 
+class ajax_state : public driver_device
+{
+public:
+	ajax_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub"),
+		m_watchdog(*this, "watchdog"),
+		m_k007232_1(*this, "k007232_1"),
+		m_k007232_2(*this, "k007232_2"),
+		m_k052109(*this, "k052109"),
+		m_k051960(*this, "k051960"),
+		m_roz(*this, "roz"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
+
+	/* video-related */
+	uint8_t      m_priority;
+
+	/* misc */
+	int        m_firq_enable;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<k007232_device> m_k007232_1;
+	required_device<k007232_device> m_k007232_2;
+	required_device<k052109_device> m_k052109;
+	required_device<k051960_device> m_k051960;
+	required_device<k051316_device> m_roz;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	DECLARE_READ8_MEMBER(ls138_f10_r);
+	DECLARE_WRITE8_MEMBER(ls138_f10_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_2_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_WRITE8_MEMBER(lamps_w);
+	DECLARE_WRITE8_MEMBER(k007232_extvol_w);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE8_MEMBER(volume_callback0);
+	DECLARE_WRITE8_MEMBER(volume_callback1);
+	K052109_CB_MEMBER(tile_callback);
+	K051960_CB_MEMBER(sprite_callback);
+};
+
+
+/***************************************************************************
+
+  Callbacks for the K052109
+
+***************************************************************************/
+
+K052109_CB_MEMBER(ajax_state::tile_callback)
+{
+	static const int layer_colorbase[] = { 1024 / 16, 0 / 16, 512 / 16 };
+
+	*code |= ((*color & 0x0f) << 8) | (bank << 12);
+	*color = layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+}
+
+
+/***************************************************************************
+
+  Callbacks for the K051960
+
+***************************************************************************/
+
+K051960_CB_MEMBER(ajax_state::sprite_callback)
+{
+	enum { sprite_colorbase = 256 / 16 };
+
+	/* priority bits:
+	   4 over zoom (0 = have priority)
+	   5 over B    (0 = have priority)
+	   6 over A    (1 = have priority)
+	   never over F
+	*/
+	*priority = 0;
+	if ( *color & 0x10) *priority |= GFX_PMASK_4; /* Z = 4 */
+	if (~*color & 0x40) *priority |= GFX_PMASK_2; /* A = 2 */
+	if ( *color & 0x20) *priority |= GFX_PMASK_1; /* B = 1 */
+	*color = sprite_colorbase + (*color & 0x0f);
+}
+
+/*  bankswitch_w:
+    Handled by the LS273 Octal +ve edge trigger D-type Flip-flop with Reset at H11:
+
+    Bit Description
+    --- -----------
+    7   MRB3    Selects ROM N11/N12
+    6   CCOUNT2 Coin Counter 2  (*)
+    5   CCOUNT1 Coin Counter 1  (*)
+    4   SRESET  Slave CPU Reset?
+    3   PRI0    Layer Priority Selector
+    2   MRB2    \
+    1   MRB1     |  ROM Bank Select
+    0   MRB0    /
+
+    (*) The Coin Counters are handled by the Konami Custom 051550
+*/
+
+WRITE8_MEMBER(ajax_state::bankswitch_w)
+{
+	int bank = 0;
+
+	/* rom select */
+	if (!(data & 0x80))
+		bank += 4;
+
+	/* coin counters */
+	machine().bookkeeping().coin_counter_w(0, data & 0x20);
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);
+
+	/* priority */
+	m_priority = data & 0x08;
+
+	/* bank # (ROMS N11 and N12) */
+	bank += (data & 0x07);
+	membank("mainbank")->set_entry(bank);
+}
+
+/*  lamps_w:
+    Handled by the LS273 Octal +ve edge trigger D-type Flip-flop with Reset at B9:
+
+    Bit Description
+    --- -----------
+    7   LAMP7 & LAMP8 - Game over lamps (*)
+    6   LAMP3 & LAMP4 - Game over lamps (*)
+    5   LAMP1 - Start lamp (*)
+    4   Control panel quaking (**)
+    3   Joystick vibration (**)
+    2   LAMP5 & LAMP6 - Power up lamps (*)
+    1   LAMP2 - Super weapon lamp (*)
+    0   unused
+
+    (*) The Lamps are handled by the M54585P
+    (**)Vibration/Quaking handled by these chips:
+        Chip        Location    Description
+        ----        --------    -----------
+        PS2401-4    B21         ???
+        UPA1452H    B22         ???
+        LS74        H2          Dual +ve edge trigger D-type Flip-flop with SET and RESET
+        LS393       C20         Dual -ve edge trigger 4-bit Binary Ripple Counter with Resets
+*/
+
+WRITE8_MEMBER(ajax_state::lamps_w)
+{
+	output().set_led_value(1, data & 0x02);  /* super weapon lamp */
+	output().set_led_value(2, data & 0x04);  /* power up lamps */
+	output().set_led_value(5, data & 0x04);  /* power up lamps */
+	output().set_led_value(0, data & 0x20);  /* start lamp */
+	output().set_led_value(3, data & 0x40);  /* game over lamps */
+	output().set_led_value(6, data & 0x40);  /* game over lamps */
+	output().set_led_value(4, data & 0x80);  /* game over lamps */
+	output().set_led_value(7, data & 0x80);  /* game over lamps */
+}
+
+/*  ajax_ls138_f10:
+    The LS138 1-of-8 Decoder/Demultiplexer at F10 selects what to do:
+
+    Address R/W Description
+    ------- --- -----------
+    0x0000  (r) ??? I think this read is because a CPU core bug
+            (w) 0x0000  NSFIRQ  Trigger FIRQ on the M6809
+                0x0020  AFR     Watchdog reset (handled by the 051550)
+    0x0040  (w) SOUND           Cause interrupt on the Z80
+    0x0080  (w) SOUNDDATA       Sound code number
+    0x00c0  (w) MBL1            Enables the LS273 at H11 (Banking + Coin counters)
+    0x0100  (r) MBL2            Enables 2P Inputs reading
+    0x0140  (w) MBL3            Enables the LS273 at B9 (Lamps + Vibration)
+    0x0180  (r) MIO1            Enables 1P Inputs + DIPSW #1 & #2 reading
+    0x01c0  (r) MIO2            Enables DIPSW #3 reading
+*/
+
+READ8_MEMBER(ajax_state::ls138_f10_r)
+{
+	int data = 0, index;
+	static const char *const portnames[] = { "SYSTEM", "P1", "DSW1", "DSW2" };
+
+	switch ((offset & 0x01c0) >> 6)
+	{
+		case 0x00:  /* ??? */
+			data = machine().rand();
+			break;
+		case 0x04:  /* 2P inputs */
+			data = ioport("P2")->read();
+			break;
+		case 0x06:  /* 1P inputs + DIPSW #1 & #2 */
+			index = offset & 0x01;
+			data = ioport((offset & 0x02) ? portnames[2 + index] : portnames[index])->read();
+			break;
+		case 0x07:  /* DIPSW #3 */
+			data = ioport("DSW3")->read();
+			break;
+
+		default:
+			logerror("%04x: (ls138_f10) read from an unknown address %02x\n",space.device().safe_pc(), offset);
+	}
+
+	return data;
+}
+
+WRITE8_MEMBER(ajax_state::ls138_f10_w)
+{
+	switch ((offset & 0x01c0) >> 6)
+	{
+		case 0x00:  /* NSFIRQ + AFR */
+			if (offset)
+				m_watchdog->reset_w(space, 0, data);
+			else{
+				if (m_firq_enable)  /* Cause interrupt on slave CPU */
+					m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+			}
+			break;
+		case 0x01:  /* Cause interrupt on audio CPU */
+			m_audiocpu->set_input_line(0, HOLD_LINE);
+			break;
+		case 0x02:  /* Sound command number */
+			m_soundlatch->write(space, offset, data);
+			break;
+		case 0x03:  /* Bankswitch + coin counters + priority*/
+			bankswitch_w(space, 0, data);
+			break;
+		case 0x05:  /* Lamps + Joystick vibration + Control panel quaking */
+			lamps_w(space, 0, data);
+			break;
+
+		default:
+			logerror("%04x: (ls138_f10) write %02x to an unknown address %02x\n", space.device().safe_pc(), data, offset);
+	}
+}
+
+/*  bankswitch_w_2:
+    Handled by the LS273 Octal +ve edge trigger D-type Flip-flop with Reset at K14:
+
+    Bit Description
+    --- -----------
+    7   unused
+    6   RMRD    Enable char ROM reading through the video RAM
+    5   RVO     enables 051316 wraparound
+    4   FIRQST  FIRQ control
+    3   SRB3    \
+    2   SRB2     |
+    1   SRB1     |  ROM Bank Select
+    0   SRB0    /
+*/
+
+WRITE8_MEMBER(ajax_state::bankswitch_2_w)
+{
+	/* enable char ROM reading through the video RAM */
+	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+
+	/* bit 5 enables 051316 wraparound */
+	m_roz->set_wrap(data & 0x20);
+
+	/* FIRQ control */
+	m_firq_enable = data & 0x10;
+
+	/* bank # (ROMS G16 and I16) */
+	membank("subbank")->set_entry(data & 0x0f);
+}
+
+void ajax_state::machine_start()
+{
+	uint8_t *MAIN = memregion("maincpu")->base();
+	uint8_t *SUB  = memregion("sub")->base();
+
+	membank("mainbank")->configure_entries(0, 4, &MAIN[0x00000], 0x2000);
+	membank("mainbank")->configure_entries(4, 8, &MAIN[0x10000], 0x2000);
+	membank("subbank")->configure_entries(0,  9,  &SUB[0x00000], 0x2000);
+
+	save_item(NAME(m_priority));
+	save_item(NAME(m_firq_enable));
+}
+
+void ajax_state::machine_reset()
+{
+	m_priority = 0;
+	m_firq_enable = 0;
+}
+
+/***************************************************************************
+
+    Display Refresh
+
+***************************************************************************/
+
+uint32_t ajax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_k052109->tilemap_update();
+
+	screen.priority().fill(0, cliprect);
+
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 1);
+	if (m_priority)
+	{
+		/* basic layer order is B, zoom, A, F */
+		//		m_roz->zoom_draw(screen, bitmap, cliprect, 0, 4);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
+	}
+	else
+	{
+		/* basic layer order is B, A, zoom, F */
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
+		//		m_roz->zoom_draw(screen, bitmap, cliprect, 0, 4);
+	}
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
+	return 0;
+}
 
 static ADDRESS_MAP_START( ajax_main_map, AS_PROGRAM, 8, ajax_state )
 	AM_RANGE(0x0000, 0x01c0) AM_READWRITE(ls138_f10_r, ls138_f10_w)   /* bankswitch + sound command + FIRQ command */
@@ -35,9 +359,9 @@ static ADDRESS_MAP_START( ajax_main_map, AS_PROGRAM, 8, ajax_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ajax_sub_map, AS_PROGRAM, 8, ajax_state )
-	AM_RANGE(0x0000, 0x07ff) AM_DEVREADWRITE("k051316", k051316_device, read, write)    /* 051316 zoom/rotation layer */
-	AM_RANGE(0x0800, 0x080f) AM_DEVWRITE("k051316", k051316_device, ctrl_w)              /* 051316 control registers */
-	AM_RANGE(0x1000, 0x17ff) AM_DEVREAD("k051316", k051316_device, rom_r)                /* 051316 (ROM test) */
+	AM_RANGE(0x0000, 0x07ff) AM_DEVREADWRITE("roz", k051316_device, vram_r, vram_w)
+	AM_RANGE(0x0800, 0x080f) AM_DEVICE("roz", k051316_device, map)
+	AM_RANGE(0x1000, 0x17ff) AM_DEVREAD("roz", k051316_device, rom_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(bankswitch_2_w)          /* bankswitch control */
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("share1")                      /* shared RAM with the 052001 */
 	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)        /* video RAM + color RAM + video registers */
@@ -205,10 +529,7 @@ static MACHINE_CONFIG_START( ajax )
 	MCFG_K051960_CB(ajax_state, sprite_callback)
 	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(7)
-	MCFG_K051316_CB(ajax_state, zoom_callback)
+	MCFG_K051316_ADD("roz", 7, false, [](u32 address, u32 &code, u16 &color) { code = address & 0x07ffff; color = (address & 0x080000) >> 12; })
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

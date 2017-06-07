@@ -15,15 +15,127 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/bottom9.h"
-#include "includes/konamipt.h"
 
-#include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "cpu/z80/z80.h"
+#include "includes/konamipt.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "sound/k007232.h"
 #include "speaker.h"
+#include "video/k051316.h"
+#include "video/k051960.h"
+#include "video/k052109.h"
+#include "video/konami_helper.h"
 
+class bottom9_state : public driver_device
+{
+public:
+	bottom9_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k007232_1(*this, "k007232_1"),
+		m_k007232_2(*this, "k007232_2"),
+		m_k052109(*this, "k052109"),
+		m_k051960(*this, "k051960"),
+		m_roz(*this, "roz"),
+		m_palette(*this, "palette") { }
+
+	/* misc */
+	int        m_video_enable;
+	int        m_zoomreadroms;
+	int        m_k052109_selected;
+	int        m_nmienable;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k007232_device> m_k007232_1;
+	required_device<k007232_device> m_k007232_2;
+	required_device<k052109_device> m_k052109;
+	required_device<k051960_device> m_k051960;
+	required_device<k051316_device> m_roz;
+	required_device<palette_device> m_palette;
+	DECLARE_READ8_MEMBER(k052109_051960_r);
+	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	DECLARE_READ8_MEMBER(bottom9_bankedram1_r);
+	DECLARE_WRITE8_MEMBER(bottom9_bankedram1_w);
+	DECLARE_READ8_MEMBER(bottom9_bankedram2_r);
+	DECLARE_WRITE8_MEMBER(bottom9_bankedram2_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_WRITE8_MEMBER(bottom9_1f90_w);
+	DECLARE_WRITE8_MEMBER(bottom9_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	uint32_t screen_update_bottom9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(bottom9_interrupt);
+	INTERRUPT_GEN_MEMBER(bottom9_sound_interrupt);
+	DECLARE_WRITE8_MEMBER(volume_callback0);
+	DECLARE_WRITE8_MEMBER(volume_callback1);
+	K052109_CB_MEMBER(tile_callback);
+	K051960_CB_MEMBER(sprite_callback);
+};
+
+/***************************************************************************
+
+  Callbacks for the K052109
+
+***************************************************************************/
+
+static const int layer_colorbase[] = { 0 / 16, 0 / 16, 256 / 16 };
+
+K052109_CB_MEMBER(bottom9_state::tile_callback)
+{
+	*code |= (*color & 0x3f) << 8;
+	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+}
+
+
+/***************************************************************************
+
+  Callbacks for the K051960
+
+***************************************************************************/
+
+K051960_CB_MEMBER(bottom9_state::sprite_callback)
+{
+	enum { sprite_colorbase = 512 / 16 };
+
+	/* bit 4 = priority over zoom (0 = have priority) */
+	/* bit 5 = priority over B (1 = have priority) */
+	*priority = 0;
+	if ( *color & 0x10) *priority |= GFX_PMASK_1;
+	if (~*color & 0x20) *priority |= GFX_PMASK_2;
+
+	*color = sprite_colorbase + (*color & 0x0f);
+}
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+uint32_t bottom9_state::screen_update_bottom9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_k052109->tilemap_update();
+
+	/* note: FIX layer is not used */
+	bitmap.fill(layer_colorbase[1], cliprect);
+	screen.priority().fill(0, cliprect);
+
+//  if (m_video_enable)
+	{
+		//		m_roz->zoom_draw(screen, bitmap, cliprect, 0, 1);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
+	}
+	return 0;
+}
 
 INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_interrupt)
 {
@@ -63,9 +175,9 @@ READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
 	else
 	{
 		if (m_zoomreadroms)
-			return m_k051316->rom_r(space, offset);
+			return m_roz->rom_r(space, offset);
 		else
-			return m_k051316->read(space, offset);
+			return m_roz->vram_r(space, offset);
 	}
 }
 
@@ -74,7 +186,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram1_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset, data);
 	else
-		m_k051316->write(space, offset, data);
+		m_roz->vram_w(space, offset, data);
 }
 
 READ8_MEMBER(bottom9_state::bottom9_bankedram2_r)
@@ -171,7 +283,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bottom9_state )
 	AM_RANGE(0x1fd2, 0x1fd2) AM_READ_PORT("P2")
 	AM_RANGE(0x1fd3, 0x1fd3) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1fe0, 0x1fe0) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1ff0, 0x1fff) AM_DEVWRITE("k051316", k051316_device, ctrl_w)
+	AM_RANGE(0x1ff0, 0x1fff) AM_DEVICE("roz", k051316_device, map)
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_SHARE("palette")
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
@@ -333,9 +445,7 @@ static MACHINE_CONFIG_START( bottom9 )
 	MCFG_K051960_SCREEN_TAG("screen")
 	MCFG_K051960_CB(bottom9_state, sprite_callback)
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_CB(bottom9_state, zoom_callback)
+	MCFG_K051316_ADD("roz", 4, false, [](u32 address, u32 &code, u16 &color) { code = address & 0x03ffff; color = (address & 0x3c0000) >> 14; })
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
