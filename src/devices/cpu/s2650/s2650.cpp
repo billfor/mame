@@ -16,6 +16,7 @@
 #include "debugger.h"
 #include "s2650.h"
 #include "s2650cpu.h"
+#include "2650dasm.h"
 
 /* define this to have some interrupt information logged */
 //#define VERBOSE 1
@@ -42,13 +43,10 @@ s2650_device::s2650_device(const machine_config &mconfig, const char *tag, devic
 	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
-
-offs_t s2650_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *s2650_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( s2650 );
-	return CPU_DISASSEMBLE_NAME(s2650)(this, stream, pc, oprom, opram, options);
+	return new s2650_disassembler;
 }
-
 
 device_memory_interface::space_config_vector s2650_device::memory_space_config() const
 {

@@ -104,6 +104,7 @@
 #include "debugger.h"
 #include "i8085.h"
 #include "i8085cpu.h"
+#include "8085dasm.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -1108,9 +1109,7 @@ void i8085a_cpu_device::execute_set_input(int irqline, int state)
 		m_irq_state[irqline] = state;
 }
 
-
-offs_t i8085a_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i8085a_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i8085 );
-	return CPU_DISASSEMBLE_NAME(i8085)(this, stream, pc, oprom, opram, options);
+	return new i8085_disassembler();
 }
