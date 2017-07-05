@@ -81,7 +81,6 @@ static const u32 s_flags[] =
 	0
 };
 
-
 static const u8 hmcs40_mnemonic[0x400] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
@@ -177,7 +176,7 @@ static const u8 hmcs40_mnemonic[0x400] =
 
 CPU_DISASSEMBLE(hmcs40)
 {
-	u16 op = (oprom[0] | oprom[1] << 8) & 0x3ff;
+	u16 op = opcodes.r16(pc) & 0x3ff;
 	u8 instr = hmcs40_mnemonic[op];
 	s8 bits = s_bits[instr];
 

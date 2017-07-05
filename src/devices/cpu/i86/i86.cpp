@@ -550,9 +550,9 @@ void i8086_common_cpu_device::execute_set_input( int inptnum, int state )
 	}
 }
 
-offs_t i8086_common_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t i8086_common_cpu_device::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options)
 {
-	return i386_dasm_one(stream, pc, oprom, 1);
+	return i386_dasm_one(stream, pc, opcodes, 1);
 }
 
 uint8_t i8086_common_cpu_device::read_port_byte(uint16_t port)
