@@ -19,7 +19,7 @@ static uint16_t r16(offs_t &pos, const device_disasm_interface::data_buffer &opc
 	return r;
 }
 
-static uint16_t r32(offs_t &pos, const device_disasm_interface::data_buffer &opcodes)
+static uint32_t r32(offs_t &pos, const device_disasm_interface::data_buffer &opcodes)
 {
 	uint32_t r = opcodes.r32(pos);
 	pos += 32;

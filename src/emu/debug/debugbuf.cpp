@@ -292,7 +292,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 				m_do_fill = [this](offs_t lstart, offs_t lend) {
 					auto dis = m_space->machine().disable_side_effect();
 					u16 *dest = reinterpret_cast<u16 *>(&m_buffer[0]) + ((lstart - m_lstart) >> 4);
-					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask) {
+					for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 0x10) & m_pc_mask) {
 						offs_t tpc = lpc;
 						if (m_space->device().memory().translate(m_space->spacenum(), TRANSLATE_FETCH_DEBUG, tpc))
 							*dest++ = m_space->read_word(tpc >> 3);
@@ -535,9 +535,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			assert(endian == ENDIANNESS_LITTLE);
 			m_do_fill = [this](offs_t lstart, offs_t lend) {
 				u16 *dest = reinterpret_cast<u16 *>(&m_buffer[0]) + ((lstart - m_lstart) >> 4);
-				lstart >>= 4;
-				lend >>= 4;
-				for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 1) & m_pc_mask)
+				for(offs_t lpc = lstart; lpc != lend; lpc = (lpc + 0x10) & m_pc_mask)
 					*dest++ = m_intf.disasm_decrypt16(m_back->r16(lpc), lpc, m_opcode);
 			};
 			break;
@@ -934,17 +932,17 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			m_do_r8  = [](offs_t pc) -> u8  { throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer: r8 access on 1-bit/16 wide granularity bus\n"); };
 			m_do_r16 = [this](offs_t pc) -> u16 {
 				fill(pc, 16);
-				const u16 *src = get_ptr<u16>(pc);
+				const u16 *src = reinterpret_cast<u16 *>(&m_buffer[0]) + ((pc - m_lstart) >> 4);
 				return src[0];
 			};
 			m_do_r32 = [this](offs_t pc) -> u32 { 
 				fill(pc, 32);
-				const u16 *src = get_ptr<u16>(pc);
+				const u16 *src = reinterpret_cast<u16 *>(&m_buffer[0]) + ((pc - m_lstart) >> 4);
 				return src[0] | (src[1] << 16);
 			};
 			m_do_r64 = [this](offs_t pc) -> u64 { 
 				fill(pc, 64);
-				const u16 *src = get_ptr<u16>(pc);
+				const u16 *src = reinterpret_cast<u16 *>(&m_buffer[0]) + ((pc - m_lstart) >> 4);
 				return src[0] | (src[1] << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
 			};
 			break;
@@ -1095,7 +1093,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 		}
 		break;
 
-	case 2:
+	case 3:
 		m_data_to_string = [this](offs_t pc, offs_t size) {
 			std::ostringstream out;
 			for(offs_t i=0; i != size; i += 16) {
@@ -1153,7 +1151,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 		};
 		break;
 
-	case  1:
+	case  3:
 		m_data_get = [this](offs_t pc, offs_t size, std::vector<u8> &data) {
 			for(offs_t i=0; i != size >> 4; i++) {
 				u16 r = r16(pc);
