@@ -628,9 +628,6 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 	// loop over entries and look for errors
 	for (address_map_entry &entry : m_entrylist)
 	{
-		uint32_t start = entry.m_addrstart;
-		uint32_t end = entry.m_addrend;
-
 		// look for overlapping entries
 		if (!detected_overlap)
 		{
@@ -650,7 +647,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 		}
 
 		// look for inverted start/end pairs
-		if (end < start)
+		if (entry.m_addrend < entry.m_addrstart)
 			osd_printf_error("Wrong %s memory read handler start = %08x > end = %08x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend);
 
 		// look for ranges outside the global mask
@@ -660,7 +657,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 			osd_printf_error("In %s memory range %x-%x, end address is outside of the global address mask %x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, globalmask);
 
 		// look for misaligned entries
-		if ((start & (alignunit - 1)) != 0 || (end & (alignunit - 1)) != (alignunit - 1))
+		if ((entry.m_addrstart & (alignunit - 1)) != 0 || (entry.m_addrend & (alignunit - 1)) != (alignunit - 1))
 			osd_printf_error("Wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, alignunit);
 
 		// verify mask/mirror/select
@@ -711,7 +708,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 					{
 						// verify the address range is within the region's bounds
 						offs_t length = ROMREGION_GETLENGTH(romp);
-						if (entry.m_rgnoffs + (end - start + 1) > length)
+						if (entry.m_rgnoffs + spaceconfig.addr2byte(entry.m_addrend - entry.m_addrstart + 1) > length)
 							osd_printf_error("%s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region, length);
 						found = true;
 					}
