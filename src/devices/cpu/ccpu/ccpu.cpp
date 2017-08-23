@@ -24,8 +24,8 @@ DEFINE_DEVICE_TYPE(CCPU, ccpu_cpu_device, "ccpu", "Cinematronics CPU")
 
 #define READOP(a)         (m_direct->read_byte(a))
 
-#define RDMEM(a)          (m_data->read_word((a) * 2) & 0xfff)
-#define WRMEM(a,v)        (m_data->write_word((a) * 2, (v)))
+#define RDMEM(a)          (m_data->read_word((a) & 0xfff))
+#define WRMEM(a,v)        (m_data->write_word((a), (v)))
 
 #define READPORT(a)       (m_io->read_byte(a))
 #define WRITEPORT(a,v)    (m_io->write_byte((a), (v)))
