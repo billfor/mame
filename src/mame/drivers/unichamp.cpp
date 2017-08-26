@@ -77,6 +77,8 @@ public:
 	DECLARE_READ16_MEMBER(unichamp_trapl_r);
 	DECLARE_WRITE16_MEMBER(unichamp_trapl_w);
 
+	DECLARE_READ16_MEMBER(read_ff);
+
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -134,7 +136,7 @@ READ8_MEMBER(unichamp_state::bext_r)
 	//The BEXT instruction pushes a user-defined nibble out on the four EBCA pins (EBCA0 to EBCA3)
 	//and reads the ECBI input pin for HIGH or LOW signal to know whether or not to branch
 
-	//The unisonic control system couldnt be simpler in desing.
+	//The unisonic control system couldnt be simpler in design.
 	//Each of the two player controllers has three buttons:
 	//one tying !RESET(GIC pin 21) to ground when closed - resetting the WHOLE system.
 	//a YES button (connecting EBCA0 to EBCI for Player1 and EBC2 to EBCI for Player2)
@@ -154,6 +156,11 @@ DRIVER_INIT_MEMBER(unichamp_state,unichamp)
 {
 }
 
+READ16_MEMBER(unichamp_state::read_ff)
+{
+	return 0xffff;
+}
+
 void unichamp_state::machine_start()
 {
 	if (m_cart->exists()){
@@ -166,10 +173,11 @@ void unichamp_state::machine_start()
 			ptr[i] = ptr[i+1];
 			ptr[i+1] = TEMP;
 		}
-
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1800,
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x17ff,
 					read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
-	}
+	} else
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x17ff,
+					read16_delegate(FUNC(unichamp_state::read_ff), this));
 }
 
 /* Set Reset and INTR/INTRM Vector */
