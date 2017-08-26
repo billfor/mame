@@ -410,7 +410,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	case  3: regs.idb = regs.tr; break;
 	case  4: regs.idb = regs.dp; break;
 	case  5: regs.idb = regs.rp; break;
-	case  6: regs.idb = m_data->read_word(regs.rp<<1); break;
+	case  6: regs.idb = m_data->read_word(regs.rp); break;
 	case  7: regs.idb = 0x8000 - regs.flaga.s1; break;  //SGN
 	case  8: regs.idb = regs.dr; regs.sr.rqm = 1; break;
 	case  9: regs.idb = regs.dr; break;
@@ -611,7 +611,7 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 	case  8: regs.so = BITSWAP16(id, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB first output, output tapped at bit 15 shifting left
 	case  9: regs.so = id; break;  //MSB first output, output tapped at bit 15 shifting left
 	case 10: regs.k = id; break;
-	case 11: regs.k = id; regs.l = m_data->read_word(regs.rp<<1); break;
+	case 11: regs.k = id; regs.l = m_data->read_word(regs.rp); break;
 	case 12: regs.l = id; regs.k = dataRAM[regs.dp | 0x40]; break;
 	case 13: regs.l = id; break;
 	case 14: regs.trb = id; break;
