@@ -48,7 +48,7 @@
 
 #define E132XS_STRICT_VERIFY            0x0001          /* verify all instructions */
 
-#define SINGLE_INSTRUCTION_MODE         (1)
+#define SINGLE_INSTRUCTION_MODE         (0)
 
 #define ENABLE_E132XS_DRC               (1)
 
@@ -144,6 +144,7 @@ public:
 	void e132_16k_iram_map(address_map &map);
 	void e132_4k_iram_map(address_map &map);
 	void e132_8k_iram_map(address_map &map);
+
 protected:
 	struct internal_hyperstone_state
 	{

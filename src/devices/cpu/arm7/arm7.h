@@ -41,18 +41,134 @@
     COMPILER-SPECIFIC OPTIONS
 ***************************************************************************/
 
+/* compilation boundaries -- how far back/forward does the analysis extend? */
+#define COMPILE_BACKWARDS_BYTES         128
+#define COMPILE_FORWARDS_BYTES          512
+#define COMPILE_MAX_INSTRUCTIONS        ((COMPILE_BACKWARDS_BYTES/4) + (COMPILE_FORWARDS_BYTES/4))
+#define COMPILE_MAX_SEQUENCE            64
+
+#define SINGLE_INSTRUCTION_MODE         (0)
+
 #define ARM7DRC_STRICT_VERIFY      0x0001          /* verify all instructions */
-#define ARM7DRC_FLUSH_PC           0x0008          /* flush the PC value before each memory access */
+#define ARM7DRC_FLUSH_PC           0x0002          /* flush the PC value before each memory access */
 
 #define ARM7DRC_COMPATIBLE_OPTIONS (ARM7DRC_STRICT_VERIFY | ARM7DRC_FLUSH_PC)
 #define ARM7DRC_FASTEST_OPTIONS    (0)
 
 /****************************************************************************************************
+ *  CONSTANTS
+ ***************************************************************************************************/
+
+enum
+{
+	TLB_COARSE = 0,
+	TLB_FINE
+};
+
+enum
+{
+	FAULT_NONE = 0,
+	FAULT_DOMAIN,
+	FAULT_PERMISSION
+};
+
+/* There are 36 Unique - 32 bit processor registers */
+/* Each mode has 17 registers (except user & system, which have 16) */
+/* This is a list of each *unique* register */
+enum
+{
+	/* All modes have the following */
+	eR0 = 0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
+	eR8, eR9, eR10, eR11, eR12,
+	eR13, /* Stack Pointer */
+	eR14, /* Link Register (holds return address) */
+	eR15, /* Program Counter */
+	eCPSR, /* Current Status Program Register */
+
+	/* Fast Interrupt - Bank switched registers */
+	eR8_FIQ, eR9_FIQ, eR10_FIQ, eR11_FIQ, eR12_FIQ, eR13_FIQ, eR14_FIQ, eSPSR_FIQ,
+
+	/* IRQ - Bank switched registers */
+	eR13_IRQ, eR14_IRQ, eSPSR_IRQ,
+
+	/* Supervisor/Service Mode - Bank switched registers */
+	eR13_SVC, eR14_SVC, eSPSR_SVC,
+
+	/* Abort Mode - Bank switched registers */
+	eR13_ABT, eR14_ABT, eSPSR_ABT,
+
+	/* Undefined Mode - Bank switched registers */
+	eR13_UND, eR14_UND, eSPSR_UND,
+
+	NUM_REGS
+};
+
+#define ARM7_NUM_MODES 0x10
+
+/* 17 processor registers are visible at any given time,
+ * banked depending on processor mode.
+ */
+
+static const int sRegisterTable[ARM7_NUM_MODES][18] =
+{
+	{ /* USR */
+		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
+		eR8, eR9, eR10, eR11, eR12,
+		eR13, eR14,
+		eR15, eCPSR  // No SPSR in this mode
+	},
+	{ /* FIQ */
+		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
+		eR8_FIQ, eR9_FIQ, eR10_FIQ, eR11_FIQ, eR12_FIQ,
+		eR13_FIQ, eR14_FIQ,
+		eR15, eCPSR, eSPSR_FIQ
+	},
+	{ /* IRQ */
+		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
+		eR8, eR9, eR10, eR11, eR12,
+		eR13_IRQ, eR14_IRQ,
+		eR15, eCPSR, eSPSR_IRQ
+	},
+	{ /* SVC */
+		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
+		eR8, eR9, eR10, eR11, eR12,
+		eR13_SVC, eR14_SVC,
+		eR15, eCPSR, eSPSR_SVC
+	},
+	{0}, {0}, {0},        // values for modes 4,5,6 are not valid
+	{ /* ABT */
+		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
+		eR8, eR9, eR10, eR11, eR12,
+		eR13_ABT, eR14_ABT,
+		eR15, eCPSR, eSPSR_ABT
+	},
+	{0}, {0}, {0},        // values for modes 8,9,a are not valid!
+	{ /* UND */
+		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
+		eR8, eR9, eR10, eR11, eR12,
+		eR13_UND, eR14_UND,
+		eR15, eCPSR, eSPSR_UND
+	},
+	{0}, {0}, {0},        // values for modes c,d, e are not valid!
+	{ /* SYS */
+		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
+		eR8, eR9, eR10, eR11, eR12,
+		eR13, eR14,
+		eR15, eCPSR  // No SPSR in this mode
+	}
+};
+
+/****************************************************************************************************
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
 
+class arm7_frontend;
+
 class arm7_cpu_device : public cpu_device, public arm7_disassembler::config
 {
+	friend class arm7_frontend;
+	friend class arm9_frontend;
+
 public:
 	// construction/destruction
 	arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -113,6 +229,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_stop() override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 3; }
@@ -135,43 +252,52 @@ protected:
 
 	address_space_config m_program_config;
 
-	uint32_t m_r[/*NUM_REGS*/37];
+	struct internal_arm_state
+	{
+		uint32_t m_r[37];
+
+		uint32_t m_insn_prefetch_depth;
+		uint32_t m_insn_prefetch_count;
+		uint32_t m_insn_prefetch_index;
+		uint32_t m_insn_prefetch_buffer[3];
+		uint32_t m_insn_prefetch_address[3];
+		uint32_t m_prefetch_word0_shift;
+		uint32_t m_prefetch_word1_shift;
+
+		uint32_t m_pendingIrq;
+		uint32_t m_pendingFiq;
+		uint32_t m_pendingAbtD;
+		uint32_t m_pendingAbtP;
+		uint32_t m_pendingUnd;
+		uint32_t m_pendingSwi;
+		uint32_t m_pending_interrupt;
+		int m_icount;
+
+		/* Coprocessor Registers */
+		uint32_t m_control;
+		uint32_t m_tlbBase;
+		uint32_t m_tlb_base_mask;
+		uint32_t m_faultStatus[2];
+		uint32_t m_faultAddress;
+		uint32_t m_fcsePID;
+		uint32_t m_pid_offset;
+		uint32_t m_domainAccessControl;
+		uint32_t m_decoded_access_control[16];
+
+		const int* m_reg_group;
+	};
 
 	void update_insn_prefetch(uint32_t curr_pc);
 	virtual uint16_t insn_fetch_thumb(uint32_t pc);
 	uint32_t insn_fetch_arm(uint32_t pc);
 	int get_insn_prefetch_index(uint32_t address);
 
-	uint32_t m_insn_prefetch_depth;
-	uint32_t m_insn_prefetch_count;
-	uint32_t m_insn_prefetch_index;
-	uint32_t m_insn_prefetch_buffer[3];
-	uint32_t m_insn_prefetch_address[3];
-	const uint32_t m_prefetch_word0_shift;
-	const uint32_t m_prefetch_word1_shift;
+	internal_arm_state *m_core;
 
-	bool m_pendingIrq;
-	bool m_pendingFiq;
-	bool m_pendingAbtD;
-	bool m_pendingAbtP;
-	bool m_pendingUnd;
-	bool m_pendingSwi;
-	bool m_pending_interrupt;
-	int m_icount;
-	endianness_t m_endian;
 	address_space *m_program;
 	direct_read_data<0> *m_direct;
 
-	/* Coprocessor Registers */
-	uint32_t m_control;
-	uint32_t m_tlbBase;
-	uint32_t m_tlb_base_mask;
-	uint32_t m_faultStatus[2];
-	uint32_t m_faultAddress;
-	uint32_t m_fcsePID;
-	uint32_t m_pid_offset;
-	uint32_t m_domainAccessControl;
-	uint8_t m_decoded_access_control[16];
+	endianness_t m_endian;
 
 	uint8_t m_archRev;          // ARM architecture revision (3, 4, and 5 are valid)
 	uint8_t m_archFlags;        // architecture flags
@@ -183,6 +309,8 @@ protected:
 //#endif
 
 	uint32_t m_copro_id;
+
+	bool m_enable_drc;
 
 	// For debugger
 	uint32_t m_pc;
@@ -197,7 +325,8 @@ protected:
 	void HandleCoProcDO(uint32_t insn);
 	void HandleCoProcRT(uint32_t insn);
 	void HandleCoProcDT(uint32_t insn);
-	void HandleBranch(uint32_t insn, bool h_bit);
+	void HandleBranch(uint32_t insn);
+	void HandleBranchHBit(uint32_t insn);
 	void HandleMemSingle(uint32_t insn);
 	void HandleHalfWordDT(uint32_t insn);
 	void HandleSwap(uint32_t insn);
@@ -210,7 +339,6 @@ protected:
 
 	void arm7ops_0123(uint32_t insn);
 	void arm7ops_4567(uint32_t insn);
-	void arm7ops_89(uint32_t insn);
 	void arm7ops_ab(uint32_t insn);
 	void arm7ops_cd(uint32_t insn);
 	void arm7ops_e(uint32_t insn);
@@ -224,7 +352,8 @@ protected:
 	void arm9ops_c(uint32_t insn);
 	void arm9ops_e(uint32_t insn);
 
-	void set_cpsr(uint32_t val);
+	virtual void set_cpsr(uint32_t val);
+	inline void set_cpsr_nomode(uint32_t val) { m_core->m_r[eCPSR] = val; }
 	bool arm7_tlb_translate(offs_t &addr, int flags, bool no_exception = false);
 	uint32_t arm7_tlb_get_second_level_descriptor( uint32_t granularity, uint32_t first_desc, uint32_t vaddr );
 	int detect_fault(int desc_lvl1, int ap, int flags);
@@ -383,48 +512,48 @@ protected:
 	/* ARM7 registers */
 	struct arm7imp_state
 	{
-		/* core state */
-		drc_cache *         cache;                      /* pointer to the DRC code cache */
-		drcuml_state *      drcuml;                     /* DRC UML generator state */
-		//arm7_frontend *     drcfe;                      /* pointer to the DRC front-end state */
-		uint32_t              drcoptions;                 /* configurable DRC options */
-
 		/* internal stuff */
-		uint8_t               cache_dirty;                /* true if we need to flush the cache */
-		uint32_t              jmpdest;                    /* destination jump target */
+		uint32_t            jmpdest;                    /* destination jump target */
 
 		/* parameters for subroutines */
-		uint64_t              numcycles;                  /* return value from gettotalcycles */
-		uint32_t              mode;                       /* current global mode */
+		uint64_t            numcycles;                  /* return value from gettotalcycles */
+		uint32_t            mode;                       /* current global mode */
 		const char *        format;                     /* format string for print_debug */
-		uint32_t              arg0;                       /* print_debug argument 1 */
-		uint32_t              arg1;                       /* print_debug argument 2 */
+		uint32_t            arg0;                       /* print_debug argument 1 */
+		uint32_t            arg1;                       /* print_debug argument 2 */
 
 		/* register mappings */
-		uml::parameter   regmap[/*NUM_REGS*/37];               /* parameter to register mappings for all 16 integer registers */
+		uml::parameter      regmap[/*NUM_REGS*/37];     /* parameter to register mappings for all integer registers */
 
 		/* subroutines */
-		uml::code_handle *   entry;                      /* entry point */
-		uml::code_handle *   nocode;                     /* nocode exception handler */
-		uml::code_handle *   out_of_cycles;              /* out of cycles exception handler */
-		uml::code_handle *   tlb_translate;              /* tlb translation handler */
-		uml::code_handle *   detect_fault;               /* tlb fault detection handler */
-		uml::code_handle *   check_irq;                  /* irq check handler */
-		uml::code_handle *   read8;                      /* read byte */
-		uml::code_handle *   write8;                     /* write byte */
-		uml::code_handle *   read16;                     /* read half */
-		uml::code_handle *   write16;                    /* write half */
-		uml::code_handle *   read32;                     /* read word */
-		uml::code_handle *   write32;                    /* write word */
+		uml::code_handle *  entry;                      /* entry point */
+		uml::code_handle *  nocode;                     /* nocode exception handler */
+		uml::code_handle *  out_of_cycles;              /* out of cycles exception handler */
+		uml::code_handle *  tlb_translate;              /* tlb translation handler */
+		uml::code_handle *  detect_fault;               /* tlb fault detection handler */
+		uml::code_handle *  check_irq;                  /* irq check handler */
+		uml::code_handle *  read8;                      /* read byte */
+		uml::code_handle *  write8;                     /* write byte */
+		uml::code_handle *  read16;                     /* read half */
+		uml::code_handle *  write16;                    /* write half */
+		uml::code_handle *  read32;                     /* read word */
+		uml::code_handle *  write32;                    /* write word */
 
 		/* fast RAM */
-		uint32_t              fastram_select;
+		uint32_t            fastram_select;
 		fast_ram_info       fastram[ARM7_MAX_FASTRAM];
 
 		/* hotspots */
-		uint32_t              hotspot_select;
+		uint32_t            hotspot_select;
 		hotspot_info        hotspot[ARM7_MAX_HOTSPOTS];
 	} m_impstate;
+
+	/* core state */
+	drc_cache           m_cache;                      /* pointer to the DRC code cache */
+	std::unique_ptr<drcuml_state> m_drcuml;           /* DRC UML generator state */
+	std::unique_ptr<arm7_frontend> m_drcfe;           /* pointer to the DRC front-end state */
+	uint32_t            m_drcoptions;                 /* configurable DRC options */
+	uint8_t             m_cache_dirty;                /* true if we need to flush the cache */
 
 	typedef void ( arm7_cpu_device::*arm7thumb_drcophandler)(drcuml_block*, compiler_state*, const opcode_desc*);
 	static const arm7thumb_drcophandler drcthumb_handler[0x40*0x10];
@@ -531,11 +660,8 @@ protected:
 	void drctg0f_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* BL */
 
 	void update_reg_ptr();
-	const int* m_reg_group;
 	void load_fast_iregs(drcuml_block *block);
 	void save_fast_iregs(drcuml_block *block);
-	void arm7_drc_init();
-	void arm7_drc_exit();
 	void execute_run_drc();
 	void arm7drc_set_options(uint32_t options);
 	void arm7drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
@@ -568,7 +694,6 @@ protected:
 	bool drcarm7ops_e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
 	bool drcarm7ops_f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
 	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-
 };
 
 
@@ -585,6 +710,9 @@ class arm7500_cpu_device : public arm7_cpu_device
 public:
 	// construction/destruction
 	arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	void set_cpsr(uint32_t val) override;
 };
 
 

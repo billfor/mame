@@ -409,17 +409,10 @@ uint32_t hyperstone_device::get_emu_code_addr(uint8_t num) /* num is OP */
 void hyperstone_device::dump_registers()
 {
 	static uint64_t total_ops = 0;
-	//static uint64_t total_11094 = 0;
 	total_ops++;
 	if (total_ops < 0ULL)
 	{
-		//if (m_core->global_regs[0] == 0x11094)
-		//{
-		//  total_11094++;
-		//}
 		return;
-	} else if (total_ops == 0ULL) {
-		//printf("Total non-log hits of 0x11094: %d\n", (uint32_t)total_11094);
 	}
 	uint8_t packed[4];
 	packed[0] = (uint8_t)m_core->intblock;

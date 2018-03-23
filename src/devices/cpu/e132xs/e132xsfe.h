@@ -12,7 +12,6 @@ class e132xs_frontend : public drc_frontend
 {
 public:
 	e132xs_frontend(hyperstone_device *e132xs, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
-	void flush();
 
 protected:
 	// required overrides

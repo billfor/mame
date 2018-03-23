@@ -3,8 +3,8 @@
 /* ARM7 core helper Macros / Functions */
 
 /* Macros that need to be defined according to the cpu implementation specific need */
-#define ARM7REG(reg)        m_r[reg]
-#define ARM7_ICOUNT         m_icount
+#define ARM7REG(reg)        m_core->m_r[reg]
+#define ARM7_ICOUNT         m_core->m_icount
 
 
 #if 0
@@ -29,14 +29,14 @@
 /* Set NZCV flags for ADDS / SUBS */
 #define HandleALUAddFlags(rd, rn, op2)                                                \
 	if (insn & INSN_S)                                                                  \
-	set_cpsr(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                       \
+	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                       \
 				| (((!SIGN_BITS_DIFFER(rn, op2)) && SIGN_BITS_DIFFER(rn, rd)) << V_BIT) \
 				| (((IsNeg(rn) & IsNeg(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsNeg(op2) & IsPos(rd))) ? C_MASK : 0) \
 				| HandleALUNZFlags(rd)));                                               \
 	R15 += 4;
 
 #define HandleThumbALUAddFlags(rd, rn, op2)                                                       \
-	set_cpsr(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                   \
+	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                   \
 				| (((!THUMB_SIGN_BITS_DIFFER(rn, op2)) && THUMB_SIGN_BITS_DIFFER(rn, rd)) << V_BIT) \
 				| (((~(rn)) < (op2)) << C_BIT)                                                      \
 				| HandleALUNZFlags(rd)));                                                           \
@@ -62,14 +62,14 @@
 
 #define HandleALUSubFlags(rd, rn, op2)                                                                         \
 	if (insn & INSN_S)                                                                                           \
-	set_cpsr(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
+	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
 				| ((SIGN_BITS_DIFFER(rn, op2) && SIGN_BITS_DIFFER(rn, rd)) << V_BIT)                             \
 				| (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
 				| HandleALUNZFlags(rd)));                                                                        \
 	R15 += 4;
 
 #define HandleThumbALUSubFlags(rd, rn, op2)                                                                    \
-	set_cpsr(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
+	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
 				| ((THUMB_SIGN_BITS_DIFFER(rn, op2) && THUMB_SIGN_BITS_DIFFER(rn, rd)) << V_BIT)                 \
 				| (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
 				| HandleALUNZFlags(rd)));                                                                        \
@@ -122,7 +122,7 @@
 
 #define HandleALULogicalFlags(rd, sc)                  \
 	if (insn & INSN_S)                                   \
-	set_cpsr(((GET_CPSR & ~(N_MASK | Z_MASK | C_MASK)) \
+	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | C_MASK)) \
 				| HandleALUNZFlags(rd)                   \
 				| (((sc) != 0) << C_BIT)));              \
 	R15 += 4;
@@ -131,7 +131,7 @@
 #define DRC_RS      uml::mem(&GetRegister(rs))
 #define DRC_CPSR    uml::mem(&GET_CPSR)
 #define DRC_PC      uml::mem(&R15)
-#define DRC_REG(i)  uml::mem(&m_r[(i)])
+#define DRC_REG(i)  uml::mem(&GetRegister(i))
 
 #define DRCHandleALULogicalFlags(rd, sc)                                \
 	if (insn & INSN_S)                                                  \
@@ -148,11 +148,11 @@
 
 
 // used to be functions, but no longer a need, so we'll use define for better speed.
-#define GetRegister(rIndex)        m_r[m_reg_group[rIndex]]
-#define SetRegister(rIndex, value) m_r[m_reg_group[rIndex]] = value
+#define GetRegister(rIndex)        m_core->m_r[m_core->m_reg_group[rIndex]]
+#define SetRegister(rIndex, value) m_core->m_r[m_core->m_reg_group[rIndex]] = value
 
-#define GetModeRegister(mode, rIndex)        m_r[sRegisterTable[mode][rIndex]]
-#define SetModeRegister(mode, rIndex, value) m_r[sRegisterTable[mode][rIndex]] = value
+#define GetModeRegister(mode, rIndex)        m_core->m_r[sRegisterTable[mode][rIndex]]
+#define SetModeRegister(mode, rIndex, value) m_core->m_r[sRegisterTable[mode][rIndex]] = value
 
 
 /* Macros that can be re-defined for custom cpu implementations - The core expects these to be defined */

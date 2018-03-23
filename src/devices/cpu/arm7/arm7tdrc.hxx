@@ -1537,7 +1537,7 @@ void arm7_cpu_device::drctg0d_e(drcuml_block *block, compiler_state *compiler, c
 
 void arm7_cpu_device::drctg0d_f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc) // SWI (this is sort of a "hole" in the opcode encoding)
 {
-	UML_MOV(block, uml::mem(&m_pendingSwi), 1);
+	UML_MOV(block, uml::mem(&m_core->m_pendingSwi), 1);
 	UML_CALLH(block, *m_impstate.check_irq);
 }
 

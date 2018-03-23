@@ -289,7 +289,7 @@ void arm7_cpu_device::tg00_0(uint32_t pc, uint32_t op) /* Shift left */
 	uint32_t rs, rd, rrs;
 	int32_t offs;
 
-	set_cpsr(GET_CPSR & ~(N_MASK | Z_MASK));
+	set_cpsr_nomode(GET_CPSR & ~(N_MASK | Z_MASK));
 
 	rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
@@ -300,19 +300,19 @@ void arm7_cpu_device::tg00_0(uint32_t pc, uint32_t op) /* Shift left */
 		SetRegister(rd, rrs << offs);
 		if (rrs & (1 << (31 - (offs - 1))))
 		{
-			set_cpsr(GET_CPSR | C_MASK);
+			set_cpsr_nomode(GET_CPSR | C_MASK);
 		}
 		else
 		{
-			set_cpsr(GET_CPSR & ~C_MASK);
+			set_cpsr_nomode(GET_CPSR & ~C_MASK);
 		}
 	}
 	else
 	{
 		SetRegister(rd, rrs);
 	}
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 	R15 += 2;
 }
 
@@ -330,11 +330,11 @@ void arm7_cpu_device::tg00_1(uint32_t pc, uint32_t op) /* Shift right */
 		SetRegister(rd, rrs >> offs);
 		if (rrs & (1 << (offs - 1)))
 		{
-			set_cpsr(GET_CPSR | C_MASK);
+			set_cpsr_nomode(GET_CPSR | C_MASK);
 		}
 		else
 		{
-			set_cpsr(GET_CPSR & ~C_MASK);
+			set_cpsr_nomode(GET_CPSR & ~C_MASK);
 		}
 	}
 	else
@@ -342,15 +342,15 @@ void arm7_cpu_device::tg00_1(uint32_t pc, uint32_t op) /* Shift right */
 		SetRegister(rd, 0);
 		if (rrs & 0x80000000)
 		{
-			set_cpsr(GET_CPSR | C_MASK);
+			set_cpsr_nomode(GET_CPSR | C_MASK);
 		}
 		else
 		{
-			set_cpsr(GET_CPSR & ~C_MASK);
+			set_cpsr_nomode(GET_CPSR & ~C_MASK);
 		}
 	}
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 	R15 += 2;
 }
 
@@ -375,11 +375,11 @@ void arm7_cpu_device::tg01_0(uint32_t pc, uint32_t op)
 		{
 			if (rrs >> 31)
 			{
-				set_cpsr(GET_CPSR | C_MASK);
+				set_cpsr_nomode(GET_CPSR | C_MASK);
 			}
 			else
 			{
-				set_cpsr(GET_CPSR & ~C_MASK);
+				set_cpsr_nomode(GET_CPSR & ~C_MASK);
 			}
 			SetRegister(rd, (rrs & 0x80000000) ? 0xFFFFFFFF : 0x00000000);
 		}
@@ -387,19 +387,19 @@ void arm7_cpu_device::tg01_0(uint32_t pc, uint32_t op)
 		{
 			if ((rrs >> (offs - 1)) & 1)
 			{
-				set_cpsr(GET_CPSR | C_MASK);
+				set_cpsr_nomode(GET_CPSR | C_MASK);
 			}
 			else
 			{
-				set_cpsr(GET_CPSR & ~C_MASK);
+				set_cpsr_nomode(GET_CPSR & ~C_MASK);
 			}
 			SetRegister(rd,
 							(rrs & 0x80000000)
 							? ((0xFFFFFFFF << (32 - offs)) | (rrs >> offs))
 							: (rrs >> offs));
 		}
-		set_cpsr(GET_CPSR & ~(N_MASK | Z_MASK));
-		set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+		set_cpsr_nomode(GET_CPSR & ~(N_MASK | Z_MASK));
+		set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 		R15 += 2;
 	}
 }
@@ -451,8 +451,8 @@ void arm7_cpu_device::tg02_0(uint32_t pc, uint32_t op)
 	uint32_t rd = (op & THUMB_INSN_IMM_RD) >> THUMB_INSN_IMM_RD_SHIFT;
 	uint32_t op2 = (op & THUMB_INSN_IMM);
 	SetRegister(rd, op2);
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 	R15 += 2;
 }
 
@@ -491,8 +491,8 @@ void arm7_cpu_device::tg04_00_00(uint32_t pc, uint32_t op) /* AND Rd, Rs */
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	SetRegister(rd, GetRegister(rd) & GetRegister(rs));
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 	R15 += 2;
 }
 
@@ -501,8 +501,8 @@ void arm7_cpu_device::tg04_00_01(uint32_t pc, uint32_t op) /* EOR Rd, Rs */
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	SetRegister(rd, GetRegister(rd) ^ GetRegister(rs));
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 	R15 += 2;
 }
 
@@ -519,11 +519,11 @@ void arm7_cpu_device::tg04_00_02(uint32_t pc, uint32_t op) /* LSL Rd, Rs */
 			SetRegister(rd, rrd << offs);
 			if (rrd & (1 << (31 - (offs - 1))))
 			{
-				set_cpsr(GET_CPSR | C_MASK);
+				set_cpsr_nomode(GET_CPSR | C_MASK);
 			}
 			else
 			{
-				set_cpsr(GET_CPSR & ~C_MASK);
+				set_cpsr_nomode(GET_CPSR & ~C_MASK);
 			}
 		}
 		else if (offs == 32)
@@ -531,21 +531,21 @@ void arm7_cpu_device::tg04_00_02(uint32_t pc, uint32_t op) /* LSL Rd, Rs */
 			SetRegister(rd, 0);
 			if (rrd & 1)
 			{
-				set_cpsr(GET_CPSR | C_MASK);
+				set_cpsr_nomode(GET_CPSR | C_MASK);
 			}
 			else
 			{
-				set_cpsr(GET_CPSR & ~C_MASK);
+				set_cpsr_nomode(GET_CPSR & ~C_MASK);
 			}
 		}
 		else
 		{
 			SetRegister(rd, 0);
-			set_cpsr(GET_CPSR & ~C_MASK);
+			set_cpsr_nomode(GET_CPSR & ~C_MASK);
 		}
 	}
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 	R15 += 2;
 }
 
@@ -562,11 +562,11 @@ void arm7_cpu_device::tg04_00_03(uint32_t pc, uint32_t op) /* LSR Rd, Rs */
 			SetRegister(rd, rrd >> offs);
 			if (rrd & (1 << (offs - 1)))
 			{
-				set_cpsr(GET_CPSR | C_MASK);
+				set_cpsr_nomode(GET_CPSR | C_MASK);
 			}
 			else
 			{
-				set_cpsr(GET_CPSR & ~C_MASK);
+				set_cpsr_nomode(GET_CPSR & ~C_MASK);
 			}
 		}
 		else if (offs == 32)
@@ -574,21 +574,21 @@ void arm7_cpu_device::tg04_00_03(uint32_t pc, uint32_t op) /* LSR Rd, Rs */
 			SetRegister(rd, 0);
 			if (rrd & 0x80000000)
 			{
-				set_cpsr(GET_CPSR | C_MASK);
+				set_cpsr_nomode(GET_CPSR | C_MASK);
 			}
 			else
 			{
-				set_cpsr(GET_CPSR & ~C_MASK);
+				set_cpsr_nomode(GET_CPSR & ~C_MASK);
 			}
 		}
 		else
 		{
 			SetRegister(rd, 0);
-			set_cpsr(GET_CPSR & ~C_MASK);
+			set_cpsr_nomode(GET_CPSR & ~C_MASK);
 		}
 	}
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 	R15 += 2;
 }
 
@@ -604,11 +604,11 @@ void arm7_cpu_device::tg04_00_04(uint32_t pc, uint32_t op) /* ASR Rd, Rs */
 		{
 			if (rrd >> 31)
 			{
-				set_cpsr(GET_CPSR | C_MASK);
+				set_cpsr_nomode(GET_CPSR | C_MASK);
 			}
 			else
 			{
-				set_cpsr(GET_CPSR & ~C_MASK);
+				set_cpsr_nomode(GET_CPSR & ~C_MASK);
 			}
 			SetRegister(rd, (GetRegister(rd) & 0x80000000) ? 0xFFFFFFFF : 0x00000000);
 		}
@@ -616,19 +616,19 @@ void arm7_cpu_device::tg04_00_04(uint32_t pc, uint32_t op) /* ASR Rd, Rs */
 		{
 			if ((rrd >> (rrs-1)) & 1)
 			{
-				set_cpsr(GET_CPSR | C_MASK);
+				set_cpsr_nomode(GET_CPSR | C_MASK);
 			}
 			else
 			{
-				set_cpsr(GET_CPSR & ~C_MASK);
+				set_cpsr_nomode(GET_CPSR & ~C_MASK);
 			}
 			SetRegister(rd, (rrd & 0x80000000)
 							? ((0xFFFFFFFF << (32 - rrs)) | (rrd >> rrs))
 							: (rrd >> rrs));
 		}
 	}
-	set_cpsr(GET_CPSR & ~(N_MASK | Z_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+	set_cpsr_nomode(GET_CPSR & ~(N_MASK | Z_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 	R15 += 2;
 }
 
@@ -661,14 +661,14 @@ void arm7_cpu_device::tg04_00_07(uint32_t pc, uint32_t op) /* ROR Rd, Rs */
 	SetRegister(rd, (rrd >> imm) | (rrd << (32 - imm)));
 	if (rrd & (1 << (imm - 1)))
 	{
-		set_cpsr(GET_CPSR | C_MASK);
+		set_cpsr_nomode(GET_CPSR | C_MASK);
 	}
 	else
 	{
-		set_cpsr(GET_CPSR & ~C_MASK);
+		set_cpsr_nomode(GET_CPSR & ~C_MASK);
 	}
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 	R15 += 2;
 }
 
@@ -676,8 +676,8 @@ void arm7_cpu_device::tg04_00_08(uint32_t pc, uint32_t op) /* TST Rd, Rs */
 {
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd) & GetRegister(rs)));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd) & GetRegister(rs)));
 	R15 += 2;
 }
 
@@ -711,8 +711,8 @@ void arm7_cpu_device::tg04_00_0c(uint32_t pc, uint32_t op) /* ORR Rd, Rs */
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	SetRegister(rd, GetRegister(rd) | GetRegister(rs));
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 	R15 += 2;
 }
 
@@ -721,9 +721,9 @@ void arm7_cpu_device::tg04_00_0d(uint32_t pc, uint32_t op) /* MUL Rd, Rs */
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	uint32_t rn = GetRegister(rd) * GetRegister(rs);
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
 	SetRegister(rd, rn);
-	set_cpsr(GET_CPSR | HandleALUNZFlags(rn));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(rn));
 	R15 += 2;
 }
 
@@ -732,8 +732,8 @@ void arm7_cpu_device::tg04_00_0e(uint32_t pc, uint32_t op) /* BIC Rd, Rs */
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	SetRegister(rd, GetRegister(rd) & (~GetRegister(rs)));
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 	R15 += 2;
 }
 
@@ -743,8 +743,8 @@ void arm7_cpu_device::tg04_00_0f(uint32_t pc, uint32_t op) /* MVN Rd, Rs */
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	uint32_t op2 = GetRegister(rs);
 	SetRegister(rd, ~op2);
-	set_cpsr(GET_CPSR & ~(Z_MASK | N_MASK));
-	set_cpsr(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
+	set_cpsr_nomode(GET_CPSR & ~(Z_MASK | N_MASK));
+	set_cpsr_nomode(GET_CPSR | HandleALUNZFlags(GetRegister(rd)));
 	R15 += 2;
 }
 
@@ -902,7 +902,7 @@ void arm7_cpu_device::tg04_01_30(uint32_t pc, uint32_t op)
 	}
 	else
 	{
-		set_cpsr(GET_CPSR & ~T_MASK);
+		set_cpsr_nomode(GET_CPSR & ~T_MASK);
 		if (addr & 2)
 		{
 			addr += 2;
@@ -925,7 +925,7 @@ void arm7_cpu_device::tg04_01_31(uint32_t pc, uint32_t op)
 	}
 	else
 	{
-		set_cpsr(GET_CPSR & ~T_MASK);
+		set_cpsr_nomode(GET_CPSR & ~T_MASK);
 		if (addr & 2)
 		{
 			addr += 2;
@@ -943,7 +943,7 @@ void arm7_cpu_device::tg04_01_32(uint32_t pc, uint32_t op)
 	// are we also switching to ARM mode?
 	if (!(addr & 1))
 	{
-		set_cpsr(GET_CPSR & ~T_MASK);
+		set_cpsr_nomode(GET_CPSR & ~T_MASK);
 		if (addr & 2)
 		{
 			addr += 2;
@@ -1278,7 +1278,7 @@ void arm7_cpu_device::tg0b_d(uint32_t pc, uint32_t op) /* POP {Rlist}{PC} */
 		}
 		else
 		{
-			set_cpsr(GET_CPSR & ~T_MASK);
+			set_cpsr_nomode(GET_CPSR & ~T_MASK);
 			if (addr & 2)
 			{
 				addr += 2;
@@ -1535,8 +1535,8 @@ void arm7_cpu_device::tg0d_e(uint32_t pc, uint32_t op) // COND_AL:
 
 void arm7_cpu_device::tg0d_f(uint32_t pc, uint32_t op) // COND_NV:   // SWI (this is sort of a "hole" in the opcode encoding)
 {
-	m_pendingSwi = 1;
-	update_irq_state();
+	m_core->m_pendingSwi = true;
+	m_core->m_pending_interrupt = true;
 	arm7_check_irq_state();
 }
 
@@ -1561,7 +1561,7 @@ void arm7_cpu_device::tg0e_1(uint32_t pc, uint32_t op)
 	addr &= 0xfffffffc;
 	SetRegister(14, (R15 + 2) | 1);
 	R15 = addr;
-	set_cpsr(GET_CPSR & ~T_MASK);
+	set_cpsr_nomode(GET_CPSR & ~T_MASK);
 }
 
 

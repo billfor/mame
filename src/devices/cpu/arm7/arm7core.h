@@ -41,6 +41,7 @@ enum
 /****************************************************************************************************
  *  ARM7 CORE REGISTERS
  ***************************************************************************************************/
+
 enum
 {
 	ARM7_PC = 0,
@@ -51,39 +52,8 @@ enum
 	ARM7_CPSR, ARM7_AR13, ARM7_AR14, ARM7_ASPSR, ARM7_UR13, ARM7_UR14, ARM7_USPSR
 };
 
-/* There are 36 Unique - 32 bit processor registers */
-/* Each mode has 17 registers (except user & system, which have 16) */
-/* This is a list of each *unique* register */
-enum
-{
-	/* All modes have the following */
-	eR0 = 0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-	eR8, eR9, eR10, eR11, eR12,
-	eR13, /* Stack Pointer */
-	eR14, /* Link Register (holds return address) */
-	eR15, /* Program Counter */
-	eCPSR, /* Current Status Program Register */
-
-	/* Fast Interrupt - Bank switched registers */
-	eR8_FIQ, eR9_FIQ, eR10_FIQ, eR11_FIQ, eR12_FIQ, eR13_FIQ, eR14_FIQ, eSPSR_FIQ,
-
-	/* IRQ - Bank switched registers */
-	eR13_IRQ, eR14_IRQ, eSPSR_IRQ,
-
-	/* Supervisor/Service Mode - Bank switched registers */
-	eR13_SVC, eR14_SVC, eSPSR_SVC,
-
-	/* Abort Mode - Bank switched registers */
-	eR13_ABT, eR14_ABT, eSPSR_ABT,
-
-	/* Undefined Mode - Bank switched registers */
-	eR13_UND, eR14_UND, eSPSR_UND,
-
-	NUM_REGS
-};
-
 /* Coprocessor-related macros */
-#define COPRO_TLB_BASE                      m_tlbBase
+#define COPRO_TLB_BASE                      m_core->m_tlbBase
 #define COPRO_TLB_BASE_MASK                 0xffffc000
 #define COPRO_TLB_VADDR_FLTI_MASK           0xfff00000
 #define COPRO_TLB_VADDR_FLTI_MASK_SHIFT     18
@@ -107,7 +77,7 @@ enum
 #define COPRO_TLB_SECTION_TABLE             2
 #define COPRO_TLB_FINE_TABLE                3
 
-#define COPRO_CTRL                          m_control
+#define COPRO_CTRL                          m_core->m_control
 #define COPRO_CTRL_MMU_EN                   0x00000001
 #define COPRO_CTRL_ADDRFAULT_EN             0x00000002
 #define COPRO_CTRL_DCACHE_EN                0x00000004
@@ -131,58 +101,14 @@ enum
 #define COPRO_CTRL_INTVEC_F                 1
 #define COPRO_CTRL_MASK                     0x0000338f
 
-#define COPRO_DOMAIN_ACCESS_CONTROL         m_domainAccessControl
+#define COPRO_DOMAIN_ACCESS_CONTROL         m_core->m_domainAccessControl
 
-#define COPRO_FAULT_STATUS_D                m_faultStatus[0]
-#define COPRO_FAULT_STATUS_P                m_faultStatus[1]
+#define COPRO_FAULT_STATUS_D                m_core->m_faultStatus[0]
+#define COPRO_FAULT_STATUS_P                m_core->m_faultStatus[1]
 
-#define COPRO_FAULT_ADDRESS                 m_faultAddress
+#define COPRO_FAULT_ADDRESS                 m_core->m_faultAddress
 
-#define COPRO_FCSE_PID                      m_fcsePID
-
-//#define ARM7_USE_DRC
-
-/* forward declaration of implementation-specific state */
-#ifndef ARM7_USE_DRC
-struct arm7imp_state {};
-#else
-struct arm7imp_state;
-#endif
-
-/* CPU state struct */
-struct arm_state
-{
-	uint32_t m_r[NUM_REGS];
-	bool m_pendingIrq;
-	bool m_pendingFiq;
-	bool m_pendingAbtD;
-	bool m_pendingAbtP;
-	bool m_pendingUnd;
-	bool m_pendingSwi;
-	bool m_pending_interrupt;
-	int m_icount;
-	endianness_t m_endian;
-	address_space *m_program;
-	direct_read_data<0> *m_direct;
-
-	/* Coprocessor Registers */
-	uint32_t m_control;
-	uint32_t m_tlbBase;
-	uint32_t m_tlb_base_mask;
-	uint32_t m_faultStatus[2];
-	uint32_t m_faultAddress;
-	uint32_t m_fcsePID;
-	uint32_t m_domainAccessControl;
-	uint32_t m_decoded_access_control[16];
-
-	uint8_t m_archRev;          // ARM architecture revision (3, 4, and 5 are valid)
-	uint8_t m_archFlags;        // architecture flags
-
-#if ARM7_MMU_ENABLE_HACK
-	uint32_t mmu_enable_addr; // workaround for "MMU is enabled when PA != VA" problem
-#endif
-	arm7imp_state m_impstate;
-};
+#define COPRO_FCSE_PID                      m_core->m_fcsePID
 
 /****************************************************************************************************
  *  VARIOUS INTERNAL STRUCS/DEFINES/ETC..
@@ -198,8 +124,6 @@ enum
 	eARM7_MODE_UND  = 0xb,      // Bit: 4-0 = 11011
 	eARM7_MODE_SYS  = 0xf       // Bit: 4-0 = 11111
 };
-
-#define ARM7_NUM_MODES 0x10
 
 static const int thumbCycles[256] =
 {
@@ -220,59 +144,6 @@ static const int thumbCycles[256] =
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3,  // d
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,  // e
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2   // f
-};
-
-/* 17 processor registers are visible at any given time,
- * banked depending on processor mode.
- */
-
-static const int sRegisterTable[ARM7_NUM_MODES][18] =
-{
-	{ /* USR */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8, eR9, eR10, eR11, eR12,
-		eR13, eR14,
-		eR15, eCPSR  // No SPSR in this mode
-	},
-	{ /* FIQ */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8_FIQ, eR9_FIQ, eR10_FIQ, eR11_FIQ, eR12_FIQ,
-		eR13_FIQ, eR14_FIQ,
-		eR15, eCPSR, eSPSR_FIQ
-	},
-	{ /* IRQ */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8, eR9, eR10, eR11, eR12,
-		eR13_IRQ, eR14_IRQ,
-		eR15, eCPSR, eSPSR_IRQ
-	},
-	{ /* SVC */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8, eR9, eR10, eR11, eR12,
-		eR13_SVC, eR14_SVC,
-		eR15, eCPSR, eSPSR_SVC
-	},
-	{0}, {0}, {0},        // values for modes 4,5,6 are not valid
-	{ /* ABT */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8, eR9, eR10, eR11, eR12,
-		eR13_ABT, eR14_ABT,
-		eR15, eCPSR, eSPSR_ABT
-	},
-	{0}, {0}, {0},        // values for modes 8,9,a are not valid!
-	{ /* UND */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8, eR9, eR10, eR11, eR12,
-		eR13_UND, eR14_UND,
-		eR15, eCPSR, eSPSR_UND
-	},
-	{0}, {0}, {0},        // values for modes c,d, e are not valid!
-	{ /* SYS */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8, eR9, eR10, eR11, eR12,
-		eR13, eR14,
-		eR15, eCPSR  // No SPSR in this mode
-	}
 };
 
 #define N_BIT   31
@@ -471,9 +342,9 @@ enum
 };
 
 /* Convenience Macros */
-#define R15                     m_r[eR15]
+#define R15                     m_core->m_r[eR15]
 #define SPSR                    17                     // SPSR is always the 18th register in our 0 based array sRegisterTable[][18]
-#define GET_CPSR                m_r[eCPSR]
+#define GET_CPSR                m_core->m_r[eCPSR]
 #define MODE_FLAG               0xF                    // Mode bits are 4:0 of CPSR, but we ignore bit 4.
 #define GET_MODE                (GET_CPSR & MODE_FLAG)
 #define SIGN_BIT                ((uint32_t)(1 << 31))

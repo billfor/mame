@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "lpc210x.h"
+#include "arm7fe.h"
 
 DEFINE_DEVICE_TYPE(LPC2103, lpc210x_device, "lpc2103", "NXP LPC2103")
 
