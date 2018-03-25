@@ -1481,13 +1481,13 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 		/* Half Word Data Transfer */
 		if (insn & 0x60)         // bits = 6-5 != 00
 		{
-			HandleHalfWordDT(insn);
+			//HandleHalfWordDT();
 		}
 		else
 		/* Swap */
 		if (insn & 0x01000000)   // bit 24 = 1
 		{
-			HandleSwap(insn);
+			//HandleSwap();
 		}
 		/* Multiply Or Multiply Long */
 		else
@@ -1496,15 +1496,15 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 			if (insn & 0x800000) // Bit 23 = 1 for Multiply Long
 			{
 				/* Signed? */
-				if (insn & 0x00400000)
-					HandleSMulLong(insn);
-				else
-					HandleUMulLong(insn);
+				//if (insn & 0x00400000)
+					//HandleSMulLong();
+				//else
+					//HandleUMulLong();
 			}
 			/* multiply */
 			else
 			{
-				HandleMul(insn);
+				//HandleMul();
 			}
 			R15 += 4;
 		}
@@ -1515,14 +1515,14 @@ bool arm7_cpu_device::drcarm7ops_0123(drcuml_block *block, compiler_state *compi
 		/* PSR Transfer (MRS & MSR) */
 		if (((insn & 0x00100000) == 0) && ((insn & 0x01800000) == 0x01000000)) // S bit must be clear, and bit 24,23 = 10
 		{
-			HandlePSRTransfer(insn);
+			//HandlePSRTransfer();
 			ARM7_ICOUNT += 2;       // PSR only takes 1 - S Cycle, so we add + 2, since at end, we -3..
 			R15 += 4;
 		}
 		/* Data Processing */
 		else
 		{
-			HandleALU(insn);
+			//HandleALU();
 		}
 	}
 

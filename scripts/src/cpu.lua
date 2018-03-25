@@ -126,7 +126,7 @@ if (CPUS["ARM7"]~=null) then
 		MAME_DIR .. "src/devices/cpu/arm7/arm7fe.cpp",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7fe.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7thmb.cpp",
-		MAME_DIR .. "src/devices/cpu/arm7/arm7ops.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7ops.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/lpc210x.cpp",
 		MAME_DIR .. "src/devices/cpu/arm7/lpc210x.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.h",

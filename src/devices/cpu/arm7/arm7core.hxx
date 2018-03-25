@@ -118,6 +118,8 @@ void arm7_cpu_device::arm7_check_irq_state()
 		SetRegister(14, pc - 8 + 8);                   /* save PC to R14 */
 		SetRegister(SPSR, cpsr);               /* Save current CPSR */
 		set_cpsr_nomode(GET_CPSR | I_MASK);            /* Mask IRQ */
+		if (GET_CPSR & T_MASK)
+			m_mode_changed = true;
 		set_cpsr_nomode(GET_CPSR & ~T_MASK);
 		R15 = 0x10;                             /* IRQ Vector address */
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
@@ -134,6 +136,8 @@ void arm7_cpu_device::arm7_check_irq_state()
 		SetRegister(14, pc - 4 + 4);                   /* save PC to R14 */
 		SetRegister(SPSR, cpsr);               /* Save current CPSR */
 		set_cpsr_nomode(GET_CPSR | I_MASK | F_MASK);   /* Mask both IRQ & FIQ */
+		if (GET_CPSR & T_MASK)
+			m_mode_changed = true;
 		set_cpsr_nomode(GET_CPSR & ~T_MASK);
 		R15 = 0x1c;                             /* IRQ Vector address */
 		R15 |= m_vectorbase;
@@ -146,20 +150,22 @@ void arm7_cpu_device::arm7_check_irq_state()
 	{
 		SwitchMode(eARM7_MODE_IRQ);             /* Set IRQ mode so PC is saved to correct R14 bank */
 		SetRegister(14, pc - 4 + 4);                   /* save PC to R14 */
-		if (MODE32)
-		{
+		//if (MODE32)
+		//{
 			SetRegister(SPSR, cpsr);               /* Save current CPSR */
 			set_cpsr_nomode(GET_CPSR | I_MASK);            /* Mask IRQ */
+			if (GET_CPSR & T_MASK)
+				m_mode_changed = true;
 			set_cpsr_nomode(GET_CPSR & ~T_MASK);
 			R15 = 0x18;                             /* IRQ Vector address */
-		}
-		else
-		{
-			uint32_t temp;
-			R15 = (pc & 0xF4000000) /* N Z C V F */ | 0x18 | 0x00000002 /* IRQ */ | 0x08000000 /* I */;
-			temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
-			set_cpsr_nomode(temp);            /* Mask IRQ */
-		}
+		//}
+		//else
+		//{
+		//	uint32_t temp;
+		//	R15 = (pc & 0xF4000000) /* N Z C V F */ | 0x18 | 0x00000002 /* IRQ */ | 0x08000000 /* I */;
+		//	temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
+		//	set_cpsr_nomode(temp);            /* Mask IRQ */
+		//}
 		R15 |= m_vectorbase;
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
 		return;
@@ -173,6 +179,8 @@ void arm7_cpu_device::arm7_check_irq_state()
 		SetRegister(14, pc - 4 + 4);                   /* save PC to R14 */
 		SetRegister(SPSR, cpsr);               /* Save current CPSR */
 		set_cpsr_nomode(GET_CPSR | I_MASK);            /* Mask IRQ */
+		if (GET_CPSR & T_MASK)
+			m_mode_changed = true;
 		set_cpsr_nomode(GET_CPSR & ~T_MASK);
 		R15 = 0x0c | m_vectorbase;                             /* IRQ Vector address */
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
@@ -197,6 +205,8 @@ void arm7_cpu_device::arm7_check_irq_state()
 		}
 		SetRegister(SPSR, cpsr);               /* Save current CPSR */
 		set_cpsr_nomode(GET_CPSR | I_MASK);            /* Mask IRQ */
+		if (GET_CPSR & T_MASK)
+			m_mode_changed = true;
 		set_cpsr_nomode(GET_CPSR & ~T_MASK);
 		R15 = 0x04 | m_vectorbase;                             /* IRQ Vector address */
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
@@ -218,20 +228,23 @@ void arm7_cpu_device::arm7_check_irq_state()
 		{
 			SetRegister(14, pc - 4 + 4);           /* save PC to R14 */
 		}
-		if (MODE32)
-		{
+
+		//if (MODE32)
+		//{
 			SetRegister(SPSR, cpsr);               /* Save current CPSR */
 			set_cpsr_nomode(GET_CPSR | I_MASK);            /* Mask IRQ */
+			if (GET_CPSR & T_MASK)
+				m_mode_changed = true;
 			set_cpsr_nomode(GET_CPSR & ~T_MASK);           /* Go to ARM mode */
 			R15 = 0x08;                             /* Jump to the SWI vector */
-		}
-		else
-		{
-			uint32_t temp;
-			R15 = (pc & 0xF4000000) /* N Z C V F */ | 0x08 | 0x00000003 /* SVC */ | 0x08000000 /* I */;
-			temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
-			set_cpsr_nomode(temp);            /* Mask IRQ */
-		}
+		//}
+		//else
+		//{
+		//	uint32_t temp;
+		//	R15 = (pc & 0xF4000000) /* N Z C V F */ | 0x08 | 0x00000003 /* SVC */ | 0x08000000 /* I */;
+		//	temp = (GET_CPSR & 0x0FFFFF3F) /* N Z C V I F */ | (R15 & 0xF0000000) /* N Z C V */ | ((R15 & 0x0C000000) >> (26 - 6)) /* I F */;
+		//	set_cpsr_nomode(temp);            /* Mask IRQ */
+		//}
 		R15 |= m_vectorbase;
 		if ((COPRO_CTRL & COPRO_CTRL_MMU_EN) && (COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST)) R15 |= 0xFFFF0000;
 		m_core->m_pendingSwi = false;

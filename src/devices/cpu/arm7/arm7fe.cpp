@@ -279,9 +279,9 @@ void arm7_frontend::describe_halfword_transfer(opcode_desc &desc, const opcode_d
 	const uint32_t rn = (op & INSN_RN) >> INSN_RN_SHIFT;
 	desc.regin[0] |= REGFLAG_R(rn);
 
-	if (op & INSN_SDT_P)
+	if (op & 0x01000000)
 	{
-		if (op & INSN_SDT_W)
+		if (op & 0x00200000)
 		{
 			desc.regout[0] |= REGFLAG_R(rn);
 		}
@@ -327,7 +327,7 @@ bool arm7_frontend::describe_ops_4567(opcode_desc &desc, const opcode_desc *prev
 {
 	const uint32_t rn = (op & INSN_RN) >> INSN_RN_SHIFT;
 	desc.regin[0] |= REGFLAG_R(rn);
-	if ((op & INSN_SDT_P) && (op & INSN_SDT_W))
+	if ((op & 0x01200000) == 0x01200000)
 	{
 		desc.regout[0] |= REGFLAG_R(rn);
 	}
@@ -338,7 +338,7 @@ bool arm7_frontend::describe_ops_4567(opcode_desc &desc, const opcode_desc *prev
 		// Load
 		desc.regout[0] |= REGFLAG_R(rd);
 		desc.flags |= OPFLAG_READS_MEMORY;
-		if (!(op & INSN_SDT_B) && rd == eR15)
+		if (!(op & 0x00400000) && rd == eR15)
 		{
 			desc.cycles = 5;
 		}
@@ -351,7 +351,7 @@ bool arm7_frontend::describe_ops_4567(opcode_desc &desc, const opcode_desc *prev
 		desc.cycles = 2;
 	}
 
-	if (!(op & INSN_SDT_P))
+	if (!(op & 0x01000000))
 	{
 		desc.regout[0] |= REGFLAG_R(rn);
 	}

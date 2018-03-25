@@ -23,7 +23,6 @@
 #ifndef __ARM7CORE_H__
 #define __ARM7CORE_H__
 
-#define ARM7_MMU_ENABLE_HACK 0
 #define ARM7_DEBUG_CORE 0
 
 
@@ -56,7 +55,7 @@ enum
 #define COPRO_TLB_BASE                      m_core->m_tlbBase
 #define COPRO_TLB_BASE_MASK                 0xffffc000
 #define COPRO_TLB_VADDR_FLTI_MASK           0xfff00000
-#define COPRO_TLB_VADDR_FLTI_MASK_SHIFT     18
+#define COPRO_TLB_VADDR_FLTI_MASK_SHIFT     20
 #define COPRO_TLB_VADDR_CSLTI_MASK          0x000ff000
 #define COPRO_TLB_VADDR_CSLTI_MASK_SHIFT    10
 #define COPRO_TLB_VADDR_FSLTI_MASK          0x000ffc00
@@ -186,15 +185,7 @@ static const int thumbCycles[256] =
 // todo: use these in all places (including dasm file)
 #define INSN_COND           ((uint32_t)0xf0000000u)
 #define INSN_SDT_L          ((uint32_t)0x00100000u)
-#define INSN_SDT_W          ((uint32_t)0x00200000u)
-#define INSN_SDT_B          ((uint32_t)0x00400000u)
-#define INSN_SDT_U          ((uint32_t)0x00800000u)
-#define INSN_SDT_P          ((uint32_t)0x01000000u)
 #define INSN_BDT_L          ((uint32_t)0x00100000u)
-#define INSN_BDT_W          ((uint32_t)0x00200000u)
-#define INSN_BDT_S          ((uint32_t)0x00400000u)
-#define INSN_BDT_U          ((uint32_t)0x00800000u)
-#define INSN_BDT_P          ((uint32_t)0x01000000u)
 #define INSN_BDT_REGS       ((uint32_t)0x0000ffffu)
 #define INSN_SDT_IMM        ((uint32_t)0x00000fffu)
 #define INSN_MUL_A          ((uint32_t)0x00200000u)
@@ -346,8 +337,8 @@ enum
 #define SPSR                    17                     // SPSR is always the 18th register in our 0 based array sRegisterTable[][18]
 #define GET_CPSR                m_core->m_r[eCPSR]
 #define MODE_FLAG               0xF                    // Mode bits are 4:0 of CPSR, but we ignore bit 4.
-#define GET_MODE                (GET_CPSR & MODE_FLAG)
-#define SIGN_BIT                ((uint32_t)(1 << 31))
+#define GET_MODE                m_core->m_mode
+#define SIGN_BIT                (1 << 31)
 #define SIGN_BITS_DIFFER(a, b)  (((a) ^ (b)) >> 31)
 /* I really don't know why these were set to 16-bit, the thumb registers are still 32-bit ... */
 #define THUMB_SIGN_BIT               ((uint32_t)(1 << 31))
@@ -362,7 +353,7 @@ enum
 #define ARM7_TLB_ABORT_D (1 << 0)
 #define ARM7_TLB_ABORT_P (1 << 1)
 #define ARM7_TLB_READ    (1 << 2)
-#define ARM7_TLB_WRITE   (1 << 3)
+#define ARM7_TLB_WRITE   (1 << 8)
 
 /* ARM flavors */
 enum arm_flavor

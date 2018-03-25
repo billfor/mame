@@ -27,19 +27,18 @@
 #define IsPos(i) ((~(i)) >> 31)
 
 /* Set NZCV flags for ADDS / SUBS */
-#define HandleALUAddFlags(rd, rn, op2)                                                \
-	if (insn & INSN_S)                                                                  \
-	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                       \
-				| (((!SIGN_BITS_DIFFER(rn, op2)) && SIGN_BITS_DIFFER(rn, rd)) << V_BIT) \
-				| (((IsNeg(rn) & IsNeg(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsNeg(op2) & IsPos(rd))) ? C_MASK : 0) \
-				| HandleALUNZFlags(rd)));                                               \
+#define HandleALUAddFlags(rd, rn, op2)												\
+	if (SET_FLAGS)																	\
+	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))				\
+				| s_add_nvc_flags[((rn & SIGN_BIT) >> 29) | ((op2 & SIGN_BIT) >> 30) | ((uint32_t)rd >> 31)]	\
+				| HandleALUZFlag(rd));											\
 	R15 += 4;
 
-#define HandleThumbALUAddFlags(rd, rn, op2)                                                       \
-	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                   \
-				| (((!THUMB_SIGN_BITS_DIFFER(rn, op2)) && THUMB_SIGN_BITS_DIFFER(rn, rd)) << V_BIT) \
-				| (((~(rn)) < (op2)) << C_BIT)                                                      \
-				| HandleALUNZFlags(rd)));                                                           \
+#define HandleThumbALUAddFlags(rd, rn, op2)								\
+	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))	\
+				| (((~(rn ^ op2)) & (rn ^ rd) & SIGN_BIT) >> 3)			\
+				| (((~(rn)) < (op2)) << C_BIT)							\
+				| HandleALUNZFlags(rd)));								\
 	R15 += 2;
 
 #define DRCHandleThumbALUAddFlags(rd, rn, op2)                                                  \
@@ -60,17 +59,16 @@
 	UML_OR(block, DRC_CPSR, DRC_CPSR, uml::I0);                                                  \
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 
-#define HandleALUSubFlags(rd, rn, op2)                                                                         \
-	if (insn & INSN_S)                                                                                           \
-	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
-				| ((SIGN_BITS_DIFFER(rn, op2) && SIGN_BITS_DIFFER(rn, rd)) << V_BIT)                             \
-				| (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
-				| HandleALUNZFlags(rd)));                                                                        \
+#define HandleALUSubFlags(rd, rn, op2)													\
+	if (SET_FLAGS)																		\
+	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))					\
+				| s_sub_nvc_flags[((rn & SIGN_BIT) >> 29) | ((op2 & SIGN_BIT) >> 30) | ((uint32_t)rd >> 31)]	\
+				| HandleALUZFlag(rd));												\
 	R15 += 4;
 
 #define HandleThumbALUSubFlags(rd, rn, op2)                                                                    \
 	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
-				| ((THUMB_SIGN_BITS_DIFFER(rn, op2) && THUMB_SIGN_BITS_DIFFER(rn, rd)) << V_BIT)                 \
+				| (((rn ^ op2) & (rn ^ rd) & SIGN_BIT) >> 3)                 \
 				| (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
 				| HandleALUNZFlags(rd)));                                                                        \
 	R15 += 2;
@@ -109,6 +107,9 @@
 #define HandleALUNZFlags(rd)               \
 	(((rd) & SIGN_BIT) | ((!(rd)) << Z_BIT))
 
+#define HandleALUZFlag(rd)               \
+	((!(rd)) << Z_BIT))
+
 #define DRCHandleALUNZFlags(rd)                            \
 	UML_AND(block, uml::I0, rd, SIGN_BIT);                 \
 	UML_CMP(block, rd, 0);                                 \
@@ -120,11 +121,11 @@
 #define HandleLongALUNZFlags(rd)                            \
 	((((rd) & ((uint64_t)1 << 63)) >> 32) | ((!(rd)) << Z_BIT))
 
-#define HandleALULogicalFlags(rd, sc)                  \
-	if (insn & INSN_S)                                   \
-	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | C_MASK)) \
-				| HandleALUNZFlags(rd)                   \
-				| (((sc) != 0) << C_BIT)));              \
+#define HandleALULogicalFlags(rd, sc)							\
+	if (SET_FLAGS)												\
+	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | C_MASK))	\
+				| HandleALUNZFlags(rd)							\
+				| (((sc) != 0) << C_BIT)));						\
 	R15 += 4;
 
 #define DRC_RD      uml::mem(&GetRegister(rd))
