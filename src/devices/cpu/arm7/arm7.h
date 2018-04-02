@@ -85,6 +85,10 @@ enum
 	eR13, /* Stack Pointer */
 	eR14, /* Link Register (holds return address) */
 	eR15, /* Program Counter */
+	eSPSR,
+
+	/* User - All possible bank switched registers */
+	eR8_USR, eR9_USR, eR10_USR, eR11_USR, eR12_USR, eR13_USR, eR14_USR, eSPSR_USR,
 
 	/* Fast Interrupt - Bank switched registers */
 	eR8_FIQ, eR9_FIQ, eR10_FIQ, eR11_FIQ, eR12_FIQ, eR13_FIQ, eR14_FIQ, eSPSR_FIQ,
@@ -311,6 +315,12 @@ protected:
 		OPCODE_MVN  /* 1111 */
 	};
 
+	enum stldm_mode
+	{
+		DEFAULT_MODE = 0,
+		USER_MODE = 1
+	};
+
 	arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint8_t archFlags, endianness_t endianness);
 
 	void postload();
@@ -348,7 +358,7 @@ protected:
 
 	struct internal_arm_state
 	{
-		uint32_t m_r[37];
+		uint32_t m_r[NUM_REGS];
 		uint32_t m_cpsr;
 		uint32_t m_nflag;
 		uint32_t m_zflag;
@@ -389,7 +399,7 @@ protected:
 		const int* m_reg_group;
 	};
 
-	uint32_t m_r[37];
+	uint32_t m_r[NUM_REGS];
 	uint32_t m_cpsr;
 	uint32_t m_nflag;
 	uint32_t m_zflag;
@@ -472,10 +482,10 @@ protected:
 	void SwitchMode(uint32_t cpsr_mode_val);
 	inline ATTR_FORCE_INLINE uint32_t decodeShiftWithCarry(const uint32_t insn, uint32_t *pCarry);
 	inline ATTR_FORCE_INLINE uint32_t decodeShift(const uint32_t insn);
-	template <copro_mode MMU, bdt_s_bit S_BIT> int loadInc(const uint32_t insn, uint32_t rbv, const int mode);
-	template <copro_mode MMU, bdt_s_bit S_BIT> int loadDec(const uint32_t insn, uint32_t rbv, const int mode);
-	template <copro_mode MMU> int storeInc(const uint32_t insn, uint32_t rbv, const int mode);
-	template <copro_mode MMU> int storeDec(const uint32_t insn, uint32_t rbv, const int mode);
+	template <copro_mode MMU, bdt_s_bit S_BIT, stldm_mode USER> int loadInc(const uint32_t insn, uint32_t rbv);
+	template <copro_mode MMU, bdt_s_bit S_BIT, stldm_mode USER> int loadDec(const uint32_t insn, uint32_t rbv);
+	template <copro_mode MMU, stldm_mode USER> int storeInc(const uint32_t insn, uint32_t rbv);
+	template <copro_mode MMU, stldm_mode USER> int storeDec(const uint32_t insn, uint32_t rbv);
 	void HandleCoProcRT(const uint32_t insn);
 	void HandleCoProcDT(const uint32_t insn);
 	template <link_mode LINK> void HandleBranch(const uint32_t insn);
@@ -697,7 +707,7 @@ protected:
 		uint32_t            arg1;                       /* print_debug argument 2 */
 
 		/* register mappings */
-		uml::parameter      regmap[/*NUM_REGS*/37];     /* parameter to register mappings for all integer registers */
+		uml::parameter      regmap[/*NUM_REGS*/45];     /* parameter to register mappings for all integer registers */
 
 		/* subroutines */
 		uml::code_handle *  entry;                      /* entry point */
@@ -833,7 +843,8 @@ protected:
 	void drctg0f_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void drctg0f_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* BL */
 
-	inline void update_reg_ptr();
+	inline void update_reg_ptr(const uint32_t old_mode);
+	inline void init_reg_ptr();
 	void load_fast_iregs(drcuml_block *block);
 	void save_fast_iregs(drcuml_block *block);
 	void execute_run_drc();

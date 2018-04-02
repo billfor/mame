@@ -203,8 +203,8 @@
 
 
 // used to be functions, but no longer a need, so we'll use define for better speed.
-#define GetRegister(rIndex)        *m_rp[rIndex]
-#define SetRegister(rIndex, value) *m_rp[rIndex] = value
+#define GetRegister(rIndex)        m_r[rIndex]
+#define SetRegister(rIndex, value) m_r[rIndex] = value
 
 #define GetModeRegister(mode, rIndex)        m_r[s_register_table[mode][rIndex]]
 #define SetModeRegister(mode, rIndex, value) m_r[s_register_table[mode][rIndex]] = value

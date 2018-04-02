@@ -317,8 +317,8 @@ uint32_t arm7_cpu_device::decodeShift(const uint32_t insn)
 	return 0;
 }
 
-template <arm7_cpu_device::copro_mode MMU, arm7_cpu_device::bdt_s_bit S_BIT>
-int arm7_cpu_device::loadInc(const uint32_t insn, uint32_t rbv, const int mode)
+template <arm7_cpu_device::copro_mode MMU, arm7_cpu_device::bdt_s_bit S_BIT, arm7_cpu_device::stldm_mode USER>
+int arm7_cpu_device::loadInc(const uint32_t insn, uint32_t rbv)
 {
 	int result = 0;
 	rbv &= ~3;
@@ -343,18 +343,35 @@ int arm7_cpu_device::loadInc(const uint32_t insn, uint32_t rbv, const int mode)
 			}
 			if (i == 15)
 			{
-				if (S_BIT) /* Pull full contents from stack */
-					SetModeRegister(mode, 15, data);
-				else //if (MODE32) /* Pull only address, preserve mode & status flags */
-					SetModeRegister(mode, 15, data);
-				//else
-				//{
-				//	SetModeRegister(mode, 15, (GetModeRegister(mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
-				//}
+				if (USER)
+				{
+					if (S_BIT) /* Pull full contents from stack */
+						SetModeRegister(eARM7_MODE_USER, 15, data);
+					else //if (MODE32) /* Pull only address, preserve mode & status flags */
+						SetModeRegister(eARM7_MODE_USER, 15, data);
+					//else
+					//{
+					//	SetModeRegister(mode, 15, (GetModeRegister(mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
+					//}
+				}
+				else
+				{
+					if (S_BIT) /* Pull full contents from stack */
+						SetRegister(15, data);
+					else //if (MODE32) /* Pull only address, preserve mode & status flags */
+						SetRegister(15, data);
+					//else
+					//{
+					//	SetModeRegister(mode, 15, (GetModeRegister(mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
+					//}
+				}
 			}
 			else
 			{
-				SetModeRegister(mode, i, data);
+				if (USER)
+					SetModeRegister(eARM7_MODE_USER, i, data);
+				else
+					SetRegister(i, data);
 			}
 			result++;
 		}
@@ -374,8 +391,8 @@ int arm7_cpu_device::loadInc(const uint32_t insn, uint32_t rbv, const int mode)
 	return result;
 }
 
-template <arm7_cpu_device::copro_mode MMU, arm7_cpu_device::bdt_s_bit S_BIT>
-int arm7_cpu_device::loadDec(const uint32_t insn, uint32_t rbv, const int mode)
+template <arm7_cpu_device::copro_mode MMU, arm7_cpu_device::bdt_s_bit S_BIT, arm7_cpu_device::stldm_mode USER>
+int arm7_cpu_device::loadDec(const uint32_t insn, uint32_t rbv)
 {
 	int result = 0;
 	rbv &= ~3;
@@ -400,18 +417,35 @@ int arm7_cpu_device::loadDec(const uint32_t insn, uint32_t rbv, const int mode)
 			}
 			if (i == 15)
 			{
-				if (S_BIT) /* Pull full contents from stack */
-					SetModeRegister(mode, 15, data);
-				else //if (MODE32) /* Pull only address, preserve mode & status flags */
-					SetModeRegister(mode, 15, data);
-				//else
-				//{
-				//	SetModeRegister(mode, 15, (GetModeRegister(mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
-				//}
+				if (USER)
+				{
+					if (S_BIT) /* Pull full contents from stack */
+						SetModeRegister(eARM7_MODE_USER, 15, data);
+					else //if (MODE32) /* Pull only address, preserve mode & status flags */
+						SetModeRegister(eARM7_MODE_USER, 15, data);
+					//else
+					//{
+					//	SetModeRegister(mode, 15, (GetModeRegister(mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
+					//}
+				}
+				else
+				{
+					if (S_BIT) /* Pull full contents from stack */
+						SetRegister(15, data);
+					else //if (MODE32) /* Pull only address, preserve mode & status flags */
+						SetRegister(15, data);
+					//else
+					//{
+					//	SetModeRegister(mode, 15, (GetModeRegister(mode, 15) & ~0x03FFFFFC) | (data & 0x03FFFFFC));
+					//}
+				}
 			}
 			else
 			{
-				SetModeRegister(mode, i, data);
+				if (USER)
+					SetModeRegister(eARM7_MODE_USER, i, data);
+				else
+					SetRegister(i, data);
 			}
 			result++;
 		}
@@ -431,8 +465,8 @@ int arm7_cpu_device::loadDec(const uint32_t insn, uint32_t rbv, const int mode)
 	return result;
 }
 
-template <arm7_cpu_device::copro_mode MMU>
-int arm7_cpu_device::storeInc(const uint32_t insn, uint32_t rbv, const int mode)
+template <arm7_cpu_device::copro_mode MMU, arm7_cpu_device::stldm_mode USER>
+int arm7_cpu_device::storeInc(const uint32_t insn, uint32_t rbv)
 {
 	int result = 0;
 	for (int i = 0; i < 16; i++)
@@ -443,18 +477,24 @@ int arm7_cpu_device::storeInc(const uint32_t insn, uint32_t rbv, const int mode)
 			if (i == 15) /* R15 is plus 12 from address of STM */
 				LOG(("%08x: StoreInc on R15\n", R15));
 #endif
-			if (MMU)
-				arm7_cpu_write32_mmu(rbv += 4, GetModeRegister(mode, i));
+			if (USER)
+				if (MMU)
+					arm7_cpu_write32_mmu(rbv += 4, GetModeRegister(eARM7_MODE_USER, i));
+				else
+					arm7_cpu_write32(rbv += 4, GetModeRegister(eARM7_MODE_USER, i));
 			else
-				arm7_cpu_write32(rbv += 4, GetModeRegister(mode, i));
+				if (MMU)
+					arm7_cpu_write32_mmu(rbv += 4, GetRegister(i));
+				else
+					arm7_cpu_write32(rbv += 4, GetRegister(i));
 			result++;
 		}
 	}
 	return result;
 } /* storeInc */
 
-template <arm7_cpu_device::copro_mode MMU>
-int arm7_cpu_device::storeDec(const uint32_t insn, uint32_t rbv, const int mode)
+template <arm7_cpu_device::copro_mode MMU, arm7_cpu_device::stldm_mode USER>
+int arm7_cpu_device::storeDec(const uint32_t insn, uint32_t rbv)
 {
 	// pre-count the # of registers being stored
 	int const result = population_count_32(insn & 0x0000ffff);
@@ -470,10 +510,16 @@ int arm7_cpu_device::storeDec(const uint32_t insn, uint32_t rbv, const int mode)
 			if (i == 15) /* R15 is plus 12 from address of STM */
 				LOG(("%08x: StoreDec on R15\n", R15));
 #endif
-			if (MMU)
-				arm7_cpu_write32_mmu(rbv, GetModeRegister(mode, i));
+			if (USER)
+				if (MMU)
+					arm7_cpu_write32_mmu(rbv, GetModeRegister(eARM7_MODE_USER, i));
+				else
+					arm7_cpu_write32(rbv, GetModeRegister(eARM7_MODE_USER, i));
 			else
-				arm7_cpu_write32(rbv, GetModeRegister(mode, i));
+				if (MMU)
+					arm7_cpu_write32_mmu(rbv, GetRegister(i));
+				else
+					arm7_cpu_write32(rbv, GetRegister(i));
 			rbv += 4;
 		}
 	}
@@ -524,7 +570,7 @@ void arm7_cpu_device::HandleCoProcDT(const uint32_t insn)
 	uint32_t rnv = GetRegister(rn);    // Get Address Value stored from Rn
 	uint32_t ornv = rnv;                // Keep value of Rn
 	uint32_t off = (insn & 0xff) << 2;  // Offset is << 2 according to manual
-	uint32_t *prn = &ARM7REG(rn);       // Pointer to our register, so it can be changed in the callback
+	uint32_t *prn = &m_r[s_register_table[m_mode][rn]];       // Pointer to our register, so it can be changed in the callback
 
 #if ARM7_DEBUG_CORE
 	if (((insn >> 16) & 0xf) == 15 && (insn & 0x200000))
@@ -1651,12 +1697,12 @@ void arm7_cpu_device::HandleMemBlock(const uint32_t insn)
 				//int curmode = GET_MODE;
 				//SwitchMode(eARM7_MODE_USER);
 				LOG(("%08x: User Bank Transfer not fully tested - please check if working properly!\n", R15));
-				result = loadInc<MMU, S_BIT>(insn, rbp, eARM7_MODE_USER);
+				result = loadInc<MMU, S_BIT, USER_MODE>(insn, rbp);
 				// todo - not sure if Writeback occurs on User registers also..
 				//SwitchMode(curmode);
 			}
 			else
-				result = loadInc<MMU, S_BIT>(insn, rbp, GET_MODE);
+				result = loadInc<MMU, S_BIT, DEFAULT_MODE>(insn, rbp);
 
 			if (WRITEBACK && !m_pendingAbtD)
 			{
@@ -1725,13 +1771,13 @@ void arm7_cpu_device::HandleMemBlock(const uint32_t insn)
 				//int curmode = GET_MODE;
 				//SwitchMode(eARM7_MODE_USER);
 				LOG(("%08x: User Bank Transfer not fully tested - please check if working properly!\n", R15));
-				result = loadDec<MMU, S_BIT>(insn, rbp, eARM7_MODE_USER);
+				result = loadDec<MMU, S_BIT, USER_MODE>(insn, rbp);
 				// todo - not sure if Writeback occurs on User registers also..
 				//SwitchMode(curmode);
 			}
 			else
 			{
-				result = loadDec<MMU, S_BIT>(insn, rbp, GET_MODE);
+				result = loadDec<MMU, S_BIT, DEFAULT_MODE>(insn, rbp);
 			}
 
 			if (WRITEBACK && !m_pendingAbtD)
@@ -1816,13 +1862,13 @@ void arm7_cpu_device::HandleMemBlock(const uint32_t insn)
 				//int curmode = GET_MODE;
 				//SwitchMode(eARM7_MODE_USER);
 				LOG(("%08x: User Bank Transfer not fully tested - please check if working properly!\n", R15));
-				result = storeInc<MMU>(insn, rbp, eARM7_MODE_USER);
+				result = storeInc<MMU, USER_MODE>(insn, rbp);
 				// todo - not sure if Writeback occurs on User registers also..
 				//SwitchMode(curmode);
 			}
 			else
 			{
-				result = storeInc<MMU>(insn, rbp, GET_MODE);
+				result = storeInc<MMU, DEFAULT_MODE>(insn, rbp);
 			}
 
 			if (WRITEBACK && !m_pendingAbtD)
@@ -1845,13 +1891,13 @@ void arm7_cpu_device::HandleMemBlock(const uint32_t insn)
 				//int curmode = GET_MODE;
 				//SwitchMode(eARM7_MODE_USER);
 				LOG(("%08x: User Bank Transfer not fully tested - please check if working properly!\n", R15));
-				result = storeDec<MMU>(insn, rbp, eARM7_MODE_USER);
+				result = storeDec<MMU, USER_MODE>(insn, rbp);
 				// todo - not sure if Writeback occurs on User registers also..
 				//SwitchMode(curmode);
 			}
 			else
 			{
-				result = storeDec<MMU>(insn, rbp, GET_MODE);
+				result = storeDec<MMU, DEFAULT_MODE>(insn, rbp);
 			}
 
 			if (WRITEBACK && !m_pendingAbtD)

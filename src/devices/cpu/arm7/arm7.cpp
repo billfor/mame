@@ -267,10 +267,87 @@ device_memory_interface::space_config_vector arm7_cpu_device::memory_space_confi
 	};
 }
 
-void arm7_cpu_device::update_reg_ptr()
+void arm7_cpu_device::update_reg_ptr(const uint32_t old_mode)
 {
-	m_reg_group = s_register_table[m_mode];
-	m_rp = m_register_pointers[m_mode];
+	//m_reg_group = s_register_table[m_mode];
+	//m_rp = m_register_pointers[m_mode];
+	if ((old_mode == eARM7_MODE_USER && m_mode == eARM7_MODE_SYS) || (old_mode == eARM7_MODE_SYS && m_mode == eARM7_MODE_USER))
+		return;
+
+	if (old_mode == eARM7_MODE_USER || old_mode == eARM7_MODE_SYS)
+	{
+		memcpy(&m_r[eR8_USR], &m_r[eR8], sizeof(uint32_t) * 7);
+		m_r[eSPSR_USR] = m_r[eSPSR];
+	}
+	else if (old_mode == eARM7_MODE_IRQ)
+	{
+		m_r[eR13_IRQ] = m_r[eR13];
+		m_r[eR14_IRQ] = m_r[eR14];
+		m_r[eSPSR_IRQ] = m_r[eSPSR];
+	}
+	else if (old_mode == eARM7_MODE_FIQ)
+	{
+		memcpy(&m_r[eR8_FIQ], &m_r[eR8], sizeof(uint32_t) * 7);
+		m_r[eSPSR_FIQ] = m_r[eSPSR];
+	}
+	else if (old_mode == eARM7_MODE_SVC)
+	{
+		m_r[eR13_SVC] = m_r[eR13];
+		m_r[eR14_SVC] = m_r[eR14];
+		m_r[eSPSR_SVC] = m_r[eSPSR];
+	}
+	else if (old_mode == eARM7_MODE_ABT)
+	{
+		m_r[eR13_ABT] = m_r[eR13];
+		m_r[eR14_ABT] = m_r[eR14];
+		m_r[eSPSR_ABT] = m_r[eSPSR];
+	}
+	else if (old_mode == eARM7_MODE_UND)
+	{
+		m_r[eR13_UND] = m_r[eR13];
+		m_r[eR14_UND] = m_r[eR14];
+		m_r[eSPSR_UND] = m_r[eSPSR];
+	}
+
+	init_reg_ptr();
+}
+
+void arm7_cpu_device::init_reg_ptr()
+{
+	if (m_mode == eARM7_MODE_USER || m_mode == eARM7_MODE_SYS)
+	{
+		memcpy(&m_r[eR8], &m_r[eR8_USR], sizeof(uint32_t) * 7);
+		m_r[eSPSR] = m_r[eSPSR_USR];
+	}
+	else if (m_mode == eARM7_MODE_IRQ)
+	{
+		m_r[eR13] = m_r[eR13_IRQ];
+		m_r[eR14] = m_r[eR14_IRQ];
+		m_r[eSPSR] = m_r[eSPSR_IRQ];
+	}
+	else if (m_mode == eARM7_MODE_FIQ)
+	{
+		memcpy(&m_r[eR8], &m_r[eR8_FIQ], sizeof(uint32_t) * 7);
+		m_r[eSPSR] = m_r[eSPSR_FIQ];
+	}
+	else if (m_mode == eARM7_MODE_SVC)
+	{
+		m_r[eR13] = m_r[eR13_SVC];
+		m_r[eR14] = m_r[eR14_SVC];
+		m_r[eSPSR] = m_r[eSPSR_SVC];
+	}
+	else if (m_mode == eARM7_MODE_ABT)
+	{
+		m_r[eR13] = m_r[eR13_ABT];
+		m_r[eR14] = m_r[eR14_ABT];
+		m_r[eSPSR] = m_r[eSPSR_ABT];
+	}
+	else if (m_mode == eARM7_MODE_UND)
+	{
+		m_r[eR13] = m_r[eR13_UND];
+		m_r[eR14] = m_r[eR14_UND];
+		m_r[eSPSR] = m_r[eSPSR_UND];
+	}
 }
 
 void arm7_cpu_device::split_flags()
@@ -294,12 +371,13 @@ void arm7_cpu_device::set_cpsr(uint32_t val)
 	const uint32_t mode = m_cpsr & MODE_FLAG;
 	if (mode != m_mode)
 	{
+		const uint32_t old_mode = m_mode;
 		m_mode = mode;
 		m_read_fault_table = ((m_mode == eARM7_MODE_USER) ? s_read_fault_table_user : s_read_fault_table_no_user);
 		m_write_fault_table = ((m_mode == eARM7_MODE_USER) ? s_write_fault_table_user : s_write_fault_table_no_user);
 		//m_read_fault_word = ((m_mode == eARM7_MODE_USER) ? s_read_fault_word_user : s_read_fault_word_no_user);
 		//m_write_fault_word = ((m_mode == eARM7_MODE_USER) ? s_write_fault_word_user : s_write_fault_word_no_user);
-		update_reg_ptr();
+		update_reg_ptr(old_mode);
 	}
 }
 
@@ -332,12 +410,13 @@ void arm7500_cpu_device::set_cpsr(uint32_t val)
 	const uint32_t mode = m_cpsr & MODE_FLAG;
 	if (mode != m_mode)
 	{
+		const uint32_t old_mode = m_mode;
 		m_mode = mode;
 		m_read_fault_table = ((m_mode == eARM7_MODE_USER) ? s_read_fault_table_user : s_read_fault_table_no_user);
 		m_write_fault_table = ((m_mode == eARM7_MODE_USER) ? s_write_fault_table_user : s_write_fault_table_no_user);
 		//m_read_fault_word = ((m_mode == eARM7_MODE_USER) ? s_read_fault_word_user : s_read_fault_word_no_user);
 		//m_write_fault_word = ((m_mode == eARM7_MODE_USER) ? s_write_fault_word_user : s_write_fault_word_no_user);
-		update_reg_ptr();
+		update_reg_ptr(old_mode);
 	}
 }
 
@@ -925,7 +1004,7 @@ bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &addr
 
 void arm7_cpu_device::postload()
 {
-	update_reg_ptr();
+	init_reg_ptr();
 }
 
 void arm7_cpu_device::device_start()
@@ -1038,6 +1117,16 @@ void arm7_cpu_device::device_start()
 	state_add( ARM7_R13,   "R13",  m_r[13]).formatstr("%08X");
 	state_add( ARM7_R14,   "R14",  m_r[14]).formatstr("%08X");
 	state_add( ARM7_R15,   "R15",  m_r[15]).formatstr("%08X");
+	state_add( ARM7_SPSR,  "SPSR", m_r[16]).formatstr("%08X");
+	/* USR/SYS Mode Shadowed Registers */
+	state_add( ARM7_USRR8,   "USR8",  m_r[eR8_USR]  ).formatstr("%08X");
+	state_add( ARM7_USRR9,   "USR9",  m_r[eR9_USR]  ).formatstr("%08X");
+	state_add( ARM7_USRR10,  "USR10", m_r[eR10_USR] ).formatstr("%08X");
+	state_add( ARM7_USRR11,  "USR11", m_r[eR11_USR] ).formatstr("%08X");
+	state_add( ARM7_USRR12,  "USR12", m_r[eR12_USR] ).formatstr("%08X");
+	state_add( ARM7_USRR13,  "USR13", m_r[eR13_USR] ).formatstr("%08X");
+	state_add( ARM7_USRR14,  "USR14", m_r[eR14_USR] ).formatstr("%08X");
+	state_add( ARM7_USRSPSR, "USR16", m_r[eSPSR_USR]).formatstr("%08X");
 	/* FIRQ Mode Shadowed Registers */
 	state_add( ARM7_FR8,   "FR8",  m_r[eR8_FIQ]  ).formatstr("%08X");
 	state_add( ARM7_FR9,   "FR9",  m_r[eR9_FIQ]  ).formatstr("%08X");
@@ -1334,7 +1423,6 @@ void arm7_cpu_device::execute_core()
 	do
 	{
 		uint32_t pc = R15;
-		//printf("%x: %x\n", pc & ~3, m_icount);
 
 		if (DEBUG)
 			debugger_instruction_hook(this, pc);
