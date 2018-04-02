@@ -506,7 +506,7 @@ protected:
 	inline void set_cpsr_nomode(uint32_t val) { m_cpsr = val; }
 	inline uint32_t make_cpsr();
 	inline void split_flags();
-	template <tlb_rw_mode WRITE> bool arm7_tlb_translate(offs_t &addr);
+	template <tlb_rw_mode WRITE> inline ATTR_FORCE_INLINE bool arm7_tlb_translate(offs_t &addr);
 	template <check_mode DO_FETCH, insn_mode THUMB, pid_mode CHECK_PID> inline ATTR_FORCE_INLINE uint32_t arm7_tlb_translate_check(offs_t addr);
 	uint32_t arm7_tlb_get_second_level_descriptor(uint32_t granularity, uint32_t vaddr);
 	inline int detect_read_fault(uint32_t desc_index, uint32_t ap);

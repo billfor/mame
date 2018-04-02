@@ -473,7 +473,7 @@ bool arm7_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	// compute the physical PC
 	const uint32_t cpsr = get_cpsr();
 	assert((desc.physpc & (T_IS_SET(cpsr) ? 1 : 3)) == 0);
-	if (!m_cpu->arm7_tlb_translate<arm7_cpu_device::TLB_READ>(desc.physpc))
+	if (false)//!m_cpu->arm7_tlb_translate<arm7_cpu_device::TLB_READ>(desc.physpc))
 	{
 		// uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and
 		// mark as needing to validate; otherwise, just end the sequence here
