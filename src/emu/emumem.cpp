@@ -280,7 +280,7 @@ public:
 	virtual void copy(handler_entry *entry);
 
 	// return offset within the range referenced by this handler
-	offs_t offset(offs_t address) const { return (address - m_addrstart) & m_addrmask; }
+	inline ATTR_FORCE_INLINE offs_t offset(offs_t address) const { return (address - m_addrstart) & m_addrmask; }
 
 	// return a pointer to the backing RAM at the given offset
 	u8 *ramptr(offs_t offset = 0) const { return *m_rambaseptr + offset; }
@@ -1102,7 +1102,7 @@ public:
 	}
 
 	// native read
-	NativeType read_native(offs_t offset, NativeType mask)
+	inline ATTR_FORCE_INLINE NativeType read_native(offs_t offset, NativeType mask)
 	{
 		g_profiler.start(PROFILER_MEMREAD);
 

@@ -3,8 +3,8 @@
 /* ARM7 core helper Macros / Functions */
 
 /* Macros that need to be defined according to the cpu implementation specific need */
-#define ARM7REG(reg)        m_core->m_r[reg]
-#define ARM7_ICOUNT         m_core->m_icount
+#define ARM7REG(reg)        m_r[reg]
+#define ARM7_ICOUNT         m_icount
 
 
 #if 0
@@ -29,16 +29,35 @@
 /* Set NZCV flags for ADDS / SUBS */
 #define HandleALUAddFlags(rd, rn, op2)												\
 	if (SET_FLAGS)																	\
-	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))				\
-				| s_add_nvc_flags[((rn & SIGN_BIT) >> 29) | ((op2 & SIGN_BIT) >> 30) | ((uint32_t)rd >> 31)]	\
-				| HandleALUZFlag(rd));											\
+	{																				\
+		if (rd)																		\
+		{																			\
+			m_zflag = 0;															\
+			m_nflag = rd >> 31;														\
+		}																			\
+		else																		\
+		{																			\
+			m_zflag = 1;															\
+			m_nflag = 0;															\
+		}																			\
+		m_vflag = (~(rn ^ op2) & (rn ^ rd)) >> 31;									\
+		m_cflag = ((rn & op2) | (rn & ~rd) | (op2 & ~rd)) >> 31;					\
+	}																				\
 	R15 += 4;
 
-#define HandleThumbALUAddFlags(rd, rn, op2)								\
-	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))	\
-				| (((~(rn ^ op2)) & (rn ^ rd) & SIGN_BIT) >> 3)			\
-				| (((~(rn)) < (op2)) << C_BIT)							\
-				| HandleALUNZFlags(rd)));								\
+#define HandleThumbALUAddFlags(rd, rn, op2)										\
+	if (rd)																		\
+	{																			\
+		m_zflag = 0;															\
+		m_nflag = rd >> 31;														\
+	}																			\
+	else																		\
+	{																			\
+		m_zflag = 1;															\
+		m_nflag = 0;															\
+	}																			\
+	m_vflag = (~(rn ^ op2) & (rn ^ rd)) >> 31;									\
+	m_cflag = ((rn & op2) | (rn & ~rd) | (op2 & ~rd)) >> 31;					\
 	R15 += 2;
 
 #define DRCHandleThumbALUAddFlags(rd, rn, op2)                                                  \
@@ -59,18 +78,37 @@
 	UML_OR(block, DRC_CPSR, DRC_CPSR, uml::I0);                                                  \
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 
-#define HandleALUSubFlags(rd, rn, op2)													\
-	if (SET_FLAGS)																		\
-	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))					\
-				| s_sub_nvc_flags[((rn & SIGN_BIT) >> 29) | ((op2 & SIGN_BIT) >> 30) | ((uint32_t)rd >> 31)]	\
-				| HandleALUZFlag(rd));												\
+#define HandleALUSubFlags(rd, rn, op2)												\
+	if (SET_FLAGS)																	\
+	{																				\
+		if (rd)																		\
+		{																			\
+			m_zflag = 0;															\
+			m_nflag = rd >> 31;														\
+		}																			\
+		else																		\
+		{																			\
+			m_zflag = 1;															\
+			m_nflag = 0;															\
+		}																			\
+		m_vflag = ((rn ^ op2) & (rn ^ rd)) >> 31;									\
+		m_cflag = ((rn & ~op2) | (rn & ~rd) | (~op2 & ~rd)) >> 31;					\
+	}																				\
 	R15 += 4;
 
-#define HandleThumbALUSubFlags(rd, rn, op2)                                                                    \
-	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
-				| (((rn ^ op2) & (rn ^ rd) & SIGN_BIT) >> 3)                 \
-				| (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
-				| HandleALUNZFlags(rd)));                                                                        \
+#define HandleThumbALUSubFlags(rd, rn, op2)											\
+	if (rd)																		\
+	{																			\
+		m_zflag = 0;															\
+		m_nflag = rd >> 31;														\
+	}																			\
+	else																		\
+	{																			\
+		m_zflag = 1;															\
+		m_nflag = 0;															\
+	}																			\
+	m_vflag = ((rn ^ op2) & (rn ^ rd)) >> 31;									\
+	m_cflag = ((rn & ~op2) | (rn & ~rd) | (~op2 & ~rd)) >> 31;					\
 	R15 += 2;
 
 #define DRCHandleThumbALUSubFlags(rd, rn, op2)                                                  \
@@ -104,11 +142,17 @@
 
 // This macro (which I didn't write) - doesn't make it obvious that the SIGN BIT = 31, just as the N Bit does,
 // therefore, N is set by default
-#define HandleALUNZFlags(rd)               \
-	(((rd) & SIGN_BIT) | ((!(rd)) << Z_BIT))
-
-#define HandleALUZFlag(rd)               \
-	((!(rd)) << Z_BIT))
+#define HandleALUNZFlags(rd)		\
+	if (rd)							\
+	{								\
+		m_zflag = 0;				\
+		m_nflag = (rd >> 31) & 1;	\
+	}								\
+	else							\
+	{								\
+		m_zflag = 1;				\
+		m_nflag = 0;				\
+	}
 
 #define DRCHandleALUNZFlags(rd)                            \
 	UML_AND(block, uml::I0, rd, SIGN_BIT);                 \
@@ -118,14 +162,24 @@
 	UML_ROLINS(block, uml::I0, uml::I1, Z_BIT, 1 << Z_BIT);
 
 // Long ALU Functions use bit 63
-#define HandleLongALUNZFlags(rd)                            \
-	((((rd) & ((uint64_t)1 << 63)) >> 32) | ((!(rd)) << Z_BIT))
+#define HandleLongALUNZFlags(rd)	\
+	if (rd)							\
+	{								\
+		m_zflag = 0;				\
+		m_nflag = (rd >> 63) & 1;	\
+	}								\
+	else							\
+	{								\
+		m_zflag = 1;				\
+		m_nflag = 0;				\
+	}
 
-#define HandleALULogicalFlags(rd, sc)							\
-	if (SET_FLAGS)												\
-	set_cpsr_nomode(((GET_CPSR & ~(N_MASK | Z_MASK | C_MASK))	\
-				| HandleALUNZFlags(rd)							\
-				| (((sc) != 0) << C_BIT)));						\
+#define HandleALULogicalFlags(rd, sc)	\
+	if (SET_FLAGS)						\
+	{									\
+		HandleALUNZFlags(rd);			\
+		m_cflag = (sc) != 0 ? 1 : 0;	\
+	}									\
 	R15 += 4;
 
 #define DRC_RD      uml::mem(&GetRegister(rd))
@@ -149,22 +203,16 @@
 
 
 // used to be functions, but no longer a need, so we'll use define for better speed.
-#define GetRegister(rIndex)        m_core->m_r[m_core->m_reg_group[rIndex]]
-#define SetRegister(rIndex, value) m_core->m_r[m_core->m_reg_group[rIndex]] = value
+#define GetRegister(rIndex)        *m_rp[rIndex]
+#define SetRegister(rIndex, value) *m_rp[rIndex] = value
 
-#define GetModeRegister(mode, rIndex)        m_core->m_r[sRegisterTable[mode][rIndex]]
-#define SetModeRegister(mode, rIndex, value) m_core->m_r[sRegisterTable[mode][rIndex]] = value
+#define GetModeRegister(mode, rIndex)        m_r[s_register_table[mode][rIndex]]
+#define SetModeRegister(mode, rIndex, value) m_r[s_register_table[mode][rIndex]] = value
 
 
 /* Macros that can be re-defined for custom cpu implementations - The core expects these to be defined */
 /* In this case, we are using the default arm7 handlers (supplied by the core)
    - but simply changes these and define your own if needed for cpu implementation specific needs */
-#define READ8(addr)         arm7_cpu_read8(addr)
-#define WRITE8(addr,data)   arm7_cpu_write8(addr,data)
-#define READ16(addr)        arm7_cpu_read16(addr)
-#define WRITE16(addr,data)  arm7_cpu_write16(addr,data)
-#define READ32(addr)        arm7_cpu_read32(addr)
-#define WRITE32(addr,data)  arm7_cpu_write32(addr,data)
 #define PTR_READ32          &arm7_cpu_read32
 #define PTR_WRITE32         &arm7_cpu_write32
 
@@ -172,3 +220,32 @@
 #define LSR(v, s) ((v) >> (s))
 #define ROL(v, s) (LSL((v), (s)) | (LSR((v), 32u - (s))))
 #define ROR(v, s) (LSR((v), (s)) | (LSL((v), 32u - (s))))
+
+#define ALUStoreTest(rdn, rd)		\
+	if (rdn == eR15)				\
+	{								\
+		if (SET_FLAGS)				\
+			SetRegister(rdn, rd);	\
+		cycles += 2;				\
+	}
+
+#define ALUStoreDest(rdn, rd)					\
+	if (rdn == eR15)							\
+	{											\
+		if (SET_FLAGS)							\
+		{										\
+			if (m_mode != eARM7_MODE_USER)		\
+			{									\
+				uint32_t old_t = m_tflag;		\
+				set_cpsr(GetRegister(SPSR));	\
+				if (m_tflag != old_t)			\
+					set_mode_changed();			\
+			}									\
+		}										\
+		SetRegister(rdn, rd);					\
+		cycles += 2;							\
+	}											\
+	else										\
+	{											\
+		SetRegister(rdn, rd);					\
+	}

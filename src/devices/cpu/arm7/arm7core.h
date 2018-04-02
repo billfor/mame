@@ -52,7 +52,7 @@ enum
 };
 
 /* Coprocessor-related macros */
-#define COPRO_TLB_BASE                      m_core->m_tlbBase
+#define COPRO_TLB_BASE                      m_tlbBase
 #define COPRO_TLB_BASE_MASK                 0xffffc000
 #define COPRO_TLB_VADDR_FLTI_MASK           0xfff00000
 #define COPRO_TLB_VADDR_FLTI_MASK_SHIFT     20
@@ -76,7 +76,7 @@ enum
 #define COPRO_TLB_SECTION_TABLE             2
 #define COPRO_TLB_FINE_TABLE                3
 
-#define COPRO_CTRL                          m_core->m_control
+#define COPRO_CTRL                          m_control
 #define COPRO_CTRL_MMU_EN                   0x00000001
 #define COPRO_CTRL_ADDRFAULT_EN             0x00000002
 #define COPRO_CTRL_DCACHE_EN                0x00000004
@@ -100,14 +100,14 @@ enum
 #define COPRO_CTRL_INTVEC_F                 1
 #define COPRO_CTRL_MASK                     0x0000338f
 
-#define COPRO_DOMAIN_ACCESS_CONTROL         m_core->m_domainAccessControl
+#define COPRO_DOMAIN_ACCESS_CONTROL         m_domainAccessControl
 
-#define COPRO_FAULT_STATUS_D                m_core->m_faultStatus[0]
-#define COPRO_FAULT_STATUS_P                m_core->m_faultStatus[1]
+#define COPRO_FAULT_STATUS_D                m_faultStatus[0]
+#define COPRO_FAULT_STATUS_P                m_faultStatus[1]
 
-#define COPRO_FAULT_ADDRESS                 m_core->m_faultAddress
+#define COPRO_FAULT_ADDRESS                 m_faultAddress
 
-#define COPRO_FCSE_PID                      m_core->m_fcsePID
+#define COPRO_FCSE_PID                      m_fcsePID
 
 /****************************************************************************************************
  *  VARIOUS INTERNAL STRUCS/DEFINES/ETC..
@@ -209,7 +209,7 @@ static const int thumbCycles[256] =
 #define INSN_OP2_IMM        ((uint32_t)0x000000ffu)
 #define INSN_OP2_SHIFT_TYPE_SHIFT   4
 #define INSN_OP2_SHIFT_SHIFT        7
-#define INSN_OP2_ROTATE_SHIFT       8
+#define INSN_OP2_ROTATE_SHIFT       7
 #define INSN_MUL_RS_SHIFT           8
 #define INSN_MUL_RN_SHIFT           12
 #define INSN_MUL_RD_SHIFT           16
@@ -294,26 +294,6 @@ static const int thumbCycles[256] =
 
 enum
 {
-	OPCODE_AND, /* 0000 */
-	OPCODE_EOR, /* 0001 */
-	OPCODE_SUB, /* 0010 */
-	OPCODE_RSB, /* 0011 */
-	OPCODE_ADD, /* 0100 */
-	OPCODE_ADC, /* 0101 */
-	OPCODE_SBC, /* 0110 */
-	OPCODE_RSC, /* 0111 */
-	OPCODE_TST, /* 1000 */
-	OPCODE_TEQ, /* 1001 */
-	OPCODE_CMP, /* 1010 */
-	OPCODE_CMN, /* 1011 */
-	OPCODE_ORR, /* 1100 */
-	OPCODE_MOV, /* 1101 */
-	OPCODE_BIC, /* 1110 */
-	OPCODE_MVN  /* 1111 */
-};
-
-enum
-{
 	COND_EQ = 0,          /*  Z           equal                   */
 	COND_NE,              /* ~Z           not equal               */
 	COND_CS, COND_HS = 2, /*  C           unsigned higher or same */
@@ -333,11 +313,11 @@ enum
 };
 
 /* Convenience Macros */
-#define R15                     m_core->m_r[eR15]
-#define SPSR                    17                     // SPSR is always the 18th register in our 0 based array sRegisterTable[][18]
-#define GET_CPSR                m_core->m_r[eCPSR]
+#define R15                     m_r[eR15]
+#define SPSR                    16                     // SPSR is always the 17th register in our 0 based array s_register_table[][17]
+#define GET_CPSR                m_cpsr
 #define MODE_FLAG               0xF                    // Mode bits are 4:0 of CPSR, but we ignore bit 4.
-#define GET_MODE                m_core->m_mode
+#define GET_MODE                m_mode
 #define SIGN_BIT                (1 << 31)
 #define SIGN_BITS_DIFFER(a, b)  (((a) ^ (b)) >> 31)
 /* I really don't know why these were set to 16-bit, the thumb registers are still 32-bit ... */
@@ -353,7 +333,7 @@ enum
 #define ARM7_TLB_ABORT_D (1 << 0)
 #define ARM7_TLB_ABORT_P (1 << 1)
 #define ARM7_TLB_READ    (1 << 2)
-#define ARM7_TLB_WRITE   (1 << 8)
+#define ARM7_TLB_WRITE   (1 << 5)
 
 /* ARM flavors */
 enum arm_flavor

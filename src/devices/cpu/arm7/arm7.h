@@ -85,7 +85,6 @@ enum
 	eR13, /* Stack Pointer */
 	eR14, /* Link Register (holds return address) */
 	eR15, /* Program Counter */
-	eCPSR, /* Current Status Program Register */
 
 	/* Fast Interrupt - Bank switched registers */
 	eR8_FIQ, eR9_FIQ, eR10_FIQ, eR11_FIQ, eR12_FIQ, eR13_FIQ, eR14_FIQ, eSPSR_FIQ,
@@ -106,59 +105,6 @@ enum
 };
 
 #define ARM7_NUM_MODES 0x10
-
-/* 17 processor registers are visible at any given time,
- * banked depending on processor mode.
- */
-
-static const int sRegisterTable[ARM7_NUM_MODES][18] =
-{
-	{ /* USR */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8, eR9, eR10, eR11, eR12,
-		eR13, eR14,
-		eR15, eCPSR  // No SPSR in this mode
-	},
-	{ /* FIQ */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8_FIQ, eR9_FIQ, eR10_FIQ, eR11_FIQ, eR12_FIQ,
-		eR13_FIQ, eR14_FIQ,
-		eR15, eCPSR, eSPSR_FIQ
-	},
-	{ /* IRQ */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8, eR9, eR10, eR11, eR12,
-		eR13_IRQ, eR14_IRQ,
-		eR15, eCPSR, eSPSR_IRQ
-	},
-	{ /* SVC */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8, eR9, eR10, eR11, eR12,
-		eR13_SVC, eR14_SVC,
-		eR15, eCPSR, eSPSR_SVC
-	},
-	{0}, {0}, {0},        // values for modes 4,5,6 are not valid
-	{ /* ABT */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8, eR9, eR10, eR11, eR12,
-		eR13_ABT, eR14_ABT,
-		eR15, eCPSR, eSPSR_ABT
-	},
-	{0}, {0}, {0},        // values for modes 8,9,a are not valid!
-	{ /* UND */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8, eR9, eR10, eR11, eR12,
-		eR13_UND, eR14_UND,
-		eR15, eCPSR, eSPSR_UND
-	},
-	{0}, {0}, {0},        // values for modes c,d, e are not valid!
-	{ /* SYS */
-		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
-		eR8, eR9, eR10, eR11, eR12,
-		eR13, eR14,
-		eR15, eCPSR  // No SPSR in this mode
-	}
-};
 
 /****************************************************************************************************
  *  PUBLIC FUNCTIONS
@@ -273,6 +219,12 @@ protected:
 		S_BIT = 1
 	};
 
+	enum alu_bit
+	{
+		PSR_OP = 0,
+		ALU_OP = 1
+	};
+
 	enum size_mode
 	{
 		SIZE_DWORD = 0,
@@ -283,6 +235,80 @@ protected:
 	{
 		NO_WRITEBACK = 0,
 		WRITEBACK = 1
+	};
+
+	enum check_mode
+	{
+		NO_FETCH = 0,
+		FETCH = 1
+	};
+
+	enum tlb_rw_mode
+	{
+		TLB_READ = 0,
+		TLB_WRITE = 1
+	};
+
+	enum link_mode
+	{
+		BRANCH = 0,
+		BRANCH_LINK = 1
+	};
+
+	enum pid_mode
+	{
+		IGNORE_PID = 0,
+		VALID_PID = 1
+	};
+
+	enum debug_mode
+	{
+		NO_HOOK = 0,
+		CHECK_HOOK = 1
+	};
+
+	enum lmul_mode
+	{
+		MUL_WORD = 0,
+		MUL_LONG = 1
+	};
+
+	enum smul_mode
+	{
+		MUL_UNSIGNED = 0,
+		MUL_SIGNED = 1
+	};
+
+	enum accum_mode
+	{
+		MUL_ONLY = 0,
+		MUL_ACCUM = 1
+	};
+
+	enum load_mode
+	{
+		IS_STORE = 0,
+		IS_LOAD = 1
+	};
+
+	enum alu_mode
+	{
+		OPCODE_AND, /* 0000 */
+		OPCODE_EOR, /* 0001 */
+		OPCODE_SUB, /* 0010 */
+		OPCODE_RSB, /* 0011 */
+		OPCODE_ADD, /* 0100 */
+		OPCODE_ADC, /* 0101 */
+		OPCODE_SBC, /* 0110 */
+		OPCODE_RSC, /* 0111 */
+		OPCODE_TST, /* 1000 */
+		OPCODE_TEQ, /* 1001 */
+		OPCODE_CMP, /* 1010 */
+		OPCODE_CMN, /* 1011 */
+		OPCODE_ORR, /* 1100 */
+		OPCODE_MOV, /* 1101 */
+		OPCODE_BIC, /* 1110 */
+		OPCODE_MVN  /* 1111 */
 	};
 
 	arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint8_t archFlags, endianness_t endianness);
@@ -301,8 +327,10 @@ protected:
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	template <insn_mode THUMB, copro_mode MMU_ENABLED, prefetch_mode PREFETCH> void execute_core();
-	void execute_arm9_insn();
+	template <insn_mode THUMB, copro_mode MMU_ENABLED, prefetch_mode PREFETCH, pid_mode CHECK_PID, debug_mode DEBUG> void execute_core();
+	template <copro_mode MMU> inline ATTR_FORCE_INLINE void execute_arm7_insn(const uint32_t insn);
+	template <copro_mode MMU> inline ATTR_FORCE_INLINE void execute_thumb_insn(const uint32_t op, uint32_t pc);
+	void execute_arm9_insn(const uint32_t insn);
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -321,6 +349,12 @@ protected:
 	struct internal_arm_state
 	{
 		uint32_t m_r[37];
+		uint32_t m_cpsr;
+		uint32_t m_nflag;
+		uint32_t m_zflag;
+		uint32_t m_cflag;
+		uint32_t m_vflag;
+		uint32_t m_tflag;
 
 		uint32_t m_insn_prefetch_depth;
 		uint32_t m_insn_prefetch_count;
@@ -355,15 +389,64 @@ protected:
 		const int* m_reg_group;
 	};
 
+	uint32_t m_r[37];
+	uint32_t m_cpsr;
+	uint32_t m_nflag;
+	uint32_t m_zflag;
+	uint32_t m_cflag;
+	uint32_t m_vflag;
+	uint32_t m_tflag;
+	uint32_t **m_rp;
+
+	uint32_t m_insn_prefetch_depth;
+	uint32_t m_insn_prefetch_count;
+	uint32_t m_insn_prefetch_index;
+	uint32_t m_insn_prefetch_buffer[3];
+	uint32_t m_insn_prefetch_address[3];
+	uint32_t m_insn_prefetch_translated[3];
+	uint32_t m_prefetch_word0_shift;
+	uint32_t m_prefetch_word1_shift;
+
+	uint32_t m_pendingIrq;
+	uint32_t m_pendingFiq;
+	uint32_t m_pendingAbtD;
+	uint32_t m_pendingAbtP;
+	uint32_t m_pendingUnd;
+	uint32_t m_pendingSwi;
+	uint32_t m_pending_interrupt;
+	int m_icount;
+
+	/* Coprocessor Registers */
+	uint32_t m_control;
+	uint32_t m_tlbBase;
+	uint32_t m_tlb_base_mask;
+	uint32_t m_faultStatus[2];
+	uint32_t m_faultAddress;
+	uint32_t m_fcsePID;
+	uint32_t m_pid_offset;
+	uint32_t m_domainAccessControl;
+	uint32_t m_decoded_access_control[16];
+	uint32_t m_mode;
+
+	uint32_t m_section_bits[0x1000];
+	uint32_t m_early_faultless[0x1000];
+	uint8_t m_lvl1_type[0x1000];
+	uint8_t m_dac_index[0x1000];
+	uint8_t m_lvl1_ap[0x1000];
+	uint8_t m_section_read_fault[0x1000];
+	uint8_t m_section_write_fault[0x1000];
+
+	const int* m_reg_group;
+
 	void update_insn_prefetch(uint32_t curr_pc);
-	void update_insn_prefetch_mmu(uint32_t curr_pc);
-	void insn_fetch_thumb(uint32_t pc, bool& translated);
-	void insn_fetch_arm(uint32_t pc, bool& translated);
+	template <pid_mode CHECK_PID> void update_insn_prefetch_mmu(uint32_t curr_pc);
+	uint32_t insn_fetch_thumb(uint32_t pc, bool& translated);
+	uint32_t insn_fetch_arm(uint32_t pc, bool& translated);
 	int get_insn_prefetch_index(uint32_t address);
 
 	internal_arm_state *m_core;
 
-	bool m_mode_changed;
+	int m_stashed_icount;
 
 	address_space *m_program;
 	direct_read_data<0> *m_direct;
@@ -373,7 +456,6 @@ protected:
 	uint8_t m_archRev;          // ARM architecture revision (3, 4, and 5 are valid)
 	uint8_t m_archFlags;        // architecture flags
 
-	uint32_t m_insn;
 	uint32_t m_vectorbase;
 	bool m_prefetch_enabled;
 
@@ -388,176 +470,189 @@ protected:
 	void calculate_nvc_flags();
 	int64_t saturate_qbit_overflow(int64_t res);
 	void SwitchMode(uint32_t cpsr_mode_val);
-	uint32_t decodeShift(uint32_t *pCarry);
-	template <bdt_s_bit S_BIT> int loadInc(uint32_t rbv, int mode);
-	template <bdt_s_bit S_BIT> int loadDec(uint32_t rbv, int mode);
-	int storeInc(uint32_t rbv, int mode);
-	int storeDec(uint32_t rbv, int mode);
-	void HandleCoProcDO();
-	void HandleCoProcRT();
-	void HandleCoProcDT();
-	void HandleBranch();
-	void HandleBranchHBit();
-	template <imm_mode IMMEDIATE, index_mode PRE_INDEX, offset_mode OFFSET_UP, size_mode SIZE_BYTE, writeback_mode WRITEBACK> void HandleMemSingle();
-	template <index_mode PRE_INDEX, offset_mode OFFSET_UP, writeback_mode WRITEBACK> void HandleHalfWordDT();
-	void HandleSwap();
-	void HandlePSRTransfer();
-	template <imm_mode IMMEDIATE, flags_mode SET_FLAGS> void HandleALU();
-	template <flags_mode SET_FLAGS> void HandleMul();
-	template <flags_mode SET_FLAGS> void HandleSMulLong();
-	template <flags_mode SET_FLAGS> void HandleUMulLong();
-	template <index_mode PRE_INDEX, offset_mode OFFSET_UP, bdt_s_bit S_BIT, writeback_mode WRITEBACK> void HandleMemBlock();
+	inline ATTR_FORCE_INLINE uint32_t decodeShiftWithCarry(const uint32_t insn, uint32_t *pCarry);
+	inline ATTR_FORCE_INLINE uint32_t decodeShift(const uint32_t insn);
+	template <copro_mode MMU, bdt_s_bit S_BIT> int loadInc(const uint32_t insn, uint32_t rbv, const int mode);
+	template <copro_mode MMU, bdt_s_bit S_BIT> int loadDec(const uint32_t insn, uint32_t rbv, const int mode);
+	template <copro_mode MMU> int storeInc(const uint32_t insn, uint32_t rbv, const int mode);
+	template <copro_mode MMU> int storeDec(const uint32_t insn, uint32_t rbv, const int mode);
+	void HandleCoProcRT(const uint32_t insn);
+	void HandleCoProcDT(const uint32_t insn);
+	template <link_mode LINK> void HandleBranch(const uint32_t insn);
+	void HandleBranchHBit(const uint32_t insn);
+	template <copro_mode MMU, imm_mode IMMEDIATE, index_mode PRE_INDEX, offset_mode OFFSET_UP, size_mode SIZE_BYTE, writeback_mode WRITEBACK, load_mode LOAD> void HandleMemSingle(const uint32_t insn);
+	template <copro_mode MMU, index_mode PRE_INDEX, offset_mode OFFSET_UP, writeback_mode WRITEBACK, load_mode LOAD> void HandleHalfWordDT(const uint32_t insn);
+	template <copro_mode MMU> void HandleSwap(const uint32_t insn);
+	void HandlePSRTransfer(const uint32_t insn);
+	template <imm_mode IMMEDIATE, flags_mode SET_FLAGS, alu_mode OPCODE> inline ATTR_FORCE_INLINE void HandleALU(const uint32_t insn);
+	template <flags_mode SET_FLAGS, accum_mode ACCUM> void HandleMul(const uint32_t insn);
+	template <flags_mode SET_FLAGS, accum_mode ACCUM> void HandleSMulLong(const uint32_t insn);
+	template <flags_mode SET_FLAGS, accum_mode ACCUM> void HandleUMulLong(const uint32_t insn);
+	template <copro_mode MMU, index_mode PRE_INDEX, offset_mode OFFSET_UP, bdt_s_bit S_BIT, writeback_mode WRITEBACK> void HandleMemBlock(const uint32_t insn);
 
-	template <offset_mode OFFSET_MODE, flags_mode SET_FLAGS, writeback_mode WRITEBACK> void arm7ops_0();
-	template <offset_mode OFFSET_MODE, flags_mode SET_FLAGS, writeback_mode WRITEBACK> void arm7ops_1();
-	template <flags_mode SET_FLAGS> void arm7ops_2();
-	template <offset_mode OFFSET_MODE, flags_mode SET_FLAGS> void arm7ops_3();
-	void arm7ops_4567();
-	void arm7ops_ab();
-	void arm7ops_cd();
-	void arm7ops_e();
-	void arm7ops_f();
+	template <copro_mode MMU, offset_mode OFFSET_MODE, flags_mode SET_FLAGS, writeback_mode WRITEBACK, lmul_mode LONG_MUL, smul_mode SIGNED_MUL, accum_mode ACCUM, load_mode LOAD, alu_mode OPCODE> void arm7ops_0(const uint32_t insn);
+	template <copro_mode MMU, offset_mode OFFSET_MODE, flags_mode SET_FLAGS, writeback_mode WRITEBACK, load_mode LOAD, alu_bit ALU_BIT, alu_mode OPCODE> void arm7ops_1(const uint32_t insn);
 
-	void arm9ops_undef();
-	void arm9ops_1();
-	void arm9ops_57();
-	void arm9ops_89();
-	void arm9ops_ab();
-	void arm9ops_c();
-	void arm9ops_e();
+	void arm9ops_undef(const uint32_t insn);
+	void arm9ops_1(const uint32_t insn);
+	void arm9ops_57(const uint32_t insn);
+	void arm9ops_89(const uint32_t insn);
+	void arm9ops_ab(const uint32_t insn);
+	void arm9ops_c(const uint32_t insn);
+	void arm9ops_e(const uint32_t insn);
 
+	inline void set_mode_changed() { m_stashed_icount = m_icount; m_icount = -1; }
 	virtual void set_cpsr(uint32_t val);
-	inline void set_cpsr_nomode(uint32_t val) { m_core->m_r[eCPSR] = val; }
-	bool arm7_tlb_translate(offs_t &addr, int flags);
-	inline ATTR_FORCE_INLINE bool arm7_tlb_translate_check(offs_t &addr);
-	uint32_t arm7_tlb_get_second_level_descriptor( uint32_t granularity, uint32_t first_desc, uint32_t vaddr );
-	inline int detect_read_fault(int desc_lvl1, int ap);
-	inline int detect_fault(int desc_lvl1, int ap, int flags);
+	inline void set_cpsr_nomode(uint32_t val) { m_cpsr = val; }
+	inline uint32_t make_cpsr();
+	inline void split_flags();
+	template <tlb_rw_mode WRITE> bool arm7_tlb_translate(offs_t &addr);
+	template <check_mode DO_FETCH, insn_mode THUMB, pid_mode CHECK_PID> inline ATTR_FORCE_INLINE uint32_t arm7_tlb_translate_check(offs_t addr);
+	uint32_t arm7_tlb_get_second_level_descriptor(uint32_t granularity, uint32_t vaddr);
+	inline int detect_read_fault(uint32_t desc_index, uint32_t ap);
+	template <tlb_rw_mode WRITE> inline ATTR_FORCE_INLINE int detect_fault(uint32_t desc_index, uint32_t ap);
 	int decode_fault(int mode, int ap, int access_control, int system, int rom, int write);
 	inline ATTR_FORCE_INLINE void arm7_check_irq_state();
 	void update_irq_state();
 	virtual void arm7_cpu_write32(uint32_t addr, uint32_t data);
 	virtual void arm7_cpu_write16(uint32_t addr, uint16_t data);
 	virtual void arm7_cpu_write8(uint32_t addr, uint8_t data);
+	virtual void arm7_cpu_write32_mmu(uint32_t addr, uint32_t data);
+	virtual void arm7_cpu_write16_mmu(uint32_t addr, uint16_t data);
+	virtual void arm7_cpu_write8_mmu(uint32_t addr, uint8_t data);
 	virtual uint32_t arm7_cpu_read32(uint32_t addr);
 	virtual uint32_t arm7_cpu_read16(uint32_t addr);
 	virtual uint8_t arm7_cpu_read8(uint32_t addr);
+	virtual uint32_t arm7_cpu_read32_mmu(uint32_t addr);
+	virtual uint32_t arm7_cpu_read16_mmu(uint32_t addr);
+	virtual uint8_t arm7_cpu_read8_mmu(uint32_t addr);
 
 	// Coprocessor support
 	DECLARE_WRITE32_MEMBER( arm7_do_callback );
 	virtual DECLARE_READ32_MEMBER( arm7_rt_r_callback );
 	virtual DECLARE_WRITE32_MEMBER( arm7_rt_w_callback );
-	void arm7_dt_r_callback(uint32_t *prn);
-	void arm7_dt_w_callback(uint32_t *prn);
+	void arm7_dt_r_callback(const uint32_t insn, uint32_t *prn);
+	void arm7_dt_w_callback(const uint32_t insn, uint32_t *prn);
 
-	void tg00_0(uint32_t pc);
-	void tg00_1(uint32_t pc);
-	void tg01_0(uint32_t pc);
-	void tg01_10(uint32_t pc);
-	void tg01_11(uint32_t pc);
-	void tg01_12(uint32_t pc);
-	void tg01_13(uint32_t pc);
-	void tg02_0(uint32_t pc);
-	void tg02_1(uint32_t pc);
-	void tg03_0(uint32_t pc);
-	void tg03_1(uint32_t pc);
-	void tg04_00_00(uint32_t pc);
-	void tg04_00_01(uint32_t pc);
-	void tg04_00_02(uint32_t pc);
-	void tg04_00_03(uint32_t pc);
-	void tg04_00_04(uint32_t pc);
-	void tg04_00_05(uint32_t pc);
-	void tg04_00_06(uint32_t pc);
-	void tg04_00_07(uint32_t pc);
-	void tg04_00_08(uint32_t pc);
-	void tg04_00_09(uint32_t pc);
-	void tg04_00_0a(uint32_t pc);
-	void tg04_00_0b(uint32_t pc);
-	void tg04_00_0c(uint32_t pc);
-	void tg04_00_0d(uint32_t pc);
-	void tg04_00_0e(uint32_t pc);
-	void tg04_00_0f(uint32_t pc);
-	void tg04_01_00(uint32_t pc);
-	void tg04_01_01(uint32_t pc);
-	void tg04_01_02(uint32_t pc);
-	void tg04_01_03(uint32_t pc);
-	void tg04_01_10(uint32_t pc);
-	void tg04_01_11(uint32_t pc);
-	void tg04_01_12(uint32_t pc);
-	void tg04_01_13(uint32_t pc);
-	void tg04_01_20(uint32_t pc);
-	void tg04_01_21(uint32_t pc);
-	void tg04_01_22(uint32_t pc);
-	void tg04_01_23(uint32_t pc);
-	void tg04_01_30(uint32_t pc);
-	void tg04_01_31(uint32_t pc);
-	void tg04_01_32(uint32_t pc);
-	void tg04_01_33(uint32_t pc);
-	void tg04_0203(uint32_t pc);
-	void tg05_0(uint32_t pc);
-	void tg05_1(uint32_t pc);
-	void tg05_2(uint32_t pc);
-	void tg05_3(uint32_t pc);
-	void tg05_4(uint32_t pc);
-	void tg05_5(uint32_t pc);
-	void tg05_6(uint32_t pc);
-	void tg05_7(uint32_t pc);
-	void tg06_0(uint32_t pc);
-	void tg06_1(uint32_t pc);
-	void tg07_0(uint32_t pc);
-	void tg07_1(uint32_t pc);
-	void tg08_0(uint32_t pc);
-	void tg08_1(uint32_t pc);
-	void tg09_0(uint32_t pc);
-	void tg09_1(uint32_t pc);
-	void tg0a_0(uint32_t pc);
-	void tg0a_1(uint32_t pc);
-	void tg0b_0(uint32_t pc);
-	void tg0b_1(uint32_t pc);
-	void tg0b_2(uint32_t pc);
-	void tg0b_3(uint32_t pc);
-	void tg0b_4(uint32_t pc);
-	void tg0b_5(uint32_t pc);
-	void tg0b_6(uint32_t pc);
-	void tg0b_7(uint32_t pc);
-	void tg0b_8(uint32_t pc);
-	void tg0b_9(uint32_t pc);
-	void tg0b_a(uint32_t pc);
-	void tg0b_b(uint32_t pc);
-	void tg0b_c(uint32_t pc);
-	void tg0b_d(uint32_t pc);
-	void tg0b_e(uint32_t pc);
-	void tg0b_f(uint32_t pc);
-	void tg0c_0(uint32_t pc);
-	void tg0c_1(uint32_t pc);
-	void tg0d_0(uint32_t pc);
-	void tg0d_1(uint32_t pc);
-	void tg0d_2(uint32_t pc);
-	void tg0d_3(uint32_t pc);
-	void tg0d_4(uint32_t pc);
-	void tg0d_5(uint32_t pc);
-	void tg0d_6(uint32_t pc);
-	void tg0d_7(uint32_t pc);
-	void tg0d_8(uint32_t pc);
-	void tg0d_9(uint32_t pc);
-	void tg0d_a(uint32_t pc);
-	void tg0d_b(uint32_t pc);
-	void tg0d_c(uint32_t pc);
-	void tg0d_d(uint32_t pc);
-	void tg0d_e(uint32_t pc);
-	void tg0d_f(uint32_t pc);
-	void tg0e_0(uint32_t pc);
-	void tg0e_1(uint32_t pc);
-	void tg0f_0(uint32_t pc);
-	void tg0f_1(uint32_t pc);
-
-	typedef void ( arm7_cpu_device::*arm7thumb_ophandler ) (uint32_t);
-	static const arm7thumb_ophandler thumb_handler[0x40*0x10];
+	void tg00_0(uint32_t op, uint32_t pc);
+	void tg00_1(uint32_t op, uint32_t pc);
+	void tg01_0(uint32_t op, uint32_t pc);
+	void tg01_10(uint32_t op, uint32_t pc);
+	void tg01_11(uint32_t op, uint32_t pc);
+	void tg01_12(uint32_t op, uint32_t pc);
+	void tg01_13(uint32_t op, uint32_t pc);
+	void tg02_0(uint32_t op, uint32_t pc);
+	void tg02_1(uint32_t op, uint32_t pc);
+	void tg03_0(uint32_t op, uint32_t pc);
+	void tg03_1(uint32_t op, uint32_t pc);
+	void tg04_00_00(uint32_t op, uint32_t pc);
+	void tg04_00_01(uint32_t op, uint32_t pc);
+	void tg04_00_02(uint32_t op, uint32_t pc);
+	void tg04_00_03(uint32_t op, uint32_t pc);
+	void tg04_00_04(uint32_t op, uint32_t pc);
+	void tg04_00_05(uint32_t op, uint32_t pc);
+	void tg04_00_06(uint32_t op, uint32_t pc);
+	void tg04_00_07(uint32_t op, uint32_t pc);
+	void tg04_00_08(uint32_t op, uint32_t pc);
+	void tg04_00_09(uint32_t op, uint32_t pc);
+	void tg04_00_0a(uint32_t op, uint32_t pc);
+	void tg04_00_0b(uint32_t op, uint32_t pc);
+	void tg04_00_0c(uint32_t op, uint32_t pc);
+	void tg04_00_0d(uint32_t op, uint32_t pc);
+	void tg04_00_0e(uint32_t op, uint32_t pc);
+	void tg04_00_0f(uint32_t op, uint32_t pc);
+	void tg04_01_00(uint32_t op, uint32_t pc);
+	void tg04_01_01(uint32_t op, uint32_t pc);
+	void tg04_01_02(uint32_t op, uint32_t pc);
+	void tg04_01_03(uint32_t op, uint32_t pc);
+	void tg04_01_10(uint32_t op, uint32_t pc);
+	void tg04_01_11(uint32_t op, uint32_t pc);
+	void tg04_01_12(uint32_t op, uint32_t pc);
+	void tg04_01_13(uint32_t op, uint32_t pc);
+	void tg04_01_20(uint32_t op, uint32_t pc);
+	void tg04_01_21(uint32_t op, uint32_t pc);
+	void tg04_01_22(uint32_t op, uint32_t pc);
+	void tg04_01_23(uint32_t op, uint32_t pc);
+	void tg04_01_30(uint32_t op, uint32_t pc);
+	void tg04_01_31(uint32_t op, uint32_t pc);
+	void tg04_01_32(uint32_t op, uint32_t pc);
+	void tg04_01_33(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg04_0203(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg05_0(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg05_1(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg05_2(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg05_3(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg05_4(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg05_5(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg05_6(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg05_7(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg06_0(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg06_1(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg07_0(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg07_1(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg08_0(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg08_1(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg09_0(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg09_1(uint32_t op, uint32_t pc);
+	void tg0a_0(uint32_t op, uint32_t pc);
+	void tg0a_1(uint32_t op, uint32_t pc);
+	void tg0b_0(uint32_t op, uint32_t pc);
+	void tg0b_1(uint32_t op, uint32_t pc);
+	void tg0b_2(uint32_t op, uint32_t pc);
+	void tg0b_3(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg0b_4(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg0b_5(uint32_t op, uint32_t pc);
+	void tg0b_6(uint32_t op, uint32_t pc);
+	void tg0b_7(uint32_t op, uint32_t pc);
+	void tg0b_8(uint32_t op, uint32_t pc);
+	void tg0b_9(uint32_t op, uint32_t pc);
+	void tg0b_a(uint32_t op, uint32_t pc);
+	void tg0b_b(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg0b_c(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg0b_d(uint32_t op, uint32_t pc);
+	void tg0b_e(uint32_t op, uint32_t pc);
+	void tg0b_f(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg0c_0(uint32_t op, uint32_t pc);
+	template <copro_mode MMU> void tg0c_1(uint32_t op, uint32_t pc);
+	void tg0d_0(uint32_t op, uint32_t pc);
+	void tg0d_1(uint32_t op, uint32_t pc);
+	void tg0d_2(uint32_t op, uint32_t pc);
+	void tg0d_3(uint32_t op, uint32_t pc);
+	void tg0d_4(uint32_t op, uint32_t pc);
+	void tg0d_5(uint32_t op, uint32_t pc);
+	void tg0d_6(uint32_t op, uint32_t pc);
+	void tg0d_7(uint32_t op, uint32_t pc);
+	void tg0d_8(uint32_t op, uint32_t pc);
+	void tg0d_9(uint32_t op, uint32_t pc);
+	void tg0d_a(uint32_t op, uint32_t pc);
+	void tg0d_b(uint32_t op, uint32_t pc);
+	void tg0d_c(uint32_t op, uint32_t pc);
+	void tg0d_d(uint32_t op, uint32_t pc);
+	void tg0d_e(uint32_t op, uint32_t pc);
+	void tg0d_f(uint32_t op, uint32_t pc);
+	void tg0e_0(uint32_t op, uint32_t pc);
+	void tg0e_1(uint32_t op, uint32_t pc);
+	void tg0f_0(uint32_t op, uint32_t pc);
+	void tg0f_1(uint32_t op, uint32_t pc);
 
 	uint32_t *m_tlb_base;
-	static int s_fault_table[512];
+	static int s_read_fault_table_user[16];
+	static int s_read_fault_table_no_user[16];
+	static int s_write_fault_table_user[16];
+	static int s_write_fault_table_no_user[16];
+	static uint32_t s_read_fault_word_user;
+	static uint32_t s_read_fault_word_no_user;
+	static uint32_t s_write_fault_word_user;
+	static uint32_t s_write_fault_word_no_user;
 	static uint32_t s_add_nvc_flags[8];
 	static uint32_t s_sub_nvc_flags[8];
+	static const int s_register_table[ARM7_NUM_MODES][17];
+	uint32_t *m_register_pointers[ARM7_NUM_MODES][17];
+
+	int *m_read_fault_table;
+	int *m_write_fault_table;
+	uint32_t m_read_fault_word;
+	uint32_t m_write_fault_word;
 
 	//
 	// DRC
@@ -738,7 +833,7 @@ protected:
 	void drctg0f_0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void drctg0f_1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc); /* BL */
 
-	void update_reg_ptr();
+	inline void update_reg_ptr();
 	void load_fast_iregs(drcuml_block *block);
 	void save_fast_iregs(drcuml_block *block);
 	void execute_run_drc();
@@ -827,9 +922,15 @@ public:
 	virtual void arm7_cpu_write32(uint32_t addr, uint32_t data) override;
 	virtual void arm7_cpu_write16(uint32_t addr, uint16_t data) override;
 	virtual void arm7_cpu_write8(uint32_t addr, uint8_t data) override;
+	virtual void arm7_cpu_write32_mmu(uint32_t addr, uint32_t data) override;
+	virtual void arm7_cpu_write16_mmu(uint32_t addr, uint16_t data) override;
+	virtual void arm7_cpu_write8_mmu(uint32_t addr, uint8_t data) override;
 	virtual uint32_t arm7_cpu_read32(uint32_t addr) override;
 	virtual uint32_t arm7_cpu_read16(uint32_t addr) override;
 	virtual uint8_t arm7_cpu_read8(uint32_t addr) override;
+	virtual uint32_t arm7_cpu_read32_mmu(uint32_t addr) override;
+	virtual uint32_t arm7_cpu_read16_mmu(uint32_t addr) override;
+	virtual uint8_t arm7_cpu_read8_mmu(uint32_t addr) override;
 
 protected:
 	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

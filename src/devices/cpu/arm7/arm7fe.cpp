@@ -455,12 +455,12 @@ bool arm9_frontend::describe_arm9_ops_e(opcode_desc &desc, const opcode_desc *pr
 
 uint32_t arm7_frontend::get_cpsr()
 {
-	return m_cpu->m_core->m_r[eCPSR];
+	return m_cpu->m_core->m_cpsr;
 }
 
 bool arm7_frontend::get_mode32()
 {
-	return m_cpu->m_core->m_r[eCPSR] & SR_MODE32;
+	return m_cpu->m_core->m_cpsr & SR_MODE32;
 }
 
 //-------------------------------------------------
@@ -473,7 +473,7 @@ bool arm7_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	// compute the physical PC
 	const uint32_t cpsr = get_cpsr();
 	assert((desc.physpc & (T_IS_SET(cpsr) ? 1 : 3)) == 0);
-	if (!m_cpu->arm7_tlb_translate(desc.physpc, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
+	if (!m_cpu->arm7_tlb_translate<arm7_cpu_device::TLB_READ>(desc.physpc))
 	{
 		// uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and
 		// mark as needing to validate; otherwise, just end the sequence here
