@@ -1069,6 +1069,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"osborne",
 		"osi",
 		"palm",
+		"palm",
 		"pc",
 		"pdp1",
 		"pel",
@@ -2657,6 +2658,7 @@ files {
 createMESSProjects(_target, _subtarget, "palm")
 files {
 	MAME_DIR .. "src/mame/drivers/palm.cpp",
+	MAME_DIR .. "src/mame/drivers/palmcolor.cpp",
 	MAME_DIR .. "src/mame/drivers/palm_dbg.hxx",
 	MAME_DIR .. "src/mame/drivers/palmz22.cpp",
 }

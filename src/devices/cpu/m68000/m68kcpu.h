@@ -64,19 +64,20 @@ static constexpr int FUNCTION_CODE_SUPERVISOR_PROGRAM = 6;
 static constexpr int FUNCTION_CODE_CPU_SPACE          = 7;
 
 /* CPU types for deciding what to emulate */
-static constexpr int CPU_TYPE_000    = (0x00000001);
-static constexpr int CPU_TYPE_008    = (0x00000002);
-static constexpr int CPU_TYPE_010    = (0x00000004);
-static constexpr int CPU_TYPE_EC020  = (0x00000008);
-static constexpr int CPU_TYPE_020    = (0x00000010);
-static constexpr int CPU_TYPE_EC030  = (0x00000020);
-static constexpr int CPU_TYPE_030    = (0x00000040);
-static constexpr int CPU_TYPE_EC040  = (0x00000080);
-static constexpr int CPU_TYPE_LC040  = (0x00000100);
-static constexpr int CPU_TYPE_040    = (0x00000200);
-static constexpr int CPU_TYPE_SCC070 = (0x00000400);
-static constexpr int CPU_TYPE_FSCPU32  = (0x00000800);
-static constexpr int CPU_TYPE_COLDFIRE = (0x00001000);
+static constexpr int CPU_TYPE_000       = (0x00000001);
+static constexpr int CPU_TYPE_008       = (0x00000002);
+static constexpr int CPU_TYPE_010       = (0x00000004);
+static constexpr int CPU_TYPE_EC020     = (0x00000008);
+static constexpr int CPU_TYPE_020       = (0x00000010);
+static constexpr int CPU_TYPE_EC030     = (0x00000020);
+static constexpr int CPU_TYPE_030       = (0x00000040);
+static constexpr int CPU_TYPE_EC040     = (0x00000080);
+static constexpr int CPU_TYPE_LC040     = (0x00000100);
+static constexpr int CPU_TYPE_040       = (0x00000200);
+static constexpr int CPU_TYPE_SCC070    = (0x00000400);
+static constexpr int CPU_TYPE_FSCPU32   = (0x00000800);
+static constexpr int CPU_TYPE_COLDFIRE  = (0x00001000);
+static constexpr int CPU_TYPE_MC68VZ328 = (0x00002000);
 
 /* Different ways to stop the CPU */
 static constexpr int STOP_LEVEL_STOP = 1;

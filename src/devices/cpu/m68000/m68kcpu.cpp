@@ -614,9 +614,9 @@ const uint8_t m68000_base_device::m68ki_ea_idx_cycle_table[64] =
     CPU STATE DESCRIPTION
 ***************************************************************************/
 
-#define MASK_ALL                (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_FSCPU32 )
+#define MASK_ALL                (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_FSCPU32 | CPU_TYPE_MC68VZ328)
 #define MASK_24BIT_SPACE            (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020)
-#define MASK_32BIT_SPACE            (CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_FSCPU32 )
+#define MASK_32BIT_SPACE            (CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_FSCPU32 | CPU_TYPE_MC68VZ328)
 #define MASK_010_OR_LATER           (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 )
 #define MASK_020_OR_LATER           (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_EC040 | CPU_TYPE_040 | CPU_TYPE_FSCPU32 )
 #define MASK_030_OR_LATER           (CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040)
@@ -1683,7 +1683,7 @@ uint16_t m68000_base_device::get_fc()
 void m68000_base_device::define_state(void)
 {
 	uint32_t addrmask = (m_cpu_type & MASK_24BIT_SPACE) ? 0xffffff : 0xffffffff;
-
+	printf("%08x\n", addrmask);
 	state_add(STATE_GENPC,     "PC",        m_pc).mask(addrmask).callimport();
 	state_add(STATE_GENPCBASE, "CURPC",     m_ppc).mask(addrmask).callimport().noshow();
 	state_add(M68K_SP,         "SP",        m_dar[15]);
@@ -2050,6 +2050,33 @@ void m68000_base_device::init_cpu_scc68070(void)
 }
 
 
+void m68000_base_device::init_cpu_mc68vz328(void)
+{
+	init_cpu_common();
+
+	m_cpu_type         = CPU_TYPE_MC68VZ328;
+
+	init16(*m_program, *m_oprogram);
+	m_sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
+	m_jump_table       = m68ki_instruction_jump_table[0];
+	m_cyc_instruction  = m68ki_cycles[0];
+	m_cyc_exception    = m68ki_exception_cycle_table[0];
+	m_cyc_bcc_notake_b = -2;
+	m_cyc_bcc_notake_w = 2;
+	m_cyc_dbcc_f_noexp = -2;
+	m_cyc_dbcc_f_exp   = 2;
+	m_cyc_scc_r_true   = 2;
+	m_cyc_movem_w      = 2;
+	m_cyc_movem_l      = 3;
+	m_cyc_shift        = 1;
+	m_cyc_reset        = 132;
+	m_has_pmmu         = 0;
+	m_has_hmmu         = 0;
+	m_has_fpu          = 0;
+
+	define_state();
+}
+
 void m68000_base_device::init_cpu_fscpu32(void)
 {
 	init_cpu_common();
@@ -2195,6 +2222,11 @@ std::unique_ptr<util::disasm_interface> fscpu32_device::create_disassembler()
 std::unique_ptr<util::disasm_interface> mcf5206e_device::create_disassembler()
 {
 	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_COLDFIRE);
+}
+
+std::unique_ptr<util::disasm_interface> mc68vz328_cpu_device::create_disassembler()
+{
+	return std::make_unique<m68k_disassembler>(m68k_disassembler::TYPE_68000);
 }
 
 
@@ -2482,6 +2514,7 @@ DEFINE_DEVICE_TYPE(M68040,      m68040_device,      "m68040",       "Motorola MC
 DEFINE_DEVICE_TYPE(SCC68070,    scc68070_device,    "scc68070",     "Philips SCC68070")
 DEFINE_DEVICE_TYPE(FSCPU32,     fscpu32_device,     "fscpu32",      "Freescale CPU32 Core")
 DEFINE_DEVICE_TYPE(MCF5206E,    mcf5206e_device,    "mcf5206e",     "Freescale MCF5206E")
+DEFINE_DEVICE_TYPE(MC68VZ328_CPU, mc68vz328_cpu_device,   "mc68vz328",    "Motorola MC68VZ328")
 
 m68000_device::m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m68000_device(mconfig, M68000, tag, owner, clock)
@@ -2707,12 +2740,10 @@ fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-
 void fscpu32_device::device_start()
 {
 	init_cpu_fscpu32();
 }
-
 
 
 mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -2724,3 +2755,16 @@ void mcf5206e_device::device_start()
 {
 	init_cpu_coldfire();
 }
+
+
+mc68vz328_cpu_device::mc68vz328_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m68000_base_device(mconfig, tag, owner, clock, MC68VZ328_CPU, 16,32)
+{
+}
+
+void mc68vz328_cpu_device::device_start()
+{
+	init_cpu_mc68vz328();
+}
+
+

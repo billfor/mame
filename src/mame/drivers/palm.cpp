@@ -27,17 +27,19 @@ class palm_state : public driver_device
 {
 public:
 	palm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_lsi(*this, MC68328_TAG),
-		m_ram(*this, RAM_TAG),
-		m_io_penx(*this, "PENX"),
-		m_io_peny(*this, "PENY"),
-		m_io_penb(*this, "PENB"),
-		m_io_portd(*this, "PORTD") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_lsi(*this, MC68328_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_port_f_latch(0)
+		, m_spim_data(0)
+		, m_io_penx(*this, "PENX")
+		, m_io_peny(*this, "PENY")
+		, m_io_penb(*this, "PENB")
+		, m_io_portd(*this, "PORTD") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mc68328_device> m_lsi;
+	required_device<mc68328_base_device> m_lsi;
 	required_device<ram_device> m_ram;
 	uint8_t m_port_f_latch;
 	uint16_t m_spim_data;
@@ -59,20 +61,20 @@ public:
 	required_ioport m_io_portd;
 
 	offs_t palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
-	void palmiii(machine_config &config);
-	void pilot1k(machine_config &config);
-	void palmvx(machine_config &config);
-	void palmv(machine_config &config);
 	void palm(machine_config &config);
-	void palmpro(machine_config &config);
+	void pilot1k(machine_config &config);
 	void pilot5k(machine_config &config);
+	void palmiii(machine_config &config);
+	void palmv(machine_config &config);
+	void palmvx(machine_config &config);
+	void palmpro(machine_config &config);
 	void palm_map(address_map &map);
+
+	void palmm515(machine_config &config);
+	void palmm515_map(address_map &map);
 };
 
 
-/***************************************************************************
-    MACHINE HARDWARE
-***************************************************************************/
 
 INPUT_CHANGED_MEMBER(palm_state::pen_check)
 {
@@ -135,8 +137,8 @@ WRITE_LINE_MEMBER(palm_state::palm_spim_exchange)
 void palm_state::machine_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_bank (0x000000, m_ram->size() - 1, "bank1");
-	space.install_write_bank(0x000000, m_ram->size() - 1, "bank1");
+	space.install_read_bank(0x00000000, m_ram->size() - 1, "bank1");
+	space.install_write_bank(0x00000000, m_ram->size() - 1, "bank1");
 	membank("bank1")->set_base(m_ram->pointer());
 
 	save_item(NAME(m_port_f_latch));
@@ -161,20 +163,11 @@ PALETTE_INIT_MEMBER(palm_state, palm)
 }
 
 
-/***************************************************************************
-    ADDRESS MAPS
-***************************************************************************/
-
 void palm_state::palm_map(address_map &map)
 {
 	map(0xc00000, 0xe07fff).rom().region("bios", 0);
 	map(0xfff000, 0xffffff).rw(m_lsi, FUNC(mc68328_device::read), FUNC(mc68328_device::write));
 }
-
-
-/***************************************************************************
-    MACHINE DRIVERS
-***************************************************************************/
 
 MACHINE_CONFIG_START(palm_state::palm)
 	/* basic machine hardware */
@@ -204,7 +197,7 @@ MACHINE_CONFIG_START(palm_state::palm)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_DEVICE_ADD( MC68328_TAG, MC68328, 0 ) // lsi device
+	MCFG_DEVICE_ADD(MC68328_TAG, MC68328, 0) // lsi device
 	MCFG_MC68328_CPU("maincpu")
 	MCFG_MC68328_OUT_PORT_F_CB(WRITE8(palm_state, palm_port_f_out)) // Port F Output
 	MCFG_MC68328_IN_PORT_C_CB(READ8(palm_state, palm_port_c_in)) // Port C Input
@@ -367,25 +360,6 @@ ROM_START( palmm130 )
 	ROM_DEFAULT_BIOS( "4.0e" )
 ROM_END
 
-ROM_START( palmm505 )
-	ROM_REGION16_BE( 0x408000, "bios", 0 )
-	ROM_SYSTEM_BIOS( 0, "4.0e", "Palm OS 4.0 (English)" )
-	ROMX_LOAD( "palmos40-en-m505.rom", 0x008000, 0x400000, CRC(822a4679) SHA1(a4f5e9f7edb1926647ea07969200c5c5e1521bdf), ROM_GROUPWORD | ROM_BIOS(1) )
-	ROM_RELOAD(0x000000, 0x004000)
-	ROM_SYSTEM_BIOS( 1, "4.1e", "Palm OS 4.1 (English)" )
-	ROMX_LOAD( "palmos41-en-m505.rom", 0x008000, 0x400000, CRC(d248202a) SHA1(65e1bd08b244c589b4cd10fe573e0376aba90e5f), ROM_GROUPWORD | ROM_BIOS(2) )
-	ROM_RELOAD(0x000000, 0x004000)
-	ROM_DEFAULT_BIOS( "4.1e" )
-ROM_END
-
-ROM_START( palmm515 )
-	ROM_REGION16_BE( 0x408000, "bios", 0 )
-	ROM_SYSTEM_BIOS( 0, "4.1e", "Palm OS 4.1 (English)" )
-	ROMX_LOAD( "palmos41-en-m515.rom", 0x008000, 0x400000, CRC(6e143436) SHA1(a0767ea26cc493a3f687525d173903fef89f1acb), ROM_GROUPWORD | ROM_BIOS(1) )
-	ROM_RELOAD(0x000000, 0x004000)
-	ROM_DEFAULT_BIOS( "4.1e" )
-ROM_END
-
 ROM_START( visor )
 	ROM_REGION16_BE( 0x208000, "bios", 0 )
 	ROM_SYSTEM_BIOS( 0, "3.52e", "Palm OS 3.5.2 (English)" )
@@ -489,8 +463,6 @@ COMP( 1998, palmiii,  pilot1k,  0,       palmiii,     palm, palm_state, 0,     "
 COMP( 1998, palmiiic, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm IIIc",           MACHINE_NOT_WORKING )
 COMP( 2000, palmm100, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm m100",           MACHINE_NOT_WORKING )
 COMP( 2000, palmm130, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm m130",           MACHINE_NOT_WORKING )
-COMP( 2001, palmm505, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm m505",           MACHINE_NOT_WORKING )
-COMP( 2001, palmm515, pilot1k,  0,       palmiii,     palm, palm_state, 0,     "Palm Inc",      "Palm m515",           MACHINE_NOT_WORKING )
 COMP( 1999, palmv,    pilot1k,  0,       palmv,       palm, palm_state, 0,     "3Com",          "Palm V",              MACHINE_NOT_WORKING )
 COMP( 1999, palmvx,   pilot1k,  0,       palmvx,      palm, palm_state, 0,     "Palm Inc",      "Palm Vx",             MACHINE_NOT_WORKING )
 COMP( 2001, visor,    pilot1k,  0,       palmvx,      palm, palm_state, 0,     "Handspring",    "Visor Edge",          MACHINE_NOT_WORKING )

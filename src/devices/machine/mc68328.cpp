@@ -332,9 +332,9 @@
 #define PWMC_CLKSEL             0x0007
 
 
-#define VERBOSE_LEVEL   (0)
+#define VERBOSE_LEVEL   (5)
 
-static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, const char *s_fmt, ...)
+void ATTR_PRINTF(3,4) mc68328_base_device::verboselog(int n_level, const char *s_fmt, ...)
 {
 	if (VERBOSE_LEVEL >= n_level)
 	{
@@ -343,15 +343,15 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 		va_start(v, s_fmt);
 		vsprintf(buf, s_fmt, v);
 		va_end(v);
-		device.logerror("%s: %s", device.machine().describe_context(), buf);
+		logerror("%s: %s", machine().describe_context(), buf);
 	}
 }
 
 DEFINE_DEVICE_TYPE(MC68328, mc68328_device, "mc68328", "MC68328 DragonBall Integrated Processor")
+DEFINE_DEVICE_TYPE(MC68VZ328, mc68vz328_device, "mc68vz328", "MC68VZ328 DragonBall Integrated Processor")
 
-
-mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MC68328, tag, owner, clock)
+mc68328_base_device::mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_rtc(nullptr), m_pwm(nullptr)
 	, m_out_port_a_cb(*this)
 	, m_out_port_b_cb(*this)
@@ -385,18 +385,18 @@ mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, d
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void mc68328_device::device_start()
+void mc68328_base_device::device_start()
 {
-	m_out_port_a_cb.resolve();
-	m_out_port_b_cb.resolve();
-	m_out_port_c_cb.resolve();
-	m_out_port_d_cb.resolve();
-	m_out_port_e_cb.resolve();
-	m_out_port_f_cb.resolve();
-	m_out_port_g_cb.resolve();
-	m_out_port_j_cb.resolve();
-	m_out_port_k_cb.resolve();
-	m_out_port_m_cb.resolve();
+	m_out_port_a_cb.resolve_safe();
+	m_out_port_b_cb.resolve_safe();
+	m_out_port_c_cb.resolve_safe();
+	m_out_port_d_cb.resolve_safe();
+	m_out_port_e_cb.resolve_safe();
+	m_out_port_f_cb.resolve_safe();
+	m_out_port_g_cb.resolve_safe();
+	m_out_port_j_cb.resolve_safe();
+	m_out_port_k_cb.resolve_safe();
+	m_out_port_m_cb.resolve_safe();
 
 	m_in_port_a_cb.resolve();
 	m_in_port_b_cb.resolve();
@@ -409,17 +409,17 @@ void mc68328_device::device_start()
 	m_in_port_k_cb.resolve();
 	m_in_port_m_cb.resolve();
 
-	m_out_pwm_cb.resolve();
+	m_out_pwm_cb.resolve_safe();
 
-	m_out_spim_cb.resolve();
+	m_out_spim_cb.resolve_safe();
 	m_in_spim_cb.resolve();
 
-	m_spim_xch_trigger_cb.resolve();
+	m_spim_xch_trigger_cb.resolve_safe();
 
-	m_gptimer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_device::timer1_hit),this));
-	m_gptimer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_device::timer2_hit),this));
-	m_rtc = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_device::rtc_tick),this));
-	m_pwm = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_device::pwm_transition),this));
+	m_gptimer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_base_device::timer1_hit),this));
+	m_gptimer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_base_device::timer2_hit),this));
+	m_rtc = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_base_device::rtc_tick),this));
+	m_pwm = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_base_device::pwm_transition),this));
 
 	register_state_save();
 }
@@ -428,221 +428,205 @@ void mc68328_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void mc68328_device::device_reset()
+void mc68328_base_device::device_reset()
 {
-	m_regs.scr = 0x0c;
-	m_regs.grpbasea = 0x0000;
-	m_regs.grpbaseb = 0x0000;
-	m_regs.grpbasec = 0x0000;
-	m_regs.grpbased = 0x0000;
-	m_regs.grpmaska = 0x0000;
-	m_regs.grpmaskb = 0x0000;
-	m_regs.grpmaskc = 0x0000;
-	m_regs.grpmaskd = 0x0000;
-	m_regs.csa0 = 0x00010006;
-	m_regs.csa1 = 0x00010006;
-	m_regs.csa2 = 0x00010006;
-	m_regs.csa3 = 0x00010006;
-	m_regs.csb0 = 0x00010006;
-	m_regs.csb1 = 0x00010006;
-	m_regs.csb2 = 0x00010006;
-	m_regs.csb3 = 0x00010006;
-	m_regs.csc0 = 0x00010006;
-	m_regs.csc1 = 0x00010006;
-	m_regs.csc2 = 0x00010006;
-	m_regs.csc3 = 0x00010006;
-	m_regs.csd0 = 0x00010006;
-	m_regs.csd1 = 0x00010006;
-	m_regs.csd2 = 0x00010006;
-	m_regs.csd3 = 0x00010006;
+	m_scr = 0x0c;
+	m_grpbasea = 0x0000;
+	m_grpbaseb = 0x0000;
+	m_grpbasec = 0x0000;
+	m_grpbased = 0x0000;
+	m_grpmaska = 0x0000;
+	m_grpmaskb = 0x0000;
+	m_grpmaskc = 0x0000;
+	m_grpmaskd = 0x0000;
 
-	m_regs.pllcr = 0x2400;
-	m_regs.pllfsr = 0x0123;
-	m_regs.pctlr = 0x1f;
+	m_pllcr = 0x2400;
+	m_pllfsr = 0x0123;
+	m_pctlr = 0x1f;
 
-	m_regs.ivr = 0x00;
-	m_regs.icr = 0x0000;
-	m_regs.imr = 0x00ffffff;
-	m_regs.iwr = 0x00ffffff;
-	m_regs.isr = 0x00000000;
-	m_regs.ipr = 0x00000000;
+	m_ivr = 0x00;
+	m_icr = 0x0000;
+	m_imr = 0x00ffffff;
+	m_iwr = 0x00ffffff;
+	m_isr = 0x00000000;
+	m_ipr = 0x00000000;
 
-	m_regs.padir = 0x00;
-	m_regs.padata = 0x00;
-	m_regs.pasel = 0x00;
-	m_regs.pbdir = 0x00;
-	m_regs.pbdata = 0x00;
-	m_regs.pbsel = 0x00;
-	m_regs.pcdir = 0x00;
-	m_regs.pcdata = 0x00;
-	m_regs.pcsel = 0x00;
-	m_regs.pddir = 0x00;
-	m_regs.pddata = 0x00;
-	m_regs.pdpuen = 0xff;
-	m_regs.pdpol = 0x00;
-	m_regs.pdirqen = 0x00;
-	m_regs.pddataedge = 0x00;
-	m_regs.pdirqedge = 0x00;
-	m_regs.pedir = 0x00;
-	m_regs.pedata = 0x00;
-	m_regs.pepuen = 0x80;
-	m_regs.pesel = 0x80;
-	m_regs.pfdir = 0x00;
-	m_regs.pfdata = 0x00;
-	m_regs.pfpuen = 0xff;
-	m_regs.pfsel = 0xff;
-	m_regs.pgdir = 0x00;
-	m_regs.pgdata = 0x00;
-	m_regs.pgpuen = 0xff;
-	m_regs.pgsel = 0xff;
-	m_regs.pjdir = 0x00;
-	m_regs.pjdata = 0x00;
-	m_regs.pjsel = 0x00;
-	m_regs.pkdir = 0x00;
-	m_regs.pkdata = 0x00;
-	m_regs.pkpuen = 0xff;
-	m_regs.pksel = 0xff;
-	m_regs.pmdir = 0x00;
-	m_regs.pmdata = 0x00;
-	m_regs.pmpuen = 0xff;
-	m_regs.pmsel = 0xff;
+	m_padir = 0x00;
+	m_padata = 0x00;
+	m_pasel = 0x00;
+	m_pbdir = 0x00;
+	m_pbdata = 0x00;
+	m_pbsel = 0x00;
+	m_pcdir = 0x00;
+	m_pcdata = 0x00;
+	m_pcsel = 0x00;
+	m_pddir = 0x00;
+	m_pddata = 0x00;
+	m_pdpuen = 0xff;
+	m_pdpol = 0x00;
+	m_pdirqen = 0x00;
+	m_pddataedge = 0x00;
+	m_pdirqedge = 0x00;
+	m_pedir = 0x00;
+	m_pedata = 0x00;
+	m_pepuen = 0x80;
+	m_pesel = 0x80;
+	m_pfdir = 0x00;
+	m_pfdata = 0x00;
+	m_pfpuen = 0xff;
+	m_pfsel = 0xff;
+	m_pgdir = 0x00;
+	m_pgdata = 0x00;
+	m_pgpuen = 0xff;
+	m_pgsel = 0xff;
+	m_pjdir = 0x00;
+	m_pjdata = 0x00;
+	m_pjsel = 0x00;
+	m_pkdir = 0x00;
+	m_pkdata = 0x00;
+	m_pkpuen = 0xff;
+	m_pksel = 0xff;
+	m_pmdir = 0x00;
+	m_pmdata = 0x00;
+	m_pmpuen = 0xff;
+	m_pmsel = 0xff;
 
-	m_regs.pwmc = 0x0000;
-	m_regs.pwmp = 0x0000;
-	m_regs.pwmw = 0x0000;
-	m_regs.pwmcnt = 0x0000;
+	m_pwmc = 0x0000;
+	m_pwmp = 0x0000;
+	m_pwmw = 0x0000;
+	m_pwmcnt = 0x0000;
 
-	m_regs.tctl[0] = m_regs.tctl[1] = 0x0000;
-	m_regs.tprer[0] = m_regs.tprer[1] = 0x0000;
-	m_regs.tcmp[0] = m_regs.tcmp[1] = 0xffff;
-	m_regs.tcr[0] = m_regs.tcr[1] = 0x0000;
-	m_regs.tcn[0] = m_regs.tcn[1] = 0x0000;
-	m_regs.tstat[0] = m_regs.tstat[1] = 0x0000;
-	m_regs.wctlr = 0x0000;
-	m_regs.wcmpr = 0xffff;
-	m_regs.wcn = 0x0000;
+	m_tctl[0] = m_tctl[1] = 0x0000;
+	m_tprer[0] = m_tprer[1] = 0x0000;
+	m_tcmp[0] = m_tcmp[1] = 0xffff;
+	m_tcr[0] = m_tcr[1] = 0x0000;
+	m_tcn[0] = m_tcn[1] = 0x0000;
+	m_tstat[0] = m_tstat[1] = 0x0000;
+	m_wctlr = 0x0000;
+	m_wcmpr = 0xffff;
+	m_wcn = 0x0000;
 
-	m_regs.spisr = 0x0000;
+	m_spisr = 0x0000;
 
-	m_regs.spimdata = 0x0000;
-	m_regs.spimcont = 0x0000;
+	m_spimdata = 0x0000;
+	m_spimcont = 0x0000;
 
-	m_regs.ustcnt = 0x0000;
-	m_regs.ubaud = 0x003f;
-	m_regs.urx = 0x0000;
-	m_regs.utx = 0x0000;
-	m_regs.umisc = 0x0000;
+	m_ustcnt = 0x0000;
+	m_ubaud = 0x003f;
+	m_urx = 0x0000;
+	m_utx = 0x0000;
+	m_umisc = 0x0000;
 
-	m_regs.lssa = 0x00000000;
-	m_regs.lvpw = 0xff;
-	m_regs.lxmax = 0x03ff;
-	m_regs.lymax = 0x01ff;
-	m_regs.lcxp = 0x0000;
-	m_regs.lcyp = 0x0000;
-	m_regs.lcwch = 0x0101;
-	m_regs.lblkc = 0x7f;
-	m_regs.lpicf = 0x00;
-	m_regs.lpolcf = 0x00;
-	m_regs.lacdrc = 0x00;
-	m_regs.lpxcd = 0x00;
-	m_regs.lckcon = 0x40;
-	m_regs.llbar = 0x3e;
-	m_regs.lotcr = 0x3f;
-	m_regs.lposr = 0x00;
-	m_regs.lfrcm = 0xb9;
-	m_regs.lgpmr = 0x1073;
+	m_lssa = 0x00000000;
+	m_lvpw = 0xff;
+	m_lxmax = 0x03ff;
+	m_lymax = 0x01ff;
+	m_lcxp = 0x0000;
+	m_lcyp = 0x0000;
+	m_lcwch = 0x0101;
+	m_lblkc = 0x7f;
+	m_lpicf = 0x00;
+	m_lpolcf = 0x00;
+	m_lacdrc = 0x00;
+	m_lpxcd = 0x00;
+	m_lckcon = 0x40;
+	m_llbar = 0x3e;
+	m_lotcr = 0x3f;
+	m_lposr = 0x00;
+	m_lfrcm = 0xb9;
+	m_lgpmr = 0x1073;
 
-	m_regs.hmsr = 0x00000000;
-	m_regs.alarm = 0x00000000;
-	m_regs.rtcctl = 0x00;
-	m_regs.rtcisr = 0x00;
-	m_regs.rtcienr = 0x00;
-	m_regs.stpwtch = 0x00;
+	m_hmsr = 0x00000000;
+	m_alarm = 0x00000000;
+	m_rtcctl = 0x00;
+	m_rtcisr = 0x00;
+	m_rtcienr = 0x00;
+	m_stpwtch = 0x00;
 
 	m_rtc->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
 }
 
 
-void mc68328_device::set_interrupt_line(uint32_t line, uint32_t active)
+void mc68328_base_device::set_interrupt_line(uint32_t line, uint32_t active)
 {
 	if (active)
 	{
-		m_regs.ipr |= line;
+		m_ipr |= line;
 
-		if (!(m_regs.imr & line) && !(m_regs.isr & line))
+		if (!(m_imr & line) && !(m_isr & line))
 		{
-			m_regs.isr |= line;
+			m_isr |= line;
 
-			if (m_regs.isr & INT_M68K_LINE7)
+			if (m_isr & INT_M68K_LINE7)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, m_regs.ivr | 0x07);
+				m_cpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, m_ivr | 0x07);
 			}
-			else if (m_regs.isr & INT_M68K_LINE6)
+			else if (m_isr & INT_M68K_LINE6)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_6, ASSERT_LINE, m_regs.ivr | 0x06);
+				m_cpu->set_input_line_and_vector(M68K_IRQ_6, ASSERT_LINE, m_ivr | 0x06);
 			}
-			else if (m_regs.isr & INT_M68K_LINE5)
+			else if (m_isr & INT_M68K_LINE5)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, m_regs.ivr | 0x05);
+				m_cpu->set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, m_ivr | 0x05);
 			}
-			else if (m_regs.isr & INT_M68K_LINE4)
+			else if (m_isr & INT_M68K_LINE4)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, m_regs.ivr | 0x04);
+				m_cpu->set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, m_ivr | 0x04);
 			}
-			else if (m_regs.isr & INT_M68K_LINE3)
+			else if (m_isr & INT_M68K_LINE3)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, m_regs.ivr | 0x03);
+				m_cpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, m_ivr | 0x03);
 			}
-			else if (m_regs.isr & INT_M68K_LINE2)
+			else if (m_isr & INT_M68K_LINE2)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, m_regs.ivr | 0x02);
+				m_cpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, m_ivr | 0x02);
 			}
-			else if (m_regs.isr & INT_M68K_LINE1)
+			else if (m_isr & INT_M68K_LINE1)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, m_regs.ivr | 0x01);
+				m_cpu->set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, m_ivr | 0x01);
 			}
 		}
 	}
 	else
 	{
-		m_regs.isr &= ~line;
+		m_isr &= ~line;
 
-		if ((line & INT_M68K_LINE7) && !(m_regs.isr & INT_M68K_LINE7))
+		if ((line & INT_M68K_LINE7) && !(m_isr & INT_M68K_LINE7))
 		{
 			m_cpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
 		}
-		if ((line & INT_M68K_LINE6) && !(m_regs.isr & INT_M68K_LINE6))
+		if ((line & INT_M68K_LINE6) && !(m_isr & INT_M68K_LINE6))
 		{
 			m_cpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 		}
-		if ((line & INT_M68K_LINE5) && !(m_regs.isr & INT_M68K_LINE5))
+		if ((line & INT_M68K_LINE5) && !(m_isr & INT_M68K_LINE5))
 		{
 			m_cpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 		}
-		if ((line & INT_M68K_LINE4) && !(m_regs.isr & INT_M68K_LINE4))
+		if ((line & INT_M68K_LINE4) && !(m_isr & INT_M68K_LINE4))
 		{
 			m_cpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 		}
-		if ((line & INT_M68K_LINE3) && !(m_regs.isr & INT_M68K_LINE3))
+		if ((line & INT_M68K_LINE3) && !(m_isr & INT_M68K_LINE3))
 		{
 			m_cpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		}
-		if ((line & INT_M68K_LINE2) && !(m_regs.isr & INT_M68K_LINE2))
+		if ((line & INT_M68K_LINE2) && !(m_isr & INT_M68K_LINE2))
 		{
 			m_cpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		}
-		if ((line & INT_M68K_LINE1) && !(m_regs.isr & INT_M68K_LINE1))
+		if ((line & INT_M68K_LINE1) && !(m_isr & INT_M68K_LINE1))
 		{
 			m_cpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		}
 	}
 }
 
-void mc68328_device::poll_port_d_interrupts()
+void mc68328_base_device::poll_port_d_interrupts()
 {
-	uint8_t line_transitions = m_regs.pddataedge & m_regs.pdirqedge;
-	uint8_t line_holds = m_regs.pddata &~ m_regs.pdirqedge;
-	uint8_t line_interrupts = (line_transitions | line_holds) & m_regs.pdirqen;
+	uint8_t line_transitions = m_pddataedge & m_pdirqedge;
+	uint8_t line_holds = m_pddata &~ m_pdirqedge;
+	uint8_t line_interrupts = (line_transitions | line_holds) & m_pdirqen;
 
 	if (line_interrupts)
 	{
@@ -654,7 +638,7 @@ void mc68328_device::poll_port_d_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER( mc68328_device::set_penirq_line )
+WRITE_LINE_MEMBER( mc68328_base_device::set_penirq_line )
 {
 	if (state)
 	{
@@ -662,34 +646,34 @@ WRITE_LINE_MEMBER( mc68328_device::set_penirq_line )
 	}
 	else
 	{
-		m_regs.ipr &= ~INT_PEN;
+		m_ipr &= ~INT_PEN;
 		set_interrupt_line(INT_PEN, 0);
 	}
 }
 
-void mc68328_device::set_port_d_lines(uint8_t state, int bit)
+void mc68328_base_device::set_port_d_lines(uint8_t state, int bit)
 {
-	uint8_t old_button_state = m_regs.pddata;
+	const uint8_t old_button_state = m_pddata;
 
-	if (state & (1 << bit))
+	if (BIT(state, bit))
 	{
-		m_regs.pddata |= (1 << bit);
+		m_pddata |= (1 << bit);
 	}
 	else
 	{
-		m_regs.pddata &= ~(1 << bit);
+		m_pddata &= ~(1 << bit);
 	}
 
-	m_regs.pddataedge |= ~old_button_state & m_regs.pddata;
+	m_pddataedge |= ~old_button_state & m_pddata;
 
 	poll_port_d_interrupts();
 }
 
-uint32_t mc68328_device::get_timer_frequency(uint32_t index)
+uint32_t mc68328_base_device::get_timer_frequency(uint32_t index)
 {
 	uint32_t frequency = 0;
 
-	switch (m_regs.tctl[index] & TCTL_CLKSOURCE)
+	switch (m_tctl[index] & TCTL_CLKSOURCE)
 	{
 		case TCTL_CLKSOURCE_SYSCLK:
 			frequency = 32768 * 506;
@@ -706,31 +690,31 @@ uint32_t mc68328_device::get_timer_frequency(uint32_t index)
 			frequency = 32768;
 			break;
 	}
-	frequency /= (m_regs.tprer[index] + 1);
+	frequency /= (m_tprer[index] + 1);
 
 	return frequency;
 }
 
-void mc68328_device::maybe_start_timer(uint32_t index, uint32_t new_enable)
+void mc68328_base_device::maybe_start_timer(uint32_t index, uint32_t new_enable)
 {
-	if ((m_regs.tctl[index] & TCTL_TEN) == TCTL_TEN_ENABLE && (m_regs.tctl[index] & TCTL_CLKSOURCE) > TCTL_CLKSOURCE_STOP)
+	if ((m_tctl[index] & TCTL_TEN) == TCTL_TEN_ENABLE && (m_tctl[index] & TCTL_CLKSOURCE) > TCTL_CLKSOURCE_STOP)
 	{
-		if ((m_regs.tctl[index] & TCTL_CLKSOURCE) == TCTL_CLKSOURCE_TIN)
+		if ((m_tctl[index] & TCTL_CLKSOURCE) == TCTL_CLKSOURCE_TIN)
 		{
 			m_gptimer[index]->adjust(attotime::never);
 		}
-		else if (m_regs.tcmp[index] == 0)
+		else if (m_tcmp[index] == 0)
 		{
 			m_gptimer[index]->adjust(attotime::never);
 		}
 		else
 		{
 			uint32_t frequency = get_timer_frequency(index);
-			attotime period = (attotime::from_hz(frequency) *  m_regs.tcmp[index]);
+			attotime period = (attotime::from_hz(frequency) *  m_tcmp[index]);
 
 			if (new_enable)
 			{
-				m_regs.tcn[index] = 0x0000;
+				m_tcn[index] = 0x0000;
 			}
 
 			m_gptimer[index]->adjust(period);
@@ -742,20 +726,20 @@ void mc68328_device::maybe_start_timer(uint32_t index, uint32_t new_enable)
 	}
 }
 
-void mc68328_device::timer_compare_event(uint32_t index)
+void mc68328_base_device::timer_compare_event(uint32_t index)
 {
-	m_regs.tcn[index] = m_regs.tcmp[index];
-	m_regs.tstat[index] |= TSTAT_COMP;
+	m_tcn[index] = m_tcmp[index];
+	m_tstat[index] |= TSTAT_COMP;
 
-	if ((m_regs.tctl[index] & TCTL_FRR) == TCTL_FRR_RESTART)
+	if ((m_tctl[index] & TCTL_FRR) == TCTL_FRR_RESTART)
 	{
 		uint32_t frequency = get_timer_frequency(index);
 
 		if (frequency > 0)
 		{
-			attotime period = attotime::from_hz(frequency) * m_regs.tcmp[index];
+			attotime period = attotime::from_hz(frequency) * m_tcmp[index];
 
-			m_regs.tcn[index] = 0x0000;
+			m_tcn[index] = 0x0000;
 
 			m_gptimer[index]->adjust(period);
 		}
@@ -779,43 +763,43 @@ void mc68328_device::timer_compare_event(uint32_t index)
 			m_gptimer[index]->adjust(attotime::never);
 		}
 	}
-	if ((m_regs.tctl[index] & TCTL_IRQEN) == TCTL_IRQEN_ENABLE)
+	if ((m_tctl[index] & TCTL_IRQEN) == TCTL_IRQEN_ENABLE)
 	{
 		set_interrupt_line((index == 0) ? INT_TIMER1 : INT_TIMER2, 1);
 	}
 }
 
-TIMER_CALLBACK_MEMBER( mc68328_device::timer1_hit )
+TIMER_CALLBACK_MEMBER( mc68328_base_device::timer1_hit )
 {
 	timer_compare_event(0);
 }
 
-TIMER_CALLBACK_MEMBER( mc68328_device::timer2_hit )
+TIMER_CALLBACK_MEMBER( mc68328_base_device::timer2_hit )
 {
 	timer_compare_event(1);
 }
 
-TIMER_CALLBACK_MEMBER( mc68328_device::pwm_transition )
+TIMER_CALLBACK_MEMBER( mc68328_base_device::pwm_transition )
 {
-	if (m_regs.pwmw >= m_regs.pwmp || m_regs.pwmw == 0 || m_regs.pwmp == 0)
+	if (m_pwmw >= m_pwmp || m_pwmw == 0 || m_pwmp == 0)
 	{
 		m_pwm->adjust(attotime::never);
 		return;
 	}
 
-	if (((m_regs.pwmc & PWMC_POL) == 0 && (m_regs.pwmc & PWMC_PIN) != 0) ||
-		((m_regs.pwmc & PWMC_POL) != 0 && (m_regs.pwmc & PWMC_PIN) == 0))
+	if (((m_pwmc & PWMC_POL) == 0 && (m_pwmc & PWMC_PIN) != 0) ||
+		((m_pwmc & PWMC_POL) != 0 && (m_pwmc & PWMC_PIN) == 0))
 	{
 		uint32_t frequency = 32768 * 506;
-		uint32_t divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
+		uint32_t divisor = 4 << (m_pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
 		attotime period;
 
 		frequency /= divisor;
-		period = attotime::from_hz(frequency) * (m_regs.pwmp - m_regs.pwmw);
+		period = attotime::from_hz(frequency) * (m_pwmp - m_pwmw);
 
 		m_pwm->adjust(period);
 
-		if (m_regs.pwmc & PWMC_IRQEN)
+		if (m_pwmc & PWMC_IRQEN)
 		{
 			set_interrupt_line(INT_PWM, 1);
 		}
@@ -823,87 +807,84 @@ TIMER_CALLBACK_MEMBER( mc68328_device::pwm_transition )
 	else
 	{
 		uint32_t frequency = 32768 * 506;
-		uint32_t divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
+		uint32_t divisor = 4 << (m_pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
 		attotime period;
 
 		frequency /= divisor;
-		period = attotime::from_hz(frequency) * m_regs.pwmw;
+		period = attotime::from_hz(frequency) * m_pwmw;
 
 		m_pwm->adjust(period);
 	}
 
-	m_regs.pwmc ^= PWMC_PIN;
+	m_pwmc ^= PWMC_PIN;
 
-	if (!m_out_pwm_cb.isnull())
-	{
-		m_out_pwm_cb((offs_t)0, (m_regs.pwmc & PWMC_PIN) ? 1 : 0);
-	}
+	m_out_pwm_cb((offs_t)0, (m_pwmc & PWMC_PIN) ? 1 : 0);
 }
 
-TIMER_CALLBACK_MEMBER( mc68328_device::rtc_tick )
+TIMER_CALLBACK_MEMBER( mc68328_base_device::rtc_tick )
 {
-	if (m_regs.rtcctl & RTCCTL_ENABLE)
+	if (m_rtcctl & RTCCTL_ENABLE)
 	{
 		uint32_t set_int = 0;
 
-		m_regs.hmsr++;
+		m_hmsr++;
 
-		if (m_regs.rtcienr & RTCINT_SECOND)
+		if (m_rtcienr & RTCINT_SECOND)
 		{
 			set_int = 1;
-			m_regs.rtcisr |= RTCINT_SECOND;
+			m_rtcisr |= RTCINT_SECOND;
 		}
 
-		if ((m_regs.hmsr & 0x0000003f) == 0x0000003c)
+		if ((m_hmsr & 0x0000003f) == 0x0000003c)
 		{
-			m_regs.hmsr &= 0xffffffc0;
-			m_regs.hmsr += 0x00010000;
+			m_hmsr &= 0xffffffc0;
+			m_hmsr += 0x00010000;
 
-			if (m_regs.rtcienr & RTCINT_MINUTE)
+			if (m_rtcienr & RTCINT_MINUTE)
 			{
 				set_int = 1;
-				m_regs.rtcisr |= RTCINT_MINUTE;
+				m_rtcisr |= RTCINT_MINUTE;
 			}
 
-			if ((m_regs.hmsr & 0x003f0000) == 0x003c0000)
+			if ((m_hmsr & 0x003f0000) == 0x003c0000)
 			{
-				m_regs.hmsr &= 0xffc0ffff;
-				m_regs.hmsr += 0x0100000;
+				m_hmsr &= 0xffc0ffff;
+				m_hmsr += 0x0100000;
 
-				if ((m_regs.hmsr & 0x1f000000) == 0x18000000)
+				if ((m_hmsr & 0x1f000000) == 0x18000000)
 				{
-					m_regs.hmsr &= 0xe0ffffff;
+					m_hmsr &= 0xe0ffffff;
 
-					if (m_regs.rtcienr & RTCINT_DAY)
+					if (m_rtcienr & RTCINT_DAY)
 					{
 						set_int = 1;
-						m_regs.rtcisr |= RTCINT_DAY;
+						m_rtcisr |= RTCINT_DAY;
 					}
 				}
 			}
 
-			if (m_regs.stpwtch != 0x003f)
+			if (m_stpwtch != 0x003f)
 			{
-				m_regs.stpwtch--;
-				m_regs.stpwtch &= 0x003f;
+				m_stpwtch--;
+				m_stpwtch &= 0x003f;
 
-				if (m_regs.stpwtch == 0x003f)
+				if (m_stpwtch == 0x003f)
 				{
-					if (m_regs.rtcienr & RTCINT_STOPWATCH)
+					if (m_rtcienr & RTCINT_STOPWATCH)
 					{
 						set_int = 1;
-						m_regs.rtcisr |= RTCINT_STOPWATCH;
+						m_rtcisr |= RTCINT_STOPWATCH;
 					}
 				}
 			}
 		}
 
-		if (m_regs.hmsr == m_regs.alarm)
+		if (m_hmsr == m_alarm)
 		{
-			if (m_regs.rtcienr & RTCINT_ALARM)
+			if (m_rtcienr & RTCINT_ALARM)
 			{
 				set_int = 1;
-				m_regs.rtcisr |= RTCINT_STOPWATCH;
+				m_rtcisr |= RTCINT_STOPWATCH;
 			}
 		}
 
@@ -918,719 +899,528 @@ TIMER_CALLBACK_MEMBER( mc68328_device::rtc_tick )
 	}
 }
 
-WRITE16_MEMBER( mc68328_device::write )
-{
-	uint32_t address = offset << 1;
-	uint16_t temp16[4] = { 0 };
-	uint32_t imr_old = m_regs.imr, imr_diff;
+#define COMBINE_REGISTER_MSW(reg)	\
+	reg &= ~(mem_mask << 16);		\
+	reg |= (data & mem_mask) << 16;
 
+#define COMBINE_REGISTER_LSW(reg)		\
+	reg &= 0xffff0000 | (~mem_mask);	\
+	reg |= data & mem_mask;
+
+WRITE16_MEMBER(mc68328_base_device::write)
+{
+	offset <<= 1;
+
+	if (offset >= 0xfffff000)
+	{
+		regs_w(offset, data, mem_mask);
+	}
+
+	verboselog(0, "mc68328_w: Unknown address %08x=%04x (%04x)\n", offset, data, mem_mask);
+}
+
+void mc68328_base_device::regs_w(uint32_t address, uint16_t data, uint16_t mem_mask)
+{
 	switch (address)
 	{
 		case 0x000:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfff001) = %02x\n", data & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfff001) = %02x\n", data & 0x00ff);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: SCR = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: SCR = %02x\n", data >> 8);
 			}
 			break;
 
 		case 0x100:
-			verboselog( *this, 2, "mc68328_w: GRPBASEA = %04x\n", data);
-			m_regs.grpbasea = data;
+			verboselog(2, "mc68328_w: GRPBASEA = %04x\n", data);
+			m_grpbasea = data;
 			break;
 
 		case 0x102:
-			verboselog( *this, 2, "mc68328_w: GRPBASEB = %04x\n", data);
-			m_regs.grpbaseb = data;
+			verboselog(2, "mc68328_w: GRPBASEB = %04x\n", data);
+			m_grpbaseb = data;
 			break;
 
 		case 0x104:
-			verboselog( *this, 2, "mc68328_w: GRPBASEC = %04x\n", data);
-			m_regs.grpbasec = data;
+			verboselog(2, "mc68328_w: GRPBASEC = %04x\n", data);
+			m_grpbasec = data;
 			break;
 
 		case 0x106:
-			verboselog( *this, 2, "mc68328_w: GRPBASED = %04x\n", data);
-			m_regs.grpbased = data;
+			verboselog(2, "mc68328_w: GRPBASED = %04x\n", data);
+			m_grpbased = data;
 			break;
 
 		case 0x108:
-			verboselog( *this, 2, "mc68328_w: GRPMASKA = %04x\n", data);
-			m_regs.grpmaska = data;
+			verboselog(2, "mc68328_w: GRPMASKA = %04x\n", data);
+			m_grpmaska = data;
 			break;
 
 		case 0x10a:
-			verboselog( *this, 2, "mc68328_w: GRPMASKB = %04x\n", data);
-			m_regs.grpmaskb = data;
+			verboselog(2, "mc68328_w: GRPMASKB = %04x\n", data);
+			m_grpmaskb = data;
 			break;
 
 		case 0x10c:
-			verboselog( *this, 2, "mc68328_w: GRPMASKC = %04x\n", data);
-			m_regs.grpmaskc = data;
+			verboselog(2, "mc68328_w: GRPMASKC = %04x\n", data);
+			m_grpmaskc = data;
 			break;
 
 		case 0x10e:
-			verboselog( *this, 2, "mc68328_w: GRPMASKD = %04x\n", data);
-			m_regs.grpmaskd = data;
-			break;
-
-		case 0x110:
-			verboselog( *this, 5, "mc68328_w: CSA0(0) = %04x\n", data);
-			m_regs.csa0 &= 0xffff0000 | (~mem_mask);
-			m_regs.csa0 |= data & mem_mask;
-			break;
-
-		case 0x112:
-			verboselog( *this, 5, "mc68328_w: CSA0(16) = %04x\n", data);
-			m_regs.csa0 &= ~(mem_mask << 16);
-			m_regs.csa0 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x114:
-			verboselog( *this, 5, "mc68328_w: CSA1(0) = %04x\n", data);
-			m_regs.csa1 &= 0xffff0000 | (~mem_mask);
-			m_regs.csa1 |= data & mem_mask;
-			break;
-
-		case 0x116:
-			verboselog( *this, 5, "mc68328_w: CSA1(16) = %04x\n", data);
-			m_regs.csa1 &= ~(mem_mask << 16);
-			m_regs.csa1 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x118:
-			verboselog( *this, 5, "mc68328_w: CSA2(0) = %04x\n", data);
-			m_regs.csa2 &= 0xffff0000 | (~mem_mask);
-			m_regs.csa2 |= data & mem_mask;
-			break;
-
-		case 0x11a:
-			verboselog( *this, 5, "mc68328_w: CSA2(16) = %04x\n", data);
-			m_regs.csa2 &= ~(mem_mask << 16);
-			m_regs.csa2 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x11c:
-			verboselog( *this, 5, "mc68328_w: CSA3(0) = %04x\n", data);
-			m_regs.csa3 &= 0xffff0000 | (~mem_mask);
-			m_regs.csa3 |= data & mem_mask;
-			break;
-
-		case 0x11e:
-			verboselog( *this, 5, "mc68328_w: CSA3(16) = %04x\n", data);
-			m_regs.csa3 &= ~(mem_mask << 16);
-			m_regs.csa3 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x120:
-			verboselog( *this, 5, "mc68328_w: CSB0(0) = %04x\n", data);
-			m_regs.csb0 &= 0xffff0000 | (~mem_mask);
-			m_regs.csb0 |= data & mem_mask;
-			break;
-
-		case 0x122:
-			verboselog( *this, 5, "mc68328_w: CSB0(16) = %04x\n", data);
-			m_regs.csb0 &= ~(mem_mask << 16);
-			m_regs.csb0 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x124:
-			verboselog( *this, 5, "mc68328_w: CSB1(0) = %04x\n", data);
-			m_regs.csb1 &= 0xffff0000 | (~mem_mask);
-			m_regs.csb1 |= data & mem_mask;
-			break;
-
-		case 0x126:
-			verboselog( *this, 5, "mc68328_w: CSB1(16) = %04x\n", data);
-			m_regs.csb1 &= ~(mem_mask << 16);
-			m_regs.csb1 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x128:
-			verboselog( *this, 5, "mc68328_w: CSB2(0) = %04x\n", data);
-			m_regs.csb2 &= 0xffff0000 | (~mem_mask);
-			m_regs.csb2 |= data & mem_mask;
-			break;
-
-		case 0x12a:
-			verboselog( *this, 5, "mc68328_w: CSB2(16) = %04x\n", data);
-			m_regs.csb2 &= ~(mem_mask << 16);
-			m_regs.csb2 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x12c:
-			verboselog( *this, 5, "mc68328_w: CSB3(0) = %04x\n", data);
-			m_regs.csb3 &= 0xffff0000 | (~mem_mask);
-			m_regs.csb3 |= data & mem_mask;
-			break;
-
-		case 0x12e:
-			verboselog( *this, 5, "mc68328_w: CSB3(16) = %04x\n", data);
-			m_regs.csb3 &= ~(mem_mask << 16);
-			m_regs.csb3 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x130:
-			verboselog( *this, 5, "mc68328_w: CSC0(0) = %04x\n", data);
-			m_regs.csc0 &= 0xffff0000 | (~mem_mask);
-			m_regs.csc0 |= data & mem_mask;
-			break;
-
-		case 0x132:
-			verboselog( *this, 5, "mc68328_w: CSC0(16) = %04x\n", data);
-			m_regs.csc0 &= ~(mem_mask << 16);
-			m_regs.csc0 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x134:
-			verboselog( *this, 5, "mc68328_w: CSC1(0) = %04x\n", data);
-			m_regs.csc1 &= 0xffff0000 | (~mem_mask);
-			m_regs.csc1 |= data & mem_mask;
-			break;
-
-		case 0x136:
-			verboselog( *this, 5, "mc68328_w: CSC1(16) = %04x\n", data);
-			m_regs.csc1 &= ~(mem_mask << 16);
-			m_regs.csc1 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x138:
-			verboselog( *this, 5, "mc68328_w: CSC2(0) = %04x\n", data);
-			m_regs.csc2 &= 0xffff0000 | (~mem_mask);
-			m_regs.csc2 |= data & mem_mask;
-			break;
-
-		case 0x13a:
-			verboselog( *this, 5, "mc68328_w: CSC2(16) = %04x\n", data);
-			m_regs.csc2 &= ~(mem_mask << 16);
-			m_regs.csc2 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x13c:
-			verboselog( *this, 5, "mc68328_w: CSC3(0) = %04x\n", data);
-			m_regs.csc3 &= 0xffff0000 | (~mem_mask);
-			m_regs.csc3 |= data & mem_mask;
-			break;
-
-		case 0x13e:
-			verboselog( *this, 5, "mc68328_w: CSC3(16) = %04x\n", data);
-			m_regs.csc3 &= ~(mem_mask << 16);
-			m_regs.csc3 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x140:
-			verboselog( *this, 5, "mc68328_w: CSD0(0) = %04x\n", data);
-			m_regs.csd0 &= 0xffff0000 | (~mem_mask);
-			m_regs.csd0 |= data & mem_mask;
-			break;
-
-		case 0x142:
-			verboselog( *this, 5, "mc68328_w: CSD0(16) = %04x\n", data);
-			m_regs.csd0 &= ~(mem_mask << 16);
-			m_regs.csd0 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x144:
-			verboselog( *this, 5, "mc68328_w: CSD1(0) = %04x\n", data);
-			m_regs.csd1 &= 0xffff0000 | (~mem_mask);
-			m_regs.csd1 |= data & mem_mask;
-			break;
-
-		case 0x146:
-			verboselog( *this, 5, "mc68328_w: CSD1(16) = %04x\n", data);
-			m_regs.csd1 &= ~(mem_mask << 16);
-			m_regs.csd1 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x148:
-			verboselog( *this, 5, "mc68328_w: CSD2(0) = %04x\n", data);
-			m_regs.csd2 &= 0xffff0000 | (~mem_mask);
-			m_regs.csd2 |= data & mem_mask;
-			break;
-
-		case 0x14a:
-			verboselog( *this, 5, "mc68328_w: CSD2(16) = %04x\n", data);
-			m_regs.csd2 &= ~(mem_mask << 16);
-			m_regs.csd2 |= (data & mem_mask) << 16;
-			break;
-
-		case 0x14c:
-			verboselog( *this, 5, "mc68328_w: CSD3(0) = %04x\n", data);
-			m_regs.csd3 &= 0xffff0000 | (~mem_mask);
-			m_regs.csd3 |= data & mem_mask;
-			break;
-
-		case 0x14e:
-			verboselog( *this, 5, "mc68328_w: CSD3(16) = %04x\n", data);
-			m_regs.csd3 &= ~(mem_mask << 16);
-			m_regs.csd3 |= (data & mem_mask) << 16;
+			verboselog(2, "mc68328_w: GRPMASKD = %04x\n", data);
+			m_grpmaskd = data;
 			break;
 
 		case 0x200:
-			verboselog( *this, 2, "mc68328_w: PLLCR = %04x\n", data);
-			m_regs.pllcr = data;
+			verboselog(2, "mc68328_w: PLLCR = %04x\n", data);
+			m_pllcr = data;
 			break;
 
 		case 0x202:
-			verboselog( *this, 2, "mc68328_w: PLLFSR = %04x\n", data);
-			m_regs.pllfsr = data;
+			verboselog(2, "mc68328_w: PLLFSR = %04x\n", data);
+			m_pllfsr = data;
 			break;
 
 		case 0x206:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PCTLR = %02x\n", data & 0x00ff);
-				m_regs.pctlr = data & 0x00ff;
+				verboselog(2, "mc68328_w: PCTLR = %02x\n", (uint8_t)data);
+				m_pctlr = (uint8_t)data;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfff206) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfff206) = %02x\n", data >> 8);
 			}
 			break;
 
 		case 0x300:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfff301) = %02x\n", data & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfff301) = %02x\n", (uint8_t)data);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: IVR = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.ivr = (data >> 8) & 0x00ff;
+				verboselog(2, "mc68328_w: IVR = %02x\n", data >> 8);
+				m_ivr = data >> 8;
 			}
 			break;
 
 		case 0x302:
-			verboselog( *this, 2, "mc68328_w: ICR = %04x\n", data);
-			m_regs.icr = data;
+			verboselog(2, "mc68328_w: ICR = %04x\n", data);
+			m_icr = data;
 			break;
 
 		case 0x304:
-			verboselog( *this, 2, "mc68328_w: IMR(16) = %04x\n", data);
-			m_regs.imr &= ~(mem_mask << 16);
-			m_regs.imr |= (data & mem_mask) << 16;
-			m_regs.isr &= ~((data & mem_mask) << 16);
+		{
+			const uint32_t imr_old = m_imr;
 
-			imr_diff = imr_old ^ m_regs.imr;
+			verboselog(2, "mc68328_w: IMR(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_imr);
+			m_isr &= ~((data & mem_mask) << 16);
+
+			const uint32_t imr_diff = imr_old ^ m_imr;
 			set_interrupt_line(imr_diff, 0);
 			break;
+		}
 
 		case 0x306:
-			verboselog( *this, 2, "mc68328_w: IMR(0) = %04x\n", data);
-			m_regs.imr &= 0xffff0000 | (~mem_mask);
-			m_regs.imr |= data & mem_mask;
-			m_regs.isr &= ~(data & mem_mask);
+		{
+			const uint32_t imr_old = m_imr;
 
-			imr_diff = imr_old ^ m_regs.imr;
+			verboselog(2, "mc68328_w: IMR(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_imr);
+			m_isr &= ~(data & mem_mask);
+
+			const uint32_t imr_diff = imr_old ^ m_imr;
 			set_interrupt_line(imr_diff, 0);
 			break;
+		}
 
 		case 0x308:
-			verboselog( *this, 2, "mc68328_w: IWR(16) = %04x\n", data);
-			m_regs.iwr &= ~(mem_mask << 16);
-			m_regs.iwr |= (data & mem_mask) << 16;
+			verboselog(2, "mc68328_w: IWR(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_iwr);
 			break;
 
 		case 0x30a:
-			verboselog( *this, 2, "mc68328_w: IWR(0) = %04x\n", data);
-			m_regs.iwr &= 0xffff0000 | (~mem_mask);
-			m_regs.iwr |= data & mem_mask;
+			verboselog(2, "mc68328_w: IWR(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_iwr);
 			break;
 
 		case 0x30c:
-			verboselog( *this, 2, "mc68328_w: ISR(16) = %04x\n", data);
+			verboselog(2, "mc68328_w: ISR(16) = %04x\n", data);
 			// Clear edge-triggered IRQ1
-			if ((m_regs.icr & ICR_ET1) == ICR_ET1 && (data & INT_IRQ1_SHIFT) == INT_IRQ1_SHIFT)
+			if ((m_icr & ICR_ET1) == ICR_ET1 && (data & INT_IRQ1_SHIFT) == INT_IRQ1_SHIFT)
 			{
-				m_regs.isr &= ~INT_IRQ1;
+				m_isr &= ~INT_IRQ1;
 			}
 
 			// Clear edge-triggered IRQ2
-			if ((m_regs.icr & ICR_ET2) == ICR_ET2 && (data & INT_IRQ2_SHIFT) == INT_IRQ2_SHIFT)
+			if ((m_icr & ICR_ET2) == ICR_ET2 && (data & INT_IRQ2_SHIFT) == INT_IRQ2_SHIFT)
 			{
-				m_regs.isr &= ~INT_IRQ2;
+				m_isr &= ~INT_IRQ2;
 			}
 
 			// Clear edge-triggered IRQ3
-			if ((m_regs.icr & ICR_ET3) == ICR_ET3 && (data & INT_IRQ3_SHIFT) == INT_IRQ3_SHIFT)
+			if ((m_icr & ICR_ET3) == ICR_ET3 && (data & INT_IRQ3_SHIFT) == INT_IRQ3_SHIFT)
 			{
-				m_regs.isr &= ~INT_IRQ3;
+				m_isr &= ~INT_IRQ3;
 			}
 
 			// Clear edge-triggered IRQ6
-			if ((m_regs.icr & ICR_ET6) == ICR_ET6 && (data & INT_IRQ6_SHIFT) == INT_IRQ6_SHIFT)
+			if ((m_icr & ICR_ET6) == ICR_ET6 && (data & INT_IRQ6_SHIFT) == INT_IRQ6_SHIFT)
 			{
-				m_regs.isr &= ~INT_IRQ6;
+				m_isr &= ~INT_IRQ6;
 			}
 
 			// Clear edge-triggered IRQ7
 			if ((data & INT_IRQ7_SHIFT) == INT_IRQ7_SHIFT)
 			{
-				m_regs.isr &= ~INT_IRQ7;
+				m_isr &= ~INT_IRQ7;
 			}
 			break;
 
 		case 0x30e:
-			verboselog( *this, 2, "mc68328_w: ISR(0) = %04x (Ignored)\n", data);
+			verboselog(2, "mc68328_w: ISR(0) = %04x (Ignored)\n", data);
 			break;
 
 		case 0x310:
-			verboselog( *this, 2, "mc68328_w: IPR(16) = %04x (Ignored)\n", data);
+			verboselog(2, "mc68328_w: IPR(16) = %04x (Ignored)\n", data);
 			break;
 
 		case 0x312:
-			verboselog( *this, 2, "mc68328_w: IPR(0) = %04x (Ignored)\n", data);
+			verboselog(2, "mc68328_w: IPR(0) = %04x (Ignored)\n", data);
 			break;
 
 		case 0x400:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PADATA = %02x\n", data & 0x00ff);
-				m_regs.padata = data & 0x00ff;
-				if (!m_out_port_a_cb.isnull())
-				{
-					m_out_port_a_cb((offs_t)0, data & 0x00ff);
-				}
+				// TODO: WRONG! These should be broken out as separate bits.
+				verboselog(2, "mc68328_w: PADATA = %02x\n", (uint8_t)data);
+				m_padata = (uint8_t)data;
+				m_out_port_a_cb((offs_t)0, m_padata);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PADIR = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.padir = (data >> 8) & 0x00ff;
+				m_padir = data >> 8;
+				verboselog(2, "mc68328_w: PADIR, out:%02x, in:%02x\n", m_padir, m_padir ^ 0xff);
 			}
 			break;
 
 		case 0x402:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PASEL = %02x\n", data & 0x00ff);
-				m_regs.pasel = data & 0x00ff;
+				verboselog(2, "mc68328_w: PASEL = %02x\n", data);
+				m_pasel = (uint8_t)data;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfff402) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfff402) = %02x\n", (data >> 8) & 0x00ff);
 			}
 			break;
 
 		case 0x408:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PBDATA = %02x\n", data & 0x00ff);
-				m_regs.pbdata = data & 0x00ff;
-				if (!m_out_port_b_cb.isnull())
-				{
-					m_out_port_b_cb((offs_t)0, data & 0x00ff);
-				}
+				// TODO: WRONG! These should be broken out as separate bits.
+				verboselog(2, "mc68328_w: PBDATA = %02x\n", (uint8_t)data);
+				m_pbdata = (uint8_t)data;
+				m_out_port_b_cb((offs_t)0, m_pbdata);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PBDIR = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pbdir = (data >> 8) & 0x00ff;
+				m_pbdir = data >> 8;
+				verboselog(2, "mc68328_w: PBDIR, out:%02x, in:%02x\n", m_pbdir, m_pbdir ^ 0xff);
 			}
 			break;
 
 		case 0x40a:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PBSEL = %02x\n", data & 0x00ff);
-				m_regs.pbsel = data & 0x00ff;
+				verboselog(2, "mc68328_w: PBSEL = %02x\n", (uint8_t)data);
+				m_pbsel = (uint8_t)data;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfff40a) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfff40a) = %02x\n", data >> 8);
 			}
 			break;
 
 		case 0x410:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PCDATA = %02x\n", data & 0x00ff);
-				m_regs.pcdata = data & 0x00ff;
-				if (!m_out_port_c_cb.isnull())
-				{
-					m_out_port_c_cb((offs_t)0, data & 0x00ff);
-				}
+				// TODO: WRONG! These should be broken out as separate bits.
+				verboselog(2, "mc68328_w: PCDATA = %02x\n", (uint8_t)data);
+				m_pcdata = (uint8_t)data;
+				m_out_port_c_cb((offs_t)0, m_pcdata);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PCDIR = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pcdir = (data >> 8) & 0x00ff;
+				m_pcdir = data >> 8;
+				verboselog(2, "mc68328_w: PCDIR, out:%02x, in:%02x\n", m_pcdir, m_pcdir ^ 0xff);
 			}
 			break;
 
 		case 0x412:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PCSEL = %02x\n", data & 0x00ff);
-				m_regs.pcsel = data & 0x00ff;
+				verboselog(2, "mc68328_w: PCSEL = %02x\n", (uint8_t)data);
+				m_pcsel = (uint8_t)data;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfff412) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfff412) = %02x\n", data >> 8);
 			}
 			break;
 
 		case 0x418:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PDDATA = %02x\n", data & 0x00ff);
+				verboselog(2, "mc68328_w: PDDATA = %02x\n", (uint8_t)data);
 
-				m_regs.pddataedge &= ~(data & 0x00ff);
+				m_pddataedge &= ~(data & 0x00ff);
 				poll_port_d_interrupts();
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PDDIR = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pddir = (data >> 8) & 0x00ff;
+				m_pddir = data >> 8;
+				verboselog(2, "mc68328_w: PDDIR, out:%02x, in:%02x\n", m_pddir, m_pddir ^ 0xff);
 			}
 			break;
 
 		case 0x41a:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfff41b) = %02x\n", data & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfff41b) = %02x\n", (uint8_t)data);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PDPUEN = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pdpuen = (data >> 8) & 0x00ff;
+				m_pdpuen = data >> 8;
+				verboselog(2, "mc68328_w: PDPUEN = %02x\n", m_pdpuen);
 			}
 			break;
 
 		case 0x41c:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PDIRQEN = %02x\n", data & 0x00ff);
-				m_regs.pdirqen = data & 0x00ff;
+				m_pdirqen = (uint8_t)data;
+				verboselog(2, "mc68328_w: PDIRQEN = %02x\n", m_pdirqen);
 
 				poll_port_d_interrupts();
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PDPOL = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pdpol = (data >> 8) & 0x00ff;
+				m_pdpol = data >> 8;
+				verboselog(2, "mc68328_w: PDPOL = %02x\n", m_pdpol);
 			}
 			break;
 
 		case 0x41e:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PDIRQEDGE = %02x\n", data & 0x00ff);
-				m_regs.pdirqedge = data & 0x00ff;
+				m_pdirqedge = (uint8_t)data;
+				verboselog(2, "mc68328_w: PDIRQEDGE = %02x\n", m_pdirqedge);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfff41e) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfff41e) = %02x\n", data >> 8);
 			}
 			break;
 
 		case 0x420:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PEDATA = %02x\n", data & 0x00ff);
-				m_regs.pedata = data & 0x00ff;
-				if (!m_out_port_e_cb.isnull())
-				{
-					m_out_port_e_cb((offs_t)0, data & 0x00ff);
-				}
+				// TODO: WRONG! These should be broken out as separate bits.
+				m_pedata = (uint8_t)data;
+				verboselog(2, "mc68328_w: PEDATA = %02x\n", m_pedata);
+				m_out_port_e_cb((offs_t)0, m_pedata);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PEDIR = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pedir = (data >> 8) & 0x00ff;
+				m_pedir = data >> 8;
+				verboselog(2, "mc68328_w: PEDIR, out:%02x, in:%02x\n", m_pedir, m_pedir ^ 0xff);
 			}
 			break;
 
 		case 0x422:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PESEL = %02x\n", data & 0x00ff);
-				m_regs.pesel = data & 0x00ff;
+				m_pesel = (uint8_t)data;
+				verboselog(2, "mc68328_w: PESEL = %02x\n", m_pesel);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PEPUEN = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pepuen = (data >> 8) & 0x00ff;
-				m_regs.pedata |= m_regs.pepuen;
+				m_pepuen = data >> 8;
+				verboselog(2, "mc68328_w: PEPUEN = %02x\n", m_pepuen);
+				m_pedata |= m_pepuen;
 			}
 			break;
 
 		case 0x428:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PFDATA = %02x\n", data & 0x00ff);
-				m_regs.pfdata = data & 0x00ff;
-				if (!m_out_port_f_cb.isnull())
-				{
-					m_out_port_f_cb((offs_t)0, data & 0x00ff);
-				}
+				// TODO: WRONG! These should be broken out as separate bits.
+				m_pfdata = (uint8_t)data;
+				verboselog(2, "mc68328_w: PFDATA = %02x\n", m_pfdata);
+				m_out_port_f_cb((offs_t)0, m_pfdata);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PFDIR = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pfdir = (data >> 8) & 0x00ff;
+				m_pfdir = data >> 8;
+				verboselog(2, "mc68328_w: PFDIR, out:%02x, in:%02x\n", m_pfdir, m_pfdir ^ 0xff);
 			}
 			break;
 
 		case 0x42a:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PFSEL = %02x\n", data & 0x00ff);
-				m_regs.pfsel = data & 0x00ff;
+				m_pfsel = (uint8_t)data;
+				verboselog(2, "mc68328_w: PFSEL = %02x\n", m_pfsel);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PFPUEN = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pfpuen = (data >> 8) & 0x00ff;
+				m_pfpuen = data >> 8;
+				verboselog(2, "mc68328_w: PFPUEN = %02x\n", m_pfpuen);
 			}
 			break;
 
 		case 0x430:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PGDATA = %02x\n", data & 0x00ff);
-				m_regs.pgdata = data & 0x00ff;
-				if (!m_out_port_g_cb.isnull())
-				{
-					m_out_port_g_cb((offs_t)0, data & 0x00ff);
-				}
+				// TODO: WRONG! These should be broken out as separate bits.
+				m_pgdata = (uint8_t)data;
+				verboselog(2, "mc68328_w: PGDATA = %02x\n", m_pgdata);
+				m_out_port_g_cb((offs_t)0, m_pgdata);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PGDIR = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pgdir = (data >> 8) & 0x00ff;
+				m_pgdir = data >> 8;
+				verboselog(2, "mc68328_w: PGDIR, out:%02x, in:%02x\n", m_pgdir, m_pgdir ^ 0xff);
 			}
 			break;
 
 		case 0x432:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PGSEL = %02x\n", data & 0x00ff);
-				m_regs.pgsel = data & 0x00ff;
+				m_pgsel = (uint8_t)data;
+				verboselog(2, "mc68328_w: PGSEL = %02x\n", m_pgsel);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PGPUEN = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pgpuen = (data >> 8) & 0x00ff;
+				m_pgpuen = data >> 8;
+				verboselog(2, "mc68328_w: PGPUEN = %02x\n", m_pgpuen);
 			}
 			break;
 
 		case 0x438:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PJDATA = %02x\n", data & 0x00ff);
-				m_regs.pjdata = data & 0x00ff;
-				if (!m_out_port_j_cb.isnull())
-				{
-					m_out_port_j_cb((offs_t)0, data & 0x00ff);
-				}
+				// TODO: WRONG! These should be broken out as separate bits.
+				m_pjdata = (uint8_t)data;
+				verboselog(2, "mc68328_w: PJDATA = %02x\n", m_pjdata);
+				m_out_port_j_cb((offs_t)0, m_pjdata);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PJDIR = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pjdir = (data >> 8) & 0x00ff;
+				m_pjdir = data >> 8;
+				verboselog(2, "mc68328_w: PJDIR, out:%02x, in:%02x\n", m_pjdir, m_pjdir ^ 0xff);
 			}
 			break;
 
 		case 0x43a:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PJSEL = %02x\n", data & 0x00ff);
-				m_regs.pjsel = data & 0x00ff;
+				m_pjsel = (uint8_t)data;
+				verboselog(2, "mc68328_w: PJSEL = %02x\n", m_pjsel);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfff43a) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfff43a) = %02x\n", data >> 8);
 			}
 			break;
 
 		case 0x440:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PKDATA = %02x\n", data & 0x00ff);
-				m_regs.pkdata = data & 0x00ff;
-				if (!m_out_port_k_cb.isnull())
-				{
-					m_out_port_k_cb((offs_t)0, data & 0x00ff);
-				}
+				// TODO: WRONG! These should be broken out as separate bits.
+				m_pkdata = (uint8_t)data;
+				verboselog(2, "mc68328_w: PKDATA = %02x\n", m_pkdata);
+				m_out_port_k_cb((offs_t)0, m_pkdata);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PKDIR = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pkdir = (data >> 8) & 0x00ff;
+				m_pkdir = data >> 8;
+				verboselog(2, "mc68328_w: PKDIR, out:%02x, in:%02x\n", m_pkdir, m_pkdir ^ 0xff);
 			}
 			break;
 
 		case 0x442:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PKSEL = %02x\n", data & 0x00ff);
-				m_regs.pksel = data & 0x00ff;
+				m_pksel = (uint8_t)data;
+				verboselog(2, "mc68328_w: PKSEL = %02x\n", m_pksel);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PKPUEN = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pgpuen = (data >> 8) & 0x00ff;
+				m_pgpuen = data >> 8;
+				verboselog(2, "mc68328_w: PKPUEN = %02x\n", m_pgpuen);
 			}
 			break;
 
 		case 0x448:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PMDATA = %02x\n", data & 0x00ff);
-				m_regs.pmdata = data & 0x00ff;
-				if (!m_out_port_m_cb.isnull())
-				{
-					m_out_port_m_cb((offs_t)0, data & 0x00ff);
-				}
+				// TODO: WRONG! These should be broken out as separate bits.
+				m_pmdata = (uint8_t)data;
+				verboselog(2, "mc68328_w: PMDATA = %02x\n", m_pmdata);
+				m_out_port_m_cb((offs_t)0, m_pmdata);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PMDIR = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pmdir = (data >> 8) & 0x00ff;
+				m_pmdir = data >> 8;
+				verboselog(2, "mc68328_w: PMDIR, out:%02x, in:%02x\n", m_pmdir, m_pmdir ^ 0xff);
 			}
 			break;
 
 		case 0x44a:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: PMSEL = %02x\n", data & 0x00ff);
-				m_regs.pmsel = data & 0x00ff;
+				m_pmsel = (uint8_t)data;
+				verboselog(2, "mc68328_w: PMSEL = %02x\n", m_pmsel);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: PMPUEN = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.pmpuen = (data >> 8) & 0x00ff;
+				m_pmpuen = data >> 8;
+				verboselog(2, "mc68328_w: PMPUEN = %02x\n", m_pmpuen);
 			}
 			break;
 
 		case 0x500:
-			verboselog( *this, 2, "mc68328_w: PWMC = %04x\n", data);
+			m_pwmc = data;
+			verboselog(2, "mc68328_w: PWMC = %04x\n", m_pwmc);
 
-			m_regs.pwmc = data;
-
-			if (m_regs.pwmc & PWMC_PWMIRQ)
+			if (m_pwmc & PWMC_PWMIRQ)
 			{
 				set_interrupt_line(INT_PWM, 1);
 			}
 
-			m_regs.pwmc &= ~PWMC_LOAD;
+			m_pwmc &= ~PWMC_LOAD;
 
-			if ((m_regs.pwmc & PWMC_PWMEN) != 0 && m_regs.pwmw != 0 && m_regs.pwmp != 0)
+			if ((m_pwmc & PWMC_PWMEN) != 0 && m_pwmw != 0 && m_pwmp != 0)
 			{
 				uint32_t frequency = 32768 * 506;
-				uint32_t divisor = 4 << (m_regs.pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
+				uint32_t divisor = 4 << (m_pwmc & PWMC_CLKSEL); // ?? Datasheet says 2 <<, but then we're an octave higher than CoPilot.
 				attotime period;
 				frequency /= divisor;
-				period = attotime::from_hz(frequency) * m_regs.pwmw;
+				period = attotime::from_hz(frequency) * m_pwmw;
 				m_pwm->adjust(period);
-				if (m_regs.pwmc & PWMC_IRQEN)
+				if (m_pwmc & PWMC_IRQEN)
 				{
 					set_interrupt_line(INT_PWM, 1);
 				}
-				m_regs.pwmc ^= PWMC_PIN;
+				m_pwmc ^= PWMC_PIN;
 			}
 			else
 			{
@@ -1639,160 +1429,155 @@ WRITE16_MEMBER( mc68328_device::write )
 			break;
 
 		case 0x502:
-			verboselog( *this, 2, "mc68328_w: PWMP = %04x\n", data);
-			m_regs.pwmp = data;
+			m_pwmp = data;
+			verboselog(2, "mc68328_w: PWMP = %04x\n", m_pwmp);
 			break;
 
 		case 0x504:
-			verboselog( *this, 2, "mc68328_w: PWMW = %04x\n", data);
-			m_regs.pwmw = data;
+			m_pwmw = data;
+			verboselog(2, "mc68328_w: PWMW = %04x\n", m_pwmw);
 			break;
 
 		case 0x506:
-			verboselog( *this, 2, "mc68328_w: PWMCNT = %04x\n", data);
-			m_regs.pwmcnt = 0;
+			verboselog(2, "mc68328_w: PWMCNT = %04x\n", data);
+			m_pwmcnt = 0;
 			break;
 
 		case 0x600:
-			verboselog( *this, 2, "mc68328_w: TCTL1 = %04x\n", data);
-			temp16[0] = m_regs.tctl[0];
-			m_regs.tctl[0] = data;
-			if ((temp16[0] & TCTL_TEN) == (m_regs.tctl[0] & TCTL_TEN))
+		{
+			const uint16_t old_tctl = m_tctl[0];
+			m_tctl[0] = data;
+			verboselog(2, "mc68328_w: TCTL1 = %04x\n", m_tctl[0]);
+			if ((old_tctl & TCTL_TEN) == (m_tctl[0] & TCTL_TEN))
 			{
 				maybe_start_timer(0, 0);
 			}
-			else if ((temp16[0] & TCTL_TEN) != TCTL_TEN_ENABLE && (m_regs.tctl[0] & TCTL_TEN) == TCTL_TEN_ENABLE)
+			else if ((old_tctl & TCTL_TEN) != TCTL_TEN_ENABLE && (m_tctl[0] & TCTL_TEN) == TCTL_TEN_ENABLE)
 			{
 				maybe_start_timer(0, 1);
 			}
 			break;
+		}
 
 		case 0x602:
-			verboselog( *this, 2, "mc68328_w: TPRER1 = %04x\n", data);
-			m_regs.tprer[0] = data;
+			m_tprer[0] = data;
+			verboselog(2, "mc68328_w: TPRER1 = %04x\n", m_tprer[0]);
 			maybe_start_timer(0, 0);
 			break;
 
 		case 0x604:
-			verboselog( *this, 2, "mc68328_w: TCMP1 = %04x\n", data);
-			m_regs.tcmp[0] = data;
+			m_tcmp[0] = data;
+			verboselog(2, "mc68328_w: TCMP1 = %04x\n", m_tcmp[0]);
 			maybe_start_timer(0, 0);
 			break;
 
 		case 0x606:
-			verboselog( *this, 2, "mc68328_w: TCR1 = %04x (Ignored)\n", data);
+			verboselog(2, "mc68328_w: TCR1 = %04x (Ignored)\n", data);
 			break;
 
 		case 0x608:
-			verboselog( *this, 2, "mc68328_w: TCN1 = %04x (Ignored)\n", data);
+			verboselog(2, "mc68328_w: TCN1 = %04x (Ignored)\n", data);
 			break;
 
 		case 0x60a:
-			verboselog( *this, 5, "mc68328_w: TSTAT1 = %04x\n", data);
-			m_regs.tstat[0] &= ~m_regs.tclear[0];
-			if (!(m_regs.tstat[0] & TSTAT_COMP))
+			verboselog(5, "mc68328_w: TSTAT1 = %04x (Ignored)\n", data);
+			m_tstat[0] &= ~m_tclear[0];
+			if (!(m_tstat[0] & TSTAT_COMP))
 			{
 				set_interrupt_line(INT_TIMER1, 0);
 			}
 			break;
 
 		case 0x60c:
-			verboselog( *this, 2, "mc68328_w: TCTL2 = %04x\n", data);
-			temp16[0] = m_regs.tctl[1];
-			m_regs.tctl[1] = data;
-			if ((temp16[0] & TCTL_TEN) == (m_regs.tctl[1] & TCTL_TEN))
+		{
+			const uint16_t old_tctl = m_tctl[1];
+			m_tctl[1] = data;
+			verboselog(2, "mc68328_w: TCTL2 = %04x\n", m_tctl[1]);
+			if ((old_tctl & TCTL_TEN) == (m_tctl[1] & TCTL_TEN))
 			{
 				maybe_start_timer(1, 0);
 			}
-			else if ((temp16[0] & TCTL_TEN) != TCTL_TEN_ENABLE && (m_regs.tctl[1] & TCTL_TEN) == TCTL_TEN_ENABLE)
+			else if ((old_tctl & TCTL_TEN) != TCTL_TEN_ENABLE && (m_tctl[1] & TCTL_TEN) == TCTL_TEN_ENABLE)
 			{
 				maybe_start_timer(1, 1);
 			}
 			break;
+		}
 
 		case 0x60e:
-			verboselog( *this, 2, "mc68328_w: TPRER2 = %04x\n", data);
-			m_regs.tprer[1] = data;
+			m_tprer[1] = data;
+			verboselog(2, "mc68328_w: TPRER2 = %04x\n", m_tprer[1]);
 			maybe_start_timer(1, 0);
 			break;
 
 		case 0x610:
-			verboselog( *this, 2, "mc68328_w: TCMP2 = %04x\n", data);
-			m_regs.tcmp[1] = data;
+			m_tcmp[1] = data;
+			verboselog(2, "mc68328_w: TCMP2 = %04x\n", m_tcmp[1]);
 			maybe_start_timer(1, 0);
 			break;
 
 		case 0x612:
-			verboselog( *this, 2, "mc68328_w: TCR2 = %04x (Ignored)\n", data);
+			verboselog(2, "mc68328_w: TCR2 = %04x (Ignored)\n", data);
 			break;
 
 		case 0x614:
-			verboselog( *this, 2, "mc68328_w: TCN2 = %04x (Ignored)\n", data);
+			verboselog(2, "mc68328_w: TCN2 = %04x (Ignored)\n", data);
 			break;
 
 		case 0x616:
-			verboselog( *this, 2, "mc68328_w: TSTAT2 = %04x\n", data);
-			m_regs.tstat[1] &= ~m_regs.tclear[1];
-			if (!(m_regs.tstat[1] & TSTAT_COMP))
+			verboselog(2, "mc68328_w: TSTAT2 = %04x (Ignored)\n", data);
+			m_tstat[1] &= ~m_tclear[1];
+			if (!(m_tstat[1] & TSTAT_COMP))
 			{
 				set_interrupt_line(INT_TIMER2, 0);
 			}
 			break;
 
 		case 0x618:
-			verboselog( *this, 2, "mc68328_w: WCTLR = %04x\n", data);
-			m_regs.wctlr = data;
+			m_wctlr = data;
+			verboselog(2, "mc68328_w: WCTLR = %04x\n", m_wctlr);
 			break;
 
 		case 0x61a:
-			verboselog( *this, 2, "mc68328_w: WCMPR = %04x\n", data);
-			m_regs.wcmpr = data;
+			m_wcmpr = data;
+			verboselog(2, "mc68328_w: WCMPR = %04x\n", m_wcmpr);
 			break;
 
 		case 0x61c:
-			verboselog( *this, 2, "mc68328_w: WCN = %04x (Ignored)\n", data);
+			verboselog(2, "mc68328_w: WCN = %04x (Ignored)\n", data);
 			break;
 
 		case 0x700:
-			verboselog( *this, 2, "mc68328_w: SPISR = %04x\n", data);
-			m_regs.spisr = data;
+			m_spisr = data;
+			verboselog(2, "mc68328_w: SPISR = %04x\n", m_spisr);
 			break;
 
 		case 0x800:
-			verboselog( *this, 2, "mc68328_w: SPIMDATA = %04x\n", data);
-			if (!m_out_spim_cb.isnull())
-			{
-				m_out_spim_cb(0, data, 0xffff);
-			}
-			else
-			{
-				m_regs.spimdata = data;
-			}
+			m_spimdata = data;
+			verboselog(2, "mc68328_w: SPIMDATA = %04x\n", m_spimdata);
+			m_out_spim_cb(0, m_spimdata, 0xffff);
 			break;
 
 		case 0x802:
-			verboselog( *this, 2, "mc68328_w: SPIMCONT = %04x\n", data);
-			verboselog( *this, 3, "           Count = %d\n", data & SPIM_CLOCK_COUNT);
-			verboselog( *this, 3, "           Polarity = %s\n", (data & SPIM_POL) ? "Inverted" : "Active-high");
-			verboselog( *this, 3, "           Phase = %s\n", (data & SPIM_PHA) ? "Opposite" : "Normal");
-			verboselog( *this, 3, "           IRQ Enable = %s\n", (data & SPIM_IRQEN) ? "Enable" : "Disable");
-			verboselog( *this, 3, "           IRQ Pending = %s\n", (data & SPIM_SPIMIRQ) ? "Yes" : "No");
-			verboselog( *this, 3, "           Exchange = %s\n", (data & SPIM_XCH) ? "Initiate" : "Idle");
-			verboselog( *this, 3, "           SPIM Enable = %s\n", (data & SPIM_SPMEN) ? "Enable" : "Disable");
-			verboselog( *this, 3, "           Data Rate = Divide By %d\n", 1 << ((((data & SPIM_RATE) >> 13) & 0x0007) + 2) );
-			m_regs.spimcont = data;
+			verboselog(2, "mc68328_w: SPIMCONT = %04x\n", data);
+			verboselog(3, "           Count = %d\n", data & SPIM_CLOCK_COUNT);
+			verboselog(3, "           Polarity = %s\n", (data & SPIM_POL) ? "Inverted" : "Active-high");
+			verboselog(3, "           Phase = %s\n", (data & SPIM_PHA) ? "Opposite" : "Normal");
+			verboselog(3, "           IRQ Enable = %s\n", (data & SPIM_IRQEN) ? "Enable" : "Disable");
+			verboselog(3, "           IRQ Pending = %s\n", (data & SPIM_SPIMIRQ) ? "Yes" : "No");
+			verboselog(3, "           Exchange = %s\n", (data & SPIM_XCH) ? "Initiate" : "Idle");
+			verboselog(3, "           SPIM Enable = %s\n", (data & SPIM_SPMEN) ? "Enable" : "Disable");
+			verboselog(3, "           Data Rate = Divide By %d\n", 1 << ((((data & SPIM_RATE) >> 13) & 0x0007) + 2) );
+			m_spimcont = data;
 			// $$HACK$$ We should probably emulate the ADS7843 A/D device properly.
 			if (data & SPIM_XCH)
 			{
-				m_regs.spimcont &= ~SPIM_XCH;
-				if (!m_spim_xch_trigger_cb.isnull())
-				{
-					m_spim_xch_trigger_cb(0);
-				}
+				m_spimcont &= ~SPIM_XCH;
+				m_spim_xch_trigger_cb(0);
 				if (data & SPIM_IRQEN)
 				{
-					m_regs.spimcont |= SPIM_SPIMIRQ;
-					verboselog( *this, 3, "Triggering SPIM Interrupt\n" );
+					m_spimcont |= SPIM_SPIMIRQ;
+					verboselog(3, "Triggering SPIM Interrupt\n" );
 					set_interrupt_line(INT_SPIM, 1);
 				}
 			}
@@ -1803,1245 +1588,1586 @@ WRITE16_MEMBER( mc68328_device::write )
 			break;
 
 		case 0x900:
-			verboselog( *this, 2, "mc68328_w: USTCNT = %04x\n", data);
-			m_regs.ustcnt = data;
+			m_ustcnt = data;
+			verboselog(2, "mc68328_w: USTCNT = %04x\n", m_ustcnt);
 			break;
 
 		case 0x902:
-			verboselog( *this, 2, "mc68328_w: UBAUD = %04x\n", data);
-			m_regs.ubaud = data;
+			m_ubaud = data;
+			verboselog(2, "mc68328_w: UBAUD = %04x\n", m_ubaud);
 			break;
 
 		case 0x904:
-			verboselog( *this, 2, "mc68328_w: URX = %04x\n", data);
+			verboselog(2, "mc68328_w: URX = %04x\n", data);
 			break;
 
 		case 0x906:
-			verboselog( *this, 2, "mc68328_w: UTX = %04x\n", data);
+			verboselog(2, "mc68328_w: UTX = %04x\n", data);
 			break;
 
 		case 0x908:
-			verboselog( *this, 2, "mc68328_w: UMISC = %04x\n", data);
-			m_regs.umisc = data;
+			m_umisc = data;
+			verboselog(2, "mc68328_w: UMISC = %04x\n", m_umisc);
 			break;
 
 		case 0xa00:
-			verboselog( *this, 2, "mc68328_w: LSSA(16) = %04x\n", data);
-			m_regs.lssa &= ~(mem_mask << 16);
-			m_regs.lssa |= (data & mem_mask) << 16;
-			verboselog( *this, 3, "              Address: %08x\n", m_regs.lssa);
+			verboselog(2, "mc68328_w: LSSA(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_lssa);
+			verboselog(3, "              Address: %08x\n", m_lssa);
 			break;
 
 		case 0xa02:
-			verboselog( *this, 2, "mc68328_w: LSSA(0) = %04x\n", data);
-			m_regs.lssa &= 0xffff0000 | (~mem_mask);
-			m_regs.lssa |= data & mem_mask;
-			verboselog( *this, 3, "              Address: %08x\n", m_regs.lssa);
+			verboselog(2, "mc68328_w: LSSA(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_lssa);
+			verboselog(3, "              Address: %08x\n", m_lssa);
 			break;
 
 		case 0xa04:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: LVPW = %02x\n", data & 0x00ff);
-				m_regs.lvpw = data & 0x00ff;
-				verboselog( *this, 3, "              Page Width: %d\n", (m_regs.lvpw + 1) * ((m_regs.lpicf & 0x01) ? 8 : 16));
+				m_lvpw = (uint8_t)data;
+				verboselog(2, "mc68328_w: LVPW = %02x\n", m_lvpw);
+				verboselog(3, "              Page Width: %d\n", (m_lvpw + 1) * ((m_lpicf & 0x01) ? 8 : 16));
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfffa04) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfffa04) = %02x\n", (data >> 8) & 0x00ff);
 			}
 			break;
 
 		case 0xa08:
-			verboselog( *this, 2, "mc68328_w: LXMAX = %04x\n", data);
-			m_regs.lxmax = data;
-			verboselog( *this, 3, "              Width: %d\n", (data & 0x03ff) + 1);
+			m_lxmax = data;
+			verboselog(2, "mc68328_w: LXMAX = %04x\n", m_lxmax);
+			verboselog(3, "              Width: %d\n", (data & 0x03ff) + 1);
 			break;
 
 		case 0xa0a:
-			verboselog( *this, 2, "mc68328_w: LYMAX = %04x\n", data);
-			m_regs.lymax = data;
-			verboselog( *this, 3, "              Height: %d\n", (data & 0x03ff) + 1);
+			m_lymax = data;
+			verboselog(2, "mc68328_w: LYMAX = %04x\n", m_lymax);
+			verboselog(3, "              Height: %d\n", (data & 0x03ff) + 1);
 			break;
 
 		case 0xa18:
-			verboselog( *this, 2, "mc68328_w: LCXP = %04x\n", data);
-			m_regs.lcxp = data;
-			verboselog( *this, 3, "              X Position: %d\n", data & 0x03ff);
-			switch (m_regs.lcxp >> 14)
+			m_lcxp = data;
+			verboselog(2, "mc68328_w: LCXP = %04x\n", m_lcxp);
+			verboselog(3, "              X Position: %d\n", data & 0x03ff);
+			switch (m_lcxp >> 14)
 			{
 				case 0:
-					verboselog( *this, 3, "              Cursor Control: Transparent\n");
+					verboselog(3, "              Cursor Control: Transparent\n");
 					break;
 
 				case 1:
-					verboselog( *this, 3, "              Cursor Control: Black\n");
+					verboselog(3, "              Cursor Control: Black\n");
 					break;
 
 				case 2:
-					verboselog( *this, 3, "              Cursor Control: Reverse\n");
+					verboselog(3, "              Cursor Control: Reverse\n");
 					break;
 
 				case 3:
-					verboselog( *this, 3, "              Cursor Control: Invalid\n");
+					verboselog(3, "              Cursor Control: Invalid\n");
 					break;
 			}
 			break;
 
 		case 0xa1a:
-			verboselog( *this, 2, "mc68328_w: LCYP = %04x\n", data);
-			m_regs.lcyp = data;
-			verboselog( *this, 3, "              Y Position: %d\n", data & 0x01ff);
+			m_lcyp = data;
+			verboselog(2, "mc68328_w: LCYP = %04x\n", m_lcyp);
+			verboselog(3, "              Y Position: %d\n", data & 0x01ff);
 			break;
 
 		case 0xa1c:
-			verboselog( *this, 2, "mc68328_w: LCWCH = %04x\n", data);
-			m_regs.lcwch = data;
-			verboselog( *this, 3, "              Width:  %d\n", (data >> 8) & 0x1f);
-			verboselog( *this, 3, "              Height: %d\n", data & 0x1f);
+			m_lcwch = data;
+			verboselog(2, "mc68328_w: LCWCH = %04x\n", m_lcwch);
+			verboselog(3, "              Width:  %d\n", (data >> 8) & 0x1f);
+			verboselog(3, "              Height: %d\n", data & 0x1f);
 			break;
 
 		case 0xa1e:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: LBLKC = %02x\n", data & 0x00ff);
-				m_regs.lblkc = data & 0x00ff;
-				verboselog( *this, 3, "              Blink Enable:  %d\n", m_regs.lblkc >> 7);
-				verboselog( *this, 3, "              Blink Divisor: %d\n", m_regs.lblkc & 0x7f);
+				m_lblkc = (uint8_t)data;
+				verboselog(2, "mc68328_w: LBLKC = %02x\n", m_lblkc);
+				verboselog(3, "              Blink Enable:  %d\n", m_lblkc >> 7);
+				verboselog(3, "              Blink Divisor: %d\n", m_lblkc & 0x7f);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfffa1e) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfffa1e) = %02x\n", (data >> 8) & 0x00ff);
 			}
 			break;
 
 		case 0xa20:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: LPOLCF = %02x\n", data & 0x00ff);
-				m_regs.lpolcf = data & 0x00ff;
-				verboselog( *this, 3, "              LCD Shift Clock Polarity: %s\n", (m_regs.lpicf & 0x08) ? "Active positive edge of LCLK" : "Active negative edge of LCLK");
-				verboselog( *this, 3, "              First-line marker polarity: %s\n", (m_regs.lpicf & 0x04) ? "Active Low" : "Active High");
-				verboselog( *this, 3, "              Line-pulse polarity: %s\n", (m_regs.lpicf & 0x02) ? "Active Low" : "Active High");
-				verboselog( *this, 3, "              Pixel polarity: %s\n", (m_regs.lpicf & 0x01) ? "Active Low" : "Active High");
+				m_lpolcf = (uint8_t)data;
+				verboselog(2, "mc68328_w: LPOLCF = %02x\n", m_lpolcf);
+				verboselog(3, "              LCD Shift Clock Polarity: %s\n", (m_lpicf & 0x08) ? "Active positive edge of LCLK" : "Active negative edge of LCLK");
+				verboselog(3, "              First-line marker polarity: %s\n", (m_lpicf & 0x04) ? "Active Low" : "Active High");
+				verboselog(3, "              Line-pulse polarity: %s\n", (m_lpicf & 0x02) ? "Active Low" : "Active High");
+				verboselog(3, "              Pixel polarity: %s\n", (m_lpicf & 0x01) ? "Active Low" : "Active High");
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: LPICF = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.lpicf = (data >> 8) & 0x00ff;
-				switch((m_regs.lpicf >> 1) & 0x03)
+				m_lpicf = data >> 8;
+				verboselog(2, "mc68328_w: LPICF = %02x\n", m_lpicf);
+				switch((m_lpicf >> 1) & 0x03)
 				{
-					case 0:
-						verboselog( *this, 3, "              Bus Size: 1-bit\n");
-						break;
-
-					case 1:
-						verboselog( *this, 3, "              Bus Size: 2-bit\n");
-						break;
-
-					case 2:
-						verboselog( *this, 3, "              Bus Size: 4-bit\n");
-						break;
-
-					case 3:
-						verboselog( *this, 3, "              Bus Size: unused\n");
-						break;
+					case 0: verboselog(3, "              Bus Size: 1-bit\n"); break;
+					case 1: verboselog(3, "              Bus Size: 2-bit\n"); break;
+					case 2: verboselog(3, "              Bus Size: 4-bit\n"); break;
+					case 3: verboselog(3, "              Bus Size: unused\n"); break;
 				}
-				verboselog( *this, 3, "              Gray scale enable: %d\n", m_regs.lpicf & 0x01);
+				verboselog(3, "              Gray scale enable: %d\n", m_lpicf & 0x01);
 			}
 			break;
 
 		case 0xa22:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: LACDRC = %02x\n", data & 0x00ff);
-				m_regs.lacdrc = data & 0x00ff;
+				m_lacdrc = (uint8_t)data;
+				verboselog(2, "mc68328_w: LACDRC = %02x\n", m_lacdrc);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfffa22) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfffa22) = %02x\n", (data >> 8) & 0x00ff);
 			}
 			break;
 
 		case 0xa24:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: LPXCD = %02x\n", data & 0x00ff);
-				m_regs.lpxcd = data & 0x00ff;
-				verboselog( *this, 3, "              Clock Divisor: %d\n", m_regs.lpxcd + 1);
+				m_lpxcd = (uint8_t)data;
+				verboselog(2, "mc68328_w: LPXCD = %02x\n", m_lpxcd);
+				verboselog(3, "              Clock Divisor: %d\n", m_lpxcd + 1);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfffa24) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfffa24) = %02x\n", (data >> 8) & 0x00ff);
 			}
 			break;
 
 		case 0xa26:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: LCKCON = %02x\n", data & 0x00ff);
-				m_regs.lckcon = data & 0x00ff;
-				verboselog( *this, 3, "              LCDC Enable: %d\n", (m_regs.lckcon >> 7) & 0x01);
-				verboselog( *this, 3, "              DMA Burst Length: %d\n", ((m_regs.lckcon >> 6) & 0x01) ? 16 : 8);
-				verboselog( *this, 3, "              DMA Bursting Clock Control: %d\n", ((m_regs.lckcon >> 4) & 0x03) + 1);
-				verboselog( *this, 3, "              Bus Width: %d\n", ((m_regs.lckcon >> 1) & 0x01) ? 8 : 16);
-				verboselog( *this, 3, "              Pixel Clock Divider Source: %s\n", (m_regs.lckcon & 0x01) ? "PIX" : "SYS");
+				m_lckcon = (uint8_t)data;
+				verboselog(2, "mc68328_w: LCKCON = %02x\n", m_lckcon);
+				verboselog(3, "              LCDC Enable: %d\n", (m_lckcon >> 7) & 0x01);
+				verboselog(3, "              DMA Burst Length: %d\n", ((m_lckcon >> 6) & 0x01) ? 16 : 8);
+				verboselog(3, "              DMA Bursting Clock Control: %d\n", ((m_lckcon >> 4) & 0x03) + 1);
+				verboselog(3, "              Bus Width: %d\n", ((m_lckcon >> 1) & 0x01) ? 8 : 16);
+				verboselog(3, "              Pixel Clock Divider Source: %s\n", (m_lckcon & 0x01) ? "PIX" : "SYS");
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfffa26) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfffa26) = %02x\n", (data >> 8) & 0x00ff);
 			}
 			break;
 
 		case 0xa28:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: LLBAR = %02x\n", data & 0x00ff);
-				m_regs.llbar = data & 0x00ff;
-				verboselog( *this, 3, "              Address: %d\n", (m_regs.llbar & 0x7f) * ((m_regs.lpicf & 0x01) ? 8 : 16));
+				m_llbar = (uint8_t)data;
+				verboselog(2, "mc68328_w: LLBAR = %02x\n", m_llbar);
+				verboselog(3, "              Address: %d\n", (m_llbar & 0x7f) * ((m_lpicf & 0x01) ? 8 : 16));
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfffa28) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfffa28) = %02x\n", (data >> 8) & 0x00ff);
 			}
 			break;
 
 		case 0xa2a:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: LOTCR = %02x\n", data & 0x00ff);
+				verboselog(2, "mc68328_w: LOTCR = %02x\n", data & 0x00ff);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfffa2a) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfffa2a) = %02x\n", (data >> 8) & 0x00ff);
 			}
 			break;
 
 		case 0xa2c:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: LPOSR = %02x\n", data & 0x00ff);
-				m_regs.lposr = data & 0x00ff;
-				verboselog( *this, 3, "              Byte Offset: %d\n", (m_regs.lposr >> 3) & 0x01);
-				verboselog( *this, 3, "              Pixel Offset: %d\n", m_regs.lposr & 0x07);
+				m_lposr = (uint8_t)data;
+				verboselog(2, "mc68328_w: LPOSR = %02x\n", m_lposr);
+				verboselog(3, "              Byte Offset: %d\n", (m_lposr >> 3) & 0x01);
+				verboselog(3, "              Pixel Offset: %d\n", m_lposr & 0x07);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfffa2c) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfffa2c) = %02x\n", (data >> 8) & 0x00ff);
 			}
 			break;
 
 		case 0xa30:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_w: LFRCM = %02x\n", data & 0x00ff);
-				m_regs.lfrcm = data & 0x00ff;
-				verboselog( *this, 3, "              X Modulation: %d\n", (m_regs.lfrcm >> 4) & 0x0f);
-				verboselog( *this, 3, "              Y Modulation: %d\n", m_regs.lfrcm & 0x0f);
+				m_lfrcm = (uint8_t)data;
+				verboselog(2, "mc68328_w: LFRCM = %02x\n", m_lfrcm);
+				verboselog(3, "              X Modulation: %d\n", (m_lfrcm >> 4) & 0x0f);
+				verboselog(3, "              Y Modulation: %d\n", m_lfrcm & 0x0f);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: Unknown address (0xfffa30) = %02x\n", (data >> 8) & 0x00ff);
+				verboselog(2, "mc68328_w: Unknown address (0xfffa30) = %02x\n", (data >> 8) & 0x00ff);
 			}
 			break;
 
 		case 0xa32:
-			verboselog( *this, 2, "mc68328_w: LGPMR = %04x\n", data);
-			m_regs.lgpmr = data;
-			verboselog( *this, 3, "              Palette 0: %d\n", (m_regs.lgpmr >>  8) & 0x07);
-			verboselog( *this, 3, "              Palette 1: %d\n", (m_regs.lgpmr >> 12) & 0x07);
-			verboselog( *this, 3, "              Palette 2: %d\n", (m_regs.lgpmr >>  0) & 0x07);
-			verboselog( *this, 3, "              Palette 3: %d\n", (m_regs.lgpmr >>  4) & 0x07);
+			m_lgpmr = data;
+			verboselog(2, "mc68328_w: LGPMR = %04x\n", m_lgpmr);
+			verboselog(3, "              Palette 0: %d\n", (m_lgpmr >>  8) & 0x07);
+			verboselog(3, "              Palette 1: %d\n", (m_lgpmr >> 12) & 0x07);
+			verboselog(3, "              Palette 2: %d\n", (m_lgpmr >>  0) & 0x07);
+			verboselog(3, "              Palette 3: %d\n", (m_lgpmr >>  4) & 0x07);
 			break;
 
 		case 0xb00:
-			verboselog( *this, 2, "mc68328_w: HMSR(0) = %04x\n", data);
-			m_regs.hmsr &= ~(mem_mask << 16);
-			m_regs.hmsr |= (data & mem_mask) << 16;
-			m_regs.hmsr &= 0x1f3f003f;
+			verboselog(2, "mc68328_w: HMSR(0) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_hmsr);
+			m_hmsr &= 0x1f3f003f;
 			break;
 
 		case 0xb02:
-			verboselog( *this, 2, "mc68328_w: HMSR(16) = %04x\n", data);
-			m_regs.hmsr &= 0xffff0000 | (~mem_mask);
-			m_regs.hmsr |= data & mem_mask;
-			m_regs.hmsr &= 0x1f3f003f;
+			verboselog(2, "mc68328_w: HMSR(16) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_hmsr);
+			m_hmsr &= 0x1f3f003f;
 			break;
 
 		case 0xb04:
-			verboselog( *this, 2, "mc68328_w: ALARM(0) = %04x\n", data);
-			m_regs.alarm &= ~(mem_mask << 16);
-			m_regs.alarm |= (data & mem_mask) << 16;
-			m_regs.alarm &= 0x1f3f003f;
+			verboselog(2, "mc68328_w: ALARM(0) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_alarm);
+			m_alarm &= 0x1f3f003f;
 			break;
 
 		case 0xb06:
-			verboselog( *this, 2, "mc68328_w: ALARM(16) = %04x\n", data);
-			m_regs.alarm &= 0xffff0000 | (~mem_mask);
-			m_regs.alarm |= data & mem_mask;
-			m_regs.alarm &= 0x1f3f003f;
+			verboselog(2, "mc68328_w: ALARM(16) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_alarm);
+			m_alarm &= 0x1f3f003f;
 			break;
 
 		case 0xb0c:
-			verboselog( *this, 2, "mc68328_w: RTCCTL = %04x\n", data);
-			m_regs.rtcctl = data & 0x00a0;
+			verboselog(2, "mc68328_w: RTCCTL = %04x\n", data);
+			m_rtcctl = data & 0x00a0;
 			break;
 
 		case 0xb0e:
-			verboselog( *this, 2, "mc68328_w: RTCISR = %04x\n", data);
-			m_regs.rtcisr &= ~data;
-			if (m_regs.rtcisr == 0)
+			verboselog(2, "mc68328_w: RTCISR = %04x\n", data);
+			m_rtcisr &= ~data;
+			if (m_rtcisr == 0)
 			{
 				set_interrupt_line(INT_RTC, 0);
 			}
 			break;
 
 		case 0xb10:
-			verboselog( *this, 2, "mc68328_w: RTCIENR = %04x\n", data);
-			m_regs.rtcienr = data & 0x001f;
+			verboselog(2, "mc68328_w: RTCIENR = %04x\n", data);
+			m_rtcienr = data & 0x001f;
 			break;
 
 		case 0xb12:
-			verboselog( *this, 2, "mc68328_w: STPWTCH = %04x\n", data);
-			m_regs.stpwtch = data & 0x003f;
+			verboselog(2, "mc68328_w: STPWTCH = %04x\n", data);
+			m_stpwtch = data & 0x003f;
 			break;
 
 		default:
-			verboselog( *this, 0, "mc68328_w: Unknown address (0x%06x) = %04x (%04x)\n", 0xfff000 + address, data, mem_mask);
+			verboselog(0, "mc68328_w: Unknown address (0x%08x) = %04x (%04x)\n", 0xfffff000 + address, data, mem_mask);
 			break;
 	}
 }
 
-READ16_MEMBER( mc68328_device::read )
+READ16_MEMBER(mc68328_base_device::read)
 {
-	uint16_t temp16;
-	uint32_t address = offset << 1;
+	offset <<= 1;
 
+	if (offset >= 0xfffff000)
+	{
+		return regs_r(offset, mem_mask);
+	}
+
+	verboselog(0, "mc68328_r: Unknown address %08x (%04x)\n", offset, mem_mask);
+	return 0;
+}
+
+uint16_t mc68328_base_device::regs_r(uint32_t address, uint16_t mem_mask)
+{
 	switch (address)
 	{
 		case 0x000:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfff001)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfff001)\n", mem_mask);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): SCR = %02x\n", mem_mask, m_regs.scr);
-				return m_regs.scr << 8;
+				verboselog(2, "mc68328_r (%04x): SCR = %02x\n", mem_mask, m_scr);
+				return m_scr << 8;
 			}
 			break;
 
 		case 0x100:
-			verboselog( *this, 2, "mc68328_r (%04x): GRPBASEA = %04x\n", mem_mask, m_regs.grpbasea);
-			return m_regs.grpbasea;
+			verboselog(2, "mc68328_r (%04x): GRPBASEA = %04x\n", mem_mask, m_grpbasea);
+			return m_grpbasea;
 
 		case 0x102:
-			verboselog( *this, 2, "mc68328_r (%04x): GRPBASEB = %04x\n", mem_mask, m_regs.grpbaseb);
-			return m_regs.grpbaseb;
+			verboselog(2, "mc68328_r (%04x): GRPBASEB = %04x\n", mem_mask, m_grpbaseb);
+			return m_grpbaseb;
 
 		case 0x104:
-			verboselog( *this, 2, "mc68328_r (%04x): GRPBASEC = %04x\n", mem_mask, m_regs.grpbasec);
-			return m_regs.grpbasec;
+			verboselog(2, "mc68328_r (%04x): GRPBASEC = %04x\n", mem_mask, m_grpbasec);
+			return m_grpbasec;
 
 		case 0x106:
-			verboselog( *this, 2, "mc68328_r (%04x): GRPBASED = %04x\n", mem_mask, m_regs.grpbased);
-			return m_regs.grpbased;
+			verboselog(2, "mc68328_r (%04x): GRPBASED = %04x\n", mem_mask, m_grpbased);
+			return m_grpbased;
 
 		case 0x108:
-			verboselog( *this, 2, "mc68328_r (%04x): GRPMASKA = %04x\n", mem_mask, m_regs.grpmaska);
-			return m_regs.grpmaska;
+			verboselog(2, "mc68328_r (%04x): GRPMASKA = %04x\n", mem_mask, m_grpmaska);
+			return m_grpmaska;
 
 		case 0x10a:
-			verboselog( *this, 2, "mc68328_r (%04x): GRPMASKB = %04x\n", mem_mask, m_regs.grpmaskb);
-			return m_regs.grpmaskb;
+			verboselog(2, "mc68328_r (%04x): GRPMASKB = %04x\n", mem_mask, m_grpmaskb);
+			return m_grpmaskb;
 
 		case 0x10c:
-			verboselog( *this, 2, "mc68328_r (%04x): GRPMASKC = %04x\n", mem_mask, m_regs.grpmaskc);
-			return m_regs.grpmaskc;
+			verboselog(2, "mc68328_r (%04x): GRPMASKC = %04x\n", mem_mask, m_grpmaskc);
+			return m_grpmaskc;
 
 		case 0x10e:
-			verboselog( *this, 2, "mc68328_r (%04x): GRPMASKD = %04x\n", mem_mask, m_regs.grpmaskd);
-			return m_regs.grpmaskd;
-
-		case 0x110:
-			verboselog( *this, 5, "mc68328_r (%04x): CSA0(0) = %04x\n", mem_mask, m_regs.csa0 & 0x0000ffff);
-			return m_regs.csa0 & 0x0000ffff;
-
-		case 0x112:
-			verboselog( *this, 5, "mc68328_r (%04x): CSA0(16) = %04x\n", mem_mask, m_regs.csa0 >> 16);
-			return m_regs.csa0 >> 16;
-
-		case 0x114:
-			verboselog( *this, 5, "mc68328_r (%04x): CSA1(0) = %04x\n", mem_mask, m_regs.csa1 & 0x0000ffff);
-			return m_regs.csa1 & 0x0000ffff;
-
-		case 0x116:
-			verboselog( *this, 5, "mc68328_r (%04x): CSA1(16) = %04x\n", mem_mask, m_regs.csa1 >> 16);
-			return m_regs.csa1 >> 16;
-
-		case 0x118:
-			verboselog( *this, 5, "mc68328_r (%04x): CSA2(0) = %04x\n", mem_mask, m_regs.csa2 & 0x0000ffff);
-			return m_regs.csa2 & 0x0000ffff;
-
-		case 0x11a:
-			verboselog( *this, 5, "mc68328_r (%04x): CSA2(16) = %04x\n", mem_mask, m_regs.csa2 >> 16);
-			return m_regs.csa2 >> 16;
-
-		case 0x11c:
-			verboselog( *this, 5, "mc68328_r (%04x): CSA3(0) = %04x\n", mem_mask, m_regs.csa3 & 0x0000ffff);
-			return m_regs.csa3 & 0x0000ffff;
-
-		case 0x11e:
-			verboselog( *this, 5, "mc68328_r (%04x): CSA3(16) = %04x\n", mem_mask, m_regs.csa3 >> 16);
-			return m_regs.csa3 >> 16;
-
-		case 0x120:
-			verboselog( *this, 5, "mc68328_r (%04x): CSB0(0) = %04x\n", mem_mask, m_regs.csb0 & 0x0000ffff);
-			return m_regs.csb0 & 0x0000ffff;
-
-		case 0x122:
-			verboselog( *this, 5, "mc68328_r (%04x): CSB0(16) = %04x\n", mem_mask, m_regs.csb0 >> 16);
-			return m_regs.csb0 >> 16;
-
-		case 0x124:
-			verboselog( *this, 5, "mc68328_r (%04x): CSB1(0) = %04x\n", mem_mask, m_regs.csb1 & 0x0000ffff);
-			return m_regs.csb1 & 0x0000ffff;
-
-		case 0x126:
-			verboselog( *this, 5, "mc68328_r (%04x): CSB1(16) = %04x\n", mem_mask, m_regs.csb1 >> 16);
-			return m_regs.csb1 >> 16;
-
-		case 0x128:
-			verboselog( *this, 5, "mc68328_r (%04x): CSB2(0) = %04x\n", mem_mask, m_regs.csb2 & 0x0000ffff);
-			return m_regs.csb2 & 0x0000ffff;
-
-		case 0x12a:
-			verboselog( *this, 5, "mc68328_r (%04x): CSB2(16) = %04x\n", mem_mask, m_regs.csb2 >> 16);
-			return m_regs.csb2 >> 16;
-
-		case 0x12c:
-			verboselog( *this, 5, "mc68328_r (%04x): CSB3(0) = %04x\n", mem_mask, m_regs.csb3 & 0x0000ffff);
-			return m_regs.csb3 & 0x0000ffff;
-
-		case 0x12e:
-			verboselog( *this, 5, "mc68328_r (%04x): CSB3(16) = %04x\n", mem_mask, m_regs.csb3 >> 16);
-			return m_regs.csb3 >> 16;
-
-		case 0x130:
-			verboselog( *this, 5, "mc68328_r (%04x): CSC0(0) = %04x\n", mem_mask, m_regs.csc0 & 0x0000ffff);
-			return m_regs.csc0 & 0x0000ffff;
-
-		case 0x132:
-			verboselog( *this, 5, "mc68328_r (%04x): CSC0(16) = %04x\n", mem_mask, m_regs.csc0 >> 16);
-			return m_regs.csc0 >> 16;
-
-		case 0x134:
-			verboselog( *this, 5, "mc68328_r (%04x): CSC1(0) = %04x\n", mem_mask, m_regs.csc1 & 0x0000ffff);
-			return m_regs.csc1 & 0x0000ffff;
-
-		case 0x136:
-			verboselog( *this, 5, "mc68328_r (%04x): CSC1(16) = %04x\n", mem_mask, m_regs.csc1 >> 16);
-			return m_regs.csc1 >> 16;
-
-		case 0x138:
-			verboselog( *this, 5, "mc68328_r (%04x): CSC2(0) = %04x\n", mem_mask, m_regs.csc2 & 0x0000ffff);
-			return m_regs.csc2 & 0x0000ffff;
-
-		case 0x13a:
-			verboselog( *this, 5, "mc68328_r (%04x): CSC2(16) = %04x\n", mem_mask, m_regs.csc2 >> 16);
-			return m_regs.csc2 >> 16;
-
-		case 0x13c:
-			verboselog( *this, 5, "mc68328_r (%04x): CSC3(0) = %04x\n", mem_mask, m_regs.csc3 & 0x0000ffff);
-			return m_regs.csc3 & 0x0000ffff;
-
-		case 0x13e:
-			verboselog( *this, 5, "mc68328_r (%04x): CSC3(16) = %04x\n", mem_mask, m_regs.csc3 >> 16);
-			return m_regs.csc3 >> 16;
-
-		case 0x140:
-			verboselog( *this, 5, "mc68328_r (%04x): CSD0(0) = %04x\n", mem_mask, m_regs.csd0 & 0x0000ffff);
-			return m_regs.csd0 & 0x0000ffff;
-
-		case 0x142:
-			verboselog( *this, 5, "mc68328_r (%04x): CSD0(16) = %04x\n", mem_mask, m_regs.csd0 >> 16);
-			return m_regs.csd0 >> 16;
-
-		case 0x144:
-			verboselog( *this, 5, "mc68328_r (%04x): CSD1(0) = %04x\n", mem_mask, m_regs.csd1 & 0x0000ffff);
-			return m_regs.csd1 & 0x0000ffff;
-
-		case 0x146:
-			verboselog( *this, 5, "mc68328_r (%04x): CSD1(16) = %04x\n", mem_mask, m_regs.csd1 >> 16);
-			return m_regs.csd1 >> 16;
-
-		case 0x148:
-			verboselog( *this, 5, "mc68328_r (%04x): CSD2(0) = %04x\n", mem_mask, m_regs.csd2 & 0x0000ffff);
-			return m_regs.csd2 & 0x0000ffff;
-
-		case 0x14a:
-			verboselog( *this, 5, "mc68328_r (%04x): CSD2(16) = %04x\n", mem_mask, m_regs.csd2 >> 16);
-			return m_regs.csd2 >> 16;
-
-		case 0x14c:
-			verboselog( *this, 5, "mc68328_r (%04x): CSD3(0) = %04x\n", mem_mask, m_regs.csd3 & 0x0000ffff);
-			return m_regs.csd3 & 0x0000ffff;
-
-		case 0x14e:
-			verboselog( *this, 5, "mc68328_r (%04x): CSD3(16) = %04x\n", mem_mask, m_regs.csd3 >> 16);
-			return m_regs.csd3 >> 16;
+			verboselog(2, "mc68328_r (%04x): GRPMASKD = %04x\n", mem_mask, m_grpmaskd);
+			return m_grpmaskd;
 
 		case 0x200:
-			verboselog( *this, 2, "mc68328_r (%04x): PLLCR = %04x\n", mem_mask, m_regs.pllcr);
-			return m_regs.pllcr;
+			verboselog(2, "mc68328_r (%04x): PLLCR = %04x\n", mem_mask, m_pllcr);
+			return m_pllcr;
 
 		case 0x202:
-			verboselog( *this, 2, "mc68328_r (%04x): PLLFSR = %04x\n", mem_mask, m_regs.pllfsr);
-			m_regs.pllfsr ^= 0x8000;
-			return m_regs.pllfsr;
+			verboselog(2, "mc68328_r (%04x): PLLFSR = %04x\n", mem_mask, m_pllfsr);
+			m_pllfsr ^= 0x8000;
+			return m_pllfsr;
 
 		case 0x206:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfff206)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfff206)\n", mem_mask);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PCTLR = %02x\n", mem_mask, m_regs.pctlr);
-				return m_regs.pctlr << 8;
+				verboselog(2, "mc68328_r (%04x): PCTLR = %02x\n", mem_mask, m_pctlr);
+				return m_pctlr << 8;
 			}
 			break;
 
 		case 0x300:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfff301)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfff301)\n", mem_mask);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): IVR = %02x\n", mem_mask, m_regs.ivr);
-				return m_regs.ivr << 8;
+				verboselog(2, "mc68328_r (%04x): IVR = %02x\n", mem_mask, m_ivr);
+				return m_ivr << 8;
 			}
 			break;
 
 		case 0x302:
-			verboselog( *this, 2, "mc68328_r (%04x): ICR = %04x\n", mem_mask, m_regs.icr);
-			return m_regs.icr;
+			verboselog(2, "mc68328_r (%04x): ICR = %04x\n", mem_mask, m_icr);
+			return m_icr;
 
 		case 0x304:
-			verboselog( *this, 2, "mc68328_r (%04x): IMR(16) = %04x\n", mem_mask, m_regs.imr >> 16);
-			return m_regs.imr >> 16;
+			verboselog(2, "mc68328_r (%04x): IMR(16) = %04x\n", mem_mask, m_imr >> 16);
+			return m_imr >> 16;
 
 		case 0x306:
-			verboselog( *this, 2, "mc68328_r (%04x): IMR(0) = %04x\n", mem_mask, m_regs.imr & 0x0000ffff);
-			return m_regs.imr & 0x0000ffff;
+			verboselog(2, "mc68328_r (%04x): IMR(0) = %04x\n", mem_mask, m_imr & 0x0000ffff);
+			return m_imr & 0x0000ffff;
 
 		case 0x308:
-			verboselog( *this, 2, "mc68328_r (%04x): IWR(16) = %04x\n", mem_mask, m_regs.iwr >> 16);
-			return m_regs.iwr >> 16;
+			verboselog(2, "mc68328_r (%04x): IWR(16) = %04x\n", mem_mask, m_iwr >> 16);
+			return m_iwr >> 16;
 
 		case 0x30a:
-			verboselog( *this, 2, "mc68328_r (%04x): IWR(0) = %04x\n", mem_mask, m_regs.iwr & 0x0000ffff);
-			return m_regs.iwr & 0x0000ffff;
+			verboselog(2, "mc68328_r (%04x): IWR(0) = %04x\n", mem_mask, m_iwr & 0x0000ffff);
+			return m_iwr & 0x0000ffff;
 
 		case 0x30c:
-			verboselog( *this, 2, "mc68328_r (%04x): ISR(16) = %04x\n", mem_mask, m_regs.isr >> 16);
-			return m_regs.isr >> 16;
+			verboselog(2, "mc68328_r (%04x): ISR(16) = %04x\n", mem_mask, m_isr >> 16);
+			return m_isr >> 16;
 
 		case 0x30e:
-			verboselog( *this, 2, "mc68328_r (%04x): ISR(0) = %04x\n", mem_mask, m_regs.isr & 0x0000ffff);
-			return m_regs.isr & 0x0000ffff;
+			verboselog(2, "mc68328_r (%04x): ISR(0) = %04x\n", mem_mask, m_isr & 0x0000ffff);
+			return m_isr & 0x0000ffff;
 
 		case 0x310:
-			verboselog( *this, 2, "mc68328_r (%04x): IPR(16) = %04x\n", mem_mask, m_regs.ipr >> 16);
-			return m_regs.ipr >> 16;
+			verboselog(2, "mc68328_r (%04x): IPR(16) = %04x\n", mem_mask, m_ipr >> 16);
+			return m_ipr >> 16;
 
 		case 0x312:
-			verboselog( *this, 2, "mc68328_r (%04x): IPR(0) = %04x\n", mem_mask, m_regs.ipr & 0x0000ffff);
-			return m_regs.ipr & 0x0000ffff;
+			verboselog(2, "mc68328_r (%04x): IPR(0) = %04x\n", mem_mask, m_ipr & 0x0000ffff);
+			return m_ipr & 0x0000ffff;
 
 		case 0x400:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PADATA = %02x\n", mem_mask, m_regs.padata);
+				verboselog(2, "mc68328_r (%04x): PADATA = %02x\n", mem_mask, m_padata);
 				if (!m_in_port_a_cb.isnull())
 				{
 					return m_in_port_a_cb(0);
 				}
 				else
 				{
-					return m_regs.padata;
+					return m_padata;
 				}
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PADIR = %02x\n", mem_mask, m_regs.padir);
-				return m_regs.padir << 8;
+				verboselog(2, "mc68328_r (%04x): PADIR = %02x\n", mem_mask, m_padir);
+				return m_padir << 8;
 			}
 
 		case 0x402:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PASEL = %02x\n", mem_mask, m_regs.pasel);
-				return m_regs.pasel;
+				verboselog(2, "mc68328_r (%04x): PASEL = %02x\n", mem_mask, m_pasel);
+				return m_pasel;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfff402)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfff402)\n", mem_mask);
 			}
 			break;
 
 		case 0x408:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PBDATA = %02x\n", mem_mask, m_regs.pbdata);
+				verboselog(2, "mc68328_r (%04x): PBDATA = %02x\n", mem_mask, m_pbdata);
 				if (!m_in_port_b_cb.isnull())
 				{
 					return m_in_port_b_cb(0);
 				}
 				else
 				{
-					return m_regs.pbdata;
+					return m_pbdata;
 				}
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PBDIR = %02x\n", mem_mask, m_regs.pbdir);
-				return m_regs.pbdir << 8;
+				verboselog(2, "mc68328_r (%04x): PBDIR = %02x\n", mem_mask, m_pbdir);
+				return m_pbdir << 8;
 			}
 
 		case 0x40a:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PBSEL = %02x\n", mem_mask, m_regs.pbsel);
-				return m_regs.pbsel;
+				verboselog(2, "mc68328_r (%04x): PBSEL = %02x\n", mem_mask, m_pbsel);
+				return m_pbsel;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfff40a)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfff40a)\n", mem_mask);
 			}
 			break;
 
 		case 0x410:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PCDATA = %02x\n", mem_mask, m_regs.pcdata);
+				verboselog(2, "mc68328_r (%04x): PCDATA = %02x\n", mem_mask, m_pcdata);
 				if (!m_in_port_c_cb.isnull())
 				{
 					return m_in_port_c_cb(0);
 				}
 				else
 				{
-					return m_regs.pcdata;
+					return m_pcdata;
 				}
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PCDIR = %02x\n", mem_mask, m_regs.pcdir);
-				return m_regs.pcdir << 8;
+				verboselog(2, "mc68328_r (%04x): PCDIR = %02x\n", mem_mask, m_pcdir);
+				return m_pcdir << 8;
 			}
 
 		case 0x412:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PCSEL = %02x\n", mem_mask, m_regs.pcsel);
-				return m_regs.pcsel;
+				verboselog(2, "mc68328_r (%04x): PCSEL = %02x\n", mem_mask, m_pcsel);
+				return m_pcsel;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfff412)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfff412)\n", mem_mask);
 			}
 			break;
 
 		case 0x418:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PDDATA = %02x\n", mem_mask, m_regs.pddata);
+				verboselog(2, "mc68328_r (%04x): PDDATA = %02x\n", mem_mask, m_pddata);
 				if (!m_in_port_d_cb.isnull())
 				{
 					return m_in_port_d_cb(0);
 				}
 				else
 				{
-					return m_regs.pddata;
+					return m_pddata;
 				}
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PDDIR = %02x\n", mem_mask, m_regs.pddir);
-				return m_regs.pddir << 8;
+				verboselog(2, "mc68328_r (%04x): PDDIR = %02x\n", mem_mask, m_pddir);
+				return m_pddir << 8;
 			}
 
 		case 0x41a:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfff41b)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfff41b)\n", mem_mask);
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PDPUEN = %02x\n", mem_mask, m_regs.pdpuen);
-				return m_regs.pdpuen << 8;
+				verboselog(2, "mc68328_r (%04x): PDPUEN = %02x\n", mem_mask, m_pdpuen);
+				return m_pdpuen << 8;
 			}
 			break;
 
 		case 0x41c:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PDIRQEN = %02x\n", mem_mask, m_regs.pdirqen);
-				return m_regs.pdirqen;
+				verboselog(2, "mc68328_r (%04x): PDIRQEN = %02x\n", mem_mask, m_pdirqen);
+				return m_pdirqen;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PDPOL = %02x\n", mem_mask, m_regs.pdpol);
-				return m_regs.pdpol << 8;
+				verboselog(2, "mc68328_r (%04x): PDPOL = %02x\n", mem_mask, m_pdpol);
+				return m_pdpol << 8;
 			}
 
 		case 0x41e:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PDIRQEDGE = %02x\n", mem_mask, m_regs.pdirqedge);
-				return m_regs.pdirqedge;
+				verboselog(2, "mc68328_r (%04x): PDIRQEDGE = %02x\n", mem_mask, m_pdirqedge);
+				return m_pdirqedge;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfff41e)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfff41e)\n", mem_mask);
 			}
 			break;
 
 		case 0x420:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PEDATA = %02x\n", mem_mask, m_regs.pedata);
+				verboselog(2, "mc68328_r (%04x): PEDATA = %02x\n", mem_mask, m_pedata);
 				if (!m_in_port_e_cb.isnull())
 				{
 					return m_in_port_e_cb(0);
 				}
 				else
 				{
-					return m_regs.pedata;
+					return m_pedata;
 				}
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PEDIR = %02x\n", mem_mask, m_regs.pedir);
-				return m_regs.pedir << 8;
+				verboselog(2, "mc68328_r (%04x): PEDIR = %02x\n", mem_mask, m_pedir);
+				return m_pedir << 8;
 			}
 
 		case 0x422:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PESEL = %02x\n", mem_mask, m_regs.pesel);
-				return m_regs.pesel;
+				verboselog(2, "mc68328_r (%04x): PESEL = %02x\n", mem_mask, m_pesel);
+				return m_pesel;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PEPUEN = %02x\n", mem_mask, m_regs.pepuen);
-				return m_regs.pepuen << 8;
+				verboselog(2, "mc68328_r (%04x): PEPUEN = %02x\n", mem_mask, m_pepuen);
+				return m_pepuen << 8;
 			}
 
 		case 0x428:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PFDATA = %02x\n", mem_mask, m_regs.pfdata);
+				verboselog(2, "mc68328_r (%04x): PFDATA = %02x\n", mem_mask, m_pfdata);
 				if (!m_in_port_f_cb.isnull())
 				{
 					return m_in_port_f_cb(0);
 				}
 				else
 				{
-					return m_regs.pfdata;
+					return m_pfdata;
 				}
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PFDIR = %02x\n", mem_mask, m_regs.pfdir);
-				return m_regs.pfdir << 8;
+				verboselog(2, "mc68328_r (%04x): PFDIR = %02x\n", mem_mask, m_pfdir);
+				return m_pfdir << 8;
 			}
 
 		case 0x42a:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PFSEL = %02x\n", mem_mask, m_regs.pfsel);
-				return m_regs.pfsel;
+				verboselog(2, "mc68328_r (%04x): PFSEL = %02x\n", mem_mask, m_pfsel);
+				return m_pfsel;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PFPUEN = %02x\n", mem_mask, m_regs.pfpuen);
-				return m_regs.pfpuen << 8;
+				verboselog(2, "mc68328_r (%04x): PFPUEN = %02x\n", mem_mask, m_pfpuen);
+				return m_pfpuen << 8;
 			}
 
 		case 0x430:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PGDATA = %02x\n", mem_mask, m_regs.pgdata);
+				verboselog(2, "mc68328_r (%04x): PGDATA = %02x\n", mem_mask, m_pgdata);
 				if (!m_in_port_g_cb.isnull())
 				{
 					return m_in_port_g_cb(0);
 				}
 				else
 				{
-					return m_regs.pgdata;
+					return m_pgdata;
 				}
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PGDIR = %02x\n", mem_mask, m_regs.pgdir);
-				return m_regs.pgdir << 8;
+				verboselog(2, "mc68328_r (%04x): PGDIR = %02x\n", mem_mask, m_pgdir);
+				return m_pgdir << 8;
 			}
 
 		case 0x432:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PGSEL = %02x\n", mem_mask, m_regs.pgsel);
-				return m_regs.pgsel;
+				verboselog(2, "mc68328_r (%04x): PGSEL = %02x\n", mem_mask, m_pgsel);
+				return m_pgsel;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PGPUEN = %02x\n", mem_mask, m_regs.pgpuen);
-				return m_regs.pgpuen << 8;
+				verboselog(2, "mc68328_r (%04x): PGPUEN = %02x\n", mem_mask, m_pgpuen);
+				return m_pgpuen << 8;
 			}
 
 		case 0x438:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PJDATA = %02x\n", mem_mask, m_regs.pjdata);
+				verboselog(2, "mc68328_r (%04x): PJDATA = %02x\n", mem_mask, m_pjdata);
 				if (!m_in_port_j_cb.isnull())
 				{
 					return m_in_port_j_cb(0);
 				}
 				else
 				{
-					return m_regs.pjdata;
+					return m_pjdata;
 				}
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PJDIR = %02x\n", mem_mask, m_regs.pjdir);
-				return m_regs.pjdir << 8;
+				verboselog(2, "mc68328_r (%04x): PJDIR = %02x\n", mem_mask, m_pjdir);
+				return m_pjdir << 8;
 			}
 
 		case 0x43a:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PJSEL = %02x\n", mem_mask, m_regs.pjsel);
-				return m_regs.pjsel;
+				verboselog(2, "mc68328_r (%04x): PJSEL = %02x\n", mem_mask, m_pjsel);
+				return m_pjsel;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfff43a)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfff43a)\n", mem_mask);
 			}
 			break;
 
 		case 0x440:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PKDATA = %02x\n", mem_mask, m_regs.pkdata);
+				verboselog(2, "mc68328_r (%04x): PKDATA = %02x\n", mem_mask, m_pkdata);
 				if (!m_in_port_k_cb.isnull())
 				{
 					return m_in_port_k_cb(0);
 				}
 				else
 				{
-					return m_regs.pkdata;
+					return m_pkdata;
 				}
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PKDIR = %02x\n", mem_mask, m_regs.pkdir);
-				return m_regs.pkdir << 8;
+				verboselog(2, "mc68328_r (%04x): PKDIR = %02x\n", mem_mask, m_pkdir);
+				return m_pkdir << 8;
 			}
 
 		case 0x442:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PKSEL = %02x\n", mem_mask, m_regs.pksel);
-				return m_regs.pksel;
+				verboselog(2, "mc68328_r (%04x): PKSEL = %02x\n", mem_mask, m_pksel);
+				return m_pksel;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PKPUEN = %02x\n", mem_mask, m_regs.pkpuen);
-				return m_regs.pkpuen << 8;
+				verboselog(2, "mc68328_r (%04x): PKPUEN = %02x\n", mem_mask, m_pkpuen);
+				return m_pkpuen << 8;
 			}
 
 		case 0x448:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PMDATA = %02x\n", mem_mask, m_regs.pmdata);
+				verboselog(2, "mc68328_r (%04x): PMDATA = %02x\n", mem_mask, m_pmdata);
 				if (!m_in_port_m_cb.isnull())
 				{
 					return m_in_port_m_cb(0);
 				}
 				else
 				{
-					return m_regs.pmdata;
+					return m_pmdata;
 				}
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PMDIR = %02x\n", mem_mask, m_regs.pmdir);
-				return m_regs.pmdir << 8;
+				verboselog(2, "mc68328_r (%04x): PMDIR = %02x\n", mem_mask, m_pmdir);
+				return m_pmdir << 8;
 			}
 
 		case 0x44a:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PMSEL = %02x\n", mem_mask, m_regs.pmsel);
-				return m_regs.pmsel;
+				verboselog(2, "mc68328_r (%04x): PMSEL = %02x\n", mem_mask, m_pmsel);
+				return m_pmsel;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): PMPUEN = %02x\n", mem_mask, m_regs.pmpuen);
-				return m_regs.pmpuen << 8;
+				verboselog(2, "mc68328_r (%04x): PMPUEN = %02x\n", mem_mask, m_pmpuen);
+				return m_pmpuen << 8;
 			}
 
 		case 0x500:
-			verboselog( *this, 2, "mc68328_r (%04x): PWMC = %04x\n", mem_mask, m_regs.pwmc);
-			temp16 = m_regs.pwmc;
-			if (m_regs.pwmc & PWMC_PWMIRQ)
+		{
+			verboselog(2, "mc68328_r (%04x): PWMC = %04x\n", mem_mask, m_pwmc);
+			const uint16_t old_pwmc = m_pwmc;
+			if (m_pwmc & PWMC_PWMIRQ)
 			{
-				m_regs.pwmc &= ~PWMC_PWMIRQ;
+				m_pwmc &= ~PWMC_PWMIRQ;
 				set_interrupt_line(INT_PWM, 0);
 			}
-			return temp16;
+			return old_pwmc;
+		}
 
 		case 0x502:
-			verboselog( *this, 2, "mc68328_r (%04x): PWMP = %04x\n", mem_mask, m_regs.pwmp);
-			return m_regs.pwmp;
+			verboselog(2, "mc68328_r (%04x): PWMP = %04x\n", mem_mask, m_pwmp);
+			return m_pwmp;
 
 		case 0x504:
-			verboselog( *this, 2, "mc68328_r (%04x): PWMW = %04x\n", mem_mask, m_regs.pwmw);
-			return m_regs.pwmw;
+			verboselog(2, "mc68328_r (%04x): PWMW = %04x\n", mem_mask, m_pwmw);
+			return m_pwmw;
 
 		case 0x506:
-			verboselog( *this, 2, "mc68328_r (%04x): PWMCNT = %04x\n", mem_mask, m_regs.pwmcnt);
-			return m_regs.pwmcnt;
+			verboselog(2, "mc68328_r (%04x): PWMCNT = %04x\n", mem_mask, m_pwmcnt);
+			return m_pwmcnt;
 
 		case 0x600:
-			verboselog( *this, 2, "mc68328_r (%04x): TCTL1 = %04x\n", mem_mask, m_regs.tctl[0]);
-			return m_regs.tctl[0];
+			verboselog(2, "mc68328_r (%04x): TCTL1 = %04x\n", mem_mask, m_tctl[0]);
+			return m_tctl[0];
 
 		case 0x602:
-			verboselog( *this, 2, "mc68328_r (%04x): TPRER1 = %04x\n", mem_mask, m_regs.tprer[0]);
-			return m_regs.tprer[0];
+			verboselog(2, "mc68328_r (%04x): TPRER1 = %04x\n", mem_mask, m_tprer[0]);
+			return m_tprer[0];
 
 		case 0x604:
-			verboselog( *this, 2, "mc68328_r (%04x): TCMP1 = %04x\n", mem_mask, m_regs.tcmp[0]);
-			return m_regs.tcmp[0];
+			verboselog(2, "mc68328_r (%04x): TCMP1 = %04x\n", mem_mask, m_tcmp[0]);
+			return m_tcmp[0];
 
 		case 0x606:
-			verboselog( *this, 2, "mc68328_r (%04x): TCR1 = %04x\n", mem_mask, m_regs.tcr[0]);
-			return m_regs.tcr[0];
+			verboselog(2, "mc68328_r (%04x): TCR1 = %04x\n", mem_mask, m_tcr[0]);
+			return m_tcr[0];
 
 		case 0x608:
-			verboselog( *this, 2, "mc68328_r (%04x): TCN1 = %04x\n", mem_mask, m_regs.tcn[0]);
-			return m_regs.tcn[0];
+			verboselog(2, "mc68328_r (%04x): TCN1 = %04x\n", mem_mask, m_tcn[0]);
+			return m_tcn[0];
 
 		case 0x60a:
-			verboselog( *this, 5, "mc68328_r (%04x): TSTAT1 = %04x\n", mem_mask, m_regs.tstat[0]);
-			m_regs.tclear[0] |= m_regs.tstat[0];
-			return m_regs.tstat[0];
+			verboselog(5, "mc68328_r (%04x): TSTAT1 = %04x\n", mem_mask, m_tstat[0]);
+			m_tclear[0] |= m_tstat[0];
+			return m_tstat[0];
 
 		case 0x60c:
-			verboselog( *this, 2, "mc68328_r (%04x): TCTL2 = %04x\n", mem_mask, m_regs.tctl[1]);
-			return m_regs.tctl[1];
+			verboselog(2, "mc68328_r (%04x): TCTL2 = %04x\n", mem_mask, m_tctl[1]);
+			return m_tctl[1];
 
 		case 0x60e:
-			verboselog( *this, 2, "mc68328_r (%04x): TPREP2 = %04x\n", mem_mask, m_regs.tprer[1]);
-			return m_regs.tprer[1];
+			verboselog(2, "mc68328_r (%04x): TPREP2 = %04x\n", mem_mask, m_tprer[1]);
+			return m_tprer[1];
 
 		case 0x610:
-			verboselog( *this, 2, "mc68328_r (%04x): TCMP2 = %04x\n", mem_mask, m_regs.tcmp[1]);
-			return m_regs.tcmp[1];
+			verboselog(2, "mc68328_r (%04x): TCMP2 = %04x\n", mem_mask, m_tcmp[1]);
+			return m_tcmp[1];
 
 		case 0x612:
-			verboselog( *this, 2, "mc68328_r (%04x): TCR2 = %04x\n", mem_mask, m_regs.tcr[1]);
-			return m_regs.tcr[1];
+			verboselog(2, "mc68328_r (%04x): TCR2 = %04x\n", mem_mask, m_tcr[1]);
+			return m_tcr[1];
 
 		case 0x614:
-			verboselog( *this, 2, "mc68328_r (%04x): TCN2 = %04x\n", mem_mask, m_regs.tcn[1]);
-			return m_regs.tcn[1];
+			verboselog(2, "mc68328_r (%04x): TCN2 = %04x\n", mem_mask, m_tcn[1]);
+			return m_tcn[1];
 
 		case 0x616:
-			verboselog( *this, 2, "mc68328_r (%04x): TSTAT2 = %04x\n", mem_mask, m_regs.tstat[1]);
-			m_regs.tclear[1] |= m_regs.tstat[1];
-			return m_regs.tstat[1];
+			verboselog(2, "mc68328_r (%04x): TSTAT2 = %04x\n", mem_mask, m_tstat[1]);
+			m_tclear[1] |= m_tstat[1];
+			return m_tstat[1];
 
 		case 0x618:
-			verboselog( *this, 2, "mc68328_r (%04x): WCTLR = %04x\n", mem_mask, m_regs.wctlr);
-			return m_regs.wctlr;
+			verboselog(2, "mc68328_r (%04x): WCTLR = %04x\n", mem_mask, m_wctlr);
+			return m_wctlr;
 
 		case 0x61a:
-			verboselog( *this, 2, "mc68328_r (%04x): WCMPR = %04x\n", mem_mask, m_regs.wcmpr);
-			return m_regs.wcmpr;
+			verboselog(2, "mc68328_r (%04x): WCMPR = %04x\n", mem_mask, m_wcmpr);
+			return m_wcmpr;
 
 		case 0x61c:
-			verboselog( *this, 2, "mc68328_r (%04x): WCN = %04x\n", mem_mask, m_regs.wcn);
-			return m_regs.wcn;
+			verboselog(2, "mc68328_r (%04x): WCN = %04x\n", mem_mask, m_wcn);
+			return m_wcn;
 
 		case 0x700:
-			verboselog( *this, 2, "mc68328_r (%04x): SPISR = %04x\n", mem_mask, m_regs.spisr);
-			return m_regs.spisr;
+			verboselog(2, "mc68328_r (%04x): SPISR = %04x\n", mem_mask, m_spisr);
+			return m_spisr;
 
 		case 0x800:
-			verboselog( *this, 2, "mc68328_r (%04x): SPIMDATA = %04x\n", mem_mask, m_regs.spimdata);
+			verboselog(2, "mc68328_r (%04x): SPIMDATA = %04x\n", mem_mask, m_spimdata);
 			if (!m_in_spim_cb.isnull())
 			{
 				return m_in_spim_cb(0, 0xffff);
 			}
-			return m_regs.spimdata;
+			return m_spimdata;
 
 		case 0x802:
-			verboselog( *this, 2, "mc68328_r (%04x): SPIMCONT = %04x\n", mem_mask, m_regs.spimcont);
-			if (m_regs.spimcont & SPIM_XCH)
+			verboselog(2, "mc68328_r (%04x): SPIMCONT = %04x\n", mem_mask, m_spimcont);
+			if (m_spimcont & SPIM_XCH)
 			{
-				m_regs.spimcont &= ~SPIM_XCH;
-				m_regs.spimcont |= SPIM_SPIMIRQ;
-				return ((m_regs.spimcont | SPIM_XCH) &~ SPIM_SPIMIRQ);
+				m_spimcont &= ~SPIM_XCH;
+				m_spimcont |= SPIM_SPIMIRQ;
+				return ((m_spimcont | SPIM_XCH) &~ SPIM_SPIMIRQ);
 			}
-			return m_regs.spimcont;
+			return m_spimcont;
 
 		case 0x900:
-			verboselog( *this, 2, "mc68328_r (%04x): USTCNT = %04x\n", mem_mask, m_regs.ustcnt);
-			return m_regs.ustcnt;
+			verboselog(2, "mc68328_r (%04x): USTCNT = %04x\n", mem_mask, m_ustcnt);
+			return m_ustcnt;
 
 		case 0x902:
-			verboselog( *this, 2, "mc68328_r (%04x): UBAUD = %04x\n", mem_mask, m_regs.ubaud);
-			return m_regs.ubaud;
+			verboselog(2, "mc68328_r (%04x): UBAUD = %04x\n", mem_mask, m_ubaud);
+			return m_ubaud;
 
 		case 0x904:
-			verboselog( *this, 5, "mc68328_r (%04x): URX = %04x\n", mem_mask, m_regs.urx);
-			return m_regs.urx;
+			verboselog(5, "mc68328_r (%04x): URX = %04x\n", mem_mask, m_urx);
+			return m_urx;
 
 		case 0x906:
-			verboselog( *this, 5, "mc68328_r (%04x): UTX = %04x\n", mem_mask, m_regs.utx);
-			return m_regs.utx | UTX_FIFO_EMPTY | UTX_FIFO_HALF | UTX_TX_AVAIL;
+			verboselog(5, "mc68328_r (%04x): UTX = %04x\n", mem_mask, m_utx);
+			return m_utx | UTX_FIFO_EMPTY | UTX_FIFO_HALF | UTX_TX_AVAIL;
 
 		case 0x908:
-			verboselog( *this, 2, "mc68328_r (%04x): UMISC = %04x\n", mem_mask, m_regs.umisc);
-			return m_regs.umisc;
+			verboselog(2, "mc68328_r (%04x): UMISC = %04x\n", mem_mask, m_umisc);
+			return m_umisc;
 
 		case 0xa00:
-			verboselog( *this, 2, "mc68328_r (%04x): LSSA(16) = %04x\n", mem_mask, m_regs.lssa >> 16);
-			return m_regs.lssa >> 16;
+			verboselog(2, "mc68328_r (%04x): LSSA(16) = %04x\n", mem_mask, m_lssa >> 16);
+			return m_lssa >> 16;
 
 		case 0xa02:
-			verboselog( *this, 2, "mc68328_r (%04x): LSSA(0) = %04x\n", mem_mask, m_regs.lssa & 0x0000ffff);
-			return m_regs.lssa & 0x0000ffff;
+			verboselog(2, "mc68328_r (%04x): LSSA(0) = %04x\n", mem_mask, m_lssa & 0x0000ffff);
+			return m_lssa & 0x0000ffff;
 
 		case 0xa04:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): LVPW = %02x\n", mem_mask, m_regs.lvpw);
-				return m_regs.lvpw;
+				verboselog(2, "mc68328_r (%04x): LVPW = %02x\n", mem_mask, m_lvpw);
+				return m_lvpw;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfffa04)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfffa04)\n", mem_mask);
 			}
 			break;
 
 		case 0xa08:
-			verboselog( *this, 2, "mc68328_r (%04x): LXMAX = %04x\n", mem_mask, m_regs.lxmax);
-			return m_regs.lxmax;
+			verboselog(2, "mc68328_r (%04x): LXMAX = %04x\n", mem_mask, m_lxmax);
+			return m_lxmax;
 
 		case 0xa0a:
-			verboselog( *this, 2, "mc68328_r (%04x): LYMAX = %04x\n", mem_mask, m_regs.lymax);
-			return m_regs.lymax;
+			verboselog(2, "mc68328_r (%04x): LYMAX = %04x\n", mem_mask, m_lymax);
+			return m_lymax;
 
 		case 0xa18:
-			verboselog( *this, 2, "mc68328_r (%04x): LCXP = %04x\n", mem_mask, m_regs.lcxp);
-			return m_regs.lcxp;
+			verboselog(2, "mc68328_r (%04x): LCXP = %04x\n", mem_mask, m_lcxp);
+			return m_lcxp;
 
 		case 0xa1a:
-			verboselog( *this, 2, "mc68328_r (%04x): LCYP = %04x\n", mem_mask, m_regs.lcyp);
-			return m_regs.lcyp;
+			verboselog(2, "mc68328_r (%04x): LCYP = %04x\n", mem_mask, m_lcyp);
+			return m_lcyp;
 
 		case 0xa1c:
-			verboselog( *this, 2, "mc68328_r (%04x): LCWCH = %04x\n", mem_mask, m_regs.lcwch);
-			return m_regs.lcwch;
+			verboselog(2, "mc68328_r (%04x): LCWCH = %04x\n", mem_mask, m_lcwch);
+			return m_lcwch;
 
 		case 0xa1e:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): LBLKC = %02x\n", mem_mask, m_regs.lblkc);
-				return m_regs.lblkc;
+				verboselog(2, "mc68328_r (%04x): LBLKC = %02x\n", mem_mask, m_lblkc);
+				return m_lblkc;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfffa1e)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfffa1e)\n", mem_mask);
 			}
 			break;
 
 		case 0xa20:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): LPOLCF = %02x\n", mem_mask, m_regs.lpolcf);
-				return m_regs.lpolcf;
+				verboselog(2, "mc68328_r (%04x): LPOLCF = %02x\n", mem_mask, m_lpolcf);
+				return m_lpolcf;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): LPICF = %02x\n", mem_mask, m_regs.lpicf);
-				return m_regs.lpicf << 8;
+				verboselog(2, "mc68328_r (%04x): LPICF = %02x\n", mem_mask, m_lpicf);
+				return m_lpicf << 8;
 			}
 
 		case 0xa22:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): LACDRC = %02x\n", mem_mask, m_regs.lacdrc);
-				return m_regs.lacdrc;
+				verboselog(2, "mc68328_r (%04x): LACDRC = %02x\n", mem_mask, m_lacdrc);
+				return m_lacdrc;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfffa22)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfffa22)\n", mem_mask);
 			}
 			break;
 
 		case 0xa24:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): LPXCD = %02x\n", mem_mask, m_regs.lpxcd);
-				return m_regs.lpxcd;
+				verboselog(2, "mc68328_r (%04x): LPXCD = %02x\n", mem_mask, m_lpxcd);
+				return m_lpxcd;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfffa24)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfffa24)\n", mem_mask);
 			}
 			break;
 
 		case 0xa26:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): LCKCON = %02x\n", mem_mask, m_regs.lckcon);
-				return m_regs.lckcon;
+				verboselog(2, "mc68328_r (%04x): LCKCON = %02x\n", mem_mask, m_lckcon);
+				return m_lckcon;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfffa26)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfffa26)\n", mem_mask);
 			}
 			break;
 
 		case 0xa28:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): LLBAR = %02x\n", mem_mask, m_regs.llbar);
-				return m_regs.llbar;
+				verboselog(2, "mc68328_r (%04x): LLBAR = %02x\n", mem_mask, m_llbar);
+				return m_llbar;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfffa28)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfffa28)\n", mem_mask);
 			}
 			break;
 
 		case 0xa2a:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): LOTCR = %02x\n", mem_mask, m_regs.lotcr);
-				return m_regs.lotcr;
+				verboselog(2, "mc68328_r (%04x): LOTCR = %02x\n", mem_mask, m_lotcr);
+				return m_lotcr;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfffa2a)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfffa2a)\n", mem_mask);
 			}
 			break;
 
 		case 0xa2c:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): LPOSR = %02x\n", mem_mask, m_regs.lposr);
-				return m_regs.lposr;
+				verboselog(2, "mc68328_r (%04x): LPOSR = %02x\n", mem_mask, m_lposr);
+				return m_lposr;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfffa2c)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfffa2c)\n", mem_mask);
 			}
 			break;
 
 		case 0xa30:
 			if (mem_mask & 0x00ff)
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): LFRCM = %02x\n", mem_mask, m_regs.lfrcm);
-				return m_regs.lfrcm;
+				verboselog(2, "mc68328_r (%04x): LFRCM = %02x\n", mem_mask, m_lfrcm);
+				return m_lfrcm;
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_r (%04x): Unknown address (0xfffa30)\n", mem_mask);
+				verboselog(2, "mc68328_r (%04x): Unknown address (0xfffa30)\n", mem_mask);
 			}
 			break;
 
 		case 0xa32:
-			verboselog( *this, 2, "mc68328_r (%04x): LGPMR = %04x\n", mem_mask, m_regs.lgpmr);
-			return m_regs.lgpmr;
+			verboselog(2, "mc68328_r (%04x): LGPMR = %04x\n", mem_mask, m_lgpmr);
+			return m_lgpmr;
 
 		case 0xb00:
-			verboselog( *this, 2, "mc68328_r (%04x): HMSR(0) = %04x\n", mem_mask, m_regs.hmsr & 0x0000ffff);
-			return m_regs.hmsr & 0x0000ffff;
+			verboselog(2, "mc68328_r (%04x): HMSR(0) = %04x\n", mem_mask, m_hmsr & 0x0000ffff);
+			return m_hmsr & 0x0000ffff;
 
 		case 0xb02:
-			verboselog( *this, 2, "mc68328_r (%04x): HMSR(16) = %04x\n", mem_mask, m_regs.hmsr >> 16);
-			return m_regs.hmsr >> 16;
+			verboselog(2, "mc68328_r (%04x): HMSR(16) = %04x\n", mem_mask, m_hmsr >> 16);
+			return m_hmsr >> 16;
 
 		case 0xb04:
-			verboselog( *this, 2, "mc68328_r (%04x): ALARM(0) = %04x\n", mem_mask, m_regs.alarm & 0x0000ffff);
-			return m_regs.alarm & 0x0000ffff;
+			verboselog(2, "mc68328_r (%04x): ALARM(0) = %04x\n", mem_mask, m_alarm & 0x0000ffff);
+			return m_alarm & 0x0000ffff;
 
 		case 0xb06:
-			verboselog( *this, 2, "mc68328_r (%04x): ALARM(16) = %04x\n", mem_mask, m_regs.alarm >> 16);
-			return m_regs.alarm >> 16;
+			verboselog(2, "mc68328_r (%04x): ALARM(16) = %04x\n", mem_mask, m_alarm >> 16);
+			return m_alarm >> 16;
 
 		case 0xb0c:
-			verboselog( *this, 2, "mc68328_r (%04x): RTCCTL = %04x\n", mem_mask, m_regs.rtcctl);
-			return m_regs.rtcctl;
+			verboselog(2, "mc68328_r (%04x): RTCCTL = %04x\n", mem_mask, m_rtcctl);
+			return m_rtcctl;
 
 		case 0xb0e:
-			verboselog( *this, 2, "mc68328_r (%04x): RTCISR = %04x\n", mem_mask, m_regs.rtcisr);
-			return m_regs.rtcisr;
+			verboselog(2, "mc68328_r (%04x): RTCISR = %04x\n", mem_mask, m_rtcisr);
+			return m_rtcisr;
 
 		case 0xb10:
-			verboselog( *this, 2, "mc68328_r (%04x): RTCIENR = %04x\n", mem_mask, m_regs.rtcienr);
-			return m_regs.rtcienr;
+			verboselog(2, "mc68328_r (%04x): RTCIENR = %04x\n", mem_mask, m_rtcienr);
+			return m_rtcienr;
 
 		case 0xb12:
-			verboselog( *this, 2, "mc68328_r (%04x): STPWTCH = %04x\n", mem_mask, m_regs.stpwtch);
-			return m_regs.stpwtch;
+			verboselog(2, "mc68328_r (%04x): STPWTCH = %04x\n", mem_mask, m_stpwtch);
+			return m_stpwtch;
 
 		default:
-			verboselog( *this, 0, "mc68328_r (%04x): Unknown address (0x%06x)\n", mem_mask, 0xfff000 + address);
+			verboselog(0, "mc68328_r (%04x): Unknown address (0x%08x)\n", mem_mask, 0xfffff000 + address);
 			break;
 	}
 	return 0;
 }
 
-/* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
+void mc68328_base_device::register_state_save()
+{
+	save_item(NAME(m_scr));
+	save_item(NAME(m_grpbasea));
+	save_item(NAME(m_grpbaseb));
+	save_item(NAME(m_grpbasec));
+	save_item(NAME(m_grpbased));
+	save_item(NAME(m_grpmaska));
+	save_item(NAME(m_grpmaskb));
+	save_item(NAME(m_grpmaskc));
+	save_item(NAME(m_grpmaskd));
+
+	save_item(NAME(m_pllcr));
+	save_item(NAME(m_pllfsr));
+	save_item(NAME(m_pctlr));
+
+	save_item(NAME(m_ivr));
+	save_item(NAME(m_icr));
+	save_item(NAME(m_imr));
+	save_item(NAME(m_iwr));
+	save_item(NAME(m_isr));
+	save_item(NAME(m_ipr));
+
+	save_item(NAME(m_padir));
+	save_item(NAME(m_padata));
+	save_item(NAME(m_pasel));
+	save_item(NAME(m_pbdir));
+	save_item(NAME(m_pbdata));
+	save_item(NAME(m_pbsel));
+	save_item(NAME(m_pcdir));
+	save_item(NAME(m_pcdata));
+	save_item(NAME(m_pcsel));
+	save_item(NAME(m_pddir));
+	save_item(NAME(m_pddata));
+	save_item(NAME(m_pdpuen));
+	save_item(NAME(m_pdpol));
+	save_item(NAME(m_pdirqen));
+	save_item(NAME(m_pddataedge));
+	save_item(NAME(m_pdirqedge));
+	save_item(NAME(m_pedir));
+	save_item(NAME(m_pedata));
+	save_item(NAME(m_pepuen));
+	save_item(NAME(m_pesel));
+	save_item(NAME(m_pfdir));
+	save_item(NAME(m_pfdata));
+	save_item(NAME(m_pfpuen));
+	save_item(NAME(m_pfsel));
+	save_item(NAME(m_pgdir));
+	save_item(NAME(m_pgdata));
+	save_item(NAME(m_pgpuen));
+	save_item(NAME(m_pgsel));
+	save_item(NAME(m_pjdir));
+	save_item(NAME(m_pjdata));
+	save_item(NAME(m_pjsel));
+	save_item(NAME(m_pkdir));
+	save_item(NAME(m_pkdata));
+	save_item(NAME(m_pkpuen));
+	save_item(NAME(m_pksel));
+	save_item(NAME(m_pmdir));
+	save_item(NAME(m_pmdata));
+	save_item(NAME(m_pmpuen));
+	save_item(NAME(m_pmsel));
+
+	save_item(NAME(m_pwmc));
+	save_item(NAME(m_pwmp));
+	save_item(NAME(m_pwmw));
+	save_item(NAME(m_pwmcnt));
+
+	save_item(NAME(m_tctl[0]));
+	save_item(NAME(m_tctl[1]));
+	save_item(NAME(m_tprer[0]));
+	save_item(NAME(m_tprer[1]));
+	save_item(NAME(m_tcmp[0]));
+	save_item(NAME(m_tcmp[1]));
+	save_item(NAME(m_tcr[0]));
+	save_item(NAME(m_tcr[1]));
+	save_item(NAME(m_tcn[0]));
+	save_item(NAME(m_tcn[1]));
+	save_item(NAME(m_tstat[0]));
+	save_item(NAME(m_tstat[1]));
+	save_item(NAME(m_wctlr));
+	save_item(NAME(m_wcmpr));
+	save_item(NAME(m_wcn));
+
+	save_item(NAME(m_spisr));
+
+	save_item(NAME(m_spimdata));
+	save_item(NAME(m_spimcont));
+
+	save_item(NAME(m_ustcnt));
+	save_item(NAME(m_ubaud));
+	save_item(NAME(m_urx));
+	save_item(NAME(m_utx));
+	save_item(NAME(m_umisc));
+
+	save_item(NAME(m_lssa));
+	save_item(NAME(m_lvpw));
+	save_item(NAME(m_lxmax));
+	save_item(NAME(m_lymax));
+	save_item(NAME(m_lcxp));
+	save_item(NAME(m_lcyp));
+	save_item(NAME(m_lcwch));
+	save_item(NAME(m_lblkc));
+	save_item(NAME(m_lpicf));
+	save_item(NAME(m_lpolcf));
+	save_item(NAME(m_lacdrc));
+	save_item(NAME(m_lpxcd));
+	save_item(NAME(m_lckcon));
+	save_item(NAME(m_llbar));
+	save_item(NAME(m_lotcr));
+	save_item(NAME(m_lposr));
+	save_item(NAME(m_lfrcm));
+	save_item(NAME(m_lgpmr));
+
+	save_item(NAME(m_hmsr));
+	save_item(NAME(m_alarm));
+	save_item(NAME(m_rtcctl));
+	save_item(NAME(m_rtcisr));
+	save_item(NAME(m_rtcienr));
+	save_item(NAME(m_stpwtch));
+}
+
+
+
+mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68328_base_device(mconfig, MC68328, tag, owner, clock)
+{
+}
+
+void mc68328_device::register_state_save()
+{
+	mc68328_base_device::register_state_save();
+
+	save_item(NAME(m_csa0));
+	save_item(NAME(m_csa1));
+	save_item(NAME(m_csa2));
+	save_item(NAME(m_csa3));
+	save_item(NAME(m_csb0));
+	save_item(NAME(m_csb1));
+	save_item(NAME(m_csb2));
+	save_item(NAME(m_csb3));
+	save_item(NAME(m_csc0));
+	save_item(NAME(m_csc1));
+	save_item(NAME(m_csc2));
+	save_item(NAME(m_csc3));
+	save_item(NAME(m_csd0));
+	save_item(NAME(m_csd1));
+	save_item(NAME(m_csd2));
+	save_item(NAME(m_csd3));
+}
+
+void mc68328_device::device_reset()
+{
+	m_csa0 = 0x00010006;
+	m_csa1 = 0x00010006;
+	m_csa2 = 0x00010006;
+	m_csa3 = 0x00010006;
+	m_csb0 = 0x00010006;
+	m_csb1 = 0x00010006;
+	m_csb2 = 0x00010006;
+	m_csb3 = 0x00010006;
+	m_csc0 = 0x00010006;
+	m_csc1 = 0x00010006;
+	m_csc2 = 0x00010006;
+	m_csc3 = 0x00010006;
+	m_csd0 = 0x00010006;
+	m_csd1 = 0x00010006;
+	m_csd2 = 0x00010006;
+	m_csd3 = 0x00010006;
+}
+
+void mc68328_device::regs_w(uint32_t address, uint16_t data, uint16_t mem_mask)
+{
+	switch (address)
+	{
+		case 0x110:
+			verboselog(5, "mc68328_w: CSA0(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csa0);
+			break;
+
+		case 0x112:
+			verboselog(5, "mc68328_w: CSA0(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csa0);
+			break;
+
+		case 0x114:
+			verboselog(5, "mc68328_w: CSA1(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csa1);
+			break;
+
+		case 0x116:
+			verboselog(5, "mc68328_w: CSA1(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csa1);
+			break;
+
+		case 0x118:
+			verboselog(5, "mc68328_w: CSA2(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csa2);
+			break;
+
+		case 0x11a:
+			verboselog(5, "mc68328_w: CSA2(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csa2);
+			break;
+
+		case 0x11c:
+			verboselog(5, "mc68328_w: CSA3(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csa3);
+			break;
+
+		case 0x11e:
+			verboselog(5, "mc68328_w: CSA3(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csa3);
+			break;
+
+		case 0x120:
+			verboselog(5, "mc68328_w: CSB0(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csb0);
+			break;
+
+		case 0x122:
+			verboselog(5, "mc68328_w: CSB0(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csb0);
+			break;
+
+		case 0x124:
+			verboselog(5, "mc68328_w: CSB1(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csb1);
+			break;
+
+		case 0x126:
+			verboselog(5, "mc68328_w: CSB1(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csb1);
+			break;
+
+		case 0x128:
+			verboselog(5, "mc68328_w: CSB2(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csb2);
+			break;
+
+		case 0x12a:
+			verboselog(5, "mc68328_w: CSB2(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csb2);
+			break;
+
+		case 0x12c:
+			verboselog(5, "mc68328_w: CSB3(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csb3);
+			break;
+
+		case 0x12e:
+			verboselog(5, "mc68328_w: CSB3(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csb3);
+			break;
+
+		case 0x130:
+			verboselog(5, "mc68328_w: CSC0(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csc0);
+			break;
+
+		case 0x132:
+			verboselog(5, "mc68328_w: CSC0(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csc0);
+			break;
+
+		case 0x134:
+			verboselog(5, "mc68328_w: CSC1(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csc1);
+			break;
+
+		case 0x136:
+			verboselog(5, "mc68328_w: CSC1(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csc1);
+			break;
+
+		case 0x138:
+			verboselog(5, "mc68328_w: CSC2(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csc2);
+			break;
+
+		case 0x13a:
+			verboselog(5, "mc68328_w: CSC2(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csc2);
+			break;
+
+		case 0x13c:
+			verboselog(5, "mc68328_w: CSC3(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csc3);
+			break;
+
+		case 0x13e:
+			verboselog(5, "mc68328_w: CSC3(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csc3);
+			break;
+
+		case 0x140:
+			verboselog(5, "mc68328_w: CSD0(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csd0);
+			break;
+
+		case 0x142:
+			verboselog(5, "mc68328_w: CSD0(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csd0);
+			break;
+
+		case 0x144:
+			verboselog(5, "mc68328_w: CSD1(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csd1);
+			break;
+
+		case 0x146:
+			verboselog(5, "mc68328_w: CSD1(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csd1);
+			break;
+
+		case 0x148:
+			verboselog(5, "mc68328_w: CSD2(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csd2);
+			break;
+
+		case 0x14a:
+			verboselog(5, "mc68328_w: CSD2(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csd2);
+			break;
+
+		case 0x14c:
+			verboselog(5, "mc68328_w: CSD3(0) = %04x\n", data);
+			COMBINE_REGISTER_LSW(m_csd3);
+			break;
+
+		case 0x14e:
+			verboselog(5, "mc68328_w: CSD3(16) = %04x\n", data);
+			COMBINE_REGISTER_MSW(m_csd3);
+			break;
+
+		default:
+			mc68328_base_device::regs_w(address, data, mem_mask);
+			return;
+	}
+}
+
+uint16_t mc68328_device::regs_r(uint32_t address, uint16_t mem_mask)
+{
+	switch (address)
+	{
+		case 0x110:
+			verboselog(5, "mc68328_r (%04x): CSA0(0) = %04x\n", mem_mask, m_csa0 & 0x0000ffff);
+			return m_csa0 & 0x0000ffff;
+
+		case 0x112:
+			verboselog(5, "mc68328_r (%04x): CSA0(16) = %04x\n", mem_mask, m_csa0 >> 16);
+			return m_csa0 >> 16;
+
+		case 0x114:
+			verboselog(5, "mc68328_r (%04x): CSA1(0) = %04x\n", mem_mask, m_csa1 & 0x0000ffff);
+			return m_csa1 & 0x0000ffff;
+
+		case 0x116:
+			verboselog(5, "mc68328_r (%04x): CSA1(16) = %04x\n", mem_mask, m_csa1 >> 16);
+			return m_csa1 >> 16;
+
+		case 0x118:
+			verboselog(5, "mc68328_r (%04x): CSA2(0) = %04x\n", mem_mask, m_csa2 & 0x0000ffff);
+			return m_csa2 & 0x0000ffff;
+
+		case 0x11a:
+			verboselog(5, "mc68328_r (%04x): CSA2(16) = %04x\n", mem_mask, m_csa2 >> 16);
+			return m_csa2 >> 16;
+
+		case 0x11c:
+			verboselog(5, "mc68328_r (%04x): CSA3(0) = %04x\n", mem_mask, m_csa3 & 0x0000ffff);
+			return m_csa3 & 0x0000ffff;
+
+		case 0x11e:
+			verboselog(5, "mc68328_r (%04x): CSA3(16) = %04x\n", mem_mask, m_csa3 >> 16);
+			return m_csa3 >> 16;
+
+		case 0x120:
+			verboselog(5, "mc68328_r (%04x): CSB0(0) = %04x\n", mem_mask, m_csb0 & 0x0000ffff);
+			return m_csb0 & 0x0000ffff;
+
+		case 0x122:
+			verboselog(5, "mc68328_r (%04x): CSB0(16) = %04x\n", mem_mask, m_csb0 >> 16);
+			return m_csb0 >> 16;
+
+		case 0x124:
+			verboselog(5, "mc68328_r (%04x): CSB1(0) = %04x\n", mem_mask, m_csb1 & 0x0000ffff);
+			return m_csb1 & 0x0000ffff;
+
+		case 0x126:
+			verboselog(5, "mc68328_r (%04x): CSB1(16) = %04x\n", mem_mask, m_csb1 >> 16);
+			return m_csb1 >> 16;
+
+		case 0x128:
+			verboselog(5, "mc68328_r (%04x): CSB2(0) = %04x\n", mem_mask, m_csb2 & 0x0000ffff);
+			return m_csb2 & 0x0000ffff;
+
+		case 0x12a:
+			verboselog(5, "mc68328_r (%04x): CSB2(16) = %04x\n", mem_mask, m_csb2 >> 16);
+			return m_csb2 >> 16;
+
+		case 0x12c:
+			verboselog(5, "mc68328_r (%04x): CSB3(0) = %04x\n", mem_mask, m_csb3 & 0x0000ffff);
+			return m_csb3 & 0x0000ffff;
+
+		case 0x12e:
+			verboselog(5, "mc68328_r (%04x): CSB3(16) = %04x\n", mem_mask, m_csb3 >> 16);
+			return m_csb3 >> 16;
+
+		case 0x130:
+			verboselog(5, "mc68328_r (%04x): CSC0(0) = %04x\n", mem_mask, m_csc0 & 0x0000ffff);
+			return m_csc0 & 0x0000ffff;
+
+		case 0x132:
+			verboselog(5, "mc68328_r (%04x): CSC0(16) = %04x\n", mem_mask, m_csc0 >> 16);
+			return m_csc0 >> 16;
+
+		case 0x134:
+			verboselog(5, "mc68328_r (%04x): CSC1(0) = %04x\n", mem_mask, m_csc1 & 0x0000ffff);
+			return m_csc1 & 0x0000ffff;
+
+		case 0x136:
+			verboselog(5, "mc68328_r (%04x): CSC1(16) = %04x\n", mem_mask, m_csc1 >> 16);
+			return m_csc1 >> 16;
+
+		case 0x138:
+			verboselog(5, "mc68328_r (%04x): CSC2(0) = %04x\n", mem_mask, m_csc2 & 0x0000ffff);
+			return m_csc2 & 0x0000ffff;
+
+		case 0x13a:
+			verboselog(5, "mc68328_r (%04x): CSC2(16) = %04x\n", mem_mask, m_csc2 >> 16);
+			return m_csc2 >> 16;
+
+		case 0x13c:
+			verboselog(5, "mc68328_r (%04x): CSC3(0) = %04x\n", mem_mask, m_csc3 & 0x0000ffff);
+			return m_csc3 & 0x0000ffff;
+
+		case 0x13e:
+			verboselog(5, "mc68328_r (%04x): CSC3(16) = %04x\n", mem_mask, m_csc3 >> 16);
+			return m_csc3 >> 16;
+
+		case 0x140:
+			verboselog(5, "mc68328_r (%04x): CSD0(0) = %04x\n", mem_mask, m_csd0 & 0x0000ffff);
+			return m_csd0 & 0x0000ffff;
+
+		case 0x142:
+			verboselog(5, "mc68328_r (%04x): CSD0(16) = %04x\n", mem_mask, m_csd0 >> 16);
+			return m_csd0 >> 16;
+
+		case 0x144:
+			verboselog(5, "mc68328_r (%04x): CSD1(0) = %04x\n", mem_mask, m_csd1 & 0x0000ffff);
+			return m_csd1 & 0x0000ffff;
+
+		case 0x146:
+			verboselog(5, "mc68328_r (%04x): CSD1(16) = %04x\n", mem_mask, m_csd1 >> 16);
+			return m_csd1 >> 16;
+
+		case 0x148:
+			verboselog(5, "mc68328_r (%04x): CSD2(0) = %04x\n", mem_mask, m_csd2 & 0x0000ffff);
+			return m_csd2 & 0x0000ffff;
+
+		case 0x14a:
+			verboselog(5, "mc68328_r (%04x): CSD2(16) = %04x\n", mem_mask, m_csd2 >> 16);
+			return m_csd2 >> 16;
+
+		case 0x14c:
+			verboselog(5, "mc68328_r (%04x): CSD3(0) = %04x\n", mem_mask, m_csd3 & 0x0000ffff);
+			return m_csd3 & 0x0000ffff;
+
+		case 0x14e:
+			verboselog(5, "mc68328_r (%04x): CSD3(16) = %04x\n", mem_mask, m_csd3 >> 16);
+			return m_csd3 >> 16;
+
+		default:
+			return mc68328_base_device::regs_r(address, mem_mask);
+	}
+}
+
 uint32_t mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *video_ram = (uint16_t *)(machine().device<ram_device>(RAM_TAG)->pointer() + (m_regs.lssa & 0x00ffffff));
-	uint16_t word;
-	uint16_t *line;
-	int y, x, b;
+	uint16_t *video_ram = (uint16_t *)(machine().device<ram_device>(RAM_TAG)->pointer() + (m_lssa & 0x00ffffff));
 
-	if (m_regs.lckcon & LCKCON_LCDC_EN)
+	if (m_lckcon & LCKCON_LCDC_EN)
 	{
-		for (y = 0; y < 160; y++)
+		for (int y = 0; y < 160; y++)
 		{
-			line = &bitmap.pix16(y);
+			uint16_t *line = &bitmap.pix16(y);
 
-			for (x = 0; x < 160; x += 16)
+			for (int x = 0; x < 160; x += 16)
 			{
-				word = *(video_ram++);
-				for (b = 0; b < 16; b++)
+				const uint16_t word = *(video_ram++);
+				for (int b = 0; b < 16; b++)
 				{
-					line[x + b] = (word >> (15 - b)) & 0x0001;
+					line[x + b] = BIT(word, 15 - b);
 				}
 			}
 		}
 	}
 	else
 	{
-		for (y = 0; y < 160; y++)
+		for (int y = 0; y < 160; y++)
 		{
-			line = &bitmap.pix16(y);
+			uint16_t *line = &bitmap.pix16(y);
 
-			for (x = 0; x < 160; x++)
+			for (int x = 0; x < 160; x++)
 			{
 				line[x] = 0;
 			}
@@ -3051,140 +3177,101 @@ uint32_t mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-void mc68328_device::register_state_save()
+
+mc68vz328_device::mc68vz328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68328_base_device(mconfig, MC68VZ328, tag, owner, clock)
+	, m_in_boot(true)
+	, m_boot_region(*this, finder_base::DUMMY_TAG)
+	, m_ram(*this, finder_base::DUMMY_TAG)
 {
-	save_item(NAME(m_regs.scr));
-	save_item(NAME(m_regs.grpbasea));
-	save_item(NAME(m_regs.grpbaseb));
-	save_item(NAME(m_regs.grpbasec));
-	save_item(NAME(m_regs.grpbased));
-	save_item(NAME(m_regs.grpmaska));
-	save_item(NAME(m_regs.grpmaskb));
-	save_item(NAME(m_regs.grpmaskc));
-	save_item(NAME(m_regs.grpmaskd));
-	save_item(NAME(m_regs.csa0));
-	save_item(NAME(m_regs.csa1));
-	save_item(NAME(m_regs.csa2));
-	save_item(NAME(m_regs.csa3));
-	save_item(NAME(m_regs.csb0));
-	save_item(NAME(m_regs.csb1));
-	save_item(NAME(m_regs.csb2));
-	save_item(NAME(m_regs.csb3));
-	save_item(NAME(m_regs.csc0));
-	save_item(NAME(m_regs.csc1));
-	save_item(NAME(m_regs.csc2));
-	save_item(NAME(m_regs.csc3));
-	save_item(NAME(m_regs.csd0));
-	save_item(NAME(m_regs.csd1));
-	save_item(NAME(m_regs.csd2));
-	save_item(NAME(m_regs.csd3));
+}
 
-	save_item(NAME(m_regs.pllcr));
-	save_item(NAME(m_regs.pllfsr));
-	save_item(NAME(m_regs.pctlr));
+void mc68vz328_device::device_reset()
+{
+	m_in_boot = true;
+}
 
-	save_item(NAME(m_regs.ivr));
-	save_item(NAME(m_regs.icr));
-	save_item(NAME(m_regs.imr));
-	save_item(NAME(m_regs.iwr));
-	save_item(NAME(m_regs.isr));
-	save_item(NAME(m_regs.ipr));
+void mc68vz328_device::register_state_save()
+{
+	mc68328_base_device::register_state_save();
+}
 
-	save_item(NAME(m_regs.padir));
-	save_item(NAME(m_regs.padata));
-	save_item(NAME(m_regs.pasel));
-	save_item(NAME(m_regs.pbdir));
-	save_item(NAME(m_regs.pbdata));
-	save_item(NAME(m_regs.pbsel));
-	save_item(NAME(m_regs.pcdir));
-	save_item(NAME(m_regs.pcdata));
-	save_item(NAME(m_regs.pcsel));
-	save_item(NAME(m_regs.pddir));
-	save_item(NAME(m_regs.pddata));
-	save_item(NAME(m_regs.pdpuen));
-	save_item(NAME(m_regs.pdpol));
-	save_item(NAME(m_regs.pdirqen));
-	save_item(NAME(m_regs.pddataedge));
-	save_item(NAME(m_regs.pdirqedge));
-	save_item(NAME(m_regs.pedir));
-	save_item(NAME(m_regs.pedata));
-	save_item(NAME(m_regs.pepuen));
-	save_item(NAME(m_regs.pesel));
-	save_item(NAME(m_regs.pfdir));
-	save_item(NAME(m_regs.pfdata));
-	save_item(NAME(m_regs.pfpuen));
-	save_item(NAME(m_regs.pfsel));
-	save_item(NAME(m_regs.pgdir));
-	save_item(NAME(m_regs.pgdata));
-	save_item(NAME(m_regs.pgpuen));
-	save_item(NAME(m_regs.pgsel));
-	save_item(NAME(m_regs.pjdir));
-	save_item(NAME(m_regs.pjdata));
-	save_item(NAME(m_regs.pjsel));
-	save_item(NAME(m_regs.pkdir));
-	save_item(NAME(m_regs.pkdata));
-	save_item(NAME(m_regs.pkpuen));
-	save_item(NAME(m_regs.pksel));
-	save_item(NAME(m_regs.pmdir));
-	save_item(NAME(m_regs.pmdata));
-	save_item(NAME(m_regs.pmpuen));
-	save_item(NAME(m_regs.pmsel));
+WRITE16_MEMBER(mc68vz328_device::mem_w)
+{
+	const uint32_t address = offset << 1;
 
-	save_item(NAME(m_regs.pwmc));
-	save_item(NAME(m_regs.pwmp));
-	save_item(NAME(m_regs.pwmw));
-	save_item(NAME(m_regs.pwmcnt));
+	if (address >= 0xfffff000)
+	{
+		regs_w(address & 0xfff, data, mem_mask);
+	}
+	else if (address >= 0x10000000 || m_in_boot)
+	{
+		//verboselog(0, "mem_w: %08x = %04x (%04x)\n", address, data, mem_mask);
+	}
+}
 
-	save_item(NAME(m_regs.tctl[0]));
-	save_item(NAME(m_regs.tctl[1]));
-	save_item(NAME(m_regs.tprer[0]));
-	save_item(NAME(m_regs.tprer[1]));
-	save_item(NAME(m_regs.tcmp[0]));
-	save_item(NAME(m_regs.tcmp[1]));
-	save_item(NAME(m_regs.tcr[0]));
-	save_item(NAME(m_regs.tcr[1]));
-	save_item(NAME(m_regs.tcn[0]));
-	save_item(NAME(m_regs.tcn[1]));
-	save_item(NAME(m_regs.tstat[0]));
-	save_item(NAME(m_regs.tstat[1]));
-	save_item(NAME(m_regs.wctlr));
-	save_item(NAME(m_regs.wcmpr));
-	save_item(NAME(m_regs.wcn));
+READ16_MEMBER(mc68vz328_device::mem_r)
+{
+	const uint32_t address = offset << 1;
 
-	save_item(NAME(m_regs.spisr));
+	if (address >= 0xfffff000)
+	{
+		return regs_r(address & 0xfff, mem_mask);
+	}
+	else if (address >= 0x10000000 || m_in_boot)
+	{
+		const uint32_t region_address = address % m_boot_region->bytes();
+		const uint16_t foo = m_boot_region->as_u16(region_address >> 1);
+		//verboselog(0, "mem_r: %08x = %04x (%04x)\n", address, foo, mem_mask);
+		return foo;
+	}
 
-	save_item(NAME(m_regs.spimdata));
-	save_item(NAME(m_regs.spimcont));
+	return 0;
+}
 
-	save_item(NAME(m_regs.ustcnt));
-	save_item(NAME(m_regs.ubaud));
-	save_item(NAME(m_regs.urx));
-	save_item(NAME(m_regs.utx));
-	save_item(NAME(m_regs.umisc));
+void mc68vz328_device::regs_w(uint32_t address, uint16_t data, uint16_t mem_mask)
+{
+	switch (address)
+	{
+		case 0x10a:
+		{
+			m_in_boot = false;
 
-	save_item(NAME(m_regs.lssa));
-	save_item(NAME(m_regs.lvpw));
-	save_item(NAME(m_regs.lxmax));
-	save_item(NAME(m_regs.lymax));
-	save_item(NAME(m_regs.lcxp));
-	save_item(NAME(m_regs.lcyp));
-	save_item(NAME(m_regs.lcwch));
-	save_item(NAME(m_regs.lblkc));
-	save_item(NAME(m_regs.lpicf));
-	save_item(NAME(m_regs.lpolcf));
-	save_item(NAME(m_regs.lacdrc));
-	save_item(NAME(m_regs.lpxcd));
-	save_item(NAME(m_regs.lckcon));
-	save_item(NAME(m_regs.llbar));
-	save_item(NAME(m_regs.lotcr));
-	save_item(NAME(m_regs.lposr));
-	save_item(NAME(m_regs.lfrcm));
-	save_item(NAME(m_regs.lgpmr));
+			// Technically we should exit boot-mode when the CPU has enabled the requisite chip-select, but this register is written to at around the right time, so whatever
+			address_space &space = m_cpu->space(AS_PROGRAM);
+			space.install_read_bank(0x00000000, m_ram->size() - 1, "bank1");
+			space.install_write_bank(0x00000000, m_ram->size() - 1, "bank1");
+			membank("^bank1")->set_base(m_ram->pointer());
 
-	save_item(NAME(m_regs.hmsr));
-	save_item(NAME(m_regs.alarm));
-	save_item(NAME(m_regs.rtcctl));
-	save_item(NAME(m_regs.rtcisr));
-	save_item(NAME(m_regs.rtcienr));
-	save_item(NAME(m_regs.stpwtch));
+			mc68328_base_device::regs_w(address, data, mem_mask);
+			break;
+		}
+
+		default:
+			mc68328_base_device::regs_w(address, data, mem_mask);
+			return;
+	}
+}
+
+uint16_t mc68vz328_device::regs_r(uint32_t address, uint16_t mem_mask)
+{
+	switch (address)
+	{
+		default:
+			return mc68328_base_device::regs_r(address, mem_mask);
+	}
+}
+
+uint32_t mc68vz328_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = 0; y < 160; y++)
+	{
+		uint16_t *line = &bitmap.pix16(y);
+
+		for (int x = 0; x < 160; x++)
+		{
+			line[x] = 0;
+		}
+	}
+	return 0;
 }

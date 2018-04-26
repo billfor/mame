@@ -2,13 +2,7 @@
 // copyright-holders:Ryan Holtz
 /**********************************************************************
 
- Motorola 68328 ("DragonBall") System-on-a-Chip implementation
-
- By Ryan Holtz
-
- **********************************************************************/
-
-/*****************************************************************************************************************
+ Motorola 68(VZ)328 ("DragonBall") System-on-a-Chip implementation
 
                                                              P P P P P P P   P P P P P P P
                                                              E E E E E E E   J J J J J J J
@@ -86,17 +80,171 @@
 
                       Source: MC68328 (DragonBall)(tm) Integrated Processor User's Manual
 
- *****************************************************************************************************************/
+
+
+
+                                                                       PG0  P
+                                                                        /   M P       P V P
+                    M M M   M M M                           ! !        BUSW 5 M P P P M S J
+                    A A A   A A A M                         L U         /   / 4 M M M 0 S 6
+                    1 1 1   1 1 1 A M M M M M     M M M M P W W       / !   ! / 3 2 1 / / /
+                    5 4 3   2 1 0 9 A A A A A     A A A A G E E       R D   D S / / / S ! !
+                    / / /   / / / / 8 7 6 5 4     3 2 1 0 1 / /   L   E T   M D D D S D C C
+                  V A A A V A A A A / / / / / V V / / / / / ! ! ! V V S A   O A Q Q D C S S
+                  S 1 1 1 D 1 1 1 1 A A A A A S S A A A A A L U O D D E C N D 1 M M C L D D
+                  S 6 5 4 D 3 2 1 0 9 8 7 6 5 S S 4 3 2 1 0 B B E D D T K C E 0 L H E K 1 2
+                  | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+              +-------------------------------------------------------------------------------+
+              |     _                                                                         |
+              |    (_)                                                                        |
+              |                                                                               |
+              |                                                                               |
+              |                                                                               |
+         VSS--|                                                                               |--VDD
+         A17--|                                                                               |--D0/PA0
+         A18--|                                                                               |--D1/PA1
+         A19--|                                                                               |--D2/PA2
+     PF3/A20--|                                                                               |--D3/PA3
+     PF4/A21--|                                                                               |--D4/PA4
+     PF5/A22--|                                                                               |--D5/PA5
+     PF6/A23--|                                                                               |--D6/PA6
+        LVDD--|                                                                               |--D7/PA7
+         VDD--|                                                                               |--VSS
+    PJ4/RXD2--|                                                                               |--VSS
+    PJ5/TXD2--|                                                                               |--D8
+   PJ6/!RTS2--|                                                                               |--D9
+   PJ7/!CTS2--|                                                                               |--D10
+         VSS--|                                                                               |--D11
+         VSS--|                                                                               |--D12
+  PE0/SPITXD--|                                                                               |--D13
+  PE1/SPIRXD--|                                   MC68VZ328                                   |--D14
+ PE2/SPICLK2--|                                   TOP  VIEW                                   |--D15
+PE3/!DWE/UCLK-|                                                                               |--LVDD
+    PE4/RXD1--|                                                                               |--VDD
+    PE5/TXD1--|                                                                               |--PK7/LD7
+   PE6/!RTS1--|                                                                               |--PK6/LD6
+   PE7/!CTS1--|                                                                               |--PK5/LD5
+          NC--|                                                                               |--PK4/LD4
+         VDD--|                                                                               |--PK3/!UDS
+ PG2/!EMUIRQ--|                                                                               |--PK2/!LDS
+PG3/!HIZ/P/!D-|                                                                               |--!CSA0
+  PG4/!EMUCS--|                                                                               |--PF7/!CSA1
+ PG5/!EMUBRK--|                                                                               |--VSS
+         VSS--|                                                                               |--PB0/!CSB0
+         VSS--|                                                                               |--PB1/!CSB1/!SDWE
+       EXTAL--|                                                                               |--PB2/!CSC0/!RAS0
+        XTAL--|                                                                               |--PB3/!CSC1/!RAS1
+        LVDD--|                                                                               |--PB4/!CSD0/!CAS0
+         VSS--|                                                                               |--VSS
+              |                                                                               |
+              |                                                                               |
+              |                                                                               |
+              |                                                                               |
+              |                                                                               |
+              +-------------------------------------------------------------------------------+
+                   | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+                   V N P P P P P P P P P V V P P P P P P P P L V P P P P P P P P V P P P V
+                   D C J J J J F F D D D S S D D D D D F C C V D C C C C C C B B S K K B D
+                   D   3 2 1 0 2 1 7 6 5 S S 4 3 2 1 0 0 7 6 D D 5 4 3 2 1 0 7 6 S 0 1 5 D
+                       / / / / / / / / /     / / / / / / / / D   / / / / / / / /   / / /
+                       ! S M M C ! ! ! !     ! ! ! ! ! C L L     L L L L L L P T   ! R !
+                       S P I O L I I I I     I I I I I O A C     L F D D D D W O   D ! C
+                       S I S S K R R R R     R N N N N N C L     P R 3 2 1 0 M U   R W S
+                         C O I O Q Q Q Q     Q T T T T T D K       M         O T   D   D
+                         L       5 6 3 2     1 3 2 1 0 R                     1 /   Y   1
+                         K                             A                       T   /   /
+                         1                             S                       I PWMO2 !CAS1
+                                                       T                       N
+A
+                            Figure 20-1. MC68VZ328 TQFP Pin Assignments - Top View
+
+                             Source: MC68VZ328 Integrated Processor User's Manual
+
+******************************************************************************************************************/
 
 #ifndef MAME_MACHINE_MC68328_H
 #define MAME_MACHINE_MC68328_H
 
+#include "machine/ram.h"
 
-class mc68328_device : public device_t
+#define MCFG_MC68328_CPU(_tag) \
+	downcast<mc68328_base_device &>(*device).set_cpu_tag("^" _tag);
+
+#define MCFG_MC68328_OUT_PORT_A_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_out_port_a_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_OUT_PORT_B_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_out_port_b_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_OUT_PORT_C_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_out_port_c_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_OUT_PORT_D_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_out_port_d_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_OUT_PORT_E_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_out_port_e_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_OUT_PORT_F_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_out_port_f_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_OUT_PORT_G_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_out_port_g_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_OUT_PORT_J_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_out_port_j_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_OUT_PORT_K_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_out_port_k_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_OUT_PORT_M_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_out_port_m_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_IN_PORT_A_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_in_port_a_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_IN_PORT_B_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_in_port_b_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_IN_PORT_C_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_in_port_c_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_IN_PORT_D_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_in_port_d_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_IN_PORT_E_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_in_port_e_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_IN_PORT_F_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_in_port_f_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_IN_PORT_G_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_in_port_g_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_IN_PORT_J_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_in_port_j_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_IN_PORT_K_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_in_port_k_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_IN_PORT_M_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_in_port_m_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_OUT_PWM_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_out_pwm_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_OUT_SPIM_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_out_spim_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_IN_SPIM_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_in_spim_callback(DEVCB_##_devcb);
+
+#define MCFG_MC68328_SPIM_XCH_TRIGGER_CB(_devcb) \
+	devcb = &downcast<mc68328_base_device &>(*device).set_spim_xch_trigger_callback(DEVCB_##_devcb);
+
+class mc68328_base_device : public device_t
 {
 public:
-	mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
 	template <class Object> devcb_base &set_out_port_a_callback(Object &&cb) { return m_out_port_a_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_port_b_callback(Object &&cb) { return m_out_port_b_cb.set_callback(std::forward<Object>(cb)); }
@@ -123,228 +271,174 @@ public:
 	template <class Object> devcb_base &set_in_spim_callback(Object &&cb) { return m_in_spim_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_spim_xch_trigger_callback(Object &&cb) { return m_spim_xch_trigger_cb.set_callback(std::forward<Object>(cb)); }
 
-
 	DECLARE_WRITE16_MEMBER(write);
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE_LINE_MEMBER(set_penirq_line);
 	void set_port_d_lines(uint8_t state, int bit);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 protected:
+	mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
+
+	virtual void regs_w(uint32_t address, uint16_t data, uint16_t mem_mask);
+	virtual uint16_t regs_r(uint32_t address, uint16_t mem_mask);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
-	struct mc68328_regs_t
-	{
-		// $(FF)FFF000
-		uint8_t   scr;        // System Control Register
-		uint8_t   unused0[255];
+	uint8_t   m_scr;        // System Control Register
 
-		// $(FF)FFF100
-		uint16_t  grpbasea;   // Chip Select Group A Base Register
-		uint16_t  grpbaseb;   // Chip Select Group B Base Register
-		uint16_t  grpbasec;   // Chip Select Group C Base Register
-		uint16_t  grpbased;   // Chip Select Group D Base Register
-		uint16_t  grpmaska;   // Chip Select Group A Mask Register
-		uint16_t  grpmaskb;   // Chip Select Group B Mask Register
-		uint16_t  grpmaskc;   // Chip Select Group C Mask Register
-		uint16_t  grpmaskd;   // Chip Select Group D Mask Register
-		uint32_t  csa0;       // Group A Chip Select 0 Register
-		uint32_t  csa1;       // Group A Chip Select 1 Register
-		uint32_t  csa2;       // Group A Chip Select 2 Register
-		uint32_t  csa3;       // Group A Chip Select 3 Register
-		uint32_t  csb0;       // Group B Chip Select 0 Register
-		uint32_t  csb1;       // Group B Chip Select 1 Register
-		uint32_t  csb2;       // Group B Chip Select 2 Register
-		uint32_t  csb3;       // Group B Chip Select 3 Register
-		uint32_t  csc0;       // Group C Chip Select 0 Register
-		uint32_t  csc1;       // Group C Chip Select 1 Register
-		uint32_t  csc2;       // Group C Chip Select 2 Register
-		uint32_t  csc3;       // Group C Chip Select 3 Register
-		uint32_t  csd0;       // Group D Chip Select 0 Register
-		uint32_t  csd1;       // Group D Chip Select 1 Register
-		uint32_t  csd2;       // Group D Chip Select 2 Register
-		uint32_t  csd3;       // Group D Chip Select 3 Register
-		uint8_t   unused1[176];
+	uint16_t  m_grpbasea;   // Chip Select Group A Base Register
+	uint16_t  m_grpbaseb;   // Chip Select Group B Base Register
+	uint16_t  m_grpbasec;   // Chip Select Group C Base Register
+	uint16_t  m_grpbased;   // Chip Select Group D Base Register
+	uint16_t  m_grpmaska;   // Chip Select Group A Mask Register
+	uint16_t  m_grpmaskb;   // Chip Select Group B Mask Register
+	uint16_t  m_grpmaskc;   // Chip Select Group C Mask Register
+	uint16_t  m_grpmaskd;   // Chip Select Group D Mask Register
+	uint32_t  m_csa0;       // Group A Chip Select 0 Register
+	uint32_t  m_csa1;       // Group A Chip Select 1 Register
+	uint32_t  m_csa2;       // Group A Chip Select 2 Register
+	uint32_t  m_csa3;       // Group A Chip Select 3 Register
+	uint32_t  m_csb0;       // Group B Chip Select 0 Register
+	uint32_t  m_csb1;       // Group B Chip Select 1 Register
+	uint32_t  m_csb2;       // Group B Chip Select 2 Register
+	uint32_t  m_csb3;       // Group B Chip Select 3 Register
+	uint32_t  m_csc0;       // Group C Chip Select 0 Register
+	uint32_t  m_csc1;       // Group C Chip Select 1 Register
+	uint32_t  m_csc2;       // Group C Chip Select 2 Register
+	uint32_t  m_csc3;       // Group C Chip Select 3 Register
+	uint32_t  m_csd0;       // Group D Chip Select 0 Register
+	uint32_t  m_csd1;       // Group D Chip Select 1 Register
+	uint32_t  m_csd2;       // Group D Chip Select 2 Register
+	uint32_t  m_csd3;       // Group D Chip Select 3 Register
 
-		// $(FF)FFF200
-		uint16_t  pllcr;      // PLL Control Register
-		uint16_t  pllfsr;     // PLL Frequency Select Register
-		uint8_t   pad2[3];
-		uint8_t   pctlr;      // Power Control Register
-		uint8_t   unused3[248];
+	uint16_t  m_pllcr;      // PLL Control Register
+	uint16_t  m_pllfsr;     // PLL Frequency Select Register
+	uint8_t   m_pctlr;      // Power Control Register
 
-		// $(FF)FFF300
-		uint8_t   ivr;        // Interrupt Vector Register
-		uint8_t   unused4[1];
-		uint16_t  icr;        // Interrupt Control Register
-		uint32_t  imr;        // Interrupt Mask Register
-		uint32_t  iwr;        // Interrupt Wakeup Enable Register
-		uint32_t  isr;        // Interrupt Status Register
-		uint32_t  ipr;        // Interrupt Pending Register
-		uint8_t   unused5[236];
+	uint8_t   m_ivr;        // Interrupt Vector Register
+	uint16_t  m_icr;        // Interrupt Control Register
+	uint32_t  m_imr;        // Interrupt Mask Register
+	uint32_t  m_iwr;        // Interrupt Wakeup Enable Register
+	uint32_t  m_isr;        // Interrupt Status Register
+	uint32_t  m_ipr;        // Interrupt Pending Register
 
-		// $(FF)FFF400
-		uint8_t   padir;      // Port A Direction Register
-		uint8_t   padata;     // Port A Data Register
-		uint8_t   unused6[1];
-		uint8_t   pasel;      // Port A Select Register
-		uint8_t   unused7[4];
+	uint8_t   m_padir;      // Port A Direction Register
+	uint8_t   m_padata;     // Port A Data Register
+	uint8_t   m_pasel;      // Port A Select Register
 
-		uint8_t   pbdir;      // Port B Direction Register
-		uint8_t   pbdata;     // Port B Data Register
-		uint8_t   unused8[1];
-		uint8_t   pbsel;      // Port B Select Register
-		uint8_t   unused9[4];
+	uint8_t   m_pbdir;      // Port B Direction Register
+	uint8_t   m_pbdata;     // Port B Data Register
+	uint8_t   m_pbsel;      // Port B Select Register
 
-		uint8_t   pcdir;      // Port C Direction Register
-		uint8_t   pcdata;     // Port C Data Register
-		uint8_t   unused10[1];
-		uint8_t   pcsel;      // Port C Select Register
-		uint8_t   unused11[4];
+	uint8_t   m_pcdir;      // Port C Direction Register
+	uint8_t   m_pcdata;     // Port C Data Register
+	uint8_t   m_pcsel;      // Port C Select Register
 
-		uint8_t   pddir;      // Port D Direction Register
-		uint8_t   pddata;     // Port D Data Register
-		uint8_t   pdpuen;     // Port D Pullup Enable Register
-		uint8_t   unused12[1];
-		uint8_t   pdpol;      // Port D Polarity Register
-		uint8_t   pdirqen;    // Port D IRQ Enable Register
-		uint8_t   pddataedge; // Port D Data Edge Level
-		uint8_t   pdirqedge;  // Port D IRQ Edge Register
+	uint8_t   m_pddir;      // Port D Direction Register
+	uint8_t   m_pddata;     // Port D Data Register
+	uint8_t   m_pdpuen;     // Port D Pullup Enable Register
+	uint8_t   m_pdpol;      // Port D Polarity Register
+	uint8_t   m_pdirqen;    // Port D IRQ Enable Register
+	uint8_t   m_pddataedge; // Port D Data Edge Level
+	uint8_t   m_pdirqedge;  // Port D IRQ Edge Register
 
-		uint8_t   pedir;      // Port E Direction Register
-		uint8_t   pedata;     // Port E Data Register
-		uint8_t   pepuen;     // Port E Pullup Enable Register
-		uint8_t   pesel;      // Port E Select Register
-		uint8_t   unused14[4];
+	uint8_t   m_pedir;      // Port E Direction Register
+	uint8_t   m_pedata;     // Port E Data Register
+	uint8_t   m_pepuen;     // Port E Pullup Enable Register
+	uint8_t   m_pesel;      // Port E Select Register
 
-		uint8_t   pfdir;      // Port F Direction Register
-		uint8_t   pfdata;     // Port F Data Register
-		uint8_t   pfpuen;     // Port F Pullup Enable Register
-		uint8_t   pfsel;      // Port F Select Register
-		uint8_t   unused15[4];
+	uint8_t   m_pfdir;      // Port F Direction Register
+	uint8_t   m_pfdata;     // Port F Data Register
+	uint8_t   m_pfpuen;     // Port F Pullup Enable Register
+	uint8_t   m_pfsel;      // Port F Select Register
 
-		uint8_t   pgdir;      // Port G Direction Register
-		uint8_t   pgdata;     // Port G Data Register
-		uint8_t   pgpuen;     // Port G Pullup Enable Register
-		uint8_t   pgsel;      // Port G Select Register
-		uint8_t   unused16[4];
+	uint8_t   m_pgdir;      // Port G Direction Register
+	uint8_t   m_pgdata;     // Port G Data Register
+	uint8_t   m_pgpuen;     // Port G Pullup Enable Register
+	uint8_t   m_pgsel;      // Port G Select Register
 
-		uint8_t   pjdir;      // Port J Direction Register
-		uint8_t   pjdata;     // Port J Data Register
-		uint8_t   unused17[1];
-		uint8_t   pjsel;      // Port J Select Register
-		uint8_t   unused18[4];
-		uint8_t   pkdir;      // Port K Direction Register
-		uint8_t   pkdata;     // Port K Data Register
-		uint8_t   pkpuen;     // Port K Pullup Enable Register
-		uint8_t   pksel;      // Port K Select Register
-		uint8_t   unused19[4];
+	uint8_t   m_pjdir;      // Port J Direction Register
+	uint8_t   m_pjdata;     // Port J Data Register
+	uint8_t   m_pjsel;      // Port J Select Register
+	uint8_t   m_pkdir;      // Port K Direction Register
+	uint8_t   m_pkdata;     // Port K Data Register
+	uint8_t   m_pkpuen;     // Port K Pullup Enable Register
+	uint8_t   m_pksel;      // Port K Select Register
 
-		uint8_t   pmdir;      // Port M Direction Register
-		uint8_t   pmdata;     // Port M Data Register
-		uint8_t   pmpuen;     // Port M Pullup Enable Register
-		uint8_t   pmsel;      // Port M Select Register
-		uint8_t   unused20[180];
+	uint8_t   m_pmdir;      // Port M Direction Register
+	uint8_t   m_pmdata;     // Port M Data Register
+	uint8_t   m_pmpuen;     // Port M Pullup Enable Register
+	uint8_t   m_pmsel;      // Port M Select Register
 
-		// $(FF)FFF500
-		uint16_t  pwmc;       // PWM Control Register
-		uint16_t  pwmp;       // PWM Period Register
-		uint16_t  pwmw;       // PWM Width Register
-		uint16_t  pwmcnt;     // PWN Counter
-		uint8_t   unused21[248];
+	uint16_t  m_pwmc;       // PWM Control Register
+	uint16_t  m_pwmp;       // PWM Period Register
+	uint16_t  m_pwmw;       // PWM Width Register
+	uint16_t  m_pwmcnt;     // PWN Counter
 
-		// $(FF)FFF600
-		uint16_t  tctl[2];    // Timer Control Register
-		uint16_t  tprer[2];   // Timer Prescaler Register
-		uint16_t  tcmp[2];    // Timer Compare Register
-		uint16_t  tcr[2];     // Timer Capture Register
-		uint16_t  tcn[2];     // Timer Counter
-		uint16_t  tstat[2];   // Timer Status
-		uint16_t  wctlr;      // Watchdog Control Register
-		uint16_t  wcmpr;      // Watchdog Compare Register
-		uint16_t  wcn;        // Watchdog Counter
-		uint8_t   tclear[2];  // Timer Clearable Status
-		uint8_t   unused22[224];
+	uint16_t  m_tctl[2];    // Timer Control Register
+	uint16_t  m_tprer[2];   // Timer Prescaler Register
+	uint16_t  m_tcmp[2];    // Timer Compare Register
+	uint16_t  m_tcr[2];     // Timer Capture Register
+	uint16_t  m_tcn[2];     // Timer Counter
+	uint16_t  m_tstat[2];   // Timer Status
+	uint16_t  m_wctlr;      // Watchdog Control Register
+	uint16_t  m_wcmpr;      // Watchdog Compare Register
+	uint16_t  m_wcn;        // Watchdog Counter
+	uint8_t   m_tclear[2];  // Timer Clearable Status
 
-		// $(FF)FFF700
-		uint16_t  spisr;      // SPIS Register
-		uint8_t   unused23[254];
+	uint16_t  m_spisr;      // SPIS Register
 
-		// $(FF)FFF800
-		uint16_t  spimdata;   // SPIM Data Register
-		uint16_t  spimcont;   // SPIM Control/Status Register
-		uint8_t   unused24[252];
+	uint16_t  m_spimdata;   // SPIM Data Register
+	uint16_t  m_spimcont;   // SPIM Control/Status Register
 
-		// $(FF)FFF900
-		uint16_t  ustcnt;     // UART Status/Control Register
-		uint16_t  ubaud;      // UART Baud Control Register
-		uint16_t  urx;        // UART RX Register
-		uint16_t  utx;        // UART TX Register
-		uint16_t  umisc;      // UART Misc Register
-		uint8_t   unused25[246];
+	uint16_t  m_ustcnt;     // UART Status/Control Register
+	uint16_t  m_ubaud;      // UART Baud Control Register
+	uint16_t  m_urx;        // UART RX Register
+	uint16_t  m_utx;        // UART TX Register
+	uint16_t  m_umisc;      // UART Misc Register
 
-		// $(FF)FFFA00
-		uint32_t  lssa;       // Screen Starting Address Register
-		uint8_t   unused26[1];
-		uint8_t   lvpw;       // Virtual Page Width Register
-		uint8_t   unused27[2];
-		uint16_t  lxmax;      // Screen Width Register
-		uint16_t  lymax;      // Screen Height Register
-		uint8_t   unused28[12];
-		uint16_t  lcxp;       // Cursor X Position
-		uint16_t  lcyp;       // Cursor Y Position
-		uint16_t  lcwch;      // Cursor Width & Height Register
-		uint8_t   unused29[1];
-		uint8_t   lblkc;      // Blink Control Register
-		uint8_t   lpicf;      // Panel Interface Config Register
-		uint8_t   lpolcf;     // Polarity Config Register
-		uint8_t   unused30[1];
-		uint8_t   lacdrc;     // ACD (M) Rate Control Register
-		uint8_t   unused31[1];
-		uint8_t   lpxcd;      // Pixel Clock Divider Register
-		uint8_t   unused32[1];
-		uint8_t   lckcon;     // Clocking Control Register
-		uint8_t   unused33[1];
-		uint8_t   llbar;      // Last Buffer Address Register
-		uint8_t   unused34[1];
-		uint8_t   lotcr;      // Octet Terminal Count Register
-		uint8_t   unused35[1];
-		uint8_t   lposr;      // Panning Offset Register
-		uint8_t   unused36[3];
-		uint8_t   lfrcm;      // Frame Rate Control Modulation Register
-		uint16_t  lgpmr;      // Gray Palette Mapping Register
-		uint8_t   unused37[204];
+	uint32_t  m_lssa;       // Screen Starting Address Register
+	uint8_t   m_lvpw;       // Virtual Page Width Register
+	uint16_t  m_lxmax;      // Screen Width Register
+	uint16_t  m_lymax;      // Screen Height Register
+	uint16_t  m_lcxp;       // Cursor X Position
+	uint16_t  m_lcyp;       // Cursor Y Position
+	uint16_t  m_lcwch;      // Cursor Width & Height Register
+	uint8_t   m_lblkc;      // Blink Control Register
+	uint8_t   m_lpicf;      // Panel Interface Config Register
+	uint8_t   m_lpolcf;     // Polarity Config Register
+	uint8_t   m_lacdrc;     // ACD (M) Rate Control Register
+	uint8_t   m_lpxcd;      // Pixel Clock Divider Register
+	uint8_t   m_lckcon;     // Clocking Control Register
+	uint8_t   m_llbar;      // Last Buffer Address Register
+	uint8_t   m_lotcr;      // Octet Terminal Count Register
+	uint8_t   m_lposr;      // Panning Offset Register
+	uint8_t   m_lfrcm;      // Frame Rate Control Modulation Register
+	uint16_t  m_lgpmr;      // Gray Palette Mapping Register
 
-		// $(FF)FFFB00
-		uint32_t  hmsr;       // RTC Hours Minutes Seconds Register
-		uint32_t  alarm;      // RTC Alarm Register
-		uint8_t   unused38[4];
-		uint16_t  rtcctl;     // RTC Control Register
-		uint16_t  rtcisr;     // RTC Interrupt Status Register
-		uint16_t  rtcienr;    // RTC Interrupt Enable Register
-		uint16_t  stpwtch;    // Stopwatch Minutes
-		uint8_t   unused42[1260];
-	};
+	uint32_t  m_hmsr;       // RTC Hours Minutes Seconds Register
+	uint32_t  m_alarm;      // RTC Alarm Register
+	uint16_t  m_rtcctl;     // RTC Control Register
+	uint16_t  m_rtcisr;     // RTC Interrupt Status Register
+	uint16_t  m_rtcienr;    // RTC Interrupt Enable Register
+	uint16_t  m_stpwtch;    // Stopwatch Minutes
 
-	// internal state
 	void set_interrupt_line(uint32_t line, uint32_t active);
 	void poll_port_d_interrupts();
 	uint32_t get_timer_frequency(uint32_t index);
 	void maybe_start_timer(uint32_t index, uint32_t new_enable);
 	void timer_compare_event(uint32_t index);
 
-	void register_state_save();
+	virtual void register_state_save();
 
 	TIMER_CALLBACK_MEMBER(timer1_hit);
 	TIMER_CALLBACK_MEMBER(timer2_hit);
 	TIMER_CALLBACK_MEMBER(pwm_transition);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
-
-	mc68328_regs_t m_regs;
 
 	emu_timer *m_gptimer[2];
 	emu_timer *m_rtc;
@@ -382,83 +476,59 @@ private:
 	required_device<cpu_device> m_cpu;
 };
 
+class mc68328_device : public mc68328_base_device
+{
+public:
+	mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	// device-level overrides
+	virtual void device_reset() override;
+
+	void register_state_save() override;
+
+	void regs_w(uint32_t address, uint16_t data, uint16_t mem_mask) override;
+	uint16_t regs_r(uint32_t address, uint16_t mem_mask) override;
+};
+
+#define MCFG_MC68VZ328_BOOT_REGION(_tag) \
+	downcast<mc68vz328_device &>(*device).set_boot_region_tag("^" _tag);
+
+#define MCFG_MC68VZ328_RAM_TAG(_tag) \
+	downcast<mc68vz328_device &>(*device).set_ram_tag("^" _tag);
+
+class mc68vz328_device : public mc68328_base_device
+{
+public:
+	mc68vz328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_boot_region_tag(const char *tag) { m_boot_region.set_tag(tag); }
+	void set_ram_tag(const char *tag) { m_ram.set_tag(tag); }
+
+	DECLARE_WRITE16_MEMBER(mem_w);
+	DECLARE_READ16_MEMBER(mem_r);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	// device-level overrides
+	virtual void device_reset() override;
+
+	void register_state_save() override;
+
+	void regs_w(uint32_t address, uint16_t data, uint16_t mem_mask) override;
+	uint16_t regs_r(uint32_t address, uint16_t mem_mask) override;
+
+	bool m_in_boot;
+
+	required_memory_region m_boot_region;
+	required_device<ram_device> m_ram;
+	uint16_t m_fuck[0x1000000/2];
+};
 
 DECLARE_DEVICE_TYPE(MC68328, mc68328_device)
-
-#define MCFG_MC68328_CPU(_tag) \
-	downcast<mc68328_device &>(*device).set_cpu_tag("^" _tag);
-
-#define MCFG_MC68328_OUT_PORT_A_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_a_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_B_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_b_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_C_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_c_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_D_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_d_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_E_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_e_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_F_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_f_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_G_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_g_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_J_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_j_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_K_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_k_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PORT_M_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_port_m_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_A_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_a_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_B_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_b_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_C_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_c_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_D_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_d_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_E_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_e_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_F_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_f_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_G_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_g_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_J_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_j_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_K_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_k_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_PORT_M_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_port_m_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_PWM_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_pwm_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_OUT_SPIM_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_out_spim_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_IN_SPIM_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_in_spim_callback(DEVCB_##_devcb);
-
-#define MCFG_MC68328_SPIM_XCH_TRIGGER_CB(_devcb) \
-	devcb = &downcast<mc68328_device &>(*device).set_spim_xch_trigger_callback(DEVCB_##_devcb);
-
+DECLARE_DEVICE_TYPE(MC68VZ328, mc68vz328_device)
 
 #endif // MAME_MACHINE_MC68328_H

@@ -51,7 +51,8 @@ enum
 	M68K_CPU_TYPE_68040,
 	M68K_CPU_TYPE_SCC68070,
 	M68K_CPU_TYPE_FSCPU32,
-	M68K_CPU_TYPE_COLDFIRE
+	M68K_CPU_TYPE_COLDFIRE,
+	M68K_CPU_TYPE_68VZ328
 };
 
 // function codes
@@ -342,6 +343,7 @@ protected:
 	void init_cpu_fscpu32(void);
 	void init_cpu_scc68070(void);
 	void init_cpu_coldfire(void);
+	void init_cpu_mc68vz328(void);
 
 
 	void m68ki_exception_interrupt(uint32_t int_level);
@@ -701,6 +703,22 @@ public:
 	virtual void device_start() override;
 };
 
+class mc68vz328_cpu_device : public m68000_base_device
+{
+public:
+	// construction/destruction
+	mc68vz328_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	virtual uint32_t execute_min_cycles() const override { return 4; };
+	virtual uint32_t execute_max_cycles() const override { return 158; };
+
+	virtual uint32_t execute_default_irq_vector() const override { return -1; };
+
+	// device-level overrides
+	virtual void device_start() override;
+};
 
 DECLARE_DEVICE_TYPE(M68000, m68000_device)
 DECLARE_DEVICE_TYPE(M68301, m68301_device)
@@ -720,6 +738,7 @@ DECLARE_DEVICE_TYPE(M68040, m68040_device)
 DECLARE_DEVICE_TYPE(SCC68070, scc68070_device)
 DECLARE_DEVICE_TYPE(FSCPU32, fscpu32_device)
 DECLARE_DEVICE_TYPE(MCF5206E, mcf5206e_device)
+DECLARE_DEVICE_TYPE(MC68VZ328_CPU, mc68vz328_cpu_device)
 
 
 #endif // MAME_CPU_M68000_M68000_H

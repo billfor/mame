@@ -30522,8 +30522,6 @@ palmiii                         // Palm III
 palmiiic                        // Palm IIIc
 palmm100                        // Palm m100
 palmm130                        // Palm m130
-palmm505                        // Palm m505
-palmm515                        // Palm m515
 palmpers                        // Palm Pilot Personal
 palmpro                         // Palm Pilot Professional
 palmv                           // Palm V
@@ -30534,6 +30532,10 @@ spt1500                         // Symbol SPT 1500
 spt1700                         // Symbol SPT 1700
 spt1740                         // Symbol SPT 1740
 visor                           // Palm Visor Edge
+
+@source:palmcolor.cpp
+palmm505                        // Palm m505
+palmm515                        // Palm m515
 
 @source:palmz22.cpp
 palmz22                         // Palm Z22
