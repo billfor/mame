@@ -606,6 +606,10 @@ project "flac"
 	uuid "b6fc19e8-073a-4541-bb7b-d24b548d424a"
 	kind "StaticLib"
 
+	linkoptions {
+		"-D__ANDROID_API__=21",
+	}
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4127", -- warning C4127: conditional expression is constant
@@ -1540,7 +1544,7 @@ if _OPTIONS["targetos"]=="android" then
 		"c++_static"
 	}
 	linkoptions {
-		"-Wl,-soname,libSDL2.so",
+		"-D__ANDROID_API__=21,-Wl,-soname,libSDL2.so",
 	}
 
 	if _OPTIONS["SEPARATE_BIN"]~="1" then
@@ -1669,6 +1673,8 @@ end
 		MAME_DIR .. "3rdparty/SDL2/src/events/default_cursor.h",
 		MAME_DIR .. "3rdparty/SDL2/src/events/SDL_clipboardevents.c",
 		MAME_DIR .. "3rdparty/SDL2/src/events/SDL_clipboardevents_c.h",
+		MAME_DIR .. "3rdparty/SDL2/src/events/SDL_displayevents.c",
+		MAME_DIR .. "3rdparty/SDL2/src/events/SDL_displayevents_c.h",
 		MAME_DIR .. "3rdparty/SDL2/src/events/SDL_dropevents.c",
 		MAME_DIR .. "3rdparty/SDL2/src/events/SDL_dropevents_c.h",
 		MAME_DIR .. "3rdparty/SDL2/src/events/SDL_events.c",
@@ -1688,6 +1694,12 @@ end
 		MAME_DIR .. "3rdparty/SDL2/src/file/SDL_rwops.c",
 		MAME_DIR .. "3rdparty/SDL2/src/haptic/SDL_haptic.c",
 		MAME_DIR .. "3rdparty/SDL2/src/haptic/SDL_syshaptic.h",
+		MAME_DIR .. "3rdparty/SDL2/src/joystick/hidapi/SDL_hidapi_ps4.c",
+		MAME_DIR .. "3rdparty/SDL2/src/joystick/hidapi/SDL_hidapi_switch.c",
+		MAME_DIR .. "3rdparty/SDL2/src/joystick/hidapi/SDL_hidapi_xbox360.c",
+		MAME_DIR .. "3rdparty/SDL2/src/joystick/hidapi/SDL_hidapi_xboxone.c",
+		MAME_DIR .. "3rdparty/SDL2/src/joystick/hidapi/SDL_hidapijoystick.c",
+		MAME_DIR .. "3rdparty/SDL2/src/joystick/hidapi/SDL_hidapijoystick_c.h",
 		MAME_DIR .. "3rdparty/SDL2/src/joystick/SDL_gamecontroller.c",
 		MAME_DIR .. "3rdparty/SDL2/src/joystick/SDL_joystick.c",
 		MAME_DIR .. "3rdparty/SDL2/src/joystick/SDL_joystick_c.h",
@@ -1707,7 +1719,6 @@ end
 		MAME_DIR .. "3rdparty/SDL2/src/render/SDL_d3dmath.h",
 		MAME_DIR .. "3rdparty/SDL2/src/render/SDL_render.c",
 		MAME_DIR .. "3rdparty/SDL2/src/render/SDL_sysrender.h",
-		MAME_DIR .. "3rdparty/SDL2/src/render/SDL_yuv_mmx.c",
 		MAME_DIR .. "3rdparty/SDL2/src/render/SDL_yuv_sw.c",
 		MAME_DIR .. "3rdparty/SDL2/src/render/SDL_yuv_sw_c.h",
 		MAME_DIR .. "3rdparty/SDL2/src/render/software/SDL_blendfillrect.c",
@@ -1727,11 +1738,16 @@ end
 		MAME_DIR .. "3rdparty/SDL2/src/render/software/SDL_rotate.h",
 		MAME_DIR .. "3rdparty/SDL2/src/SDL.c",
 		MAME_DIR .. "3rdparty/SDL2/src/SDL_assert.c",
+		MAME_DIR .. "3rdparty/SDL2/src/SDL_dataqueue.c",
+		MAME_DIR .. "3rdparty/SDL2/src/SDL_dataqueue.h",
 		MAME_DIR .. "3rdparty/SDL2/src/SDL_error.c",
 		MAME_DIR .. "3rdparty/SDL2/src/SDL_error_c.h",
 		MAME_DIR .. "3rdparty/SDL2/src/SDL_hints.c",
 		MAME_DIR .. "3rdparty/SDL2/src/SDL_hints_c.h",
 		MAME_DIR .. "3rdparty/SDL2/src/SDL_log.c",
+		MAME_DIR .. "3rdparty/SDL2/src/sensor/SDL_sensor.c",
+		MAME_DIR .. "3rdparty/SDL2/src/sensor/SDL_sensor_c.h",
+		MAME_DIR .. "3rdparty/SDL2/src/sensor/SDL_syssensor.h",
 		MAME_DIR .. "3rdparty/SDL2/src/stdlib/SDL_getenv.c",
 		MAME_DIR .. "3rdparty/SDL2/src/stdlib/SDL_iconv.c",
 		MAME_DIR .. "3rdparty/SDL2/src/stdlib/SDL_malloc.c",
@@ -1780,6 +1796,11 @@ end
 		MAME_DIR .. "3rdparty/SDL2/src/video/SDL_surface.c",
 		MAME_DIR .. "3rdparty/SDL2/src/video/SDL_sysvideo.h",
 		MAME_DIR .. "3rdparty/SDL2/src/video/SDL_video.c",
+		MAME_DIR .. "3rdparty/SDL2/src/video/SDL_vulkan_internal.h",
+		MAME_DIR .. "3rdparty/SDL2/src/video/SDL_vulkan_utils.c",
+		MAME_DIR .. "3rdparty/SDL2/src/video/SDL_yuv.c",
+		MAME_DIR .. "3rdparty/SDL2/src/video/yuv2rgb/yuv_rgb.c",
+		MAME_DIR .. "3rdparty/SDL2/src/video/yuv2rgb/yuv_rgb.h"
 
 	}
 	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="windows" then
@@ -1814,17 +1835,17 @@ end
 
 	if _OPTIONS["targetos"]=="android" then
 		files {
-			MAME_DIR .. "3rdparty/SDL2/src/audio/android/opensl_io.h",
-			MAME_DIR .. "3rdparty/SDL2/src/audio/android/opensl_io.c",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/android/SDL_androidaudio.h",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/android/SDL_androidaudio.c",
 			MAME_DIR .. "3rdparty/SDL2/src/core/android/SDL_android.c",
 			MAME_DIR .. "3rdparty/SDL2/src/core/android/SDL_android.h",
 			MAME_DIR .. "3rdparty/SDL2/src/filesystem/android/SDL_sysfilesystem.c",
-			MAME_DIR .. "3rdparty/SDL2/src/haptic/dummy/SDL_syshaptic.c",
+			MAME_DIR .. "3rdparty/SDL2/src/haptic/android/SDL_syshaptic.c",
+			MAME_DIR .. "3rdparty/SDL2/src/hidapi/android/hid.cpp",
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/android/SDL_sysjoystick.c",
 			MAME_DIR .. "3rdparty/SDL2/src/loadso/dlopen/SDL_sysloadso.c",
 			MAME_DIR .. "3rdparty/SDL2/src/power/android/SDL_syspower.c",
+			MAME_DIR .. "3rdparty/SDL2/src/sensor/android/SDL_androidsensor.c",
 			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_syscond.c",
 			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_sysmutex.c",
 			MAME_DIR .. "3rdparty/SDL2/src/thread/pthread/SDL_sysmutex_c.h",
@@ -1849,6 +1870,8 @@ end
 			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidtouch.h",
 			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidvideo.c",
 			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidvideo.h",
+			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidvulkan.c",
+			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidvulkan.h",
 			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidwindow.c",
 			MAME_DIR .. "3rdparty/SDL2/src/video/android/SDL_androidwindow.h",
 		}
@@ -1863,6 +1886,7 @@ end
 			MAME_DIR .. "3rdparty/SDL2/src/filesystem/cocoa/SDL_sysfilesystem.m",
 			MAME_DIR .. "3rdparty/SDL2/src/haptic/darwin/SDL_syshaptic.c",
 			MAME_DIR .. "3rdparty/SDL2/src/haptic/darwin/SDL_syshaptic_c.h",
+			MAME_DIR .. "3rdparty/SDL2/src/hidapi/mac/hid.c",
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/darwin/SDL_sysjoystick.c",
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/darwin/SDL_sysjoystick_c.h",
 			MAME_DIR .. "3rdparty/SDL2/src/loadso/dlopen/SDL_sysloadso.c",
@@ -1920,6 +1944,7 @@ end
 			MAME_DIR .. "3rdparty/SDL2/src/haptic/windows/SDL_windowshaptic_c.h",
 			MAME_DIR .. "3rdparty/SDL2/src/haptic/windows/SDL_xinputhaptic.c",
 			MAME_DIR .. "3rdparty/SDL2/src/haptic/windows/SDL_xinputhaptic_c.h",
+			MAME_DIR .. "3rdparty/SDL2/src/hidapi/windows/hid.c",
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/windows/SDL_dinputjoystick.c",
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/windows/SDL_dinputjoystick_c.h",
 			MAME_DIR .. "3rdparty/SDL2/src/joystick/windows/SDL_mmjoystick.c",
