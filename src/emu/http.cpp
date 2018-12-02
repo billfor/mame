@@ -248,6 +248,8 @@ struct websocket_connection_impl : public http_manager::websocket_connection {
 	websocket_connection_impl(webpp::ws_server *server, std::shared_ptr<webpp::Connection> connection)
 		: m_wsserver(server), m_connection(connection) { }
 
+	virtual ~websocket_connection_impl() = default;
+
 	/** Sends a message to the client that is connected on the other end of this Websocket connection. */
 	virtual void send_message(const std::string &payload, int opcode) {
 		if (auto connection = m_connection.lock()) {

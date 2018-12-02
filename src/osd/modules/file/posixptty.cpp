@@ -24,7 +24,9 @@
 #include <libutil.h>
 #elif defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__) || defined(__ANDROID__)
 #include <termios.h>
+#if !defined(__ANDROID__)
 #include <util.h>
+#endif
 #elif defined(__linux__) || defined(EMSCRIPTEN)
 #include <pty.h>
 #elif defined(__HAIKU__)

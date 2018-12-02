@@ -887,10 +887,11 @@ function toolchain(_buildDir, _subDir)
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib",
 			}
 			includedirs {
-				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/include",
+				"$(ANDROID_NDK_ROOT)/sysroot/usr/include/arm-linux-androideabi"
 			}
 			buildoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM)",
+				"--sysroot=$(ANDROID_NDK_ROOT)/sysroot",
 				"-target armv7-none-linux-androideabi",
 				"-march=armv7-a",
 				"-mfloat-abi=softfp",
@@ -902,7 +903,7 @@ function toolchain(_buildDir, _subDir)
 			}
 			linkoptions {
 				"-gcc-toolchain $(ANDROID_NDK_ARM)",
-				"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm",
+				"--sysroot=$(ANDROID_NDK_ROOT)/sysroot",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtbegin_so.o",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtend_so.o",
 				"-target armv7-none-linux-androideabi",
