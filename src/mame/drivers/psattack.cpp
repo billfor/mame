@@ -189,6 +189,7 @@ WRITE8_MEMBER( psattack_state::cfcard_regs_w )
 
 READ16_MEMBER( psattack_state::cfcard_data_r )
 {
+	// TODO: may not be it (pushes data into stack then never read it other than a comparison check from +0xfc)
 	return m_ata->read_cs0(0, 0x0000ffff);
 }
 

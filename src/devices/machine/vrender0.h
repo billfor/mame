@@ -23,7 +23,7 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define IDLE_LOOP_SPEEDUP
+//#define IDLE_LOOP_SPEEDUP
 
 
 

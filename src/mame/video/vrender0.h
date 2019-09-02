@@ -29,6 +29,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	int vrender0_ProcessPacket(uint32_t PacketPtr);
@@ -93,6 +94,9 @@ private:
 	
 	uint16_t *m_DrawDest;		//!< frameram pointer to draw buffer area
 	uint16_t *m_DisplayDest;	//!< frameram pointer to display buffer area
+	bool m_flip_sync;
+	
+	emu_timer *m_pipeline_timer;
 };
 
 DECLARE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device)
