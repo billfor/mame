@@ -543,8 +543,8 @@ void gticlub_state::gticlub_map(address_map &map)
 	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("user2", 0);   /* Data ROM */
-	map(0x7f800000, 0x7f9fffff).rom().share("share2");
-	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0).share("share2");    /* Program ROM */
+	map(0x7f800000, 0x7f9fffff).rom().region("user1", 0);
+	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0);    /* Program ROM */
 }
 
 void gticlub_state::hangplt_map(address_map &map)
@@ -561,8 +561,8 @@ void gticlub_state::hangplt_map(address_map &map)
 	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("user2", 0);   /* Data ROM */
-	map(0x7f800000, 0x7f9fffff).rom().share("share2");
-	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0).share("share2");    /* Program ROM */
+	map(0x7f800000, 0x7f9fffff).rom().region("user1", 0);
+	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0);    /* Program ROM */
 }
 
 /**********************************************************************/

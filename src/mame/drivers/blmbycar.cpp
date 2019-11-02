@@ -114,10 +114,10 @@ WRITE16_MEMBER(blmbycar_state::vram_w)
 void blmbycar_state::common_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x103fff).writeonly();                                               // ???
+	map(0x100000, 0x103fff).writeonly().share("unk_100000");                          // ???
 	map(0x104000, 0x105fff).ram().w(FUNC(blmbycar_state::vram_w<1>)).share("vram_1"); // Layer 1
 	map(0x106000, 0x107fff).ram().w(FUNC(blmbycar_state::vram_w<0>)).share("vram_0"); // Layer 0
-	map(0x108000, 0x10bfff).writeonly();                                               // ???
+	map(0x108000, 0x10bfff).writeonly().share("unk_108000");                          // ???
 	map(0x10c000, 0x10c003).writeonly().share("scroll_1");              // Scroll 1
 	map(0x10c004, 0x10c007).writeonly().share("scroll_0");              // Scroll 0
 	map(0x200000, 0x203fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette").mirror(0x4000); // Palette

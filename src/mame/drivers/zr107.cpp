@@ -506,8 +506,8 @@ void midnrun_state::main_memmap(address_map &map)
 	map(0x7e008000, 0x7e009fff).rw("k056230", FUNC(k056230_device::read), FUNC(k056230_device::write));               /* LANC registers */
 	map(0x7e00a000, 0x7e00bfff).rw("k056230", FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));      /* LANC Buffer RAM (27E) */
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
-	map(0x7f800000, 0x7f9fffff).rom().share("share2");
-	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0).share("share2");    /* Program ROM */
+	map(0x7f800000, 0x7f9fffff).rom().region("user1", 0);
+	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0);    /* Program ROM */
 }
 
 
@@ -535,8 +535,8 @@ void jetwave_state::main_memmap(address_map &map)
 	map(0x7e00a000, 0x7e00bfff).rw("k056230", FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));    /* LANC Buffer RAM (27E) */
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("user2", 0);
-	map(0x7f800000, 0x7f9fffff).rom().share("share2");
-	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0).share("share2");  /* Program ROM */
+	map(0x7f800000, 0x7f9fffff).rom().region("user1", 0);
+	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0);  /* Program ROM */
 }
 
 

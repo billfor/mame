@@ -59,6 +59,7 @@ public:
 		, m_video_ram(*this, "video_ram")
 		, m_modifiers(*this, "MODIFIERS")
 		, m_led(*this, "led0")
+		, m_bank(*this, "bank")
 	{ }
 
 	void bankswitch();
@@ -111,9 +112,10 @@ protected:
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_ioport m_modifiers;
 	output_finder<> m_led;
+	required_memory_bank m_bank;
 
 	/* memory state */
-	int m_bank;
+	int m_curbank;
 
 	/* PIT state */
 	int m_pit_out2;

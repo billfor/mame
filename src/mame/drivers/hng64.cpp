@@ -831,7 +831,7 @@ void hng64_state::hng_map(address_map &map)
 {
 	// main RAM / ROM
 	map(0x00000000, 0x00ffffff).ram().share("mainram");
-	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0).share("cart");
+	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0);
 
 	// Misc Peripherals
 	map(0x1f700000, 0x1f7010ff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs"); // various things
@@ -849,7 +849,7 @@ void hng64_state::hng_map(address_map &map)
 	map(0x1f808000, 0x1f8087ff).rw(FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).umask32(0xffffffff);
 
 	// BIOS ROM
-	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0).share("rombase");
+	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0);
 
 	// Sprites
 	map(0x20000000, 0x2000bfff).ram().share("spriteram");

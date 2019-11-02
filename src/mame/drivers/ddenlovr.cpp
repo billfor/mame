@@ -2422,7 +2422,7 @@ void ddenlovr_state::mmpanic_map(address_map &map)
 	map(0x0000, 0x5fff).rom();                                             // ROM
 	map(0x0051, 0x0051).r(FUNC(ddenlovr_state::magic_r));                                   // ?
 	map(0x6000, 0x6fff).ram();                                             // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");                                // RAM (Banked)
+	map(0x7000, 0x7fff).ram();                                             // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");                                // ROM (Banked)
 	map(0x8000, 0x81ff).w(FUNC(ddenlovr_state::rongrong_palette_w));
 }

@@ -385,7 +385,7 @@ MACHINE_START_MEMBER(blaster_state,blaster)
 	m_mainbank->configure_entry(0, m_videoram);
 
 	m_blaster_bankb->configure_entries(1, 16, memregion("maincpu")->base() + 0x10000, 0x0000);
-	m_blaster_bankb->configure_entry(0, &m_videoram[0x4000]);
+	m_blaster_bankb->configure_entry(0, memshare("bankb")->ptr());
 
 	/* register for save states */
 	save_item(NAME(m_vram_bank));

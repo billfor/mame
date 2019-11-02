@@ -1139,8 +1139,7 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 		window_addr = ((m_mmr.window_offset << 8) + 0x7c00) & 0xffff;
 //      if(window_addr < 0xfc00)
 		{
-			space.install_readwrite_bank(0x7c00,0x7fff,"bank24");
-			membank("bank24")->set_base(RAM+window_addr);
+			space.install_ram(0x7c00,0x7fff,RAM+window_addr);
 		}
 	}
 	else
